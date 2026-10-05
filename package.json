@@ -1,0 +1,12 @@
+{
+  "name": "jogo-claude",
+  "private": true,
+  "workspaces": [
+    "client"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w client",
+    "build": "npm run build -w client",
+    "dados": "node scripts/baixar-pokeapi.mjs"
+  }
+}

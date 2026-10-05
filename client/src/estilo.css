@@ -1,0 +1,133 @@
+:root {
+  --fundo: #14161f;
+  --painel: #1e2230;
+  --painel-2: #272c3d;
+  --borda: #343a50;
+  --texto: #eef0f6;
+  --texto-2: #9aa1b8;
+  --destaque: #ffcb05;
+  --perigo: #e64545;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  color: var(--texto);
+  background: var(--fundo);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: var(--fundo); }
+h1, h2 { margin: 0 0 6px; }
+h1 small, h2 small { color: var(--texto-2); font-weight: 500; }
+h2 { font-size: 1rem; }
+button { font: inherit; color: inherit; }
+
+.tela { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+.sub, .meta, .dica, .desc { color: var(--texto-2); }
+.sub { margin: 0 0 20px; }
+
+.sprite { image-rendering: pixelated; }
+
+.tipos { display: flex; gap: 6px; justify-content: center; }
+.tipo {
+  padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
+  color: #fff; text-shadow: 0 1px 1px rgb(0 0 0 / 0.4);
+}
+
+.botao {
+  padding: 9px 18px; border-radius: 10px; border: 0; cursor: pointer; font-weight: 700;
+  background: var(--destaque); color: #1a1a1a;
+}
+.botao:hover:not(:disabled) { filter: brightness(1.08); }
+.botao:disabled { opacity: 0.4; cursor: not-allowed; }
+.botao.secundario { background: var(--painel-2); color: var(--texto); border: 1px solid var(--borda); }
+
+/* Escolha do inicial */
+.tela-inicial { text-align: center; padding-top: 64px; }
+.grade-iniciais { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+.cartao-inicial {
+  width: 200px; padding: 20px 12px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  background: var(--painel); border: 2px solid var(--borda); border-radius: 16px; cursor: pointer;
+  transition: transform 0.12s, border-color 0.12s;
+}
+.cartao-inicial:hover { transform: translateY(-4px); border-color: var(--destaque); }
+.cartao-inicial .sprite { height: 96px; object-fit: contain; }
+
+/* Região */
+.abas { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.aba {
+  padding: 6px 14px; border-radius: 999px; border: 1px solid var(--borda); background: var(--painel); cursor: pointer;
+}
+.aba.ativa { background: var(--destaque); color: #1a1a1a; border-color: transparent; font-weight: 700; }
+.aba:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.layout-regiao, .layout-bioma { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+aside { display: flex; flex-direction: column; gap: 16px; }
+
+.grade-biomas { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.cartao-bioma {
+  text-align: left; padding: 0 0 14px; display: flex; flex-direction: column; gap: 4px; overflow: hidden;
+  background: var(--painel); border: 2px solid var(--borda); border-radius: 14px; cursor: pointer;
+  transition: transform 0.12s, border-color 0.12s;
+}
+.cartao-bioma:hover { transform: translateY(-3px); border-color: var(--cor-bioma); }
+.cartao-bioma > :not(.faixa) { padding: 0 14px; }
+.cartao-bioma .faixa {
+  height: 76px; margin-bottom: 8px; display: flex; align-items: flex-end; justify-content: center;
+  background: linear-gradient(160deg, var(--cor-chao), var(--cor-bioma));
+}
+.cartao-bioma .faixa .sprite { width: 64px; height: 64px; }
+.cartao-bioma .desc { font-size: 0.85rem; }
+.cartao-bioma .meta { font-size: 0.8rem; }
+
+/* Time */
+.painel-time { background: var(--painel); border: 1px solid var(--borda); border-radius: 14px; padding: 14px; }
+.vagas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.vaga {
+  min-height: 88px; border-radius: 10px; background: var(--painel-2); padding: 4px;
+  display: flex; flex-direction: column; align-items: center; font-size: 0.72rem; text-align: center;
+}
+.vaga .sprite { width: 56px; height: 56px; }
+.vaga small { color: var(--texto-2); }
+.vaga.vazia { border: 2px dashed var(--borda); background: transparent; }
+.vaga.shiny { box-shadow: inset 0 0 0 2px var(--destaque); }
+
+/* Bioma */
+.barra { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.barra h1 { margin: 0; font-size: 1.3rem; }
+.barra .meta { margin-left: auto; }
+.area-jogo { border-radius: 12px; overflow: hidden; border: 2px solid var(--borda); line-height: 0; }
+.area-jogo canvas { display: block; }
+.dica { font-size: 0.85rem; }
+.lista-chances {
+  list-style: none; margin: 0; padding: 8px; max-height: 420px; overflow-y: auto;
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 14px;
+}
+.lista-chances li { display: flex; align-items: center; gap: 8px; padding: 2px 4px; font-size: 0.85rem; opacity: 0.55; }
+.lista-chances li.visto { opacity: 1; }
+.lista-chances .sprite { width: 36px; height: 36px; }
+.lista-chances small { margin-left: auto; color: var(--texto-2); font-variant-numeric: tabular-nums; }
+
+/* Pop-up de encontro */
+.popup-fundo {
+  position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 16px;
+  background: rgb(0 0 0 / 0.55); animation: aparecer 0.15s ease-out;
+}
+.popup {
+  width: min(360px, 100%); padding: 20px; text-align: center; border-radius: 18px;
+  background: var(--painel); border: 2px solid var(--borda); box-shadow: 0 20px 50px rgb(0 0 0 / 0.5);
+  animation: subir 0.2s ease-out;
+}
+.popup.shiny { border-color: var(--destaque); box-shadow: 0 0 40px rgb(255 203 5 / 0.35); }
+.popup .aviso { margin: 0 0 8px; color: var(--texto-2); font-weight: 600; }
+.popup.shiny .aviso { color: var(--destaque); }
+.popup .palco {
+  height: 150px; display: grid; place-items: center; margin-bottom: 8px; border-radius: 12px;
+  background: radial-gradient(ellipse at 50% 85%, #3a4260 0 30%, transparent 31%), var(--painel-2);
+}
+.popup .palco .sprite { max-height: 130px; transform: scale(1.4); }
+.popup .acoes { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+
+@keyframes aparecer { from { opacity: 0; } }
+@keyframes subir { from { transform: translateY(12px) scale(0.96); opacity: 0; } }
+
+@media (max-width: 860px) {
+  .layout-regiao, .layout-bioma { grid-template-columns: 1fr; }
+}
