@@ -35,9 +35,19 @@ export interface Encontro {
 
 /**
  * Cada Pokémon mora em um único bioma: o do seu tipo principal (o primeiro).
- * Se nenhum bioma tiver o tipo principal, vale o segundo tipo.
+ * Se nenhum bioma tiver o tipo principal, vale o segundo tipo. Exceções em BIOMA_FIXO.
  */
+/** Exceções escolhidas pelo dono (a linha evolutiva inteira vai junto). Número da Pokédex → bioma. */
+export const BIOMA_FIXO: Record<number, string> = {
+  137: 'torre', 233: 'torre', 474: 'torre', // Porygon, Porygon2, Porygon-Z → Torre Assombrada (cemitério)
+  41: 'caverna', 42: 'caverna', 169: 'caverna', // Zubat, Golbat, Crobat → Caverna Rochosa
+  88: 'vulcao', 89: 'vulcao', // Grimer, Muk → Vulcão
+  109: 'vulcao', 110: 'vulcao', // Koffing, Weezing → Vulcão
+  147: 'agua', 148: 'agua', 149: 'agua', // Dratini, Dragonair, Dragonite → Mar Profundo
+};
+
 export function biomaDoPokemon(p: PokemonBase): string | null {
+  if (BIOMA_FIXO[p.id]) return BIOMA_FIXO[p.id];
   for (const tipo of p.tipos) {
     const bioma = BIOMAS.find((b) => b.tipos.includes(tipo));
     if (bioma) return bioma.id;

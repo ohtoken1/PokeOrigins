@@ -51,7 +51,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 ## Convenções
 - Código, nomes e comentários em **português** (sem acentos em identificadores).
 - Regras de jogo (probabilidades, níveis, chance de shiny) ficam em `shared/` como constantes fáceis de ajustar.
-- Bioma = lista de tipos; cada Pokémon mora em UM bioma só: o do seu tipo principal (ex.: Gastly Fantasma/Veneno → Torre). Pedido do dono. Lendários/míticos e iniciais não aparecem soltos.
+- Bioma = lista de tipos; cada Pokémon mora em UM bioma só: o do seu tipo principal (ex.: Gastly Fantasma/Veneno → Torre). Pedido do dono. Exceções por linha evolutiva em `BIOMA_FIXO` (`shared/encontros.ts`): Porygon → Torre, Zubat → Caverna, Grimer e Koffing → Vulcão, Dratini → Mar Profundo. Lendários/míticos e iniciais não aparecem soltos.
 - `CHANCE_ENCONTRO_POR_PASSO = 1` (pedido do dono: todo passo tem Pokémon, não precisa ser no mato).
 - Peso no sorteio = taxa de captura oficial (mais fácil de capturar = mais comum). Evoluções aparecem com +10 níveis por estágio.
 - Windows/PowerShell: depois de instalar algo, o PATH pode precisar ser recarregado no shell.
