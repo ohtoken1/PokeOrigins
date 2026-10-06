@@ -121,6 +121,19 @@ function conteudo(): HTMLElement[] {
   return [
     el('h4', {}, 'Treinador'),
     campo(`Nível de treinador (1–${NIVEL_MAX_TREINADOR})`, el('div', { class: 'admin-linha' }, nivelTreinadorCampo, aplicarNivel)),
+    el('h4', {}, 'Moedas'),
+    ...(['gold', 'silver'] as const).map((moeda) => {
+      const campoQtd = el('input', { type: 'number', min: 1, value: 1000, disabled: !save }) as HTMLInputElement;
+      const dar = el('button', { class: 'botao secundario', disabled: !save }, 'Adicionar') as HTMLButtonElement;
+      dar.addEventListener('click', () => {
+        const atual = carregarSave();
+        if (!atual) return;
+        atual[moeda] = Math.max(0, atual[moeda] + Math.round(Number(campoQtd.value) || 0));
+        salvar(atual);
+        aoMudarSave?.();
+      });
+      return campo(`${moeda === 'gold' ? 'Gold' : 'Silver'} (tem ${save ? save[moeda].toLocaleString('pt-BR') : 0})`, el('div', { class: 'admin-linha' }, campoQtd, dar));
+    }),
     el('h4', {}, 'Tickets'),
     ...TICKETS.map((t) =>
       el(

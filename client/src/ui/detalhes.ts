@@ -28,7 +28,7 @@ function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | 
     if (!save) return;
     const preco = PRECO_REVELAR_IVS[moeda];
     if (save[moeda] < preco) {
-      aviso.textContent = moeda === 'gold' ? 'Gold ainda não está disponível no jogo.' : `Silver insuficiente (você tem ${save.silver}).`;
+      aviso.textContent = `${moeda === 'gold' ? 'Gold' : 'Silver'} insuficiente (você tem ${save[moeda]}).`;
       return;
     }
     save[moeda] -= preco;
@@ -50,7 +50,7 @@ function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | 
       'div',
       { class: 'botoes' },
       !p.ivsFaixa && el('button', { class: 'botao', disabled: !save, onclick: () => pagar('silver') }, `Ver faixas · ${PRECO_REVELAR_IVS.silver} silver`),
-      el('button', { class: 'botao secundario', disabled: !save, title: 'Gold ainda não está disponível', onclick: () => pagar('gold') }, `Ver exatos · ${PRECO_REVELAR_IVS.gold} gold`),
+      el('button', { class: 'botao botao-gold', disabled: !save, onclick: () => pagar('gold') }, `Ver exatos · ${PRECO_REVELAR_IVS.gold} gold`),
     ),
     aviso,
   );

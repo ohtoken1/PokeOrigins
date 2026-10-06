@@ -81,10 +81,17 @@ export const telaRegiao: Tela = (raiz, navegar) => {
         el(
           'aside',
           {},
+          // moedas separadas: silver (ganha jogando) e gold (moeda paga, futuramente)
+          el(
+            'div',
+            { class: 'carteira' },
+            el('div', { class: 'moeda moeda-silver', title: 'Silver: ganho jogando' }, el('span', { class: 'moeda-icone' }), el('small', {}, 'Silver'), el('strong', {}, save.silver.toLocaleString('pt-BR'))),
+            el('div', { class: 'moeda moeda-gold', title: 'Gold: moeda paga (por enquanto, pelo painel Admin)' }, el('span', { class: 'moeda-icone' }), el('small', {}, 'Gold'), el('strong', {}, save.gold.toLocaleString('pt-BR'))),
+          ),
           el(
             'div',
             { class: 'painel-treinador' },
-            el('div', { class: 'linha-treinador' }, el('strong', {}, `Treinador Nv. ${treinador.nivel}`), el('span', { class: 'saldo' }, `${save.silver.toLocaleString('pt-BR')} silver`)),
+            el('div', { class: 'linha-treinador' }, el('strong', {}, `Treinador Nv. ${treinador.nivel}`)),
             el('small', {}, treinador.necessario ? `${treinador.atual.toLocaleString('pt-BR')} / ${treinador.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo!'),
             el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${treinador.necessario ? (treinador.atual / treinador.necessario) * 100 : 100}%` } })),
           ),

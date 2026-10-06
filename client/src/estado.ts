@@ -19,7 +19,7 @@ export interface Save {
   itens: Record<string, number>;
   /** Moeda do jogo. */
   silver: number;
-  /** Moeda premium (ainda não implementada: começa em 0). */
+  /** Moeda paga (futuramente comprada; por enquanto o Admin dá). Começa em 0. */
   gold: number;
   passos: number;
   /** XP total do treinador (o nível sai de shared/treinador.ts). */
