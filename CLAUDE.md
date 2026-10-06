@@ -19,6 +19,7 @@ Mapa: `client/src/jogo/mapa.ts` gera e desenha com tilesets em `client/public/ti
 Sprites de Pokémon: **só ampliar por fator inteiro** (`alturaAlvo` em `spritePokemon` usa `zoom` 2×, 3×…); fator quebrado deixa o pixel art borrado/irregular.
 **Idioma (regra do dono):** todo texto visível ao jogador em **português** — inclusive descrições de itens, golpes e habilidades vindas do Showdown/PokéAPI (traduzir, nunca mostrar em inglês). Podem ficar em inglês só os **nomes** de golpes, itens e atributos (Attack, Sp. Atk, Sp. Def…).
 Teste (não definitivo): opção "Batalha com sprites 3D (teste)" no menu da região usa os GIFs 3D do Showdown (`client/src/batalha/sprites3d.ts`); padrão é pixel art.
+Painel de administrador (`client/src/ui/admin.ts`, aba "⚙ Admin" fixa na esquerda, sem login por enquanto): chance de shiny, multiplicador de lendários / só lendários, chance de encontro por passo, Pokémon e nível forçados. Ajustes em `localStorage` (`jogo-claude:admin`), aplicados por `ajustarTabela`/`encontroForcado`/`sortearEncontro` em `shared/encontros.ts`.
 Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de teste).
 
 ## Batalha (`shared/batalha/`)

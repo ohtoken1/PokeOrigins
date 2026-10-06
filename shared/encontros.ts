@@ -16,6 +16,31 @@ export const NIVEL_LENDARIO = 50;
 
 export type Faixa = [number, number];
 
+/** Ajustes de teste do painel de administrador (padrão = regras normais do jogo). */
+export interface AjustesEncontro {
+  /** chance de shiny (0 a 1) */
+  chanceShiny: number;
+  /** multiplica o peso de lendários/míticos (0 = nunca aparecem) */
+  multLendario: number;
+  /** só lendários/míticos do bioma aparecem */
+  soLendarios: boolean;
+  /** chance de encontro a cada passo (0 a 1) */
+  chancePorPasso: number;
+  /** número da Pokédex que sempre aparece (de qualquer bioma), ou null */
+  especie: number | null;
+  /** nível fixo dos encontros, ou null */
+  nivel: number | null;
+}
+
+export const AJUSTES_PADRAO: AjustesEncontro = {
+  chanceShiny: CHANCE_SHINY,
+  multLendario: 1,
+  soLendarios: false,
+  chancePorPasso: CHANCE_ENCONTRO_POR_PASSO,
+  especie: null,
+  nivel: null,
+};
+
 export interface EntradaTabela {
   pokemon: PokemonBase;
   /** Peso no sorteio; quanto maior, mais comum. Usa a taxa de captura oficial. */
@@ -113,6 +138,21 @@ export function faixaDosEncontros(_bioma: Bioma, nivelTreinador: number, tetoEsc
   return [Math.max(1, teto - FAIXA_NIVEIS_ENCONTRO), teto];
 }
 
+const ehLendario = (p: PokemonBase) => p.lendario || p.mitico;
+
+/** Aplica os ajustes de administrador nos pesos da tabela (sem lendários no bioma, "só lendários" é ignorado). */
+export function ajustarTabela(tabela: EntradaTabela[], ajustes: AjustesEncontro): EntradaTabela[] {
+  let nova = tabela.map((e) => (ehLendario(e.pokemon) ? { ...e, peso: e.peso * ajustes.multLendario } : e)).filter((e) => e.peso > 0);
+  if (ajustes.soLendarios && nova.some((e) => ehLendario(e.pokemon))) nova = nova.filter((e) => ehLendario(e.pokemon));
+  return nova;
+}
+
+/** Encontro de teste: espécie e/ou nível escolhidos pelo administrador. */
+export function encontroForcado(pokemon: PokemonBase, [min, max]: Faixa, ajustes: AjustesEncontro, aleatorio = Math.random): Encontro {
+  const nivel = ajustes.nivel ?? min + Math.floor(aleatorio() * (max - min + 1));
+  return { pokemon, nivel: Math.max(1, Math.min(100, nivel)), shiny: aleatorio() < ajustes.chanceShiny };
+}
+
 const cabe = (e: EntradaTabela, nivel: number) => nivel >= e.nivelMin && nivel <= e.nivelMax;
 
 /** Probabilidade (0 a 1) de cada entrada sair na faixa de nível, na mesma ordem da tabela. */
@@ -129,7 +169,8 @@ export function probabilidades(tabela: EntradaTabela[], [min, max]: Faixa): numb
 }
 
 /** Sorteia o nível dentro da faixa e depois um Pokémon cuja forma existe nesse nível. */
-export function sortearEncontro(tabela: EntradaTabela[], [min, max]: Faixa, aleatorio = Math.random): Encontro {
+export function sortearEncontro(tabela: EntradaTabela[], [min, max]: Faixa, aleatorio = Math.random, ajustes = AJUSTES_PADRAO): Encontro {
+  if (ajustes.nivel !== null) min = max = ajustes.nivel;
   let nivel = min + Math.floor(aleatorio() * (max - min + 1));
   let candidatos = tabela.filter((e) => cabe(e, nivel));
   if (!candidatos.length) {
@@ -149,6 +190,7 @@ export function sortearEncontro(tabela: EntradaTabela[], [min, max]: Faixa, alea
     }
   }
   nivel = Math.max(escolhido.nivelMin, Math.min(escolhido.nivelMax, nivel));
-  if (escolhido.pokemon.lendario || escolhido.pokemon.mitico) nivel = Math.max(NIVEL_LENDARIO, nivel);
-  return { pokemon: escolhido.pokemon, nivel, shiny: aleatorio() < CHANCE_SHINY };
+  if (ajustes.nivel !== null) nivel = ajustes.nivel;
+  else if (ehLendario(escolhido.pokemon)) nivel = Math.max(NIVEL_LENDARIO, nivel);
+  return { pokemon: escolhido.pokemon, nivel, shiny: aleatorio() < ajustes.chanceShiny };
 }

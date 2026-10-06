@@ -3,10 +3,11 @@ import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
 import { regiaoPorId } from '../../../shared/regioes';
 import { nivelTreinador } from '../../../shared/treinador';
-import { CHANCE_ENCONTRO_POR_PASSO, faixaDosEncontros, montarTabela, probabilidades, sortearEncontro } from '../../../shared/encontros';
+import { ajustarTabela, encontroForcado, faixaDosEncontros, montarTabela, probabilidades, sortearEncontro } from '../../../shared/encontros';
 import { ALTURA_TELA, BiomaScene, LARGURA_TELA } from '../jogo/BiomaScene';
 import { abrirBatalha } from '../batalha/telaBatalha';
-import { pokemonsDaRegiao } from '../dados';
+import { pokemonPorId, pokemonsDaRegiao } from '../dados';
+import { ajustesAdmin, aoMudarAdmin } from '../ui/admin';
 import { carregarSave, curarTime, novoPokemon, salvar } from '../estado';
 import { el, spritePokemon } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
@@ -19,7 +20,9 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   if (!save) return navegar({ tela: 'inicial' });
   const bioma = biomaPorId(biomaId);
   const regiao = regiaoPorId(save.regiao);
-  const tabela = montarTabela(bioma, pokemonsDaRegiao(regiao.id), regiao.iniciais);
+  const tabelaNormal = montarTabela(bioma, pokemonsDaRegiao(regiao.id), regiao.iniciais);
+  // tabela com os ajustes do painel de administrador (lendários mais/menos comuns…)
+  let tabela = ajustarTabela(tabelaNormal, ajustesAdmin());
   const nivelDoTreinador = nivelTreinador(save.xpTreinador);
   const faixaNatural = faixaDosEncontros(bioma, nivelDoTreinador);
   const faixaAtual = () => faixaDosEncontros(bioma, nivelDoTreinador, save.nivelEncontro);
@@ -41,7 +44,8 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   // só os Pokémon que podem aparecer na faixa de nível atual
   const listaChances = el('ol', { class: 'lista-chances' });
   const atualizarChances = () => {
-    const chances = probabilidades(tabela, faixaAtual());
+    const nivelFixo = ajustesAdmin().nivel;
+    const chances = probabilidades(tabela, nivelFixo === null ? faixaAtual() : [nivelFixo, nivelFixo]);
     listaChances.replaceChildren(
       ...tabela
       .map((entrada, i) => ({ entrada, chance: chances[i] }))
@@ -63,7 +67,8 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   const tituloChances = el('h2', {}, '');
   const atualizarTitulo = () => {
     const [min, max] = faixaAtual();
-    tituloChances.textContent = `Pokémon deste bioma · Nv. ${min}–${max}`;
+    const { nivel, especie } = ajustesAdmin();
+    tituloChances.textContent = `Pokémon deste bioma · Nv. ${nivel ?? `${min}–${max}`}${especie !== null ? ' · (admin: Pokémon forçado)' : ''}`;
   };
   atualizarTitulo();
 
@@ -134,12 +139,14 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       fugirDoEncontro();
       save.passos++;
       atualizarContador();
-      if (tabela.length === 0 || Math.random() >= CHANCE_ENCONTRO_POR_PASSO) {
+      const ajustes = ajustesAdmin();
+      if (tabela.length === 0 || Math.random() >= ajustes.chancePorPasso) {
         salvar(save);
         return;
       }
 
-      const encontro = sortearEncontro(tabela, faixaAtual());
+      const encontro =
+        ajustes.especie !== null ? encontroForcado(pokemonPorId(ajustes.especie), faixaAtual(), ajustes) : sortearEncontro(tabela, faixaAtual(), Math.random, ajustes);
       if (!save.vistos.includes(encontro.pokemon.id)) save.vistos.push(encontro.pokemon.id);
       salvar(save);
       atualizarContador();
@@ -191,7 +198,14 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     atualizarPausa();
   });
 
+  const pararDeOuvirAdmin = aoMudarAdmin(() => {
+    tabela = ajustarTabela(tabelaNormal, ajustesAdmin());
+    atualizarChances();
+    atualizarTitulo();
+  });
+
   return () => {
+    pararDeOuvirAdmin();
     pararDeOuvirJanelas();
     fugirDoEncontro();
     jogo.destroy(true);
