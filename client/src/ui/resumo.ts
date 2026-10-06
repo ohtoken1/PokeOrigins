@@ -4,7 +4,7 @@ import { Dex } from '@pkmn/sim';
 import { atributos, especie, faixaVelocidade, hpMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { nomeItemEquipado } from '../../../shared/usoItens';
 import { pokemonPorId } from '../dados';
-import { el, seloGenero, seloTipo, selosTipos } from './dom';
+import { el, seloGenero, seloNT, seloTipo, selosTipos } from './dom';
 
 const NOMES_ATRIBUTOS: Record<string, string> = { hp: 'HP', atk: 'Attack', def: 'Defense', spa: 'Sp. Atk', spd: 'Sp. Def', spe: 'Speed' };
 
@@ -16,7 +16,7 @@ export function resumoPokemon(p: PokemonIndividual, opcoes: { abilityConhecida: 
   const efeito = natureza.plus && natureza.minus ? `+${NOMES_ATRIBUTOS[natureza.plus]} −${NOMES_ATRIBUTOS[natureza.minus]}` : 'neutra';
   const [min, max] = faixaVelocidade(p);
   const linhas: HTMLElement[] = [
-    el('div', { class: 'resumo-titulo' }, el('strong', {}, dados.nome), seloGenero(p.genero), p.shiny ? ' ✨' : '', el('small', {}, ` Nv. ${p.nivel}`)),
+    el('div', { class: 'resumo-titulo' }, el('strong', {}, dados.nome), seloGenero(p.genero), p.shiny ? ' ✨' : '', el('small', {}, ` Nv. ${p.nivel}`), seloNT(p)),
     selosTipos(dados),
     linha('Gênero', p.genero === 'M' ? 'Macho' : p.genero === 'F' ? 'Fêmea' : 'Sem gênero'),
     linha('Nature', `${natureza.name} (${efeito})`),

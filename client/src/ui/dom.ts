@@ -58,6 +58,11 @@ export function seloGenero(g: 'M' | 'F' | 'N'): HTMLElement | null {
   return el('span', { class: `genero ${g}`, title: g === 'M' ? 'Macho' : 'Fêmea' }, g === 'M' ? '♂︎' : '♀︎');
 }
 
+/** Selo "NT" (inegociável): o Pokémon não pode ser trocado com outros jogadores. */
+export function seloNT(p: { inegociavel?: boolean }): HTMLElement | null {
+  return p.inegociavel ? el('span', { class: 'selo-nt', title: 'NT · Inegociável: não pode ser trocado com outros jogadores' }, '🔒 NT') : null;
+}
+
 export function corTipo(tipo: string): string {
   return TIPOS[tipo.toLowerCase()]?.cor ?? '#777';
 }

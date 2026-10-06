@@ -28,6 +28,8 @@ export interface PokemonIndividual {
   status: string | null;
   /** Item equipado para a batalha (id do Showdown, ex.: "eviolite"). */
   item?: string | null;
+  /** NT = inegociável: não pode ser trocado com outros jogadores (ex.: o inicial). */
+  inegociavel?: boolean;
 }
 
 export const ATRIBUTOS: Atributo[] = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];

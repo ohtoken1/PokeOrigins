@@ -5,7 +5,7 @@ import { traduzir } from '../../../shared/traducao';
 import { pokemonPorId } from '../dados';
 import { abrirJanela } from './janela';
 import { irPara } from './navegacao';
-import { el, seloGenero, seloTipo, selosTipos, spritePokemon } from './dom';
+import { el, seloGenero, seloNT, seloTipo, selosTipos, spritePokemon } from './dom';
 import { barraHp } from './time';
 
 const NOMES: Record<Atributo, string> = { hp: 'HP', atk: 'Ataque', def: 'Defesa', spa: 'At. Esp.', spd: 'Def. Esp.', spe: 'Velocidade' };
@@ -88,7 +88,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
       el(
         'div',
         { class: 'resumo' },
-        el('h3', {}, dados.nome, seloGenero(p.genero), p.shiny ? ' ✨' : '', el('small', {}, ` Nv. ${p.nivel} · #${dados.id}`)),
+        el('h3', {}, dados.nome, seloGenero(p.genero), p.shiny ? ' ✨' : '', el('small', {}, ` Nv. ${p.nivel} · #${dados.id}`), seloNT(p)),
         selosTipos(dados),
         el('div', { class: 'hp' }, barraHp(p.hp, max), el('small', {}, `HP ${p.hp}/${max}${p.status ? ` · ${STATUS[p.status] ?? p.status}` : ''}`)),
         el('dl', {},

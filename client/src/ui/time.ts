@@ -22,6 +22,7 @@ export function cartaoPokemon(p: PokemonDoJogador, atributos: Record<string, unk
       ...atributos,
     },
     spritePokemon(dados, { shiny: p.shiny, animado: false }),
+    p.inegociavel ? el('span', { class: 'canto-nt', title: 'NT · Inegociável' }, 'NT') : null,
     el('span', {}, `${dados.nome}${p.shiny ? ' ✨' : ''}`),
     el('small', {}, `Nv. ${p.nivel}`),
     barraHp(p.hp, max),

@@ -1,5 +1,6 @@
 // Save local no navegador. TEMPORÁRIO: quando o servidor existir, o save fica na conta do jogador.
-import { atributosZerados, curar, gerarIndividuo, type PokemonIndividual } from '../../shared/batalha/pokemon';
+import { atributosZerados, curar, gerarIndividuo, hpMaximo, type PokemonIndividual } from '../../shared/batalha/pokemon';
+import { IV_INICIAL } from '../../shared/regioes';
 import { ITENS_INICIAIS } from '../../shared/itens';
 import { SILVER_INICIAL } from '../../shared/loja';
 import { pokemonPorId } from './dados';
@@ -66,10 +67,19 @@ export function novoPokemon(especieId: number, nivel: number, shiny = false): Po
   return gerarIndividuo(especieId, nivel, { shiny, crescimento: pokemonPorId(especieId).crescimento });
 }
 
+/** Inicial: IVs 20 em tudo e inegociável (NT). */
+function novoInicial(especieId: number): PokemonDoJogador {
+  const p = novoPokemon(especieId, 5);
+  for (const a of Object.keys(p.ivs) as (keyof typeof p.ivs)[]) p.ivs[a] = IV_INICIAL;
+  p.hp = hpMaximo(p);
+  p.inegociavel = true;
+  return p;
+}
+
 export function novoSave(regiao: string, inicial: number): Save {
   return {
     regiao,
-    time: [novoPokemon(inicial, 5)],
+    time: [novoInicial(inicial)],
     caixa: [],
     itens: { ...ITENS_INICIAIS },
     silver: SILVER_INICIAL,

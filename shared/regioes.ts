@@ -20,6 +20,11 @@ export const REGIOES: Regiao[] = [
   { id: 'paldea', nome: 'Paldea', pokedex: [906, 1025], iniciais: [906, 909, 912], disponivel: true },
 ];
 
+/** Os iniciais de todas as regiões (forma inicial): o primeiro Pokémon do jogador é sorteado entre eles. */
+export const TODOS_INICIAIS: number[] = REGIOES.flatMap((r) => r.iniciais);
+/** IVs do Pokémon inicial: 20 em todos os atributos. */
+export const IV_INICIAL = 20;
+
 export function regiaoPorId(id: string): Regiao {
   const regiao = REGIOES.find((r) => r.id === id);
   if (!regiao) throw new Error(`Região desconhecida: ${id}`);

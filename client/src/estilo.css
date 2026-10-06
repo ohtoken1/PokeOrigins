@@ -537,3 +537,32 @@ button.vaga:hover { border-color: var(--borda); }
 }
 .carregando-mapa .giro { width: 18px; height: 18px; border-radius: 50%; border: 3px solid var(--borda); border-top-color: var(--destaque); animation: girar 0.8s linear infinite; }
 @keyframes girar { to { transform: rotate(360deg); } }
+
+/* Início: escolha da região e roleta do inicial */
+.grade-regioes { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; max-width: 1000px; margin: 0 auto; }
+.cartao-regiao {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px; cursor: pointer; font: inherit; color: var(--texto);
+  background: var(--painel); border: 2px solid var(--borda); border-radius: 14px; transition: transform 0.15s, border-color 0.15s;
+}
+.cartao-regiao:hover { transform: translateY(-3px); border-color: var(--destaque); }
+.cartao-regiao strong { font-size: 1.1rem; }
+.cartao-regiao small { color: var(--texto-2); }
+.cartao-regiao-sprites { display: flex; justify-content: center; min-height: 56px; }
+.cartao-regiao-sprites .sprite { width: 56px; height: 56px; object-fit: contain; }
+.roleta {
+  position: relative; max-width: 720px; height: 112px; margin: 24px auto 16px; overflow: hidden;
+  background: var(--painel); border: 2px solid var(--borda); border-radius: 14px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent); mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+}
+.roleta-faixa { display: flex; height: 100%; will-change: transform; }
+.roleta-item { flex: 0 0 96px; display: grid; place-items: center; }
+.roleta-item .sprite { width: 80px; height: 80px; object-fit: contain; }
+.roleta-item.sorteado { background: rgb(255 203 5 / 0.15); }
+.roleta-marcador { position: absolute; left: 50%; top: 0; bottom: 0; width: 96px; translate: -50% 0; border: 3px solid var(--destaque); border-radius: 10px; z-index: 1; pointer-events: none; }
+.roleta-resultado { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 8px; }
+.roleta-resultado h2 { font-size: 1.6rem; margin: 0; }
+.voltar-regiao { margin-top: 20px; }
+/* selo NT (inegociável) */
+.selo-nt { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 6px; font-size: 0.68rem; font-weight: 800; color: #ffd84a; background: rgb(255 216 74 / 0.12); border: 1px solid rgb(255 216 74 / 0.5); vertical-align: middle; cursor: help; }
+.vaga { position: relative; }
+.canto-nt { position: absolute; top: 3px; right: 4px; font-size: 0.55rem; font-weight: 800; color: #ffd84a; letter-spacing: 0.03em; }
