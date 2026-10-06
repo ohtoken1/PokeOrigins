@@ -47,11 +47,18 @@ function miniatura(biomaId: string): Promise<string> {
   return pronta;
 }
 
-/** Fileira de atalhos; o bioma atual fica destacado. */
+const CHAVE_POSICAO = 'jogo-claude:posicao-atalhos';
+
+/**
+ * Caixinha vertical de atalhos (o bioma atual fica destacado). Fica solta na tela e pode ser
+ * arrastada pela alça do topo; a posição fica guardada.
+ */
 export function atalhosBiomas(atual: string, ir: (biomaId: string) => void): HTMLElement {
-  return el(
+  const alca = el('div', { class: 'atalhos-alca', title: 'Arraste para mover' }, '⠿ Biomas');
+  const caixa = el(
     'nav',
     { class: 'atalhos-biomas', 'aria-label': 'Trocar de bioma' },
+    alca,
     ...BIOMAS.map((b) => {
       const botao = el(
         'button',
@@ -62,4 +69,45 @@ export function atalhosBiomas(atual: string, ir: (biomaId: string) => void): HTM
       return botao;
     }),
   );
+
+  const posicionar = (x: number, y: number) => {
+    x = Math.max(0, Math.min(window.innerWidth - caixa.offsetWidth, x));
+    y = Math.max(0, Math.min(window.innerHeight - caixa.offsetHeight, y));
+    Object.assign(caixa.style, { left: `${x}px`, top: `${y}px` });
+  };
+  // posição salva (depois de entrar na página, quando já tem tamanho)
+  requestAnimationFrame(() => {
+    try {
+      const salva = JSON.parse(localStorage.getItem(CHAVE_POSICAO) ?? 'null');
+      if (Array.isArray(salva)) posicionar(salva[0], salva[1]);
+    } catch {
+      /* fica na posição padrão */
+    }
+  });
+
+  alca.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    const r = caixa.getBoundingClientRect();
+    const [ox, oy] = [e.clientX - r.left, e.clientY - r.top];
+    alca.setPointerCapture(e.pointerId);
+    caixa.classList.add('arrastando');
+    const mover = (ev: PointerEvent) => posicionar(ev.clientX - ox, ev.clientY - oy);
+    alca.addEventListener('pointermove', mover);
+    alca.addEventListener(
+      'pointerup',
+      () => {
+        alca.removeEventListener('pointermove', mover);
+        caixa.classList.remove('arrastando');
+        const r2 = caixa.getBoundingClientRect();
+        try {
+          localStorage.setItem(CHAVE_POSICAO, JSON.stringify([r2.left, r2.top]));
+        } catch {
+          /* ignora */
+        }
+      },
+      { once: true },
+    );
+  });
+  return caixa;
 }

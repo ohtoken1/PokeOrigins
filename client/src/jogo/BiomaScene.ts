@@ -15,6 +15,32 @@ const DURACAO_PASSO = 160;
 
 /** Sprites da 5ª geração (Black/White): frente e costas, normal e shiny, já no tamanho relativo certo. */
 const SPRITES_BW = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white';
+/** Linhas de cima e de baixo da parte não transparente da imagem (para medir o Pokémon e achar os pés). */
+const cacheAreas = new WeakMap<HTMLImageElement, { topo: number; base: number }>();
+function areaDesenhada(img: HTMLImageElement): { topo: number; base: number } {
+  const salva = cacheAreas.get(img);
+  if (salva) return salva;
+  const c = document.createElement('canvas');
+  [c.width, c.height] = [img.width, img.height];
+  const ctx = c.getContext('2d', { willReadFrequently: true })!;
+  ctx.drawImage(img, 0, 0);
+  let [topo, base] = [0, img.height];
+  try {
+    const d = ctx.getImageData(0, 0, img.width, img.height).data;
+    const linhaTem = (y: number) => {
+      for (let x = 0; x < img.width; x++) if (d[(y * img.width + x) * 4 + 3] > 0) return true;
+      return false;
+    };
+    while (topo < img.height - 1 && !linhaTem(topo)) topo++;
+    while (base > topo + 1 && !linhaTem(base - 1)) base--;
+  } catch {
+    /* sem CORS: usa a imagem toda */
+  }
+  const area = { topo, base };
+  cacheAreas.set(img, area);
+  return area;
+}
+
 export interface Seguidor {
   especie: number;
   shiny: boolean;
@@ -48,6 +74,7 @@ export class BiomaScene extends Phaser.Scene {
   /** últimas posições do jogador: o seguidor fica 1 passo atrás (2 se for grande) */
   private rastro: { x: number; y: number }[] = [];
   private olhandoParaCima = false;
+  private escalaSeguidor = ESCALA_DETALHE;
   private movendo = false;
   private direcao: Direcao = 'baixo';
   /** alterna a perna que vai à frente a cada passo */
@@ -214,7 +241,17 @@ export class BiomaScene extends Phaser.Scene {
   private mostrarLadoSeguidor() {
     if (!this.dadosSeguidor) return;
     const chave = this.chaveSeguidor(this.olhandoParaCima);
-    if (this.textures.exists(chave)) this.imgSeguidor.setTexture(chave);
+    if (!this.textures.exists(chave)) return;
+    const textura = this.textures.get(chave);
+    // reduzido suavemente (não é ampliação de pixel art), então filtro linear
+    textura.setFilter(Phaser.Textures.FilterMode.LINEAR);
+    const { topo, base } = areaDesenhada(textura.getSourceImage() as HTMLImageElement);
+    // altura na tela proporcional à altura real: o treinador (~1,4 m) tem ~16 px no mundo
+    const altura = pokemonPorId(this.dadosSeguidor.especie).altura;
+    const alvo = Math.max(10, Math.min(44, (altura / 14) * 16));
+    this.escalaSeguidor = alvo / Math.max(1, base - topo);
+    const h = textura.getSourceImage().height;
+    this.imgSeguidor.setTexture(chave).setOrigin(0.5, base / h).setScale(this.escalaSeguidor);
   }
 
   private atualizarProfundidade() {
@@ -274,7 +311,7 @@ export class BiomaScene extends Phaser.Scene {
       const [fx, fy] = this.pesDoTile(destino.x, destino.y);
       this.tweens.add({ targets: this.seguidor, x: fx, y: fy, duration: DURACAO_PASSO });
       // pulinho
-      this.tweens.add({ targets: this.imgSeguidor, scaleY: ESCALA_DETALHE * 0.9, scaleX: ESCALA_DETALHE * 1.05, duration: DURACAO_PASSO / 2, yoyo: true });
+      this.tweens.add({ targets: this.imgSeguidor, scaleY: this.escalaSeguidor * 0.9, scaleX: this.escalaSeguidor * 1.05, duration: DURACAO_PASSO / 2, yoyo: true });
     }
   }
 }
