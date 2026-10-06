@@ -41,8 +41,14 @@ export const PRECOS: Record<string, number> = {};
 /** Silver inicial e recompensa por vitória: provisórios até o dono definir a economia. */
 export const SILVER_INICIAL = 1000;
 export const SILVER_POR_VITORIA = 10;
-/** Preço para revelar os IVs de um Pokémon capturado (provisório). Gold ainda não existe no jogo: preparado para depois. */
+/**
+ * Preço para revelar os IVs de um Pokémon capturado (provisório): silver mostra só a FAIXA de cada IV,
+ * gold mostra o valor exato. Gold ainda não existe no jogo: preparado para depois.
+ */
 export const PRECO_REVELAR_IVS = { silver: 100, gold: 1 };
+/** Faixas de IV mostradas com silver (o 31 fica junto com 26+). */
+export const FAIXAS_IV: [number, number][] = [[0, 5], [6, 10], [11, 15], [16, 20], [21, 25], [26, 31]];
+export const faixaDoIv = (iv: number): [number, number] => FAIXAS_IV.find(([a, b]) => iv >= a && iv <= b) ?? [iv, iv];
 
 /** Pedras que fazem Pokémon evoluir ao serem usadas. */
 export const PEDRAS_EVOLUCAO = ['firestone', 'waterstone', 'thunderstone', 'leafstone', 'moonstone', 'sunstone', 'shinystone', 'duskstone', 'dawnstone', 'icestone'];

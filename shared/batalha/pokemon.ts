@@ -30,8 +30,10 @@ export interface PokemonIndividual {
   item?: string | null;
   /** NT = inegociável: não pode ser trocado com outros jogadores (ex.: o inicial). */
   inegociavel?: boolean;
-  /** IVs à mostra na ficha (capturados nascem ocultos; revelar custa silver ou gold). */
+  /** IVs exatos à mostra na ficha (capturados nascem ocultos; gold revela o valor exato). */
   ivsRevelados?: boolean;
+  /** Só a FAIXA de cada IV à mostra (0–5, 6–10… 26–31), comprada com silver. */
+  ivsFaixa?: boolean;
 }
 
 /** IV mínimo de um Pokémon shiny (cada atributo vem entre 15 e 31). */
