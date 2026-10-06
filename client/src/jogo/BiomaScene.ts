@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import type { Bioma } from '../../../shared/biomas';
 import { ALTURA, LARGURA, TAM, desenharMapa, gerarMapa, type Mapa } from './mapa';
 import { PALETAS } from './paletas';
+import { pokemonPorId } from '../dados';
 import { desenharPersonagem, urlIconePokemon, type Direcao, type Quadro } from './personagem';
 
 /** Tamanho da tela do jogo em pixels (a câmera mostra 30×20 tiles ampliados 2×). */
@@ -11,6 +12,16 @@ const ZOOM = 2;
 /** Personagem e seguidor são desenhados com o dobro de detalhe e exibidos na metade do tamanho. */
 const ESCALA_DETALHE = 1 / ZOOM;
 const DURACAO_PASSO = 160;
+
+/**
+ * Escala do ícone (40×30) do Pokémon que segue o jogador pela altura real (decímetros).
+ * Múltiplos de 0,5 = 1, 2, 3… pixels da tela por pixel do ícone (pixel art sem borrar).
+ */
+function escalaPorAltura(altura: number): number {
+  if (altura <= 9) return ESCALA_DETALHE; // Pikachu, Charmander, Bulbasaur…
+  if (altura <= 19) return ESCALA_DETALHE * 2; // Charizard, Arcanine, Mewtwo…
+  return ESCALA_DETALHE * 3; // Moltres, Gyarados, Onix, Dragonite…
+}
 
 export interface OpcoesBioma {
   bioma: Bioma;
@@ -31,7 +42,10 @@ const DIRECOES_POR_TECLA: Record<string, [number, number]> = {
 export class BiomaScene extends Phaser.Scene {
   private mapa!: Mapa;
   private jogador!: Phaser.GameObjects.Image;
-  private seguidor!: Phaser.GameObjects.Image;
+  /** o seguidor é um container (anda de tile em tile) com a imagem dentro (balança parado no lugar) */
+  private seguidor!: Phaser.GameObjects.Container;
+  private imgSeguidor!: Phaser.GameObjects.Image;
+  private escalaSeguidor = ESCALA_DETALHE;
   private pos = { x: 0, y: 0 };
   private posSeguidor = { x: 0, y: 0 };
   private especieSeguidor: number | null;
@@ -71,7 +85,10 @@ export class BiomaScene extends Phaser.Scene {
     this.add.image(0, 0, 'mapa').setOrigin(0);
 
     const [sx, sy] = this.pesDoTile(this.posSeguidor.x, this.posSeguidor.y);
-    this.seguidor = this.add.image(sx, sy, '__DEFAULT').setOrigin(0.5, 0.9).setScale(ESCALA_DETALHE).setVisible(false);
+    this.imgSeguidor = this.add.image(0, 0, '__DEFAULT').setOrigin(0.5, 0.9).setScale(ESCALA_DETALHE);
+    this.seguidor = this.add.container(sx, sy, [this.imgSeguidor]).setVisible(false);
+    // balanço para cima e para baixo em 2 quadros, como os Pokémon que seguem nos jogos
+    this.tweens.add({ targets: this.imgSeguidor, y: -1.5, duration: 260, yoyo: true, repeat: -1, ease: 'Stepped', easeParams: [2] });
     const [px, py] = this.pesDoTile(this.pos.x, this.pos.y);
     this.jogador = this.add.image(px, py, 'jogador-baixo-0').setOrigin(0.5, 28 / 32).setScale(ESCALA_DETALHE);
     this.atualizarProfundidade();
@@ -97,7 +114,7 @@ export class BiomaScene extends Phaser.Scene {
   private efeitosSubmersos() {
     const [w, h] = [LARGURA * TAM, ALTURA * TAM];
     this.jogador.setTint(0xc8e4ff);
-    this.seguidor.setTint(0xc8e4ff);
+    this.imgSeguidor.setTint(0xc8e4ff);
 
     const luz = this.add.graphics().setDepth(5000).setBlendMode(Phaser.BlendModes.ADD);
     const feixes = Math.round(w / 85);
@@ -178,7 +195,10 @@ export class BiomaScene extends Phaser.Scene {
     const chave = `icone-${id}`;
     const aplicar = () => {
       if (this.especieSeguidor !== id || !this.textures.exists(chave)) return;
-      this.seguidor.setTexture(chave).setVisible(true);
+      // tamanho de acordo com a altura real (Moltres bem maior que o treinador), sempre em fator inteiro na tela
+      this.escalaSeguidor = escalaPorAltura(pokemonPorId(id).altura);
+      this.imgSeguidor.setTexture(chave).setScale(this.escalaSeguidor);
+      this.seguidor.setVisible(true);
     };
     if (this.textures.exists(chave)) return aplicar();
     this.load.setCORS('anonymous');
@@ -230,11 +250,11 @@ export class BiomaScene extends Phaser.Scene {
       const sdx = anterior.x - this.posSeguidor.x;
       this.posSeguidor = { ...anterior };
       // os ícones olham para a esquerda; espelha quando anda para a direita
-      if (sdx) this.seguidor.setFlipX(sdx > 0);
+      if (sdx) this.imgSeguidor.setFlipX(sdx > 0);
       const [fx, fy] = this.pesDoTile(anterior.x, anterior.y);
       this.tweens.add({ targets: this.seguidor, x: fx, y: fy, duration: DURACAO_PASSO });
       // pulinho
-      this.tweens.add({ targets: this.seguidor, scaleY: ESCALA_DETALHE * 0.85, scaleX: ESCALA_DETALHE * 1.08, duration: DURACAO_PASSO / 2, yoyo: true });
+      this.tweens.add({ targets: this.imgSeguidor, scaleY: this.escalaSeguidor * 0.88, scaleX: this.escalaSeguidor * 1.06, duration: DURACAO_PASSO / 2, yoyo: true });
     }
   }
 }

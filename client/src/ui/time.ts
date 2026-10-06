@@ -1,4 +1,4 @@
-import { hpMaximo, nomeGolpe } from '../../../shared/batalha/pokemon';
+import { expParaNivel, hpMaximo, nomeGolpe } from '../../../shared/batalha/pokemon';
 import { pokemonPorId } from '../dados';
 import { TAMANHO_MAXIMO_TIME, type PokemonDoJogador } from '../estado';
 import { abrirDetalhes } from './detalhes';
@@ -25,6 +25,20 @@ export function cartaoPokemon(p: PokemonDoJogador, atributos: Record<string, unk
     el('span', {}, `${dados.nome}${p.shiny ? ' ✨' : ''}`),
     el('small', {}, `Nv. ${p.nivel}`),
     barraHp(p.hp, max),
+    barraXp(p),
+  );
+}
+
+/** Barrinha azul do XP que falta para o próximo nível. */
+export function barraXp(p: PokemonDoJogador): HTMLElement {
+  const crescimento = pokemonPorId(p.especieId).crescimento;
+  const atual = expParaNivel(crescimento, p.nivel);
+  const proximo = expParaNivel(crescimento, p.nivel + 1);
+  const fracao = p.nivel >= 100 ? 1 : Math.max(0, Math.min(1, (p.exp - atual) / Math.max(1, proximo - atual)));
+  return el(
+    'div',
+    { class: 'barra-xp', title: p.nivel >= 100 ? 'Nível máximo' : `XP: faltam ${Math.max(0, proximo - p.exp)} para o Nv. ${p.nivel + 1}` },
+    el('div', { style: { width: `${fracao * 100}%` } }),
   );
 }
 

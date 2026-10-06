@@ -463,3 +463,22 @@ button.vaga:hover { border-color: var(--borda); }
 .resumo-titulo small { color: var(--texto-2); }
 .resumo-linha { display: flex; justify-content: space-between; gap: 10px; }
 .resumo-linha span { color: var(--texto-2); }
+.barra-xp { width: 100%; height: 3px; margin-top: 2px; border-radius: 2px; background: rgb(255 255 255 / 0.1); overflow: hidden; }
+.barra-xp > div { height: 100%; background: #5ab8ff; }
+/* PC com boxes */
+.janela.janela-pc { width: min(860px, 100%); }
+.pc .vagas-time, .pc .vagas-box { grid-template-columns: repeat(6, 1fr); }
+.box-cabecalho { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; }
+.box-cabecalho .botao { padding: 6px 12px; }
+.box-lista { background: var(--painel-2); color: var(--texto); border: 1px solid var(--borda); border-radius: 8px; padding: 6px 10px; font: inherit; }
+.box-abas { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 10px; }
+.box-aba { min-width: 28px; padding: 3px 6px; border-radius: 6px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto-2); cursor: pointer; font-size: 0.75rem; }
+.box-aba.ativa { color: var(--texto); border-color: var(--destaque); }
+.box-aba.alvo { outline: 2px dashed var(--destaque); outline-offset: 1px; }
+.vaga.vazia.alvo { outline: 2px dashed var(--destaque); outline-offset: 2px; }
+.mover-box { display: inline-flex; gap: 4px; align-items: center; }
+.soltar { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.soltar-palco { width: 160px; height: 140px; display: grid; place-items: center; border-radius: 12px; background: var(--painel-2); overflow: hidden; }
+.soltar p { margin: 0; }
+.soltar-botoes { display: flex; gap: 8px; margin-top: 6px; }
+.janela.janela-soltar { width: min(380px, 100%); }

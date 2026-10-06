@@ -4,73 +4,75 @@
 export type Direcao = 'baixo' | 'cima' | 'lado';
 
 const CORES: Record<string, string> = {
-  k: '#2a2430', // contorno
-  h: '#e8403c', // boné
-  H: '#a82828', // aba do boné
-  w: '#f8f8f8', // logo do boné
-  c: '#5a3a28', // cabelo
-  s: '#ffd8b0', // pele
-  S: '#e8b088', // sombra da pele
-  e: '#2a2430', // olho
-  r: '#f4a0a0', // bochecha
-  b: '#3a78d8', // camisa
-  B: '#2a58a8', // sombra da camisa
-  g: '#f0c040', // mochila
-  G: '#c09020', // sombra da mochila
-  p: '#3a3e58', // calça
-  P: '#2a2c40', // sombra da calça
-  o: '#c84030', // tênis
+  k: '#3a2c3c', // contorno (mais suave que preto)
+  h: '#ee4a46', // boné
+  H: '#b02e34', // aba do boné
+  w: '#ffffff', // logo do boné / gola
+  W: '#ffffff', // brilho do olho / detalhe do tênis
+  c: '#6a4430', // cabelo
+  C: '#4e3020', // mecha escura do cabelo
+  s: '#ffdcb8', // pele
+  S: '#efb892', // sombra da pele
+  e: '#263a6a', // olho
+  r: '#ff9e9e', // bochecha
+  b: '#3c86e0', // camisa
+  B: '#2a62b0', // sombra da camisa
+  g: '#f4c64a', // mochila
+  G: '#c8962a', // sombra da mochila
+  p: '#3c4262', // calça
+  P: '#2a2e46', // sombra da calça
+  o: '#e04a3a', // tênis
 };
 
-/** Metade esquerda (12 colunas); a direita é o espelho. Linhas a partir da 2. */
+/** Metade esquerda (12 colunas); a direita é o espelho. Estilo "chibi": cabeça grande, olhos com brilho. */
 const FRENTE = [
-  '........kkkk',
-  '......kkhhhh',
-  '.....khhhhhw',
-  '....khhhhhww',
-  '....khhhhhhw',
-  '....kHHHHHHH',
-  '...kkkkkkkkk',
-  '....kcccssss',
-  '....kccsssss',
-  '....kcsssess',
-  '....kcsssess',
-  '....kcsrssss',
-  '.....kSsssss',
   '......kkkkkk',
-  '.....kbbbbbb',
-  '....kbbbbbbb',
-  '...kbbkbbbbb',
-  '...kskbbbbbb',
-  '...kskBBBBBB',
+  '....kkhhhhhh',
+  '...khhhhhhhw',
+  '..khhhhhhhww',
+  '..khhhhhhhhw',
+  '.kHHHHHHHHHH',
+  '..kcccssssss',
+  '.kcccsssssss',
+  '.kccssWessss',
+  '.kcsssseesss',
+  '.kcsrrssssss',
+  '..kSssssssss',
+  '...kSSssssss',
+  '....kkkkkkkk',
+  '....kbbbbbwb',
+  '...kbbbbbbbb',
+  '..kbbkbbbbbb',
+  '..kskbbbbbbb',
+  '..kskBBBBBBB',
   '....kkpppppp',
   '.....kpppppp',
   '.....kpppPk.',
   '.....kpppPk.',
-  '.....kooook.',
+  '.....kooWok.',
   '.....kkkkkk.',
 ];
 
 const COSTAS = [
-  '........kkkk',
-  '......kkhhhh',
-  '.....khhhhhh',
-  '....khhhhhhh',
-  '....khhhhhhh',
-  '....kHHHHHHH',
-  '...kkkkkkkkk',
-  '....kccccccc',
-  '....kccccccc',
-  '....kccccccc',
-  '....kcCccccc',
-  '.....kcccccc',
-  '.....kSsssss',
   '......kkkkkk',
-  '.....kbbbggg',
+  '....kkhhhhhh',
+  '...khhhhhhhh',
+  '..khhhhhhhhh',
+  '..khhhhhhhhh',
+  '.kHHHHHHHHHH',
+  '.kcccccccccc',
+  '.kcCcccccccc',
+  '.kcccccCcccc',
+  '.kccCccccccc',
+  '.kcccccccCcc',
+  '..kccccccccc',
+  '...kSsssssss',
+  '....kkkkkkkk',
   '....kbbbgggg',
-  '...kbbkgGggg',
-  '...kskbgGggg',
-  '...kskbggggg',
+  '...kbbbggggg',
+  '..kbbkgGgggg',
+  '..kskbgGgggg',
+  '..kskBgggggg',
   '....kkpppppp',
   '.....kpppppp',
   '.....kpppPk.',
@@ -86,20 +88,20 @@ const LADO = [
   '.......khhhhhhhhhhk.....',
   '......khhhhhhhhhhhhk....',
   '......khhhhhhhhhhhhk....',
-  '....kkHHHHHHHHHHHHHk....',
-  '...kHHHkkkkkkkkkkkkk....',
-  '......kssssscccccck.....',
-  '.....kssssssscccccck....',
-  '.....ksessssscccccck....',
-  '.....ksessssssccccck....',
-  '......ksrsssssscccck....',
-  '.......kSssssssccck.....',
-  '........kkkkkkkkkk......',
-  '.........kbbbbbggk......',
-  '........kbbbbbbggk......',
-  '........kbbbbbbgggk.....',
-  '........kbsskbbgggk.....',
-  '........kbsskBBgggk.....',
+  '...kkHHHHHHHHHhhhhhk....',
+  '..kHHHHHkkkkkkcccccck...',
+  '.....ksssssssscccccck...',
+  '....kssWessssscccccck...',
+  '....ksseesssssccccck....',
+  '....ksrrsssssscccck.....',
+  '.....kSssssssscccck.....',
+  '......kSSssssssck.......',
+  '.......kkkkkkkkkk.......',
+  '.........kbbbbggk.......',
+  '........kbbbbbgggk......',
+  '........kbbbbbgGgk......',
+  '........kbsskbgGgk......',
+  '........kbsskBBggk......',
   '.........kkppppppk......',
   '.........kpppppppk......',
   '.........kppk.kppk......',
@@ -112,7 +114,7 @@ const espelhar = (metades: string[]) => metades.map((m) => m + [...m].reverse().
 
 const MODELOS: Record<Direcao, string[]> = {
   baixo: espelhar(FRENTE),
-  cima: espelhar(COSTAS.map((l) => l.replace('C', 'c'))),
+  cima: espelhar(COSTAS),
   lado: LADO,
 };
 

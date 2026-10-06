@@ -8,7 +8,7 @@ import { ITENS, type ItemId } from '../../../shared/itens';
 import { efeitoBola } from '../../../shared/bolas';
 import { nivelTreinador } from '../../../shared/treinador';
 import { MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
-import { curarTime, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
+import { curarTime, guardarNoPC, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { iconeItem } from '../ui/iconeItem';
@@ -485,8 +485,8 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
       registrarCapturado(save, selvagem.especieId);
       if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(selvagem);
       else {
-        save.caixa.push(selvagem);
-        await dizer(`${dadosSelvagem.nome} foi enviado para o PC.`);
+        const box = guardarNoPC(save, selvagem);
+        await dizer(`${dadosSelvagem.nome} foi enviado para o PC (Box ${box + 1}).`);
       }
     } else if (resultado === 'derrota') {
       await dizer('Você não tem mais Pokémon em condições de lutar!');

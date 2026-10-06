@@ -4,7 +4,10 @@ import { ITENS_INICIAIS } from '../../shared/itens';
 import { SILVER_INICIAL } from '../../shared/loja';
 import { pokemonPorId } from './dados';
 
-export type PokemonDoJogador = PokemonIndividual;
+export type PokemonDoJogador = PokemonIndividual & {
+  /** Box do PC onde está guardado (0 a NUMERO_BOXES − 1); só vale para quem está no PC. */
+  box?: number;
+};
 
 export interface Save {
   regiao: string;
@@ -32,6 +35,31 @@ export function registrarCapturado(save: Save, especieId: number): void {
 }
 
 export const TAMANHO_MAXIMO_TIME = 6;
+export const NUMERO_BOXES = 20;
+export const TAMANHO_BOX = 30;
+
+/** Pokémon da box, na ordem em que aparecem. */
+export function pokemonsDaBox(save: Save, box: number): PokemonDoJogador[] {
+  return save.caixa.filter((p) => p.box === box);
+}
+
+/**
+ * Guarda no PC: na box `preferida` se couber, senão na próxima com espaço. Devolve a box usada.
+ * (Com o PC todo cheio, fica na última box mesmo passando do limite.)
+ */
+export function guardarNoPC(save: Save, p: PokemonDoJogador, preferida = 0): number {
+  let box = NUMERO_BOXES - 1;
+  for (let i = 0; i < NUMERO_BOXES; i++) {
+    const b = (preferida + i) % NUMERO_BOXES;
+    if (pokemonsDaBox(save, b).length < TAMANHO_BOX) {
+      box = b;
+      break;
+    }
+  }
+  p.box = box;
+  save.caixa.push(p);
+  return box;
+}
 const CHAVE = 'jogo-claude:save';
 
 export function novoPokemon(especieId: number, nivel: number, shiny = false): PokemonDoJogador {
@@ -68,6 +96,8 @@ function normalizar(save: Save): Save {
   };
   save.time = save.time.map(atualizar);
   save.caixa = (save.caixa ?? []).map(atualizar);
+  // saves antigos (PC sem boxes): distribui pela ordem, 30 por box
+  save.caixa.forEach((p, i) => (p.box ??= Math.min(NUMERO_BOXES - 1, Math.floor(i / TAMANHO_BOX))));
 
   const itens: Record<string, number> = { ...ITENS_INICIAIS, ...(save.itens ?? {}) };
   if ('pokebola' in itens) {
