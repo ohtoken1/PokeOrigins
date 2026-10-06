@@ -277,11 +277,11 @@ ${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) }
 }
 
 /** Pokébola pequena desenhada em SVG (marca de "capturado" na lista). */
-/** Chance de captura com Poké Ball, HP cheio e sem status (fórmula da 3ª/4ª geração, a mesma da batalha). */
+/** Chance de captura com Poké Ball, HP cheio e sem status (fórmula da 3ª/4ª geração ≈ taxa/3 ÷ 255, a mesma da batalha). */
 function capturaBase(taxa: number): string {
   const a = Math.floor(taxa / 3);
   if (a >= 255) return '100%';
-  const b = Math.floor(65536 / Math.pow(255 / Math.max(1, a), 0.1875));
+  const b = Math.floor(1048560 / (16711680 / Math.max(1, a)) ** 0.25);
   const chance = Math.pow(b / 65536, 4) * 100;
   return `${chance < 1 ? chance.toFixed(2) : chance.toFixed(1)}%`;
 }

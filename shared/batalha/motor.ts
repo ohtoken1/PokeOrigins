@@ -204,7 +204,8 @@ export class BatalhaSelvagem {
     let chance = 1;
     if (a >= 255) tremidas = 4;
     else {
-      const b = Math.floor(65536 / (255 / Math.max(1, a)) ** 0.1875);
+      // 3ª/4ª geração: 4 checagens, chance final ≈ a/255 (igual ao Pokémon Database)
+      const b = Math.floor(1048560 / (16711680 / Math.max(1, a)) ** 0.25);
       chance = Math.min(1, b / 65536) ** 4;
       while (tremidas < 4 && Math.floor(this.aleatorio() * 65536) < b) tremidas++;
     }
