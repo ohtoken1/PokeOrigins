@@ -4,9 +4,10 @@
 import { Dex } from '@pkmn/sim';
 import maquinas from './data/maquinas.json';
 import { ITENS, type ItemId } from './itens';
+import { ITENS_ESPECIAIS, TICKETS } from './tickets';
 import { nomeCategoria, nomeTipo, traduzir } from './traducao';
 
-export type CategoriaLoja = 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'tm' | 'tr';
+export type CategoriaLoja = 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'tm' | 'tr' | 'especiais' | 'tickets';
 
 export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
   { id: 'bolas', nome: 'Pokébolas' },
@@ -16,6 +17,8 @@ export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
   { id: 'tm', nome: 'TMs' },
   { id: 'tr', nome: 'TRs' },
 ];
+/** Abas da bolsa: as da loja + itens que só saem de tickets. */
+export const CATEGORIAS_BOLSA: { id: CategoriaLoja; nome: string }[] = [...CATEGORIAS, { id: 'especiais', nome: 'Especiais' }, { id: 'tickets', nome: 'Tickets' }];
 
 export interface ItemLoja {
   /** id usado na bolsa (ids do Showdown para itens de batalha: "eviolite", "firestone"…) */
@@ -26,6 +29,8 @@ export interface ItemLoja {
   preco: number;
   /** TMs e TRs: golpe ensinado (id do Showdown) */
   golpe?: string;
+  /** imagem da PokéAPI (sprites/items/<sprite>.png) para itens sem ícone no Showdown */
+  sprite?: string;
 }
 
 /** Moeda do jogo. */
@@ -96,7 +101,15 @@ function montarCatalogo(): ItemLoja[] {
 }
 
 export const CATALOGO: ItemLoja[] = montarCatalogo();
-const porId = new Map(CATALOGO.map((i) => [i.id, i]));
+/** Fora da loja: itens de forma de lendários e tickets (só saem de tickets / batalhas). */
+const FORA_DA_LOJA: ItemLoja[] = [
+  ...ITENS_ESPECIAIS.map((id): ItemLoja => {
+    const i = Dex.items.get(id);
+    return { id, nome: i.name, categoria: 'especiais', descricao: traduzir(i.shortDesc || i.desc), preco: 0 };
+  }),
+  ...TICKETS.map((t): ItemLoja => ({ id: t.id, nome: t.nome, categoria: 'tickets', descricao: t.descricao, preco: 0, sprite: 'eon-ticket' })),
+];
+const porId = new Map([...CATALOGO, ...FORA_DA_LOJA].map((i) => [i.id, i]));
 
 export function itemDaLoja(id: string): ItemLoja | undefined {
   return porId.get(id);

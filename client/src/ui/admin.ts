@@ -1,3 +1,4 @@
+import { TICKETS } from '../../../shared/tickets';
 // Painel de administrador (aba na esquerda) para testar encontros: shiny, lendários, chance por passo,
 // Pokémon e nível forçados. Provisório: sem login; os ajustes ficam só neste navegador.
 import { AJUSTES_PADRAO, CHANCE_SHINY, type AjustesEncontro } from '../../../shared/encontros';
@@ -120,6 +121,24 @@ function conteudo(): HTMLElement[] {
   return [
     el('h4', {}, 'Treinador'),
     campo(`Nível de treinador (1–${NIVEL_MAX_TREINADOR})`, el('div', { class: 'admin-linha' }, nivelTreinadorCampo, aplicarNivel)),
+    el('h4', {}, 'Tickets'),
+    ...TICKETS.map((t) =>
+      el(
+        'button',
+        {
+          class: 'botao secundario',
+          disabled: !save,
+          onclick: () => {
+            const atual = carregarSave();
+            if (!atual) return;
+            atual.itens[t.id] = (atual.itens[t.id] ?? 0) + 1;
+            salvar(atual);
+            aoMudarSave?.();
+          },
+        },
+        `+1 ${t.nome}`,
+      ),
+    ),
     el('h4', {}, 'Pokédex'),
     (() => {
       const caixa = el('input', { type: 'checkbox', checked: pokedexRevelada() }) as HTMLInputElement;

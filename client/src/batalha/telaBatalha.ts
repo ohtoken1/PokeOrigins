@@ -8,6 +8,7 @@ import { ITENS, type ItemId } from '../../../shared/itens';
 import { efeitoBola } from '../../../shared/bolas';
 import { nivelTreinador } from '../../../shared/treinador';
 import { MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
+import { sortearTicketDaBatalha } from '../../../shared/tickets';
 import { curarTime, guardarNoPC, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
@@ -485,7 +486,16 @@ ${nomeCategoria(m.category)} · ${precisao}${m.priority ? ` · prioridade ${m.pr
         const box = guardarNoPC(save, selvagem);
         await dizer(`${dadosSelvagem.nome} foi enviado para o PC (Box ${box + 1}).`);
       }
-    } else if (resultado === 'derrota') {
+    }
+    // chance baixa de achar um ticket ao vencer ou capturar
+    if (resultado === 'vitoria' || resultado === 'captura') {
+      const ticket = sortearTicketDaBatalha();
+      if (ticket) {
+        save.itens[ticket.id] = (save.itens[ticket.id] ?? 0) + 1;
+        await dizer(`Que sorte! Você encontrou um ${ticket.nome}! (está na Bolsa)`);
+      }
+    }
+    if (resultado === 'derrota') {
       await dizer('Você não tem mais Pokémon em condições de lutar!');
       await dizer('Você correu para o Centro Pokémon e seu time foi curado.');
       curarTime(save);

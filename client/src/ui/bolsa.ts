@@ -1,7 +1,7 @@
 import { especie, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { evoluir, trocarGolpe } from '../../../shared/batalha/progresso';
 import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
-import { CATEGORIAS, CABO_DE_LIGACAO, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
+import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { ehEquipavel, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
 import { pokemonPorId, todosOsPokemons } from '../dados';
 import { registrarCapturado, salvar, type Save } from '../estado';
@@ -9,6 +9,7 @@ import { abrirJanela } from './janela';
 import { el } from './dom';
 import { iconeItem } from './iconeItem';
 import { cartaoPokemon } from './time';
+import { abrirJanelaTicket } from './ticket';
 
 const ACAO: Partial<Record<CategoriaLoja, string>> = {
   remedios: 'Usar',
@@ -16,6 +17,8 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
   batalha: 'Equipar',
   tm: 'Ensinar',
   tr: 'Ensinar',
+  especiais: 'Equipar',
+  tickets: 'Abrir',
 };
 
 type Modo =
@@ -75,6 +78,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
         for (const golpe of r.golpesPendentes) aprender(p, golpe, () => {}, () => {});
         return [`${quem} evoluiu para ${pokemonPorId(para).nome}!`, ...r.mensagens].join(' ');
       }
+      case 'especiais':
       case 'batalha': {
         if (!ehEquipavel(item.id)) return 'Esse item não pode ser equipado.';
         gastar(item.id);
@@ -203,7 +207,13 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                     class: 'botao',
                     onclick: () => {
                       aviso = '';
-                      if (ITENS[item.id]?.reviverTime) {
+                      if (item.categoria === 'tickets') {
+                        // abre o ticket numa janela própria (sorteio animado)
+                        abrirJanelaTicket(save, item.id, () => {
+                          aoMudar();
+                          refazer();
+                        });
+                      } else if (ITENS[item.id]?.reviverTime) {
                         // Sacred Ash: revive todo o time de uma vez, sem escolher alvo
                         const revividos = save.time.filter((p) => p.hp <= 0);
                         if (!revividos.length) aviso = 'Não teria efeito.';

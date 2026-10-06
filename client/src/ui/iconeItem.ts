@@ -12,7 +12,7 @@ const TAMANHO = 24;
 const POR_LINHA = 16;
 
 
-export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe'>): HTMLElement {
+export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 'sprite'>): HTMLElement {
   const reserva = () => el('div', { class: `icone-item ${item.id} cat-${item.categoria}` });
 
   const sd = Dex.items.get(item.id);
@@ -25,7 +25,7 @@ export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe'>): H
   }
 
   // remédios do jogo (não existem no Showdown): imagem da PokéAPI
-  let arquivo: string | undefined = ITENS[item.id]?.sprite;
+  let arquivo: string | undefined = item.sprite ?? ITENS[item.id]?.sprite;
   // TRs não têm imagem própria na PokéAPI: usam o disco de TM do mesmo tipo
   if (item.golpe) arquivo = `tm-${Dex.moves.get(item.golpe).type.toLowerCase()}`;
   if (!arquivo) return reserva();

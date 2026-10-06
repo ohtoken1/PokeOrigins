@@ -614,3 +614,33 @@ button.vaga:hover { border-color: var(--borda); }
 .revelar-ivs .botao { padding: 6px 10px; font-size: 0.8rem; }
 .revelar-ivs .aviso { width: 100%; color: #ef6a6a; }
 .revelar-ivs .aviso:empty { display: none; }
+
+/* Tickets */
+.janela-ticket .ticket { display: flex; flex-direction: column; gap: 12px; align-items: stretch; max-width: 520px; }
+.janela-ticket .janela-corpo { overflow-x: hidden; }
+.raridades { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.raridade {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 6px; border-radius: 12px;
+  background: var(--painel-2); border: 2px solid transparent; transition: transform 0.1s, border-color 0.1s;
+}
+.raridade small { color: var(--texto-2); }
+.raridade.destaque { transform: scale(1.06); border-color: currentColor; }
+.raridade.sorteada { transform: scale(1.1); border-color: currentColor; box-shadow: 0 0 18px currentColor; }
+.raridade-comum { color: #b8c2d6; }
+.raridade-raro { color: #5aa8ff; }
+.raridade-epico { color: #b77cff; }
+.raridade-lendario { color: #ffb02e; }
+.ticket-resultado { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+.ticket-resultado:empty { display: none; }
+.ticket-resultado small { color: var(--texto-2); }
+.ticket-raridade { font-weight: 800; font-size: 1.2rem; margin: 0; }
+.ticket-linha .ticket-raridade { font-size: 0.85rem; min-width: 72px; }
+.premios { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.premio { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 10px; background: var(--painel-2); border-radius: 10px; color: var(--texto); }
+.premio .sprite { width: 72px; height: 72px; }
+.premio small { color: var(--texto-2); }
+.premio-silver { font-size: 1.6rem; }
+.ticket-lista summary { cursor: pointer; color: var(--texto-2); }
+.ticket-linha { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.ticket-linha .premios { justify-content: flex-start; }
+.ticket-linha .premio .sprite { width: 48px; height: 48px; }
