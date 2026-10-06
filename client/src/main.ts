@@ -8,6 +8,7 @@ import { telaPokedex } from './telas/pokedex';
 import { telaDatabase } from './telas/database';
 import { montarPainelAdmin } from './ui/admin';
 import { montarBarraTopo } from './ui/barraTopo';
+import { definirNavegacao } from './ui/navegacao';
 
 export type Destino = { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number } | { tela: 'database' };
 export type Navegar = (destino: Destino) => void;
@@ -34,4 +35,5 @@ const navegar: Navegar = (destino) => {
 
 montarPainelAdmin(() => navegar(destinoAtual));
 marcarAba = montarBarraTopo(navegar);
+definirNavegacao(navegar);
 navegar(carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' });

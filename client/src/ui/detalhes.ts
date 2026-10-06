@@ -4,6 +4,7 @@ import { nomeItemEquipado } from '../../../shared/usoItens';
 import { traduzir } from '../../../shared/traducao';
 import { pokemonPorId } from '../dados';
 import { abrirJanela } from './janela';
+import { irPara } from './navegacao';
 import { el, seloGenero, seloTipo, selosTipos, spritePokemon } from './dom';
 import { barraHp } from './time';
 
@@ -77,7 +78,13 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
     el(
       'section',
       { class: 'ficha-topo' },
-      el('div', { class: 'palco' }, spritePokemon(dados, { shiny: p.shiny, palco: true })),
+      el(
+        'div',
+        { class: 'ficha-coluna-sprite' },
+        el('div', { class: 'palco' }, spritePokemon(dados, { shiny: p.shiny, palco: true })),
+        // atalho para a página da espécie na Pokédex
+        el('button', { class: 'botao secundario botao-pokedex', onclick: () => irPara({ tela: 'pokedex', id: dados.id }) }, '📖 Ver na Pokédex'),
+      ),
       el(
         'div',
         { class: 'resumo' },

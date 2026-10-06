@@ -2,6 +2,12 @@ import { el } from './dom';
 
 // Avisa quem precisa saber (ex.: o mapa pausa) quando há alguma janela aberta.
 let abertas = 0;
+const todas = new Set<Janela>();
+
+/** Fecha todas as janelas (ex.: ao ir para outra tela). */
+export function fecharTodasJanelas(): void {
+  for (const j of [...todas]) j.fechar();
+}
 const avisos = new EventTarget();
 export function aoMudarJanelas(callback: (algumaAberta: boolean) => void): () => void {
   const ouvinte = () => callback(abertas > 0);
@@ -47,6 +53,7 @@ export function abrirJanela(titulo: string, conteudo: (janela: Janela) => HTMLEl
       fechada = true;
       window.removeEventListener('keydown', aoTeclar, true);
       fundo.remove();
+      todas.delete(janela);
       abertas--;
       avisos.dispatchEvent(new Event('mudou'));
       opcoes.aoFechar?.();
@@ -58,6 +65,7 @@ export function abrirJanela(titulo: string, conteudo: (janela: Janela) => HTMLEl
 
   window.addEventListener('keydown', aoTeclar, true);
   document.body.append(fundo);
+  todas.add(janela);
   abertas++;
   avisos.dispatchEvent(new Event('mudou'));
   janela.redesenhar();

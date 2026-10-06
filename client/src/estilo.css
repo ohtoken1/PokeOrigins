@@ -520,3 +520,6 @@ button.vaga:hover { border-color: var(--borda); }
 }
 .atalho-bioma:hover { opacity: 1; transform: translateY(-2px); }
 .atalho-bioma.ativo { opacity: 1; border-color: var(--destaque); box-shadow: 0 0 0 2px rgb(255 203 5 / 0.25); cursor: default; }
+
+.ficha-coluna-sprite { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+.botao-pokedex { padding: 6px 10px; font-size: 0.8rem; }
