@@ -6,6 +6,7 @@ import { pokemonPorId } from '../dados';
 import { ITENS, type ItemId } from '../../../shared/itens';
 import { curarTime, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
 import { corTipo, el, seloTipo, spritePokemon } from '../ui/dom';
+import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarGolpe, animarRetorno, tremerArena } from './animacoes';
 
 export type ResultadoBatalha = 'vitoria' | 'derrota' | 'captura' | 'fuga';
@@ -74,7 +75,18 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
   );
 
   // ---------- montagem da tela ----------
-  const spriteSelvagem = spritePokemon(dadosSelvagem, { shiny: selvagem.shiny, alturaAlvo: 150 });
+  const modo3D = usarSprites3D();
+  /** Sprite da batalha: pixel art (padrão) ou, no teste 3D, o GIF do Showdown (volta ao pixel art se falhar). */
+  const spriteBatalha = (especieId: number, shiny: boolean, costas: boolean) => {
+    const img = spritePokemon(pokemonPorId(especieId), { shiny, costas, alturaAlvo: costas ? 170 : 150 });
+    if (!modo3D) return img;
+    const pixel = img.src;
+    img.classList.add('sprite-3d');
+    img.addEventListener('error', () => img.src !== pixel && (img.src = pixel), { once: true });
+    img.src = urlSprite3D(especieId, { shiny, costas });
+    return img;
+  };
+  const spriteSelvagem = spriteBatalha(selvagem.especieId, selvagem.shiny, false);
   spriteSelvagem.classList.add('sprite-selvagem');
   let spriteJogador = el('img', { class: 'sprite sprite-jogador', alt: '' });
   const lugarJogador = el('div', { class: 'lugar lugar-jogador' }, spriteJogador);
@@ -122,7 +134,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
 
   function colocarJogador(posicao: number) {
     const p = save.time[posicao];
-    const novo = spritePokemon(pokemonPorId(p.especieId), { shiny: p.shiny, costas: true, alturaAlvo: 170 });
+    const novo = spriteBatalha(p.especieId, p.shiny, true);
     novo.classList.add('sprite-jogador');
     spriteJogador.replaceWith(novo);
     spriteJogador = novo;
@@ -372,7 +384,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
         if (pos !== batalha.ativo) colocarJogador(pos);
         await dizer(`O quê? ${antes} está evoluindo!`);
         const novo = pokemonPorId(para);
-        await animarEvolucao(spriteJogador as HTMLImageElement, (p.shiny ? novo.sprites.gifCostasShiny : novo.sprites.gifCostas) ?? novo.sprites.costas ?? '');
+        await animarEvolucao(spriteJogador as HTMLImageElement, modo3D ? urlSprite3D(para, { shiny: p.shiny, costas: true }) : ((p.shiny ? novo.sprites.gifCostasShiny : novo.sprites.gifCostas) ?? novo.sprites.costas ?? ''));
         const r = evoluir(p, para, nomeDe);
         if (!save.vistos.includes(para)) save.vistos.push(para);
         infoJogador.definir(p);

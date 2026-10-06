@@ -324,3 +324,7 @@ button.vaga:hover { border-color: var(--borda); }
 }
 .acoes-pc .botao { padding: 7px 12px; }
 .acoes-batalha .botao.item { font-size: 0.85rem; padding: 9px; }
+
+/* Teste dos sprites 3D na batalha: não são pixel art, então nada de ampliar nem "pixelated" */
+.sprite.sprite-3d { zoom: 1.6 !important; image-rendering: auto; }
+.opcao { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--texto-2); cursor: pointer; }

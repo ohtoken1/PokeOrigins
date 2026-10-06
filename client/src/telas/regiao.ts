@@ -5,6 +5,7 @@ import { montarTabela } from '../../../shared/encontros';
 import { pokemonsDaRegiao } from '../dados';
 import { apagarSave, carregarSave, curarTime } from '../estado';
 import { botoesMenus } from '../ui/menus';
+import { definirSprites3D, usarSprites3D } from '../batalha/sprites3d';
 import { el, spritePokemon } from '../ui/dom';
 import { painelTime } from '../ui/time';
 
@@ -71,6 +72,16 @@ export const telaRegiao: Tela = (raiz, navegar) => {
             '❤ Centro Pokémon (curar time)',
           ),
           el('div', { class: 'linha-botoes' }, botoesMenus(save, () => navegar({ tela: 'regiao' }))),
+          el(
+            'label',
+            { class: 'opcao' },
+            el('input', {
+              type: 'checkbox',
+              checked: usarSprites3D(),
+              onchange: (e: Event) => definirSprites3D((e.target as HTMLInputElement).checked),
+            }),
+            ' Batalha com sprites 3D (teste)',
+          ),
           el(
             'button',
             {

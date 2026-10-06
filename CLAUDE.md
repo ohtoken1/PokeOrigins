@@ -18,6 +18,7 @@ Menus: **Bolsa** (`ui/bolsa.ts`, itens em `shared/itens.ts`: bolas e remédios, 
 Mapa: `client/src/jogo/mapa.ts` gera e desenha com tilesets em `client/public/tiles/` (créditos obrigatórios em `CREDITOS.md` e no rodapé da região): Buch (grama/mato/flores/areia) e Tuxemon core_outdoor_nature (árvores 2×3, rochas 2×2, pedrinhas) e core_outdoor_water (textura 6×6 em (9,0) e moldura 3×3 de margem em (6,1)). Lagos são retangulares e não tocam caminhos (a moldura só encaixa assim). `paletas.ts` define por bioma quais tiles e filtros CSS de cor (chão, objetos, líquido). 48×36 tiles de 16px, câmera com zoom 2×. Caixas (usina) e lápides (torre) ainda são desenhadas por código. Estilo de referência do dono: tileset estilo Pokémon GBA/DS (grama clara, mato alto, árvores redondas, água com margem, caminhos de areia).
 Sprites de Pokémon: **só ampliar por fator inteiro** (`alturaAlvo` em `spritePokemon` usa `zoom` 2×, 3×…); fator quebrado deixa o pixel art borrado/irregular.
 Nomes de golpes e itens ficam **em inglês** (decisão do dono).
+Teste (não definitivo): opção "Batalha com sprites 3D (teste)" no menu da região usa os GIFs 3D do Showdown (`client/src/batalha/sprites3d.ts`); padrão é pixel art.
 Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de teste).
 
 ## Batalha (`shared/batalha/`)
@@ -50,7 +51,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 ## Convenções
 - Código, nomes e comentários em **português** (sem acentos em identificadores).
 - Regras de jogo (probabilidades, níveis, chance de shiny) ficam em `shared/` como constantes fáceis de ajustar.
-- Bioma = lista de tipos; um Pokémon entra em todos os biomas de qualquer um dos seus tipos. Lendários/míticos e iniciais não aparecem soltos.
+- Bioma = lista de tipos; cada Pokémon mora em UM bioma só: o do seu tipo principal (ex.: Gastly Fantasma/Veneno → Torre). Pedido do dono. Lendários/míticos e iniciais não aparecem soltos.
 - `CHANCE_ENCONTRO_POR_PASSO = 1` (pedido do dono: todo passo tem Pokémon, não precisa ser no mato).
 - Peso no sorteio = taxa de captura oficial (mais fácil de capturar = mais comum). Evoluções aparecem com +10 níveis por estágio.
 - Windows/PowerShell: depois de instalar algo, o PATH pode precisar ser recarregado no shell.

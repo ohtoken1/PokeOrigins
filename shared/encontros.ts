@@ -1,6 +1,6 @@
 // Sorteio de Pokémon selvagens. Fica em shared/ porque, no MMO, quem vai sortear é o
 // servidor (para ninguém trapacear); por enquanto o cliente usa o mesmo código.
-import type { Bioma } from './biomas';
+import { BIOMAS, type Bioma } from './biomas';
 import type { PokemonBase } from './tipos';
 
 /** Chance de um Pokémon ser shiny. O original é 1/4096; aqui é configurável. */
@@ -26,6 +26,18 @@ export interface Encontro {
   shiny: boolean;
 }
 
+/**
+ * Cada Pokémon mora em um único bioma: o do seu tipo principal (o primeiro).
+ * Se nenhum bioma tiver o tipo principal, vale o segundo tipo.
+ */
+export function biomaDoPokemon(p: PokemonBase): string | null {
+  for (const tipo of p.tipos) {
+    const bioma = BIOMAS.find((b) => b.tipos.includes(tipo));
+    if (bioma) return bioma.id;
+  }
+  return null;
+}
+
 export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: number[] = []): EntradaTabela[] {
   const porSlug = new Map(pokemons.map((p) => [p.slug, p]));
   const estagio = (p: PokemonBase): number => {
@@ -35,7 +47,7 @@ export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: num
 
   return pokemons
     .filter((p) => !excluir.includes(p.id))
-    .filter((p) => p.tipos.some((t) => bioma.tipos.includes(t)))
+    .filter((p) => biomaDoPokemon(p) === bioma.id)
     .map((p) => ({
       pokemon: p,
       peso: p.lendario || p.mitico ? PESO_LENDARIO : Math.max(1, p.taxaCaptura),
