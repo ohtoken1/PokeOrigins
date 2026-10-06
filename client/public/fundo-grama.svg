@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice">
+  <!-- Campos Verdes: campo de flores à noite em tons lilás (contrasta com o verde do mapa) -->
+  <defs>
+    <linearGradient id="ceu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f1b33"/>
+      <stop offset="0.6" stop-color="#2c2742"/>
+      <stop offset="0.85" stop-color="#463d63"/>
+    </linearGradient>
+    <radialGradient id="brilho" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f0e6c8" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#f0e6c8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="luz" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff4b8" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#fff4b8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#ceu)"/>
+  <g fill="#ece6f8">
+    <circle cx="120" cy="80" r="1.5" opacity="0.7"/><circle cx="380" cy="170" r="1.2" opacity="0.5"/><circle cx="560" cy="60" r="1.7" opacity="0.8"/>
+    <circle cx="820" cy="140" r="1.1" opacity="0.5"/><circle cx="1020" cy="70" r="1.5" opacity="0.6"/><circle cx="1220" cy="190" r="1" opacity="0.4"/>
+    <circle cx="1680" cy="110" r="1.4" opacity="0.6"/><circle cx="1860" cy="220" r="1.2" opacity="0.5"/><circle cx="260" cy="280" r="1" opacity="0.4"/>
+  </g>
+  <circle cx="1500" cy="220" r="160" fill="url(#brilho)"/>
+  <circle cx="1500" cy="220" r="56" fill="#f0e6c8" opacity="0.92"/>
+  <g fill="#cbbbe6" opacity="0.1"><ellipse cx="500" cy="300" rx="260" ry="16"/><ellipse cx="1200" cy="360" rx="300" ry="18"/></g>
+  <path d="M0 700 C300 640 600 660 960 690 C1300 720 1600 650 1920 670 L1920 1080 L0 1080 Z" fill="#352f50"/>
+  <path d="M0 800 C320 750 640 780 980 800 C1320 820 1620 770 1920 780 L1920 1080 L0 1080 Z" fill="#3a3358"/>
+  <path d="M0 920 C360 880 760 900 1100 920 C1440 940 1700 900 1920 890 L1920 1080 L0 1080 Z" fill="#2a2541"/>
+  <!-- flores -->
+  <g fill="#6f5fa3">
+    <circle cx="120" cy="830" r="7"/><circle cx="260" cy="860" r="6"/><circle cx="430" cy="820" r="7"/><circle cx="640" cy="850" r="6"/>
+    <circle cx="860" cy="830" r="7"/><circle cx="1080" cy="860" r="6"/><circle cx="1290" cy="835" r="7"/><circle cx="1500" cy="855" r="6"/>
+    <circle cx="1700" cy="820" r="7"/><circle cx="1860" cy="850" r="6"/>
+  </g>
+  <g fill="#8a7bc4">
+    <circle cx="200" cy="960" r="9"/><circle cx="520" cy="990" r="8"/><circle cx="780" cy="955" r="9"/><circle cx="1180" cy="985" r="8"/>
+    <circle cx="1420" cy="960" r="9"/><circle cx="1760" cy="990" r="8"/>
+  </g>
+  <g fill="#d9cdf2" opacity="0.6">
+    <circle cx="200" cy="960" r="3"/><circle cx="520" cy="990" r="3"/><circle cx="780" cy="955" r="3"/><circle cx="1180" cy="985" r="3"/><circle cx="1420" cy="960" r="3"/><circle cx="1760" cy="990" r="3"/>
+  </g>
+  <g>
+    <circle cx="380" cy="740" r="14" fill="url(#luz)"/><circle cx="380" cy="740" r="2" fill="#fff6c4"/>
+    <circle cx="980" cy="760" r="12" fill="url(#luz)"/><circle cx="980" cy="760" r="1.8" fill="#fff6c4"/>
+    <circle cx="1620" cy="730" r="14" fill="url(#luz)"/><circle cx="1620" cy="730" r="2" fill="#fff6c4"/>
+    <circle cx="700" cy="900" r="12" fill="url(#luz)"/><circle cx="700" cy="900" r="1.8" fill="#fff6c4"/>
+  </g>
+</svg>

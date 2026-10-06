@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice">
+  <!-- Caverna Rochosa: gruta de cristais azul-turquesa com brilho suave -->
+  <defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16223a"/>
+      <stop offset="0.6" stop-color="#20304a"/>
+      <stop offset="1" stop-color="#18253a"/>
+    </linearGradient>
+    <radialGradient id="brilho" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#7fd6e8" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#7fd6e8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#fundo)"/>
+  <!-- teto com estalactites -->
+  <path d="M0 0 L1920 0 L1920 170 C1700 230 1500 190 1300 240 C1050 300 820 220 600 260 C380 300 200 220 0 250 Z" fill="#2c4060"/>
+  <g fill="#2c4060">
+    <path d="M260 230 l24 110 l24 -116 z"/><path d="M700 250 l18 80 l18 -84 z"/><path d="M1180 260 l26 120 l26 -128 z"/>
+    <path d="M1560 210 l20 90 l20 -96 z"/><path d="M1780 190 l16 70 l16 -74 z"/>
+  </g>
+  <!-- paredes ao fundo -->
+  <path d="M0 640 C200 580 360 620 520 600 C700 580 820 640 1000 620 C1200 600 1360 650 1560 610 C1720 580 1840 620 1920 600 L1920 1080 L0 1080 Z" fill="#1d2c45"/>
+  <!-- brilhos dos cristais -->
+  <circle cx="360" cy="800" r="200" fill="url(#brilho)"/>
+  <circle cx="1060" cy="840" r="240" fill="url(#brilho)"/>
+  <circle cx="1650" cy="790" r="200" fill="url(#brilho)"/>
+  <!-- cristais -->
+  <g fill="#7fd6e8" opacity="0.75">
+    <polygon points="300,900 330,760 360,900"/><polygon points="350,910 372,800 394,910"/><polygon points="260,910 280,830 300,910"/>
+    <polygon points="1000,940 1036,770 1072,940"/><polygon points="1060,950 1086,830 1112,950"/><polygon points="960,950 984,860 1008,950"/>
+    <polygon points="1600,900 1628,780 1656,900"/><polygon points="1650,910 1670,820 1690,910"/>
+  </g>
+  <g fill="#c9f1f8" opacity="0.45">
+    <polygon points="330,760 340,840 330,900 322,840"/><polygon points="1036,770 1048,860 1036,940 1026,860"/><polygon points="1628,780 1638,850 1628,900 1620,850"/>
+  </g>
+  <!-- chão -->
+  <path d="M0 940 C300 910 700 930 1000 950 C1300 970 1650 920 1920 920 L1920 1080 L0 1080 Z" fill="#18253a"/>
+  <g fill="#22324d">
+    <ellipse cx="560" cy="990" rx="80" ry="22"/><ellipse cx="1400" cy="1000" rx="100" ry="26"/><ellipse cx="160" cy="1020" rx="70" ry="20"/>
+  </g>
+  <!-- partículas -->
+  <g fill="#bff0f8" opacity="0.6">
+    <circle cx="420" cy="620" r="2"/><circle cx="880" cy="700" r="1.6"/><circle cx="1240" cy="560" r="2"/><circle cx="1500" cy="680" r="1.6"/><circle cx="1800" cy="560" r="1.8"/>
+  </g>
+</svg>

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice">
+  <!-- Torre Assombrada: bosque verde-menta enevoado com luzinhas (calmo, contrasta com o roxo da torre) -->
+  <defs>
+    <linearGradient id="ceu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1d2e2b"/>
+      <stop offset="0.6" stop-color="#2a3f3a"/>
+      <stop offset="0.9" stop-color="#3b5650"/>
+    </linearGradient>
+    <radialGradient id="lua" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#e8efe4" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#e8efe4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="luz" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#c8f0d4" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#c8f0d4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#ceu)"/>
+  <circle cx="960" cy="300" r="260" fill="url(#lua)"/>
+  <circle cx="960" cy="300" r="100" fill="#e8efe4" opacity="0.7"/>
+  <!-- névoa -->
+  <g fill="#cfe6da" opacity="0.08">
+    <ellipse cx="400" cy="640" rx="500" ry="40"/><ellipse cx="1500" cy="600" rx="520" ry="44"/><ellipse cx="960" cy="760" rx="700" ry="50"/>
+  </g>
+  <!-- árvores ao fundo -->
+  <g fill="#253a35">
+    <path d="M80 760 l60 -260 l60 260 z"/><path d="M220 760 l50 -210 l50 210 z"/><path d="M380 760 l64 -290 l64 290 z"/>
+    <path d="M1460 760 l64 -280 l64 280 z"/><path d="M1620 760 l52 -220 l52 220 z"/><path d="M1760 760 l60 -260 l60 260 z"/>
+  </g>
+  <path d="M0 780 C300 740 700 760 1000 780 C1300 800 1650 750 1920 760 L1920 1080 L0 1080 Z" fill="#22352f"/>
+  <!-- árvores na frente -->
+  <g fill="#1a2a26">
+    <path d="M0 980 l80 -330 l80 330 z"/><path d="M130 990 l60 -250 l60 250 z"/>
+    <path d="M1720 990 l70 -300 l70 300 z"/><path d="M1830 980 l60 -240 l60 240 z"/>
+  </g>
+  <path d="M0 940 C400 900 800 920 1150 940 C1500 960 1750 920 1920 910 L1920 1080 L0 1080 Z" fill="#1e302c"/>
+  <!-- luzinhas -->
+  <g>
+    <circle cx="560" cy="700" r="16" fill="url(#luz)"/><circle cx="560" cy="700" r="2.4" fill="#e6fbe9"/>
+    <circle cx="1340" cy="660" r="16" fill="url(#luz)"/><circle cx="1340" cy="660" r="2.4" fill="#e6fbe9"/>
+    <circle cx="1100" cy="880" r="14" fill="url(#luz)"/><circle cx="1100" cy="880" r="2" fill="#e6fbe9"/>
+    <circle cx="760" cy="860" r="12" fill="url(#luz)"/><circle cx="760" cy="860" r="1.8" fill="#e6fbe9"/>
+    <circle cx="300" cy="860" r="14" fill="url(#luz)"/><circle cx="300" cy="860" r="2" fill="#e6fbe9"/>
+    <circle cx="1560" cy="840" r="12" fill="url(#luz)"/><circle cx="1560" cy="840" r="1.8" fill="#e6fbe9"/>
+  </g>
+</svg>

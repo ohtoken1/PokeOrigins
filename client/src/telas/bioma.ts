@@ -22,6 +22,8 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   if (!save) return navegar({ tela: 'inicial' });
   usarSave(save);
   const bioma = biomaPorId(biomaId);
+  // wallpaper do bioma (client/public/fundo-<bioma>.svg); volta ao do menu ao sair
+  document.body.dataset.fundo = bioma.id;
   const regiao = regiaoPorId(save.regiao);
   const tabelaNormal = montarTabela(bioma, pokemonsDaRegiao(regiao.id), [], todosOsPokemons());
   // tabela com os ajustes do painel de administrador (lendários mais/menos comuns…)
@@ -251,6 +253,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   });
 
   return () => {
+    delete document.body.dataset.fundo;
     pararDeOuvirAdmin();
     pararDeOuvirJanelas();
     fugirDoEncontro();

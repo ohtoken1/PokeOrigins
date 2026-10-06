@@ -16,6 +16,12 @@
 * { box-sizing: border-box; }
 /* wallpaper calmo: anoitecer num vale com lua de Pokébola (client/public/fundo.svg) */
 body { margin: 0; min-height: 100vh; background: url('/fundo.svg') center bottom / cover no-repeat fixed, var(--fundo); }
+/* wallpaper de cada bioma (cores que contrastam com o mapa) */
+body[data-fundo='grama'] { background-image: url('/fundo-grama.svg'); }
+body[data-fundo='agua'] { background-image: url('/fundo-agua.svg'); }
+body[data-fundo='vulcao'] { background-image: url('/fundo-vulcao.svg'); }
+body[data-fundo='caverna'] { background-image: url('/fundo-caverna.svg'); }
+body[data-fundo='torre'] { background-image: url('/fundo-torre.svg'); }
 h1, h2 { margin: 0 0 6px; }
 h1 small, h2 small { color: var(--texto-2); font-weight: 500; }
 h2 { font-size: 1rem; }
