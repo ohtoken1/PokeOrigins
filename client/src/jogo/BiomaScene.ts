@@ -15,6 +15,7 @@ const DURACAO_PASSO = 160;
 
 /** Sprites da 5ª geração (Black/White): frente e costas, normal e shiny, já no tamanho relativo certo. */
 const SPRITES_BW = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white';
+const SPRITES_PADRAO = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 /** Linhas de cima e de baixo da parte não transparente da imagem (para medir o Pokémon e achar os pés). */
 const cacheAreas = new WeakMap<HTMLImageElement, { topo: number; base: number }>();
 function areaDesenhada(img: HTMLImageElement): { topo: number; base: number } {
@@ -269,8 +270,10 @@ export class BiomaScene extends Phaser.Scene {
     const faltam = [false, true].filter((c) => !this.textures.exists(this.chaveSeguidor(c)));
     if (!faltam.length) return aplicar();
     this.load.setCORS('anonymous');
+    // Black/White só tem até o #649; depois disso, as imagens padrão da PokéAPI
+    const base = d.especie <= 649 ? SPRITES_BW : SPRITES_PADRAO;
     for (const costas of faltam)
-      this.load.image(this.chaveSeguidor(costas), `${SPRITES_BW}/${costas ? 'back/' : ''}${d.shiny ? 'shiny/' : ''}${d.especie}.png`);
+      this.load.image(this.chaveSeguidor(costas), `${base}/${costas ? 'back/' : ''}${d.shiny ? 'shiny/' : ''}${d.especie}.png`);
     this.load.once(Phaser.Loader.Events.COMPLETE, aplicar);
     this.load.start();
   }
@@ -278,7 +281,9 @@ export class BiomaScene extends Phaser.Scene {
   /** Frente (ou costas, andando para cima) do Pokémon que segue. */
   private mostrarLadoSeguidor() {
     if (!this.dadosSeguidor) return;
-    const chave = this.chaveSeguidor(this.olhandoParaCima);
+    let chave = this.chaveSeguidor(this.olhandoParaCima);
+    // sem imagem de costas (algumas espécies novas): usa a de frente
+    if (!this.textures.exists(chave)) chave = this.chaveSeguidor(false);
     if (!this.textures.exists(chave)) return;
     const textura = this.textures.get(chave);
     // reduzido suavemente (não é ampliação de pixel art), então filtro linear

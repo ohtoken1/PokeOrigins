@@ -1,0 +1,4356 @@
+[
+ {
+  "id": 722,
+  "nome": "Rowlet",
+  "slug": "rowlet",
+  "tipos": [
+   "grass",
+   "flying"
+  ],
+  "stats": {
+   "hp": 68,
+   "ataque": 55,
+   "defesa": 55,
+   "ataqueEspecial": 50,
+   "defesaEspecial": 50,
+   "velocidade": 42
+  },
+  "evsDados": {
+   "hp": 1
+  },
+  "altura": 3,
+  "peso": 15,
+  "experienciaBase": 64,
+  "taxaCaptura": 45,
+  "crescimento": "medium-slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 374,
+  "habilidades": [
+   {
+    "nome": "overgrow",
+    "oculta": false
+   },
+   {
+    "nome": "long-reach",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/722.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/722.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/722.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/722.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/722.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/722.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/722.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/722.gif"
+  }
+ },
+ {
+  "id": 723,
+  "nome": "Dartrix",
+  "slug": "dartrix",
+  "tipos": [
+   "grass",
+   "flying"
+  ],
+  "stats": {
+   "hp": 78,
+   "ataque": 75,
+   "defesa": 75,
+   "ataqueEspecial": 70,
+   "defesaEspecial": 70,
+   "velocidade": 52
+  },
+  "evsDados": {
+   "hp": 2
+  },
+  "altura": 7,
+  "peso": 160,
+  "experienciaBase": 147,
+  "taxaCaptura": 45,
+  "crescimento": "medium-slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "rowlet",
+  "cadeiaEvolucao": 374,
+  "habilidades": [
+   {
+    "nome": "overgrow",
+    "oculta": false
+   },
+   {
+    "nome": "long-reach",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/723.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/723.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/723.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/723.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/723.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/723.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/723.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/723.gif"
+  }
+ },
+ {
+  "id": 724,
+  "nome": "Decidueye",
+  "slug": "decidueye",
+  "tipos": [
+   "grass",
+   "ghost"
+  ],
+  "stats": {
+   "hp": 78,
+   "ataque": 107,
+   "defesa": 75,
+   "ataqueEspecial": 100,
+   "defesaEspecial": 100,
+   "velocidade": 70
+  },
+  "evsDados": {
+   "ataque": 3
+  },
+  "altura": 16,
+  "peso": 366,
+  "experienciaBase": 239,
+  "taxaCaptura": 45,
+  "crescimento": "medium-slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "dartrix",
+  "cadeiaEvolucao": 374,
+  "habilidades": [
+   {
+    "nome": "overgrow",
+    "oculta": false
+   },
+   {
+    "nome": "long-reach",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/724.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/724.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/724.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/724.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/724.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/724.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/724.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/724.gif"
+  }
+ },
+ {
+  "id": 725,
+  "nome": "Litten",
+  "slug": "litten",
+  "tipos": [
+   "fire"
+  ],
+  "stats": {
+   "hp": 45,
+   "ataque": 65,
+   "defesa": 40,
+   "ataqueEspecial": 60,
+   "defesaEspecial": 40,
+   "velocidade": 70
+  },
+  "evsDados": {
+   "velocidade": 1
+  },
+  "altura": 4,
+  "peso": 43,
+  "experienciaBase": 64,
+  "taxaCaptura": 45,
+  "crescimento": "medium-slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 375,
+  "habilidades": [
+   {
+    "nome": "blaze",
+    "oculta": false
+   },
+   {
+    "nome": "intimidate",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/725.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/725.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/725.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/725.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/725.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/725.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/725.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/725.gif"
+  }
+ },
+ {
+  "id": 726,
+  "nome": "Torracat",
+  "slug": "torracat",
+  "tipos": [
+   "fire"
+  ],
+  "stats": {
+   "hp": 65,
+   "ataque": 85,
+   "defesa": 50,
+   "ataqueEspecial": 80,
+   "defesaEspecial": 50,
+   "velocidade": 90
+  },
+  "evsDados": {
+   "velocidade": 2
+  },
+  "altura": 7,
+  "peso": 250,
+  "experienciaBase": 147,
+  "taxaCaptura": 45,
+  "crescimento": "medium-slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "litten",
+  "cadeiaEvolucao": 375,
+  "habilidades": [
+   {
+    "nome": "blaze",
+    "oculta": false
+   },
+   {
+    "nome": "intimidate",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/726.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/726.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/726.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/726.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/726.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/726.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/726.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/726.gif"
+  }
+ },
+ {
+  "id": 727,
+  "nome": "Incineroar",
+  "slug": "incineroar",
+  "tipos": [
+   "fire",
+   "dark"
+  ],
+  "stats": {
+   "hp": 95,
+   "ataque": 115,
+   "defesa": 90,
+   "ataqueEspecial": 80,
+   "defesaEspecial": 90,
+   "velocidade": 60
+  },
+  "evsDados": {
+   "ataque": 3
+  },
+  "altura": 18,
+  "peso": 830,
+  "experienciaBase": 239,
+  "taxaCaptura": 45,
+  "crescimento": "medium-slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "torracat",
+  "cadeiaEvolucao": 375,
+  "habilidades": [
+   {
+    "nome": "blaze",
+    "oculta": false
+   },
+   {
+    "nome": "intimidate",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/727.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/727.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/727.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/727.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/727.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/727.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/727.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/727.gif"
+  }
+ },
+ {
+  "id": 728,
+  "nome": "Popplio",
+  "slug": "popplio",
+  "tipos": [
+   "water"
+  ],
+  "stats": {
+   "hp": 50,
+   "ataque": 54,
+   "defesa": 54,
+   "ataqueEspecial": 66,
+   "defesaEspecial": 56,
+   "velocidade": 40
+  },
+  "evsDados": {
+   "ataqueEspecial": 1
+  },
+  "altura": 4,
+  "peso": 75,
+  "experienciaBase": 64,
+  "taxaCaptura": 45,
+  "crescimento": "medium-slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 376,
+  "habilidades": [
+   {
+    "nome": "torrent",
+    "oculta": false
+   },
+   {
+    "nome": "liquid-voice",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/728.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/728.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/728.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/728.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/728.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/728.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/728.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/728.gif"
+  }
+ },
+ {
+  "id": 729,
+  "nome": "Brionne",
+  "slug": "brionne",
+  "tipos": [
+   "water"
+  ],
+  "stats": {
+   "hp": 60,
+   "ataque": 69,
+   "defesa": 69,
+   "ataqueEspecial": 91,
+   "defesaEspecial": 81,
+   "velocidade": 50
+  },
+  "evsDados": {
+   "ataqueEspecial": 2
+  },
+  "altura": 6,
+  "peso": 175,
+  "experienciaBase": 147,
+  "taxaCaptura": 45,
+  "crescimento": "medium-slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "popplio",
+  "cadeiaEvolucao": 376,
+  "habilidades": [
+   {
+    "nome": "torrent",
+    "oculta": false
+   },
+   {
+    "nome": "liquid-voice",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/729.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/729.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/729.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/729.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/729.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/729.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/729.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/729.gif"
+  }
+ },
+ {
+  "id": 730,
+  "nome": "Primarina",
+  "slug": "primarina",
+  "tipos": [
+   "water",
+   "fairy"
+  ],
+  "stats": {
+   "hp": 80,
+   "ataque": 74,
+   "defesa": 74,
+   "ataqueEspecial": 126,
+   "defesaEspecial": 116,
+   "velocidade": 60
+  },
+  "evsDados": {
+   "ataqueEspecial": 3
+  },
+  "altura": 18,
+  "peso": 440,
+  "experienciaBase": 239,
+  "taxaCaptura": 45,
+  "crescimento": "medium-slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "brionne",
+  "cadeiaEvolucao": 376,
+  "habilidades": [
+   {
+    "nome": "torrent",
+    "oculta": false
+   },
+   {
+    "nome": "liquid-voice",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/730.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/730.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/730.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/730.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/730.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/730.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/730.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/730.gif"
+  }
+ },
+ {
+  "id": 731,
+  "nome": "Pikipek",
+  "slug": "pikipek",
+  "tipos": [
+   "normal",
+   "flying"
+  ],
+  "stats": {
+   "hp": 35,
+   "ataque": 75,
+   "defesa": 30,
+   "ataqueEspecial": 30,
+   "defesaEspecial": 30,
+   "velocidade": 65
+  },
+  "evsDados": {
+   "ataque": 1
+  },
+  "altura": 3,
+  "peso": 12,
+  "experienciaBase": 53,
+  "taxaCaptura": 255,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 377,
+  "habilidades": [
+   {
+    "nome": "keen-eye",
+    "oculta": false
+   },
+   {
+    "nome": "skill-link",
+    "oculta": false
+   },
+   {
+    "nome": "pickup",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/731.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/731.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/731.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/731.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/731.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/731.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/731.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/731.gif"
+  }
+ },
+ {
+  "id": 732,
+  "nome": "Trumbeak",
+  "slug": "trumbeak",
+  "tipos": [
+   "normal",
+   "flying"
+  ],
+  "stats": {
+   "hp": 55,
+   "ataque": 85,
+   "defesa": 50,
+   "ataqueEspecial": 40,
+   "defesaEspecial": 50,
+   "velocidade": 75
+  },
+  "evsDados": {
+   "ataque": 2
+  },
+  "altura": 6,
+  "peso": 148,
+  "experienciaBase": 124,
+  "taxaCaptura": 120,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "pikipek",
+  "cadeiaEvolucao": 377,
+  "habilidades": [
+   {
+    "nome": "keen-eye",
+    "oculta": false
+   },
+   {
+    "nome": "skill-link",
+    "oculta": false
+   },
+   {
+    "nome": "pickup",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/732.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/732.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/732.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/732.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/732.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/732.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/732.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/732.gif"
+  }
+ },
+ {
+  "id": 733,
+  "nome": "Toucannon",
+  "slug": "toucannon",
+  "tipos": [
+   "normal",
+   "flying"
+  ],
+  "stats": {
+   "hp": 80,
+   "ataque": 120,
+   "defesa": 75,
+   "ataqueEspecial": 75,
+   "defesaEspecial": 75,
+   "velocidade": 60
+  },
+  "evsDados": {
+   "ataque": 3
+  },
+  "altura": 11,
+  "peso": 260,
+  "experienciaBase": 218,
+  "taxaCaptura": 45,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "trumbeak",
+  "cadeiaEvolucao": 377,
+  "habilidades": [
+   {
+    "nome": "keen-eye",
+    "oculta": false
+   },
+   {
+    "nome": "skill-link",
+    "oculta": false
+   },
+   {
+    "nome": "sheer-force",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/733.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/733.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/733.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/733.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/733.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/733.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/733.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/733.gif"
+  }
+ },
+ {
+  "id": 734,
+  "nome": "Yungoos",
+  "slug": "yungoos",
+  "tipos": [
+   "normal"
+  ],
+  "stats": {
+   "hp": 48,
+   "ataque": 70,
+   "defesa": 30,
+   "ataqueEspecial": 30,
+   "defesaEspecial": 30,
+   "velocidade": 45
+  },
+  "evsDados": {
+   "ataque": 1
+  },
+  "altura": 4,
+  "peso": 60,
+  "experienciaBase": 51,
+  "taxaCaptura": 255,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 378,
+  "habilidades": [
+   {
+    "nome": "stakeout",
+    "oculta": false
+   },
+   {
+    "nome": "strong-jaw",
+    "oculta": false
+   },
+   {
+    "nome": "adaptability",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/734.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/734.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/734.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/734.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/734.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/734.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/734.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/734.gif"
+  }
+ },
+ {
+  "id": 735,
+  "nome": "Gumshoos",
+  "slug": "gumshoos",
+  "tipos": [
+   "normal"
+  ],
+  "stats": {
+   "hp": 88,
+   "ataque": 110,
+   "defesa": 60,
+   "ataqueEspecial": 55,
+   "defesaEspecial": 60,
+   "velocidade": 45
+  },
+  "evsDados": {
+   "ataque": 2
+  },
+  "altura": 7,
+  "peso": 142,
+  "experienciaBase": 146,
+  "taxaCaptura": 127,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "yungoos",
+  "cadeiaEvolucao": 378,
+  "habilidades": [
+   {
+    "nome": "stakeout",
+    "oculta": false
+   },
+   {
+    "nome": "strong-jaw",
+    "oculta": false
+   },
+   {
+    "nome": "adaptability",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/735.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/735.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/735.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/735.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/735.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/735.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/735.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/735.gif"
+  }
+ },
+ {
+  "id": 736,
+  "nome": "Grubbin",
+  "slug": "grubbin",
+  "tipos": [
+   "bug"
+  ],
+  "stats": {
+   "hp": 47,
+   "ataque": 62,
+   "defesa": 45,
+   "ataqueEspecial": 55,
+   "defesaEspecial": 45,
+   "velocidade": 46
+  },
+  "evsDados": {
+   "ataque": 1
+  },
+  "altura": 4,
+  "peso": 44,
+  "experienciaBase": 60,
+  "taxaCaptura": 255,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 379,
+  "habilidades": [
+   {
+    "nome": "swarm",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/736.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/736.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/736.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/736.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/736.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/736.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/736.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/736.gif"
+  }
+ },
+ {
+  "id": 737,
+  "nome": "Charjabug",
+  "slug": "charjabug",
+  "tipos": [
+   "bug",
+   "electric"
+  ],
+  "stats": {
+   "hp": 57,
+   "ataque": 82,
+   "defesa": 95,
+   "ataqueEspecial": 55,
+   "defesaEspecial": 75,
+   "velocidade": 36
+  },
+  "evsDados": {
+   "defesa": 2
+  },
+  "altura": 5,
+  "peso": 105,
+  "experienciaBase": 140,
+  "taxaCaptura": 120,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "grubbin",
+  "cadeiaEvolucao": 379,
+  "habilidades": [
+   {
+    "nome": "battery",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/737.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/737.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/737.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/737.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/737.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/737.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/737.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/737.gif"
+  }
+ },
+ {
+  "id": 738,
+  "nome": "Vikavolt",
+  "slug": "vikavolt",
+  "tipos": [
+   "bug",
+   "electric"
+  ],
+  "stats": {
+   "hp": 77,
+   "ataque": 70,
+   "defesa": 90,
+   "ataqueEspecial": 145,
+   "defesaEspecial": 75,
+   "velocidade": 43
+  },
+  "evsDados": {
+   "ataqueEspecial": 3
+  },
+  "altura": 15,
+  "peso": 450,
+  "experienciaBase": 225,
+  "taxaCaptura": 45,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "charjabug",
+  "cadeiaEvolucao": 379,
+  "habilidades": [
+   {
+    "nome": "levitate",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/738.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/738.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/738.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/738.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/738.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/738.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/738.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/738.gif"
+  }
+ },
+ {
+  "id": 739,
+  "nome": "Crabrawler",
+  "slug": "crabrawler",
+  "tipos": [
+   "fighting"
+  ],
+  "stats": {
+   "hp": 47,
+   "ataque": 82,
+   "defesa": 57,
+   "ataqueEspecial": 42,
+   "defesaEspecial": 47,
+   "velocidade": 63
+  },
+  "evsDados": {
+   "ataque": 1
+  },
+  "altura": 6,
+  "peso": 70,
+  "experienciaBase": 68,
+  "taxaCaptura": 225,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 380,
+  "habilidades": [
+   {
+    "nome": "hyper-cutter",
+    "oculta": false
+   },
+   {
+    "nome": "iron-fist",
+    "oculta": false
+   },
+   {
+    "nome": "anger-point",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/739.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/739.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/739.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/739.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/739.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/739.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/739.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/739.gif"
+  }
+ },
+ {
+  "id": 740,
+  "nome": "Crabominable",
+  "slug": "crabominable",
+  "tipos": [
+   "fighting",
+   "ice"
+  ],
+  "stats": {
+   "hp": 97,
+   "ataque": 132,
+   "defesa": 77,
+   "ataqueEspecial": 62,
+   "defesaEspecial": 67,
+   "velocidade": 43
+  },
+  "evsDados": {
+   "ataque": 2
+  },
+  "altura": 17,
+  "peso": 1800,
+  "experienciaBase": 167,
+  "taxaCaptura": 60,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "crabrawler",
+  "cadeiaEvolucao": 380,
+  "habilidades": [
+   {
+    "nome": "hyper-cutter",
+    "oculta": false
+   },
+   {
+    "nome": "iron-fist",
+    "oculta": false
+   },
+   {
+    "nome": "anger-point",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/740.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/740.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/740.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/740.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/740.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/740.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/740.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/740.gif"
+  }
+ },
+ {
+  "id": 741,
+  "nome": "Oricorio",
+  "slug": "oricorio-baile",
+  "tipos": [
+   "fire",
+   "flying"
+  ],
+  "stats": {
+   "hp": 75,
+   "ataque": 70,
+   "defesa": 70,
+   "ataqueEspecial": 98,
+   "defesaEspecial": 70,
+   "velocidade": 93
+  },
+  "evsDados": {
+   "ataqueEspecial": 2
+  },
+  "altura": 6,
+  "peso": 34,
+  "experienciaBase": 167,
+  "taxaCaptura": 45,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 381,
+  "habilidades": [
+   {
+    "nome": "dancer",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/741.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/741.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/741.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/741.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/741.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/741.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/741.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/741.gif"
+  }
+ },
+ {
+  "id": 742,
+  "nome": "Cutiefly",
+  "slug": "cutiefly",
+  "tipos": [
+   "bug",
+   "fairy"
+  ],
+  "stats": {
+   "hp": 40,
+   "ataque": 45,
+   "defesa": 40,
+   "ataqueEspecial": 55,
+   "defesaEspecial": 40,
+   "velocidade": 84
+  },
+  "evsDados": {
+   "velocidade": 1
+  },
+  "altura": 1,
+  "peso": 2,
+  "experienciaBase": 61,
+  "taxaCaptura": 190,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 382,
+  "habilidades": [
+   {
+    "nome": "honey-gather",
+    "oculta": false
+   },
+   {
+    "nome": "shield-dust",
+    "oculta": false
+   },
+   {
+    "nome": "sweet-veil",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/742.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/742.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/742.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/742.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/742.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/742.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/742.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/742.gif"
+  }
+ },
+ {
+  "id": 743,
+  "nome": "Ribombee",
+  "slug": "ribombee",
+  "tipos": [
+   "bug",
+   "fairy"
+  ],
+  "stats": {
+   "hp": 60,
+   "ataque": 55,
+   "defesa": 60,
+   "ataqueEspecial": 95,
+   "defesaEspecial": 70,
+   "velocidade": 124
+  },
+  "evsDados": {
+   "velocidade": 2
+  },
+  "altura": 2,
+  "peso": 5,
+  "experienciaBase": 162,
+  "taxaCaptura": 75,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "cutiefly",
+  "cadeiaEvolucao": 382,
+  "habilidades": [
+   {
+    "nome": "honey-gather",
+    "oculta": false
+   },
+   {
+    "nome": "shield-dust",
+    "oculta": false
+   },
+   {
+    "nome": "sweet-veil",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/743.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/743.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/743.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/743.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/743.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/743.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/743.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/743.gif"
+  }
+ },
+ {
+  "id": 744,
+  "nome": "Rockruff",
+  "slug": "rockruff",
+  "tipos": [
+   "rock"
+  ],
+  "stats": {
+   "hp": 45,
+   "ataque": 65,
+   "defesa": 40,
+   "ataqueEspecial": 30,
+   "defesaEspecial": 40,
+   "velocidade": 60
+  },
+  "evsDados": {
+   "ataque": 1
+  },
+  "altura": 5,
+  "peso": 92,
+  "experienciaBase": 56,
+  "taxaCaptura": 190,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 383,
+  "habilidades": [
+   {
+    "nome": "keen-eye",
+    "oculta": false
+   },
+   {
+    "nome": "vital-spirit",
+    "oculta": false
+   },
+   {
+    "nome": "steadfast",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/744.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/744.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/744.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/744.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/744.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/744.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/744.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/744.gif"
+  }
+ },
+ {
+  "id": 745,
+  "nome": "Lycanroc",
+  "slug": "lycanroc-midday",
+  "tipos": [
+   "rock"
+  ],
+  "stats": {
+   "hp": 75,
+   "ataque": 115,
+   "defesa": 65,
+   "ataqueEspecial": 55,
+   "defesaEspecial": 65,
+   "velocidade": 112
+  },
+  "evsDados": {
+   "ataque": 2
+  },
+  "altura": 8,
+  "peso": 250,
+  "experienciaBase": 170,
+  "taxaCaptura": 90,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "rockruff",
+  "cadeiaEvolucao": 383,
+  "habilidades": [
+   {
+    "nome": "keen-eye",
+    "oculta": false
+   },
+   {
+    "nome": "sand-rush",
+    "oculta": false
+   },
+   {
+    "nome": "steadfast",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/745.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/745.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/745.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/745.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/745.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/745.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/745.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/745.gif"
+  }
+ },
+ {
+  "id": 746,
+  "nome": "Wishiwashi",
+  "slug": "wishiwashi-solo",
+  "tipos": [
+   "water"
+  ],
+  "stats": {
+   "hp": 45,
+   "ataque": 20,
+   "defesa": 20,
+   "ataqueEspecial": 25,
+   "defesaEspecial": 25,
+   "velocidade": 40
+  },
+  "evsDados": {
+   "hp": 1
+  },
+  "altura": 2,
+  "peso": 3,
+  "experienciaBase": 61,
+  "taxaCaptura": 60,
+  "crescimento": "fast",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 384,
+  "habilidades": [
+   {
+    "nome": "schooling",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/746.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/746.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/746.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/746.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/746.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/746.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/746.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/746.gif"
+  }
+ },
+ {
+  "id": 747,
+  "nome": "Mareanie",
+  "slug": "mareanie",
+  "tipos": [
+   "poison",
+   "water"
+  ],
+  "stats": {
+   "hp": 50,
+   "ataque": 53,
+   "defesa": 62,
+   "ataqueEspecial": 43,
+   "defesaEspecial": 52,
+   "velocidade": 45
+  },
+  "evsDados": {
+   "defesa": 1
+  },
+  "altura": 4,
+  "peso": 80,
+  "experienciaBase": 61,
+  "taxaCaptura": 190,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 385,
+  "habilidades": [
+   {
+    "nome": "merciless",
+    "oculta": false
+   },
+   {
+    "nome": "limber",
+    "oculta": false
+   },
+   {
+    "nome": "regenerator",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/747.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/747.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/747.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/747.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/747.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/747.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/747.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/747.gif"
+  }
+ },
+ {
+  "id": 748,
+  "nome": "Toxapex",
+  "slug": "toxapex",
+  "tipos": [
+   "poison",
+   "water"
+  ],
+  "stats": {
+   "hp": 50,
+   "ataque": 63,
+   "defesa": 152,
+   "ataqueEspecial": 53,
+   "defesaEspecial": 142,
+   "velocidade": 35
+  },
+  "evsDados": {
+   "defesa": 2
+  },
+  "altura": 7,
+  "peso": 145,
+  "experienciaBase": 173,
+  "taxaCaptura": 75,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "mareanie",
+  "cadeiaEvolucao": 385,
+  "habilidades": [
+   {
+    "nome": "merciless",
+    "oculta": false
+   },
+   {
+    "nome": "limber",
+    "oculta": false
+   },
+   {
+    "nome": "regenerator",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/748.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/748.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/748.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/748.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/748.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/748.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/748.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/748.gif"
+  }
+ },
+ {
+  "id": 749,
+  "nome": "Mudbray",
+  "slug": "mudbray",
+  "tipos": [
+   "ground"
+  ],
+  "stats": {
+   "hp": 70,
+   "ataque": 100,
+   "defesa": 70,
+   "ataqueEspecial": 45,
+   "defesaEspecial": 55,
+   "velocidade": 45
+  },
+  "evsDados": {
+   "ataque": 1
+  },
+  "altura": 10,
+  "peso": 1100,
+  "experienciaBase": 77,
+  "taxaCaptura": 190,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 386,
+  "habilidades": [
+   {
+    "nome": "own-tempo",
+    "oculta": false
+   },
+   {
+    "nome": "stamina",
+    "oculta": false
+   },
+   {
+    "nome": "inner-focus",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/749.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/749.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/749.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/749.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/749.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/749.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/749.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/749.gif"
+  }
+ },
+ {
+  "id": 750,
+  "nome": "Mudsdale",
+  "slug": "mudsdale",
+  "tipos": [
+   "ground"
+  ],
+  "stats": {
+   "hp": 100,
+   "ataque": 125,
+   "defesa": 100,
+   "ataqueEspecial": 55,
+   "defesaEspecial": 85,
+   "velocidade": 35
+  },
+  "evsDados": {
+   "ataque": 2
+  },
+  "altura": 25,
+  "peso": 9200,
+  "experienciaBase": 175,
+  "taxaCaptura": 60,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "mudbray",
+  "cadeiaEvolucao": 386,
+  "habilidades": [
+   {
+    "nome": "own-tempo",
+    "oculta": false
+   },
+   {
+    "nome": "stamina",
+    "oculta": false
+   },
+   {
+    "nome": "inner-focus",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/750.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/750.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/750.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/750.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/750.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/750.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/750.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/750.gif"
+  }
+ },
+ {
+  "id": 751,
+  "nome": "Dewpider",
+  "slug": "dewpider",
+  "tipos": [
+   "water",
+   "bug"
+  ],
+  "stats": {
+   "hp": 38,
+   "ataque": 40,
+   "defesa": 52,
+   "ataqueEspecial": 40,
+   "defesaEspecial": 72,
+   "velocidade": 27
+  },
+  "evsDados": {
+   "defesaEspecial": 1
+  },
+  "altura": 3,
+  "peso": 40,
+  "experienciaBase": 54,
+  "taxaCaptura": 200,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 387,
+  "habilidades": [
+   {
+    "nome": "water-bubble",
+    "oculta": false
+   },
+   {
+    "nome": "water-absorb",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/751.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/751.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/751.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/751.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/751.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/751.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/751.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/751.gif"
+  }
+ },
+ {
+  "id": 752,
+  "nome": "Araquanid",
+  "slug": "araquanid",
+  "tipos": [
+   "water",
+   "bug"
+  ],
+  "stats": {
+   "hp": 68,
+   "ataque": 70,
+   "defesa": 92,
+   "ataqueEspecial": 50,
+   "defesaEspecial": 132,
+   "velocidade": 42
+  },
+  "evsDados": {
+   "defesaEspecial": 2
+  },
+  "altura": 18,
+  "peso": 820,
+  "experienciaBase": 159,
+  "taxaCaptura": 100,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "dewpider",
+  "cadeiaEvolucao": 387,
+  "habilidades": [
+   {
+    "nome": "water-bubble",
+    "oculta": false
+   },
+   {
+    "nome": "water-absorb",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/752.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/752.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/752.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/752.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/752.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/752.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/752.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/752.gif"
+  }
+ },
+ {
+  "id": 753,
+  "nome": "Fomantis",
+  "slug": "fomantis",
+  "tipos": [
+   "grass"
+  ],
+  "stats": {
+   "hp": 40,
+   "ataque": 55,
+   "defesa": 35,
+   "ataqueEspecial": 50,
+   "defesaEspecial": 35,
+   "velocidade": 35
+  },
+  "evsDados": {
+   "ataque": 1
+  },
+  "altura": 3,
+  "peso": 15,
+  "experienciaBase": 50,
+  "taxaCaptura": 190,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 388,
+  "habilidades": [
+   {
+    "nome": "leaf-guard",
+    "oculta": false
+   },
+   {
+    "nome": "contrary",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/753.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/753.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/753.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/753.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/753.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/753.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/753.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/753.gif"
+  }
+ },
+ {
+  "id": 754,
+  "nome": "Lurantis",
+  "slug": "lurantis",
+  "tipos": [
+   "grass"
+  ],
+  "stats": {
+   "hp": 70,
+   "ataque": 105,
+   "defesa": 90,
+   "ataqueEspecial": 80,
+   "defesaEspecial": 90,
+   "velocidade": 45
+  },
+  "evsDados": {
+   "ataque": 2
+  },
+  "altura": 9,
+  "peso": 185,
+  "experienciaBase": 168,
+  "taxaCaptura": 75,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "fomantis",
+  "cadeiaEvolucao": 388,
+  "habilidades": [
+   {
+    "nome": "leaf-guard",
+    "oculta": false
+   },
+   {
+    "nome": "contrary",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/754.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/754.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/754.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/754.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/754.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/754.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/754.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/754.gif"
+  }
+ },
+ {
+  "id": 755,
+  "nome": "Morelull",
+  "slug": "morelull",
+  "tipos": [
+   "grass",
+   "fairy"
+  ],
+  "stats": {
+   "hp": 40,
+   "ataque": 35,
+   "defesa": 55,
+   "ataqueEspecial": 65,
+   "defesaEspecial": 75,
+   "velocidade": 15
+  },
+  "evsDados": {
+   "defesaEspecial": 1
+  },
+  "altura": 2,
+  "peso": 15,
+  "experienciaBase": 57,
+  "taxaCaptura": 190,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 389,
+  "habilidades": [
+   {
+    "nome": "illuminate",
+    "oculta": false
+   },
+   {
+    "nome": "effect-spore",
+    "oculta": false
+   },
+   {
+    "nome": "rain-dish",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/755.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/755.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/755.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/755.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/755.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/755.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/755.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/755.gif"
+  }
+ },
+ {
+  "id": 756,
+  "nome": "Shiinotic",
+  "slug": "shiinotic",
+  "tipos": [
+   "grass",
+   "fairy"
+  ],
+  "stats": {
+   "hp": 60,
+   "ataque": 45,
+   "defesa": 80,
+   "ataqueEspecial": 90,
+   "defesaEspecial": 100,
+   "velocidade": 30
+  },
+  "evsDados": {
+   "defesaEspecial": 2
+  },
+  "altura": 10,
+  "peso": 115,
+  "experienciaBase": 142,
+  "taxaCaptura": 75,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "morelull",
+  "cadeiaEvolucao": 389,
+  "habilidades": [
+   {
+    "nome": "illuminate",
+    "oculta": false
+   },
+   {
+    "nome": "effect-spore",
+    "oculta": false
+   },
+   {
+    "nome": "rain-dish",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/756.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/756.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/756.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/756.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/756.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/756.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/756.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/756.gif"
+  }
+ },
+ {
+  "id": 757,
+  "nome": "Salandit",
+  "slug": "salandit",
+  "tipos": [
+   "poison",
+   "fire"
+  ],
+  "stats": {
+   "hp": 48,
+   "ataque": 44,
+   "defesa": 40,
+   "ataqueEspecial": 71,
+   "defesaEspecial": 40,
+   "velocidade": 77
+  },
+  "evsDados": {
+   "velocidade": 1
+  },
+  "altura": 6,
+  "peso": 48,
+  "experienciaBase": 64,
+  "taxaCaptura": 120,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 390,
+  "habilidades": [
+   {
+    "nome": "corrosion",
+    "oculta": false
+   },
+   {
+    "nome": "oblivious",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/757.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/757.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/757.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/757.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/757.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/757.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/757.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/757.gif"
+  }
+ },
+ {
+  "id": 758,
+  "nome": "Salazzle",
+  "slug": "salazzle",
+  "tipos": [
+   "poison",
+   "fire"
+  ],
+  "stats": {
+   "hp": 68,
+   "ataque": 64,
+   "defesa": 60,
+   "ataqueEspecial": 111,
+   "defesaEspecial": 60,
+   "velocidade": 117
+  },
+  "evsDados": {
+   "velocidade": 2
+  },
+  "altura": 12,
+  "peso": 222,
+  "experienciaBase": 168,
+  "taxaCaptura": 45,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "salandit",
+  "cadeiaEvolucao": 390,
+  "habilidades": [
+   {
+    "nome": "corrosion",
+    "oculta": false
+   },
+   {
+    "nome": "oblivious",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/758.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/758.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/758.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/758.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/758.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/758.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/758.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/758.gif"
+  }
+ },
+ {
+  "id": 759,
+  "nome": "Stufful",
+  "slug": "stufful",
+  "tipos": [
+   "normal",
+   "fighting"
+  ],
+  "stats": {
+   "hp": 70,
+   "ataque": 75,
+   "defesa": 50,
+   "ataqueEspecial": 45,
+   "defesaEspecial": 50,
+   "velocidade": 50
+  },
+  "evsDados": {
+   "ataque": 1
+  },
+  "altura": 5,
+  "peso": 68,
+  "experienciaBase": 68,
+  "taxaCaptura": 140,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 391,
+  "habilidades": [
+   {
+    "nome": "fluffy",
+    "oculta": false
+   },
+   {
+    "nome": "klutz",
+    "oculta": false
+   },
+   {
+    "nome": "cute-charm",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/759.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/759.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/759.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/759.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/759.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/759.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/759.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/759.gif"
+  }
+ },
+ {
+  "id": 760,
+  "nome": "Bewear",
+  "slug": "bewear",
+  "tipos": [
+   "normal",
+   "fighting"
+  ],
+  "stats": {
+   "hp": 120,
+   "ataque": 125,
+   "defesa": 80,
+   "ataqueEspecial": 55,
+   "defesaEspecial": 60,
+   "velocidade": 60
+  },
+  "evsDados": {
+   "ataque": 2
+  },
+  "altura": 21,
+  "peso": 1350,
+  "experienciaBase": 175,
+  "taxaCaptura": 70,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "stufful",
+  "cadeiaEvolucao": 391,
+  "habilidades": [
+   {
+    "nome": "fluffy",
+    "oculta": false
+   },
+   {
+    "nome": "klutz",
+    "oculta": false
+   },
+   {
+    "nome": "unnerve",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/760.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/760.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/760.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/760.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/760.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/760.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/760.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/760.gif"
+  }
+ },
+ {
+  "id": 761,
+  "nome": "Bounsweet",
+  "slug": "bounsweet",
+  "tipos": [
+   "grass"
+  ],
+  "stats": {
+   "hp": 42,
+   "ataque": 30,
+   "defesa": 38,
+   "ataqueEspecial": 30,
+   "defesaEspecial": 38,
+   "velocidade": 32
+  },
+  "evsDados": {
+   "hp": 1
+  },
+  "altura": 3,
+  "peso": 32,
+  "experienciaBase": 42,
+  "taxaCaptura": 235,
+  "crescimento": "medium-slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 392,
+  "habilidades": [
+   {
+    "nome": "leaf-guard",
+    "oculta": false
+   },
+   {
+    "nome": "oblivious",
+    "oculta": false
+   },
+   {
+    "nome": "sweet-veil",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/761.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/761.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/761.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/761.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/761.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/761.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/761.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/761.gif"
+  }
+ },
+ {
+  "id": 762,
+  "nome": "Steenee",
+  "slug": "steenee",
+  "tipos": [
+   "grass"
+  ],
+  "stats": {
+   "hp": 52,
+   "ataque": 40,
+   "defesa": 48,
+   "ataqueEspecial": 40,
+   "defesaEspecial": 48,
+   "velocidade": 62
+  },
+  "evsDados": {
+   "velocidade": 2
+  },
+  "altura": 7,
+  "peso": 82,
+  "experienciaBase": 102,
+  "taxaCaptura": 120,
+  "crescimento": "medium-slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "bounsweet",
+  "cadeiaEvolucao": 392,
+  "habilidades": [
+   {
+    "nome": "leaf-guard",
+    "oculta": false
+   },
+   {
+    "nome": "oblivious",
+    "oculta": false
+   },
+   {
+    "nome": "sweet-veil",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/762.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/762.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/762.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/762.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/762.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/762.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/762.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/762.gif"
+  }
+ },
+ {
+  "id": 763,
+  "nome": "Tsareena",
+  "slug": "tsareena",
+  "tipos": [
+   "grass"
+  ],
+  "stats": {
+   "hp": 72,
+   "ataque": 120,
+   "defesa": 98,
+   "ataqueEspecial": 50,
+   "defesaEspecial": 98,
+   "velocidade": 72
+  },
+  "evsDados": {
+   "ataque": 3
+  },
+  "altura": 12,
+  "peso": 214,
+  "experienciaBase": 230,
+  "taxaCaptura": 45,
+  "crescimento": "medium-slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "steenee",
+  "cadeiaEvolucao": 392,
+  "habilidades": [
+   {
+    "nome": "leaf-guard",
+    "oculta": false
+   },
+   {
+    "nome": "queenly-majesty",
+    "oculta": false
+   },
+   {
+    "nome": "sweet-veil",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/763.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/763.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/763.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/763.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/763.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/763.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/763.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/763.gif"
+  }
+ },
+ {
+  "id": 764,
+  "nome": "Comfey",
+  "slug": "comfey",
+  "tipos": [
+   "fairy"
+  ],
+  "stats": {
+   "hp": 51,
+   "ataque": 52,
+   "defesa": 90,
+   "ataqueEspecial": 82,
+   "defesaEspecial": 110,
+   "velocidade": 100
+  },
+  "evsDados": {
+   "defesaEspecial": 2
+  },
+  "altura": 1,
+  "peso": 3,
+  "experienciaBase": 170,
+  "taxaCaptura": 60,
+  "crescimento": "fast",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 393,
+  "habilidades": [
+   {
+    "nome": "flower-veil",
+    "oculta": false
+   },
+   {
+    "nome": "triage",
+    "oculta": false
+   },
+   {
+    "nome": "natural-cure",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/764.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/764.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/764.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/764.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/764.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/764.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/764.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/764.gif"
+  }
+ },
+ {
+  "id": 765,
+  "nome": "Oranguru",
+  "slug": "oranguru",
+  "tipos": [
+   "normal",
+   "psychic"
+  ],
+  "stats": {
+   "hp": 90,
+   "ataque": 60,
+   "defesa": 80,
+   "ataqueEspecial": 90,
+   "defesaEspecial": 110,
+   "velocidade": 60
+  },
+  "evsDados": {
+   "defesaEspecial": 2
+  },
+  "altura": 15,
+  "peso": 760,
+  "experienciaBase": 172,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 394,
+  "habilidades": [
+   {
+    "nome": "inner-focus",
+    "oculta": false
+   },
+   {
+    "nome": "telepathy",
+    "oculta": false
+   },
+   {
+    "nome": "symbiosis",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/765.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/765.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/765.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/765.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/765.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/765.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/765.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/765.gif"
+  }
+ },
+ {
+  "id": 766,
+  "nome": "Passimian",
+  "slug": "passimian",
+  "tipos": [
+   "fighting"
+  ],
+  "stats": {
+   "hp": 100,
+   "ataque": 120,
+   "defesa": 90,
+   "ataqueEspecial": 40,
+   "defesaEspecial": 60,
+   "velocidade": 80
+  },
+  "evsDados": {
+   "ataque": 2
+  },
+  "altura": 20,
+  "peso": 828,
+  "experienciaBase": 172,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 395,
+  "habilidades": [
+   {
+    "nome": "receiver",
+    "oculta": false
+   },
+   {
+    "nome": "defiant",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/766.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/766.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/766.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/766.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/766.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/766.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/766.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/766.gif"
+  }
+ },
+ {
+  "id": 767,
+  "nome": "Wimpod",
+  "slug": "wimpod",
+  "tipos": [
+   "bug",
+   "water"
+  ],
+  "stats": {
+   "hp": 25,
+   "ataque": 35,
+   "defesa": 40,
+   "ataqueEspecial": 20,
+   "defesaEspecial": 30,
+   "velocidade": 80
+  },
+  "evsDados": {
+   "velocidade": 1
+  },
+  "altura": 5,
+  "peso": 120,
+  "experienciaBase": 46,
+  "taxaCaptura": 90,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 396,
+  "habilidades": [
+   {
+    "nome": "wimp-out",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/767.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/767.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/767.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/767.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/767.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/767.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/767.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/767.gif"
+  }
+ },
+ {
+  "id": 768,
+  "nome": "Golisopod",
+  "slug": "golisopod",
+  "tipos": [
+   "bug",
+   "water"
+  ],
+  "stats": {
+   "hp": 75,
+   "ataque": 125,
+   "defesa": 140,
+   "ataqueEspecial": 60,
+   "defesaEspecial": 90,
+   "velocidade": 40
+  },
+  "evsDados": {
+   "defesa": 2
+  },
+  "altura": 20,
+  "peso": 1080,
+  "experienciaBase": 186,
+  "taxaCaptura": 45,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "wimpod",
+  "cadeiaEvolucao": 396,
+  "habilidades": [
+   {
+    "nome": "emergency-exit",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/768.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/768.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/768.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/768.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/768.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/768.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/768.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/768.gif"
+  }
+ },
+ {
+  "id": 769,
+  "nome": "Sandygast",
+  "slug": "sandygast",
+  "tipos": [
+   "ghost",
+   "ground"
+  ],
+  "stats": {
+   "hp": 55,
+   "ataque": 55,
+   "defesa": 80,
+   "ataqueEspecial": 70,
+   "defesaEspecial": 45,
+   "velocidade": 15
+  },
+  "evsDados": {
+   "defesa": 1
+  },
+  "altura": 5,
+  "peso": 700,
+  "experienciaBase": 64,
+  "taxaCaptura": 140,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 397,
+  "habilidades": [
+   {
+    "nome": "water-compaction",
+    "oculta": false
+   },
+   {
+    "nome": "sand-veil",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/769.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/769.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/769.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/769.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/769.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/769.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/769.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/769.gif"
+  }
+ },
+ {
+  "id": 770,
+  "nome": "Palossand",
+  "slug": "palossand",
+  "tipos": [
+   "ghost",
+   "ground"
+  ],
+  "stats": {
+   "hp": 85,
+   "ataque": 75,
+   "defesa": 110,
+   "ataqueEspecial": 100,
+   "defesaEspecial": 75,
+   "velocidade": 35
+  },
+  "evsDados": {
+   "defesa": 2
+  },
+  "altura": 13,
+  "peso": 2500,
+  "experienciaBase": 168,
+  "taxaCaptura": 60,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "sandygast",
+  "cadeiaEvolucao": 397,
+  "habilidades": [
+   {
+    "nome": "water-compaction",
+    "oculta": false
+   },
+   {
+    "nome": "sand-veil",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/770.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/770.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/770.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/770.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/770.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/770.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/770.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/770.gif"
+  }
+ },
+ {
+  "id": 771,
+  "nome": "Pyukumuku",
+  "slug": "pyukumuku",
+  "tipos": [
+   "water"
+  ],
+  "stats": {
+   "hp": 55,
+   "ataque": 60,
+   "defesa": 130,
+   "ataqueEspecial": 30,
+   "defesaEspecial": 130,
+   "velocidade": 5
+  },
+  "evsDados": {
+   "defesaEspecial": 2
+  },
+  "altura": 3,
+  "peso": 12,
+  "experienciaBase": 144,
+  "taxaCaptura": 60,
+  "crescimento": "fast",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 398,
+  "habilidades": [
+   {
+    "nome": "innards-out",
+    "oculta": false
+   },
+   {
+    "nome": "unaware",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/771.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/771.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/771.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/771.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/771.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/771.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/771.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/771.gif"
+  }
+ },
+ {
+  "id": 772,
+  "nome": "Type: Null",
+  "slug": "type-null",
+  "tipos": [
+   "normal"
+  ],
+  "stats": {
+   "hp": 95,
+   "ataque": 95,
+   "defesa": 95,
+   "ataqueEspecial": 95,
+   "defesaEspecial": 95,
+   "velocidade": 59
+  },
+  "evsDados": {
+   "hp": 2
+  },
+  "altura": 19,
+  "peso": 1205,
+  "experienciaBase": 107,
+  "taxaCaptura": 3,
+  "crescimento": "slow",
+  "lendario": true,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 399,
+  "habilidades": [
+   {
+    "nome": "battle-armor",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/772.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/772.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/772.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/772.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/772.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/772.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/772.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/772.gif"
+  }
+ },
+ {
+  "id": 773,
+  "nome": "Silvally",
+  "slug": "silvally",
+  "tipos": [
+   "normal"
+  ],
+  "stats": {
+   "hp": 95,
+   "ataque": 95,
+   "defesa": 95,
+   "ataqueEspecial": 95,
+   "defesaEspecial": 95,
+   "velocidade": 95
+  },
+  "evsDados": {
+   "hp": 3
+  },
+  "altura": 23,
+  "peso": 1005,
+  "experienciaBase": 257,
+  "taxaCaptura": 3,
+  "crescimento": "slow",
+  "lendario": true,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "type-null",
+  "cadeiaEvolucao": 399,
+  "habilidades": [
+   {
+    "nome": "rks-system",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/773.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/773.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/773.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/773.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/773.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/773.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/773.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/773.gif"
+  }
+ },
+ {
+  "id": 774,
+  "nome": "Minior",
+  "slug": "minior-red-meteor",
+  "tipos": [
+   "rock",
+   "flying"
+  ],
+  "stats": {
+   "hp": 60,
+   "ataque": 60,
+   "defesa": 100,
+   "ataqueEspecial": 60,
+   "defesaEspecial": 100,
+   "velocidade": 60
+  },
+  "evsDados": {
+   "defesa": 1,
+   "defesaEspecial": 1
+  },
+  "altura": 3,
+  "peso": 400,
+  "experienciaBase": 154,
+  "taxaCaptura": 30,
+  "crescimento": "medium-slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 400,
+  "habilidades": [
+   {
+    "nome": "shields-down",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/774.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/774.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/774.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/774.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/774.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/774.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/774.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/774.gif"
+  }
+ },
+ {
+  "id": 775,
+  "nome": "Komala",
+  "slug": "komala",
+  "tipos": [
+   "normal"
+  ],
+  "stats": {
+   "hp": 65,
+   "ataque": 115,
+   "defesa": 65,
+   "ataqueEspecial": 75,
+   "defesaEspecial": 95,
+   "velocidade": 65
+  },
+  "evsDados": {
+   "ataque": 2
+  },
+  "altura": 4,
+  "peso": 199,
+  "experienciaBase": 168,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 401,
+  "habilidades": [
+   {
+    "nome": "comatose",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/775.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/775.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/775.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/775.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/775.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/775.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/775.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/775.gif"
+  }
+ },
+ {
+  "id": 776,
+  "nome": "Turtonator",
+  "slug": "turtonator",
+  "tipos": [
+   "fire",
+   "dragon"
+  ],
+  "stats": {
+   "hp": 60,
+   "ataque": 78,
+   "defesa": 135,
+   "ataqueEspecial": 91,
+   "defesaEspecial": 85,
+   "velocidade": 36
+  },
+  "evsDados": {
+   "defesa": 2
+  },
+  "altura": 20,
+  "peso": 2120,
+  "experienciaBase": 170,
+  "taxaCaptura": 70,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 402,
+  "habilidades": [
+   {
+    "nome": "shell-armor",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/776.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/776.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/776.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/776.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/776.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/776.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/776.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/776.gif"
+  }
+ },
+ {
+  "id": 777,
+  "nome": "Togedemaru",
+  "slug": "togedemaru",
+  "tipos": [
+   "electric",
+   "steel"
+  ],
+  "stats": {
+   "hp": 65,
+   "ataque": 98,
+   "defesa": 63,
+   "ataqueEspecial": 40,
+   "defesaEspecial": 73,
+   "velocidade": 96
+  },
+  "evsDados": {
+   "ataque": 2
+  },
+  "altura": 3,
+  "peso": 33,
+  "experienciaBase": 152,
+  "taxaCaptura": 180,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 403,
+  "habilidades": [
+   {
+    "nome": "iron-barbs",
+    "oculta": false
+   },
+   {
+    "nome": "lightning-rod",
+    "oculta": false
+   },
+   {
+    "nome": "sturdy",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/777.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/777.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/777.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/777.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/777.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/777.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/777.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/777.gif"
+  }
+ },
+ {
+  "id": 778,
+  "nome": "Mimikyu",
+  "slug": "mimikyu-disguised",
+  "tipos": [
+   "ghost",
+   "fairy"
+  ],
+  "stats": {
+   "hp": 55,
+   "ataque": 90,
+   "defesa": 80,
+   "ataqueEspecial": 50,
+   "defesaEspecial": 105,
+   "velocidade": 96
+  },
+  "evsDados": {
+   "defesaEspecial": 2
+  },
+  "altura": 2,
+  "peso": 7,
+  "experienciaBase": 167,
+  "taxaCaptura": 45,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 404,
+  "habilidades": [
+   {
+    "nome": "disguise",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/778.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/778.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/778.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/778.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/778.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/778.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/778.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/778.gif"
+  }
+ },
+ {
+  "id": 779,
+  "nome": "Bruxish",
+  "slug": "bruxish",
+  "tipos": [
+   "water",
+   "psychic"
+  ],
+  "stats": {
+   "hp": 68,
+   "ataque": 105,
+   "defesa": 70,
+   "ataqueEspecial": 70,
+   "defesaEspecial": 70,
+   "velocidade": 92
+  },
+  "evsDados": {
+   "ataque": 2
+  },
+  "altura": 9,
+  "peso": 190,
+  "experienciaBase": 166,
+  "taxaCaptura": 80,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 405,
+  "habilidades": [
+   {
+    "nome": "dazzling",
+    "oculta": false
+   },
+   {
+    "nome": "strong-jaw",
+    "oculta": false
+   },
+   {
+    "nome": "wonder-skin",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/779.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/779.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/779.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/779.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/779.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/779.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/779.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/779.gif"
+  }
+ },
+ {
+  "id": 780,
+  "nome": "Drampa",
+  "slug": "drampa",
+  "tipos": [
+   "normal",
+   "dragon"
+  ],
+  "stats": {
+   "hp": 78,
+   "ataque": 60,
+   "defesa": 85,
+   "ataqueEspecial": 135,
+   "defesaEspecial": 91,
+   "velocidade": 36
+  },
+  "evsDados": {
+   "ataqueEspecial": 2
+  },
+  "altura": 30,
+  "peso": 1850,
+  "experienciaBase": 170,
+  "taxaCaptura": 70,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 406,
+  "habilidades": [
+   {
+    "nome": "berserk",
+    "oculta": false
+   },
+   {
+    "nome": "sap-sipper",
+    "oculta": false
+   },
+   {
+    "nome": "cloud-nine",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/780.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/780.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/780.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/780.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/780.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/780.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/780.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/780.gif"
+  }
+ },
+ {
+  "id": 781,
+  "nome": "Dhelmise",
+  "slug": "dhelmise",
+  "tipos": [
+   "ghost",
+   "grass"
+  ],
+  "stats": {
+   "hp": 70,
+   "ataque": 131,
+   "defesa": 100,
+   "ataqueEspecial": 86,
+   "defesaEspecial": 90,
+   "velocidade": 40
+  },
+  "evsDados": {
+   "ataque": 2
+  },
+  "altura": 39,
+  "peso": 2100,
+  "experienciaBase": 181,
+  "taxaCaptura": 25,
+  "crescimento": "medium",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 407,
+  "habilidades": [
+   {
+    "nome": "steelworker",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/781.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/781.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/781.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/781.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/781.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/781.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/781.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/781.gif"
+  }
+ },
+ {
+  "id": 782,
+  "nome": "Jangmo-o",
+  "slug": "jangmo-o",
+  "tipos": [
+   "dragon"
+  ],
+  "stats": {
+   "hp": 45,
+   "ataque": 55,
+   "defesa": 65,
+   "ataqueEspecial": 45,
+   "defesaEspecial": 45,
+   "velocidade": 45
+  },
+  "evsDados": {
+   "defesa": 1
+  },
+  "altura": 6,
+  "peso": 297,
+  "experienciaBase": 60,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 408,
+  "habilidades": [
+   {
+    "nome": "bulletproof",
+    "oculta": false
+   },
+   {
+    "nome": "soundproof",
+    "oculta": false
+   },
+   {
+    "nome": "overcoat",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/782.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/782.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/782.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/782.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/782.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/782.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/782.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/782.gif"
+  }
+ },
+ {
+  "id": 783,
+  "nome": "Hakamo-o",
+  "slug": "hakamo-o",
+  "tipos": [
+   "dragon",
+   "fighting"
+  ],
+  "stats": {
+   "hp": 55,
+   "ataque": 75,
+   "defesa": 90,
+   "ataqueEspecial": 65,
+   "defesaEspecial": 70,
+   "velocidade": 65
+  },
+  "evsDados": {
+   "defesa": 2
+  },
+  "altura": 12,
+  "peso": 470,
+  "experienciaBase": 147,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "jangmo-o",
+  "cadeiaEvolucao": 408,
+  "habilidades": [
+   {
+    "nome": "bulletproof",
+    "oculta": false
+   },
+   {
+    "nome": "soundproof",
+    "oculta": false
+   },
+   {
+    "nome": "overcoat",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/783.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/783.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/783.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/783.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/783.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/783.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/783.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/783.gif"
+  }
+ },
+ {
+  "id": 784,
+  "nome": "Kommo-o",
+  "slug": "kommo-o",
+  "tipos": [
+   "dragon",
+   "fighting"
+  ],
+  "stats": {
+   "hp": 75,
+   "ataque": 110,
+   "defesa": 125,
+   "ataqueEspecial": 100,
+   "defesaEspecial": 105,
+   "velocidade": 85
+  },
+  "evsDados": {
+   "defesa": 3
+  },
+  "altura": 16,
+  "peso": 782,
+  "experienciaBase": 270,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "hakamo-o",
+  "cadeiaEvolucao": 408,
+  "habilidades": [
+   {
+    "nome": "bulletproof",
+    "oculta": false
+   },
+   {
+    "nome": "soundproof",
+    "oculta": false
+   },
+   {
+    "nome": "overcoat",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/784.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/784.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/784.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/784.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/784.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/784.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/784.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/784.gif"
+  }
+ },
+ {
+  "id": 785,
+  "nome": "Tapu Koko",
+  "slug": "tapu-koko",
+  "tipos": [
+   "electric",
+   "fairy"
+  ],
+  "stats": {
+   "hp": 70,
+   "ataque": 115,
+   "defesa": 85,
+   "ataqueEspecial": 95,
+   "defesaEspecial": 75,
+   "velocidade": 130
+  },
+  "evsDados": {
+   "velocidade": 3
+  },
+  "altura": 18,
+  "peso": 205,
+  "experienciaBase": 257,
+  "taxaCaptura": 3,
+  "crescimento": "slow",
+  "lendario": true,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 409,
+  "habilidades": [
+   {
+    "nome": "electric-surge",
+    "oculta": false
+   },
+   {
+    "nome": "telepathy",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/785.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/785.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/785.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/785.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/785.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/785.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/785.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/785.gif"
+  }
+ },
+ {
+  "id": 786,
+  "nome": "Tapu Lele",
+  "slug": "tapu-lele",
+  "tipos": [
+   "psychic",
+   "fairy"
+  ],
+  "stats": {
+   "hp": 70,
+   "ataque": 85,
+   "defesa": 75,
+   "ataqueEspecial": 130,
+   "defesaEspecial": 115,
+   "velocidade": 95
+  },
+  "evsDados": {
+   "ataqueEspecial": 3
+  },
+  "altura": 12,
+  "peso": 186,
+  "experienciaBase": 257,
+  "taxaCaptura": 3,
+  "crescimento": "slow",
+  "lendario": true,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 410,
+  "habilidades": [
+   {
+    "nome": "psychic-surge",
+    "oculta": false
+   },
+   {
+    "nome": "telepathy",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/786.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/786.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/786.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/786.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/786.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/786.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/786.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/786.gif"
+  }
+ },
+ {
+  "id": 787,
+  "nome": "Tapu Bulu",
+  "slug": "tapu-bulu",
+  "tipos": [
+   "grass",
+   "fairy"
+  ],
+  "stats": {
+   "hp": 70,
+   "ataque": 130,
+   "defesa": 115,
+   "ataqueEspecial": 85,
+   "defesaEspecial": 95,
+   "velocidade": 75
+  },
+  "evsDados": {
+   "ataque": 3
+  },
+  "altura": 19,
+  "peso": 455,
+  "experienciaBase": 257,
+  "taxaCaptura": 3,
+  "crescimento": "slow",
+  "lendario": true,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 411,
+  "habilidades": [
+   {
+    "nome": "grassy-surge",
+    "oculta": false
+   },
+   {
+    "nome": "telepathy",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/787.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/787.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/787.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/787.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/787.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/787.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/787.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/787.gif"
+  }
+ },
+ {
+  "id": 788,
+  "nome": "Tapu Fini",
+  "slug": "tapu-fini",
+  "tipos": [
+   "water",
+   "fairy"
+  ],
+  "stats": {
+   "hp": 70,
+   "ataque": 75,
+   "defesa": 115,
+   "ataqueEspecial": 95,
+   "defesaEspecial": 130,
+   "velocidade": 85
+  },
+  "evsDados": {
+   "defesaEspecial": 3
+  },
+  "altura": 13,
+  "peso": 212,
+  "experienciaBase": 257,
+  "taxaCaptura": 3,
+  "crescimento": "slow",
+  "lendario": true,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 412,
+  "habilidades": [
+   {
+    "nome": "misty-surge",
+    "oculta": false
+   },
+   {
+    "nome": "telepathy",
+    "oculta": true
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/788.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/788.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/788.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/788.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/788.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/788.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/788.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/788.gif"
+  }
+ },
+ {
+  "id": 789,
+  "nome": "Cosmog",
+  "slug": "cosmog",
+  "tipos": [
+   "psychic"
+  ],
+  "stats": {
+   "hp": 43,
+   "ataque": 29,
+   "defesa": 31,
+   "ataqueEspecial": 29,
+   "defesaEspecial": 31,
+   "velocidade": 37
+  },
+  "evsDados": {
+   "hp": 1
+  },
+  "altura": 2,
+  "peso": 1,
+  "experienciaBase": 40,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": true,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 413,
+  "habilidades": [
+   {
+    "nome": "unaware",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/789.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/789.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/789.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/789.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/789.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/789.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/789.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/789.gif"
+  }
+ },
+ {
+  "id": 790,
+  "nome": "Cosmoem",
+  "slug": "cosmoem",
+  "tipos": [
+   "psychic"
+  ],
+  "stats": {
+   "hp": 43,
+   "ataque": 29,
+   "defesa": 131,
+   "ataqueEspecial": 29,
+   "defesaEspecial": 131,
+   "velocidade": 37
+  },
+  "evsDados": {
+   "defesa": 1,
+   "defesaEspecial": 1
+  },
+  "altura": 1,
+  "peso": 9999,
+  "experienciaBase": 140,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": true,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "cosmog",
+  "cadeiaEvolucao": 413,
+  "habilidades": [
+   {
+    "nome": "sturdy",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/790.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/790.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/790.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/790.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/790.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/790.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/790.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/790.gif"
+  }
+ },
+ {
+  "id": 791,
+  "nome": "Solgaleo",
+  "slug": "solgaleo",
+  "tipos": [
+   "psychic",
+   "steel"
+  ],
+  "stats": {
+   "hp": 137,
+   "ataque": 137,
+   "defesa": 107,
+   "ataqueEspecial": 113,
+   "defesaEspecial": 89,
+   "velocidade": 97
+  },
+  "evsDados": {
+   "ataque": 3
+  },
+  "altura": 34,
+  "peso": 2300,
+  "experienciaBase": 306,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": true,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "cosmoem",
+  "cadeiaEvolucao": 413,
+  "habilidades": [
+   {
+    "nome": "full-metal-body",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/791.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/791.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/791.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/791.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/791.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/791.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/791.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/791.gif"
+  }
+ },
+ {
+  "id": 792,
+  "nome": "Lunala",
+  "slug": "lunala",
+  "tipos": [
+   "psychic",
+   "ghost"
+  ],
+  "stats": {
+   "hp": 137,
+   "ataque": 113,
+   "defesa": 89,
+   "ataqueEspecial": 137,
+   "defesaEspecial": 107,
+   "velocidade": 97
+  },
+  "evsDados": {
+   "ataqueEspecial": 3
+  },
+  "altura": 40,
+  "peso": 1200,
+  "experienciaBase": 306,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": true,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "cosmoem",
+  "cadeiaEvolucao": 413,
+  "habilidades": [
+   {
+    "nome": "shadow-shield",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/792.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/792.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/792.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/792.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/792.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/792.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/792.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/792.gif"
+  }
+ },
+ {
+  "id": 793,
+  "nome": "Nihilego",
+  "slug": "nihilego",
+  "tipos": [
+   "rock",
+   "poison"
+  ],
+  "stats": {
+   "hp": 109,
+   "ataque": 53,
+   "defesa": 47,
+   "ataqueEspecial": 127,
+   "defesaEspecial": 131,
+   "velocidade": 103
+  },
+  "evsDados": {
+   "defesaEspecial": 3
+  },
+  "altura": 12,
+  "peso": 555,
+  "experienciaBase": 257,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 414,
+  "habilidades": [
+   {
+    "nome": "beast-boost",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/793.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/793.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/793.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/793.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/793.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/793.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/793.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/793.gif"
+  }
+ },
+ {
+  "id": 794,
+  "nome": "Buzzwole",
+  "slug": "buzzwole",
+  "tipos": [
+   "bug",
+   "fighting"
+  ],
+  "stats": {
+   "hp": 107,
+   "ataque": 139,
+   "defesa": 139,
+   "ataqueEspecial": 53,
+   "defesaEspecial": 53,
+   "velocidade": 79
+  },
+  "evsDados": {
+   "ataque": 1,
+   "defesa": 2
+  },
+  "altura": 24,
+  "peso": 3336,
+  "experienciaBase": 257,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 415,
+  "habilidades": [
+   {
+    "nome": "beast-boost",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/794.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/794.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/794.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/794.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/794.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/794.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/794.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/794.gif"
+  }
+ },
+ {
+  "id": 795,
+  "nome": "Pheromosa",
+  "slug": "pheromosa",
+  "tipos": [
+   "bug",
+   "fighting"
+  ],
+  "stats": {
+   "hp": 71,
+   "ataque": 137,
+   "defesa": 37,
+   "ataqueEspecial": 137,
+   "defesaEspecial": 37,
+   "velocidade": 151
+  },
+  "evsDados": {
+   "velocidade": 3
+  },
+  "altura": 18,
+  "peso": 250,
+  "experienciaBase": 257,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 416,
+  "habilidades": [
+   {
+    "nome": "beast-boost",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/795.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/795.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/795.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/795.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/795.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/795.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/795.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/795.gif"
+  }
+ },
+ {
+  "id": 796,
+  "nome": "Xurkitree",
+  "slug": "xurkitree",
+  "tipos": [
+   "electric"
+  ],
+  "stats": {
+   "hp": 83,
+   "ataque": 89,
+   "defesa": 71,
+   "ataqueEspecial": 173,
+   "defesaEspecial": 71,
+   "velocidade": 83
+  },
+  "evsDados": {
+   "ataqueEspecial": 3
+  },
+  "altura": 38,
+  "peso": 1000,
+  "experienciaBase": 257,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 417,
+  "habilidades": [
+   {
+    "nome": "beast-boost",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/796.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/796.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/796.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/796.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/796.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/796.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/796.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/796.gif"
+  }
+ },
+ {
+  "id": 797,
+  "nome": "Celesteela",
+  "slug": "celesteela",
+  "tipos": [
+   "steel",
+   "flying"
+  ],
+  "stats": {
+   "hp": 97,
+   "ataque": 101,
+   "defesa": 103,
+   "ataqueEspecial": 107,
+   "defesaEspecial": 101,
+   "velocidade": 61
+  },
+  "evsDados": {
+   "ataque": 1,
+   "defesa": 1,
+   "ataqueEspecial": 1
+  },
+  "altura": 92,
+  "peso": 9999,
+  "experienciaBase": 257,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 418,
+  "habilidades": [
+   {
+    "nome": "beast-boost",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/797.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/797.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/797.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/797.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/797.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/797.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/797.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/797.gif"
+  }
+ },
+ {
+  "id": 798,
+  "nome": "Kartana",
+  "slug": "kartana",
+  "tipos": [
+   "grass",
+   "steel"
+  ],
+  "stats": {
+   "hp": 59,
+   "ataque": 181,
+   "defesa": 131,
+   "ataqueEspecial": 59,
+   "defesaEspecial": 31,
+   "velocidade": 109
+  },
+  "evsDados": {
+   "ataque": 3
+  },
+  "altura": 3,
+  "peso": 1,
+  "experienciaBase": 257,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 419,
+  "habilidades": [
+   {
+    "nome": "beast-boost",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/798.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/798.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/798.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/798.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/798.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/798.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/798.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/798.gif"
+  }
+ },
+ {
+  "id": 799,
+  "nome": "Guzzlord",
+  "slug": "guzzlord",
+  "tipos": [
+   "dark",
+   "dragon"
+  ],
+  "stats": {
+   "hp": 223,
+   "ataque": 101,
+   "defesa": 53,
+   "ataqueEspecial": 97,
+   "defesaEspecial": 53,
+   "velocidade": 43
+  },
+  "evsDados": {
+   "hp": 3
+  },
+  "altura": 55,
+  "peso": 8880,
+  "experienciaBase": 257,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 420,
+  "habilidades": [
+   {
+    "nome": "beast-boost",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/799.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/799.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/799.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/799.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/799.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/799.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/799.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/799.gif"
+  }
+ },
+ {
+  "id": 800,
+  "nome": "Necrozma",
+  "slug": "necrozma",
+  "tipos": [
+   "psychic"
+  ],
+  "stats": {
+   "hp": 97,
+   "ataque": 107,
+   "defesa": 101,
+   "ataqueEspecial": 127,
+   "defesaEspecial": 89,
+   "velocidade": 79
+  },
+  "evsDados": {
+   "ataque": 1,
+   "ataqueEspecial": 2
+  },
+  "altura": 24,
+  "peso": 2300,
+  "experienciaBase": 270,
+  "taxaCaptura": 255,
+  "crescimento": "slow",
+  "lendario": true,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 421,
+  "habilidades": [
+   {
+    "nome": "prism-armor",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/800.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/800.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/800.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/800.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/800.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/800.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/800.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/800.gif"
+  }
+ },
+ {
+  "id": 801,
+  "nome": "Magearna",
+  "slug": "magearna",
+  "tipos": [
+   "steel",
+   "fairy"
+  ],
+  "stats": {
+   "hp": 80,
+   "ataque": 95,
+   "defesa": 115,
+   "ataqueEspecial": 130,
+   "defesaEspecial": 115,
+   "velocidade": 65
+  },
+  "evsDados": {
+   "ataqueEspecial": 3
+  },
+  "altura": 10,
+  "peso": 805,
+  "experienciaBase": 270,
+  "taxaCaptura": 3,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": true,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 422,
+  "habilidades": [
+   {
+    "nome": "soul-heart",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/801.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/801.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/801.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/801.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/801.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/801.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/801.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/801.gif"
+  }
+ },
+ {
+  "id": 802,
+  "nome": "Marshadow",
+  "slug": "marshadow",
+  "tipos": [
+   "fighting",
+   "ghost"
+  ],
+  "stats": {
+   "hp": 90,
+   "ataque": 125,
+   "defesa": 80,
+   "ataqueEspecial": 90,
+   "defesaEspecial": 90,
+   "velocidade": 125
+  },
+  "evsDados": {
+   "ataque": 2,
+   "velocidade": 1
+  },
+  "altura": 7,
+  "peso": 222,
+  "experienciaBase": 270,
+  "taxaCaptura": 3,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": true,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 423,
+  "habilidades": [
+   {
+    "nome": "technician",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/802.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/802.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/802.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/802.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/802.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/802.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/802.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/802.gif"
+  }
+ },
+ {
+  "id": 803,
+  "nome": "Poipole",
+  "slug": "poipole",
+  "tipos": [
+   "poison"
+  ],
+  "stats": {
+   "hp": 67,
+   "ataque": 73,
+   "defesa": 67,
+   "ataqueEspecial": 73,
+   "defesaEspecial": 67,
+   "velocidade": 73
+  },
+  "evsDados": {
+   "velocidade": 1
+  },
+  "altura": 6,
+  "peso": 18,
+  "experienciaBase": 189,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 424,
+  "habilidades": [
+   {
+    "nome": "beast-boost",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/803.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/803.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/803.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/803.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/803.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/803.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/803.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/803.gif"
+  }
+ },
+ {
+  "id": 804,
+  "nome": "Naganadel",
+  "slug": "naganadel",
+  "tipos": [
+   "poison",
+   "dragon"
+  ],
+  "stats": {
+   "hp": 73,
+   "ataque": 73,
+   "defesa": 73,
+   "ataqueEspecial": 127,
+   "defesaEspecial": 73,
+   "velocidade": 121
+  },
+  "evsDados": {
+   "ataqueEspecial": 3
+  },
+  "altura": 36,
+  "peso": 1500,
+  "experienciaBase": 243,
+  "taxaCaptura": 45,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": "poipole",
+  "cadeiaEvolucao": 424,
+  "habilidades": [
+   {
+    "nome": "beast-boost",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/804.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/804.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/804.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/804.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/804.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/804.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/804.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/804.gif"
+  }
+ },
+ {
+  "id": 805,
+  "nome": "Stakataka",
+  "slug": "stakataka",
+  "tipos": [
+   "rock",
+   "steel"
+  ],
+  "stats": {
+   "hp": 61,
+   "ataque": 131,
+   "defesa": 211,
+   "ataqueEspecial": 53,
+   "defesaEspecial": 101,
+   "velocidade": 13
+  },
+  "evsDados": {
+   "defesa": 3
+  },
+  "altura": 55,
+  "peso": 8200,
+  "experienciaBase": 257,
+  "taxaCaptura": 30,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 425,
+  "habilidades": [
+   {
+    "nome": "beast-boost",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/805.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/805.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/805.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/805.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/805.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/805.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/805.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/805.gif"
+  }
+ },
+ {
+  "id": 806,
+  "nome": "Blacephalon",
+  "slug": "blacephalon",
+  "tipos": [
+   "fire",
+   "ghost"
+  ],
+  "stats": {
+   "hp": 53,
+   "ataque": 127,
+   "defesa": 53,
+   "ataqueEspecial": 151,
+   "defesaEspecial": 79,
+   "velocidade": 107
+  },
+  "evsDados": {
+   "ataqueEspecial": 3
+  },
+  "altura": 18,
+  "peso": 130,
+  "experienciaBase": 257,
+  "taxaCaptura": 30,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": false,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 426,
+  "habilidades": [
+   {
+    "nome": "beast-boost",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/806.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/806.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/806.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/806.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/806.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/806.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/806.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/806.gif"
+  }
+ },
+ {
+  "id": 807,
+  "nome": "Zeraora",
+  "slug": "zeraora",
+  "tipos": [
+   "electric"
+  ],
+  "stats": {
+   "hp": 88,
+   "ataque": 112,
+   "defesa": 75,
+   "ataqueEspecial": 102,
+   "defesaEspecial": 80,
+   "velocidade": 143
+  },
+  "evsDados": {
+   "velocidade": 3
+  },
+  "altura": 15,
+  "peso": 445,
+  "experienciaBase": 270,
+  "taxaCaptura": 3,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": true,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 427,
+  "habilidades": [
+   {
+    "nome": "volt-absorb",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/807.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/807.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/807.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/807.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/807.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/807.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/807.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/807.gif"
+  }
+ },
+ {
+  "id": 808,
+  "nome": "Meltan",
+  "slug": "meltan",
+  "tipos": [
+   "steel"
+  ],
+  "stats": {
+   "hp": 46,
+   "ataque": 65,
+   "defesa": 65,
+   "ataqueEspecial": 55,
+   "defesaEspecial": 35,
+   "velocidade": 34
+  },
+  "evsDados": {
+   "ataque": 1
+  },
+  "altura": 2,
+  "peso": 80,
+  "experienciaBase": 135,
+  "taxaCaptura": 3,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": true,
+  "bebe": false,
+  "evoluiDe": null,
+  "cadeiaEvolucao": 428,
+  "habilidades": [
+   {
+    "nome": "magnet-pull",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/808.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/808.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/808.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/808.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/808.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/808.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/808.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/808.gif"
+  }
+ },
+ {
+  "id": 809,
+  "nome": "Melmetal",
+  "slug": "melmetal",
+  "tipos": [
+   "steel"
+  ],
+  "stats": {
+   "hp": 135,
+   "ataque": 143,
+   "defesa": 143,
+   "ataqueEspecial": 80,
+   "defesaEspecial": 65,
+   "velocidade": 34
+  },
+  "evsDados": {
+   "ataque": 3
+  },
+  "altura": 25,
+  "peso": 8000,
+  "experienciaBase": 270,
+  "taxaCaptura": 3,
+  "crescimento": "slow",
+  "lendario": false,
+  "mitico": true,
+  "bebe": false,
+  "evoluiDe": "meltan",
+  "cadeiaEvolucao": 428,
+  "habilidades": [
+   {
+    "nome": "iron-fist",
+    "oculta": false
+   }
+  ],
+  "sprites": {
+   "frente": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/809.png",
+   "frenteShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/809.png",
+   "costas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/809.png",
+   "costasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/809.png",
+   "gif": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/809.gif",
+   "gifShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/shiny/809.gif",
+   "gifCostas": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/809.gif",
+   "gifCostasShiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/back/shiny/809.gif"
+  }
+ }
+]

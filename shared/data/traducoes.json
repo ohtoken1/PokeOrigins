@@ -1024,5 +1024,8 @@
  "This Pokemon can only be damaged by supereffective moves and indirect damage.": "Este Pokémon só leva dano de golpes super efetivos e de dano indireto.",
  "Status moves with accuracy checks are 50% accurate when used on this Pokemon.": "Golpes de status que verificam precisão têm 50% de precisão contra este Pokémon.",
  "If Darmanitan, at end of turn changes Mode to Standard if > 1/2 max HP, else Zen.": "Se for Darmanitan, no fim do turno vira o modo Standard com mais da metade do HP; senão, Zen.",
- "If this Pokemon is a Palafin in Zero Form, switching out has it change to Hero Form.": "Se for Palafin na forma Zero, vira a forma Hero ao sair da batalha trocando."
+ "If this Pokemon is a Palafin in Zero Form, switching out has it change to Hero Form.": "Se for Palafin na forma Zero, vira a forma Hero ao sair da batalha trocando.",
+ "Removes adjacent Pokemon's held items.": "Remove os itens segurados dos Pokémon ao lado.",
+ "User's Fire type becomes typeless; must be Fire.": "O tipo Fogo do usuário deixa de existir; o usuário precisa ser do tipo Fogo.",
+ "Lowers the user's Defense, Sp. Def, Speed by 1.": "Reduz a Defense, a Sp. Def e a Speed do usuário em 1."
 }
