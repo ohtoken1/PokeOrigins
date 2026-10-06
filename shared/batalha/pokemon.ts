@@ -32,6 +32,9 @@ export interface PokemonIndividual {
   inegociavel?: boolean;
 }
 
+/** IV mínimo de um Pokémon shiny (cada atributo vem entre 15 e 31). */
+export const IV_MIN_SHINY = 15;
+
 export const ATRIBUTOS: Atributo[] = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
 export const EV_MAX_ATRIBUTO = 252;
 export const EV_MAX_TOTAL = 510;
@@ -202,7 +205,9 @@ export function gerarIndividuo(
   const { shiny = false, crescimento = null, aleatorio = Math.random } = opcoes;
   const s = especie(numero);
   const ivs = {} as Atributos;
-  for (const a of ATRIBUTOS) ivs[a] = Math.floor(aleatorio() * 32);
+  // shiny: IVs de IV_MIN_SHINY a 31 (os normais vão de 0 a 31)
+  const ivMin = shiny ? IV_MIN_SHINY : 0;
+  for (const a of ATRIBUTOS) ivs[a] = ivMin + Math.floor(aleatorio() * (32 - ivMin));
 
   let genero: PokemonIndividual['genero'];
   if (s.gender) genero = s.gender as PokemonIndividual['genero'];

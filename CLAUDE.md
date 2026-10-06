@@ -30,7 +30,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
   - Pokémon do jogador entram como `P<posição no time>` e o selvagem como `S0`; os nomes exibidos vêm dos nossos dados.
   - Showdown não tem batalha selvagem: captura (fórmula 3ª/4ª gen, bônus de status da 5ª+) e fuga (fórmula 3ª/4ª gen) são nossas. Quando o jogador perde a vez (bola falhou / fuga falhou), usamos o volátil `mustrecharge` para o selvagem agir sozinho e escondemos a mensagem de "recarga".
   - O selvagem escolhe um golpe aleatório válido (IA simples).
-- `pokemon.ts` — indivíduo (IVs, natureza, habilidade, gênero, golpes com PP, HP, status), golpes por nível do learnset do Showdown (geração mais recente da espécie), atributos, curvas de XP, fórmula de XP da 7ª gen+; XP e EVs só para quem entrou em campo na batalha (sem Exp. Share, pedido do dono), evolução só por nível.
+- `pokemon.ts` — indivíduo (IVs 0–31; **shiny 15–31**, `IV_MIN_SHINY`; natureza, habilidade, gênero, golpes com PP, HP, status), golpes por nível do learnset do Showdown (geração mais recente da espécie), atributos, curvas de XP, fórmula de XP da 7ª gen+; XP e EVs só para quem entrou em campo na batalha (sem Exp. Share, pedido do dono), evolução só por nível.
 - `progresso.ts` — XP → níveis → golpes novos (com 4 golpes o jogador escolhe qual esquecer) → evolução.
 - PP: sem PP Ups (máximo = PP base). HP/status/PP persistem entre batalhas; Centro Pokémon cura. Derrota = cura e volta ao menu da região.
 - Interface e animações: `client/src/batalha/` (físico = avanço, especial = projétil da cor do tipo, status = anel; Pokébola com tremidas; evolução piscando).
