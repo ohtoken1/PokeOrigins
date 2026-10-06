@@ -11,7 +11,7 @@ import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
 import type { PokemonBase } from '../../../shared/tipos';
 import { pokemonsDaRegiao } from '../dados';
 import { carregarSave } from '../estado';
-import { el, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
+import { el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 
 const REGIAO = 'kanto';
 
@@ -160,7 +160,14 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
       : 'Não aparece solto: só evoluindo';
 
   // gênero
-  const genero = s.gender === 'N' ? 'Sem gênero' : s.gender === 'M' ? '100% ♂' : s.gender === 'F' ? '100% ♀' : `${(s.genderRatio.M * 100).toFixed(1).replace('.0', '')}% ♂ · ${(s.genderRatio.F * 100).toFixed(1).replace('.0', '')}% ♀`;
+  // símbolos coloridos (♂ azul, ♀ rosa)
+  const pct = (v: number) => `${(v * 100).toFixed(1).replace('.0', '')}%`;
+  const genero = el('span', {},
+    ...(s.gender === 'N' ? ['Sem gênero']
+      : s.gender === 'M' ? ['100%', seloGenero('M')]
+      : s.gender === 'F' ? ['100%', seloGenero('F')]
+      : [pct(s.genderRatio.M), seloGenero('M'), ' · ', pct(s.genderRatio.F), seloGenero('F')]).filter((x): x is string | HTMLElement => x !== null),
+  );
   const evs = Object.entries(p.evsDados).map(([a, v]) => `${v} ${ATRIBUTOS.find(([x]) => x === a)?.[1] ?? a}`).join(', ') || '—';
 
   // golpes por nível e por máquina
@@ -230,6 +237,17 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
   );
 }
 
+/** Pokébola pequena desenhada em SVG (marca de "capturado" na lista). */
+function pokebolinha(): HTMLElement {
+  const marca = el('span', { class: 'dex-marca capturado', title: 'Capturado' });
+  marca.innerHTML =
+    '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">' +
+    '<path d="M1.5 8a6.5 6.5 0 0 1 13 0z" fill="#ef4444"/><path d="M1.5 8a6.5 6.5 0 0 0 13 0z" fill="#f8fafc"/>' +
+    '<circle cx="8" cy="8" r="6.5" fill="none" stroke="#1f2937" stroke-width="1.2"/><path d="M1.5 8h13" stroke="#1f2937" stroke-width="1.2"/>' +
+    '<circle cx="8" cy="8" r="2.1" fill="#f8fafc" stroke="#1f2937" stroke-width="1.2"/></svg>';
+  return marca;
+}
+
 export const telaPokedex = (inicial?: number): Tela => (raiz) => {
   const todos = pokemonsDaRegiao(REGIAO);
   const encontros = mapaDeEncontros(todos);
@@ -266,7 +284,7 @@ export const telaPokedex = (inicial?: number): Tela => (raiz) => {
           spritePokemon(p, { animado: false }),
           el('span', { class: 'dex-num' }, `#${String(p.id).padStart(3, '0')}`),
           el('span', { class: 'dex-nome' }, p.nome),
-          capturados.has(p.id) ? el('span', { class: 'dex-marca capturado', title: 'Capturado' }, '●') : vistos.has(p.id) ? el('span', { class: 'dex-marca', title: 'Visto' }, '○') : null,
+          capturados.has(p.id) ? pokebolinha() : vistos.has(p.id) ? el('span', { class: 'dex-marca', title: 'Visto' }, '○') : null,
         ),
       ),
     );
