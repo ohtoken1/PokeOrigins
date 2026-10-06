@@ -40,7 +40,8 @@ export class BiomaScene extends Phaser.Scene {
 
   preload() {
     this.load.image('buch', 'tiles/tuxemon-buch.png');
-    this.load.image('voxel', 'tiles/red-voxel.png');
+    this.load.image('natureza', 'tiles/core_outdoor_nature.png');
+    this.load.image('agua', 'tiles/core_outdoor_water.png');
   }
 
   create() {
@@ -50,7 +51,7 @@ export class BiomaScene extends Phaser.Scene {
     this.pos = { ...this.mapa.inicio };
 
     const imagem = (chave: string) => this.textures.get(chave).getSourceImage() as HTMLImageElement;
-    this.textures.addCanvas('mapa', desenharMapa(this.mapa, paleta, bioma.id, { buch: imagem('buch'), voxel: imagem('voxel') }));
+    this.textures.addCanvas('mapa', desenharMapa(this.mapa, paleta, bioma.id, { buch: imagem('buch'), natureza: imagem('natureza'), agua: imagem('agua') }));
     this.textures.addCanvas('jogador', desenharJogador());
     this.add.image(0, 0, 'mapa').setOrigin(0);
     this.jogador = this.add.image(...this.centroDoTile(this.pos.x, this.pos.y), 'jogador').setOrigin(0.5, 0.75);

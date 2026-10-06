@@ -87,7 +87,7 @@ export const telaRegiao: Tela = (raiz, navegar) => {
           el(
             'p',
             { class: 'creditos' },
-            'Tiles: "Tuxemon Tileset" por Buch e "Pokemon-inspired 16x16 tiles" por Red_Voxel (CC-BY-SA 3.0, OpenGameArt). Dados: PokéAPI. Batalha: Pokémon Showdown.',
+            'Tiles: "Tuxemon Tileset" por Buch (CC-BY-SA 3.0) e tilesets "Core Outdoor" do projeto Tuxemon por rubberduck, George_, Buch e outros (CC-BY-SA 4.0). Dados: PokéAPI. Batalha: Pokémon Showdown.',
           ),
         ),
       ),

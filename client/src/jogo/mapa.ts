@@ -6,7 +6,7 @@ export const TAM = 16;
 export const LARGURA = 48;
 export const ALTURA = 36;
 
-export type Terreno = 'chao' | 'mato' | 'caminho' | 'ponte' | 'liquido';
+export type Terreno = 'chao' | 'mato' | 'caminho' | 'liquido';
 
 export interface Mapa {
   terreno: Terreno[][];
@@ -14,7 +14,8 @@ export interface Mapa {
   /** obstáculos 2×2 (árvores, pedras grandes…) com canto superior esquerdo em x,y */
   grandes: { x: number; y: number }[];
   pedrinhas: { x: number; y: number }[];
-  flores: { x: number; y: number; cor: string; dx: number; dy: number }[];
+  /** dx/dy só servem para variar qual flor do tileset aparece */
+  flores: { x: number; y: number; dx: number; dy: number }[];
   inicio: { x: number; y: number };
 }
 
@@ -46,15 +47,11 @@ export function gerarMapa(semente: string, paleta: Paleta): Mapa {
         if (dentro(x, y) && so.includes(terreno[y][x]) && Math.hypot(x - cx, (y - cy) * 1.15) < raio + r() * 0.9) terreno[y][x] = tipo;
   };
 
-  // lagos (água, lava ou abismo, conforme o bioma)
-  for (let i = 0; i < paleta.lagos; i++) mancha(entre(7, LARGURA - 8), entre(6, ALTURA - 7), 2.5 + r() * 3, 'liquido', ['chao']);
-
-  // caminhos que cruzam o mapa (2 de largura); sobre o líquido viram ponte
+  // caminhos que cruzam o mapa (2 de largura)
   const pintarCaminho = (x: number, y: number) => {
     for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
       const [px, py] = [x + dx, y + dy];
-      if (!dentro(px, py)) continue;
-      terreno[py][px] = terreno[py][px] === 'liquido' || terreno[py][px] === 'ponte' ? 'ponte' : 'caminho';
+      if (dentro(px, py)) terreno[py][px] = 'caminho';
     }
   };
   let y = entre(ALTURA / 2 - 4, ALTURA / 2 + 4);
@@ -68,6 +65,18 @@ export function gerarMapa(semente: string, paleta: Paleta): Mapa {
     pintarCaminho(x, yy);
     if (r() < 0.18) x = Math.max(4, Math.min(LARGURA - 6, x + (r() < 0.5 ? -1 : 1)));
     pintarCaminho(x, yy);
+  }
+
+  // lagos retangulares (a moldura de margem do tileset só encaixa em retângulos), sem encostar
+  // em caminhos nem em outros lagos; mínimo 3×3 para caber os cantos e as bordas
+  for (let i = 0, tentativas = 0; i < paleta.lagos && tentativas < 200; tentativas++) {
+    const [w, h] = [entre(4, 9), entre(3, 6)];
+    const [lx, ly] = [entre(4, LARGURA - w - 4), entre(4, ALTURA - h - 4)];
+    let cabe = true;
+    for (let yy = ly - 1; yy <= ly + h && cabe; yy++) for (let xx = lx - 1; xx <= lx + w && cabe; xx++) cabe = terreno[yy][xx] === 'chao';
+    if (!cabe) continue;
+    for (let yy = ly; yy < ly + h; yy++) for (let xx = lx; xx < lx + w; xx++) terreno[yy][xx] = 'liquido';
+    i++;
   }
 
   // mato alto (só enfeite: os encontros acontecem em qualquer passo)
@@ -104,7 +113,7 @@ export function gerarMapa(semente: string, paleta: Paleta): Mapa {
   for (let fy = 0; fy < ALTURA; fy++)
     for (let fx = 0; fx < LARGURA; fx++)
       if (terreno[fy][fx] === 'chao' && !bloqueado[fy][fx] && r() < 0.07)
-        flores.push({ x: fx, y: fy, cor: paleta.flores[Math.floor(r() * paleta.flores.length)], dx: entre(2, 10), dy: entre(2, 10) });
+        flores.push({ x: fx, y: fy, dx: entre(2, 10), dy: entre(2, 10) });
 
   for (let by = 0; by < ALTURA; by++) for (let bx = 0; bx < LARGURA; bx++) if (terreno[by][bx] === 'liquido') bloqueado[by][bx] = true;
 
@@ -153,8 +162,10 @@ function modelo(ctx: Ctx, ox: number, oy: number, linhas: string[], cores: Recor
 export interface Tilesets {
   /** "Tuxemon Tileset" de Buch (CC-BY-SA 3.0): grama, mato, flores, areia */
   buch: CanvasImageSource;
-  /** "Pokemon-inspired 16x16 tiles" de Red_Voxel (CC-BY-SA 3.0): árvore */
-  voxel: CanvasImageSource;
+  /** core_outdoor_nature do Tuxemon (CC-BY-SA 4.0): árvores e pedras */
+  natureza: CanvasImageSource;
+  /** core_outdoor_water do Tuxemon (CC-BY-SA 4.0): água e margens */
+  agua: CanvasImageSource;
 }
 
 // posições (coluna, linha) dos tiles no tileset do Buch
@@ -162,6 +173,9 @@ const GRAMAS: [number, number][] = [[2, 1], [3, 1], [5, 5], [6, 5], [2, 1], [3, 
 const MATO_ALTO: [number, number] = [1, 5];
 const FLORES: [number, number][] = [[7, 0], [7, 1], [7, 3], [7, 4], [7, 6], [7, 7]];
 const AREIA: [number, number] = [4, 5];
+// no core_outdoor_water: textura da água (bloco 6×6) e moldura da margem (3×3, meio transparente)
+const AGUA: [number, number] = [9, 0];
+const MARGEM: [number, number] = [6, 1];
 
 /** Cópia do tileset com o filtro de cor do bioma já aplicado. */
 function comFiltro(img: CanvasImageSource, filtro: string): CanvasImageSource {
@@ -187,11 +201,10 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
   const t = (x: number, y: number): Terreno | null => terreno[y]?.[x] ?? null;
 
   const buch = comFiltro(tilesets.buch, paleta.filtro);
-  const voxel = comFiltro(tilesets.voxel, paleta.filtro);
-  const tile = (src: CanvasImageSource, [tx, ty]: [number, number], px: number, py: number) =>
-    ctx.drawImage(src, tx * TAM, ty * TAM, TAM, TAM, px, py, TAM, TAM);
-
-  const [liq, liqBrilho, liqBorda, liqMargem] = paleta.liquido;
+  const natureza = comFiltro(tilesets.natureza, paleta.filtroObjetos);
+  const agua = comFiltro(tilesets.agua, paleta.filtroLiquido);
+  const tile = (src: CanvasImageSource, [tx, ty]: [number, number], px: number, py: number, w = 1, h = 1) =>
+    ctx.drawImage(src, tx * TAM, ty * TAM, w * TAM, h * TAM, px, py, w * TAM, h * TAM);
 
   for (let y = 0; y < ALTURA; y++)
     for (let x = 0; x < LARGURA; x++) {
@@ -199,15 +212,25 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
       const py = y * TAM;
       const tipo = terreno[y][x];
 
-      // grama do tileset é a base de tudo
+      if (tipo === 'liquido') {
+        // textura repetida em blocos de 6×6 para não aparecer emenda
+        tile(agua, [AGUA[0] + (x % 6), AGUA[1] + (y % 6)], px, py);
+        const terra = (v: Terreno | null) => v !== 'liquido' && v !== null;
+        const col = terra(t(x - 1, y)) ? 0 : terra(t(x + 1, y)) ? 2 : 1;
+        const lin = terra(t(x, y - 1)) ? 0 : terra(t(x, y + 1)) ? 2 : 1;
+        if (col !== 1 || lin !== 1) tile(agua, [MARGEM[0] + col, MARGEM[1] + lin], px, py);
+        continue;
+      }
+
+      // grama do tileset é a base do resto
       tile(buch, GRAMAS[Math.floor(r() * GRAMAS.length)], px, py);
 
       if (tipo === 'mato') {
         tile(buch, MATO_ALTO, px, py);
       } else if (tipo === 'caminho') {
-        // areia do tileset + borda clara/escura onde encosta na grama (como no tileset)
+        // areia do tileset + borda onde encosta na grama
         tile(buch, AREIA, px, py);
-        const ehCaminho = (v: Terreno | null) => v === 'caminho' || v === 'ponte' || v === null;
+        const ehCaminho = (v: Terreno | null) => v === 'caminho' || v === null;
         const bordas: [boolean, number, number, number, number][] = [
           [!ehCaminho(t(x, y - 1)), px, py, TAM, 1],
           [!ehCaminho(t(x, y + 1)), px, py + TAM - 1, TAM, 1],
@@ -216,136 +239,36 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
         ];
         ctx.save();
         ctx.filter = paleta.filtro;
-        for (const [ativo, bx, by, bw, bh] of bordas) {
-          if (!ativo) continue;
-          ctx.fillStyle = '#c8a860';
-          ctx.fillRect(bx, by, bw, bh);
-        }
+        ctx.fillStyle = '#c8a860';
+        for (const [ativo, bx, by, bw, bh] of bordas) if (ativo) ctx.fillRect(bx, by, bw, bh);
         ctx.restore();
-      } else if (tipo === 'liquido' || tipo === 'ponte') {
-        ctx.fillStyle = liq;
-        ctx.fillRect(px, py, TAM, TAM);
-        const ehLiquido = (v: Terreno | null) => v === 'liquido' || v === 'ponte' || v === null;
-        // margem clara + borda escura onde encosta na terra
-        const lados: [boolean, number, number, number, number][] = [
-          [!ehLiquido(t(x, y - 1)), px, py, TAM, 1],
-          [!ehLiquido(t(x, y + 1)), px, py + TAM - 1, TAM, 1],
-          [!ehLiquido(t(x - 1, y)), px, py, 1, TAM],
-          [!ehLiquido(t(x + 1, y)), px + TAM - 1, py, 1, TAM],
-        ];
-        for (const [ativo, lx, ly, lw, lh] of lados) {
-          if (!ativo) continue;
-          ctx.fillStyle = liqMargem;
-          ctx.fillRect(lx, ly, lw, lh);
-          ctx.fillStyle = liqBorda;
-          ctx.fillRect(lw === 1 ? (lx === px ? lx + 1 : lx - 1) : lx, lh === 1 ? (ly === py ? ly + 1 : ly - 1) : ly, lw, lh);
-        }
-        if (r() < 0.5) {
-          const [wx, wy] = [px + 3 + Math.floor(r() * 8), py + 4 + Math.floor(r() * 8)];
-          ctx.fillStyle = liqBrilho;
-          ctx.fillRect(wx, wy, 3, 1);
-          ctx.fillRect(wx + 1, wy - 1, 1, 1);
-        }
-        if (tipo === 'ponte') {
-          const horizontal = t(x - 1, y) === 'ponte' || t(x + 1, y) === 'ponte' || t(x - 1, y) === 'caminho' || t(x + 1, y) === 'caminho';
-          ctx.fillStyle = '#b8824e';
-          ctx.fillRect(px, py, TAM, TAM);
-          ctx.fillStyle = '#6e4626';
-          for (let i = 0; i < TAM; i += 4) horizontal ? ctx.fillRect(px + i, py, 1, TAM) : ctx.fillRect(px, py + i, TAM, 1);
-          ctx.fillStyle = '#d8a46a';
-          for (let i = 1; i < TAM; i += 4) horizontal ? ctx.fillRect(px + i, py + 1, 1, TAM - 2) : ctx.fillRect(px + 1, py + i, TAM - 2, 1);
-        }
       }
     }
 
   for (const f of mapa.flores) tile(buch, FLORES[(f.dx + f.dy) % FLORES.length], f.x * TAM, f.y * TAM);
-
-  const pixel = (x: number, y: number, cor: string) => {
-    ctx.fillStyle = cor;
-    ctx.fillRect(x, y, 1, 1);
-  };
-  for (const p of mapa.pedrinhas) {
-    const [cx, cy] = [p.x * TAM + 8, p.y * TAM + 9];
-    elipse(ctx, cx, cy + 3, 6, 2, 'rgba(0,0,0,0.18)');
-    elipse(ctx, cx, cy, 6, 4, '#3a3a42');
-    elipse(ctx, cx, cy, 5, 3, '#7a7a84');
-    elipse(ctx, cx - 1, cy - 1, 3, 1, '#a8a8b2');
-    pixel(cx - 2, cy - 2, '#d0d0d8');
-  }
+  for (const p of mapa.pedrinhas) tile(natureza, paleta.pedrinhas[(p.x + p.y) % paleta.pedrinhas.length], p.x * TAM, p.y * TAM);
 
   // grandes em ordem de cima para baixo, para os de baixo cobrirem os de cima
   for (const g of [...mapa.grandes].sort((a, b) => a.y - b.y)) {
-    if (paleta.obstaculo === 'arvore') {
-      // árvore do Red_Voxel: 48×48 a partir do tile (5,3), base alinhada com o fim do espaço 2×2
-      ctx.drawImage(voxel, 5 * TAM, 3 * TAM, 48, 48, g.x * TAM - 8, g.y * TAM - 16, 48, 48);
-    } else desenharGrande(ctx, g.x * TAM, g.y * TAM, paleta, r);
+    const escolher = (lista: [number, number][]) => lista[(g.x * 7 + g.y * 3) % lista.length];
+    if (paleta.obstaculo === 'arvore' && paleta.arvores) {
+      // árvore de 2×3 tiles: a copa passa 1 tile acima do espaço 2×2 que ela bloqueia
+      tile(natureza, escolher(paleta.arvores), g.x * TAM, (g.y - 1) * TAM, 2, 3);
+    } else if (paleta.obstaculo === 'rocha' && paleta.rochas) {
+      tile(natureza, escolher(paleta.rochas), g.x * TAM, g.y * TAM, 2, 2);
+    } else desenharGrande(ctx, g.x * TAM, g.y * TAM, paleta);
   }
 
   return canvas;
 }
 
-function desenharGrande(ctx: Ctx, ox: number, oy: number, paleta: Paleta, r: () => number) {
+/** Obstáculos sem tile no tileset (caixas da usina, lápides da torre), desenhados por código. */
+function desenharGrande(ctx: Ctx, ox: number, oy: number, paleta: Paleta) {
   const [contorno, escuro, medio, claro] = paleta.copa;
   const cx = ox + 16;
   elipse(ctx, cx, oy + 28, 12, 3, 'rgba(0,0,0,0.2)');
 
   switch (paleta.obstaculo) {
-    case 'arvore': {
-      ctx.fillStyle = '#4a2e1a';
-      ctx.fillRect(cx - 4, oy + 21, 8, 8);
-      ctx.fillStyle = '#7a5030';
-      ctx.fillRect(cx - 3, oy + 21, 6, 7);
-      ctx.fillStyle = '#9a6a40';
-      ctx.fillRect(cx - 2, oy + 22, 2, 5);
-      const bolas: [number, number, number][] = [
-        [cx, oy + 10, 10],
-        [cx - 7, oy + 15, 7],
-        [cx + 7, oy + 15, 7],
-        [cx, oy + 17, 8],
-      ];
-      for (const [bx, by, br] of bolas) circulo(ctx, bx, by, br + 1, contorno);
-      for (const [bx, by, br] of bolas) circulo(ctx, bx, by, br, escuro);
-      for (const [bx, by, br] of bolas) circulo(ctx, bx - 1, by - 2, br - 2, medio);
-      circulo(ctx, cx - 3, oy + 7, 4, claro);
-      circulo(ctx, cx - 8, oy + 13, 2, claro);
-      circulo(ctx, cx + 5, oy + 12, 2, claro);
-      for (let i = 0; i < 10; i++) {
-        ctx.fillStyle = r() < 0.5 ? escuro : claro;
-        ctx.fillRect(cx - 9 + Math.floor(r() * 18), oy + 4 + Math.floor(r() * 16), 1, 1);
-      }
-      break;
-    }
-    case 'pinheiro': {
-      ctx.fillStyle = '#5a3a20';
-      ctx.fillRect(cx - 2, oy + 24, 4, 6);
-      const camadas: [number, number, number][] = [
-        [oy + 2, oy + 12, 7],
-        [oy + 7, oy + 19, 10],
-        [oy + 12, oy + 26, 13],
-      ];
-      for (const [topo, base, meia] of camadas) {
-        for (let y = topo; y <= base; y++) {
-          const w = Math.round(((y - topo) / (base - topo)) * meia);
-          ctx.fillStyle = contorno;
-          ctx.fillRect(cx - w - 1, y, w * 2 + 3, 1);
-          ctx.fillStyle = y > base - 2 ? escuro : medio;
-          ctx.fillRect(cx - w, y, w * 2 + 1, 1);
-          ctx.fillStyle = claro; // neve na beirada de cima
-          if (y < topo + 3) ctx.fillRect(cx - w, y, w * 2 + 1, 1);
-        }
-      }
-      break;
-    }
-    case 'pedra': {
-      elipse(ctx, cx, oy + 18, 14, 11, contorno);
-      elipse(ctx, cx, oy + 18, 13, 10, escuro);
-      elipse(ctx, cx - 1, oy + 16, 11, 8, medio);
-      elipse(ctx, cx - 4, oy + 12, 5, 3, claro);
-      ctx.fillStyle = contorno;
-      ctx.fillRect(cx + 3, oy + 14, 1, 5);
-      ctx.fillRect(cx + 4, oy + 19, 3, 1);
-      break;
-    }
     case 'caixa': {
       ctx.fillStyle = contorno;
       ctx.fillRect(ox + 3, oy + 4, 26, 25);
