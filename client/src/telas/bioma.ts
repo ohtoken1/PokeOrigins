@@ -16,6 +16,7 @@ import { botaoIcone, botoesMenus } from '../ui/menus';
 import { mostrarEncontro } from '../ui/popupEncontro';
 import { painelTime } from '../ui/time';
 import { atalhosBiomas } from '../ui/atalhosBiomas';
+import { APARENCIA_PADRAO, montarPersonagem } from '../personagem/lpc';
 
 export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   const save = carregarSave();
@@ -232,6 +233,9 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     },
   };
 
+  // personagem do jogador (LPC + detalhes Pokémon); a cena troca o desenho quando ficar pronto
+  const aparencia = save.aparencia ?? APARENCIA_PADRAO;
+  opcoesCena.personagem = { chave: JSON.stringify(aparencia), folhas: montarPersonagem(aparencia) };
   const jogo = mostrarJogo(areaJogo, opcoesCena);
   cena = jogo.cena;
 

@@ -91,7 +91,7 @@ export const telaRegiao: Tela = (raiz, navegar) => {
           el(
             'div',
             { class: 'painel-treinador' },
-            el('div', { class: 'linha-treinador' }, el('strong', {}, `Treinador Nv. ${treinador.nivel}`)),
+            el('div', { class: 'linha-treinador' }, el('strong', {}, `Treinador Nv. ${treinador.nivel}`), el('button', { class: 'botao secundario editar-personagem', title: 'Editar personagem', onclick: () => navegar({ tela: 'personagem' }) }, '✏️ Personagem')),
             el('small', {}, treinador.necessario ? `${treinador.atual.toLocaleString('pt-BR')} / ${treinador.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo!'),
             el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${treinador.necessario ? (treinador.atual / treinador.necessario) * 100 : 100}%` } })),
           ),

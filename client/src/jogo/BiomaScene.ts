@@ -4,6 +4,7 @@ import { ALTURA, LARGURA, TAM, desenharMapa, gerarMapa, type Mapa } from './mapa
 import { PALETAS } from './paletas';
 import { pokemonPorId } from '../dados';
 import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
+import type { FolhasPersonagem } from '../personagem/lpc';
 
 /** Tamanho da tela do jogo em pixels (a câmera mostra ~37×25 tiles ampliados 1,6×). */
 export const LARGURA_TELA = 960;
@@ -61,6 +62,8 @@ export interface OpcoesBioma {
   aoPronto?(): void;
   /** Chamado ao terminar cada passo. */
   aoPisar(): void;
+  /** Personagem LPC montado (chega depois; até lá aparece o desenho antigo). `chave` identifica a aparência. */
+  personagem?: { chave: string; folhas: Promise<FolhasPersonagem> };
 }
 
 const DIRECOES_POR_TECLA: Record<string, [number, number]> = {
@@ -86,6 +89,9 @@ export class BiomaScene extends Phaser.Scene {
   private escalaSeguidor = ESCALA_DETALHE;
   private movendo = false;
   private direcao: Direcao = 'baixo';
+  /** Textura do personagem LPC (null = desenho antigo) e a linha da folha (0 cima, 1 esquerda, 2 baixo, 3 direita). */
+  private lpc: string | null = null;
+  private linhaLpc = 2;
   /** alterna a perna que vai à frente a cada passo */
   private passos = 0;
   private pausado = false;
@@ -113,6 +119,8 @@ export class BiomaScene extends Phaser.Scene {
     this.passos = 0;
     this.pausado = false;
     this.direcaoPendente = undefined;
+    this.lpc = null;
+    this.linhaLpc = 2;
   }
 
   preload() {
@@ -155,6 +163,7 @@ export class BiomaScene extends Phaser.Scene {
     this.jogador = this.add.image(px, py, 'jogador-baixo-0').setOrigin(0.5, 28 / 32).setScale(ESCALA_DETALHE);
     this.atualizarProfundidade();
     this.carregarSeguidor();
+    this.opcoes.personagem?.folhas.then((f) => this.usarPersonagemLpc(this.opcoes.personagem!.chave, f));
     if (paleta.submerso) this.efeitosSubmersos();
 
     const camera = this.cameras.main;
@@ -300,6 +309,18 @@ export class BiomaScene extends Phaser.Scene {
     this.imgSeguidor.setTexture(chave).setOrigin(0.5, base / h).setScale(this.escalaSeguidor);
   }
 
+  /** Troca o desenho antigo pelo personagem LPC (cada quadro 64×64 vira um frame "linha-coluna"). */
+  private usarPersonagemLpc(chave: string, folhas: FolhasPersonagem) {
+    if (!this.jogador?.active) return;
+    const nome = `jogador-lpc-${chave}`;
+    if (!this.textures.exists(nome)) {
+      const t = this.textures.addCanvas(nome, folhas.walk)!;
+      for (let linha = 0; linha < 4; linha++) for (let col = 0; col < 9; col++) t.add(`${linha}-${col}`, 0, col * 64, linha * 64, 64, 64);
+    }
+    this.lpc = nome;
+    this.jogador.setTexture(nome, `${this.linhaLpc}-0`).setOrigin(0.5, 61 / 64).setFlipX(false);
+  }
+
   private atualizarProfundidade() {
     this.jogador.setDepth(this.jogador.y);
     this.seguidor.setDepth(this.seguidor.y);
@@ -309,7 +330,10 @@ export class BiomaScene extends Phaser.Scene {
     // vira para a direção mesmo se o caminho estiver bloqueado
     const direcao: Direcao = dy < 0 ? 'cima' : dy > 0 ? 'baixo' : 'lado';
     this.direcao = direcao;
-    this.jogador.setTexture(`jogador-${direcao}-0`).setFlipX(dx > 0);
+    if (this.lpc) {
+      this.linhaLpc = dy < 0 ? 0 : dy > 0 ? 2 : dx < 0 ? 1 : 3;
+      this.jogador.setTexture(this.lpc, `${this.linhaLpc}-0`);
+    } else this.jogador.setTexture(`jogador-${direcao}-0`).setFlipX(dx > 0);
 
     const x = this.pos.x + dx;
     const y = this.pos.y + dy;
@@ -321,23 +345,29 @@ export class BiomaScene extends Phaser.Scene {
     this.movendo = true;
 
     this.passos++;
-    this.jogador.setTexture(`jogador-${direcao}-${this.passos % 2 ? 1 : 2}`);
+    if (!this.lpc) this.jogador.setTexture(`jogador-${direcao}-${this.passos % 2 ? 1 : 2}`);
     const [px, py] = this.pesDoTile(x, y);
+    const inicioCiclo = (this.passos % 2) * 4;
     this.tweens.add({
       targets: this.jogador,
       x: px,
       y: py,
       duration: DURACAO_PASSO,
-      onUpdate: () => this.atualizarProfundidade(),
+      onUpdate: (tween) => {
+        // LPC: 8 quadros de andar, 4 por passo
+        if (this.lpc) this.jogador.setFrame(`${this.linhaLpc}-${1 + ((inicioCiclo + Math.min(3, Math.floor(tween.progress * 4))) % 8)}`);
+        this.atualizarProfundidade();
+      },
       onComplete: () => {
         this.movendo = false;
-        this.jogador.setTexture(`jogador-${this.direcao}-0`);
+        if (this.lpc) this.jogador.setFrame(`${this.linhaLpc}-0`);
+        else this.jogador.setTexture(`jogador-${this.direcao}-0`);
         this.atualizarProfundidade();
         this.opcoes.aoPisar();
       },
     });
-    // balanço do passo
-    this.tweens.add({ targets: this.jogador, scaleY: ESCALA_DETALHE * 0.92, duration: DURACAO_PASSO / 2, yoyo: true });
+    // balanço do passo (o LPC já balança na própria animação)
+    if (!this.lpc) this.tweens.add({ targets: this.jogador, scaleY: ESCALA_DETALHE * 0.92, duration: DURACAO_PASSO / 2, yoyo: true });
 
     // Pokémon grandes ficam 2 passos atrás para não entrar no espaço do treinador
     this.rastro.push({ ...anterior });

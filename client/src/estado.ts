@@ -4,6 +4,7 @@ import { IV_INICIAL } from '../../shared/regioes';
 import { ITENS_INICIAIS } from '../../shared/itens';
 import { SILVER_INICIAL } from '../../shared/loja';
 import { pokemonPorId } from './dados';
+import type { Aparencia } from './personagem/lpc';
 
 export type PokemonDoJogador = PokemonIndividual & {
   /** Box do PC onde está guardado (0 a NUMERO_BOXES − 1); só vale para quem está no PC. */
@@ -29,6 +30,8 @@ export interface Save {
   vistos: number[];
   /** Espécies que o jogador já teve (capturou, ganhou ou evoluiu), mesmo se soltou depois. */
   capturados: number[];
+  /** Visual do personagem (camadas LPC + detalhes Pokémon); sem isso, usa APARENCIA_PADRAO. */
+  aparencia?: Aparencia;
 }
 
 /** Marca a espécie como capturada na Pokédex. */
@@ -79,9 +82,10 @@ function novoInicial(especieId: number): PokemonDoJogador {
   return p;
 }
 
-export function novoSave(regiao: string, inicial: number): Save {
+export function novoSave(regiao: string, inicial: number, aparencia?: Aparencia): Save {
   return {
     regiao,
+    aparencia,
     time: [novoInicial(inicial)],
     caixa: [],
     itens: { ...ITENS_INICIAIS },

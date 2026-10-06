@@ -6,6 +6,7 @@ import { REGIOES, TODOS_INICIAIS } from '../../../shared/regioes';
 import { pokemonPorId } from '../dados';
 import { novoSave, salvar } from '../estado';
 import { el, selosTipos, spritePokemon } from '../ui/dom';
+import { aparenciaNova, limparAparenciaNova } from './personagem';
 
 const CHAVE_SORTEIO = 'jogo-claude:sorteio-inicial';
 const LARGURA_ITEM = 96;
@@ -20,6 +21,8 @@ const lerSorteio = (): number | null => {
 };
 
 export const telaEscolhaInicial: Tela = (raiz, navegar) => {
+  // primeiro passo: criar o personagem
+  if (!aparenciaNova()) return navegar({ tela: 'personagem' });
   const tela = el('main', { class: 'tela tela-inicial' });
   raiz.append(tela);
 
@@ -38,7 +41,8 @@ export const telaEscolhaInicial: Tela = (raiz, navegar) => {
             {
               class: 'cartao-regiao',
               onclick: () => {
-                salvar(novoSave(r.id, inicial));
+                salvar(novoSave(r.id, inicial, aparenciaNova() ?? undefined));
+                limparAparenciaNova();
                 try {
                   localStorage.removeItem(CHAVE_SORTEIO);
                 } catch {

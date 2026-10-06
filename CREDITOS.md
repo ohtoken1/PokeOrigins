@@ -8,6 +8,11 @@
 
 As cores dos tiles são alteradas por filtro em cada bioma. Versões modificadas desses tiles seguem as mesmas licenças.
 
+## Personagem do jogador
+- **Universal LPC Spritesheet Character Generator** (Liberated Pixel Cup) — vários artistas, lista por peça em `client/public/lpc/CREDITOS-LPC.csv` — CC-BY-SA 3.0 / GPL 3.0 / OGA-BY 3.0
+  https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator — `client/public/lpc/` (corpo, cabeça, olhos, cabelos, camiseta, calça, tênis; cores trocadas pelas paletas do próprio LPC)
+- Boné, estampas da camiseta e Pokébolas do cinto: desenho próprio (código em `client/src/personagem/lpc.ts`).
+
 ## Dados e sprites de Pokémon
 - PokéAPI — https://pokeapi.co
 - Motor de batalha: Pokémon Showdown via `@pkmn/sim` (MIT)

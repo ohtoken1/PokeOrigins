@@ -67,7 +67,7 @@ button { font: inherit; color: inherit; }
 .aba.ativa { background: var(--destaque); color: #1a1a1a; border-color: transparent; font-weight: 700; }
 .aba:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.layout-regiao, .layout-bioma { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+.layout-regiao, .layout-bioma { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
 aside { display: flex; flex-direction: column; gap: 16px; }
 
 .grade-biomas { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
@@ -105,7 +105,7 @@ aside { display: flex; flex-direction: column; gap: 16px; }
 .area-jogo { border-radius: 12px; overflow: hidden; border: 2px solid var(--borda); line-height: 0; }
 /* altura vem da largura (proporção da tela do jogo, 960×640): sem isso o jogo e a caixa se ajustavam um ao outro e o mapa crescia sem parar */
 .area-jogo { width: 100%; aspect-ratio: 3 / 2; }
-.area-jogo canvas { display: block; }
+.area-jogo canvas { display: block; max-width: 100%; max-height: 100%; }
 .dica { font-size: 0.85rem; }
 .lista-chances {
   list-style: none; margin: 0; padding: 8px; max-height: 420px; overflow-y: auto;
@@ -276,7 +276,7 @@ kbd { font: 600 0.7rem system-ui; padding: 1px 5px; border-radius: 4px; backgrou
 }
 
 @media (max-width: 860px) {
-  .layout-regiao, .layout-bioma { grid-template-columns: 1fr; }
+  .layout-regiao, .layout-bioma { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* Cartões de Pokémon clicáveis, menus */
@@ -724,3 +724,27 @@ button.vaga:hover { border-color: var(--borda); }
 .em-breve ul { margin: 0; padding-left: 20px; color: var(--texto-2); }
 .em-breve small { color: var(--texto-2); }
 .selo-em-breve { align-self: flex-start; padding: 2px 10px; border-radius: 999px; background: var(--destaque); color: #2a1d00; font-weight: 800; font-size: 0.75rem; }
+
+/* Criação de personagem */
+.tela-personagem { max-width: 1000px; margin: 0 auto; }
+.layout-personagem { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start; margin-top: 12px; }
+@media (max-width: 760px) { .layout-personagem { grid-template-columns: 1fr; } }
+.palco-personagem {
+  position: sticky; top: 64px; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 16px; border-radius: 16px;
+  background: rgb(27 47 74 / 0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
+}
+.chao-personagem { width: 100%; display: grid; place-items: center; padding: 8px; border-radius: 12px; background: repeating-conic-gradient(#5aa25a 0 25%, #63ad61 0 50%) 0 0 / 32px 32px; }
+.personagem-grande { width: 256px; height: 256px; image-rendering: pixelated; }
+.direcoes-personagem { display: flex; gap: 6px; }
+.direcoes-personagem .ativo, .opcoes-personagem .ativo { border-color: var(--destaque); box-shadow: 0 0 0 1px var(--destaque) inset; }
+.painel-personagem {
+  display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 16px;
+  background: rgb(27 47 74 / 0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
+}
+.painel-personagem h3 { margin: 6px 0 0; font-size: 0.95rem; }
+.grupo-personagem > span { display: block; margin-bottom: 6px; font-size: 0.72rem; color: var(--texto-2); text-transform: uppercase; letter-spacing: 0.05em; }
+.opcoes-personagem { display: flex; flex-wrap: wrap; gap: 6px; }
+.opcoes-personagem .botao { padding: 5px 10px; font-size: 0.82rem; }
+.cor-personagem { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--borda); cursor: pointer; padding: 0; }
+.creditos-lpc { display: block; margin-top: 16px; color: var(--texto-2); font-size: 0.7rem; }
+.editar-personagem { padding: 3px 8px; font-size: 0.75rem; }

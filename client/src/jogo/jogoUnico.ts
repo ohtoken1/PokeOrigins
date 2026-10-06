@@ -19,6 +19,8 @@ export function mostrarJogo(area: HTMLElement, opcoes: OpcoesBioma): { cena: () 
       scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_HORIZONTALLY },
     });
     jogo.scene.add('bioma', BiomaScene, false);
+    // depuração no navegador (só no modo de desenvolvimento)
+    if (import.meta.env.DEV) (window as unknown as { jogo: Phaser.Game }).jogo = jogo;
   } else {
     // o mesmo canvas muda de lugar na página
     area.append(jogo.canvas);
