@@ -1,5 +1,6 @@
 // Animações básicas da batalha (Web Animations API). Fáceis de trocar por efeitos melhores depois.
 import { corTipo, el } from '../ui/dom';
+import { iconeItem } from '../ui/iconeItem';
 
 /** Espera a animação acabar; com a aba em segundo plano o navegador congela animações, então há um limite de tempo. */
 const esperarAnimacao = (a: Animation) => {
@@ -138,11 +139,12 @@ function explosao(arena: HTMLElement, ponto: { x: number; y: number }, cor: stri
 }
 
 /** Pokébola: voa até o selvagem, puxa ele para dentro, cai e treme. */
-export async function animarBola(arena: HTMLElement, alvo: HTMLElement, tremidas: number, capturou: boolean) {
+export async function animarBola(arena: HTMLElement, alvo: HTMLElement, tremidas: number, capturou: boolean, bolaId = 'pokeball') {
   const para = centro(alvo, arena);
   const de = { x: arena.clientWidth * 0.2, y: arena.clientHeight * 0.95 };
   const chao = { x: para.x, y: para.y + alvo.clientHeight * 0.35 };
-  const bola = el('div', { class: 'pokebola' });
+  // sprite oficial da bola arremessada (Great Ball, Ultra Ball…)
+  const bola = el('div', { class: 'pokebola com-sprite' }, iconeItem({ id: bolaId, categoria: 'bolas' }));
   arena.append(bola);
   const pos = (p: { x: number; y: number }, extra = '') => ({ transform: `translate(${p.x}px,${p.y}px) translate(-50%,-50%) ${extra}` });
 

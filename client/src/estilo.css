@@ -236,6 +236,9 @@ kbd { font: 600 0.7rem system-ui; padding: 1px 5px; border-radius: 4px; backgrou
   background: linear-gradient(180deg, #ee3b3b 0 46%, #222 46% 54%, #fafafa 54%);
   box-shadow: inset 0 0 0 2px #222;
 }
+.pokebola.com-sprite { background: none; box-shadow: none; border-radius: 0; width: 48px; height: 48px; display: grid; place-items: center; }
+.pokebola.com-sprite::after { display: none; }
+.pokebola.com-sprite > * { zoom: 2; margin: 0; }
 .pokebola::after {
   content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; translate: -50% -50%;
   border-radius: 50%; background: #fafafa; box-shadow: 0 0 0 2px #222;

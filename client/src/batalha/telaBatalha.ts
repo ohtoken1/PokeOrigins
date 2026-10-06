@@ -378,7 +378,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     });
     const { capturou, tremidas, eventos } = batalha.arremessarBola(efeito);
     if (capturou && bola === 'healball') curarAoCapturar = true;
-    await animarBola(arena, spriteSelvagem, tremidas, capturou);
+    await animarBola(arena, spriteSelvagem, tremidas, capturou, bola);
     if (capturou) {
       await dizer(`Pegou! ${dadosSelvagem.nome} foi capturado!`);
       return finalizar('captura');
