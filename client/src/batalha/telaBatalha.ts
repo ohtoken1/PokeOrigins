@@ -12,6 +12,7 @@ import { curarTime, guardarNoPC, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { iconeItem } from '../ui/iconeItem';
+import { resumoPokemon } from '../ui/resumo';
 import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarGolpe, animarRetorno, tremerArena } from './animacoes';
 
 export type ResultadoBatalha = 'vitoria' | 'derrota' | 'captura' | 'fuga';
@@ -69,30 +70,6 @@ function caixaInfo(doJogador: boolean) {
   };
 }
 
-const NOMES_ATRIBUTOS: Record<string, string> = { atk: 'Attack', def: 'Defense', spa: 'Sp. Atk', spd: 'Sp. Def', spe: 'Speed' };
-
-/** Linhas do resumo do Pokémon (mouse em cima dele na batalha). */
-function resumoPokemon(p: PokemonIndividual, doJogador: boolean, abilityConhecida: boolean): HTMLElement[] {
-  const dados = pokemonPorId(p.especieId);
-  const natureza = Dex.natures.get(p.natureza);
-  const efeito = natureza.plus && natureza.minus ? `+${NOMES_ATRIBUTOS[natureza.plus]} −${NOMES_ATRIBUTOS[natureza.minus]}` : 'neutra';
-
-  const [min, max] = faixaVelocidade(p);
-  const linha = (rotulo: string, valor: string) => el('div', { class: 'resumo-linha' }, el('span', {}, rotulo), el('strong', {}, valor));
-  return [
-    el('div', { class: 'resumo-titulo' }, el('strong', {}, `${dados.nome}${p.shiny ? ' ✨' : ''}`), el('small', {}, ` Nv. ${p.nivel}`)),
-    selosTipos(dados),
-    el('div', { class: 'resumo-linha' }, el('span', {}, 'Gênero'), el('strong', {}, seloGenero(p.genero) ?? '', p.genero === 'M' ? ' Macho' : p.genero === 'F' ? ' Fêmea' : 'Sem gênero')),
-    linha('Nature', `${natureza.name} (${efeito})`),
-    // ability do selvagem fica escondida (mostra as possíveis) até ela agir na batalha
-    abilityConhecida
-      ? linha('Ability', Dex.abilities.get(p.habilidade).name)
-      : linha('Abilities possíveis', [...new Set(Object.values(especie(p.especieId).abilities))].join(' / ')),
-    linha('Speed (IV 0–31)', `${min}–${max}`),
-    ...(doJogador ? [linha('Speed atual', String(atributos(p).spe))] : []),
-  ];
-}
-
 export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalha): void {
   const dadosSelvagem = pokemonPorId(selvagem.especieId);
   const batalha = new BatalhaSelvagem(
@@ -142,13 +119,12 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
       const p = quem();
       if (!p) return;
       resumo.className = `resumo-pokemon ${lado}`;
-      resumo.replaceChildren(...resumoPokemon(p, lado === 'jogador', lado === 'jogador' || batalha.habilidadeSelvagemRevelada));
+      resumo.replaceChildren(...resumoPokemon(p, { abilityConhecida: lado === 'jogador' || batalha.habilidadeSelvagemRevelada }));
       resumo.hidden = false;
     });
     lugar.addEventListener('mouseleave', () => (resumo.hidden = true));
   };
   mostrarResumo(lugarSelvagem, 'selvagem', () => selvagem);
-  mostrarResumo(lugarJogador, 'jogador', () => save.time[batalha.ativo]);
 
   const mensagem = el('p', { class: 'mensagem' });
   const acoes = el('div', { class: 'acoes-batalha' });

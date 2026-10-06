@@ -1,7 +1,8 @@
-import { expParaNivel, hpMaximo, nomeGolpe } from '../../../shared/batalha/pokemon';
+import { expParaNivel, hpMaximo } from '../../../shared/batalha/pokemon';
 import { pokemonPorId } from '../dados';
 import { TAMANHO_MAXIMO_TIME, type PokemonDoJogador } from '../estado';
 import { abrirDetalhes } from './detalhes';
+import { resumoAoPassar } from './resumo';
 import { el, spritePokemon } from './dom';
 
 export function barraHp(hp: number, hpMax: number): HTMLElement {
@@ -14,11 +15,10 @@ export function barraHp(hp: number, hpMax: number): HTMLElement {
 export function cartaoPokemon(p: PokemonDoJogador, atributos: Record<string, unknown> = {}): HTMLElement {
   const dados = pokemonPorId(p.especieId);
   const max = hpMaximo(p);
-  return el(
+  const cartao = el(
     'button',
     {
       class: `vaga ${p.shiny ? 'shiny' : ''} ${p.hp <= 0 ? 'desmaiado' : ''}`,
-      title: `${p.golpes.map((g) => nomeGolpe(g.id)).join(', ')}\nHP ${p.hp}/${max}${p.status ? ` · ${p.status.toUpperCase()}` : ''}`,
       ...atributos,
     },
     spritePokemon(dados, { shiny: p.shiny, animado: false }),
@@ -27,6 +27,9 @@ export function cartaoPokemon(p: PokemonDoJogador, atributos: Record<string, unk
     barraHp(p.hp, max),
     barraXp(p),
   );
+  // informações ao passar o mouse (natureza, ability, atributos, golpes…)
+  resumoAoPassar(cartao, () => p);
+  return cartao;
 }
 
 /** Barrinha azul do XP que falta para o próximo nível. */
@@ -55,7 +58,6 @@ export function painelTime(time: PokemonDoJogador[], aoReordenar?: () => void): 
   if (aoReordenar)
     vagas.forEach((vaga, origem) => {
       if (!time[origem]) return;
-      vaga.title += ' · arraste para mudar a ordem';
       vaga.classList.add('arrastavel');
       vaga.addEventListener('pointerdown', (e) => {
         if (e.button !== 0) return;

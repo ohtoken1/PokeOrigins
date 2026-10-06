@@ -236,7 +236,7 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
         );
       }
 
-      return el(
+      const pc = el(
         'div',
         { class: 'pc' },
         el('section', {}, el('h4', {}, `Time (${save.time.length}/${TAMANHO_MAXIMO_TIME})`), el('div', { class: 'vagas vagas-time' }, vagasTime)),
@@ -258,8 +258,9 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
           { class: 'acoes-pc' },
           p ? [el('strong', {}, `${nome(p)} Nv. ${p.nivel}`), ...acoes] : el('span', { class: 'meta' }, 'Clique num Pokémon para ver as opções, ou arraste para mover.'),
         ),
-        verFicha && p ? fichaPokemon(p) : null,
       );
+      // "Ver ficha": a ficha abre à esquerda e o PC vai para a direita
+      return verFicha && p ? el('div', { class: 'pc-com-ficha' }, el('div', { class: 'pc-ficha' }, fichaPokemon(p)), pc) : pc;
     },
     { classe: 'janela-pc' },
   );

@@ -157,18 +157,18 @@ export async function animarBola(arena: HTMLElement, alvo: HTMLElement, tremidas
 
   await esperarAnimacao(
     bola.animate([pos(de, 'rotate(0)'), pos({ x: (de.x + para.x) / 2, y: Math.max(30, para.y - 45) }, 'rotate(360deg)'), pos(para, 'rotate(720deg)')], {
-      duration: 550,
+      duration: 900,
       easing: 'ease-out',
     }),
   );
-  await esperarAnimacao(alvo.animate([{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(0)', filter: 'brightness(4)' }], { duration: 300, fill: 'forwards' }));
-  await esperarAnimacao(bola.animate([pos(para), pos(chao)], { duration: 300, easing: 'ease-in', fill: 'forwards' }));
+  await esperarAnimacao(alvo.animate([{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(0)', filter: 'brightness(4)' }], { duration: 400, fill: 'forwards' }));
+  await esperarAnimacao(bola.animate([pos(para), pos(chao)], { duration: 420, easing: 'ease-in', fill: 'forwards' }));
   // fixa a posição no chão (sem depender da animação continuar valendo)
   Object.assign(bola.style, pos(chao));
 
   for (let i = 0; i < tremidas; i++) {
-    await new Promise((r) => setTimeout(r, 350));
-    await esperarAnimacao(bola.animate([pos(chao, 'rotate(0)'), pos(chao, 'rotate(-25deg)'), pos(chao, 'rotate(25deg)'), pos(chao, 'rotate(0)')], { duration: 450 }));
+    await new Promise((r) => setTimeout(r, 450));
+    await esperarAnimacao(bola.animate([pos(chao, 'rotate(0)'), pos(chao, 'rotate(-25deg)'), pos(chao, 'rotate(25deg)'), pos(chao, 'rotate(0)')], { duration: 600 }));
   }
   await new Promise((r) => setTimeout(r, 350));
 
