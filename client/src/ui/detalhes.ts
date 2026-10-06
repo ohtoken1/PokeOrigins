@@ -84,7 +84,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
           el('th', {}, NOMES[a], ' ', marca(a)),
           el('td', {}, el('span', { class: 'barrinha', style: { '--v': String(Math.min(1, base[a] / 180)) } }), String(base[a])),
           p.ivsRevelados
-            ? el('td', { class: p.ivs[a] === 31 ? 'perfeito' : '' }, `${p.ivs[a]}/31`)
+            ? el('td', { class: p.ivs[a] === 31 ? 'perfeito' : '' }, String(p.ivs[a]))
             : p.ivsFaixa
               ? el('td', { class: `faixa ${faixaDoIv(p.ivs[a])[0] >= 26 ? 'perfeito' : ''}`, title: 'Faixa do IV' }, faixaDoIv(p.ivs[a]).join('–'))
               : el('td', { class: 'oculto', title: 'IV oculto' }, '?'),
@@ -94,7 +94,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
       ),
     ),
     el('tfoot', {}, el('tr', {}, el('th', {}, 'Total'), el('td', {}, String(totalBase)), el('td', {}, p.ivsRevelados
-          ? `${ATRIBUTOS.reduce((s, a) => s + p.ivs[a], 0)}/186`
+          ? String(ATRIBUTOS.reduce((s, a) => s + p.ivs[a], 0))
           : p.ivsFaixa
             ? ATRIBUTOS.map((a) => faixaDoIv(p.ivs[a])).reduce(([x, y], [a, b]) => [x + a, y + b], [0, 0]).join('–')
             : '?'), el('td', {}, `${totalEvs}/${EV_MAX_TOTAL}`), el('td'))),
