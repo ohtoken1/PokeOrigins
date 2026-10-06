@@ -15,6 +15,8 @@ const ZOOM = 1.4;
 const ESCALA_DETALHE = 1 / 1.6;
 /** Quanto o personagem/seguidor são maiores no mundo que o tamanho original (zoom 2 → 1,6). */
 const COMPENSA_ZOOM = 2 / 1.6;
+/** Escala do personagem LPC (quadro 64×64) no mundo: 20% menor que a do desenho antigo (pedido do dono). */
+const ESCALA_LPC = 0.5;
 const DURACAO_PASSO = 160;
 /** Quadros da animação de andar do LPC por quadradinho (o ciclo tem 8). */
 const QUADROS_POR_PASSO = 3;
@@ -328,7 +330,8 @@ export class BiomaScene extends Phaser.Scene {
       for (let linha = 0; linha < 4; linha++) for (let col = 0; col < 9; col++) t.add(`${linha}-${col}`, 0, col * 64, linha * 64, 64, 64);
     }
     this.lpc = nome;
-    this.jogador.setTexture(nome, `${this.linhaLpc}-0`).setOrigin(0.5, 61 / 64).setFlipX(false);
+    this.jogador.setTexture(nome, `${this.linhaLpc}-0`).setOrigin(0.5, 61 / 64).setFlipX(false).setScale(ESCALA_LPC);
+    this.sombraJogador.setSize(12, 4);
   }
 
   private atualizarSombras() {
