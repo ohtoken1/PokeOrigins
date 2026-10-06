@@ -2,6 +2,7 @@ import type { Tela } from '../main';
 import { REGIOES, regiaoPorId } from '../../../shared/regioes';
 import { BIOMAS } from '../../../shared/biomas';
 import { montarTabela } from '../../../shared/encontros';
+import { bonusNivelSelvagem, progressoTreinador } from '../../../shared/treinador';
 import { pokemonsDaRegiao } from '../dados';
 import { apagarSave, carregarSave, curarTime } from '../estado';
 import { botoesMenus } from '../ui/menus';
@@ -16,6 +17,8 @@ export const telaRegiao: Tela = (raiz, navegar) => {
   if (!save) return navegar({ tela: 'inicial' });
   const regiao = regiaoPorId(save.regiao);
   const pokemons = pokemonsDaRegiao(regiao.id);
+  const treinador = progressoTreinador(save.xpTreinador);
+  const bonus = bonusNivelSelvagem(treinador.nivel);
 
   const abas = REGIOES.map((r) =>
     el(
@@ -37,7 +40,7 @@ export const telaRegiao: Tela = (raiz, navegar) => {
       },
       el('div', { class: 'faixa' }, destaques.map((e) => spritePokemon(e.pokemon, { animado: false }))),      el('strong', {}, bioma.nome),
       el('span', { class: 'desc' }, bioma.descricao),
-      el('span', { class: 'meta' }, `${tabela.length} espécies · Nv. ${bioma.nivel[0]}–${bioma.nivel[1]}+`),
+      el('span', { class: 'meta' }, `${tabela.length} espécies · Nv. ${bioma.nivel[0] + bonus}–${bioma.nivel[1] + bonus}+`),
     );
   });
 
@@ -59,6 +62,13 @@ export const telaRegiao: Tela = (raiz, navegar) => {
         el(
           'aside',
           {},
+          el(
+            'div',
+            { class: 'painel-treinador' },
+            el('strong', {}, `Treinador Nv. ${treinador.nivel}`),
+            el('small', {}, treinador.necessario ? `${treinador.atual.toLocaleString('pt-BR')} / ${treinador.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo!'),
+            el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${treinador.necessario ? (treinador.atual / treinador.necessario) * 100 : 100}%` } })),
+          ),
           painelTime(save.time),
           el(
             'button',

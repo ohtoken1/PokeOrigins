@@ -328,3 +328,8 @@ button.vaga:hover { border-color: var(--borda); }
 /* Teste dos sprites 3D na batalha: não são pixel art, então nada de ampliar nem "pixelated" */
 .sprite.sprite-3d { zoom: 1.6 !important; image-rendering: auto; }
 .opcao { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--texto-2); cursor: pointer; }
+
+/* Nível de treinador */
+.painel-treinador { display: grid; gap: 4px; padding: 12px 14px; border-radius: 14px; background: var(--painel); border: 1px solid var(--borda); }
+.painel-treinador small { color: var(--texto-2); font-variant-numeric: tabular-nums; }
+.painel-treinador .barra-exp { height: 6px; }

@@ -55,3 +55,9 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - `CHANCE_ENCONTRO_POR_PASSO = 1` (pedido do dono: todo passo tem Pokémon, não precisa ser no mato).
 - Peso no sorteio = taxa de captura oficial (mais fácil de capturar = mais comum). Evoluções aparecem com +10 níveis por estágio.
 - Windows/PowerShell: depois de instalar algo, o PATH pode precisar ser recarregado no shell.
+
+## Nível de treinador (`shared/treinador.ts`)
+- Níveis 1–100, separado do nível dos Pokémon. Ganha o MESMO XP que o Pokémon em campo ganha ao derrotar/capturar (pedido do dono). Derrota/fuga não dá XP.
+- Curva lenta de propósito (futuro: recompensas por nível): subir do nível n pede `100 × n^1,9` XP; total até o 100 ≈ 21,4 milhões.
+- Selvagens ganham `floor((nível − 1) × 0,8)` níveis (no 100: +79); lendários ficam no mínimo no 50.
+- Save: `xpTreinador` (o nível é calculado). Aparece no menu da região (barra de XP) e na barra do bioma.

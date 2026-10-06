@@ -12,6 +12,8 @@ export interface Save {
   caixa: PokemonDoJogador[];
   itens: Record<ItemId, number>;
   passos: number;
+  /** XP total do treinador (o nível sai de shared/treinador.ts). */
+  xpTreinador: number;
   vistos: number[];
 }
 
@@ -29,6 +31,7 @@ export function novoSave(regiao: string, inicial: number): Save {
     caixa: [],
     itens: { ...ITENS_INICIAIS },
     passos: 0,
+    xpTreinador: 0,
     vistos: [inicial],
   };
 }
@@ -57,6 +60,7 @@ function normalizar(save: Save): Save {
     itens[id] = antigos[id] ?? (antigo ? antigos[antigo] : undefined) ?? ITENS_INICIAIS[id];
   }
   save.itens = itens;
+  save.xpTreinador ??= 0;
   return save;
 }
 

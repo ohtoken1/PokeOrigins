@@ -2,6 +2,7 @@
 // servidor (para ninguém trapacear); por enquanto o cliente usa o mesmo código.
 import { BIOMAS, type Bioma } from './biomas';
 import type { PokemonBase } from './tipos';
+import { bonusNivelSelvagem } from './treinador';
 
 /** Chance de um Pokémon ser shiny. O original é 1/4096; aqui é configurável. */
 export const CHANCE_SHINY = 1 / 512;
@@ -61,7 +62,8 @@ export function probabilidades(tabela: EntradaTabela[]): number[] {
   return tabela.map((e) => e.peso / total);
 }
 
-export function sortearEncontro(tabela: EntradaTabela[], bioma: Bioma, aleatorio = Math.random): Encontro {
+/** `nivelTreinador` deixa os selvagens mais fortes conforme o treinador sobe de nível. */
+export function sortearEncontro(tabela: EntradaTabela[], bioma: Bioma, nivelTreinador = 1, aleatorio = Math.random): Encontro {
   const total = tabela.reduce((soma, e) => soma + e.peso, 0);
   let sorteio = aleatorio() * total;
   let escolhido = tabela[tabela.length - 1];
@@ -74,6 +76,9 @@ export function sortearEncontro(tabela: EntradaTabela[], bioma: Bioma, aleatorio
   }
   const [min, max] = bioma.nivel;
   const lendario = escolhido.pokemon.lendario || escolhido.pokemon.mitico;
-  const nivel = lendario ? NIVEL_LENDARIO : Math.min(100, min + Math.floor(aleatorio() * (max - min + 1)) + (escolhido.estagio - 1) * 10);
+  const bonus = bonusNivelSelvagem(nivelTreinador);
+  const nivel = lendario
+    ? Math.max(NIVEL_LENDARIO, Math.min(100, max + bonus))
+    : Math.min(100, min + Math.floor(aleatorio() * (max - min + 1)) + (escolhido.estagio - 1) * 10 + bonus);
   return { pokemon: escolhido.pokemon, nivel, shiny: aleatorio() < CHANCE_SHINY };
 }

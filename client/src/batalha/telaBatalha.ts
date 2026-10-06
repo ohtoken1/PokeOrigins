@@ -4,6 +4,7 @@ import { expGanha, expParaNivel, ganharEvs, hpMaximo, nomeGolpe, type PokemonInd
 import { evoluir, ganharExperiencia, trocarGolpe, type ResultadoProgresso } from '../../../shared/batalha/progresso';
 import { pokemonPorId } from '../dados';
 import { ITENS, type ItemId } from '../../../shared/itens';
+import { nivelTreinador } from '../../../shared/treinador';
 import { curarTime, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
 import { corTipo, el, seloTipo, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
@@ -361,11 +362,23 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     for (const golpe of r.golpesPendentes) await perguntarGolpe(p, golpe);
   }
 
+  /** O treinador ganha o mesmo XP que o Pokémon derrotado/capturado dá ao Pokémon em campo. */
+  async function darXpTreinador() {
+    const nivelAtivo = save.time[batalha.ativo]?.nivel ?? 1;
+    const xp = expGanha(dadosSelvagem.experienciaBase ?? 50, selvagem.nivel, nivelAtivo, true);
+    const antes = nivelTreinador(save.xpTreinador);
+    save.xpTreinador += xp;
+    await dizer(`Você ganhou ${xp} XP de treinador!`);
+    const depois = nivelTreinador(save.xpTreinador);
+    if (depois > antes) await dizer(`Seu nível de treinador subiu para ${depois}! Os Pokémon selvagens ficaram mais fortes.`);
+  }
+
   async function finalizar(resultado: ResultadoBatalha) {
     acoes.replaceChildren();
     batalha.sincronizar();
 
     if (resultado === 'vitoria') {
+      await darXpTreinador();
       const evolucoes: { pos: number; para: number }[] = [];
       for (const pos of batalha.indices) {
         const p = save.time[pos];
@@ -392,6 +405,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
         await mostrarProgresso(pos, r);
       }
     } else if (resultado === 'captura') {
+      await darXpTreinador();
       selvagem.hp = Math.max(1, selvagem.hp);
       if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(selvagem);
       else {

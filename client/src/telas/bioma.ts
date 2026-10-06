@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
 import { regiaoPorId } from '../../../shared/regioes';
+import { nivelTreinador } from '../../../shared/treinador';
 import { CHANCE_ENCONTRO_POR_PASSO, montarTabela, probabilidades, sortearEncontro } from '../../../shared/encontros';
 import { ALTURA_TELA, BiomaScene, LARGURA_TELA } from '../jogo/BiomaScene';
 import { abrirBatalha } from '../batalha/telaBatalha';
@@ -22,7 +23,8 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   const chances = probabilidades(tabela);
 
   const contador = el('span', { class: 'meta' }, '');
-  const atualizarContador = () => (contador.textContent = `${save.passos} passos · ${save.vistos.length} vistos`);
+  const atualizarContador = () =>
+    (contador.textContent = `Treinador Nv. ${nivelTreinador(save.xpTreinador)} · ${save.passos} passos · ${save.vistos.length} vistos`);
   atualizarContador();
 
   let cena: BiomaScene | undefined;
@@ -103,7 +105,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         return;
       }
 
-      const encontro = sortearEncontro(tabela, bioma);
+      const encontro = sortearEncontro(tabela, bioma, nivelTreinador(save.xpTreinador));
       if (!save.vistos.includes(encontro.pokemon.id)) save.vistos.push(encontro.pokemon.id);
       salvar(save);
       atualizarContador();
