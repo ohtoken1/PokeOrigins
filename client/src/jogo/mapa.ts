@@ -147,16 +147,6 @@ function elipse(ctx: Ctx, cx: number, cy: number, rx: number, ry: number, cor: s
     for (let x = -rx; x <= rx; x++) if ((x * x) / (rx * rx) + (y * y) / (ry * ry) <= 1.05) ctx.fillRect(cx + x, cy + y, 1, 1);
 }
 
-/** Desenha um modelo de texto: cada letra é uma cor, '.' é transparente. */
-function modelo(ctx: Ctx, ox: number, oy: number, linhas: string[], cores: Record<string, string>) {
-  linhas.forEach((linha, y) =>
-    [...linha].forEach((c, x) => {
-      if (c === '.' || !cores[c]) return;
-      ctx.fillStyle = cores[c];
-      ctx.fillRect(ox + x, oy + y, 1, 1);
-    }),
-  );
-}
 
 /** Imagens dos tilesets (créditos em CREDITOS.md). */
 export interface Tilesets {
@@ -302,41 +292,4 @@ function desenharGrande(ctx: Ctx, ox: number, oy: number, paleta: Paleta) {
       break;
     }
   }
-}
-
-// ---------- jogador ----------
-
-const JOGADOR = [
-  '.....kkkkkk.....',
-  '....krrrrrrk....',
-  '...krrwrrrrrk...',
-  '...kkkkkkkkkk...',
-  '..kkrrrrrrrrkk..',
-  '...ksssssssk....',
-  '...kseksskes....',
-  '...kssssssk.....',
-  '....kssssk......',
-  '...kbbbbbbk.....',
-  '..kbbwbbbbbk....',
-  '..ksbbbbbbsk....',
-  '..kskbbbbksk....',
-  '...kddkkddk.....',
-  '...kddk.kddk....',
-  '....kk...kk.....',
-];
-
-export function desenharJogador(): HTMLCanvasElement {
-  const canvas = document.createElement('canvas');
-  canvas.width = 16;
-  canvas.height = 16;
-  modelo(canvas.getContext('2d')!, 1, 0, JOGADOR, {
-    k: '#1e1e28',
-    r: '#e03838',
-    w: '#ffffff',
-    s: '#f8c8a0',
-    e: '#1e1e28',
-    b: '#3060d0',
-    d: '#3a4258',
-  });
-  return canvas;
 }

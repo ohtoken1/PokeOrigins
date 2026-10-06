@@ -1,15 +1,21 @@
 import Phaser from 'phaser';
 import type { Bioma } from '../../../shared/biomas';
-import { ALTURA, LARGURA, TAM, desenharJogador, desenharMapa, gerarMapa, type Mapa } from './mapa';
+import { ALTURA, LARGURA, TAM, desenharMapa, gerarMapa, type Mapa } from './mapa';
 import { PALETAS } from './paletas';
+import { desenharPersonagem, urlIconePokemon, type Direcao } from './personagem';
 
 /** Tamanho da tela do jogo em pixels (a câmera mostra 21×15 tiles ampliados 2×). */
 export const LARGURA_TELA = 672;
 export const ALTURA_TELA = 480;
 const ZOOM = 2;
+/** Personagem e seguidor são desenhados com o dobro de detalhe e exibidos na metade do tamanho. */
+const ESCALA_DETALHE = 1 / ZOOM;
+const DURACAO_PASSO = 160;
 
 export interface OpcoesBioma {
   bioma: Bioma;
+  /** Espécie do primeiro Pokémon do time, que anda atrás do jogador. */
+  seguidor: number | null;
   /** Chamado ao terminar cada passo. */
   aoPisar(): void;
 }
@@ -25,7 +31,10 @@ const DIRECOES_POR_TECLA: Record<string, [number, number]> = {
 export class BiomaScene extends Phaser.Scene {
   private mapa!: Mapa;
   private jogador!: Phaser.GameObjects.Image;
+  private seguidor!: Phaser.GameObjects.Image;
   private pos = { x: 0, y: 0 };
+  private posSeguidor = { x: 0, y: 0 };
+  private especieSeguidor: number | null;
   private movendo = false;
   private pausado = false;
   private direcaoPendente: [number, number] | undefined;
@@ -36,6 +45,7 @@ export class BiomaScene extends Phaser.Scene {
   constructor(opcoes: OpcoesBioma) {
     super('bioma');
     this.opcoes = opcoes;
+    this.especieSeguidor = opcoes.seguidor;
   }
 
   preload() {
@@ -49,12 +59,19 @@ export class BiomaScene extends Phaser.Scene {
     const paleta = PALETAS[bioma.id] ?? PALETAS.grama;
     this.mapa = gerarMapa(bioma.id, paleta);
     this.pos = { ...this.mapa.inicio };
+    this.posSeguidor = { ...this.mapa.inicio };
 
     const imagem = (chave: string) => this.textures.get(chave).getSourceImage() as HTMLImageElement;
     this.textures.addCanvas('mapa', desenharMapa(this.mapa, paleta, bioma.id, { buch: imagem('buch'), natureza: imagem('natureza'), agua: imagem('agua') }));
-    this.textures.addCanvas('jogador', desenharJogador());
+    for (const direcao of ['baixo', 'cima', 'lado'] as Direcao[]) this.textures.addCanvas(`jogador-${direcao}`, desenharPersonagem(direcao));
     this.add.image(0, 0, 'mapa').setOrigin(0);
-    this.jogador = this.add.image(...this.centroDoTile(this.pos.x, this.pos.y), 'jogador').setOrigin(0.5, 0.75);
+
+    const [sx, sy] = this.pesDoTile(this.posSeguidor.x, this.posSeguidor.y);
+    this.seguidor = this.add.image(sx, sy, '__DEFAULT').setOrigin(0.5, 0.9).setScale(ESCALA_DETALHE).setVisible(false);
+    const [px, py] = this.pesDoTile(this.pos.x, this.pos.y);
+    this.jogador = this.add.image(px, py, 'jogador-baixo').setOrigin(0.5, 28 / 32).setScale(ESCALA_DETALHE);
+    this.atualizarProfundidade();
+    this.carregarSeguidor();
 
     const camera = this.cameras.main;
     camera.setZoom(ZOOM).setBounds(0, 0, LARGURA * TAM, ALTURA * TAM).setRoundPixels(true);
@@ -74,6 +91,13 @@ export class BiomaScene extends Phaser.Scene {
     this.pausado = pausado;
   }
 
+  /** Troca o Pokémon que segue o jogador (ex.: o time mudou de ordem ou ele evoluiu). */
+  definirSeguidor(especieId: number | null) {
+    if (especieId === this.especieSeguidor) return;
+    this.especieSeguidor = especieId;
+    if (this.seguidor) this.carregarSeguidor();
+  }
+
   update() {
     if (this.movendo) return;
     if (this.pausado) {
@@ -91,29 +115,73 @@ export class BiomaScene extends Phaser.Scene {
     if (direcao) this.tentarMover(...direcao);
   }
 
-  private centroDoTile(x: number, y: number): [number, number] {
-    return [x * TAM + TAM / 2, y * TAM + TAM / 2];
+  /** Ponto onde ficam os pés de quem está no tile (um pouco abaixo do centro). */
+  private pesDoTile(x: number, y: number): [number, number] {
+    return [x * TAM + TAM / 2, y * TAM + TAM - 2];
+  }
+
+  private carregarSeguidor() {
+    const id = this.especieSeguidor;
+    if (!id) {
+      this.seguidor.setVisible(false);
+      return;
+    }
+    const chave = `icone-${id}`;
+    const aplicar = () => {
+      if (this.especieSeguidor !== id || !this.textures.exists(chave)) return;
+      this.seguidor.setTexture(chave).setVisible(true);
+    };
+    if (this.textures.exists(chave)) return aplicar();
+    this.load.setCORS('anonymous');
+    this.load.image(chave, urlIconePokemon(id));
+    this.load.once(Phaser.Loader.Events.COMPLETE, aplicar);
+    this.load.start();
+  }
+
+  private atualizarProfundidade() {
+    this.jogador.setDepth(this.jogador.y);
+    this.seguidor.setDepth(this.seguidor.y);
   }
 
   private tentarMover(dx: number, dy: number) {
-    if (dx) this.jogador.setFlipX(dx < 0);
+    // vira para a direção mesmo se o caminho estiver bloqueado
+    const direcao: Direcao = dy < 0 ? 'cima' : dy > 0 ? 'baixo' : 'lado';
+    this.jogador.setTexture(`jogador-${direcao}`).setFlipX(dx > 0);
+
     const x = this.pos.x + dx;
     const y = this.pos.y + dy;
     if (x < 0 || y < 0 || x >= LARGURA || y >= ALTURA || this.mapa.bloqueado[y][x]) return;
+
+    // o seguidor vai para onde o jogador estava
+    const anterior = this.pos;
     this.pos = { x, y };
     this.movendo = true;
-    const [px, py] = this.centroDoTile(x, y);
+
+    const [px, py] = this.pesDoTile(x, y);
     this.tweens.add({
       targets: this.jogador,
       x: px,
       y: py,
-      duration: 160,
+      duration: DURACAO_PASSO,
+      onUpdate: () => this.atualizarProfundidade(),
       onComplete: () => {
         this.movendo = false;
+        this.atualizarProfundidade();
         this.opcoes.aoPisar();
       },
     });
-    // pulinho do passo
-    this.tweens.add({ targets: this.jogador, scaleY: 0.9, duration: 80, yoyo: true });
+    // balanço do passo
+    this.tweens.add({ targets: this.jogador, scaleY: ESCALA_DETALHE * 0.92, duration: DURACAO_PASSO / 2, yoyo: true });
+
+    if (anterior.x !== this.posSeguidor.x || anterior.y !== this.posSeguidor.y) {
+      const sdx = anterior.x - this.posSeguidor.x;
+      this.posSeguidor = { ...anterior };
+      // os ícones olham para a esquerda; espelha quando anda para a direita
+      if (sdx) this.seguidor.setFlipX(sdx > 0);
+      const [fx, fy] = this.pesDoTile(anterior.x, anterior.y);
+      this.tweens.add({ targets: this.seguidor, x: fx, y: fy, duration: DURACAO_PASSO });
+      // pulinho
+      this.tweens.add({ targets: this.seguidor, scaleY: ESCALA_DETALHE * 0.85, scaleX: ESCALA_DETALHE * 1.08, duration: DURACAO_PASSO / 2, yoyo: true });
+    }
   }
 }

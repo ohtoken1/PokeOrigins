@@ -25,8 +25,13 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   const atualizarContador = () => (contador.textContent = `${save.passos} passos · ${save.vistos.length} vistos`);
   atualizarContador();
 
+  let cena: BiomaScene | undefined;
   const caixaTime = el('div', {});
-  const atualizarTime = () => caixaTime.replaceChildren(painelTime(save.time));
+  const atualizarTime = () => {
+    caixaTime.replaceChildren(painelTime(save.time));
+    // o primeiro do time anda atrás do jogador (a cena ainda não existe na primeira chamada)
+    cena?.definirSeguidor(save.time[0]?.especieId ?? null);
+  };
   atualizarTime();
 
   const listaChances = el(
@@ -85,8 +90,9 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     fecharEncontro = undefined;
   };
 
-  const cena = new BiomaScene({
+  cena = new BiomaScene({
     bioma,
+    seguidor: save.time[0]?.especieId ?? null,
     aoPisar: () => {
       // andar com um encontro aberto = fugir dele
       fugirDoEncontro();
@@ -142,7 +148,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   let emBatalha = false;
   let janelaAberta = false;
   function atualizarPausa() {
-    cena.pausar(emBatalha || janelaAberta);
+    cena?.pausar(emBatalha || janelaAberta);
   }
   const pararDeOuvirJanelas = aoMudarJanelas((aberta) => {
     janelaAberta = aberta;
