@@ -3,7 +3,7 @@
 O dono do projeto não é programador: explique decisões em português simples e teste no navegador antes de dizer que algo funciona.
 Respostas **curtas** (o dono pediu para economizar limite). Prioridade atual: **lapidar o jogo local**; servidor/contas/anti-trapaça só depois, quando o dono pedir.
 
-**Livro de Regras (`LIVRO-DE-REGRAS.md`):** documento do jogo para jogadores/Discord (regras do NOSSO sistema, histórico de versões e ideias futuras). Sempre que uma regra, número ou sistema mudar, atualizar a seção certa e o "Histórico de versões"; ideias novas do dono vão em "Ideias para o futuro".
+**Livro de Regras (`LIVRO-DE-REGRAS.md`):** documento do jogo para jogadores/Discord (regras do NOSSO sistema, histórico de versões e ideias futuras). Sempre que uma regra, número ou sistema mudar, atualizar a seção certa e o "Histórico de versões"; ideias novas do dono vão no **Banco de Ideias** (artifact https://claude.ai/artifact/HmZUUAxtgDjExnTVrziBQf, coleção `ideias` no db: titulo, descricao, categoria, status ideia|vamos-fazer|fazendo|em-espera|concluido|nao-vamos, criadoEm, atualizadoEm) — ao concluir algo da lista, marcar como concluído lá.
 
 ## Visão do jogo
 - **MMO de Pokémon** para navegador (PC primeiro; celular via Capacitor e app de PC via Electron/Tauri depois).
