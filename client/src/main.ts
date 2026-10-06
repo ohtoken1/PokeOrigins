@@ -4,6 +4,7 @@ import { telaEscolhaInicial } from './telas/escolhaInicial';
 import { telaRegiao } from './telas/regiao';
 import { telaBioma } from './telas/bioma';
 import { montarPainelAdmin } from './ui/admin';
+import { montarBarraTopo } from './ui/barraTopo';
 
 export type Destino = { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string };
 export type Navegar = (destino: Destino) => void;
@@ -25,4 +26,5 @@ const navegar: Navegar = (destino) => {
 };
 
 montarPainelAdmin(() => navegar(destinoAtual));
+montarBarraTopo(() => navegar(carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' }));
 navegar(carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' });

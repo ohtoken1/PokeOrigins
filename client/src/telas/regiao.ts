@@ -5,6 +5,7 @@ import { faixaDosEncontros, montarTabela, probabilidades } from '../../../shared
 import { progressoTreinador } from '../../../shared/treinador';
 import { pokemonsDaRegiao } from '../dados';
 import { apagarSave, carregarSave, curarTime } from '../estado';
+import { icone } from '../ui/icones';
 import { botoesMenus } from '../ui/menus';
 import { definirSprites3D, usarSprites3D } from '../batalha/sprites3d';
 import { el, spritePokemon } from '../ui/dom';
@@ -75,13 +76,14 @@ export const telaRegiao: Tela = (raiz, navegar) => {
           el(
             'button',
             {
-              class: 'botao',
+              class: 'botao botao-com-icone',
               onclick: () => {
                 curarTime(save);
                 navegar({ tela: 'regiao' });
               },
             },
-            '❤ Centro Pokémon (curar time)',
+            icone('coracao'),
+            'Centro Pokémon (curar time)',
           ),
           el('div', { class: 'linha-botoes' }, botoesMenus(save, () => navegar({ tela: 'regiao' }))),
           el(

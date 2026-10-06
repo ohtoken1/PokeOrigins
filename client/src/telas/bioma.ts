@@ -102,7 +102,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         { class: 'barra' },
         el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'regiao' }) }, '← Voltar'),
         el('h1', {}, `${bioma.nome}`, el('small', {}, ` · ${regiao.nome}`)),
-        botaoIcone('❤️', 'Curar time', () => {
+        botaoIcone('coracao', 'Curar time', () => {
           curarTime(save);
           atualizarTime();
         }),
