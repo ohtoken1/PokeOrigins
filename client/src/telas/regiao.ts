@@ -67,7 +67,7 @@ export const telaRegiao: Tela = (raiz, navegar) => {
           el(
             'div',
             { class: 'painel-treinador' },
-            el('strong', {}, `Treinador Nv. ${treinador.nivel}`),
+            el('div', { class: 'linha-treinador' }, el('strong', {}, `Treinador Nv. ${treinador.nivel}`), el('span', { class: 'saldo' }, `${save.silver.toLocaleString('pt-BR')} silver`)),
             el('small', {}, treinador.necessario ? `${treinador.atual.toLocaleString('pt-BR')} / ${treinador.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo!'),
             el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${treinador.necessario ? (treinador.atual / treinador.necessario) * 100 : 100}%` } })),
           ),

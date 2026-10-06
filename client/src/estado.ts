@@ -1,6 +1,7 @@
 // Save local no navegador. TEMPORÁRIO: quando o servidor existir, o save fica na conta do jogador.
 import { atributosZerados, curar, gerarIndividuo, type PokemonIndividual } from '../../shared/batalha/pokemon';
-import { ITENS, ITENS_INICIAIS, type ItemId } from '../../shared/itens';
+import { ITENS_INICIAIS } from '../../shared/itens';
+import { SILVER_INICIAL } from '../../shared/loja';
 import { pokemonPorId } from './dados';
 
 export type PokemonDoJogador = PokemonIndividual;
@@ -10,7 +11,10 @@ export interface Save {
   time: PokemonDoJogador[];
   /** PC: Pokémon guardados fora do time. */
   caixa: PokemonDoJogador[];
-  itens: Record<ItemId, number>;
+  /** Quantidade de cada item na bolsa (id do item → quantidade). */
+  itens: Record<string, number>;
+  /** Moeda do jogo. */
+  silver: number;
   passos: number;
   /** XP total do treinador (o nível sai de shared/treinador.ts). */
   xpTreinador: number;
@@ -32,6 +36,7 @@ export function novoSave(regiao: string, inicial: number): Save {
     time: [novoPokemon(inicial, 5)],
     caixa: [],
     itens: { ...ITENS_INICIAIS },
+    silver: SILVER_INICIAL,
     passos: 0,
     xpTreinador: 0,
     nivelEncontro: null,
@@ -55,14 +60,13 @@ function normalizar(save: Save): Save {
   save.time = save.time.map(atualizar);
   save.caixa = (save.caixa ?? []).map(atualizar);
 
-  const antigos = (save.itens ?? {}) as Record<string, number>;
-  const renomeados: Record<string, string> = { pokebola: 'pokeball' };
-  const itens = { ...ITENS_INICIAIS };
-  for (const id of Object.keys(ITENS) as ItemId[]) {
-    const antigo = Object.entries(renomeados).find(([, novo]) => novo === id)?.[0];
-    itens[id] = antigos[id] ?? (antigo ? antigos[antigo] : undefined) ?? ITENS_INICIAIS[id];
+  const itens: Record<string, number> = { ...ITENS_INICIAIS, ...(save.itens ?? {}) };
+  if ('pokebola' in itens) {
+    itens.pokeball = itens.pokebola;
+    delete itens.pokebola;
   }
   save.itens = itens;
+  save.silver ??= SILVER_INICIAL;
   save.xpTreinador ??= 0;
   save.nivelEncontro ??= null;
   return save;

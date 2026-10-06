@@ -341,3 +341,22 @@ button.vaga:hover { border-color: var(--borda); }
 }
 .nivel-encontros input[type='range'] { width: 110px; }
 .nivel-encontros label { display: flex; align-items: center; gap: 4px; color: var(--texto-2); }
+
+/* Loja */
+.janela.janela-loja { width: min(820px, 100%); }
+.loja { display: grid; gap: 12px; }
+.topo-loja { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.topo-loja .busca { flex: 1; min-width: 180px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto); font: inherit; }
+.saldo { color: var(--destaque); font-variant-numeric: tabular-nums; }
+.abas-loja { margin: 0; }
+.lista-loja { display: grid; gap: 6px; }
+.linha-item .texto { flex: 1; min-width: 0; }
+.linha-item .preco { font-weight: 700; color: var(--destaque); white-space: nowrap; font-size: 0.85rem; }
+.linha-item .quantidade { margin-left: 0; }
+.icone-item.cat-evolucao { background: radial-gradient(circle at 35% 35%, #fff 0 15%, #f08a3a 16% 60%, #a04a1a 61%); }
+.icone-item.cat-batalha { border-radius: 6px; background: linear-gradient(135deg, #7a8aa8, #3a4a68); }
+.icone-item.cat-frutas { background: radial-gradient(circle at 40% 40%, #ff9a9a 0 30%, #d83a4a 31%); }
+.icone-item.cat-tm, .icone-item.cat-tr { border-radius: 50%; background: radial-gradient(circle, #222 0 18%, #c8c8d8 19% 60%, #8a8aa8 61%); }
+.icone-item.cat-tr { background: radial-gradient(circle, #222 0 18%, #f08ab8 19% 60%, #a84a78 61%); }
+.lista-golpes-escolha { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.linha-treinador { display: flex; justify-content: space-between; align-items: center; gap: 8px; }

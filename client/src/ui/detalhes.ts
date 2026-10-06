@@ -1,5 +1,6 @@
 import { Dex } from '@pkmn/sim';
 import { ATRIBUTOS, EV_MAX_TOTAL, atributos, especie, expParaNivel, hpMaximo, ppMaximo, type Atributo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { nomeItemEquipado } from '../../../shared/usoItens';
 import { pokemonPorId } from '../dados';
 import { abrirJanela } from './janela';
 import { el, seloTipo, selosTipos, spritePokemon } from './dom';
@@ -87,6 +88,8 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
           el('dd', {}, natureza.name, natureza.plus ? el('small', {}, ` (+${NOMES[natureza.plus as Atributo]}, −${NOMES[natureza.minus as Atributo]})`) : el('small', {}, ' (neutra)')),
           el('dt', {}, 'Habilidade'),
           el('dd', {}, habilidade.name, habilidade.shortDesc ? el('small', {}, ` — ${habilidade.shortDesc}`) : null),
+          el('dt', {}, 'Item'),
+          el('dd', {}, p.item ? nomeItemEquipado(p.item) : '—'),
           el('dt', {}, 'Experiência'),
           el('dd', {}, `${p.exp}`, p.nivel < 100 ? el('small', {}, ` (faltam ${proximo - p.exp} para o Nv. ${p.nivel + 1})`) : null),
         ),

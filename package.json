@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "npm run dev -w client",
     "build": "npm run build -w client",
-    "dados": "node scripts/baixar-pokeapi.mjs"
+    "dados": "node scripts/baixar-pokeapi.mjs",
+    "maquinas": "node scripts/baixar-maquinas.mjs"
   }
 }

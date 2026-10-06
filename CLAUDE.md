@@ -58,10 +58,16 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 
 ## Nível de treinador (`shared/treinador.ts`)
 - Níveis 1–50, separado do nível dos Pokémon. Ganha o MESMO XP que o Pokémon em campo ganha ao derrotar/capturar (pedido do dono). Derrota/fuga não dá XP.
-- Curva: subir do nível n pede `100 × n^1,9` XP (total até o 50 ≈ 2,83 milhões; estimativa ≈ 1.150 vitórias).
+- Curva: subir do nível n pede `6620 × n^1,9` XP (total até o 50 ≈ 187 milhões; estimativa ≈ 100 mil vitórias contra selvagens — pedido do dono, porque batalhas contra NPC e eventos de fim de semana darão XP extra no futuro).
 - Selvagens: faixa do bioma + `floor((nível − 1) × 1,9)`, até 100 (no 50: Campos Verdes 95–100).
 - Treinador 35+: controle no canto do mapa escolhe o nível dos encontros (±2, até o máximo natural); `save.nivelEncontro` (null = auto).
 
 ## Faixas de nível das formas (`shared/encontros.ts`)
 - Cada forma só aparece na sua faixa (Charmander 1–15, Charmeleon 16–35, Charizard 36–100): nível de evolução do Showdown. Formas que evoluem por pedra/troca/amizade (Raichu, Alakazam, Gengar, Eeveelutions…) NÃO aparecem nos mapas (pedido do dono); a forma anterior vai até o 100. Lendários/míticos só a partir do 50.
 - O sorteio escolhe primeiro o nível (dentro da faixa) e depois um Pokémon cuja forma existe nesse nível.
+
+## Loja e itens (`shared/loja.ts`, `shared/usoItens.ts`, `client/src/ui/loja.ts`, `ui/bolsa.ts`)
+- Moeda: **silver** (`save.silver`). Provisório: todo item custa 1 (`PRECO_PADRAO`, ajustes em `PRECOS`), começa com 1000 e ganha 10 por vitória — o dono vai definir a economia.
+- Catálogo: bolas/remédios nossos + pedras de evolução + Linking Cord (item nosso para evolução por troca) + itens de batalha e frutas padrão da 9ª gen do Showdown + TMs (Scarlet/Violet) e TRs (Sword/Shield) de `shared/data/maquinas.json` (`npm run maquinas`, GraphQL da PokéAPI).
+- Bolsa: remédios (usar), pedras/Linking Cord (evoluir; troca com item exige o item equipado e o consome), itens de batalha/frutas (equipar; o anterior volta à bolsa), TMs/TRs (ensinar se o learnset do Showdown tiver fonte "M" em qualquer geração; são gastos). PC tem "Tirar item".
+- Item equipado vai para a batalha do Showdown (`PokemonIndividual.item`); frutas comidas somem no fim.

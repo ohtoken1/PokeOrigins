@@ -1,74 +1,205 @@
+import { especie, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { evoluir, trocarGolpe } from '../../../shared/batalha/progresso';
 import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
-import { pokemonPorId } from '../dados';
+import { CATEGORIAS, CABO_DE_LIGACAO, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
+import { ehEquipavel, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
+import { pokemonPorId, pokemonsDaRegiao } from '../dados';
 import { salvar, type Save } from '../estado';
 import { abrirJanela } from './janela';
 import { el } from './dom';
 import { cartaoPokemon } from './time';
 
-const GRUPOS = [
-  { categoria: 'remedio', titulo: 'Remédios' },
-  { categoria: 'bola', titulo: 'Pokébolas' },
-] as const;
+const ACAO: Partial<Record<CategoriaLoja, string>> = {
+  remedios: 'Usar',
+  evolucao: 'Usar',
+  batalha: 'Equipar',
+  frutas: 'Equipar',
+  tm: 'Ensinar',
+  tr: 'Ensinar',
+};
 
-/** Bolsa fora da batalha: ver itens e usar remédios no time. */
+type Modo =
+  | { tipo: 'lista' }
+  | { tipo: 'alvo'; item: ItemLoja }
+  | { tipo: 'esquecer'; p: PokemonIndividual; golpe: string; aoAprender: () => void; aoDesistir: () => void };
+
+/** Bolsa fora da batalha: ver itens, usar remédios e pedras, ensinar TMs/TRs, equipar itens. */
 export function abrirBolsa(save: Save, aoMudar: () => void): void {
-  let usando: ItemId | null = null;
+  let aba: CategoriaLoja = 'remedios';
+  let modo: Modo = { tipo: 'lista' };
   let aviso = '';
+  /** Golpes que ainda precisam de decisão (ex.: aprendidos ao evoluir com 4 golpes). */
+  const fila: Extract<Modo, { tipo: 'esquecer' }>[] = [];
+
+  const nome = (p: PokemonIndividual) => pokemonPorId(p.especieId).nome;
+  const existe = (numero: number) => pokemonsDaRegiao(save.regiao).some((d) => d.id === numero);
+  const gastar = (id: string) => {
+    save.itens[id] = (save.itens[id] ?? 0) - 1;
+    if (save.itens[id] <= 0) delete save.itens[id];
+  };
+  const concluir = (mensagem: string) => {
+    aviso = mensagem;
+    salvar(save);
+    aoMudar();
+    modo = fila.shift() ?? { tipo: 'lista' };
+  };
+
+  /** Aprende na hora se tiver vaga; senão pergunta qual golpe esquecer. */
+  const aprender = (p: PokemonIndividual, golpe: string, aoAprender: () => void, aoDesistir: () => void) => {
+    if (p.golpes.length < 4) {
+      p.golpes.push({ id: golpe, pp: ppMaximo(golpe) });
+      aoAprender();
+      return `${nome(p)} aprendeu ${nomeGolpe(golpe)}!`;
+    }
+    fila.push({ tipo: 'esquecer', p, golpe, aoAprender, aoDesistir });
+    return null;
+  };
+
+  const aplicar = (item: ItemLoja, p: PokemonIndividual): string | null => {
+    const quem = nome(p);
+    switch (item.categoria) {
+      case 'remedios': {
+        const msg = usarRemedio(ITENS[item.id as ItemId], p, quem);
+        if (msg) gastar(item.id);
+        return msg ?? 'Não teria efeito.';
+      }
+      case 'evolucao': {
+        const para = evolucaoPorItem(p, item.id, existe);
+        if (!para) return `${item.nome} não tem efeito em ${quem}.`;
+        gastar(item.id);
+        // troca com item (ex.: Metal Coat): o item equipado é gasto na evolução
+        if (item.id === CABO_DE_LIGACAO && especie(para).evoItem) p.item = null;
+        const r = evoluir(p, para, (n) => pokemonPorId(n).nome);
+        if (!save.vistos.includes(para)) save.vistos.push(para);
+        for (const golpe of r.golpesPendentes) aprender(p, golpe, () => {}, () => {});
+        return [`${quem} evoluiu para ${pokemonPorId(para).nome}!`, ...r.mensagens].join(' ');
+      }
+      case 'batalha':
+      case 'frutas': {
+        if (!ehEquipavel(item.id)) return 'Esse item não pode ser equipado.';
+        gastar(item.id);
+        const antigo = p.item;
+        if (antigo) save.itens[antigo] = (save.itens[antigo] ?? 0) + 1;
+        p.item = item.id;
+        return `${quem} agora segura ${item.nome}.${antigo ? ` (${nomeItemEquipado(antigo)} voltou para a bolsa)` : ''}`;
+      }
+      case 'tm':
+      case 'tr': {
+        const golpe = item.golpe!;
+        if (p.golpes.some((g) => g.id === golpe)) return `${quem} já conhece ${nomeGolpe(golpe)}.`;
+        if (!podeAprenderPorMaquina(p, golpe)) return `${quem} não pode aprender ${nomeGolpe(golpe)}.`;
+        return aprender(p, golpe, () => gastar(item.id), () => {}) ?? '';
+      }
+      default:
+        return null;
+    }
+  };
 
   abrirJanela('Bolsa', (janela) => {
-    if (usando) {
-      const item = ITENS[usando];
+    const refazer = () => janela.redesenhar();
+
+    if (modo.tipo === 'esquecer') {
+      const m = modo;
       return el(
         'div',
         { class: 'bolsa' },
-        el('p', {}, `Usar ${item.nome} em qual Pokémon?`),
+        el('p', {}, `${nome(m.p)} quer aprender ${nomeGolpe(m.golpe)}, mas já conhece 4 golpes. Esquecer qual?`),
+        el(
+          'div',
+          { class: 'lista-golpes-escolha' },
+          m.p.golpes.map((g, i) =>
+            el(
+              'button',
+              {
+                class: 'botao secundario',
+                onclick: () => {
+                  const esquecido = nomeGolpe(g.id);
+                  trocarGolpe(m.p, i, m.golpe);
+                  m.aoAprender();
+                  concluir(`${nome(m.p)} esqueceu ${esquecido} e aprendeu ${nomeGolpe(m.golpe)}!`);
+                  refazer();
+                },
+              },
+              nomeGolpe(g.id),
+            ),
+          ),
+        ),
+        el(
+          'button',
+          {
+            class: 'botao',
+            onclick: () => {
+              m.aoDesistir();
+              concluir(`${nome(m.p)} não aprendeu ${nomeGolpe(m.golpe)}.`);
+              refazer();
+            },
+          },
+          `Não aprender ${nomeGolpe(m.golpe)}`,
+        ),
+      );
+    }
+
+    if (modo.tipo === 'alvo') {
+      const item = modo.item;
+      return el(
+        'div',
+        { class: 'bolsa' },
+        el('p', {}, `${ACAO[item.categoria]} ${item.nome} em qual Pokémon?`),
         el(
           'div',
           { class: 'vagas' },
           save.time.map((p) =>
             cartaoPokemon(p, {
               onclick: () => {
-                const id = usando!;
-                const mensagem = usarRemedio(item, p, pokemonPorId(p.especieId).nome);
-                if (mensagem) {
-                  save.itens[id]--;
-                  salvar(save);
-                  aoMudar();
+                const msg = aplicar(item, p);
+                if (msg) concluir(msg);
+                else {
+                  // vai perguntar qual golpe esquecer
+                  modo = fila.shift() ?? { tipo: 'lista' };
                 }
-                aviso = mensagem ?? 'Não teria efeito.';
-                usando = null;
-                janela.redesenhar();
+                refazer();
               },
             }),
           ),
         ),
-        el('button', { class: 'botao secundario', onclick: () => ((usando = null), janela.redesenhar()) }, '← Voltar'),
+        el('button', { class: 'botao secundario', onclick: () => ((modo = { tipo: 'lista' }), refazer()) }, '← Voltar'),
       );
     }
+
+    // lista por categoria (só mostra o que o jogador tem)
+    const meus = Object.entries(save.itens)
+      .filter(([, qtd]) => qtd > 0)
+      .map(([id, qtd]) => ({ item: itemDaLoja(id), qtd }))
+      .filter((x): x is { item: ItemLoja; qtd: number } => !!x.item);
+    const comItens = CATEGORIAS.filter((c) => meus.some((m) => m.item.categoria === c.id));
+    if (!comItens.some((c) => c.id === aba) && comItens.length) aba = comItens[0].id;
 
     return el(
       'div',
       { class: 'bolsa' },
       aviso && el('p', { class: 'aviso-bolsa' }, aviso),
-      GRUPOS.map(({ categoria, titulo }) =>
-        el(
-          'section',
-          {},
-          el('h4', {}, titulo),
-          (Object.keys(ITENS) as ItemId[])
-            .filter((id) => ITENS[id].categoria === categoria)
-            .map((id) =>
-              el(
-                'div',
-                { class: `linha-item ${save.itens[id] ? '' : 'acabou'}` },
-                el('div', { class: `icone-item ${id}` }),
-                el('div', {}, el('strong', {}, ITENS[id].nome), el('p', {}, ITENS[id].descricao)),
-                el('span', { class: 'quantidade' }, `×${save.itens[id]}`),
-                categoria === 'remedio' &&
-                  el('button', { class: 'botao', disabled: !save.itens[id], onclick: () => ((usando = id), (aviso = ''), janela.redesenhar()) }, 'Usar'),
-              ),
+      el(
+        'nav',
+        { class: 'abas abas-loja' },
+        comItens.map((c) => el('button', { class: `aba ${c.id === aba ? 'ativa' : ''}`, onclick: () => ((aba = c.id), (aviso = ''), refazer()) }, c.nome)),
+      ),
+      meus.length === 0 && el('p', { class: 'meta' }, 'A bolsa está vazia. Compre itens na Loja.'),
+      el(
+        'section',
+        {},
+        meus
+          .filter((m) => m.item.categoria === aba)
+          .map(({ item, qtd }) =>
+            el(
+              'div',
+              { class: 'linha-item' },
+              el('div', { class: `icone-item ${item.id} cat-${item.categoria}` }),
+              el('div', { class: 'texto' }, el('strong', {}, item.nome), el('p', {}, item.descricao)),
+              el('span', { class: 'quantidade' }, `×${qtd}`),
+              ACAO[item.categoria] &&
+                el('button', { class: 'botao', onclick: () => ((modo = { tipo: 'alvo', item }), (aviso = ''), refazer()) }, ACAO[item.categoria]!),
             ),
-        ),
+          ),
       ),
     );
   });

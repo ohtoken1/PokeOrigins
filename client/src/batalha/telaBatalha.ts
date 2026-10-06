@@ -5,6 +5,7 @@ import { evoluir, ganharExperiencia, trocarGolpe, type ResultadoProgresso } from
 import { pokemonPorId } from '../dados';
 import { ITENS, type ItemId } from '../../../shared/itens';
 import { nivelTreinador } from '../../../shared/treinador';
+import { MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
 import { curarTime, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
 import { corTipo, el, seloTipo, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
@@ -379,6 +380,8 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
 
     if (resultado === 'vitoria') {
       await darXpTreinador();
+      save.silver += SILVER_POR_VITORIA;
+      await dizer(`Você ganhou ${SILVER_POR_VITORIA} ${MOEDA}!`);
       const evolucoes: { pos: number; para: number }[] = [];
       for (const pos of batalha.indices) {
         const p = save.time[pos];

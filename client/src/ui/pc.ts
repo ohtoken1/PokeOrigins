@@ -1,3 +1,4 @@
+import { nomeItemEquipado } from '../../../shared/usoItens';
 import { pokemonPorId } from '../dados';
 import { salvar, TAMANHO_MAXIMO_TIME, type PokemonDoJogador, type Save } from '../estado';
 import { fichaPokemon } from './detalhes';
@@ -41,6 +42,24 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
         const { onde, indice } = selecao;
         const nome = pokemonPorId(selecionado.especieId).nome;
         acoes.push(el('button', { class: 'botao secundario', onclick: () => ((verFicha = !verFicha), refazer()) }, verFicha ? 'Esconder ficha' : 'Ver ficha'));
+        if (selecionado.item) {
+          const item = selecionado.item;
+          acoes.push(
+            el(
+              'button',
+              {
+                class: 'botao secundario',
+                onclick: () => {
+                  save.itens[item] = (save.itens[item] ?? 0) + 1;
+                  selecionado.item = null;
+                  mudou();
+                  refazer();
+                },
+              },
+              `Tirar ${nomeItemEquipado(item)}`,
+            ),
+          );
+        }
         if (onde === 'time') {
           acoes.push(
             el(

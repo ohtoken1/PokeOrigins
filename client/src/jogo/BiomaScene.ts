@@ -83,7 +83,8 @@ export class BiomaScene extends Phaser.Scene {
 
     const teclado = this.input.keyboard!;
     this.setas = teclado.createCursorKeys();
-    this.wasd = teclado.addKeys('W,A,S,D') as typeof this.wasd;
+    // false = não bloqueia as letras: dá para digitar W A S D na busca da loja com o mapa aberto
+    this.wasd = teclado.addKeys('W,A,S,D', false) as typeof this.wasd;
     // guarda toques rápidos (apertar e soltar entre dois quadros), que isDown não pega
     teclado.on('keydown', (e: KeyboardEvent) => {
       const direcao = DIRECOES_POR_TECLA[e.key.toLowerCase()];

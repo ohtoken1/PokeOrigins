@@ -79,7 +79,7 @@ function conjuntoShowdown(p: PokemonIndividual, nome: string) {
     nature: p.natureza,
     gender: p.genero === 'N' ? '' : p.genero,
     shiny: p.shiny,
-    item: '',
+    item: p.item ?? '',
     ivs: p.ivs,
     evs: p.evs,
   };
@@ -250,6 +250,8 @@ export class BatalhaSelvagem {
     const copiar = (sim: PokemonSim, p: PokemonIndividual) => {
       p.hp = sim.fainted ? 0 : sim.hp;
       p.status = sim.fainted || !sim.status ? null : sim.status;
+      // frutas comidas na batalha são gastas; os outros itens voltam ao dono no fim (como nos jogos atuais)
+      if (p.item && !sim.item && Dex.items.get(p.item).isBerry) p.item = null;
       for (const g of p.golpes) {
         const slot = sim.baseMoveSlots.find((s) => s.id === g.id);
         if (slot) g.pp = slot.pp;

@@ -1,0 +1,1318 @@
+[
+ {
+  "id": "tm01",
+  "golpe": "takedown"
+ },
+ {
+  "id": "tm02",
+  "golpe": "charm"
+ },
+ {
+  "id": "tm03",
+  "golpe": "faketears"
+ },
+ {
+  "id": "tm04",
+  "golpe": "agility"
+ },
+ {
+  "id": "tm05",
+  "golpe": "mudslap"
+ },
+ {
+  "id": "tm06",
+  "golpe": "scaryface"
+ },
+ {
+  "id": "tm07",
+  "golpe": "protect"
+ },
+ {
+  "id": "tm08",
+  "golpe": "firefang"
+ },
+ {
+  "id": "tm09",
+  "golpe": "thunderfang"
+ },
+ {
+  "id": "tm10",
+  "golpe": "icefang"
+ },
+ {
+  "id": "tm11",
+  "golpe": "waterpulse"
+ },
+ {
+  "id": "tm12",
+  "golpe": "lowkick"
+ },
+ {
+  "id": "tm13",
+  "golpe": "acidspray"
+ },
+ {
+  "id": "tm14",
+  "golpe": "acrobatics"
+ },
+ {
+  "id": "tm15",
+  "golpe": "strugglebug"
+ },
+ {
+  "id": "tm16",
+  "golpe": "psybeam"
+ },
+ {
+  "id": "tm17",
+  "golpe": "confuseray"
+ },
+ {
+  "id": "tm18",
+  "golpe": "thief"
+ },
+ {
+  "id": "tm19",
+  "golpe": "disarmingvoice"
+ },
+ {
+  "id": "tm20",
+  "golpe": "trailblaze"
+ },
+ {
+  "id": "tm21",
+  "golpe": "pounce"
+ },
+ {
+  "id": "tm22",
+  "golpe": "chillingwater"
+ },
+ {
+  "id": "tm23",
+  "golpe": "chargebeam"
+ },
+ {
+  "id": "tm24",
+  "golpe": "firespin"
+ },
+ {
+  "id": "tm25",
+  "golpe": "facade"
+ },
+ {
+  "id": "tm26",
+  "golpe": "poisontail"
+ },
+ {
+  "id": "tm27",
+  "golpe": "aerialace"
+ },
+ {
+  "id": "tm28",
+  "golpe": "bulldoze"
+ },
+ {
+  "id": "tm29",
+  "golpe": "hex"
+ },
+ {
+  "id": "tm30",
+  "golpe": "snarl"
+ },
+ {
+  "id": "tm31",
+  "golpe": "metalclaw"
+ },
+ {
+  "id": "tm32",
+  "golpe": "swift"
+ },
+ {
+  "id": "tm33",
+  "golpe": "magicalleaf"
+ },
+ {
+  "id": "tm34",
+  "golpe": "icywind"
+ },
+ {
+  "id": "tm35",
+  "golpe": "mudshot"
+ },
+ {
+  "id": "tm36",
+  "golpe": "rocktomb"
+ },
+ {
+  "id": "tm37",
+  "golpe": "drainingkiss"
+ },
+ {
+  "id": "tm38",
+  "golpe": "flamecharge"
+ },
+ {
+  "id": "tm39",
+  "golpe": "lowsweep"
+ },
+ {
+  "id": "tm40",
+  "golpe": "aircutter"
+ },
+ {
+  "id": "tm41",
+  "golpe": "storedpower"
+ },
+ {
+  "id": "tm42",
+  "golpe": "nightshade"
+ },
+ {
+  "id": "tm43",
+  "golpe": "fling"
+ },
+ {
+  "id": "tm44",
+  "golpe": "dragontail"
+ },
+ {
+  "id": "tm45",
+  "golpe": "venoshock"
+ },
+ {
+  "id": "tm46",
+  "golpe": "avalanche"
+ },
+ {
+  "id": "tm47",
+  "golpe": "endure"
+ },
+ {
+  "id": "tm48",
+  "golpe": "voltswitch"
+ },
+ {
+  "id": "tm49",
+  "golpe": "sunnyday"
+ },
+ {
+  "id": "tm50",
+  "golpe": "raindance"
+ },
+ {
+  "id": "tm51",
+  "golpe": "sandstorm"
+ },
+ {
+  "id": "tm52",
+  "golpe": "snowscape"
+ },
+ {
+  "id": "tm53",
+  "golpe": "smartstrike"
+ },
+ {
+  "id": "tm54",
+  "golpe": "psyshock"
+ },
+ {
+  "id": "tm55",
+  "golpe": "dig"
+ },
+ {
+  "id": "tm56",
+  "golpe": "bulletseed"
+ },
+ {
+  "id": "tm57",
+  "golpe": "falseswipe"
+ },
+ {
+  "id": "tm58",
+  "golpe": "brickbreak"
+ },
+ {
+  "id": "tm59",
+  "golpe": "zenheadbutt"
+ },
+ {
+  "id": "tm60",
+  "golpe": "uturn"
+ },
+ {
+  "id": "tm61",
+  "golpe": "shadowclaw"
+ },
+ {
+  "id": "tm62",
+  "golpe": "foulplay"
+ },
+ {
+  "id": "tm63",
+  "golpe": "psychicfangs"
+ },
+ {
+  "id": "tm64",
+  "golpe": "bulkup"
+ },
+ {
+  "id": "tm65",
+  "golpe": "airslash"
+ },
+ {
+  "id": "tm66",
+  "golpe": "bodyslam"
+ },
+ {
+  "id": "tm67",
+  "golpe": "firepunch"
+ },
+ {
+  "id": "tm68",
+  "golpe": "thunderpunch"
+ },
+ {
+  "id": "tm69",
+  "golpe": "icepunch"
+ },
+ {
+  "id": "tm70",
+  "golpe": "sleeptalk"
+ },
+ {
+  "id": "tm71",
+  "golpe": "seedbomb"
+ },
+ {
+  "id": "tm72",
+  "golpe": "electroball"
+ },
+ {
+  "id": "tm73",
+  "golpe": "drainpunch"
+ },
+ {
+  "id": "tm74",
+  "golpe": "reflect"
+ },
+ {
+  "id": "tm75",
+  "golpe": "lightscreen"
+ },
+ {
+  "id": "tm76",
+  "golpe": "rockblast"
+ },
+ {
+  "id": "tm77",
+  "golpe": "waterfall"
+ },
+ {
+  "id": "tm78",
+  "golpe": "dragonclaw"
+ },
+ {
+  "id": "tm79",
+  "golpe": "dazzlinggleam"
+ },
+ {
+  "id": "tm80",
+  "golpe": "metronome"
+ },
+ {
+  "id": "tm81",
+  "golpe": "grassknot"
+ },
+ {
+  "id": "tm82",
+  "golpe": "thunderwave"
+ },
+ {
+  "id": "tm83",
+  "golpe": "poisonjab"
+ },
+ {
+  "id": "tm84",
+  "golpe": "stompingtantrum"
+ },
+ {
+  "id": "tm85",
+  "golpe": "rest"
+ },
+ {
+  "id": "tm86",
+  "golpe": "rockslide"
+ },
+ {
+  "id": "tm87",
+  "golpe": "taunt"
+ },
+ {
+  "id": "tm88",
+  "golpe": "swordsdance"
+ },
+ {
+  "id": "tm89",
+  "golpe": "bodypress"
+ },
+ {
+  "id": "tm90",
+  "golpe": "spikes"
+ },
+ {
+  "id": "tm91",
+  "golpe": "toxicspikes"
+ },
+ {
+  "id": "tm92",
+  "golpe": "imprison"
+ },
+ {
+  "id": "tm93",
+  "golpe": "flashcannon"
+ },
+ {
+  "id": "tm94",
+  "golpe": "darkpulse"
+ },
+ {
+  "id": "tm95",
+  "golpe": "leechlife"
+ },
+ {
+  "id": "tm96",
+  "golpe": "eerieimpulse"
+ },
+ {
+  "id": "tm97",
+  "golpe": "fly"
+ },
+ {
+  "id": "tm98",
+  "golpe": "skillswap"
+ },
+ {
+  "id": "tm99",
+  "golpe": "ironhead"
+ },
+ {
+  "id": "tm100",
+  "golpe": "dragondance"
+ },
+ {
+  "id": "tm101",
+  "golpe": "powergem"
+ },
+ {
+  "id": "tm102",
+  "golpe": "gunkshot"
+ },
+ {
+  "id": "tm103",
+  "golpe": "substitute"
+ },
+ {
+  "id": "tm104",
+  "golpe": "irondefense"
+ },
+ {
+  "id": "tm105",
+  "golpe": "xscissor"
+ },
+ {
+  "id": "tm106",
+  "golpe": "drillrun"
+ },
+ {
+  "id": "tm107",
+  "golpe": "willowisp"
+ },
+ {
+  "id": "tm108",
+  "golpe": "crunch"
+ },
+ {
+  "id": "tm109",
+  "golpe": "trick"
+ },
+ {
+  "id": "tm110",
+  "golpe": "liquidation"
+ },
+ {
+  "id": "tm111",
+  "golpe": "gigadrain"
+ },
+ {
+  "id": "tm112",
+  "golpe": "aurasphere"
+ },
+ {
+  "id": "tm113",
+  "golpe": "tailwind"
+ },
+ {
+  "id": "tm114",
+  "golpe": "shadowball"
+ },
+ {
+  "id": "tm115",
+  "golpe": "dragonpulse"
+ },
+ {
+  "id": "tm116",
+  "golpe": "stealthrock"
+ },
+ {
+  "id": "tm117",
+  "golpe": "hypervoice"
+ },
+ {
+  "id": "tm118",
+  "golpe": "heatwave"
+ },
+ {
+  "id": "tm119",
+  "golpe": "energyball"
+ },
+ {
+  "id": "tm120",
+  "golpe": "psychic"
+ },
+ {
+  "id": "tm121",
+  "golpe": "heavyslam"
+ },
+ {
+  "id": "tm122",
+  "golpe": "encore"
+ },
+ {
+  "id": "tm123",
+  "golpe": "surf"
+ },
+ {
+  "id": "tm124",
+  "golpe": "icespinner"
+ },
+ {
+  "id": "tm125",
+  "golpe": "flamethrower"
+ },
+ {
+  "id": "tm126",
+  "golpe": "thunderbolt"
+ },
+ {
+  "id": "tm127",
+  "golpe": "playrough"
+ },
+ {
+  "id": "tm128",
+  "golpe": "amnesia"
+ },
+ {
+  "id": "tm129",
+  "golpe": "calmmind"
+ },
+ {
+  "id": "tm130",
+  "golpe": "helpinghand"
+ },
+ {
+  "id": "tm131",
+  "golpe": "pollenpuff"
+ },
+ {
+  "id": "tm132",
+  "golpe": "batonpass"
+ },
+ {
+  "id": "tm133",
+  "golpe": "earthpower"
+ },
+ {
+  "id": "tm134",
+  "golpe": "reversal"
+ },
+ {
+  "id": "tm135",
+  "golpe": "icebeam"
+ },
+ {
+  "id": "tm136",
+  "golpe": "electricterrain"
+ },
+ {
+  "id": "tm137",
+  "golpe": "grassyterrain"
+ },
+ {
+  "id": "tm138",
+  "golpe": "psychicterrain"
+ },
+ {
+  "id": "tm139",
+  "golpe": "mistyterrain"
+ },
+ {
+  "id": "tm140",
+  "golpe": "nastyplot"
+ },
+ {
+  "id": "tm141",
+  "golpe": "fireblast"
+ },
+ {
+  "id": "tm142",
+  "golpe": "hydropump"
+ },
+ {
+  "id": "tm143",
+  "golpe": "blizzard"
+ },
+ {
+  "id": "tm144",
+  "golpe": "firepledge"
+ },
+ {
+  "id": "tm145",
+  "golpe": "waterpledge"
+ },
+ {
+  "id": "tm146",
+  "golpe": "grasspledge"
+ },
+ {
+  "id": "tm147",
+  "golpe": "wildcharge"
+ },
+ {
+  "id": "tm148",
+  "golpe": "sludgebomb"
+ },
+ {
+  "id": "tm149",
+  "golpe": "earthquake"
+ },
+ {
+  "id": "tm150",
+  "golpe": "stoneedge"
+ },
+ {
+  "id": "tm151",
+  "golpe": "phantomforce"
+ },
+ {
+  "id": "tm152",
+  "golpe": "gigaimpact"
+ },
+ {
+  "id": "tm153",
+  "golpe": "blastburn"
+ },
+ {
+  "id": "tm154",
+  "golpe": "hydrocannon"
+ },
+ {
+  "id": "tm155",
+  "golpe": "frenzyplant"
+ },
+ {
+  "id": "tm156",
+  "golpe": "outrage"
+ },
+ {
+  "id": "tm157",
+  "golpe": "overheat"
+ },
+ {
+  "id": "tm158",
+  "golpe": "focusblast"
+ },
+ {
+  "id": "tm159",
+  "golpe": "leafstorm"
+ },
+ {
+  "id": "tm160",
+  "golpe": "hurricane"
+ },
+ {
+  "id": "tm161",
+  "golpe": "trickroom"
+ },
+ {
+  "id": "tm162",
+  "golpe": "bugbuzz"
+ },
+ {
+  "id": "tm163",
+  "golpe": "hyperbeam"
+ },
+ {
+  "id": "tm164",
+  "golpe": "bravebird"
+ },
+ {
+  "id": "tm165",
+  "golpe": "flareblitz"
+ },
+ {
+  "id": "tm166",
+  "golpe": "thunder"
+ },
+ {
+  "id": "tm167",
+  "golpe": "closecombat"
+ },
+ {
+  "id": "tm168",
+  "golpe": "solarbeam"
+ },
+ {
+  "id": "tm169",
+  "golpe": "dracometeor"
+ },
+ {
+  "id": "tm170",
+  "golpe": "steelbeam"
+ },
+ {
+  "id": "tm171",
+  "golpe": "terablast"
+ },
+ {
+  "id": "tm172",
+  "golpe": "roar"
+ },
+ {
+  "id": "tm173",
+  "golpe": "charge"
+ },
+ {
+  "id": "tm174",
+  "golpe": "haze"
+ },
+ {
+  "id": "tm175",
+  "golpe": "toxic"
+ },
+ {
+  "id": "tm176",
+  "golpe": "sandtomb"
+ },
+ {
+  "id": "tm177",
+  "golpe": "spite"
+ },
+ {
+  "id": "tm178",
+  "golpe": "gravity"
+ },
+ {
+  "id": "tm179",
+  "golpe": "smackdown"
+ },
+ {
+  "id": "tm180",
+  "golpe": "gyroball"
+ },
+ {
+  "id": "tm181",
+  "golpe": "knockoff"
+ },
+ {
+  "id": "tm182",
+  "golpe": "bugbite"
+ },
+ {
+  "id": "tm183",
+  "golpe": "superfang"
+ },
+ {
+  "id": "tm184",
+  "golpe": "vacuumwave"
+ },
+ {
+  "id": "tm185",
+  "golpe": "lunge"
+ },
+ {
+  "id": "tm186",
+  "golpe": "highhorsepower"
+ },
+ {
+  "id": "tm187",
+  "golpe": "iciclespear"
+ },
+ {
+  "id": "tm188",
+  "golpe": "scald"
+ },
+ {
+  "id": "tm189",
+  "golpe": "heatcrash"
+ },
+ {
+  "id": "tm190",
+  "golpe": "solarblade"
+ },
+ {
+  "id": "tm191",
+  "golpe": "uproar"
+ },
+ {
+  "id": "tm192",
+  "golpe": "focuspunch"
+ },
+ {
+  "id": "tm193",
+  "golpe": "weatherball"
+ },
+ {
+  "id": "tm194",
+  "golpe": "grassyglide"
+ },
+ {
+  "id": "tm195",
+  "golpe": "burningjealousy"
+ },
+ {
+  "id": "tm196",
+  "golpe": "flipturn"
+ },
+ {
+  "id": "tm197",
+  "golpe": "dualwingbeat"
+ },
+ {
+  "id": "tm198",
+  "golpe": "poltergeist"
+ },
+ {
+  "id": "tm199",
+  "golpe": "lashout"
+ },
+ {
+  "id": "tm200",
+  "golpe": "scaleshot"
+ },
+ {
+  "id": "tm201",
+  "golpe": "mistyexplosion"
+ },
+ {
+  "id": "tm202",
+  "golpe": "painsplit"
+ },
+ {
+  "id": "tm203",
+  "golpe": "psychup"
+ },
+ {
+  "id": "tm204",
+  "golpe": "doubleedge"
+ },
+ {
+  "id": "tm205",
+  "golpe": "endeavor"
+ },
+ {
+  "id": "tm206",
+  "golpe": "petalblizzard"
+ },
+ {
+  "id": "tm207",
+  "golpe": "temperflare"
+ },
+ {
+  "id": "tm208",
+  "golpe": "whirlpool"
+ },
+ {
+  "id": "tm209",
+  "golpe": "muddywater"
+ },
+ {
+  "id": "tm210",
+  "golpe": "supercellslam"
+ },
+ {
+  "id": "tm211",
+  "golpe": "electroweb"
+ },
+ {
+  "id": "tm212",
+  "golpe": "tripleaxel"
+ },
+ {
+  "id": "tm213",
+  "golpe": "coaching"
+ },
+ {
+  "id": "tm214",
+  "golpe": "sludgewave"
+ },
+ {
+  "id": "tm215",
+  "golpe": "scorchingsands"
+ },
+ {
+  "id": "tm216",
+  "golpe": "featherdance"
+ },
+ {
+  "id": "tm217",
+  "golpe": "futuresight"
+ },
+ {
+  "id": "tm218",
+  "golpe": "expandingforce"
+ },
+ {
+  "id": "tm219",
+  "golpe": "skittersmack"
+ },
+ {
+  "id": "tm220",
+  "golpe": "meteorbeam"
+ },
+ {
+  "id": "tm221",
+  "golpe": "throatchop"
+ },
+ {
+  "id": "tm222",
+  "golpe": "breakingswipe"
+ },
+ {
+  "id": "tm223",
+  "golpe": "metalsound"
+ },
+ {
+  "id": "tm224",
+  "golpe": "curse"
+ },
+ {
+  "id": "tm225",
+  "golpe": "hardpress"
+ },
+ {
+  "id": "tm226",
+  "golpe": "dragoncheer"
+ },
+ {
+  "id": "tm227",
+  "golpe": "alluringvoice"
+ },
+ {
+  "id": "tm228",
+  "golpe": "psychicnoise"
+ },
+ {
+  "id": "tm229",
+  "golpe": "upperhand"
+ },
+ {
+  "id": "tr00",
+  "golpe": "swordsdance"
+ },
+ {
+  "id": "tr01",
+  "golpe": "bodyslam"
+ },
+ {
+  "id": "tr02",
+  "golpe": "flamethrower"
+ },
+ {
+  "id": "tr03",
+  "golpe": "hydropump"
+ },
+ {
+  "id": "tr04",
+  "golpe": "surf"
+ },
+ {
+  "id": "tr05",
+  "golpe": "icebeam"
+ },
+ {
+  "id": "tr06",
+  "golpe": "blizzard"
+ },
+ {
+  "id": "tr07",
+  "golpe": "lowkick"
+ },
+ {
+  "id": "tr08",
+  "golpe": "thunderbolt"
+ },
+ {
+  "id": "tr09",
+  "golpe": "thunder"
+ },
+ {
+  "id": "tr10",
+  "golpe": "earthquake"
+ },
+ {
+  "id": "tr11",
+  "golpe": "psychic"
+ },
+ {
+  "id": "tr12",
+  "golpe": "agility"
+ },
+ {
+  "id": "tr13",
+  "golpe": "focusenergy"
+ },
+ {
+  "id": "tr14",
+  "golpe": "metronome"
+ },
+ {
+  "id": "tr15",
+  "golpe": "fireblast"
+ },
+ {
+  "id": "tr16",
+  "golpe": "waterfall"
+ },
+ {
+  "id": "tr17",
+  "golpe": "amnesia"
+ },
+ {
+  "id": "tr18",
+  "golpe": "leechlife"
+ },
+ {
+  "id": "tr19",
+  "golpe": "triattack"
+ },
+ {
+  "id": "tr20",
+  "golpe": "substitute"
+ },
+ {
+  "id": "tr21",
+  "golpe": "reversal"
+ },
+ {
+  "id": "tr22",
+  "golpe": "sludgebomb"
+ },
+ {
+  "id": "tr23",
+  "golpe": "spikes"
+ },
+ {
+  "id": "tr24",
+  "golpe": "outrage"
+ },
+ {
+  "id": "tr25",
+  "golpe": "psyshock"
+ },
+ {
+  "id": "tr26",
+  "golpe": "endure"
+ },
+ {
+  "id": "tr27",
+  "golpe": "sleeptalk"
+ },
+ {
+  "id": "tr28",
+  "golpe": "megahorn"
+ },
+ {
+  "id": "tr29",
+  "golpe": "batonpass"
+ },
+ {
+  "id": "tr30",
+  "golpe": "encore"
+ },
+ {
+  "id": "tr31",
+  "golpe": "irontail"
+ },
+ {
+  "id": "tr32",
+  "golpe": "crunch"
+ },
+ {
+  "id": "tr33",
+  "golpe": "shadowball"
+ },
+ {
+  "id": "tr34",
+  "golpe": "futuresight"
+ },
+ {
+  "id": "tr35",
+  "golpe": "uproar"
+ },
+ {
+  "id": "tr36",
+  "golpe": "heatwave"
+ },
+ {
+  "id": "tr37",
+  "golpe": "taunt"
+ },
+ {
+  "id": "tr38",
+  "golpe": "trick"
+ },
+ {
+  "id": "tr39",
+  "golpe": "superpower"
+ },
+ {
+  "id": "tr40",
+  "golpe": "skillswap"
+ },
+ {
+  "id": "tr41",
+  "golpe": "blazekick"
+ },
+ {
+  "id": "tr42",
+  "golpe": "hypervoice"
+ },
+ {
+  "id": "tr43",
+  "golpe": "overheat"
+ },
+ {
+  "id": "tr44",
+  "golpe": "cosmicpower"
+ },
+ {
+  "id": "tr45",
+  "golpe": "muddywater"
+ },
+ {
+  "id": "tr46",
+  "golpe": "irondefense"
+ },
+ {
+  "id": "tr47",
+  "golpe": "dragonclaw"
+ },
+ {
+  "id": "tr48",
+  "golpe": "bulkup"
+ },
+ {
+  "id": "tr49",
+  "golpe": "calmmind"
+ },
+ {
+  "id": "tr50",
+  "golpe": "leafblade"
+ },
+ {
+  "id": "tr51",
+  "golpe": "dragondance"
+ },
+ {
+  "id": "tr52",
+  "golpe": "gyroball"
+ },
+ {
+  "id": "tr53",
+  "golpe": "closecombat"
+ },
+ {
+  "id": "tr54",
+  "golpe": "toxicspikes"
+ },
+ {
+  "id": "tr55",
+  "golpe": "flareblitz"
+ },
+ {
+  "id": "tr56",
+  "golpe": "aurasphere"
+ },
+ {
+  "id": "tr57",
+  "golpe": "poisonjab"
+ },
+ {
+  "id": "tr58",
+  "golpe": "darkpulse"
+ },
+ {
+  "id": "tr59",
+  "golpe": "seedbomb"
+ },
+ {
+  "id": "tr60",
+  "golpe": "xscissor"
+ },
+ {
+  "id": "tr61",
+  "golpe": "bugbuzz"
+ },
+ {
+  "id": "tr62",
+  "golpe": "dragonpulse"
+ },
+ {
+  "id": "tr63",
+  "golpe": "powergem"
+ },
+ {
+  "id": "tr64",
+  "golpe": "focusblast"
+ },
+ {
+  "id": "tr65",
+  "golpe": "energyball"
+ },
+ {
+  "id": "tr66",
+  "golpe": "bravebird"
+ },
+ {
+  "id": "tr67",
+  "golpe": "earthpower"
+ },
+ {
+  "id": "tr68",
+  "golpe": "nastyplot"
+ },
+ {
+  "id": "tr69",
+  "golpe": "zenheadbutt"
+ },
+ {
+  "id": "tr70",
+  "golpe": "flashcannon"
+ },
+ {
+  "id": "tr71",
+  "golpe": "leafstorm"
+ },
+ {
+  "id": "tr72",
+  "golpe": "powerwhip"
+ },
+ {
+  "id": "tr73",
+  "golpe": "gunkshot"
+ },
+ {
+  "id": "tr74",
+  "golpe": "ironhead"
+ },
+ {
+  "id": "tr75",
+  "golpe": "stoneedge"
+ },
+ {
+  "id": "tr76",
+  "golpe": "stealthrock"
+ },
+ {
+  "id": "tr77",
+  "golpe": "grassknot"
+ },
+ {
+  "id": "tr78",
+  "golpe": "sludgewave"
+ },
+ {
+  "id": "tr79",
+  "golpe": "heavyslam"
+ },
+ {
+  "id": "tr80",
+  "golpe": "electroball"
+ },
+ {
+  "id": "tr81",
+  "golpe": "foulplay"
+ },
+ {
+  "id": "tr82",
+  "golpe": "storedpower"
+ },
+ {
+  "id": "tr83",
+  "golpe": "allyswitch"
+ },
+ {
+  "id": "tr84",
+  "golpe": "scald"
+ },
+ {
+  "id": "tr85",
+  "golpe": "workup"
+ },
+ {
+  "id": "tr86",
+  "golpe": "wildcharge"
+ },
+ {
+  "id": "tr87",
+  "golpe": "drillrun"
+ },
+ {
+  "id": "tr88",
+  "golpe": "heatcrash"
+ },
+ {
+  "id": "tr89",
+  "golpe": "hurricane"
+ },
+ {
+  "id": "tr90",
+  "golpe": "playrough"
+ },
+ {
+  "id": "tr91",
+  "golpe": "venomdrench"
+ },
+ {
+  "id": "tr92",
+  "golpe": "dazzlinggleam"
+ },
+ {
+  "id": "tr93",
+  "golpe": "darkestlariat"
+ },
+ {
+  "id": "tr94",
+  "golpe": "highhorsepower"
+ },
+ {
+  "id": "tr95",
+  "golpe": "throatchop"
+ },
+ {
+  "id": "tr96",
+  "golpe": "pollenpuff"
+ },
+ {
+  "id": "tr97",
+  "golpe": "psychicfangs"
+ },
+ {
+  "id": "tr98",
+  "golpe": "liquidation"
+ },
+ {
+  "id": "tr99",
+  "golpe": "bodypress"
+ }
+]
