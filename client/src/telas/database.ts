@@ -8,6 +8,7 @@ import type { PokemonBase } from '../../../shared/tipos';
 import { ORDEM_TIERS, tierDoPokemon } from '../../../shared/tiers';
 import { todosOsPokemons } from '../dados';
 import { REGIOES } from '../../../shared/regioes';
+import { CATEGORIAS_POKEMON, categoriasDoPokemon } from '../../../shared/categorias';
 import { el, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { iconeItem } from '../ui/iconeItem';
 
@@ -117,7 +118,7 @@ const ATRIBUTOS: [keyof PokemonBase['stats'], string][] = [
   ['hp', 'HP'], ['ataque', 'Atk'], ['defesa', 'Def'], ['ataqueEspecial', 'SpA'], ['defesaEspecial', 'SpD'], ['velocidade', 'Spe'],
 ];
 const filtroTipos = <T,>(tiposDe: (linha: T) => string[]): Filtro<T> => ({
-  todos: 'Todos os tipos',
+  todos: 'Tipagens',
   opcoes: TODOS_TIPOS.map((t) => [t, nomeTipo(t)]),
   valores: (l) => tiposDe(l).map((t) => t.toLowerCase()),
 });
@@ -146,11 +147,12 @@ export const telaDatabase: Tela = (raiz, navegar) => {
       filtros: [
         filtroTipos((p: PokemonBase) => p.tipos),
         {
-          todos: 'Todas as regiões',
+          todos: 'Regiões',
           opcoes: REGIOES.filter((r) => r.disponivel).map((r) => [r.id, r.nome]),
           valores: (p: PokemonBase) => [REGIOES.find((r) => p.id >= r.pokedex[0] && p.id <= r.pokedex[1])?.id ?? ''],
         },
-        { todos: 'Todas as tiers', opcoes: ORDEM_TIERS.map((t) => [t, t]), valores: (p: PokemonBase) => [tierDoPokemon(p.id)] },
+        { todos: 'Tiers', opcoes: ORDEM_TIERS.map((t) => [t, t]), valores: (p: PokemonBase) => [tierDoPokemon(p.id)] },
+        { todos: 'Categorias', opcoes: CATEGORIAS_POKEMON, valores: categoriasDoPokemon },
       ],
       colunas: [
         { titulo: '#', celula: (p) => String(p.id).padStart(3, '0'), ordem: (p) => p.id, classe: 'num' },
@@ -198,7 +200,7 @@ export const telaDatabase: Tela = (raiz, navegar) => {
       busca: (m) => `${m.name} ${m.type} ${traduzir(m.shortDesc || m.desc)}`,
       filtros: [
         filtroTipos((m) => [m.type]),
-        { todos: 'Todas as categorias', opcoes: ['Physical', 'Special', 'Status'].map((c) => [c, nomeCategoria(c)]), valores: (m) => [m.category] },
+        { todos: 'Categorias', opcoes: ['Physical', 'Special', 'Status'].map((c) => [c, nomeCategoria(c)]), valores: (m) => [m.category] },
       ],
       colunas: [
         { titulo: 'Nome', celula: (m) => m.name, ordem: (m) => m.name },
