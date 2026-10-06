@@ -3,7 +3,7 @@
 import { BIOMAS, type Bioma } from './biomas';
 import { nivelDeEvolucao } from './batalha/pokemon';
 import type { PokemonBase } from './tipos';
-import { bonusNivelSelvagem } from './treinador';
+import { FAIXA_NIVEIS_ENCONTRO, nivelMaximoEncontro } from './treinador';
 
 /** Chance de um Pokémon ser shiny. O original é 1/4096; aqui é configurável. */
 export const CHANCE_SHINY = 1 / 512;
@@ -13,8 +13,6 @@ export const CHANCE_ENCONTRO_POR_PASSO = 1;
 export const PESO_LENDARIO = 1;
 /** Lendários e míticos aparecem desde o começo, mas nunca abaixo deste nível. */
 export const NIVEL_LENDARIO = 50;
-/** Quando o jogador escolhe o nível dos encontros, eles variam este tanto para cima/baixo. */
-export const VARIACAO_NIVEL_ESCOLHIDO = 2;
 
 export type Faixa = [number, number];
 
@@ -105,15 +103,14 @@ export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: num
 }
 
 /**
- * Faixa de nível dos encontros: a do bioma somada ao bônus do treinador (até 100), ou,
- * se o jogador escolheu um nível, esse nível com uma pequena variação (sem passar do máximo natural).
+ * Faixa de nível dos encontros (igual em todos os biomas): do teto − 10 até o teto.
+ * O teto é 2× o nível de treinador; o jogador pode escolher um teto MENOR (nunca maior).
+ * Ex.: treinador 20 → 30–40; escolhendo 10 → 1–10.
  */
-export function faixaDosEncontros(bioma: Bioma, nivelTreinador: number, nivelEscolhido: number | null = null): Faixa {
-  const bonus = bonusNivelSelvagem(nivelTreinador);
-  const natural: Faixa = [Math.min(100, bioma.nivel[0] + bonus), Math.min(100, bioma.nivel[1] + bonus)];
-  if (nivelEscolhido === null) return natural;
-  const centro = Math.max(1, Math.min(natural[1], nivelEscolhido));
-  return [Math.max(1, centro - VARIACAO_NIVEL_ESCOLHIDO), Math.min(natural[1], centro + VARIACAO_NIVEL_ESCOLHIDO)];
+export function faixaDosEncontros(_bioma: Bioma, nivelTreinador: number, tetoEscolhido: number | null = null): Faixa {
+  const maximo = nivelMaximoEncontro(nivelTreinador);
+  const teto = tetoEscolhido === null ? maximo : Math.max(1, Math.min(maximo, tetoEscolhido));
+  return [Math.max(1, teto - FAIXA_NIVEIS_ENCONTRO), teto];
 }
 
 const cabe = (e: EntradaTabela, nivel: number) => nivel >= e.nivelMin && nivel <= e.nivelMax;

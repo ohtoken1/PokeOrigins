@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
 import { regiaoPorId } from '../../../shared/regioes';
-import { NIVEL_ESCOLHER_ENCONTRO, nivelTreinador } from '../../../shared/treinador';
+import { nivelTreinador } from '../../../shared/treinador';
 import { CHANCE_ENCONTRO_POR_PASSO, faixaDosEncontros, montarTabela, probabilidades, sortearEncontro } from '../../../shared/encontros';
 import { ALTURA_TELA, BiomaScene, LARGURA_TELA } from '../jogo/BiomaScene';
 import { abrirBatalha } from '../batalha/telaBatalha';
@@ -21,9 +21,8 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   const regiao = regiaoPorId(save.regiao);
   const tabela = montarTabela(bioma, pokemonsDaRegiao(regiao.id), regiao.iniciais);
   const nivelDoTreinador = nivelTreinador(save.xpTreinador);
-  const podeEscolherNivel = nivelDoTreinador >= NIVEL_ESCOLHER_ENCONTRO;
   const faixaNatural = faixaDosEncontros(bioma, nivelDoTreinador);
-  const faixaAtual = () => faixaDosEncontros(bioma, nivelDoTreinador, podeEscolherNivel ? save.nivelEncontro : null);
+  const faixaAtual = () => faixaDosEncontros(bioma, nivelDoTreinador, save.nivelEncontro);
 
   const contador = el('span', { class: 'meta' }, '');
   const atualizarContador = () =>
@@ -69,15 +68,15 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   atualizarTitulo();
 
   const areaJogo = el('div', { class: 'area-jogo' });
-  // a partir do nível 35 de treinador: escolher o nível dos encontros (canto do mapa)
-  if (podeEscolherNivel) {
+  // escolher um teto MENOR para os encontros (canto do mapa); disponível em qualquer nível
+  {
     const valor = el('strong', {}, '');
     const deslizante = el('input', { type: 'range', min: 1, max: faixaNatural[1], value: save.nivelEncontro ?? faixaNatural[1] });
     const auto = el('input', { type: 'checkbox', checked: save.nivelEncontro === null });
     const aplicar = () => {
       save.nivelEncontro = auto.checked ? null : Number(deslizante.value);
       deslizante.disabled = auto.checked;
-      valor.textContent = auto.checked ? 'Auto' : `Nv. ${deslizante.value}`;
+      valor.textContent = auto.checked ? `Nv. ${faixaNatural[1]} (máx.)` : `Nv. ${deslizante.value}`;
       salvar(save);
       atualizarChances();
       atualizarTitulo();
@@ -86,7 +85,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     auto.addEventListener('change', aplicar);
     // não deixar as setas do teclado mexerem no controle em vez de andar
     deslizante.addEventListener('keydown', (e) => e.preventDefault());
-    areaJogo.append(el('div', { class: 'nivel-encontros' }, el('span', {}, 'Encontros: ', valor), deslizante, el('label', {}, auto, ' Auto')));
+    areaJogo.append(el('div', { class: 'nivel-encontros' }, el('span', {}, 'Encontros até: ', valor), deslizante, el('label', {}, auto, ' Auto')));
     aplicar();
   }
   raiz.append(

@@ -4,10 +4,8 @@
 
 export const NIVEL_MAX_TREINADOR = 50;
 /** XP para ir do nível n ao n+1 = BASE × n^EXPOENTE. */
-const BASE = 3310;
-const EXPOENTE = 1.9;
-/** Quantos níveis os Pokémon selvagens ganham por nível de treinador. */
-export const NIVEIS_SELVAGEM_POR_NIVEL_TREINADOR = 1.9;
+const BASE = 242;
+const EXPOENTE = 2.6;
 
 export function xpParaSubir(nivel: number): number {
   return Math.floor(BASE * nivel ** EXPOENTE);
@@ -37,10 +35,10 @@ export function progressoTreinador(xpTotal: number): { nivel: number; atual: num
   return { nivel, atual: xpTotal - xpTotalParaNivel(nivel), necessario: xpParaSubir(nivel) };
 }
 
-/** Níveis somados aos Pokémon selvagens por causa do nível do treinador. */
-export function bonusNivelSelvagem(nivel: number): number {
-  return Math.floor((nivel - 1) * NIVEIS_SELVAGEM_POR_NIVEL_TREINADOR);
-}
+/** Os encontros vão do (teto − 10) ao teto. */
+export const FAIXA_NIVEIS_ENCONTRO = 10;
 
-/** A partir deste nível o jogador pode escolher o nível dos encontros. */
-export const NIVEL_ESCOLHER_ENCONTRO = 35;
+/** Nível máximo dos Pokémon selvagens: 2× o nível de treinador (treinador 50 → 100). */
+export function nivelMaximoEncontro(nivelTreinador: number): number {
+  return Math.min(100, 2 * nivelTreinador);
+}
