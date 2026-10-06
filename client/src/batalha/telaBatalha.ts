@@ -81,7 +81,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
   const modo3D = usarSprites3D();
   /** Sprite da batalha: pixel art (padrão) ou, no teste 3D, o GIF do Showdown (volta ao pixel art se falhar). */
   const spriteBatalha = (especieId: number, shiny: boolean, costas: boolean) => {
-    const img = spritePokemon(pokemonPorId(especieId), { shiny, costas, alturaAlvo: costas ? 170 : 150 });
+    const img = spritePokemon(pokemonPorId(especieId), { shiny, costas, palco: true });
     if (!modo3D) return img;
     const pixel = img.src;
     img.classList.add('sprite-3d');

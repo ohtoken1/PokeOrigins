@@ -20,6 +20,7 @@ h2 { font-size: 1rem; }
 button { font: inherit; color: inherit; }
 
 .tela { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+.tela.tela-bioma { max-width: 1340px; }
 .sub, .meta, .dica, .desc { color: var(--texto-2); }
 .sub { margin: 0 0 20px; }
 

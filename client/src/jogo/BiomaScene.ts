@@ -4,9 +4,9 @@ import { ALTURA, LARGURA, TAM, desenharMapa, gerarMapa, type Mapa } from './mapa
 import { PALETAS } from './paletas';
 import { desenharPersonagem, urlIconePokemon, type Direcao, type Quadro } from './personagem';
 
-/** Tamanho da tela do jogo em pixels (a câmera mostra 21×15 tiles ampliados 2×). */
-export const LARGURA_TELA = 672;
-export const ALTURA_TELA = 480;
+/** Tamanho da tela do jogo em pixels (a câmera mostra 30×20 tiles ampliados 2×). */
+export const LARGURA_TELA = 960;
+export const ALTURA_TELA = 640;
 const ZOOM = 2;
 /** Personagem e seguidor são desenhados com o dobro de detalhe e exibidos na metade do tamanho. */
 const ESCALA_DETALHE = 1 / ZOOM;
@@ -100,8 +100,9 @@ export class BiomaScene extends Phaser.Scene {
     this.seguidor.setTint(0xc8e4ff);
 
     const luz = this.add.graphics().setDepth(5000).setBlendMode(Phaser.BlendModes.ADD);
-    for (let i = 0; i < 9; i++) {
-      const x = (i + 0.3) * (w / 9);
+    const feixes = Math.round(w / 85);
+    for (let i = 0; i < feixes; i++) {
+      const x = (i + 0.3) * (w / feixes);
       luz.fillStyle(0xbfe8ff, 0.05);
       luz.fillPoints([new Phaser.Geom.Point(x, 0), new Phaser.Geom.Point(x + 28, 0), new Phaser.Geom.Point(x + 28 + 160, h), new Phaser.Geom.Point(x + 90, h)], true);
     }
@@ -121,7 +122,7 @@ export class BiomaScene extends Phaser.Scene {
         scale: { min: 0.35, max: 0.8 },
         alpha: { start: 0.8, end: 0 },
         lifespan: { min: 2500, max: 5000 },
-        frequency: 40,
+        frequency: 10,
       })
       .setDepth(5001);
     // bolhas saindo do jogador de vez em quando

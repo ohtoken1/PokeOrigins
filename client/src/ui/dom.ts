@@ -64,11 +64,6 @@ export function selosTipos(p: PokemonBase): HTMLElement {
   return el('div', { class: 'tipos' }, p.tipos.map(seloTipo));
 }
 
-/**
- * Sprite do Pokémon: GIF animado quando existe, senão a imagem parada.
- * `alturaAlvo` amplia por um fator INTEIRO (2×, 3×…) até perto dessa altura: ampliar por fator
- * quebrado (1,5×) deixa os pixels de tamanhos diferentes e o sprite fica "mal pixelado".
- */
 /** Parte desenhada (não transparente) do primeiro quadro da imagem. */
 function areaVisivel(img: HTMLImageElement): { x0: number; y0: number; x1: number; y1: number } | null {
   const [w, h] = [img.naturalWidth, img.naturalHeight];
@@ -116,11 +111,17 @@ function centralizar(img: HTMLImageElement, zoom: number, chao?: number) {
   img.style.translate = `${dx}px ${dy}px`;
 }
 
+/**
+ * Sprite do Pokémon: GIF animado quando existe, senão a imagem parada.
+ * `palco`: centraliza no palco pela parte desenhada, todos na MESMA escala (pedido do dono: Mew
+ * pequeno, Mewtwo grande, como no Showdown). `escala` só por fator INTEIRO: fator quebrado (1,5×)
+ * deixa os pixels de tamanhos diferentes e o sprite fica "mal pixelado".
+ */
 export function spritePokemon(
   p: PokemonBase,
-  opcoes: { shiny?: boolean; animado?: boolean; costas?: boolean; alturaAlvo?: number; chao?: number } = {},
+  opcoes: { shiny?: boolean; animado?: boolean; costas?: boolean; palco?: boolean; escala?: number; chao?: number } = {},
 ): HTMLImageElement {
-  const { shiny = false, animado = true, costas = false, alturaAlvo, chao } = opcoes;
+  const { shiny = false, animado = true, costas = false, palco = false, escala = 1, chao } = opcoes;
   const s = p.sprites;
   const parado = costas ? (shiny ? s.costasShiny : s.costas) : shiny ? s.frenteShiny : s.frente;
   const gif = costas ? (shiny ? s.gifCostasShiny : s.gifCostas) : shiny ? s.gifShiny : s.gif;
@@ -130,18 +131,11 @@ export function spritePokemon(
     src: (animado && gif) || parado || '',
     loading: 'lazy',
     // permite ler os pixels para centralizar (PokéAPI no GitHub libera CORS)
-    crossorigin: alturaAlvo ? 'anonymous' : undefined,
+    crossorigin: palco ? 'anonymous' : undefined,
   });
   if (animado && gif && parado) img.addEventListener('error', () => (img.src = parado), { once: true });
-  if (alturaAlvo) {
-    // os GIFs do Showdown já têm o tamanho relativo certo (Onix grande, Caterpie pequeno);
-    // só ampliamos os pequenos, no máximo 2×, olhando a maior dimensão (Exeggcute é largo)
-    img.addEventListener('load', () => {
-      const maior = Math.max(img.naturalWidth, img.naturalHeight);
-      const zoom = Math.min(2, Math.max(1, Math.floor(alturaAlvo / maior)));
-      img.style.zoom = String(zoom);
-      centralizar(img, zoom, chao);
-    });
-  }
+  if (escala !== 1) img.style.zoom = String(escala);
+  // os GIFs do Showdown já têm o tamanho relativo certo (Onix grande, Caterpie pequeno)
+  if (palco) img.addEventListener('load', () => centralizar(img, escala, chao));
   return img;
 }

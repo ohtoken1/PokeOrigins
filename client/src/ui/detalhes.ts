@@ -77,7 +77,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
     el(
       'section',
       { class: 'ficha-topo' },
-      el('div', { class: 'palco' }, spritePokemon(dados, { shiny: p.shiny, alturaAlvo: 120 })),
+      el('div', { class: 'palco' }, spritePokemon(dados, { shiny: p.shiny, palco: true })),
       el(
         'div',
         { class: 'resumo' },

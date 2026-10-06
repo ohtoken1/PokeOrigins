@@ -29,7 +29,7 @@ export function mostrarEncontro(raiz: HTMLElement, encontro: Encontro, acoes: Ac
   const cartao = el(
     'div',
     { class: `encontro ${shiny ? 'shiny' : ''} ${lendario ? 'lendario' : ''}`, role: 'status', 'aria-live': 'polite' },
-    el('div', { class: 'palco' }, spritePokemon(pokemon, { shiny, alturaAlvo: 160, chao: 0.9 })),
+    el('div', { class: 'palco' }, spritePokemon(pokemon, { shiny, palco: true, chao: 0.9 })),
     el(
       'div',
       { class: 'info' },

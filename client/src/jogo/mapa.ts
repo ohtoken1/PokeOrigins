@@ -3,8 +3,10 @@
 import type { Paleta } from './paletas';
 
 export const TAM = 16;
-export const LARGURA = 48;
-export const ALTURA = 36;
+export const LARGURA = 96;
+export const ALTURA = 72;
+/** Quantas vezes o mapa é maior que o original de 48×36 (quantidade de lagos, bosques, mato…). */
+const ESCALA = (LARGURA * ALTURA) / (48 * 36);
 
 export type Terreno = 'chao' | 'mato' | 'caminho' | 'liquido';
 
@@ -54,22 +56,31 @@ export function gerarMapa(semente: string, paleta: Paleta): Mapa {
       if (dentro(px, py)) terreno[py][px] = 'caminho';
     }
   };
-  let y = entre(ALTURA / 2 - 4, ALTURA / 2 + 4);
-  for (let x = 0; x < LARGURA; x++) {
-    pintarCaminho(x, y);
-    if (r() < 0.18) y = Math.max(4, Math.min(ALTURA - 6, y + (r() < 0.5 ? -1 : 1)));
-    pintarCaminho(x, y);
+  // um caminho horizontal e um vertical a cada ~36 tiles (mapa maior = mais caminhos)
+  const horizontais = Math.max(1, Math.round(ALTURA / 36));
+  for (let k = 0; k < horizontais; k++) {
+    const centro = Math.round((ALTURA * (k + 0.5)) / horizontais);
+    let y = entre(centro - 4, centro + 4);
+    for (let x = 0; x < LARGURA; x++) {
+      pintarCaminho(x, y);
+      if (r() < 0.18) y = Math.max(4, Math.min(ALTURA - 6, y + (r() < 0.5 ? -1 : 1)));
+      pintarCaminho(x, y);
+    }
   }
-  let x = entre(LARGURA / 2 - 6, LARGURA / 2 + 6);
-  for (let yy = 0; yy < ALTURA; yy++) {
-    pintarCaminho(x, yy);
-    if (r() < 0.18) x = Math.max(4, Math.min(LARGURA - 6, x + (r() < 0.5 ? -1 : 1)));
-    pintarCaminho(x, yy);
+  const verticais = Math.max(1, Math.round(LARGURA / 48));
+  for (let k = 0; k < verticais; k++) {
+    const centro = Math.round((LARGURA * (k + 0.5)) / verticais);
+    let x = entre(centro - 6, centro + 6);
+    for (let yy = 0; yy < ALTURA; yy++) {
+      pintarCaminho(x, yy);
+      if (r() < 0.18) x = Math.max(4, Math.min(LARGURA - 6, x + (r() < 0.5 ? -1 : 1)));
+      pintarCaminho(x, yy);
+    }
   }
 
   // lagos retangulares (a moldura de margem do tileset só encaixa em retângulos), sem encostar
   // em caminhos nem em outros lagos; mínimo 3×3 para caber os cantos e as bordas
-  for (let i = 0, tentativas = 0; i < paleta.lagos && tentativas < 200; tentativas++) {
+  for (let i = 0, tentativas = 0; i < paleta.lagos * ESCALA && tentativas < 200 * ESCALA; tentativas++) {
     const [w, h] = [entre(4, 9), entre(3, 6)];
     const [lx, ly] = [entre(4, LARGURA - w - 4), entre(4, ALTURA - h - 4)];
     let cabe = true;
@@ -80,7 +91,7 @@ export function gerarMapa(semente: string, paleta: Paleta): Mapa {
   }
 
   // mato alto (só enfeite: os encontros acontecem em qualquer passo)
-  for (let i = 0; i < 10; i++) mancha(entre(3, LARGURA - 4), entre(3, ALTURA - 4), 1.5 + r() * 2.5, 'mato', ['chao']);
+  for (let i = 0; i < 10 * ESCALA; i++) mancha(entre(3, LARGURA - 4), entre(3, ALTURA - 4), 1.5 + r() * 2.5, 'mato', ['chao']);
 
   // obstáculos grandes: borda grossa de "floresta" e bosques espalhados
   const grandes: Mapa['grandes'] = [];
@@ -94,7 +105,7 @@ export function gerarMapa(semente: string, paleta: Paleta): Mapa {
   for (let gy = 0; gy < ALTURA - 1; gy += 2)
     for (let gx = 0; gx < LARGURA - 1; gx += 2)
       if (gx < 4 || gy < 4 || gx >= LARGURA - 5 || gy >= ALTURA - 5) colocarGrande(gx, gy);
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 16 * ESCALA; i++) {
     const cx = entre(5, LARGURA - 7);
     const cy = entre(5, ALTURA - 7);
     for (let j = entre(2, 6); j > 0; j--) colocarGrande(cx + entre(-3, 3), cy + entre(-3, 3));
@@ -102,7 +113,7 @@ export function gerarMapa(semente: string, paleta: Paleta): Mapa {
 
   // pedrinhas e flores
   const pedrinhas: Mapa['pedrinhas'] = [];
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 30 * ESCALA; i++) {
     const [px, py] = [entre(1, LARGURA - 2), entre(1, ALTURA - 2)];
     if (livre(px, py) && terreno[py][px] === 'chao') {
       bloqueado[py][px] = true;

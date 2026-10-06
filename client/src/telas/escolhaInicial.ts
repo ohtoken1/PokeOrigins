@@ -18,7 +18,7 @@ export const telaEscolhaInicial: Tela = (raiz, navegar) => {
           navegar({ tela: 'regiao' });
         },
       },
-      el('div', { class: 'palco-inicial' }, spritePokemon(p, { alturaAlvo: 120 })),
+      el('div', { class: 'palco-inicial' }, spritePokemon(p, { palco: true, escala: 2 })),
       el('strong', {}, p.nome),
       selosTipos(p),
     );
