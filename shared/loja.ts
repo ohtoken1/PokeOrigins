@@ -6,14 +6,13 @@ import maquinas from './data/maquinas.json';
 import { ITENS, type ItemId } from './itens';
 import { nomeCategoria, nomeTipo, traduzir } from './traducao';
 
-export type CategoriaLoja = 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'frutas' | 'tm' | 'tr';
+export type CategoriaLoja = 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'tm' | 'tr';
 
 export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
   { id: 'bolas', nome: 'Pokébolas' },
   { id: 'remedios', nome: 'Remédios' },
   { id: 'evolucao', nome: 'Evolução' },
   { id: 'batalha', nome: 'Itens de batalha' },
-  { id: 'frutas', nome: 'Frutas' },
   { id: 'tm', nome: 'TMs' },
   { id: 'tr', nome: 'TRs' },
 ];
@@ -45,6 +44,22 @@ export const CABO_DE_LIGACAO = 'linkingcord';
 
 const preco = (id: string) => PRECOS[id] ?? PRECO_PADRAO;
 
+const ehLendario = (nome: string) => (Dex.species.get(nome).tags ?? []).some((t) => /Legendary|Mythical/.test(t));
+
+/**
+ * Regras do dono para a loja: fora frutas, plates/memories, itens exclusivos de lendários/míticos,
+ * itens sem uso em batalha e itens de treino de EV/IV; itens cuja função é evoluir vão para "Evolução".
+ */
+function classificarItem(i: ReturnType<typeof Dex.items.get>): 'batalha' | 'evolucao' | 'fora' {
+  const desc = i.shortDesc || i.desc || '';
+  if (i.isBerry) return 'fora';
+  if (i.onPlate || /plate$|memory$/.test(i.id)) return 'fora';
+  if (i.itemUser?.length && i.itemUser.every(ehLendario)) return 'fora';
+  if (/^Evolves/.test(desc)) return 'evolucao';
+  if (/No competitive use|Though this feather|big nugget|Hyper Training|Klutz Ability does not ignore/i.test(desc) || i.id === 'machobrace') return 'fora';
+  return 'batalha';
+}
+
 function montarCatalogo(): ItemLoja[] {
   const itens: ItemLoja[] = [];
   const add = (item: Omit<ItemLoja, 'preco'>) => itens.push({ ...item, preco: preco(item.id) });
@@ -60,10 +75,12 @@ function montarCatalogo(): ItemLoja[] {
   }
   add({ id: CABO_DE_LIGACAO, nome: 'Linking Cord', categoria: 'evolucao', descricao: 'Faz evoluir Pokémon que evoluem por troca (se precisar de item, ele deve estar equipado).' });
 
-  // itens de batalha e frutas: os padrões da 9ª geração, menos bolas e pedras de evolução
+  // itens padrão da 9ª geração: os de evoluir vão para "Evolução", os de batalha para "Itens de batalha"
   for (const i of Dex.items.all()) {
     if (i.isNonstandard || i.isPokeball || PEDRAS_EVOLUCAO.includes(i.id)) continue;
-    add({ id: i.id, nome: i.name, categoria: i.isBerry ? 'frutas' : 'batalha', descricao: traduzir(i.shortDesc || i.desc) });
+    const tipo = classificarItem(i);
+    if (tipo === 'fora') continue;
+    add({ id: i.id, nome: i.name, categoria: tipo, descricao: traduzir(i.shortDesc || i.desc) });
   }
 
   for (const m of maquinas as { id: string; golpe: string }[]) {

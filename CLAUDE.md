@@ -68,7 +68,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 
 ## Loja e itens (`shared/loja.ts`, `shared/usoItens.ts`, `client/src/ui/loja.ts`, `ui/bolsa.ts`)
 - Moeda: **silver** (`save.silver`). Provisório: todo item custa 1 (`PRECO_PADRAO`, ajustes em `PRECOS`), começa com 1000 e ganha 10 por vitória — o dono vai definir a economia.
-- Catálogo: bolas/remédios nossos + pedras de evolução + Linking Cord (item nosso para evolução por troca) + itens de batalha e frutas padrão da 9ª gen do Showdown + TMs (Scarlet/Violet) e TRs (Sword/Shield) de `shared/data/maquinas.json` (`npm run maquinas`, GraphQL da PokéAPI).
+- Catálogo: bolas/remédios nossos + Evolução (pedras, Linking Cord e itens "Evolves…": maçãs, bules, armaduras, Dragon Scale…; usar = evoluir) + itens de batalha padrão da 9ª gen do Showdown SEM frutas, plates/memories, itens de lendários/míticos, itens sem uso em batalha e de EV/IV (regras em `classificarItem`) + TMs (Scarlet/Violet) e TRs (Sword/Shield) de `shared/data/maquinas.json` (`npm run maquinas`, GraphQL da PokéAPI).
 - Bolsa: remédios (usar), pedras/Linking Cord (evoluir; troca com item exige o item equipado e o consome), itens de batalha/frutas (equipar; o anterior volta à bolsa), TMs/TRs (ensinar se o learnset do Showdown tiver fonte "M" em qualquer geração; são gastos). PC tem "Tirar item".
 - Item equipado vai para a batalha do Showdown (`PokemonIndividual.item`); frutas comidas somem no fim.
 

@@ -14,7 +14,6 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
   remedios: 'Usar',
   evolucao: 'Usar',
   batalha: 'Equipar',
-  frutas: 'Equipar',
   tm: 'Ensinar',
   tr: 'Ensinar',
 };
@@ -75,8 +74,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
         for (const golpe of r.golpesPendentes) aprender(p, golpe, () => {}, () => {});
         return [`${quem} evoluiu para ${pokemonPorId(para).nome}!`, ...r.mensagens].join(' ');
       }
-      case 'batalha':
-      case 'frutas': {
+      case 'batalha': {
         if (!ehEquipavel(item.id)) return 'Esse item não pode ser equipado.';
         gastar(item.id);
         const antigo = p.item;
