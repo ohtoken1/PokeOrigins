@@ -16,6 +16,8 @@ const ESCALA_DETALHE = 1 / ZOOM;
 /** Quanto o personagem/seguidor crescem no mundo para manter o tamanho de tela de quando o zoom era 2. */
 const COMPENSA_ZOOM = 2 / ZOOM;
 const DURACAO_PASSO = 160;
+/** Quadros da animação de andar do LPC por quadradinho (o ciclo tem 8). */
+const QUADROS_POR_PASSO = 3;
 
 /** Sprites da 5ª geração (Black/White): frente e costas, normal e shiny, já no tamanho relativo certo. */
 const SPRITES_BW = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white';
@@ -92,6 +94,8 @@ export class BiomaScene extends Phaser.Scene {
   /** Textura do personagem LPC (null = desenho antigo) e a linha da folha (0 cima, 1 esquerda, 2 baixo, 3 direita). */
   private lpc: string | null = null;
   private linhaLpc = 2;
+  /** Posição no ciclo de 8 quadros de andar (continua de um passo para o outro). */
+  private cicloLpc = 0;
   /** alterna a perna que vai à frente a cada passo */
   private passos = 0;
   private pausado = false;
@@ -331,8 +335,10 @@ export class BiomaScene extends Phaser.Scene {
     const direcao: Direcao = dy < 0 ? 'cima' : dy > 0 ? 'baixo' : 'lado';
     this.direcao = direcao;
     if (this.lpc) {
+      // vira mantendo o quadro atual da animação (não "trava" entre passos)
       this.linhaLpc = dy < 0 ? 0 : dy > 0 ? 2 : dx < 0 ? 1 : 3;
-      this.jogador.setTexture(this.lpc, `${this.linhaLpc}-0`);
+      const coluna = String(this.jogador.frame.name).split('-')[1] ?? '0';
+      this.jogador.setTexture(this.lpc, `${this.linhaLpc}-${coluna}`);
     } else this.jogador.setTexture(`jogador-${direcao}-0`).setFlipX(dx > 0);
 
     const x = this.pos.x + dx;
@@ -347,7 +353,7 @@ export class BiomaScene extends Phaser.Scene {
     this.passos++;
     if (!this.lpc) this.jogador.setTexture(`jogador-${direcao}-${this.passos % 2 ? 1 : 2}`);
     const [px, py] = this.pesDoTile(x, y);
-    const inicioCiclo = (this.passos % 2) * 4;
+    const inicioCiclo = this.cicloLpc;
     this.tweens.add({
       targets: this.jogador,
       x: px,
@@ -355,13 +361,22 @@ export class BiomaScene extends Phaser.Scene {
       duration: DURACAO_PASSO,
       onUpdate: (tween) => {
         // LPC: 8 quadros de andar, 4 por passo
-        if (this.lpc) this.jogador.setFrame(`${this.linhaLpc}-${1 + ((inicioCiclo + Math.min(3, Math.floor(tween.progress * 4))) % 8)}`);
+        // LPC: ~3 quadros por quadradinho andado, sem voltar ao "parado" entre passos seguidos
+        if (this.lpc) this.jogador.setFrame(`${this.linhaLpc}-${1 + (Math.floor(inicioCiclo + tween.progress * QUADROS_POR_PASSO) % 8)}`);
         this.atualizarProfundidade();
       },
       onComplete: () => {
         this.movendo = false;
-        if (this.lpc) this.jogador.setFrame(`${this.linhaLpc}-0`);
-        else this.jogador.setTexture(`jogador-${this.direcao}-0`);
+        if (this.lpc) {
+          this.cicloLpc = (inicioCiclo + QUADROS_POR_PASSO) % 8;
+          // só volta a ficar parado se não começar outro passo logo em seguida
+          this.time.delayedCall(40, () => {
+            if (!this.movendo && this.lpc) {
+              this.jogador.setFrame(`${this.linhaLpc}-0`);
+              this.cicloLpc = 0;
+            }
+          });
+        } else this.jogador.setTexture(`jogador-${this.direcao}-0`);
         this.atualizarProfundidade();
         this.opcoes.aoPisar();
       },

@@ -142,13 +142,12 @@ const ESTAMPA_DESENHO: Record<Exclude<Estampa, 'nenhuma'>, { linhas: string[]; c
 /** Boné por cima da cabeça (a parte do cabelo que sairia por cima do boné é apagada antes). */
 function desenharBone(ctx: CanvasRenderingContext2D, ox: number, oy: number, cab: NonNullable<Caixa>, linha: number, bone: Exclude<Bone, 'nenhum'>) {
   const [cor, sombra, aba] = COR_BONE[bone];
-  const esq = cab.esq - 1, dir = cab.dir + 1, topo = cab.topo - 1;
-  const largura = dir - esq + 1;
-  // copa arredondada: as 2 primeiras linhas mais estreitas
-  const ALTURA = 8;
+  // do tamanho do crânio (a caixa da cabeça inclui as orelhas): 1 px para dentro de cada lado
+  const esq = cab.esq + 1, dir = cab.dir - 1, topo = cab.topo - 2;
+  const ALTURA = 6;
   for (let j = 0; j < ALTURA; j++) {
     const recuo = j === 0 ? 3 : j === 1 ? 1 : 0;
-    for (let x = esq + recuo; x <= dir - recuo; x++) px(ctx, ox + x, oy + topo + j, j >= ALTURA - 2 ? sombra : cor);
+    for (let x = esq + recuo; x <= dir - recuo; x++) px(ctx, ox + x, oy + topo + j, j === ALTURA - 1 ? sombra : cor);
     px(ctx, ox + esq + recuo - 1, oy + topo + j, CONTORNO);
     px(ctx, ox + dir - recuo + 1, oy + topo + j, CONTORNO);
   }
@@ -156,27 +155,24 @@ function desenharBone(ctx: CanvasRenderingContext2D, ox: number, oy: number, cab
   px(ctx, ox + esq + 1, oy + topo, CONTORNO);
   px(ctx, ox + dir - 1, oy + topo, CONTORNO);
   const meio = Math.round((esq + dir) / 2);
+  const logo = (x: number) => padrao(ctx, ox + x - 1, oy + topo + 2, ['.w.', 'wkw'], { w: '#f4f4f4', k: CONTORNO });
   if (linha === 2) {
-    // de frente: logo de Pokébola e aba reta
-    padrao(ctx, ox + meio - 2, oy + topo + 2, ['.www.', 'wwkww', '.www.'], { w: '#f4f4f4', k: CONTORNO });
-    for (let x = esq - 1; x <= dir + 1; x++) {
-      px(ctx, ox + x, oy + topo + ALTURA, aba);
-      px(ctx, ox + x, oy + topo + ALTURA + 1, CONTORNO);
-    }
+    // de frente: logo pequeno e aba curta logo abaixo da copa
+    logo(meio);
+    for (let x = esq; x <= dir; x++) px(ctx, ox + x, oy + topo + ALTURA, aba);
+    for (let x = esq + 1; x <= dir - 1; x++) px(ctx, ox + x, oy + topo + ALTURA + 1, CONTORNO);
   } else if (linha === 1 || linha === 3) {
-    // de lado: aba para a frente (esquerda ou direita) e logo na lateral
-    const frente = linha === 1 ? -1 : 1;
-    const inicio = linha === 1 ? esq - 4 : meio;
-    for (let x = inicio; x <= inicio + Math.floor(largura / 2) + 3; x++) {
+    // de lado: aba de 4 px para a frente
+    const [de, ate] = linha === 1 ? [esq - 4, meio] : [meio, dir + 4];
+    for (let x = de; x <= ate; x++) {
       px(ctx, ox + x, oy + topo + ALTURA - 1, aba);
       px(ctx, ox + x, oy + topo + ALTURA, CONTORNO);
     }
-    padrao(ctx, ox + meio - 1 + frente * 2, oy + topo + 2, ['.w.', 'wkw', '.w.'], { w: '#f4f4f4', k: CONTORNO });
+    logo(meio + (linha === 1 ? -2 : 2));
   } else {
     // de costas: fecho do boné
-    for (let x = meio - 2; x <= meio + 2; x++) px(ctx, ox + x, oy + topo + ALTURA - 2, '#f4f4f4');
+    for (let x = meio - 1; x <= meio + 1; x++) px(ctx, ox + x, oy + topo + ALTURA - 2, '#f4f4f4');
   }
-  void largura;
 }
 
 export interface FolhasPersonagem {
@@ -212,6 +208,7 @@ export async function montarPersonagem(a: Aparencia): Promise<FolhasPersonagem> 
     const cabeca = dadosDe('cabeca');
     const camiseta = dadosDe('camiseta');
     const calca = dadosDe('calca');
+    const corpoDados = dadosDe('corpo');
     const colunas = folha.width / 64;
 
     // com boné: apaga o cabelo que ficaria acima da copa
@@ -234,19 +231,33 @@ export async function montarPersonagem(a: Aparencia): Promise<FolhasPersonagem> 
       for (let col = 0; col < colunas; col++) {
         const ox = col * 64, oy = linha * 64;
         const tronco = camiseta && caixa(camiseta, ox, oy);
+        // mão/braço na frente do quadril: pixel de pele (da camada do corpo) que a calça não cobre na imagem final
+        const cobertoPeloBraco = (x: number, y: number) => {
+          if (!corpoDados) return false;
+          const k = ((oy + y) * corpoDados.width + ox + x) * 4;
+          const fim = ctx.getImageData(ox + x, oy + y, 1, 1).data;
+          return corpoDados.data[k + 3] > 0 && fim[0] === corpoDados.data[k] && fim[1] === corpoDados.data[k + 1] && fim[2] === corpoDados.data[k + 2];
+        };
         const cintura = calca && caixa(calca, ox, oy);
         if (a.estampa !== 'nenhuma' && linha === 2 && tronco) {
           const e = ESTAMPA_DESENHO[a.estampa];
           const meio = Math.round((tronco.esq + tronco.dir) / 2);
-          padrao(ctx, ox + meio - Math.floor(e.linhas[0].length / 2), oy + tronco.topo + 4, e.linhas, e.cores);
+          padrao(ctx, ox + meio - Math.floor(e.linhas[0].length / 2), oy + tronco.topo + 7, e.linhas, e.cores);
         }
-        if (a.cinto && cintura) {
+        if (a.cinto && cintura && calca) {
           const bola = ['rrr', 'kwk', 'www'];
-          const cores = { r: '#e8443c', k: CONTORNO, w: '#f4f4f4' };
-          const y = oy + cintura.topo;
-          if (linha === 2) padrao(ctx, ox + cintura.esq + 1, y, bola, cores);
-          else if (linha === 0) padrao(ctx, ox + cintura.dir - 3, y, bola, cores);
-          else padrao(ctx, ox + (linha === 1 ? cintura.dir - 3 : cintura.esq + 1), y, bola, cores);
+          const cores: Record<string, string> = { r: '#e8443c', k: CONTORNO, w: '#f4f4f4' };
+          const meio = Math.round((cintura.esq + cintura.dir) / 2);
+          const x0 = linha === 2 ? meio - 5 : linha === 0 ? meio + 3 : linha === 1 ? meio + 1 : meio - 3;
+          const y0 = cintura.topo + 1;
+          bola.forEach((l, j) =>
+            [...l].forEach((ch, i) => {
+              const x = x0 + i, y = y0 + j;
+              // só pinta onde a calça é o que aparece por cima: braço/mão na frente continuam visíveis
+              const k = ((oy + y) * calca.width + ox + x) * 4;
+              if (calca.data[k + 3] > 0 && !cobertoPeloBraco(x, y)) px(ctx, ox + x, oy + y, cores[ch]);
+            }),
+          );
         }
         if (a.bone !== 'nenhum' && cabeca) {
           const cab = caixa(cabeca, ox, oy);

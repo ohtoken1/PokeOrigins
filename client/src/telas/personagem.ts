@@ -48,7 +48,7 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
     if (!folhas) return;
     ctx.clearRect(0, 0, 64, 64);
     ctx.drawImage(folhas.walk, (1 + (quadro % 8)) * 64, direcao * 64, 64, 64, 0, 0, 64, 64);
-  }, 110);
+  }, 125);
 
   const grupo = (titulo: string, itens: [string, string, string?][], atual: () => string, escolher: (v: string) => void) => {
     const caixa = el('div', { class: 'opcoes-personagem' });
@@ -70,16 +70,16 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
     const meio = (cores: string[]) => cores[Math.floor(cores.length / 2)];
     const cor = (lista: string[], tabela: Record<string, string[]>) => lista.map((k): [string, string, string] => [k, k, meio(tabela[k])]);
     painel.replaceChildren(
-      el('h3', {}, '🧢 Estilo Pokémon'),
+      el('h3', {}, 'Estilo Pokémon'),
       grupo('Boné', Object.entries(BONES), () => a.bone, (v) => (a.bone = v as Aparencia['bone'])),
       grupo('Estampa da camiseta', Object.entries(ESTAMPAS), () => a.estampa, (v) => (a.estampa = v as Aparencia['estampa'])),
       grupo('Pokébolas no cinto', [['sim', 'Com'], ['nao', 'Sem']], () => (a.cinto ? 'sim' : 'nao'), (v) => (a.cinto = v === 'sim')),
-      el('h3', {}, '🙂 Corpo'),
+      el('h3', {}, 'Corpo'),
       grupo('Corpo', [['masc', 'Masculino'], ['fem', 'Feminino']], () => a.corpo, (v) => (a.corpo = v as Aparencia['corpo'])),
       grupo('Tom de pele', cor(PELES, p.body), () => a.pele, (v) => (a.pele = v)),
       grupo('Cabelo', Object.entries(CABELOS), () => a.cabelo, (v) => (a.cabelo = v)),
       grupo('Cor do cabelo', cor(CORES_CABELO, p.hair), () => a.corCabelo, (v) => (a.corCabelo = v)),
-      el('h3', {}, '👕 Roupas'),
+      el('h3', {}, 'Roupas'),
       grupo('Camiseta', cor(CORES_ROUPA, p.cloth), () => a.camiseta, (v) => (a.camiseta = v)),
       grupo('Calça', cor(CORES_ROUPA, p.cloth), () => a.calca, (v) => (a.calca = v)),
       grupo('Tênis', cor(CORES_ROUPA, p.cloth), () => a.tenis, (v) => (a.tenis = v)),
@@ -87,18 +87,16 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
   });
   remontar();
 
+  // um botão só: cada clique vira o personagem (baixo → esquerda → cima → direita)
+  const ORDEM_GIRO = [2, 1, 0, 3];
   const direcoes = el(
     'div',
     { class: 'direcoes-personagem' },
-    ...(['↑', '←', '↓', '→'] as const).map((seta, i) =>
-      el('button', {
-        class: `botao secundario ${i === direcao ? 'ativo' : ''}`,
-        onclick: (e: Event) => {
-          direcao = i;
-          direcoes.querySelectorAll('button').forEach((b) => b.classList.toggle('ativo', b === e.currentTarget));
-        },
-      }, seta),
-    ),
+    el('button', {
+      class: 'botao secundario',
+      title: 'Virar o personagem',
+      onclick: () => (direcao = ORDEM_GIRO[(ORDEM_GIRO.indexOf(direcao) + 1) % 4]),
+    }, '↻ Virar'),
   );
 
   const concluir = () => {
