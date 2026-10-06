@@ -405,7 +405,7 @@ export class BiomaScene extends Phaser.Scene {
     this.sombraJogador.setPosition(this.jogador.x, this.jogador.y - 1).setDepth(this.jogador.depth - 0.5);
     // nome acima da cabeça (o personagem LPC tem ~30 px de altura no mundo)
     // mesma posição do personagem (sem arredondar à parte, senão treme ao andar)
-    this.nomeJogador?.setPosition(this.jogador.x, this.jogador.y - (this.lpc ? 27 : 20));
+    this.nomeJogador?.setPosition(this.jogador.x, this.jogador.y - (this.lpc ? 25 : 18));
     const largura = this.pmd ? Math.max(8, this.pmd.largura * ESCALA_PMD * 0.75) : Math.max(8, this.imgSeguidor.displayWidth * 0.45);
     this.sombraSeguidor
       .setPosition(this.seguidor.x, this.seguidor.y - 1)
