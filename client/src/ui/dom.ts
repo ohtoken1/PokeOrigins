@@ -69,11 +69,59 @@ export function selosTipos(p: PokemonBase): HTMLElement {
  * `alturaAlvo` amplia por um fator INTEIRO (2×, 3×…) até perto dessa altura: ampliar por fator
  * quebrado (1,5×) deixa os pixels de tamanhos diferentes e o sprite fica "mal pixelado".
  */
+/** Parte desenhada (não transparente) do primeiro quadro da imagem. */
+function areaVisivel(img: HTMLImageElement): { x0: number; y0: number; x1: number; y1: number } | null {
+  const [w, h] = [img.naturalWidth, img.naturalHeight];
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext('2d', { willReadFrequently: true })!;
+  ctx.drawImage(img, 0, 0);
+  let dados: Uint8ClampedArray;
+  try {
+    dados = ctx.getImageData(0, 0, w, h).data;
+  } catch {
+    return null; // imagem sem CORS: fica como está
+  }
+  let [x0, y0, x1, y1] = [w, h, -1, -1];
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++)
+      if (dados[(y * w + x) * 4 + 3] > 0) {
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+  return x1 < 0 ? null : { x0, y0, x1: x1 + 1, y1: y1 + 1 };
+}
+
+/**
+ * Os GIFs do Showdown têm sobra transparente desigual: desloca a imagem (propriedade `translate`,
+ * que não atrapalha as animações com `transform`) para o Pokémon ficar no meio na horizontal.
+ * `chao` (0 a 1): altura do palco onde ficam os pés; sem ele, só centraliza na horizontal.
+ */
+function centralizar(img: HTMLImageElement, zoom: number, chao?: number) {
+  const area = areaVisivel(img);
+  if (!area) return null;
+  const dx = Math.round(img.naturalWidth / 2 - (area.x0 + area.x1) / 2);
+  let dy = 0;
+  const palco = img.parentElement;
+  if (chao !== undefined && palco) {
+    // imagem centralizada no palco: o pé está em (altura do palco − altura da imagem)/2 + y1
+    const alturaPalco = palco.clientHeight / zoom;
+    const pe = (alturaPalco - img.naturalHeight) / 2 + area.y1;
+    // não deixa a cabeça sair por cima
+    dy = Math.round(Math.max(alturaPalco * chao - pe, -((alturaPalco - img.naturalHeight) / 2 + area.y0)));
+  }
+  img.style.translate = `${dx}px ${dy}px`;
+  return area;
+}
+
 export function spritePokemon(
   p: PokemonBase,
-  opcoes: { shiny?: boolean; animado?: boolean; costas?: boolean; alturaAlvo?: number } = {},
+  opcoes: { shiny?: boolean; animado?: boolean; costas?: boolean; alturaAlvo?: number; chao?: number } = {},
 ): HTMLImageElement {
-  const { shiny = false, animado = true, costas = false, alturaAlvo } = opcoes;
+  const { shiny = false, animado = true, costas = false, alturaAlvo, chao } = opcoes;
   const s = p.sprites;
   const parado = costas ? (shiny ? s.costasShiny : s.costas) : shiny ? s.frenteShiny : s.frente;
   const gif = costas ? (shiny ? s.gifCostasShiny : s.gifCostas) : shiny ? s.gifShiny : s.gif;
@@ -82,6 +130,8 @@ export function spritePokemon(
     alt: p.nome,
     src: (animado && gif) || parado || '',
     loading: 'lazy',
+    // permite ler os pixels para centralizar (PokéAPI no GitHub libera CORS)
+    crossorigin: alturaAlvo ? 'anonymous' : undefined,
   });
   if (animado && gif && parado) img.addEventListener('error', () => (img.src = parado), { once: true });
   if (alturaAlvo) {
@@ -89,7 +139,13 @@ export function spritePokemon(
     // só ampliamos os pequenos, no máximo 2×, olhando a maior dimensão (Exeggcute é largo)
     img.addEventListener('load', () => {
       const maior = Math.max(img.naturalWidth, img.naturalHeight);
-      img.style.zoom = String(Math.min(2, Math.max(1, Math.floor(alturaAlvo / maior))));
+      const zoom = Math.min(2, Math.max(1, Math.floor(alturaAlvo / maior)));
+      img.style.zoom = String(zoom);
+      const area = centralizar(img, zoom, chao);
+      // Pokémon grande demais para o palco (ex.: Articuno abrindo as asas): usa a imagem parada, que cabe
+      const palco = img.parentElement;
+      if (chao !== undefined && area && palco && parado && img.src !== parado && ((area.x1 - area.x0) * zoom > palco.clientWidth || (area.y1 - area.y0) * zoom > palco.clientHeight))
+        img.src = parado;
     });
   }
   return img;
