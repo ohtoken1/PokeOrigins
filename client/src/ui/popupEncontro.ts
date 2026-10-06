@@ -29,7 +29,7 @@ export function mostrarEncontro(raiz: HTMLElement, encontro: Encontro, acoes: Ac
   const cartao = el(
     'div',
     { class: `encontro ${shiny ? 'shiny' : ''} ${lendario ? 'lendario' : ''}`, role: 'status', 'aria-live': 'polite' },
-    el('div', { class: 'palco' }, spritePokemon(pokemon, { shiny, alturaAlvo: 96, chao: 0.9 })),
+    el('div', { class: 'palco' }, spritePokemon(pokemon, { shiny, alturaAlvo: 160, chao: 0.9 })),
     el(
       'div',
       { class: 'info' },
@@ -48,5 +48,47 @@ export function mostrarEncontro(raiz: HTMLElement, encontro: Encontro, acoes: Ac
 
   window.addEventListener('keydown', aoTeclar);
   raiz.append(cartao);
+  permitirArrastar(cartao, raiz);
   return fechar;
+}
+
+/** Posição escolhida pelo jogador (canto superior esquerdo, em px dentro do mapa); vale para os próximos cartões. */
+const CHAVE_POSICAO = 'jogo-claude:posicao-encontro';
+
+function permitirArrastar(cartao: HTMLElement, raiz: HTMLElement) {
+  const limitar = (x: number, y: number) => [
+    Math.max(0, Math.min(raiz.clientWidth - cartao.offsetWidth, x)),
+    Math.max(0, Math.min(raiz.clientHeight - cartao.offsetHeight, y)),
+  ];
+  const posicionar = (x: number, y: number) => {
+    [x, y] = limitar(x, y);
+    Object.assign(cartao.style, { left: `${x}px`, top: `${y}px`, right: 'auto', bottom: 'auto' });
+    return [x, y];
+  };
+  try {
+    const salva = JSON.parse(localStorage.getItem(CHAVE_POSICAO) ?? 'null');
+    if (Array.isArray(salva)) posicionar(salva[0], salva[1]);
+  } catch {
+    /* sem posição salva: fica no canto */
+  }
+
+  cartao.addEventListener('pointerdown', (e) => {
+    if ((e.target as HTMLElement).closest('button') || e.button !== 0) return;
+    e.preventDefault();
+    const [ox, oy] = [e.clientX - cartao.offsetLeft, e.clientY - cartao.offsetTop];
+    cartao.setPointerCapture(e.pointerId);
+    cartao.classList.add('arrastando');
+    const mover = (ev: PointerEvent) => posicionar(ev.clientX - ox, ev.clientY - oy);
+    const soltar = () => {
+      cartao.classList.remove('arrastando');
+      cartao.removeEventListener('pointermove', mover);
+      try {
+        localStorage.setItem(CHAVE_POSICAO, JSON.stringify([cartao.offsetLeft, cartao.offsetTop]));
+      } catch {
+        /* ignora */
+      }
+    };
+    cartao.addEventListener('pointermove', mover);
+    cartao.addEventListener('pointerup', soltar, { once: true });
+  });
 }

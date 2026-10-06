@@ -119,17 +119,20 @@ aside { display: flex; flex-direction: column; gap: 16px; }
 /* Cartão de encontro (não trava o jogo) */
 .area-jogo { position: relative; }
 .encontro {
-  position: absolute; right: 12px; bottom: 12px; z-index: 5; width: min(300px, calc(100% - 24px));
-  display: flex; gap: 10px; align-items: center; padding: 10px; line-height: normal;
-  background: rgb(30 34 48 / 0.94); border: 2px solid var(--borda); border-radius: 14px;
-  box-shadow: 0 10px 30px rgb(0 0 0 / 0.45); animation: deslizar 0.18s ease-out;
+  position: absolute; right: 12px; bottom: 12px; z-index: 5; width: min(360px, calc(100% - 24px));
+  display: flex; gap: 8px; align-items: center; padding: 6px; line-height: normal;
+  background: transparent; border: 2px solid transparent; border-radius: 14px;
+  animation: deslizar 0.18s ease-out; cursor: grab; user-select: none; touch-action: none;
+  text-shadow: 0 1px 2px #000, 0 0 4px #000;
 }
-.encontro.shiny { border-color: var(--destaque); box-shadow: 0 0 30px rgb(255 203 5 / 0.4); }
+.encontro:hover { border-color: rgb(255 255 255 / 0.25); }
+.encontro.arrastando { cursor: grabbing; animation: none; }
+.encontro.shiny { border-color: rgb(255 203 5 / 0.6); }
 .encontro .palco {
-  flex: 0 0 96px; height: 96px; display: grid; place-items: center; border-radius: 10px;
-  background: radial-gradient(ellipse at 50% 85%, #3a4260 0 32%, transparent 33%), var(--painel-2);
+  flex: 0 0 160px; height: 160px; display: grid; place-items: center;
+  background: radial-gradient(ellipse 34% 9% at 50% 88%, rgb(0 0 0 / 0.35) 0 99%, transparent 100%);
 }
-.encontro .palco { overflow: hidden; }
+.encontro .palco img { pointer-events: none; -webkit-user-drag: none; }
 .encontro .info { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; min-width: 0; }
 .encontro .info h2 { margin: 0; font-size: 1rem; }
 .encontro .aviso { margin: 0; font-size: 0.75rem; font-weight: 700; color: var(--texto-2); text-transform: uppercase; }
@@ -138,11 +141,12 @@ aside { display: flex; flex-direction: column; gap: 16px; }
 .encontro.shiny .nome { color: #ffd84a; }
 .encontro.lendario .nome { color: #ff5a4a; }
 .encontro.lendario .aviso { color: #ff5a4a; }
-.encontro.shiny.lendario .nome { background: linear-gradient(90deg, #ffd84a, #ff5a4a); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.encontro.lendario { border-color: #ff5a4a; }
+.encontro.shiny.lendario .nome { background: linear-gradient(90deg, #ffd84a, #ff5a4a); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 1px 1px #000); }
+.encontro.lendario { border-color: rgb(255 90 74 / 0.6); }
 .encontro .tipos { justify-content: flex-start; }
 .encontro .botao { padding: 6px 12px; margin-top: 2px; }
-.encontro .dica { margin: 0; font-size: 0.72rem; }
+.encontro .dica { margin: 0; font-size: 0.72rem; color: #e8ecf4; }
+.encontro .botao { text-shadow: none; cursor: pointer; }
 kbd { font: 600 0.7rem system-ui; padding: 1px 5px; border-radius: 4px; background: rgb(0 0 0 / 0.2); }
 
 /* Batalha */

@@ -102,7 +102,7 @@ function areaVisivel(img: HTMLImageElement): { x0: number; y0: number; x1: numbe
  */
 function centralizar(img: HTMLImageElement, zoom: number, chao?: number) {
   const area = areaVisivel(img);
-  if (!area) return null;
+  if (!area) return;
   const dx = Math.round(img.naturalWidth / 2 - (area.x0 + area.x1) / 2);
   let dy = 0;
   const palco = img.parentElement;
@@ -114,7 +114,6 @@ function centralizar(img: HTMLImageElement, zoom: number, chao?: number) {
     dy = Math.round(Math.max(alturaPalco * chao - pe, -((alturaPalco - img.naturalHeight) / 2 + area.y0)));
   }
   img.style.translate = `${dx}px ${dy}px`;
-  return area;
 }
 
 export function spritePokemon(
@@ -141,11 +140,7 @@ export function spritePokemon(
       const maior = Math.max(img.naturalWidth, img.naturalHeight);
       const zoom = Math.min(2, Math.max(1, Math.floor(alturaAlvo / maior)));
       img.style.zoom = String(zoom);
-      const area = centralizar(img, zoom, chao);
-      // Pokémon grande demais para o palco (ex.: Articuno abrindo as asas): usa a imagem parada, que cabe
-      const palco = img.parentElement;
-      if (chao !== undefined && area && palco && parado && img.src !== parado && ((area.x1 - area.x0) * zoom > palco.clientWidth || (area.y1 - area.y0) * zoom > palco.clientHeight))
-        img.src = parado;
+      centralizar(img, zoom, chao);
     });
   }
   return img;
