@@ -1,9 +1,10 @@
 import type { Bioma } from '../../../shared/biomas';
 import { BatalhaSelvagem, type EventoBatalha, type Lado } from '../../../shared/batalha/motor';
-import { expGanha, expParaNivel, ganharEvs, hpMaximo, nomeGolpe, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { curar, expGanha, expParaNivel, ganharEvs, hpMaximo, nomeGolpe, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { evoluir, ganharExperiencia, trocarGolpe, type ResultadoProgresso } from '../../../shared/batalha/progresso';
 import { pokemonPorId } from '../dados';
 import { ITENS, type ItemId } from '../../../shared/itens';
+import { efeitoBola } from '../../../shared/bolas';
 import { nivelTreinador } from '../../../shared/treinador';
 import { MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
 import { curarTime, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
@@ -231,13 +232,15 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
 
   function menuBolsa() {
     acoes.replaceChildren(
-      ...(Object.keys(ITENS) as ItemId[]).map((id) =>
-        botao(`${ITENS[id].nome} ×${save.itens[id]}`, () => (ITENS[id].categoria === 'bola' ? arremessar(id) : menuAlvoRemedio(id)), {
-          class: `botao item ${ITENS[id].categoria}`,
-          disabled: save.itens[id] <= 0,
-          title: ITENS[id].descricao,
-        }),
-      ),
+      // só o que o jogador tem; Sacred Ash é só fora da batalha
+      ...(Object.keys(ITENS) as ItemId[])
+        .filter((id) => (save.itens[id] ?? 0) > 0 && !ITENS[id].reviverTime)
+        .map((id) =>
+          botao(`${ITENS[id].nome} ×${save.itens[id]}`, () => (ITENS[id].categoria === 'bola' ? arremessar(id) : menuAlvoRemedio(id)), {
+            class: `botao item ${ITENS[id].categoria}`,
+            title: ITENS[id].descricao,
+          }),
+        ),
       botao('← Voltar', menuPrincipal, { class: 'botao secundario voltar' }),
     );
   }
@@ -295,6 +298,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
   // ---------- ações ----------
   async function executar(acao: () => EventoBatalha[]) {
     acoes.replaceChildren();
+    turno++;
     await reproduzir(acao());
     menuPrincipal();
   }
@@ -313,7 +317,24 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     save.itens[bola]--;
     salvar(save);
     mensagem.textContent = `Você arremessou uma ${ITENS[bola].nome}!`;
-    const { capturou, tremidas, eventos } = batalha.arremessarBola(ITENS[bola].bonus ?? 1);
+    const ativo = save.time[batalha.ativo];
+    const efeito = efeitoBola(bola, {
+      especieId: selvagem.especieId,
+      tipos: dadosSelvagem.tipos,
+      velocidadeBase: dadosSelvagem.stats.velocidade,
+      pesoKg: dadosSelvagem.peso / 10,
+      nivel: selvagem.nivel,
+      genero: selvagem.genero,
+      status: batalha.statusSelvagem,
+      especieAtivo: ativo.especieId,
+      nivelAtivo: ativo.nivel,
+      generoAtivo: ativo.genero,
+      turno,
+      bioma: bioma.id,
+      jaPossui: [...save.time, ...save.caixa].some((p) => p.especieId === selvagem.especieId),
+    });
+    const { capturou, tremidas, eventos } = batalha.arremessarBola(efeito);
+    if (capturou && bola === 'healball') curarAoCapturar = true;
     await animarBola(arena, spriteSelvagem, tremidas, capturou);
     if (capturou) {
       await dizer(`Pegou! ${dadosSelvagem.nome} foi capturado!`);
@@ -374,6 +395,10 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     if (depois > antes) await dizer(`Seu nível de treinador subiu para ${depois}! Os Pokémon selvagens ficaram mais fortes.`);
   }
 
+  /** Turno atual (Quick Ball e Timer Ball) e se a Heal Ball deve curar o capturado. */
+  let turno = 1;
+  let curarAoCapturar = false;
+
   async function finalizar(resultado: ResultadoBatalha) {
     acoes.replaceChildren();
     batalha.sincronizar();
@@ -410,6 +435,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     } else if (resultado === 'captura') {
       await darXpTreinador();
       selvagem.hp = Math.max(1, selvagem.hp);
+      if (curarAoCapturar) curar(selvagem);
       if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(selvagem);
       else {
         save.caixa.push(selvagem);

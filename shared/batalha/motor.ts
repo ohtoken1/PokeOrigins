@@ -3,7 +3,8 @@
 // selvagem, então captura e fuga são feitas aqui, com as fórmulas dos jogos originais.
 import { Battle, Dex } from '@pkmn/sim';
 import { especie, ppMaximo, type PokemonIndividual } from './pokemon';
-import { efeitoRemedio, usarRemedio, type Item } from '../itens';
+import { aplicarRemedio, usarRemedio, type Item } from '../itens';
+import type { EfeitoBola } from '../bolas';
 
 export type Lado = 'jogador' | 'selvagem';
 
@@ -190,9 +191,11 @@ export class BatalhaSelvagem {
    * Arremessa uma Pokébola (fórmula da 3ª/4ª geração, bônus de status da 5ª em diante).
    * Se falhar, o selvagem ataca de graça.
    */
-  arremessarBola(bonusBola: number): { capturou: boolean; tremidas: number; eventos: EventoBatalha[] } {
+  arremessarBola(bola: EfeitoBola): { capturou: boolean; tremidas: number; eventos: EventoBatalha[] } {
+    if (bola.garantida) return { capturou: true, tremidas: 3, eventos: [] };
     const alvo = this.batalha.p2.active[0];
-    const taxa = this.taxaCaptura;
+    const bonusBola = bola.bonus;
+    const taxa = Math.max(1, Math.min(255, this.taxaCaptura + bola.ajusteTaxa));
     const bonusStatus = alvo.status === 'slp' || alvo.status === 'frz' ? 2.5 : alvo.status ? 1.5 : 1;
     const a = Math.floor((((3 * alvo.maxhp - 2 * alvo.hp) * taxa * bonusBola) / (3 * alvo.maxhp)) * bonusStatus);
 
@@ -217,8 +220,19 @@ export class BatalhaSelvagem {
       return mensagem ? { mensagem, eventos: this.turnoGratisDoSelvagem() } : null;
     }
     const sim = this.objetos[k];
-    const efeito = efeitoRemedio(item, { hp: sim.fainted ? 0 : sim.hp, hpMax: sim.maxhp, status: sim.fainted ? null : sim.status || null }, nome);
-    if (!efeito) return null;
+    const r = aplicarRemedio(
+      item,
+      {
+        hp: sim.fainted ? 0 : sim.hp,
+        hpMax: sim.maxhp,
+        status: sim.fainted ? null : sim.status || null,
+        golpes: sim.baseMoveSlots.map((s) => ({ id: s.id, pp: s.pp, ppMax: s.maxpp })),
+      },
+      nome,
+    );
+    if (!r) return null;
+    const efeito = { ...r.estado, mensagem: r.mensagem };
+    for (const s of sim.baseMoveSlots) s.pp = efeito.golpes.find((g) => g.id === s.id)?.pp ?? s.pp;
     if (sim.fainted) {
       sim.fainted = false;
       sim.faintQueued = false;
@@ -233,6 +247,11 @@ export class BatalhaSelvagem {
       eventos.push({ tipo: 'hp', lado: 'jogador', hp: sim.hp, hpMax: sim.maxhp }, { tipo: 'status', lado: 'jogador', status: sim.status || null });
     }
     return { mensagem: efeito.mensagem, eventos: [...eventos, ...this.turnoGratisDoSelvagem()] };
+  }
+
+  /** Status atual do selvagem (para a Dream Ball). */
+  get statusSelvagem(): string | null {
+    return this.batalha.p2.active[0]?.status || null;
   }
 
   /** Fórmula de fuga da 3ª/4ª geração. Se falhar, o selvagem ataca de graça. */

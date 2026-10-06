@@ -1,4 +1,4 @@
-import { especie, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { especie, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { evoluir, trocarGolpe } from '../../../shared/batalha/progresso';
 import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { CATEGORIAS, CABO_DE_LIGACAO, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
@@ -196,7 +196,27 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
               el('div', { class: 'texto' }, el('strong', {}, item.nome), el('p', {}, item.descricao)),
               el('span', { class: 'quantidade' }, `×${qtd}`),
               ACAO[item.categoria] &&
-                el('button', { class: 'botao', onclick: () => ((modo = { tipo: 'alvo', item }), (aviso = ''), refazer()) }, ACAO[item.categoria]!),
+                el(
+                  'button',
+                  {
+                    class: 'botao',
+                    onclick: () => {
+                      aviso = '';
+                      if (ITENS[item.id]?.reviverTime) {
+                        // Sacred Ash: revive todo o time de uma vez, sem escolher alvo
+                        const revividos = save.time.filter((p) => p.hp <= 0);
+                        if (!revividos.length) aviso = 'Não teria efeito.';
+                        else {
+                          for (const p of revividos) p.hp = hpMaximo(p);
+                          gastar(item.id);
+                          concluir(`${revividos.map(nome).join(', ')} ${revividos.length > 1 ? 'foram revividos' : 'foi revivido'}!`);
+                        }
+                      } else modo = { tipo: 'alvo', item };
+                      refazer();
+                    },
+                  },
+                  ACAO[item.categoria]!,
+                ),
             ),
           ),
       ),

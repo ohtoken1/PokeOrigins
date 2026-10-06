@@ -47,12 +47,12 @@ const preco = (id: string) => PRECOS[id] ?? PRECO_PADRAO;
 const ehLendario = (nome: string) => (Dex.species.get(nome).tags ?? []).some((t) => /Legendary|Mythical/.test(t));
 
 /**
- * Regras do dono para a loja: fora frutas, plates/memories, itens exclusivos de lendários/míticos,
+ * Regras do dono para a loja: fora frutas, gems, plates/memories, itens exclusivos de lendários/míticos,
  * itens sem uso em batalha e itens de treino de EV/IV; itens cuja função é evoluir vão para "Evolução".
  */
 function classificarItem(i: ReturnType<typeof Dex.items.get>): 'batalha' | 'evolucao' | 'fora' {
   const desc = i.shortDesc || i.desc || '';
-  if (i.isBerry) return 'fora';
+  if (i.isBerry || i.isGem) return 'fora';
   if (i.onPlate || /plate$|memory$/.test(i.id)) return 'fora';
   if (i.itemUser?.length && i.itemUser.every(ehLendario)) return 'fora';
   if (/^Evolves/.test(desc)) return 'evolucao';

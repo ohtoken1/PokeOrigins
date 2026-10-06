@@ -75,3 +75,5 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 ## Traduções (`shared/traducao.ts` + `shared/data/traducoes.json`)
 - Mapa "descrição em inglês do Showdown → português" (itens, golpes, habilidades; ~1.026 textos). Use sempre `traduzir()` ao mostrar `shortDesc`/`desc`; `nomeTipo()`/`nomeCategoria()` para tipo e categoria.
 - Ao adicionar conteúdo novo (outra região, itens novos), gerar a lista dos textos sem tradução, traduzir e acrescentar no JSON — nunca exibir a descrição em inglês.
+- Pokébolas: 25 (todas as obtíveis), efeitos de captura em `shared/bolas.ts` (Master garante; Quick 1º turno; Timer por turno; Dusk em Caverna/Torre; Dive/Lure no Mar Profundo; Net Água/Inseto; Nest nível baixo; Level/Love/Moon/Heavy/Fast/Repeat/Dream como nos jogos; Heal cura o capturado).
+- Remédios (`shared/itens.ts`, `aplicarRemedio`): HP (Potion…Max Potion, bebidas, Energy), Full Restore, Revive/Max Revive/Revival Herb, Sacred Ash (time todo, só fora da batalha), curas de status específicas e gerais, Ether/Max Ether (golpe que mais gastou PP) e Elixir/Max Elixir. Só itens com imagem oficial na PokéAPI.
