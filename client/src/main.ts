@@ -5,10 +5,11 @@ import { telaEscolhaInicial } from './telas/escolhaInicial';
 import { telaRegiao } from './telas/regiao';
 import { telaBioma } from './telas/bioma';
 import { telaPokedex } from './telas/pokedex';
+import { telaDatabase } from './telas/database';
 import { montarPainelAdmin } from './ui/admin';
 import { montarBarraTopo } from './ui/barraTopo';
 
-export type Destino = { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex' };
+export type Destino = { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number } | { tela: 'database' };
 export type Navegar = (destino: Destino) => void;
 /** Cada tela desenha dentro de `raiz` e pode devolver uma função de limpeza. */
 export type Tela = (raiz: HTMLElement, navegar: Navegar) => (() => void) | void;
@@ -26,7 +27,8 @@ const navegar: Navegar = (destino) => {
   window.scrollTo(0, 0);
   if (destino.tela === 'inicial') limparTelaAtual = telaEscolhaInicial(raiz, navegar);
   else if (destino.tela === 'regiao') limparTelaAtual = telaRegiao(raiz, navegar);
-  else if (destino.tela === 'pokedex') limparTelaAtual = telaPokedex(raiz, navegar);
+  else if (destino.tela === 'pokedex') limparTelaAtual = telaPokedex(destino.id)(raiz, navegar);
+  else if (destino.tela === 'database') limparTelaAtual = telaDatabase(raiz, navegar);
   else limparTelaAtual = telaBioma(destino.biomaId)(raiz, navegar);
 };
 

@@ -66,3 +66,25 @@
   .dex-coluna { position: static; }
   .dex-lista { max-height: 260px; }
 }
+
+/* Database */
+.tela.tela-database { max-width: 1340px; }
+.db-abas { margin: 12px 0 16px; }
+.db-ferramentas { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.db-busca { flex: 0 1 360px; background: var(--painel-2); color: var(--texto); border: 1px solid var(--borda); border-radius: 8px; padding: 8px 10px; font: inherit; }
+.db-rolagem { overflow-x: auto; background: var(--painel); border: 1px solid var(--borda); border-radius: 12px; }
+.db-tabela { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.db-tabela th { background: var(--painel-2); text-align: left; color: var(--texto-2); font-weight: 600; padding: 8px; white-space: nowrap; }
+.db-tabela th.ordenavel { cursor: pointer; user-select: none; }
+.db-tabela th.ordenavel:hover { color: var(--texto); }
+.db-tabela th[data-ordem]:not([data-ordem=''])::after { content: ' ' attr(data-ordem); color: var(--destaque); }
+.db-tabela td { padding: 5px 8px; border-top: 1px solid rgb(255 255 255 / 0.05); vertical-align: middle; }
+.db-tabela tr.clicavel { cursor: pointer; }
+.db-tabela tbody tr:hover td { background: var(--painel-2); }
+.db-tabela .num { text-align: right; font-variant-numeric: tabular-nums; }
+.db-tabela .desc { color: var(--texto-2); min-width: 260px; }
+.db-tabela .tipos { justify-content: flex-start; }
+.db-sprite .sprite { width: 40px; height: 40px; object-fit: contain; display: block; }
+.db-donos { display: flex; flex-wrap: wrap; max-width: 260px; }
+.db-donos .sprite { width: 32px; height: 32px; object-fit: contain; }
+.db-mais { margin: 12px auto 0; display: block; }

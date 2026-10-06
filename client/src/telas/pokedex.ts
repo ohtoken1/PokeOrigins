@@ -230,14 +230,14 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
   );
 }
 
-export const telaPokedex: Tela = (raiz) => {
+export const telaPokedex = (inicial?: number): Tela => (raiz) => {
   const todos = pokemonsDaRegiao(REGIAO);
   const encontros = mapaDeEncontros(todos);
   const save = carregarSave();
   const vistos = new Set(save?.vistos ?? []);
   const capturados = new Set([...(save?.time ?? []), ...(save?.caixa ?? [])].map((p) => p.especieId));
 
-  let selecionado = todos[0]?.id ?? 1;
+  let selecionado = inicial ?? todos[0]?.id ?? 1;
   const busca = el('input', { type: 'search', placeholder: 'Buscar por nome ou número…', class: 'dex-busca' }) as HTMLInputElement;
   const tipos = [...new Set(todos.flatMap((p) => p.tipos))].sort((a, b) => nomeTipo(a[0].toUpperCase() + a.slice(1)).localeCompare(nomeTipo(b[0].toUpperCase() + b.slice(1))));
   const filtroTipo = el('select', { class: 'dex-filtro' },
@@ -288,4 +288,7 @@ export const telaPokedex: Tela = (raiz) => {
       ),
     ),
   );
+  // aberto pela Database: rola a lista até o Pokémon escolhido
+  const ativo = lista.querySelector<HTMLElement>('.ativo');
+  if (ativo) lista.scrollTop = ativo.offsetTop - lista.clientHeight / 2;
 };
