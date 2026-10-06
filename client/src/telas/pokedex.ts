@@ -11,18 +11,13 @@ import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
 import type { PokemonBase } from '../../../shared/tipos';
 import { pokemonsDaRegiao, todosOsPokemons } from '../dados';
 import { carregarSave } from '../estado';
-import { el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
+import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 
 
 const CRESCIMENTO: Record<string, string> = { fast: 'Rápido', medium: 'Médio', 'medium-slow': 'Médio-lento', slow: 'Lento' };
 const ATRIBUTOS: [keyof PokemonBase['stats'], string][] = [
   ['hp', 'HP'], ['ataque', 'Attack'], ['defesa', 'Defense'], ['ataqueEspecial', 'Sp. Atk'], ['defesaEspecial', 'Sp. Def'], ['velocidade', 'Speed'],
 ];
-const GRUPOS_OVO: Record<string, string> = {
-  Monster: 'Monstro', 'Water 1': 'Água 1', 'Water 2': 'Água 2', 'Water 3': 'Água 3', Bug: 'Inseto', Flying: 'Voador', Field: 'Campo',
-  Fairy: 'Fada', Grass: 'Planta', 'Human-Like': 'Humanoide', Mineral: 'Mineral', Amorphous: 'Amorfo', Dragon: 'Dragão',
-  Ditto: 'Ditto', Undiscovered: 'Desconhecido',
-};
 const CONDICOES: Record<string, string> = { 'during the day': 'de dia', 'at night': 'à noite' };
 
 /** Onde cada espécie aparece solta (bioma + faixa de nível). */
@@ -68,6 +63,18 @@ function fraquezas(tipos: string[]): Map<number, string[]> {
     grupos.set(mult, [...(grupos.get(mult) ?? []), tipo]);
   }
   return grupos;
+}
+
+/** Golpes de ovo (fonte "E" no learnset do Showdown), da espécie e das formas anteriores. */
+function golpesDeOvo(p: PokemonBase): string[] {
+  const ids = new Set<string>();
+  let s: ReturnType<typeof Dex.species.get> | undefined = especie(p.id);
+  while (s?.exists) {
+    const ls = Dex.species.getLearnsetData(s.id).learnset ?? {};
+    for (const [id, fontes] of Object.entries(ls)) if (fontes.some((f) => /^\dE/.test(f)) && Dex.moves.get(id).exists) ids.add(id);
+    s = s.prevo ? Dex.species.get(s.prevo) : undefined;
+  }
+  return [...ids].sort((a, b) => Dex.moves.get(a).name.localeCompare(Dex.moves.get(b).name));
 }
 
 function podeAprenderTM(p: PokemonBase, golpe: string): boolean {
@@ -193,16 +200,33 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
     ),
   );
   const tms = (maquinas as { id: string; golpe: string }[]).filter((m) => podeAprenderTM(p, m.golpe));
-  const listaTms = el(
-    'div',
-    { class: 'dex-tms' },
-    ...tms.map((m) => {
-      const g = Dex.moves.get(m.golpe);
-      const tr = m.id.startsWith('tr');
-      return el('span', { class: 'dex-tm', title: `${nomeTipo(g.type)} · ${traduzir(g.shortDesc)}`, style: { borderColor: `var(--borda)` } },
-        el('small', {}, `${tr ? 'TR' : 'TM'}${m.id.slice(2).padStart(tr ? 2 : 3, '0')}`), ' ', g.name);
-    }),
-  );
+  const chipGolpe = (id: string, rotulo?: string) => {
+    const g = Dex.moves.get(id);
+    return el('span', { class: 'dex-tm', title: `${nomeTipo(g.type)} · ${nomeCategoria(g.category)} · Poder ${g.basePower || '—'}
+${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) } },
+      rotulo ? el('small', {}, rotulo) : null, rotulo ? ' ' : '', g.name);
+  };
+  const listaTms = el('div', { class: 'dex-tms' }, ...tms.map((m) => {
+    const tr = m.id.startsWith('tr');
+    return chipGolpe(m.golpe, `${tr ? 'TR' : 'TM'}${m.id.slice(2).padStart(tr ? 2 : 3, '0')}`);
+  }));
+  const ovos = golpesDeOvo(p);
+  const listaOvos = el('div', { class: 'dex-tms' }, ...ovos.map((id) => chipGolpe(id)));
+
+  // TMs/TRs e Egg Moves ficam guardados em botões (abre um de cada vez)
+  const conteudoGolpesExtras = el('div', { class: 'dex-extras' });
+  const botoesExtras: HTMLButtonElement[] = [];
+  const botaoExtra = (texto: string, lista: HTMLElement, quantidade: number) => {
+    const b = el('button', { class: 'botao secundario', disabled: !quantidade }, `${texto} (${quantidade})`) as HTMLButtonElement;
+    b.addEventListener('click', () => {
+      const abrir = !b.classList.contains('ligado');
+      botoesExtras.forEach((x) => x.classList.remove('ligado'));
+      b.classList.toggle('ligado', abrir);
+      conteudoGolpesExtras.replaceChildren(...(abrir ? [lista] : []));
+    });
+    botoesExtras.push(b);
+    return b;
+  };
 
   const titulo = el('div', { class: 'dex-titulo' },
     el('span', { class: 'dex-numero' }, `#${String(p.id).padStart(4, '0')}`),
@@ -227,7 +251,9 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
         linha('Crescimento', CRESCIMENTO[p.crescimento ?? ''] ?? '—'),
         linha('XP base', String(p.experienciaBase ?? '—')),
         linha('EVs ao derrotar', evs),
-        linha('Grupos de ovo', s.eggGroups.map((g) => GRUPOS_OVO[g] ?? g).join(', ')),
+        // nomes de ability e egg group ficam em inglês (regra do dono)
+        linha('Abilities', p.habilidades.map((h) => `${Dex.abilities.get(h.nome).name || h.nome}${h.oculta ? ' (H)' : ''}`).join(' / ')),
+        linha('Egg Groups', s.eggGroups.join(', ')),
         linha('Onde encontrar', textoOnde),
       ),
     ),
@@ -236,7 +262,13 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
     el('section', {}, el('h3', {}, 'Dano recebido por tipo'), efetividade),
     el('section', {}, el('h3', {}, 'Evolução'), cadeia.length > 1 ? evolucao : el('p', { class: 'dica' }, 'Não evolui.')),
     el('section', {}, el('h3', {}, 'Golpes por nível'), golpes),
-    el('section', {}, el('h3', {}, `TMs e TRs (${tms.length})`), tms.length ? listaTms : el('p', { class: 'dica' }, 'Nenhum.')),
+    el(
+      'section',
+      {},
+      el('h3', {}, 'Outros golpes'),
+      el('div', { class: 'dex-botoes-extras' }, botaoExtra('TMs e TRs', listaTms, tms.length), botaoExtra('Egg Moves', listaOvos, ovos.length)),
+      conteudoGolpesExtras,
+    ),
   );
 }
 

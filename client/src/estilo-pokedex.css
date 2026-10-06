@@ -92,3 +92,9 @@
 .db-tier { font-weight: 700; font-size: 0.8rem; padding: 2px 8px; border-radius: 6px; background: var(--painel-2); border: 1px solid var(--borda); }
 
 .dex-filtros { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+.dex-botoes-extras { display: flex; gap: 8px; flex-wrap: wrap; }
+.dex-botoes-extras .botao { padding: 7px 14px; }
+.dex-botoes-extras .botao.ligado { background: var(--destaque); color: #000; }
+.dex-extras:not(:empty) { margin-top: 12px; }
+.dex-tm { border-left-width: 3px; }
