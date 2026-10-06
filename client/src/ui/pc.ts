@@ -260,6 +260,8 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
         ),
       );
       // "Ver ficha": a ficha abre à esquerda e o PC vai para a direita
+      // a janela alarga quando a ficha está aberta
+      queueMicrotask(() => pc.closest('.janela')?.classList.toggle('com-ficha', verFicha && !!p));
       return verFicha && p ? el('div', { class: 'pc-com-ficha' }, el('div', { class: 'pc-ficha' }, fichaPokemon(p)), pc) : pc;
     },
     { classe: 'janela-pc' },

@@ -33,19 +33,28 @@ export function resumoPokemon(p: PokemonIndividual, opcoes: { abilityConhecida: 
   linhas.push(
     linha('HP', `${p.hp}/${hpMaximo(p)}`),
     linha('Item', p.item ? nomeItemEquipado(p.item) : '—'),
+    // atributos um embaixo do outro, com barrinha (▲/▼ = o que a Nature aumenta/diminui)
     el(
       'div',
       { class: 'resumo-atributos' },
-      ...(['atk', 'def', 'spa', 'spd', 'spe'] as const).map((a) =>
-        el('span', { class: natureza.plus === a ? 'sobe' : natureza.minus === a ? 'desce' : '' }, el('small', {}, NOMES_ATRIBUTOS[a]), String(valores[a])),
-      ),
+      ...(['atk', 'def', 'spa', 'spd', 'spe'] as const).map((a) => {
+        const marca = natureza.plus === a ? 'sobe' : natureza.minus === a ? 'desce' : '';
+        return el(
+          'div',
+          { class: `resumo-atributo ${marca}` },
+          el('span', {}, NOMES_ATRIBUTOS[a], marca === 'sobe' ? ' ▲' : marca === 'desce' ? ' ▼' : ''),
+          el('span', { class: 'resumo-barra' }, el('span', { style: { width: `${Math.min(100, (valores[a] / Math.max(60, p.nivel * 3)) * 100)}%` } })),
+          el('strong', {}, String(valores[a])),
+        );
+      }),
     ),
     el(
       'div',
       { class: 'resumo-golpes' },
+      el('h5', {}, 'Golpes'),
       ...p.golpes.map((g) => {
         const m = Dex.moves.get(g.id);
-        return el('div', {}, seloTipo(m.type), el('span', {}, m.name), el('small', {}, `${g.pp}/${m.pp}`));
+        return el('div', { class: 'resumo-golpe' }, seloTipo(m.type), el('span', {}, m.name), el('small', {}, `PP ${g.pp}/${m.pp}`));
       }),
     ),
   );
@@ -64,7 +73,10 @@ export function resumoAoPassar(alvo: HTMLElement, pokemon: () => PokemonIndividu
   alvo.addEventListener('mouseenter', () => {
     if (alvo.classList.contains('arrastando')) return;
     atual = alvo;
-    flutuante ??= document.body.appendChild(el('div', { class: 'resumo-pokemon resumo-flutuante' }));
+    flutuante ??= el('div', { class: 'resumo-pokemon resumo-flutuante' });
+    // sempre por cima de tudo (inclusive das janelas do PC e da bolsa)
+    document.body.appendChild(flutuante);
+    Object.assign(flutuante.style, { position: 'fixed', zIndex: '100000' });
     flutuante.replaceChildren(...resumoPokemon(pokemon(), { abilityConhecida: true, completo: true }));
     flutuante.hidden = false;
     const r = alvo.getBoundingClientRect();

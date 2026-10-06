@@ -3,7 +3,7 @@ import type { Bioma } from '../../../shared/biomas';
 import { ALTURA, LARGURA, TAM, desenharMapa, gerarMapa, type Mapa } from './mapa';
 import { PALETAS } from './paletas';
 import { pokemonPorId } from '../dados';
-import { desenharPersonagem, urlIconePokemon, type Direcao, type Quadro } from './personagem';
+import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
 
 /** Tamanho da tela do jogo em pixels (a câmera mostra 30×20 tiles ampliados 2×). */
 export const LARGURA_TELA = 960;
@@ -13,20 +13,17 @@ const ZOOM = 2;
 const ESCALA_DETALHE = 1 / ZOOM;
 const DURACAO_PASSO = 160;
 
-/**
- * Escala do ícone (40×30) do Pokémon que segue o jogador pela altura real (decímetros).
- * Múltiplos de 0,5 = 1, 2, 3… pixels da tela por pixel do ícone (pixel art sem borrar).
- */
-function escalaPorAltura(altura: number): number {
-  if (altura <= 9) return ESCALA_DETALHE; // Pikachu, Charmander, Bulbasaur…
-  if (altura <= 19) return ESCALA_DETALHE * 2; // Charizard, Arcanine, Mewtwo…
-  return ESCALA_DETALHE * 3; // Moltres, Gyarados, Onix, Dragonite…
+/** Sprites da 5ª geração (Black/White): frente e costas, normal e shiny, já no tamanho relativo certo. */
+const SPRITES_BW = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white';
+export interface Seguidor {
+  especie: number;
+  shiny: boolean;
 }
 
 export interface OpcoesBioma {
   bioma: Bioma;
-  /** Espécie do primeiro Pokémon do time, que anda atrás do jogador. */
-  seguidor: number | null;
+  /** Primeiro Pokémon do time, que anda atrás do jogador. */
+  seguidor: Seguidor | null;
   /** Chamado ao terminar cada passo. */
   aoPisar(): void;
 }
@@ -45,10 +42,12 @@ export class BiomaScene extends Phaser.Scene {
   /** o seguidor é um container (anda de tile em tile) com a imagem dentro (balança parado no lugar) */
   private seguidor!: Phaser.GameObjects.Container;
   private imgSeguidor!: Phaser.GameObjects.Image;
-  private escalaSeguidor = ESCALA_DETALHE;
   private pos = { x: 0, y: 0 };
   private posSeguidor = { x: 0, y: 0 };
-  private especieSeguidor: number | null;
+  private dadosSeguidor: Seguidor | null;
+  /** últimas posições do jogador: o seguidor fica 1 passo atrás (2 se for grande) */
+  private rastro: { x: number; y: number }[] = [];
+  private olhandoParaCima = false;
   private movendo = false;
   private direcao: Direcao = 'baixo';
   /** alterna a perna que vai à frente a cada passo */
@@ -62,7 +61,7 @@ export class BiomaScene extends Phaser.Scene {
   constructor(opcoes: OpcoesBioma) {
     super('bioma');
     this.opcoes = opcoes;
-    this.especieSeguidor = opcoes.seguidor;
+    this.dadosSeguidor = opcoes.seguidor;
   }
 
   preload() {
@@ -158,9 +157,9 @@ export class BiomaScene extends Phaser.Scene {
   }
 
   /** Troca o Pokémon que segue o jogador (ex.: o time mudou de ordem ou ele evoluiu). */
-  definirSeguidor(especieId: number | null) {
-    if (especieId === this.especieSeguidor) return;
-    this.especieSeguidor = especieId;
+  definirSeguidor(novo: Seguidor | null) {
+    if (novo?.especie === this.dadosSeguidor?.especie && novo?.shiny === this.dadosSeguidor?.shiny) return;
+    this.dadosSeguidor = novo;
     if (this.seguidor) this.carregarSeguidor();
   }
 
@@ -186,25 +185,36 @@ export class BiomaScene extends Phaser.Scene {
     return [x * TAM + TAM / 2, y * TAM + TAM - 2];
   }
 
+  private chaveSeguidor(costas: boolean) {
+    const d = this.dadosSeguidor!;
+    return `seguidor-${d.especie}-${d.shiny ? 's' : 'n'}-${costas ? 'c' : 'f'}`;
+  }
+
   private carregarSeguidor() {
-    const id = this.especieSeguidor;
-    if (!id) {
+    const d = this.dadosSeguidor;
+    if (!d) {
       this.seguidor.setVisible(false);
       return;
     }
-    const chave = `icone-${id}`;
     const aplicar = () => {
-      if (this.especieSeguidor !== id || !this.textures.exists(chave)) return;
-      // tamanho de acordo com a altura real (Moltres bem maior que o treinador), sempre em fator inteiro na tela
-      this.escalaSeguidor = escalaPorAltura(pokemonPorId(id).altura);
-      this.imgSeguidor.setTexture(chave).setScale(this.escalaSeguidor);
+      if (this.dadosSeguidor !== d) return;
+      this.mostrarLadoSeguidor();
       this.seguidor.setVisible(true);
     };
-    if (this.textures.exists(chave)) return aplicar();
+    const faltam = [false, true].filter((c) => !this.textures.exists(this.chaveSeguidor(c)));
+    if (!faltam.length) return aplicar();
     this.load.setCORS('anonymous');
-    this.load.image(chave, urlIconePokemon(id));
+    for (const costas of faltam)
+      this.load.image(this.chaveSeguidor(costas), `${SPRITES_BW}/${costas ? 'back/' : ''}${d.shiny ? 'shiny/' : ''}${d.especie}.png`);
     this.load.once(Phaser.Loader.Events.COMPLETE, aplicar);
     this.load.start();
+  }
+
+  /** Frente (ou costas, andando para cima) do Pokémon que segue. */
+  private mostrarLadoSeguidor() {
+    if (!this.dadosSeguidor) return;
+    const chave = this.chaveSeguidor(this.olhandoParaCima);
+    if (this.textures.exists(chave)) this.imgSeguidor.setTexture(chave);
   }
 
   private atualizarProfundidade() {
@@ -246,15 +256,25 @@ export class BiomaScene extends Phaser.Scene {
     // balanço do passo
     this.tweens.add({ targets: this.jogador, scaleY: ESCALA_DETALHE * 0.92, duration: DURACAO_PASSO / 2, yoyo: true });
 
-    if (anterior.x !== this.posSeguidor.x || anterior.y !== this.posSeguidor.y) {
-      const sdx = anterior.x - this.posSeguidor.x;
-      this.posSeguidor = { ...anterior };
-      // os ícones olham para a esquerda; espelha quando anda para a direita
+    // Pokémon grandes ficam 2 passos atrás para não entrar no espaço do treinador
+    this.rastro.push({ ...anterior });
+    if (this.rastro.length > 3) this.rastro.shift();
+    const grande = this.dadosSeguidor ? pokemonPorId(this.dadosSeguidor.especie).altura > 10 : false;
+    const destino = this.rastro[this.rastro.length - (grande ? 2 : 1)];
+    if (destino && (destino.x !== this.posSeguidor.x || destino.y !== this.posSeguidor.y)) {
+      const sdx = destino.x - this.posSeguidor.x;
+      const sdy = destino.y - this.posSeguidor.y;
+      this.posSeguidor = { ...destino };
+      // os sprites olham para a esquerda; espelha para a direita; andando para cima mostra as costas
       if (sdx) this.imgSeguidor.setFlipX(sdx > 0);
-      const [fx, fy] = this.pesDoTile(anterior.x, anterior.y);
+      if (sdy || sdx) {
+        this.olhandoParaCima = sdy < 0;
+        this.mostrarLadoSeguidor();
+      }
+      const [fx, fy] = this.pesDoTile(destino.x, destino.y);
       this.tweens.add({ targets: this.seguidor, x: fx, y: fy, duration: DURACAO_PASSO });
       // pulinho
-      this.tweens.add({ targets: this.imgSeguidor, scaleY: this.escalaSeguidor * 0.88, scaleX: this.escalaSeguidor * 1.06, duration: DURACAO_PASSO / 2, yoyo: true });
+      this.tweens.add({ targets: this.imgSeguidor, scaleY: ESCALA_DETALHE * 0.9, scaleX: ESCALA_DETALHE * 1.05, duration: DURACAO_PASSO / 2, yoyo: true });
     }
   }
 }

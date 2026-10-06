@@ -14,6 +14,7 @@ import { aoMudarJanelas } from '../ui/janela';
 import { botaoIcone, botoesMenus } from '../ui/menus';
 import { mostrarEncontro } from '../ui/popupEncontro';
 import { painelTime } from '../ui/time';
+import { atalhosBiomas } from '../ui/atalhosBiomas';
 
 export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   const save = carregarSave();
@@ -42,7 +43,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       }),
     );
     // o primeiro do time anda atrás do jogador (a cena ainda não existe na primeira chamada)
-    cena?.definirSeguidor(save.time[0]?.especieId ?? null);
+    cena?.definirSeguidor(save.time[0] ? { especie: save.time[0].especieId, shiny: save.time[0].shiny } : null);
   };
   atualizarTime();
 
@@ -117,7 +118,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       el(
         'div',
         { class: 'layout-bioma' },
-        el('section', {}, areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. A cada passo aparece um Pokémon: Enter para lutar, ou continue andando para fugir.')),
+        el('section', {}, atalhosBiomas(bioma.id, (id) => navegar({ tela: 'bioma', biomaId: id })), areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. A cada passo aparece um Pokémon: Enter para lutar, ou continue andando para fugir.')),
         el('aside', {}, caixaTime, tituloChances, listaChances),
       ),
     ),
@@ -131,7 +132,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
 
   cena = new BiomaScene({
     bioma,
-    seguidor: save.time[0]?.especieId ?? null,
+    seguidor: save.time[0] ? { especie: save.time[0].especieId, shiny: save.time[0].shiny } : null,
     aoPisar: () => {
       // andar com um encontro aberto = fugir dele
       fugirDoEncontro();

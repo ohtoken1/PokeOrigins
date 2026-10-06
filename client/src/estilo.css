@@ -485,16 +485,38 @@ button.vaga:hover { border-color: var(--borda); }
 
 /* resumo ao passar o mouse nos cartões do time/PC */
 .resumo-flutuante { position: fixed; z-index: 2000; width: 250px; }
-.resumo-atributos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; margin-top: 2px; text-align: center; }
-.resumo-atributos span { display: flex; flex-direction: column; font-weight: 700; padding: 2px 0; border-radius: 4px; background: rgb(255 255 255 / 0.05); }
-.resumo-atributos small { font-size: 0.62rem; color: var(--texto-2); font-weight: 500; }
-.resumo-atributos .sobe { color: #ff8a80; }
-.resumo-atributos .desce { color: #82b1ff; }
-.resumo-golpes { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
-.resumo-golpes > div { display: flex; align-items: center; gap: 6px; }
-.resumo-golpes .tipo { font-size: 0.6rem; padding: 1px 6px; min-width: 52px; text-align: center; }
-.resumo-golpes small { margin-left: auto; color: var(--texto-2); }
+.resumo-flutuante { width: 260px; gap: 6px; }
+.resumo-atributos { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; padding-top: 6px; border-top: 1px solid rgb(255 255 255 / 0.08); }
+.resumo-atributo { display: grid; grid-template-columns: 70px 1fr 30px; align-items: center; gap: 8px; }
+.resumo-atributo > span:first-child { color: var(--texto-2); }
+.resumo-atributo strong { text-align: right; font-variant-numeric: tabular-nums; }
+.resumo-atributo.sobe > span:first-child { color: #ff8a80; }
+.resumo-atributo.desce > span:first-child { color: #82b1ff; }
+.resumo-barra { height: 5px; border-radius: 3px; background: rgb(255 255 255 / 0.08); overflow: hidden; }
+.resumo-barra > span { display: block; height: 100%; border-radius: 3px; background: #5ab8ff; }
+.resumo-golpes { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; padding-top: 6px; border-top: 1px solid rgb(255 255 255 / 0.08); }
+.resumo-golpes h5 { margin: 0; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--texto-2); }
+.resumo-golpe { display: grid; grid-template-columns: 62px 1fr auto; align-items: center; gap: 8px; }
+.resumo-golpe .tipo { font-size: 0.62rem; padding: 2px 0; text-align: center; }
+.resumo-golpe small { color: var(--texto-2); font-variant-numeric: tabular-nums; }
 /* PC com a ficha aberta: ficha à esquerda, PC à direita */
 .janela.janela-pc:has(.pc-com-ficha) { width: min(1400px, 100%); }
-.pc-com-ficha { display: grid; grid-template-columns: minmax(360px, 1fr) minmax(0, 1.4fr); gap: 16px; align-items: start; }
+.pc-com-ficha { display: flex; flex-direction: row; gap: 16px; align-items: flex-start; }
+.pc-com-ficha > .pc-ficha { flex: 0 0 400px; }
+.pc-com-ficha > .pc { flex: 1 1 auto; min-width: 0; }
+.janela.janela-pc.com-ficha { width: min(1400px, 100%); }
 .pc-com-ficha > .pc-ficha { position: sticky; top: 0; max-height: 80vh; overflow-y: auto; background: var(--painel-2); border-radius: 12px; padding: 12px; }
+
+/* atalhos para trocar de bioma (em cima do mapa) */
+.atalhos-biomas { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.atalho-bioma {
+  position: relative; width: 60px; height: 60px; padding: 0; border-radius: 10px; cursor: pointer; overflow: hidden;
+  border: 2px solid var(--borda); background: var(--painel-2) center / cover no-repeat; opacity: 0.6;
+  transition: opacity 0.15s, transform 0.15s, border-color 0.15s;
+}
+.atalho-bioma span {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 0; font-size: 0.55rem; font-weight: 700; line-height: 1.1;
+  color: #fff; background: rgb(0 0 0 / 0.55); text-align: center;
+}
+.atalho-bioma:hover { opacity: 1; transform: translateY(-2px); }
+.atalho-bioma.ativo { opacity: 1; border-color: var(--destaque); box-shadow: 0 0 0 2px rgb(255 203 5 / 0.25); cursor: default; }

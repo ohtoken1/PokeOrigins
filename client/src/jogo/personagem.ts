@@ -182,8 +182,3 @@ export function desenharPersonagem(direcao: Direcao, quadro: Quadro = 0): HTMLCa
   });
   return canvas;
 }
-
-/** Ícone pequeno oficial do Pokémon (40×30, da PokéAPI), usado para o Pokémon que segue o jogador. */
-export function urlIconePokemon(especieId: number): string {
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-vii/icons/${especieId}.png`;
-}
