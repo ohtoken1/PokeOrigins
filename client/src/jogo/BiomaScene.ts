@@ -41,6 +41,9 @@ function areaDesenhada(img: HTMLImageElement): { topo: number; base: number } {
   return area;
 }
 
+/** Mapas já gerados (o desenho fica guardado como textura no jogo, que é reaproveitado). */
+const mapasGerados = new Map<string, Mapa>();
+
 export interface Seguidor {
   especie: number;
   shiny: boolean;
@@ -72,7 +75,7 @@ export class BiomaScene extends Phaser.Scene {
   private imgSeguidor!: Phaser.GameObjects.Image;
   private pos = { x: 0, y: 0 };
   private posSeguidor = { x: 0, y: 0 };
-  private dadosSeguidor: Seguidor | null;
+  private dadosSeguidor: Seguidor | null = null;
   /** últimas posições do jogador: o seguidor fica 1 passo atrás (2 se for grande) */
   private rastro: { x: number; y: number }[] = [];
   private olhandoParaCima = false;
@@ -85,32 +88,59 @@ export class BiomaScene extends Phaser.Scene {
   private direcaoPendente: [number, number] | undefined;
   private setas!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<'W' | 'A' | 'S' | 'D', Phaser.Input.Keyboard.Key>;
-  private opcoes: OpcoesBioma;
+  private opcoes!: OpcoesBioma;
 
-  constructor(opcoes: OpcoesBioma) {
+  constructor() {
     super('bioma');
+  }
+
+  /**
+   * A mesma cena é reaproveitada em todos os biomas (o jogo é criado uma vez só): cada entrada
+   * num bioma chama init de novo com as opções daquele bioma, e o estado volta ao inicial.
+   */
+  init(opcoes: OpcoesBioma) {
     this.opcoes = opcoes;
     this.dadosSeguidor = opcoes.seguidor;
+    this.rastro = [];
+    this.olhandoParaCima = false;
+    this.escalaSeguidor = ESCALA_DETALHE;
+    this.movendo = false;
+    this.direcao = 'baixo';
+    this.passos = 0;
+    this.pausado = false;
+    this.direcaoPendente = undefined;
   }
 
   preload() {
-    this.load.image('buch', 'tiles/tuxemon-buch.png');
-    this.load.image('natureza', 'tiles/core_outdoor_nature.png');
-    this.load.image('agua', 'tiles/core_outdoor_water.png');
+    // nas próximas visitas os tilesets já estão carregados
+    if (!this.textures.exists('buch')) this.load.image('buch', 'tiles/tuxemon-buch.png');
+    if (!this.textures.exists('natureza')) this.load.image('natureza', 'tiles/core_outdoor_nature.png');
+    if (!this.textures.exists('agua')) this.load.image('agua', 'tiles/core_outdoor_water.png');
   }
 
   create() {
     const { bioma } = this.opcoes;
     const paleta = PALETAS[bioma.id] ?? PALETAS.grama;
-    this.mapa = gerarMapa(bioma.id, paleta);
+    // mapa de cada bioma é gerado e desenhado só na primeira visita; depois vem da memória
+    let mapa = mapasGerados.get(bioma.id);
+    if (!mapa) {
+      mapa = gerarMapa(bioma.id, paleta);
+      mapasGerados.set(bioma.id, mapa);
+    }
+    this.mapa = mapa;
     this.pos = { ...this.mapa.inicio };
     this.posSeguidor = { ...this.mapa.inicio };
 
     const imagem = (chave: string) => this.textures.get(chave).getSourceImage() as HTMLImageElement;
-    this.textures.addCanvas('mapa', desenharMapa(this.mapa, paleta, bioma.id, { buch: imagem('buch'), natureza: imagem('natureza'), agua: imagem('agua') }));
+    const chaveMapa = `mapa-${bioma.id}`;
+    if (!this.textures.exists(chaveMapa))
+      this.textures.addCanvas(chaveMapa, desenharMapa(this.mapa, paleta, bioma.id, { buch: imagem('buch'), natureza: imagem('natureza'), agua: imagem('agua') }));
     for (const direcao of ['baixo', 'cima', 'lado'] as Direcao[])
-      for (const quadro of [0, 1, 2] as Quadro[]) this.textures.addCanvas(`jogador-${direcao}-${quadro}`, desenharPersonagem(direcao, quadro));
-    this.add.image(0, 0, 'mapa').setOrigin(0);
+      for (const quadro of [0, 1, 2] as Quadro[]) {
+        const chave = `jogador-${direcao}-${quadro}`;
+        if (!this.textures.exists(chave)) this.textures.addCanvas(chave, desenharPersonagem(direcao, quadro));
+      }
+    this.add.image(0, 0, chaveMapa).setOrigin(0);
 
     const [sx, sy] = this.pesDoTile(this.posSeguidor.x, this.posSeguidor.y);
     this.imgSeguidor = this.add.image(0, 0, '__DEFAULT').setOrigin(0.5, 0.9).setScale(ESCALA_DETALHE);
@@ -122,7 +152,6 @@ export class BiomaScene extends Phaser.Scene {
     this.atualizarProfundidade();
     this.carregarSeguidor();
     if (paleta.submerso) this.efeitosSubmersos();
-    this.opcoes.aoPronto?.();
 
     const camera = this.cameras.main;
     camera.setZoom(ZOOM).setBounds(0, 0, LARGURA * TAM, ALTURA * TAM).setRoundPixels(true);
@@ -133,10 +162,13 @@ export class BiomaScene extends Phaser.Scene {
     // false = não bloqueia as letras: dá para digitar W A S D na busca da loja com o mapa aberto
     this.wasd = teclado.addKeys('W,A,S,D', false) as typeof this.wasd;
     // guarda toques rápidos (apertar e soltar entre dois quadros), que isDown não pega
-    teclado.on('keydown', (e: KeyboardEvent) => {
+    const aoTeclar = (e: KeyboardEvent) => {
       const direcao = DIRECOES_POR_TECLA[e.key.toLowerCase()];
       if (direcao) this.direcaoPendente = direcao;
-    });
+    };
+    teclado.on('keydown', aoTeclar);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => teclado.off('keydown', aoTeclar));
+    this.opcoes.aoPronto?.();
   }
 
   /** Fundo do mar: feixes de luz balançando, bolhas subindo e o personagem azulado. */
@@ -154,11 +186,13 @@ export class BiomaScene extends Phaser.Scene {
     }
     this.tweens.add({ targets: luz, alpha: 0.45, x: 24, duration: 3200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
-    const bolha = this.add.graphics();
-    bolha.lineStyle(1, 0xe8f8ff, 0.9).strokeCircle(4, 4, 3);
-    bolha.fillStyle(0xffffff, 0.9).fillRect(2, 2, 1, 1);
-    bolha.generateTexture('bolha', 8, 8);
-    bolha.destroy();
+    if (!this.textures.exists('bolha')) {
+      const bolha = this.add.graphics();
+      bolha.lineStyle(1, 0xe8f8ff, 0.9).strokeCircle(4, 4, 3);
+      bolha.fillStyle(0xffffff, 0.9).fillRect(2, 2, 1, 1);
+      bolha.generateTexture('bolha', 8, 8);
+      bolha.destroy();
+    }
     this.add
       .particles(0, 0, 'bolha', {
         // só em volta do que a câmera mostra (antes nasciam bolhas no mapa inteiro)

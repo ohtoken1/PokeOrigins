@@ -1,10 +1,10 @@
-import Phaser from 'phaser';
 import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
 import { regiaoPorId } from '../../../shared/regioes';
 import { nivelTreinador } from '../../../shared/treinador';
 import { ajustarTabela, encontroForcado, faixaDosEncontros, montarTabela, probabilidades, sortearEncontro } from '../../../shared/encontros';
-import { ALTURA_TELA, BiomaScene, LARGURA_TELA } from '../jogo/BiomaScene';
+import type { BiomaScene, OpcoesBioma } from '../jogo/BiomaScene';
+import { mostrarJogo } from '../jogo/jogoUnico';
 import { abrirBatalha } from '../batalha/telaBatalha';
 import { pokemonPorId, pokemonsDaRegiao } from '../dados';
 import { ajustesAdmin, aoMudarAdmin } from '../ui/admin';
@@ -33,7 +33,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     (contador.textContent = `Treinador Nv. ${nivelTreinador(save.xpTreinador)} · ${save.passos} passos · ${save.vistos.length} vistos`);
   atualizarContador();
 
-  let cena: BiomaScene | undefined;
+  let cena: () => BiomaScene | null = () => null;
   const caixaTime = el('div', {});
   const atualizarTime = () => {
     caixaTime.replaceChildren(
@@ -43,7 +43,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       }),
     );
     // o primeiro do time anda atrás do jogador (a cena ainda não existe na primeira chamada)
-    cena?.definirSeguidor(save.time[0] ? { especie: save.time[0].especieId, shiny: save.time[0].shiny } : null);
+    cena()?.definirSeguidor(save.time[0] ? { especie: save.time[0].especieId, shiny: save.time[0].shiny } : null);
   };
   atualizarTime();
 
@@ -134,7 +134,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   const carregando = el('div', { class: 'carregando-mapa' }, el('span', { class: 'giro' }), 'Carregando mapa…');
   areaJogo.append(carregando);
 
-  cena = new BiomaScene({
+  const opcoesCena: OpcoesBioma = {
     bioma,
     aoPronto: () => carregando.remove(),
     seguidor: save.time[0] ? { especie: save.time[0].especieId, shiny: save.time[0].shiny } : null,
@@ -180,24 +180,16 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         },
       }, selvagem.genero);
     },
-  });
+  };
 
-  const jogo = new Phaser.Game({
-    type: Phaser.AUTO,
-    parent: areaJogo,
-    width: LARGURA_TELA,
-    height: ALTURA_TELA,
-    pixelArt: true,
-    backgroundColor: '#15263c',
-    scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_HORIZONTALLY },
-    scene: cena,
-  });
+  const jogo = mostrarJogo(areaJogo, opcoesCena);
+  cena = jogo.cena;
 
   // o mapa fica parado durante a batalha e com PC/Bolsa/ficha abertos
   let emBatalha = false;
   let janelaAberta = false;
   function atualizarPausa() {
-    cena?.pausar(emBatalha || janelaAberta);
+    cena()?.pausar(emBatalha || janelaAberta);
   }
   const pararDeOuvirJanelas = aoMudarJanelas((aberta) => {
     janelaAberta = aberta;
@@ -214,11 +206,6 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     pararDeOuvirAdmin();
     pararDeOuvirJanelas();
     fugirDoEncontro();
-    // libera o contexto gráfico (WebGL) na hora: o navegador só aguenta alguns abertos e,
-    // trocando muito de bioma, os antigos acumulavam e a tela ficava preta/travada
-    const gl = (jogo.renderer as Phaser.Renderer.WebGL.WebGLRenderer | null)?.gl;
-    jogo.destroy(true);
-    // (o Phaser termina de destruir no próximo quadro; depois disso o contexto pode ser descartado)
-    setTimeout(() => gl?.getExtension('WEBGL_lose_context')?.loseContext(), 300);
+    jogo.tirar();
   };
 };
