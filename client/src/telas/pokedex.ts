@@ -222,7 +222,7 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
       ),
     ),
     el('section', {}, el('h3', {}, 'Atributos base'), atributos),
-    el('section', {}, el('h3', {}, 'Habilidades'), habilidades),
+    el('section', {}, el('h3', {}, 'Abilities'), habilidades),
     el('section', {}, el('h3', {}, 'Dano recebido por tipo'), efetividade),
     el('section', {}, el('h3', {}, 'Evolução'), cadeia.length > 1 ? evolucao : el('p', { class: 'dica' }, 'Não evolui.')),
     el('section', {}, el('h3', {}, 'Golpes por nível'), golpes),

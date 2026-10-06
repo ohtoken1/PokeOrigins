@@ -11,28 +11,8 @@ export function traduzir(texto: string | undefined | null): string {
   return MAPA[texto] ?? texto;
 }
 
-const TIPOS: Record<string, string> = {
-  Normal: 'Normal',
-  Fire: 'Fogo',
-  Water: 'Água',
-  Grass: 'Planta',
-  Electric: 'Elétrico',
-  Ice: 'Gelo',
-  Fighting: 'Lutador',
-  Poison: 'Veneno',
-  Ground: 'Terra',
-  Flying: 'Voador',
-  Psychic: 'Psíquico',
-  Bug: 'Inseto',
-  Rock: 'Pedra',
-  Ghost: 'Fantasma',
-  Dragon: 'Dragão',
-  Dark: 'Sombrio',
-  Steel: 'Aço',
-  Fairy: 'Fada',
-  Stellar: 'Stellar',
-};
 const CATEGORIAS: Record<string, string> = { Physical: 'Físico', Special: 'Especial', Status: 'Status' };
 
-export const nomeTipo = (tipo: string) => TIPOS[tipo] ?? tipo;
+/** Nomes de tipo ficam em inglês (pedido do dono): "fire"/"Fire" → "Fire". */
+export const nomeTipo = (tipo: string) => tipo.charAt(0).toUpperCase() + tipo.slice(1);
 export const nomeCategoria = (categoria: string) => CATEGORIAS[categoria] ?? categoria;

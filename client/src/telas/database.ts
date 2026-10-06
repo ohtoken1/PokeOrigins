@@ -3,7 +3,7 @@
 import { Dex } from '@pkmn/sim';
 import type { Tela } from '../main';
 import { CATALOGO, CATEGORIAS, MOEDA } from '../../../shared/loja';
-import { nomeCategoria, traduzir } from '../../../shared/traducao';
+import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
 import type { PokemonBase } from '../../../shared/tipos';
 import { pokemonsDaRegiao } from '../dados';
 import { el, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
@@ -26,14 +26,26 @@ interface Secao<T> {
   /** texto usado na busca */
   busca: (linha: T) => string;
   aoClicar?: (linha: T) => void;
+  /** filtro por tipo (Pokémon e golpes) */
+  tipos?: (linha: T) => string[];
 }
 
 const POR_PAGINA = 100;
+const TODOS_TIPOS = ['normal', 'fire', 'water', 'grass', 'electric', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
 
 /** Tabela com busca, ordenação e "mostrar mais". */
 function tabela<T>(secao: Secao<T>): HTMLElement {
   const campo = el('input', { type: 'search', class: 'db-busca', placeholder: `Buscar em ${secao.nome.toLowerCase()}…` }) as HTMLInputElement;
   const contador = el('span', { class: 'meta' });
+  const tipos = secao.tipos;
+  const filtro = el('select', { class: 'db-busca db-filtro' },
+    el('option', { value: '' }, 'Todos os tipos'),
+    ...TODOS_TIPOS.map((t) => el('option', { value: t }, nomeTipo(t))),
+  ) as HTMLSelectElement;
+  filtro.addEventListener('change', () => {
+    limite = POR_PAGINA;
+    desenhar();
+  });
   const corpo = el('tbody');
   const mais = el('button', { class: 'botao secundario db-mais' }, 'Mostrar mais');
   let ordem: { i: number; asc: boolean } | null = null;
@@ -52,7 +64,9 @@ function tabela<T>(secao: Secao<T>): HTMLElement {
 
   const desenhar = () => {
     const termo = campo.value.trim().toLowerCase();
-    let linhas = termo ? secao.linhas.filter((l) => secao.busca(l).toLowerCase().includes(termo)) : [...secao.linhas];
+    let linhas = secao.linhas.filter(
+      (l) => (!termo || secao.busca(l).toLowerCase().includes(termo)) && (!tipos || !filtro.value || tipos(l).some((t) => t.toLowerCase() === filtro.value)),
+    );
     if (ordem) {
       const { i, asc } = ordem;
       const valor = secao.colunas[i].ordem!;
@@ -86,7 +100,7 @@ function tabela<T>(secao: Secao<T>): HTMLElement {
   return el(
     'div',
     { class: 'db-secao' },
-    el('div', { class: 'db-ferramentas' }, campo, contador),
+    el('div', { class: 'db-ferramentas' }, campo, tipos ? filtro : null, contador),
     el('div', { class: 'db-rolagem' }, el('table', { class: 'db-tabela' }, el('thead', {}, el('tr', {}, ...cabecalhos)), corpo)),
     mais,
   );
@@ -116,6 +130,7 @@ export const telaDatabase: Tela = (raiz, navegar) => {
       linhas: pokemons,
       busca: (p: PokemonBase) => `${p.id} ${p.nome} ${p.tipos.join(' ')}`,
       aoClicar: (p: PokemonBase) => navegar({ tela: 'pokedex', id: p.id }),
+      tipos: (p: PokemonBase) => p.tipos,
       colunas: [
         { titulo: '#', celula: (p) => String(p.id).padStart(3, '0'), ordem: (p) => p.id, classe: 'num' },
         { titulo: '', celula: (p) => spritePokemon(p, { animado: false }), classe: 'db-sprite' },
@@ -128,7 +143,8 @@ export const telaDatabase: Tela = (raiz, navegar) => {
     {
       id: 'itens',
       nome: 'Itens',
-      linhas: CATALOGO,
+      // TMs e TRs ficam fora (já aparecem como golpes)
+      linhas: CATALOGO.filter((i) => i.categoria !== 'tm' && i.categoria !== 'tr'),
       busca: (i) => `${i.nome} ${i.descricao} ${CATEGORIAS.find((c) => c.id === i.categoria)?.nome}`,
       colunas: [
         { titulo: '', celula: (i) => iconeItem(i), classe: 'db-icone' },
@@ -140,7 +156,7 @@ export const telaDatabase: Tela = (raiz, navegar) => {
     } satisfies Secao<(typeof CATALOGO)[number]>,
     {
       id: 'habilidades',
-      nome: 'Habilidades',
+      nome: 'Abilities',
       linhas: Dex.abilities.all().filter((a) => !a.isNonstandard && a.num > 0),
       busca: (a) => `${a.name} ${traduzir(a.shortDesc || a.desc)} ${(donos.get(a.id) ?? []).map((p) => p.nome).join(' ')}`,
       colunas: [
@@ -158,6 +174,7 @@ export const telaDatabase: Tela = (raiz, navegar) => {
       nome: 'Golpes',
       linhas: Dex.moves.all().filter((m) => !m.isNonstandard && !m.isZ && !m.isMax),
       busca: (m) => `${m.name} ${m.type} ${traduzir(m.shortDesc || m.desc)}`,
+      tipos: (m) => [m.type],
       colunas: [
         { titulo: 'Nome', celula: (m) => m.name, ordem: (m) => m.name },
         { titulo: 'Tipo', celula: (m) => seloTipo(m.type), ordem: (m) => m.type },

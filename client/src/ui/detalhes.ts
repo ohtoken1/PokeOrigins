@@ -87,7 +87,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
         el('dl', {},
           el('dt', {}, 'Natureza'),
           el('dd', {}, natureza.name, natureza.plus ? el('small', {}, ` (+${NOMES[natureza.plus as Atributo]}, −${NOMES[natureza.minus as Atributo]})`) : el('small', {}, ' (neutra)')),
-          el('dt', {}, 'Habilidade'),
+          el('dt', {}, 'Ability'),
           el('dd', {}, habilidade.name, habilidade.shortDesc ? el('small', {}, ` — ${traduzir(habilidade.shortDesc)}`) : null),
           el('dt', {}, 'Item'),
           el('dd', {}, p.item ? nomeItemEquipado(p.item) : '—'),
