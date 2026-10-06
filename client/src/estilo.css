@@ -616,29 +616,40 @@ button.vaga:hover { border-color: var(--borda); }
 .revelar-ivs .aviso:empty { display: none; }
 
 /* Tickets */
-.janela-ticket .ticket { display: flex; flex-direction: column; gap: 12px; align-items: stretch; max-width: 520px; }
+.janela.janela-ticket { width: min(620px, 94vw); }
+.janela-ticket .ticket { display: flex; flex-direction: column; gap: 12px; align-items: stretch; min-width: 0; }
 .janela-ticket .janela-corpo { overflow-x: hidden; }
-.raridades { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.raridade {
-  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 6px; border-radius: 12px;
-  background: var(--painel-2); border: 2px solid transparent; transition: transform 0.1s, border-color 0.1s;
-}
-.raridade small { color: var(--texto-2); }
-.raridade.destaque { transform: scale(1.06); border-color: currentColor; }
-.raridade.sorteada { transform: scale(1.1); border-color: currentColor; box-shadow: 0 0 18px currentColor; }
-.raridade-comum { color: #b8c2d6; }
+.raridades { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; }
+.raridade { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px; border-radius: 10px; }
+.raridade small { opacity: 0.8; }
+/* cores por raridade: branco (comum), azul (raro), roxo (épico), laranja (lendário) */
+.fundo-comum { background: #eef1f6; color: #1f2633; }
+.fundo-raro { background: #3d86ea; color: #fff; }
+.fundo-epico { background: #8d4fe0; color: #fff; }
+.fundo-lendario { background: #f08a1c; color: #fff; }
+.raridade-comum { color: #dfe5ee; }
 .raridade-raro { color: #5aa8ff; }
 .raridade-epico { color: #b77cff; }
-.raridade-lendario { color: #ffb02e; }
+.raridade-lendario { color: #ffa53a; }
+.roleta.roleta-ticket { width: 100%; max-width: none; height: 104px; margin: 0; }
+.roleta-ticket .roleta-marcador { width: 4px; border: 0; border-radius: 2px; background: #fff; box-shadow: 0 0 10px #fff; }
+.casa-roleta {
+  position: relative; flex: 0 0 84px; margin: 6px 4px; border-radius: 10px; display: grid; place-items: center;
+  box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.18);
+}
+.casa-roleta .sprite { width: 72px; height: 72px; }
+.casa-roleta small { position: absolute; right: 5px; bottom: 3px; font-size: 0.68rem; font-weight: 800; }
+.casa-roleta .premio-silver { font-size: 1.8rem; }
+.casa-roleta.sorteado { outline: 3px solid #fff; }
 .ticket-resultado { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
 .ticket-resultado:empty { display: none; }
 .ticket-resultado small { color: var(--texto-2); }
 .ticket-raridade { font-weight: 800; font-size: 1.2rem; margin: 0; }
 .ticket-linha .ticket-raridade { font-size: 0.85rem; min-width: 72px; }
 .premios { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-.premio { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 10px; background: var(--painel-2); border-radius: 10px; color: var(--texto); }
+.premio { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 10px; border-radius: 10px; }
 .premio .sprite { width: 72px; height: 72px; }
-.premio small { color: var(--texto-2); }
+.premio small { opacity: 0.8; }
 .premio-silver { font-size: 1.6rem; }
 .ticket-lista summary { cursor: pointer; color: var(--texto-2); }
 .ticket-linha { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
