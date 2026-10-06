@@ -2,7 +2,8 @@ import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
 import { regiaoPorId } from '../../../shared/regioes';
 import { nivelTreinador } from '../../../shared/treinador';
-import { ajustarTabela, encontroForcado, faixaDosEncontros, montarTabela, probabilidades, sortearEncontro } from '../../../shared/encontros';
+import { NIVEL_LENDARIO, ajustarTabela, biomaDoPokemon, encontroForcado, faixaDosEncontros, montarTabela, probabilidades, sortearEncontro } from '../../../shared/encontros';
+import { comoEvolui } from '../../../shared/evolucoes';
 import type { BiomaScene, OpcoesBioma } from '../jogo/BiomaScene';
 import { mostrarJogo } from '../jogo/jogoUnico';
 import { abrirBatalha } from '../batalha/telaBatalha';
@@ -47,23 +48,38 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   };
   atualizarTime();
 
-  // só os Pokémon que podem aparecer na faixa de nível atual
+  // todos os Pokémon que moram neste bioma: com % só quem pode aparecer na faixa de nível atual;
+  // os de outras faixas mostram o nível, e os que só vêm por evolução (pedra/troca/amizade) mostram como
+  const moradores = pokemonsDaRegiao(regiao.id).filter((p) => biomaDoPokemon(p) === bioma.id && !regiao.iniciais.includes(p.id));
   const listaChances = el('ol', { class: 'lista-chances' });
   const atualizarChances = () => {
     const nivelFixo = ajustesAdmin().nivel;
     const chances = probabilidades(tabela, nivelFixo === null ? faixaAtual() : [nivelFixo, nivelFixo]);
+    const chancePorId = new Map(tabela.map((e, i) => [e.pokemon.id, chances[i]]));
+    const entradaPorId = new Map(tabelaNormal.map((e) => [e.pokemon.id, e]));
+    const linhas = moradores.map((p) => {
+      const chance = chancePorId.get(p.id) ?? 0;
+      const entrada = entradaPorId.get(p.id);
+      const lendario = p.lendario || p.mitico;
+      const info = chance > 0
+        ? `${(chance * 100).toFixed(1)}%`
+        : entrada
+          ? `Nv. ${lendario ? `${Math.max(NIVEL_LENDARIO, entrada.nivelMin)}+` : `${entrada.nivelMin}–${entrada.nivelMax}`}`
+          : comoEvolui(p);
+      return { p, chance, info, solto: !!entrada };
+    });
+    linhas.sort((a, b) => b.chance - a.chance || Number(b.solto) - Number(a.solto) || a.p.id - b.p.id);
     listaChances.replaceChildren(
-      ...tabela
-      .map((entrada, i) => ({ entrada, chance: chances[i] }))
-      .filter(({ chance }) => chance > 0)
-      .sort((a, b) => b.chance - a.chance)
-      .map(({ entrada, chance }) =>
+      ...linhas.map(({ p, chance, info, solto }) =>
         el(
           'li',
-          { class: save.vistos.includes(entrada.pokemon.id) ? 'visto' : '' },
-          spritePokemon(entrada.pokemon, { animado: false }),
-          el('span', {}, entrada.pokemon.nome),
-          el('small', {}, `${(chance * 100).toFixed(1)}%`),
+          {
+            class: `${save.vistos.includes(p.id) ? 'visto' : ''} ${chance > 0 ? '' : 'fora-da-faixa'}`,
+            title: chance > 0 ? 'Pode aparecer agora' : solto ? 'Aparece em outra faixa de nível' : `Não aparece solto: ${info}`,
+          },
+          spritePokemon(p, { animado: false }),
+          el('span', {}, p.nome),
+          el('small', {}, info),
         ),
       ),
     );

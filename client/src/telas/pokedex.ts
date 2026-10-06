@@ -3,8 +3,9 @@
 import { Dex } from '@pkmn/sim';
 import type { Tela } from '../main';
 import { BIOMAS } from '../../../shared/biomas';
-import { NIVEL_LENDARIO, montarTabela, type EntradaTabela } from '../../../shared/encontros';
-import { especie, golpesPorNivel, nivelDeEvolucao } from '../../../shared/batalha/pokemon';
+import { NIVEL_LENDARIO, biomaDoPokemon, montarTabela, type EntradaTabela } from '../../../shared/encontros';
+import { comoEvolui } from '../../../shared/evolucoes';
+import { especie, golpesPorNivel } from '../../../shared/batalha/pokemon';
 import maquinas from '../../../shared/data/maquinas.json';
 import { REGIOES } from '../../../shared/regioes';
 import { CATEGORIAS_POKEMON, categoriasDoPokemon } from '../../../shared/categorias';
@@ -20,7 +21,6 @@ const CRESCIMENTO: Record<string, string> = { fast: 'Rápido', medium: 'Médio',
 const ATRIBUTOS: [keyof PokemonBase['stats'], string][] = [
   ['hp', 'HP'], ['ataque', 'Attack'], ['defesa', 'Defense'], ['ataqueEspecial', 'Sp. Atk'], ['defesaEspecial', 'Sp. Def'], ['velocidade', 'Speed'],
 ];
-const CONDICOES: Record<string, string> = { 'during the day': 'de dia', 'at night': 'à noite' };
 
 /** Onde cada espécie aparece solta (bioma + faixa de nível). */
 function mapaDeEncontros(todos: PokemonBase[]): Map<number, { bioma: string; entrada: EntradaTabela }> {
@@ -33,26 +33,6 @@ function mapaDeEncontros(todos: PokemonBase[]): Map<number, { bioma: string; ent
 
 /** Região de origem pelo número da Pokédex nacional. */
 export const regiaoDoNumero = (numero: number) => REGIOES.find((r) => numero >= r.pokedex[0] && numero <= r.pokedex[1]);
-
-/** Como a espécie surge a partir da anterior (em português). */
-function comoEvolui(p: PokemonBase): string {
-  const s = especie(p.id);
-  const nivel = nivelDeEvolucao(p.id);
-  if (nivel) return `Nv. ${nivel}`;
-  const condicao = s.evoCondition ? ` (${CONDICOES[s.evoCondition] ?? s.evoCondition})` : '';
-  switch (s.evoType) {
-    case 'useItem':
-      return `Usar ${s.evoItem}`;
-    case 'trade':
-      return s.evoItem ? `Troca segurando ${s.evoItem}` : 'Troca';
-    case 'levelFriendship':
-      return `Amizade${condicao}`;
-    case 'levelMove':
-      return `Sabendo ${s.evoMove}`;
-    default:
-      return s.evoLevel ? `Nv. ${s.evoLevel}${condicao}` : s.evoItem ? `Usar ${s.evoItem}` : 'Condição especial';
-  }
-}
 
 /** Multiplicador de dano de cada tipo atacante contra a espécie. */
 function fraquezas(tipos: string[]): Map<number, string[]> {
@@ -180,12 +160,20 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
   );
 
   // onde encontrar
+  // onde encontrar: região + bioma (pelo tipo) e como aparece
   const onde = encontros.get(p.id);
-  const textoOnde = onde
-    ? `${onde.bioma} · Nv. ${p.lendario || p.mitico ? `${Math.max(NIVEL_LENDARIO, onde.entrada.nivelMin)}+` : `${onde.entrada.nivelMin}–${onde.entrada.nivelMax}`}${p.lendario || p.mitico ? ' (raro)' : ''}`
+  const regiaoP = regiaoDoNumero(p.id);
+  const biomaP = BIOMAS.find((b) => b.id === biomaDoPokemon(p));
+  const comoAparece = onde
+    ? `Solto · Nv. ${p.lendario || p.mitico ? `${Math.max(NIVEL_LENDARIO, onde.entrada.nivelMin)}+ (raro)` : `${onde.entrada.nivelMin}–${onde.entrada.nivelMax}`}`
     : REGIOES.some((r) => r.iniciais.includes(p.id))
-      ? 'Inicial (escolhido no começo do jogo)'
-      : 'Não aparece solto: só evoluindo';
+      ? 'Inicial (roleta do começo do jogo)'
+      : `Só evoluindo · ${comoEvolui(p)}`;
+  const textoOnde = el('span', { class: 'dex-onde' },
+    el('span', { class: 'dex-chip' }, regiaoP?.nome ?? '—'),
+    el('span', { class: 'dex-chip' }, biomaP?.nome ?? '—'),
+    el('small', {}, comoAparece),
+  );
 
   // gênero
   // símbolos coloridos (♂ azul, ♀ rosa)

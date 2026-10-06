@@ -103,3 +103,7 @@
 /* ainda não vistos: silhueta escura */
 .dex-lista li.oculto .sprite, .dex-oculto .sprite, .dex-evo.oculto .sprite { filter: brightness(0) opacity(0.45); }
 .dex-lista li.oculto .dex-nome, .dex-evo.oculto span { color: var(--texto-2); }
+
+.dex-onde { display: inline-flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; align-items: center; }
+.dex-chip { padding: 1px 8px; border-radius: 999px; font-size: 0.75rem; background: var(--painel-2); border: 1px solid var(--borda); }
+.dex-onde small { width: 100%; text-align: right; color: var(--texto-2); font-weight: 500; }
