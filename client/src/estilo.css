@@ -149,15 +149,15 @@ aside { display: flex; flex-direction: column; gap: 16px; }
 .encontro .botao { padding: 6px 12px; margin-top: 2px; }
 .encontro .dica { margin: 0; font-size: 0.72rem; color: #e8ecf4; }
 .encontro { transform-origin: 0 0; }
-.encontro .genero.M { color: #6ab4ff; }
-.encontro .genero.F { color: #ff7ab8; }
-.encontro-tamanho { position: absolute; top: 4px; right: 4px; display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s; }
-.encontro:hover .encontro-tamanho { opacity: 1; }
-.encontro-tamanho button {
-  width: 22px; height: 22px; padding: 0; border-radius: 6px; cursor: pointer; line-height: 1; font-weight: 700;
-  background: rgb(20 36 58 / 0.85); color: var(--texto); border: 1px solid var(--borda); text-shadow: none;
+/* gênero: ♂ azul, ♀ rosa */
+.genero { font-weight: 800; margin-left: 4px; font-family: 'Segoe UI Symbol', system-ui, sans-serif; }
+.genero.M { color: #4fa8ff; text-shadow: 0 0 6px rgb(79 168 255 / 0.45); }
+.genero.F { color: #ff6fae; text-shadow: 0 0 6px rgb(255 111 174 / 0.45); }
+.encontro-alca {
+  position: absolute; right: 2px; bottom: 2px; width: 16px; height: 16px; cursor: nwse-resize; opacity: 0; transition: opacity 0.15s;
+  background: linear-gradient(135deg, transparent 0 45%, rgb(255 255 255 / 0.7) 45% 52%, transparent 52% 65%, rgb(255 255 255 / 0.7) 65% 72%, transparent 72%);
 }
-.encontro-tamanho button:hover { background: var(--painel-2); }
+.encontro:hover .encontro-alca { opacity: 1; }
 .encontro .botao { text-shadow: none; cursor: pointer; }
 kbd { font: 600 0.7rem system-ui; padding: 1px 5px; border-radius: 4px; background: rgb(0 0 0 / 0.2); }
 

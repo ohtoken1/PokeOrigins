@@ -9,7 +9,7 @@ import { efeitoBola } from '../../../shared/bolas';
 import { nivelTreinador } from '../../../shared/treinador';
 import { MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
 import { curarTime, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
-import { corTipo, el, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
+import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarGolpe, animarRetorno, tremerArena } from './animacoes';
 
@@ -57,7 +57,7 @@ function caixaInfo(doJogador: boolean) {
       status.className = `chip-status ${s ?? ''}`;
     },
     definir(p: PokemonIndividual) {
-      nome.textContent = `${nomeDe(p.especieId)}${p.genero === 'M' ? ' ♂' : p.genero === 'F' ? ' ♀' : ''}${p.shiny ? ' ✨' : ''}`;
+      nome.replaceChildren(nomeDe(p.especieId), seloGenero(p.genero) ?? '', p.shiny ? ' ✨' : '');
       nivel.textContent = `Nv. ${p.nivel}`;
       this.status(p.status);
       const c = crescimentoDe(p.especieId);
@@ -75,13 +75,13 @@ function resumoPokemon(p: PokemonIndividual, doJogador: boolean): HTMLElement[] 
   const dados = pokemonPorId(p.especieId);
   const natureza = Dex.natures.get(p.natureza);
   const efeito = natureza.plus && natureza.minus ? `+${NOMES_ATRIBUTOS[natureza.plus]} −${NOMES_ATRIBUTOS[natureza.minus]}` : 'neutra';
-  const genero = p.genero === 'M' ? '♂ Macho' : p.genero === 'F' ? '♀ Fêmea' : 'Sem gênero';
+
   const [min, max] = faixaVelocidade(p);
   const linha = (rotulo: string, valor: string) => el('div', { class: 'resumo-linha' }, el('span', {}, rotulo), el('strong', {}, valor));
   return [
     el('div', { class: 'resumo-titulo' }, el('strong', {}, `${dados.nome}${p.shiny ? ' ✨' : ''}`), el('small', {}, ` Nv. ${p.nivel}`)),
     selosTipos(dados),
-    linha('Gênero', genero),
+    el('div', { class: 'resumo-linha' }, el('span', {}, 'Gênero'), el('strong', {}, seloGenero(p.genero) ?? '', p.genero === 'M' ? ' Macho' : p.genero === 'F' ? ' Fêmea' : 'Sem gênero')),
     linha('Nature', `${natureza.name} (${efeito})`),
     linha('Ability', Dex.abilities.get(p.habilidade).name),
     linha('Speed (IV 0–31)', `${min}–${max}`),

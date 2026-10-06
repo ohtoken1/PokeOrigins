@@ -1,5 +1,5 @@
 import type { Encontro } from '../../../shared/encontros';
-import { el, selosTipos, spritePokemon } from './dom';
+import { el, seloGenero, selosTipos, spritePokemon } from './dom';
 
 export interface AcoesEncontro {
   lutar(): void;
@@ -12,9 +12,6 @@ export interface AcoesEncontro {
  * se o jogador continuar andando, quem chamou fecha o cartão (= fugiu).
  * Enter ou o botão Lutar começam a batalha. Devolve a função que fecha o cartão.
  */
-/** Símbolo do gênero (♂/♀) ou nada para quem não tem gênero. */
-export const simboloGenero = (g: 'M' | 'F' | 'N') => (g === 'M' ? '♂' : g === 'F' ? '♀' : '');
-
 export function mostrarEncontro(raiz: HTMLElement, encontro: Encontro, acoes: AcoesEncontro, genero: 'M' | 'F' | 'N' = 'N'): () => void {
   const { pokemon, nivel, shiny } = encontro;
   const lendario = pokemon.lendario || pokemon.mitico;
@@ -37,7 +34,7 @@ export function mostrarEncontro(raiz: HTMLElement, encontro: Encontro, acoes: Ac
       'div',
       { class: 'info' },
       el('p', { class: 'aviso' }, lendario && shiny ? '★ Lendário shiny' : lendario ? '★ Lendário' : shiny ? '✨ Shiny' : 'Pokémon selvagem!'),
-      el('h2', {}, el('span', { class: 'nome' }, pokemon.nome), genero !== 'N' ? el('span', { class: `genero ${genero}` }, ` ${simboloGenero(genero)}`) : null, el('small', {}, ` Nv. ${nivel}`)),
+      el('h2', {}, el('span', { class: 'nome' }, pokemon.nome), seloGenero(genero), el('small', {}, ` Nv. ${nivel}`)),
       selosTipos(pokemon),
       el(
         'button',
@@ -58,7 +55,7 @@ export function mostrarEncontro(raiz: HTMLElement, encontro: Encontro, acoes: Ac
 /** Posição (canto superior esquerdo, em px dentro do mapa) e tamanho escolhidos pelo jogador; valem para os próximos cartões. */
 const CHAVE_POSICAO = 'jogo-claude:posicao-encontro';
 const CHAVE_TAMANHO = 'jogo-claude:tamanho-encontro';
-const TAMANHOS = [0.6, 0.75, 0.9, 1, 1.15, 1.3, 1.5, 1.75, 2];
+const [MIN_ESCALA, MAX_ESCALA] = [0.6, 2];
 
 const ler = <T,>(chave: string, padrao: T): T => {
   try {
@@ -75,10 +72,10 @@ const gravar = (chave: string, valor: unknown) => {
   }
 };
 
-/** Arrastar o cartão pelo mapa e aumentar/diminuir com os botões + e − do canto. */
+/** Arrastar o cartão pelo mapa e mudar o tamanho pela alça do canto. */
 function permitirArrastar(cartao: HTMLElement, raiz: HTMLElement) {
   let escala = ler(CHAVE_TAMANHO, 1);
-  if (!TAMANHOS.includes(escala)) escala = 1;
+  if (!(escala >= MIN_ESCALA && escala <= MAX_ESCALA)) escala = 1;
   let [x, y] = [0, 0];
 
   // `scale` não mexe no layout: o tamanho visível é o do cartão × escala, a partir do canto de cima à esquerda
@@ -92,19 +89,30 @@ function permitirArrastar(cartao: HTMLElement, raiz: HTMLElement) {
   // padrão: canto de baixo à direita
   else posicionar(raiz.clientWidth - cartao.offsetWidth * escala - 12, raiz.clientHeight - cartao.offsetHeight * escala - 12);
 
-  const mudarTamanho = (passo: number) => {
-    const i = TAMANHOS.indexOf(escala) + passo;
-    if (i < 0 || i >= TAMANHOS.length) return;
-    escala = TAMANHOS[i];
-    posicionar(x, y);
-    gravar(CHAVE_TAMANHO, escala);
-  };
-  cartao.append(
-    el('div', { class: 'encontro-tamanho' },
-      el('button', { title: 'Diminuir', 'aria-label': 'Diminuir', onclick: () => mudarTamanho(-1) }, '−'),
-      el('button', { title: 'Aumentar', 'aria-label': 'Aumentar', onclick: () => mudarTamanho(1) }, '+'),
-    ),
-  );
+  // alça no canto de baixo à direita: arrastar muda o tamanho do cartão
+  const alca = el('div', { class: 'encontro-alca', title: 'Arraste para mudar o tamanho' });
+  cartao.append(alca);
+  alca.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const [x0, escala0] = [e.clientX, escala];
+    const largura = cartao.offsetWidth;
+    alca.setPointerCapture(e.pointerId);
+    const mover = (ev: PointerEvent) => {
+      escala = Math.max(MIN_ESCALA, Math.min(MAX_ESCALA, escala0 + (ev.clientX - x0) / largura));
+      posicionar(x, y);
+    };
+    alca.addEventListener('pointermove', mover);
+    alca.addEventListener(
+      'pointerup',
+      () => {
+        alca.removeEventListener('pointermove', mover);
+        gravar(CHAVE_TAMANHO, escala);
+      },
+      { once: true },
+    );
+  });
 
   cartao.addEventListener('pointerdown', (e) => {
     if ((e.target as HTMLElement).closest('button') || e.button !== 0) return;

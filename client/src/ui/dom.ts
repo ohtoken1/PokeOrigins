@@ -51,6 +51,13 @@ const TIPOS: Record<string, { nome: string; cor: string }> = {
 };
 
 /** Aceita o tipo da PokéAPI ("fire") ou do Showdown ("Fire"). */
+/** Símbolo do gênero colorido (♂ azul, ♀ rosa); nada para quem não tem gênero. */
+export function seloGenero(g: 'M' | 'F' | 'N'): HTMLElement | null {
+  if (g === 'N') return null;
+  // ︎: força o símbolo como texto (sem virar emoji)
+  return el('span', { class: `genero ${g}`, title: g === 'M' ? 'Macho' : 'Fêmea' }, g === 'M' ? '♂︎' : '♀︎');
+}
+
 export function corTipo(tipo: string): string {
   return TIPOS[tipo.toLowerCase()]?.cor ?? '#777';
 }
