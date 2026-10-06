@@ -33,7 +33,7 @@ export function mostrarEncontro(raiz: HTMLElement, encontro: Encontro, acoes: Ac
     el(
       'div',
       { class: 'info' },
-      el('p', { class: 'aviso' }, [shiny && '✨ Pokémon SHINY!', lendario && `★ Pokémon ${pokemon.mitico ? 'MÍTICO' : 'LENDÁRIO'}!`].filter(Boolean).join(' ') || 'Pokémon selvagem!'),
+      el('p', { class: 'aviso' }, lendario && shiny ? '★ Lendário shiny' : lendario ? '★ Lendário' : shiny ? '✨ Shiny' : 'Pokémon selvagem!'),
       el('h2', {}, el('span', { class: 'nome' }, pokemon.nome), el('small', {}, ` Nv. ${nivel}`)),
       selosTipos(pokemon),
       el(
