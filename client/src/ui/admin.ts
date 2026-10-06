@@ -117,14 +117,6 @@ function conteudo(): HTMLElement[] {
   return [
     el('h4', {}, 'Treinador'),
     campo(`Nível de treinador (1–${NIVEL_MAX_TREINADOR})`, el('div', { class: 'admin-linha' }, nivelTreinadorCampo, aplicarNivel)),
-    el('h4', {}, 'Encontros'),
-    campo('Chance de shiny', seletor(OPCOES_SHINY, a.chanceShiny, (v) => mudar({ chanceShiny: v }))),
-    campo('Lendários e míticos', seletor(OPCOES_LENDARIO, a.multLendario, (v) => mudar({ multLendario: v }))),
-    el('label', { class: 'admin-check' }, soLendarios, ' Só lendários do bioma'),
-    campo('Encontro por passo', valorPasso, chancePasso),
-    campo('Pokémon forçado', especie),
-    campo('Nível forçado', nivel),
-    el('button', { class: 'botao secundario', onclick: () => mudar({ ...AJUSTES_PADRAO }) }, 'Restaurar padrão'),
     el('h4', {}, 'Pokédex'),
     (() => {
       const caixa = el('input', { type: 'checkbox', checked: pokedexRevelada() }) as HTMLInputElement;
@@ -136,8 +128,17 @@ function conteudo(): HTMLElement[] {
         }
         aoMudarSave?.();
       });
-      return el('label', { class: 'admin-check' }, caixa, ' Revelar todos (sem precisar ver)');
+      return el('label', { class: 'admin-check' }, caixa, ' Habilitar todos os Pokémon da Pokédex');
     })(),
+    el('h4', {}, 'Encontros'),
+    campo('Chance de shiny', seletor(OPCOES_SHINY, a.chanceShiny, (v) => mudar({ chanceShiny: v }))),
+    campo('Lendários e míticos', seletor(OPCOES_LENDARIO, a.multLendario, (v) => mudar({ multLendario: v }))),
+    el('label', { class: 'admin-check' }, soLendarios, ' Só lendários do bioma'),
+    campo('Encontro por passo', valorPasso, chancePasso),
+    campo('Pokémon forçado', especie),
+    campo('Nível forçado', nivel),
+    el('button', { class: 'botao secundario', onclick: () => mudar({ ...AJUSTES_PADRAO }) }, 'Restaurar padrão'),
+
     el('p', { class: 'admin-nota' }, 'Ajustes de teste: valem só neste navegador. Login de administrador virá depois.'),
   ];
 }
