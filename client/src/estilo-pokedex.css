@@ -99,3 +99,7 @@
 .dex-botoes-extras .botao.ligado { background: var(--destaque); color: #000; }
 .dex-extras:not(:empty) { margin-top: 12px; }
 .dex-tm { border-left-width: 3px; }
+
+/* ainda não vistos: silhueta escura */
+.dex-lista li.oculto .sprite, .dex-oculto .sprite, .dex-evo.oculto .sprite { filter: brightness(0) opacity(0.45); }
+.dex-lista li.oculto .dex-nome, .dex-evo.oculto span { color: var(--texto-2); }

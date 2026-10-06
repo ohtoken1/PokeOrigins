@@ -12,6 +12,7 @@ import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
 import type { PokemonBase } from '../../../shared/tipos';
 import { pokemonsDaRegiao, todosOsPokemons } from '../dados';
 import { carregarSave } from '../estado';
+import { pokedexRevelada } from '../ui/admin';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 
 
@@ -85,7 +86,23 @@ function podeAprenderTM(p: PokemonBase, golpe: string): boolean {
 
 const linha = (rotulo: string, valor: Node | string) => el('div', { class: 'dex-linha' }, el('span', {}, rotulo), el('strong', {}, valor));
 
-function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeof mapaDeEncontros>, abrir: (id: number) => void): HTMLElement {
+/** Pokémon ainda não visto: só a silhueta e o número (pedido do dono). */
+function fichaOculta(p: PokemonBase): HTMLElement {
+  return el(
+    'article',
+    { class: 'dex-ficha' },
+    el('div', { class: 'dex-topo dex-oculto' },
+      el('div', { class: 'dex-palco' }, spritePokemon(p, { animado: false, palco: true, chao: 0.88 })),
+      el('div', { class: 'dex-resumo' },
+        el('div', { class: 'dex-titulo' }, el('span', { class: 'dex-numero' }, `#${String(p.id).padStart(4, '0')}`), el('h2', {}, '???')),
+        el('p', { class: 'dica' }, 'Você ainda não viu este Pokémon. Encontre-o em algum bioma para liberar as informações.'),
+      ),
+    ),
+  );
+}
+
+function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeof mapaDeEncontros>, abrir: (id: number) => void, visto: (id: number) => boolean): HTMLElement {
+  if (!visto(p.id)) return fichaOculta(p);
   const s = especie(p.id);
   const estado = { shiny: false, costas: false };
   const palco = el('div', { class: 'dex-palco' });
@@ -152,9 +169,9 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
       i > 0 ? el('span', { class: 'dex-seta' }, '→') : null,
       el('div', { class: 'dex-estagio' },
         ...grupo.map((q) =>
-          el('button', { class: `dex-evo ${q.id === p.id ? 'atual' : ''}`, onclick: () => abrir(q.id) },
+          el('button', { class: `dex-evo ${q.id === p.id ? 'atual' : ''} ${visto(q.id) ? '' : 'oculto'}`, onclick: () => abrir(q.id) },
             spritePokemon(q, { animado: false }),
-            el('span', {}, q.nome),
+            el('span', {}, visto(q.id) ? q.nome : '???'),
             i > 0 ? el('small', {}, comoEvolui(q)) : null,
           ),
         ),
@@ -290,6 +307,8 @@ export const telaPokedex = (inicial?: number): Tela => (raiz) => {
   const save = carregarSave();
   const vistos = new Set(save?.vistos ?? []);
   const capturados = new Set(save?.capturados ?? []);
+  // só os vistos mostram nome, imagem e dados (o painel de admin pode revelar tudo para testes)
+  const visto = (id: number) => pokedexRevelada() || vistos.has(id) || capturados.has(id);
 
   let selecionado = inicial ?? todos[0]?.id ?? 1;
   const busca = el('input', { type: 'search', placeholder: 'Buscar por nome ou número…', class: 'dex-busca' }) as HTMLInputElement;
@@ -312,7 +331,7 @@ export const telaPokedex = (inicial?: number): Tela => (raiz) => {
   const abrir = (id: number) => {
     selecionado = id;
     const p = todos.find((q) => q.id === id);
-    if (p) painel.replaceChildren(ficha(p, todos, encontros, abrir));
+    if (p) painel.replaceChildren(ficha(p, todos, encontros, abrir, visto));
     for (const item of lista.children) item.classList.toggle('ativo', (item as HTMLElement).dataset.id === String(id));
     painel.scrollTop = 0;
   };
@@ -320,14 +339,19 @@ export const telaPokedex = (inicial?: number): Tela => (raiz) => {
   const desenharLista = () => {
     const termo = busca.value.trim().toLowerCase();
     const filtrados = todos.filter(
-      (p) => (!termo || p.nome.toLowerCase().includes(termo) || String(p.id) === termo.replace('#', '')) && (!filtroTipo.value || p.tipos.includes(filtroTipo.value)) && (!filtroRegiao.value || regiaoDoNumero(p.id)?.id === filtroRegiao.value) && (!filtroCategoria.value || categoriasDoPokemon(p).includes(filtroCategoria.value)),
+      (p) =>
+        // nome, tipagem e categoria só filtram quem já foi visto (senão a busca entregaria quem é)
+        (!termo || (visto(p.id) && p.nome.toLowerCase().includes(termo)) || String(p.id) === termo.replace('#', '')) &&
+        (!filtroTipo.value || (visto(p.id) && p.tipos.includes(filtroTipo.value))) &&
+        (!filtroRegiao.value || regiaoDoNumero(p.id)?.id === filtroRegiao.value) &&
+        (!filtroCategoria.value || (visto(p.id) && categoriasDoPokemon(p).includes(filtroCategoria.value))),
     );
     lista.replaceChildren(
       ...filtrados.map((p) =>
-        el('li', { 'data-id': p.id, class: p.id === selecionado ? 'ativo' : '', onclick: () => abrir(p.id) },
+        el('li', { 'data-id': p.id, class: `${p.id === selecionado ? 'ativo' : ''} ${visto(p.id) ? '' : 'oculto'}`, onclick: () => abrir(p.id) },
           spritePokemon(p, { animado: false }),
           el('span', { class: 'dex-num' }, `#${String(p.id).padStart(3, '0')}`),
-          el('span', { class: 'dex-nome' }, p.nome),
+          el('span', { class: 'dex-nome' }, visto(p.id) ? p.nome : '???'),
           capturados.has(p.id) ? pokebolinha() : vistos.has(p.id) ? el('span', { class: 'dex-marca', title: 'Visto' }, '○') : null,
         ),
       ),

@@ -7,6 +7,16 @@ import { carregarSave, salvar } from '../estado';
 import { el } from './dom';
 
 const CHAVE = 'jogo-claude:admin';
+const CHAVE_POKEDEX = 'jogo-claude:admin-pokedex';
+
+/** Teste: mostra a Pokédex inteira, mesmo os Pokémon ainda não vistos. */
+export function pokedexRevelada(): boolean {
+  try {
+    return localStorage.getItem(CHAVE_POKEDEX) === 'sim';
+  } catch {
+    return false;
+  }
+}
 const ouvintes = new Set<() => void>();
 /** Chamado quando o painel muda o save (a tela atual precisa recarregar). */
 let aoMudarSave: (() => void) | undefined;
@@ -115,6 +125,19 @@ function conteudo(): HTMLElement[] {
     campo('Pokémon forçado', especie),
     campo('Nível forçado', nivel),
     el('button', { class: 'botao secundario', onclick: () => mudar({ ...AJUSTES_PADRAO }) }, 'Restaurar padrão'),
+    el('h4', {}, 'Pokédex'),
+    (() => {
+      const caixa = el('input', { type: 'checkbox', checked: pokedexRevelada() }) as HTMLInputElement;
+      caixa.addEventListener('change', () => {
+        try {
+          localStorage.setItem(CHAVE_POKEDEX, caixa.checked ? 'sim' : 'nao');
+        } catch {
+          /* ignora */
+        }
+        aoMudarSave?.();
+      });
+      return el('label', { class: 'admin-check' }, caixa, ' Revelar todos (sem precisar ver)');
+    })(),
     el('p', { class: 'admin-nota' }, 'Ajustes de teste: valem só neste navegador. Login de administrador virá depois.'),
   ];
 }
