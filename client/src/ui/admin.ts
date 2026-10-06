@@ -1,11 +1,15 @@
 // Painel de administrador (aba na esquerda) para testar encontros: shiny, lendários, chance por passo,
 // Pokémon e nível forçados. Provisório: sem login; os ajustes ficam só neste navegador.
 import { AJUSTES_PADRAO, CHANCE_SHINY, type AjustesEncontro } from '../../../shared/encontros';
+import { NIVEL_MAX_TREINADOR, nivelTreinador, xpTotalParaNivel } from '../../../shared/treinador';
 import { pokemonsDaRegiao } from '../dados';
+import { carregarSave, salvar } from '../estado';
 import { el } from './dom';
 
 const CHAVE = 'jogo-claude:admin';
 const ouvintes = new Set<() => void>();
+/** Chamado quando o painel muda o save (a tela atual precisa recarregar). */
+let aoMudarSave: (() => void) | undefined;
 
 let ajustes: AjustesEncontro = carregar();
 
@@ -87,7 +91,23 @@ function conteudo(): HTMLElement[] {
     mudar({ nivel: nivel.value && n >= 1 ? Math.min(100, n) : null });
   });
 
+  // nível de treinador: grava no save e redesenha a tela atual
+  const save = carregarSave();
+  const nivelTreinadorCampo = el('input', { type: 'number', min: 1, max: NIVEL_MAX_TREINADOR, value: save ? nivelTreinador(save.xpTreinador) : 1, disabled: !save }) as HTMLInputElement;
+  const aplicarNivel = el('button', { class: 'botao secundario', disabled: !save }, 'Aplicar') as HTMLButtonElement;
+  aplicarNivel.addEventListener('click', () => {
+    const atual = carregarSave();
+    if (!atual) return;
+    const n = Math.max(1, Math.min(NIVEL_MAX_TREINADOR, Math.round(Number(nivelTreinadorCampo.value) || 1)));
+    atual.xpTreinador = xpTotalParaNivel(n);
+    salvar(atual);
+    aoMudarSave?.();
+  });
+
   return [
+    el('h4', {}, 'Treinador'),
+    campo(`Nível de treinador (1–${NIVEL_MAX_TREINADOR})`, el('div', { class: 'admin-linha' }, nivelTreinadorCampo, aplicarNivel)),
+    el('h4', {}, 'Encontros'),
     campo('Chance de shiny', seletor(OPCOES_SHINY, a.chanceShiny, (v) => mudar({ chanceShiny: v }))),
     campo('Lendários e míticos', seletor(OPCOES_LENDARIO, a.multLendario, (v) => mudar({ multLendario: v }))),
     el('label', { class: 'admin-check' }, soLendarios, ' Só lendários do bioma'),
@@ -100,13 +120,18 @@ function conteudo(): HTMLElement[] {
 }
 
 /** Cria a aba fixa na esquerda (uma vez, no início do jogo). */
-export function montarPainelAdmin() {
+export function montarPainelAdmin(recarregarTela: () => void) {
+  aoMudarSave = () => {
+    recarregarTela();
+    desenhar();
+  };
   const corpo = el('div', { class: 'admin-corpo' });
   const painel = el('aside', { class: 'admin-painel' }, el('h3', {}, 'Administrador'), corpo);
   const aba = el('button', { class: 'admin-aba', title: 'Painel de administrador' }, '⚙ Admin');
   const desenhar = () => corpo.replaceChildren(...conteudo());
   aba.addEventListener('click', () => {
-    painel.classList.toggle('aberto');
+    // ao abrir, mostra os valores atuais (ex.: nível de treinador depois de batalhas)
+    if (painel.classList.toggle('aberto')) desenhar();
     aba.classList.toggle('aberto');
   });
   // teclas digitadas no painel não andam com o personagem

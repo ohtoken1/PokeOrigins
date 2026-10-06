@@ -12,8 +12,10 @@ export type Tela = (raiz: HTMLElement, navegar: Navegar) => (() => void) | void;
 
 const raiz = document.getElementById('app')!;
 let limparTelaAtual: (() => void) | void;
+let destinoAtual: Destino = { tela: 'inicial' };
 
 const navegar: Navegar = (destino) => {
+  destinoAtual = destino;
   limparTelaAtual?.();
   raiz.replaceChildren();
   window.scrollTo(0, 0);
@@ -22,5 +24,5 @@ const navegar: Navegar = (destino) => {
   else limparTelaAtual = telaBioma(destino.biomaId)(raiz, navegar);
 };
 
-montarPainelAdmin();
+montarPainelAdmin(() => navegar(destinoAtual));
 navegar(carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' });

@@ -149,7 +149,8 @@ export function ajustarTabela(tabela: EntradaTabela[], ajustes: AjustesEncontro)
 
 /** Encontro de teste: espécie e/ou nível escolhidos pelo administrador. */
 export function encontroForcado(pokemon: PokemonBase, [min, max]: Faixa, ajustes: AjustesEncontro, aleatorio = Math.random): Encontro {
-  const nivel = ajustes.nivel ?? min + Math.floor(aleatorio() * (max - min + 1));
+  let nivel = ajustes.nivel ?? min + Math.floor(aleatorio() * (max - min + 1));
+  if (ajustes.nivel === null && ehLendario(pokemon)) nivel = Math.max(NIVEL_LENDARIO, nivel);
   return { pokemon, nivel: Math.max(1, Math.min(100, nivel)), shiny: aleatorio() < ajustes.chanceShiny };
 }
 

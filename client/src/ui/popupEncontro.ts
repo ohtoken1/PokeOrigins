@@ -14,6 +14,7 @@ export interface AcoesEncontro {
  */
 export function mostrarEncontro(raiz: HTMLElement, encontro: Encontro, acoes: AcoesEncontro): () => void {
   const { pokemon, nivel, shiny } = encontro;
+  const lendario = pokemon.lendario || pokemon.mitico;
 
   const aoTeclar = (e: KeyboardEvent) => {
     if (e.key !== 'Enter' || acoes.bloqueio) return;
@@ -27,13 +28,13 @@ export function mostrarEncontro(raiz: HTMLElement, encontro: Encontro, acoes: Ac
 
   const cartao = el(
     'div',
-    { class: `encontro ${shiny ? 'shiny' : ''}`, role: 'status', 'aria-live': 'polite' },
+    { class: `encontro ${shiny ? 'shiny' : ''} ${lendario ? 'lendario' : ''}`, role: 'status', 'aria-live': 'polite' },
     el('div', { class: 'palco' }, spritePokemon(pokemon, { shiny, alturaAlvo: 96 })),
     el(
       'div',
       { class: 'info' },
-      el('p', { class: 'aviso' }, shiny ? '✨ Pokémon SHINY!' : 'Pokémon selvagem!'),
-      el('h2', {}, pokemon.nome, el('small', {}, ` Nv. ${nivel}`)),
+      el('p', { class: 'aviso' }, [shiny && '✨ Pokémon SHINY!', lendario && `★ Pokémon ${pokemon.mitico ? 'MÍTICO' : 'LENDÁRIO'}!`].filter(Boolean).join(' ') || 'Pokémon selvagem!'),
+      el('h2', {}, el('span', { class: 'nome' }, pokemon.nome), el('small', {}, ` Nv. ${nivel}`)),
       selosTipos(pokemon),
       el(
         'button',
