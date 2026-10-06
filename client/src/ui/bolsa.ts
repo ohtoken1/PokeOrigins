@@ -3,7 +3,7 @@ import { evoluir, trocarGolpe } from '../../../shared/batalha/progresso';
 import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { CATEGORIAS, CABO_DE_LIGACAO, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { ehEquipavel, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
-import { pokemonPorId, pokemonsDaRegiao } from '../dados';
+import { pokemonPorId, todosOsPokemons } from '../dados';
 import { registrarCapturado, salvar, type Save } from '../estado';
 import { abrirJanela } from './janela';
 import { el } from './dom';
@@ -32,7 +32,8 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
   const fila: Extract<Modo, { tipo: 'esquecer' }>[] = [];
 
   const nome = (p: PokemonIndividual) => pokemonPorId(p.especieId).nome;
-  const existe = (numero: number) => pokemonsDaRegiao(save.regiao).some((d) => d.id === numero);
+  // evoluções de qualquer região carregada (ex.: Onix + Metal Coat → Steelix de Johto)
+  const existe = (numero: number) => todosOsPokemons().some((d) => d.id === numero);
   const gastar = (id: string) => {
     save.itens[id] = (save.itens[id] ?? 0) - 1;
     if (save.itens[id] <= 0) delete save.itens[id];

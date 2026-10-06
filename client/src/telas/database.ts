@@ -6,7 +6,8 @@ import { CATALOGO, CATEGORIAS, MOEDA } from '../../../shared/loja';
 import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
 import type { PokemonBase } from '../../../shared/tipos';
 import { ORDEM_TIERS, tierDoPokemon } from '../../../shared/tiers';
-import { pokemonsDaRegiao } from '../dados';
+import { todosOsPokemons } from '../dados';
+import { REGIOES } from '../../../shared/regioes';
 import { el, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { iconeItem } from '../ui/iconeItem';
 
@@ -125,7 +126,7 @@ const total = (p: PokemonBase) => ATRIBUTOS.reduce((s, [a]) => s + p.stats[a], 0
 const numero = (v: number | true) => (v === true ? '—' : v ? String(v) : '—');
 
 export const telaDatabase: Tela = (raiz, navegar) => {
-  const pokemons = pokemonsDaRegiao('kanto');
+  const pokemons = todosOsPokemons();
 
   // quais Pokémon do jogo têm cada habilidade
   const donos = new Map<string, PokemonBase[]>();
@@ -144,6 +145,11 @@ export const telaDatabase: Tela = (raiz, navegar) => {
       aoClicar: (p: PokemonBase) => navegar({ tela: 'pokedex', id: p.id }),
       filtros: [
         filtroTipos((p: PokemonBase) => p.tipos),
+        {
+          todos: 'Todas as regiões',
+          opcoes: REGIOES.filter((r) => r.disponivel).map((r) => [r.id, r.nome]),
+          valores: (p: PokemonBase) => [REGIOES.find((r) => p.id >= r.pokedex[0] && p.id <= r.pokedex[1])?.id ?? ''],
+        },
         { todos: 'Todas as tiers', opcoes: ORDEM_TIERS.map((t) => [t, t]), valores: (p: PokemonBase) => [tierDoPokemon(p.id)] },
       ],
       colunas: [

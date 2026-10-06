@@ -2,7 +2,7 @@
 // Pokémon e nível forçados. Provisório: sem login; os ajustes ficam só neste navegador.
 import { AJUSTES_PADRAO, CHANCE_SHINY, type AjustesEncontro } from '../../../shared/encontros';
 import { NIVEL_MAX_TREINADOR, nivelTreinador, xpTotalParaNivel } from '../../../shared/treinador';
-import { pokemonsDaRegiao } from '../dados';
+import { todosOsPokemons } from '../dados';
 import { carregarSave, salvar } from '../estado';
 import { el } from './dom';
 
@@ -81,7 +81,7 @@ function conteudo(): HTMLElement[] {
     'select',
     {},
     el('option', { value: '' }, '— sorteio normal —'),
-    ...pokemonsDaRegiao('kanto').map((p) => el('option', { value: p.id, selected: p.id === a.especie }, `#${p.id} ${p.nome}${p.lendario || p.mitico ? ' ★' : ''}`)),
+    ...todosOsPokemons().map((p) => el('option', { value: p.id, selected: p.id === a.especie }, `#${p.id} ${p.nome}${p.lendario || p.mitico ? ' ★' : ''}`)),
   ) as HTMLSelectElement;
   especie.addEventListener('change', () => mudar({ especie: especie.value ? Number(especie.value) : null }));
 

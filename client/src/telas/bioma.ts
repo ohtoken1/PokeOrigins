@@ -6,7 +6,7 @@ import { ajustarTabela, encontroForcado, faixaDosEncontros, montarTabela, probab
 import type { BiomaScene, OpcoesBioma } from '../jogo/BiomaScene';
 import { mostrarJogo } from '../jogo/jogoUnico';
 import { abrirBatalha } from '../batalha/telaBatalha';
-import { pokemonPorId, pokemonsDaRegiao } from '../dados';
+import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons } from '../dados';
 import { ajustesAdmin, aoMudarAdmin } from '../ui/admin';
 import { carregarSave, curarTime, novoPokemon, salvar } from '../estado';
 import { el, spritePokemon } from '../ui/dom';
@@ -21,7 +21,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   if (!save) return navegar({ tela: 'inicial' });
   const bioma = biomaPorId(biomaId);
   const regiao = regiaoPorId(save.regiao);
-  const tabelaNormal = montarTabela(bioma, pokemonsDaRegiao(regiao.id), regiao.iniciais);
+  const tabelaNormal = montarTabela(bioma, pokemonsDaRegiao(regiao.id), regiao.iniciais, todosOsPokemons());
   // tabela com os ajustes do painel de administrador (lendários mais/menos comuns…)
   let tabela = ajustarTabela(tabelaNormal, ajustesAdmin());
   const nivelDoTreinador = nivelTreinador(save.xpTreinador);

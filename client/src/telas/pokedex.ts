@@ -9,11 +9,10 @@ import maquinas from '../../../shared/data/maquinas.json';
 import { REGIOES } from '../../../shared/regioes';
 import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
 import type { PokemonBase } from '../../../shared/tipos';
-import { pokemonsDaRegiao } from '../dados';
+import { pokemonsDaRegiao, todosOsPokemons } from '../dados';
 import { carregarSave } from '../estado';
 import { el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 
-const REGIAO = 'kanto';
 
 const CRESCIMENTO: Record<string, string> = { fast: 'Rápido', medium: 'Médio', 'medium-slow': 'Médio-lento', slow: 'Lento' };
 const ATRIBUTOS: [keyof PokemonBase['stats'], string][] = [
@@ -27,12 +26,16 @@ const GRUPOS_OVO: Record<string, string> = {
 const CONDICOES: Record<string, string> = { 'during the day': 'de dia', 'at night': 'à noite' };
 
 /** Onde cada espécie aparece solta (bioma + faixa de nível). */
-function mapaDeEncontros(pokemons: PokemonBase[]): Map<number, { bioma: string; entrada: EntradaTabela }> {
-  const iniciais = REGIOES.find((r) => r.id === REGIAO)?.iniciais ?? [];
+function mapaDeEncontros(todos: PokemonBase[]): Map<number, { bioma: string; entrada: EntradaTabela }> {
   const mapa = new Map<number, { bioma: string; entrada: EntradaTabela }>();
-  for (const b of BIOMAS) for (const entrada of montarTabela(b, pokemons, iniciais)) mapa.set(entrada.pokemon.id, { bioma: b.nome, entrada });
+  for (const r of REGIOES.filter((x) => x.disponivel))
+    for (const b of BIOMAS)
+      for (const entrada of montarTabela(b, pokemonsDaRegiao(r.id), r.iniciais, todos)) mapa.set(entrada.pokemon.id, { bioma: `${r.nome} · ${b.nome}`, entrada });
   return mapa;
 }
+
+/** Região de origem pelo número da Pokédex nacional. */
+export const regiaoDoNumero = (numero: number) => REGIOES.find((r) => numero >= r.pokedex[0] && numero <= r.pokedex[1]);
 
 /** Como a espécie surge a partir da anterior (em português). */
 function comoEvolui(p: PokemonBase): string {
@@ -155,7 +158,7 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
   const onde = encontros.get(p.id);
   const textoOnde = onde
     ? `${onde.bioma} · Nv. ${p.lendario || p.mitico ? `${Math.max(NIVEL_LENDARIO, onde.entrada.nivelMin)}+` : `${onde.entrada.nivelMin}–${onde.entrada.nivelMax}`}${p.lendario || p.mitico ? ' (raro)' : ''}`
-    : REGIOES.find((r) => r.id === REGIAO)?.iniciais.includes(p.id)
+    : REGIOES.some((r) => r.iniciais.includes(p.id))
       ? 'Inicial (escolhido no começo do jogo)'
       : 'Não aparece solto: só evoluindo';
 
@@ -249,7 +252,7 @@ function pokebolinha(): HTMLElement {
 }
 
 export const telaPokedex = (inicial?: number): Tela => (raiz) => {
-  const todos = pokemonsDaRegiao(REGIAO);
+  const todos = todosOsPokemons();
   const encontros = mapaDeEncontros(todos);
   const save = carregarSave();
   const vistos = new Set(save?.vistos ?? []);
@@ -258,6 +261,10 @@ export const telaPokedex = (inicial?: number): Tela => (raiz) => {
   let selecionado = inicial ?? todos[0]?.id ?? 1;
   const busca = el('input', { type: 'search', placeholder: 'Buscar por nome ou número…', class: 'dex-busca' }) as HTMLInputElement;
   const tipos = [...new Set(todos.flatMap((p) => p.tipos))].sort((a, b) => nomeTipo(a[0].toUpperCase() + a.slice(1)).localeCompare(nomeTipo(b[0].toUpperCase() + b.slice(1))));
+  const filtroRegiao = el('select', { class: 'dex-filtro' },
+    el('option', { value: '' }, 'Todas as regiões'),
+    ...REGIOES.filter((r) => r.disponivel).map((r) => el('option', { value: r.id }, r.nome)),
+  ) as HTMLSelectElement;
   const filtroTipo = el('select', { class: 'dex-filtro' },
     el('option', { value: '' }, 'Todos os tipos'),
     ...tipos.map((t) => el('option', { value: t }, nomeTipo(t[0].toUpperCase() + t.slice(1)))),
@@ -276,7 +283,7 @@ export const telaPokedex = (inicial?: number): Tela => (raiz) => {
   const desenharLista = () => {
     const termo = busca.value.trim().toLowerCase();
     const filtrados = todos.filter(
-      (p) => (!termo || p.nome.toLowerCase().includes(termo) || String(p.id) === termo.replace('#', '')) && (!filtroTipo.value || p.tipos.includes(filtroTipo.value)),
+      (p) => (!termo || p.nome.toLowerCase().includes(termo) || String(p.id) === termo.replace('#', '')) && (!filtroTipo.value || p.tipos.includes(filtroTipo.value)) && (!filtroRegiao.value || regiaoDoNumero(p.id)?.id === filtroRegiao.value),
     );
     lista.replaceChildren(
       ...filtrados.map((p) =>
@@ -291,17 +298,18 @@ export const telaPokedex = (inicial?: number): Tela => (raiz) => {
   };
   busca.addEventListener('input', desenharLista);
   filtroTipo.addEventListener('change', desenharLista);
+  filtroRegiao.addEventListener('change', desenharLista);
   desenharLista();
   abrir(selecionado);
 
   raiz.append(
     el('main', { class: 'tela tela-pokedex' },
       el('header', { class: 'dex-cabecalho' },
-        el('h1', {}, 'Pokédex', el('small', {}, ' · Kanto')),
+        el('h1', {}, 'Pokédex', el('small', {}, ' · Nacional')),
         el('span', { class: 'meta' }, `${vistos.size} vistos · ${capturados.size} capturados · ${todos.length} no total`),
       ),
       el('div', { class: 'layout-pokedex' },
-        el('aside', { class: 'dex-coluna' }, busca, filtroTipo, lista),
+        el('aside', { class: 'dex-coluna' }, busca, el('div', { class: 'dex-filtros' }, filtroRegiao, filtroTipo), lista),
         painel,
       ),
     ),

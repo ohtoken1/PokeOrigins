@@ -90,3 +90,5 @@
 .db-mais { margin: 12px auto 0; display: block; }
 .db-filtro { flex: 0 0 180px; }
 .db-tier { font-weight: 700; font-size: 0.8rem; padding: 2px 8px; border-radius: 6px; background: var(--painel-2); border: 1px solid var(--borda); }
+
+.dex-filtros { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }

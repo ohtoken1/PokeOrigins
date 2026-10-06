@@ -79,11 +79,20 @@ export function biomaDoPokemon(p: PokemonBase): string | null {
 }
 
 /**
- * Formas que só se obtêm evoluindo por pedra, troca ou amizade (ex.: Raichu, Alakazam, Gengar):
+ * Forma anterior da espécie. Bebês criados em gerações seguintes (Pichu → Pikachu, Cleffa → Clefairy)
+ * não contam: Pikachu continua sendo forma inicial; já Crobat (de Golbat) conta.
+ */
+function anteriorDe(p: PokemonBase, porSlug: Map<string, PokemonBase>): PokemonBase | undefined {
+  const anterior = p.evoluiDe ? porSlug.get(p.evoluiDe) : undefined;
+  return anterior && anterior.id < p.id ? anterior : undefined;
+}
+
+/**
+ * Formas que só se obtêm evoluindo por pedra, troca ou amizade (ex.: Raichu, Alakazam, Gengar, Crobat):
  * não aparecem soltas nos mapas (pedido do dono).
  */
 function evoluiSemNivel(p: PokemonBase, porSlug: Map<string, PokemonBase>): boolean {
-  return !!(p.evoluiDe && porSlug.has(p.evoluiDe) && nivelDeEvolucao(p.id) === null);
+  return !!(anteriorDe(p, porSlug) && nivelDeEvolucao(p.id) === null);
 }
 
 /** Faixa de nível de cada forma, para a mesma linha evolutiva não aparecer repetida. */
@@ -94,7 +103,7 @@ function faixasDeNivel(pokemons: PokemonBase[]): Map<number, Faixa> {
     const salvo = minimos.get(p.id);
     if (salvo) return salvo;
     let min = 1;
-    const anterior = p.evoluiDe ? porSlug.get(p.evoluiDe) : undefined;
+    const anterior = anteriorDe(p, porSlug);
     if (anterior) {
       const minAnterior = nivelMin(anterior);
       min = Math.max(minAnterior + 1, nivelDeEvolucao(p.id) ?? minAnterior + 1);
@@ -107,17 +116,18 @@ function faixasDeNivel(pokemons: PokemonBase[]): Map<number, Faixa> {
   const faixas = new Map<number, Faixa>();
   for (const p of pokemons) {
     // evoluções que não aparecem no mapa não limitam a faixa (Kadabra vai até o 100, já que Alakazam não aparece)
-    const proximas = pokemons.filter((q) => q.evoluiDe === p.slug && !evoluiSemNivel(q, porSlug)).map(nivelMin);
+    const proximas = pokemons.filter((q) => anteriorDe(q, porSlug) === p && !evoluiSemNivel(q, porSlug)).map(nivelMin);
     const max = proximas.length ? Math.min(...proximas) - 1 : 100;
     faixas.set(p.id, [nivelMin(p), Math.max(nivelMin(p), max)]);
   }
   return faixas;
 }
 
-/** `pokemons` = todos da região (as faixas dependem de evoluções que podem morar em outro bioma). */
-export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: number[] = []): EntradaTabela[] {
-  const faixas = faixasDeNivel(pokemons);
-  const porSlug = new Map(pokemons.map((p) => [p.slug, p]));
+/** `pokemons` = os da região; `todos` = todas as regiões carregadas (as faixas dependem das evoluções). */
+export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: number[] = [], todos: PokemonBase[] = pokemons): EntradaTabela[] {
+  // evoluções podem ser de outra região (Golbat de Kanto → Crobat de Johto): faixas olham todos
+  const faixas = faixasDeNivel(todos);
+  const porSlug = new Map(todos.map((p) => [p.slug, p]));
   return pokemons
     .filter((p) => !excluir.includes(p.id) && !evoluiSemNivel(p, porSlug))
     .filter((p) => biomaDoPokemon(p) === bioma.id)

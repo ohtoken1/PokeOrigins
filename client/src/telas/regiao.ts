@@ -3,7 +3,7 @@ import { REGIOES, regiaoPorId } from '../../../shared/regioes';
 import { BIOMAS } from '../../../shared/biomas';
 import { faixaDosEncontros, montarTabela, probabilidades } from '../../../shared/encontros';
 import { progressoTreinador } from '../../../shared/treinador';
-import { pokemonsDaRegiao } from '../dados';
+import { pokemonsDaRegiao, todosOsPokemons } from '../dados';
 import { apagarSave, carregarSave, curarTime, salvar } from '../estado';
 import { icone } from '../ui/icones';
 import { botoesMenus } from '../ui/menus';
@@ -22,13 +22,24 @@ export const telaRegiao: Tela = (raiz, navegar) => {
   const abas = REGIOES.map((r) =>
     el(
       'button',
-      { class: `aba ${r.id === regiao.id ? 'ativa' : ''}`, disabled: !r.disponivel, title: r.disponivel ? '' : 'Em breve' },
+      {
+        class: `aba ${r.id === regiao.id ? 'ativa' : ''}`,
+        disabled: !r.disponivel,
+        title: r.disponivel ? '' : 'Em breve',
+        // trocar de região: o time vai junto, os biomas passam a ter os Pokémon da região escolhida
+        onclick: () => {
+          if (r.id === regiao.id) return;
+          save.regiao = r.id;
+          salvar(save);
+          navegar({ tela: 'regiao' });
+        },
+      },
       r.nome,
     ),
   );
 
   const cartoesBiomas = BIOMAS.map((bioma) => {
-    const tabela = montarTabela(bioma, pokemons, regiao.iniciais);
+    const tabela = montarTabela(bioma, pokemons, regiao.iniciais, todosOsPokemons());
     const faixa = faixaDosEncontros(bioma, treinador.nivel);
     const chances = probabilidades(tabela, faixa);
     const possiveis = tabela.filter((_, i) => chances[i] > 0);
@@ -58,7 +69,7 @@ export const telaRegiao: Tela = (raiz, navegar) => {
           'section',
           {},
           el('h1', {}, `Região de ${regiao.nome}`),
-          el('p', { class: 'sub' }, `Pokédex: ${save.vistos.length} de ${regiao.pokedex[1] - regiao.pokedex[0] + 1} vistos · ${save.passos} passos`),
+          el('p', { class: 'sub' }, `Pokédex: ${save.vistos.filter((n) => n >= regiao.pokedex[0] && n <= regiao.pokedex[1]).length} de ${regiao.pokedex[1] - regiao.pokedex[0] + 1} vistos · ${save.passos} passos`),
           el('div', { class: 'grade-biomas' }, cartoesBiomas),
         ),
         el(

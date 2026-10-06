@@ -10,7 +10,7 @@ export interface Regiao {
 
 export const REGIOES: Regiao[] = [
   { id: 'kanto', nome: 'Kanto', pokedex: [1, 151], iniciais: [1, 4, 7], disponivel: true },
-  { id: 'johto', nome: 'Johto', pokedex: [152, 251], iniciais: [152, 155, 158], disponivel: false },
+  { id: 'johto', nome: 'Johto', pokedex: [152, 251], iniciais: [152, 155, 158], disponivel: true },
   { id: 'hoenn', nome: 'Hoenn', pokedex: [252, 386], iniciais: [252, 255, 258], disponivel: false },
   { id: 'sinnoh', nome: 'Sinnoh', pokedex: [387, 493], iniciais: [387, 390, 393], disponivel: false },
   { id: 'unova', nome: 'Unova', pokedex: [494, 649], iniciais: [495, 498, 501], disponivel: false },
