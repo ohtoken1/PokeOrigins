@@ -57,7 +57,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - Regras de jogo (probabilidades, níveis, chance de shiny) ficam em `shared/` como constantes fáceis de ajustar.
 - Bioma = lista de tipos; cada Pokémon mora em UM bioma só: o do seu tipo principal (ex.: Gastly Fantasma/Veneno → Torre). Pedido do dono. Exceções por linha evolutiva em `BIOMA_FIXO` (`shared/encontros.ts`): Porygon → Torre, Zubat → Caverna, Grimer e Koffing → Vulcão, Dratini → Mar Profundo. Iniciais aparecem soltos normalmente (como qualquer outro).
 - `CHANCE_ENCONTRO_POR_PASSO = 1` (pedido do dono: todo passo tem Pokémon, não precisa ser no mato).
-- Peso no sorteio = taxa de captura oficial (mais fácil de capturar = mais comum). Evoluções aparecem com +10 níveis por estágio.
+- Sorteio por **linha evolutiva** (pedido do dono): sai a linha (peso = `PESO_BASE_LINHA` + taxa de captura da forma base × `PESO_POR_TAXA`, chances parecidas entre si), depois o nível dentro da faixa, e o nível decide a forma (Caterpie/Metapod/Butterfree dividem a mesma chance).
 - Windows/PowerShell: depois de instalar algo, o PATH pode precisar ser recarregado no shell.
 
 ## Nível de treinador (`shared/treinador.ts`)
@@ -68,7 +68,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 
 ## Faixas de nível das formas (`shared/encontros.ts`)
 - Cada forma só aparece na sua faixa (Charmander 1–15, Charmeleon 16–35, Charizard 36–100): nível de evolução do Showdown. Formas que evoluem por pedra/troca/amizade (Raichu, Alakazam, Gengar, Eeveelutions…) NÃO aparecem nos mapas (pedido do dono); a forma anterior vai até o 100. Lendários/míticos podem aparecer desde o treinador nível 1 (raros, peso `PESO_LENDARIO`), sempre no nível 50 ou mais.
-- O sorteio escolhe primeiro o nível (dentro da faixa) e depois um Pokémon cuja forma existe nesse nível.
+- O sorteio escolhe primeiro a linha evolutiva, depois o nível (dentro da faixa, onde a linha tem forma) e por fim a forma desse nível.
 
 ## Loja e itens (`shared/loja.ts`, `shared/usoItens.ts`, `client/src/ui/loja.ts`, `ui/bolsa.ts`)
 - Moeda: **silver** (`save.silver`). Provisório: todo item custa 1 (`PRECO_PADRAO`, ajustes em `PRECOS`), começa com 1000 e ganha 10 por vitória — o dono vai definir a economia.

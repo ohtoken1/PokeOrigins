@@ -9,7 +9,14 @@ import { FAIXA_NIVEIS_ENCONTRO, nivelMaximoEncontro } from './treinador';
 export const CHANCE_SHINY = 1 / 512;
 /** Chance de aparecer um Pokémon a cada passo (1 = todo passo). */
 export const CHANCE_ENCONTRO_POR_PASSO = 1;
-/** Peso fixo de lendários e míticos no sorteio (um comum tem ~45 a 255): ~0,1% num bioma. */
+/**
+ * Peso de cada LINHA EVOLUTIVA no sorteio (pedido do dono: chances parecidas entre si, a raridade original
+ * pesa pouco). Peso = PESO_BASE_LINHA + taxa de captura da forma base × PESO_POR_TAXA
+ * (taxa 3 → ~101, taxa 255 → ~178: o mais comum sai no máximo ~1,8× mais que o mais raro).
+ */
+export const PESO_BASE_LINHA = 100;
+export const PESO_POR_TAXA = 0.3;
+/** Peso fixo de lendários e míticos no sorteio (uma linha comum tem ~100 a 180). */
 export const PESO_LENDARIO = 1;
 /** Lendários e míticos aparecem desde o começo, mas nunca abaixo deste nível. */
 export const NIVEL_LENDARIO = 50;
@@ -43,8 +50,10 @@ export const AJUSTES_PADRAO: AjustesEncontro = {
 
 export interface EntradaTabela {
   pokemon: PokemonBase;
-  /** Peso no sorteio; quanto maior, mais comum. Usa a taxa de captura oficial. */
+  /** Peso da LINHA evolutiva no sorteio (igual para todas as formas da linha); quanto maior, mais comum. */
   peso: number;
+  /** Número da forma base da linha (Caterpie, Metapod e Butterfree → 10): a linha divide a chance. */
+  linha: number;
   /** Faixa de nível em que esta forma aparece (ex.: Charmander 1–15, Charmeleon 16–35, Charizard 36–100). */
   nivelMin: number;
   nivelMax: number;
@@ -82,6 +91,13 @@ export function biomaDoPokemon(p: PokemonBase): string | null {
  * Forma anterior da espécie. Bebês criados em gerações seguintes (Pichu → Pikachu, Cleffa → Clefairy)
  * não contam: Pikachu continua sendo forma inicial; já Crobat (de Golbat) conta.
  */
+/** Forma base da linha evolutiva (Butterfree → Caterpie). */
+function baseDaLinha(p: PokemonBase, porSlug: Map<string, PokemonBase>): PokemonBase {
+  let atual = p;
+  for (let anterior = anteriorDe(atual, porSlug); anterior; anterior = anteriorDe(atual, porSlug)) atual = anterior;
+  return atual;
+}
+
 function anteriorDe(p: PokemonBase, porSlug: Map<string, PokemonBase>): PokemonBase | undefined {
   const anterior = p.evoluiDe ? porSlug.get(p.evoluiDe) : undefined;
   return anterior && anterior.id < p.id ? anterior : undefined;
@@ -133,7 +149,9 @@ export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: num
     .filter((p) => biomaDoPokemon(p) === bioma.id)
     .map((p) => {
       const [nivelMin, nivelMax] = faixas.get(p.id)!;
-      return { pokemon: p, peso: p.lendario || p.mitico ? PESO_LENDARIO : Math.max(1, p.taxaCaptura), nivelMin, nivelMax };
+      const base = baseDaLinha(p, porSlug);
+      const peso = p.lendario || p.mitico ? PESO_LENDARIO : PESO_BASE_LINHA + base.taxaCaptura * PESO_POR_TAXA;
+      return { pokemon: p, peso, linha: base.id, nivelMin, nivelMax };
     });
 }
 
@@ -166,41 +184,70 @@ export function encontroForcado(pokemon: PokemonBase, [min, max]: Faixa, ajustes
 
 const cabe = (e: EntradaTabela, nivel: number) => nivel >= e.nivelMin && nivel <= e.nivelMax;
 
-/** Probabilidade (0 a 1) de cada entrada sair na faixa de nível, na mesma ordem da tabela. */
-export function probabilidades(tabela: EntradaTabela[], [min, max]: Faixa): number[] {
-  const chances = tabela.map(() => 0);
-  for (let nivel = min; nivel <= max; nivel++) {
-    const total = tabela.reduce((soma, e) => soma + (cabe(e, nivel) ? e.peso : 0), 0);
-    if (!total) continue;
-    tabela.forEach((e, i) => {
-      if (cabe(e, nivel)) chances[i] += e.peso / total / (max - min + 1);
-    });
-  }
-  return chances;
+interface Linha {
+  peso: number;
+  formas: EntradaTabela[];
+  /** níveis da faixa em que alguma forma da linha existe */
+  niveis: number[];
 }
 
-/** Sorteia o nível dentro da faixa e depois um Pokémon cuja forma existe nesse nível. */
+/** Agrupa a tabela por linha evolutiva, só com as linhas que têm alguma forma na faixa. */
+function linhasNaFaixa(tabela: EntradaTabela[], [min, max]: Faixa): Linha[] {
+  const grupos = new Map<number, EntradaTabela[]>();
+  for (const e of tabela) grupos.set(e.linha, [...(grupos.get(e.linha) ?? []), e]);
+  const linhas: Linha[] = [];
+  for (const formas of grupos.values()) {
+    const niveis: number[] = [];
+    for (let n = min; n <= max; n++) if (formas.some((e) => cabe(e, n))) niveis.push(n);
+    if (niveis.length) linhas.push({ peso: Math.max(...formas.map((e) => e.peso)), formas, niveis });
+  }
+  return linhas;
+}
+
+/**
+ * Probabilidade (0 a 1) de cada entrada sair na faixa de nível, na mesma ordem da tabela.
+ * Primeiro sai a linha (pelo peso), depois o nível (dentro da faixa), e o nível decide a forma.
+ */
+export function probabilidades(tabela: EntradaTabela[], faixa: Faixa): number[] {
+  const chances = new Map<EntradaTabela, number>();
+  const linhas = linhasNaFaixa(tabela, faixa);
+  const total = linhas.reduce((soma, l) => soma + l.peso, 0);
+  for (const l of linhas)
+    for (const n of l.niveis) {
+      const formas = l.formas.filter((e) => cabe(e, n));
+      for (const e of formas) chances.set(e, (chances.get(e) ?? 0) + l.peso / total / l.niveis.length / formas.length);
+    }
+  return tabela.map((e) => chances.get(e) ?? 0);
+}
+
+function sortearPorPeso<T extends { peso: number }>(itens: T[], aleatorio: () => number): T {
+  let sorteio = aleatorio() * itens.reduce((soma, i) => soma + i.peso, 0);
+  for (const item of itens) {
+    sorteio -= item.peso;
+    if (sorteio < 0) return item;
+  }
+  return itens[itens.length - 1];
+}
+
+/** Sorteia a linha evolutiva (pelo peso), depois o nível dentro da faixa, e o nível decide a forma (Caterpie/Metapod/Butterfree). */
 export function sortearEncontro(tabela: EntradaTabela[], [min, max]: Faixa, aleatorio = Math.random, ajustes = AJUSTES_PADRAO): Encontro {
   if (ajustes.nivel !== null) min = max = ajustes.nivel;
-  let nivel = min + Math.floor(aleatorio() * (max - min + 1));
-  let candidatos = tabela.filter((e) => cabe(e, nivel));
-  if (!candidatos.length) {
-    // nenhum Pokémon do bioma nesse nível: usa os de faixa mais próxima
-    const distancia = (e: EntradaTabela) => (nivel < e.nivelMin ? e.nivelMin - nivel : nivel - e.nivelMax);
+  const linhas = linhasNaFaixa(tabela, [min, max]);
+  let escolhido: EntradaTabela;
+  let nivel: number;
+  if (linhas.length) {
+    const linha = sortearPorPeso(linhas, aleatorio);
+    nivel = linha.niveis[Math.floor(aleatorio() * linha.niveis.length)];
+    const formas = linha.formas.filter((e) => cabe(e, nivel));
+    escolhido = formas[Math.floor(aleatorio() * formas.length)];
+  } else {
+    // nenhum Pokémon do bioma nessa faixa: usa os de faixa mais próxima
+    nivel = min + Math.floor(aleatorio() * (max - min + 1));
+    const distancia = (e: EntradaTabela) => (nivel < e.nivelMin ? e.nivelMin - nivel : nivel > e.nivelMax ? nivel - e.nivelMax : 0);
     const menor = Math.min(...tabela.map(distancia));
-    candidatos = tabela.filter((e) => distancia(e) === menor);
+    escolhido = sortearPorPeso(tabela.filter((e) => distancia(e) === menor), aleatorio);
+    nivel = Math.max(escolhido.nivelMin, Math.min(escolhido.nivelMax, nivel));
   }
-  const total = candidatos.reduce((soma, e) => soma + e.peso, 0);
-  let sorteio = aleatorio() * total;
-  let escolhido = candidatos[candidatos.length - 1];
-  for (const entrada of candidatos) {
-    sorteio -= entrada.peso;
-    if (sorteio < 0) {
-      escolhido = entrada;
-      break;
-    }
-  }
-  nivel = Math.max(escolhido.nivelMin, Math.min(escolhido.nivelMax, nivel));
   if (ajustes.nivel !== null) nivel = ajustes.nivel;
   else if (ehLendario(escolhido.pokemon)) nivel = Math.max(NIVEL_LENDARIO, nivel);
   return { pokemon: escolhido.pokemon, nivel, shiny: aleatorio() < ajustes.chanceShiny };
