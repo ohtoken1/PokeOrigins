@@ -24,13 +24,10 @@ export interface Paleta {
 
 const ARVORES_VERDES: [number, number][] = [[48, 0], [44, 0], [50, 0], [46, 0]];
 const PINHEIROS_AZULADOS: [number, number][] = [[44, 4], [46, 4]];
-const ARVORES_AMARELAS: [number, number][] = [[48, 4], [50, 4]];
-const ARVORES_NEVE: [number, number][] = [[44, 8], [48, 8], [46, 8], [50, 8]];
 const ROCHA_MARROM: [number, number][] = [[42, 2]];
 const ROCHA_CINZA: [number, number][] = [[42, 6]];
 const PEDRINHAS_MARRONS: [number, number][] = [[40, 0], [41, 0], [40, 1], [41, 1]];
 const PEDRINHAS_CINZAS: [number, number][] = [[40, 4], [41, 4], [40, 5], [41, 5]];
-const PEDRINHAS_NEVE: [number, number][] = [[40, 8], [41, 8], [40, 9], [41, 9]];
 
 export const PALETAS: Record<string, Paleta> = {
   grama: {
@@ -73,25 +70,6 @@ export const PALETAS: Record<string, Paleta> = {
     filtroObjetos: 'none',
     filtroLiquido: 'saturate(0.4) brightness(0.45)',
   },
-  pantano: {
-    obstaculo: 'arvore',
-    arvores: ARVORES_AMARELAS,
-    pedrinhas: PEDRINHAS_MARRONS,
-    copa: ['#1e1a14', '#3a3424', '#55503a', '#77724e'],
-    lagos: 5,
-    filtro: 'hue-rotate(35deg) saturate(0.55) brightness(0.75)',
-    filtroObjetos: 'saturate(0.6) brightness(0.75)',
-    filtroLiquido: 'hue-rotate(60deg) saturate(1.3) brightness(0.8)',
-  },
-  usina: {
-    obstaculo: 'caixa',
-    pedrinhas: PEDRINHAS_CINZAS,
-    copa: ['#2a2a30', '#4a4a54', '#6a6a78', '#9a9aa8'],
-    lagos: 2,
-    filtro: 'grayscale(0.85) brightness(1.05)',
-    filtroObjetos: 'none',
-    filtroLiquido: 'saturate(0.6)',
-  },
   torre: {
     obstaculo: 'lapide',
     pedrinhas: PEDRINHAS_CINZAS,
@@ -100,25 +78,5 @@ export const PALETAS: Record<string, Paleta> = {
     filtro: 'hue-rotate(115deg) saturate(0.75) brightness(0.62)',
     filtroObjetos: 'hue-rotate(200deg) saturate(0.5) brightness(0.7)',
     filtroLiquido: 'hue-rotate(40deg) saturate(0.7) brightness(0.35)',
-  },
-  gelo: {
-    obstaculo: 'arvore',
-    arvores: ARVORES_NEVE,
-    pedrinhas: PEDRINHAS_NEVE,
-    copa: ['#1a3a3a', '#2a5a54', '#3a7a6c', '#e8f4f8'],
-    lagos: 3,
-    filtro: 'grayscale(1) brightness(1.6) sepia(0.25) hue-rotate(175deg) saturate(1.5)',
-    filtroObjetos: 'none',
-    filtroLiquido: 'brightness(1.15) saturate(0.8)',
-  },
-  santuario: {
-    obstaculo: 'arvore',
-    arvores: ARVORES_VERDES,
-    pedrinhas: PEDRINHAS_CINZAS,
-    copa: ['#5a2a4a', '#a04a7a', '#d870a8', '#ffb0d8'],
-    lagos: 2,
-    filtro: 'hue-rotate(170deg) saturate(0.65) brightness(1.2)',
-    filtroObjetos: 'hue-rotate(200deg) saturate(0.8) brightness(1.1)',
-    filtroLiquido: 'none',
   },
 };
