@@ -130,8 +130,13 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     fecharEncontro = undefined;
   };
 
+  // aviso enquanto o mapa é gerado e desenhado (antes ficava só um quadro preto)
+  const carregando = el('div', { class: 'carregando-mapa' }, el('span', { class: 'giro' }), 'Carregando mapa…');
+  areaJogo.append(carregando);
+
   cena = new BiomaScene({
     bioma,
+    aoPronto: () => carregando.remove(),
     seguidor: save.time[0] ? { especie: save.time[0].especieId, shiny: save.time[0].shiny } : null,
     aoPisar: () => {
       // andar com um encontro aberto = fugir dele
@@ -183,7 +188,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     width: LARGURA_TELA,
     height: ALTURA_TELA,
     pixelArt: true,
-    backgroundColor: '#000000',
+    backgroundColor: '#15263c',
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_HORIZONTALLY },
     scene: cena,
   });
@@ -209,6 +214,11 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     pararDeOuvirAdmin();
     pararDeOuvirJanelas();
     fugirDoEncontro();
+    // libera o contexto gráfico (WebGL) na hora: o navegador só aguenta alguns abertos e,
+    // trocando muito de bioma, os antigos acumulavam e a tela ficava preta/travada
+    const gl = (jogo.renderer as Phaser.Renderer.WebGL.WebGLRenderer | null)?.gl;
     jogo.destroy(true);
+    // (o Phaser termina de destruir no próximo quadro; depois disso o contexto pode ser descartado)
+    setTimeout(() => gl?.getExtension('WEBGL_lose_context')?.loseContext(), 300);
   };
 };

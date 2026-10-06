@@ -50,6 +50,8 @@ export interface OpcoesBioma {
   bioma: Bioma;
   /** Primeiro Pokémon do time, que anda atrás do jogador. */
   seguidor: Seguidor | null;
+  /** Chamado quando o mapa terminou de ser montado. */
+  aoPronto?(): void;
   /** Chamado ao terminar cada passo. */
   aoPisar(): void;
 }
@@ -120,6 +122,7 @@ export class BiomaScene extends Phaser.Scene {
     this.atualizarProfundidade();
     this.carregarSeguidor();
     if (paleta.submerso) this.efeitosSubmersos();
+    this.opcoes.aoPronto?.();
 
     const camera = this.cameras.main;
     camera.setZoom(ZOOM).setBounds(0, 0, LARGURA * TAM, ALTURA * TAM).setRoundPixels(true);
@@ -159,8 +162,7 @@ export class BiomaScene extends Phaser.Scene {
     this.add
       .particles(0, 0, 'bolha', {
         // só em volta do que a câmera mostra (antes nasciam bolhas no mapa inteiro)
-        x: { min: -260, max: 260 },
-        y: { min: -170, max: 170 },
+        emitZone: { type: 'random', source: new Phaser.Geom.Rectangle(-260, -170, 520, 340), quantity: 1 },
         speedY: { min: -14, max: -28 },
         speedX: { min: -4, max: 4 },
         scale: { min: 0.35, max: 0.8 },

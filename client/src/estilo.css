@@ -528,3 +528,10 @@ button.vaga:hover { border-color: var(--borda); }
 
 .ficha-coluna-sprite { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
 .botao-pokedex { padding: 6px 10px; font-size: 0.8rem; }
+
+.carregando-mapa {
+  position: absolute; inset: 0; z-index: 3; display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: var(--fundo); color: var(--texto-2); font-weight: 600; line-height: normal;
+}
+.carregando-mapa .giro { width: 18px; height: 18px; border-radius: 50%; border: 3px solid var(--borda); border-top-color: var(--destaque); animation: girar 0.8s linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
