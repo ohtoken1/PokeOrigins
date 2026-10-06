@@ -63,5 +63,5 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - Treinador 35+: controle no canto do mapa escolhe o nível dos encontros (±2, até o máximo natural); `save.nivelEncontro` (null = auto).
 
 ## Faixas de nível das formas (`shared/encontros.ts`)
-- Cada forma só aparece na sua faixa (Charmander 1–15, Charmeleon 16–35, Charizard 36–100): nível de evolução do Showdown; evolução sem nível (pedra/troca) = forma anterior + 20. Lendários/míticos só a partir do 50.
+- Cada forma só aparece na sua faixa (Charmander 1–15, Charmeleon 16–35, Charizard 36–100): nível de evolução do Showdown. Formas que evoluem por pedra/troca/amizade (Raichu, Alakazam, Gengar, Eeveelutions…) NÃO aparecem nos mapas (pedido do dono); a forma anterior vai até o 100. Lendários/míticos só a partir do 50.
 - O sorteio escolhe primeiro o nível (dentro da faixa) e depois um Pokémon cuja forma existe nesse nível.

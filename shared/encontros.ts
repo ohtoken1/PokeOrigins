@@ -13,8 +13,6 @@ export const CHANCE_ENCONTRO_POR_PASSO = 1;
 export const PESO_LENDARIO = 1;
 /** Lendários e míticos só aparecem em encontros deste nível para cima. */
 export const NIVEL_LENDARIO = 50;
-/** Evoluções sem nível (pedra, troca, amizade) aparecem este tanto de níveis depois da forma anterior. */
-export const NIVEIS_EVOLUCAO_SEM_NIVEL = 20;
 /** Quando o jogador escolhe o nível dos encontros, eles variam este tanto para cima/baixo. */
 export const VARIACAO_NIVEL_ESCOLHIDO = 2;
 
@@ -47,6 +45,14 @@ export function biomaDoPokemon(p: PokemonBase): string | null {
   return null;
 }
 
+/**
+ * Formas que só se obtêm evoluindo por pedra, troca ou amizade (ex.: Raichu, Alakazam, Gengar):
+ * não aparecem soltas nos mapas (pedido do dono).
+ */
+function evoluiSemNivel(p: PokemonBase, porSlug: Map<string, PokemonBase>): boolean {
+  return !!(p.evoluiDe && porSlug.has(p.evoluiDe) && nivelDeEvolucao(p.id) === null);
+}
+
 /** Faixa de nível de cada forma, para a mesma linha evolutiva não aparecer repetida. */
 function faixasDeNivel(pokemons: PokemonBase[]): Map<number, Faixa> {
   const porSlug = new Map(pokemons.map((p) => [p.slug, p]));
@@ -58,7 +64,7 @@ function faixasDeNivel(pokemons: PokemonBase[]): Map<number, Faixa> {
     const anterior = p.evoluiDe ? porSlug.get(p.evoluiDe) : undefined;
     if (anterior) {
       const minAnterior = nivelMin(anterior);
-      min = Math.max(minAnterior + 1, nivelDeEvolucao(p.id) ?? minAnterior + NIVEIS_EVOLUCAO_SEM_NIVEL);
+      min = Math.max(minAnterior + 1, nivelDeEvolucao(p.id) ?? minAnterior + 1);
     }
     if (p.lendario || p.mitico) min = Math.max(min, NIVEL_LENDARIO);
     min = Math.min(100, min);
@@ -68,7 +74,8 @@ function faixasDeNivel(pokemons: PokemonBase[]): Map<number, Faixa> {
 
   const faixas = new Map<number, Faixa>();
   for (const p of pokemons) {
-    const proximas = pokemons.filter((q) => q.evoluiDe === p.slug).map(nivelMin);
+    // evoluções que não aparecem no mapa não limitam a faixa (Kadabra vai até o 100, já que Alakazam não aparece)
+    const proximas = pokemons.filter((q) => q.evoluiDe === p.slug && !evoluiSemNivel(q, porSlug)).map(nivelMin);
     const max = proximas.length ? Math.min(...proximas) - 1 : 100;
     faixas.set(p.id, [nivelMin(p), Math.max(nivelMin(p), max)]);
   }
@@ -78,8 +85,9 @@ function faixasDeNivel(pokemons: PokemonBase[]): Map<number, Faixa> {
 /** `pokemons` = todos da região (as faixas dependem de evoluções que podem morar em outro bioma). */
 export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: number[] = []): EntradaTabela[] {
   const faixas = faixasDeNivel(pokemons);
+  const porSlug = new Map(pokemons.map((p) => [p.slug, p]));
   return pokemons
-    .filter((p) => !excluir.includes(p.id))
+    .filter((p) => !excluir.includes(p.id) && !evoluiSemNivel(p, porSlug))
     .filter((p) => biomaDoPokemon(p) === bioma.id)
     .map((p) => {
       const [nivelMin, nivelMax] = faixas.get(p.id)!;
