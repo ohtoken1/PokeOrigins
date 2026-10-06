@@ -226,3 +226,9 @@ export function curar(p: PokemonIndividual): void {
 export function nomeGolpe(id: string): string {
   return Dex.moves.get(id).name;
 }
+
+/** Nível em que a espécie surge evoluindo por nível (Charmeleon = 16), ou null se evolui de outro jeito. */
+export function nivelDeEvolucao(numero: number): number | null {
+  const s = especie(numero);
+  return !s.evoType && !s.evoCondition && !s.evoItem && s.evoLevel ? s.evoLevel : null;
+}

@@ -2,8 +2,8 @@ import Phaser from 'phaser';
 import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
 import { regiaoPorId } from '../../../shared/regioes';
-import { nivelTreinador } from '../../../shared/treinador';
-import { CHANCE_ENCONTRO_POR_PASSO, montarTabela, probabilidades, sortearEncontro } from '../../../shared/encontros';
+import { NIVEL_ESCOLHER_ENCONTRO, nivelTreinador } from '../../../shared/treinador';
+import { CHANCE_ENCONTRO_POR_PASSO, faixaDosEncontros, montarTabela, probabilidades, sortearEncontro } from '../../../shared/encontros';
 import { ALTURA_TELA, BiomaScene, LARGURA_TELA } from '../jogo/BiomaScene';
 import { abrirBatalha } from '../batalha/telaBatalha';
 import { pokemonsDaRegiao } from '../dados';
@@ -20,7 +20,10 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   const bioma = biomaPorId(biomaId);
   const regiao = regiaoPorId(save.regiao);
   const tabela = montarTabela(bioma, pokemonsDaRegiao(regiao.id), regiao.iniciais);
-  const chances = probabilidades(tabela);
+  const nivelDoTreinador = nivelTreinador(save.xpTreinador);
+  const podeEscolherNivel = nivelDoTreinador >= NIVEL_ESCOLHER_ENCONTRO;
+  const faixaNatural = faixaDosEncontros(bioma, nivelDoTreinador);
+  const faixaAtual = () => faixaDosEncontros(bioma, nivelDoTreinador, podeEscolherNivel ? save.nivelEncontro : null);
 
   const contador = el('span', { class: 'meta' }, '');
   const atualizarContador = () =>
@@ -36,11 +39,14 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   };
   atualizarTime();
 
-  const listaChances = el(
-    'ol',
-    { class: 'lista-chances' },
-    tabela
+  // só os Pokémon que podem aparecer na faixa de nível atual
+  const listaChances = el('ol', { class: 'lista-chances' });
+  const atualizarChances = () => {
+    const chances = probabilidades(tabela, faixaAtual());
+    listaChances.replaceChildren(
+      ...tabela
       .map((entrada, i) => ({ entrada, chance: chances[i] }))
+      .filter(({ chance }) => chance > 0)
       .sort((a, b) => b.chance - a.chance)
       .map(({ entrada, chance }) =>
         el(
@@ -51,9 +57,38 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
           el('small', {}, `${(chance * 100).toFixed(1)}%`),
         ),
       ),
-  );
+    );
+  };
+  atualizarChances();
+
+  const tituloChances = el('h2', {}, '');
+  const atualizarTitulo = () => {
+    const [min, max] = faixaAtual();
+    tituloChances.textContent = `Pokémon deste bioma · Nv. ${min}–${max}`;
+  };
+  atualizarTitulo();
 
   const areaJogo = el('div', { class: 'area-jogo' });
+  // a partir do nível 35 de treinador: escolher o nível dos encontros (canto do mapa)
+  if (podeEscolherNivel) {
+    const valor = el('strong', {}, '');
+    const deslizante = el('input', { type: 'range', min: 1, max: faixaNatural[1], value: save.nivelEncontro ?? faixaNatural[1] });
+    const auto = el('input', { type: 'checkbox', checked: save.nivelEncontro === null });
+    const aplicar = () => {
+      save.nivelEncontro = auto.checked ? null : Number(deslizante.value);
+      deslizante.disabled = auto.checked;
+      valor.textContent = auto.checked ? 'Auto' : `Nv. ${deslizante.value}`;
+      salvar(save);
+      atualizarChances();
+      atualizarTitulo();
+    };
+    deslizante.addEventListener('input', aplicar);
+    auto.addEventListener('change', aplicar);
+    // não deixar as setas do teclado mexerem no controle em vez de andar
+    deslizante.addEventListener('keydown', (e) => e.preventDefault());
+    areaJogo.append(el('div', { class: 'nivel-encontros' }, el('span', {}, 'Encontros: ', valor), deslizante, el('label', {}, auto, ' Auto')));
+    aplicar();
+  }
   raiz.append(
     el(
       'main',
@@ -81,7 +116,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         'div',
         { class: 'layout-bioma' },
         el('section', {}, areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. A cada passo aparece um Pokémon: Enter para lutar, ou continue andando para fugir.')),
-        el('aside', {}, caixaTime, el('h2', {}, 'Pokémon deste bioma'), listaChances),
+        el('aside', {}, caixaTime, tituloChances, listaChances),
       ),
     ),
   );
@@ -105,7 +140,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         return;
       }
 
-      const encontro = sortearEncontro(tabela, bioma, nivelTreinador(save.xpTreinador));
+      const encontro = sortearEncontro(tabela, faixaAtual());
       if (!save.vistos.includes(encontro.pokemon.id)) save.vistos.push(encontro.pokemon.id);
       salvar(save);
       atualizarContador();

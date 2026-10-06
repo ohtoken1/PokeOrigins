@@ -57,7 +57,11 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - Windows/PowerShell: depois de instalar algo, o PATH pode precisar ser recarregado no shell.
 
 ## Nível de treinador (`shared/treinador.ts`)
-- Níveis 1–100, separado do nível dos Pokémon. Ganha o MESMO XP que o Pokémon em campo ganha ao derrotar/capturar (pedido do dono). Derrota/fuga não dá XP.
-- Curva lenta de propósito (futuro: recompensas por nível): subir do nível n pede `100 × n^1,9` XP; total até o 100 ≈ 21,4 milhões.
-- Selvagens ganham `floor((nível − 1) × 0,8)` níveis (no 100: +79); lendários ficam no mínimo no 50.
-- Save: `xpTreinador` (o nível é calculado). Aparece no menu da região (barra de XP) e na barra do bioma.
+- Níveis 1–50, separado do nível dos Pokémon. Ganha o MESMO XP que o Pokémon em campo ganha ao derrotar/capturar (pedido do dono). Derrota/fuga não dá XP.
+- Curva: subir do nível n pede `100 × n^1,9` XP (total até o 50 ≈ 2,83 milhões; estimativa ≈ 1.150 vitórias).
+- Selvagens: faixa do bioma + `floor((nível − 1) × 1,9)`, até 100 (no 50: Campos Verdes 95–100).
+- Treinador 35+: controle no canto do mapa escolhe o nível dos encontros (±2, até o máximo natural); `save.nivelEncontro` (null = auto).
+
+## Faixas de nível das formas (`shared/encontros.ts`)
+- Cada forma só aparece na sua faixa (Charmander 1–15, Charmeleon 16–35, Charizard 36–100): nível de evolução do Showdown; evolução sem nível (pedra/troca) = forma anterior + 20. Lendários/míticos só a partir do 50.
+- O sorteio escolhe primeiro o nível (dentro da faixa) e depois um Pokémon cuja forma existe nesse nível.

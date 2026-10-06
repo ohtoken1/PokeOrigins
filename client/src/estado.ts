@@ -14,6 +14,8 @@ export interface Save {
   passos: number;
   /** XP total do treinador (o nível sai de shared/treinador.ts). */
   xpTreinador: number;
+  /** Nível escolhido para os encontros (treinador 35+); null = automático. */
+  nivelEncontro: number | null;
   vistos: number[];
 }
 
@@ -32,6 +34,7 @@ export function novoSave(regiao: string, inicial: number): Save {
     itens: { ...ITENS_INICIAIS },
     passos: 0,
     xpTreinador: 0,
+    nivelEncontro: null,
     vistos: [inicial],
   };
 }
@@ -61,6 +64,7 @@ function normalizar(save: Save): Save {
   }
   save.itens = itens;
   save.xpTreinador ??= 0;
+  save.nivelEncontro ??= null;
   return save;
 }
 

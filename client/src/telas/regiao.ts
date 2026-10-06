@@ -1,8 +1,8 @@
 import type { Tela } from '../main';
 import { REGIOES, regiaoPorId } from '../../../shared/regioes';
 import { BIOMAS } from '../../../shared/biomas';
-import { montarTabela } from '../../../shared/encontros';
-import { bonusNivelSelvagem, progressoTreinador } from '../../../shared/treinador';
+import { faixaDosEncontros, montarTabela, probabilidades } from '../../../shared/encontros';
+import { progressoTreinador } from '../../../shared/treinador';
 import { pokemonsDaRegiao } from '../dados';
 import { apagarSave, carregarSave, curarTime } from '../estado';
 import { botoesMenus } from '../ui/menus';
@@ -18,7 +18,6 @@ export const telaRegiao: Tela = (raiz, navegar) => {
   const regiao = regiaoPorId(save.regiao);
   const pokemons = pokemonsDaRegiao(regiao.id);
   const treinador = progressoTreinador(save.xpTreinador);
-  const bonus = bonusNivelSelvagem(treinador.nivel);
 
   const abas = REGIOES.map((r) =>
     el(
@@ -30,7 +29,10 @@ export const telaRegiao: Tela = (raiz, navegar) => {
 
   const cartoesBiomas = BIOMAS.map((bioma) => {
     const tabela = montarTabela(bioma, pokemons, regiao.iniciais);
-    const destaques = [...tabela].sort((a, b) => b.peso - a.peso).slice(0, 4);
+    const faixa = faixaDosEncontros(bioma, treinador.nivel);
+    const chances = probabilidades(tabela, faixa);
+    const possiveis = tabela.filter((_, i) => chances[i] > 0);
+    const destaques = [...possiveis].sort((a, b) => b.peso - a.peso).slice(0, 4);
     return el(
       'button',
       {
@@ -40,7 +42,7 @@ export const telaRegiao: Tela = (raiz, navegar) => {
       },
       el('div', { class: 'faixa' }, destaques.map((e) => spritePokemon(e.pokemon, { animado: false }))),      el('strong', {}, bioma.nome),
       el('span', { class: 'desc' }, bioma.descricao),
-      el('span', { class: 'meta' }, `${tabela.length} espécies · Nv. ${bioma.nivel[0] + bonus}–${bioma.nivel[1] + bonus}+`),
+      el('span', { class: 'meta' }, `${possiveis.length} espécies agora · Nv. ${faixa[0]}–${faixa[1]}`),
     );
   });
 
