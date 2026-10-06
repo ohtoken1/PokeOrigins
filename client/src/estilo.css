@@ -440,6 +440,7 @@ button.vaga:hover { border-color: var(--borda); }
   background: rgb(16 30 50 / 0.95); border: 1px solid var(--borda); box-shadow: 0 8px 20px rgb(0 0 0 / 0.4);
   display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; color: var(--texto); line-height: 1.3;
 }
+.resumo-pokemon[hidden] { display: none; }
 .resumo-pokemon.selvagem { top: 64px; right: calc(12% + 210px); }
 .resumo-pokemon.jogador { bottom: 24px; left: calc(8% + 250px); }
 .resumo-pokemon .tipos { justify-content: flex-start; margin-bottom: 2px; }

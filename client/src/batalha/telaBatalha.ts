@@ -1,6 +1,6 @@
 import type { Bioma } from '../../../shared/biomas';
 import { BatalhaSelvagem, type EventoBatalha, type Lado } from '../../../shared/batalha/motor';
-import { atributos, curar, expGanha, expParaNivel, faixaVelocidade, ganharEvs, hpMaximo, nomeGolpe, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { atributos, curar, especie, expGanha, expParaNivel, faixaVelocidade, ganharEvs, hpMaximo, nomeGolpe, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { Dex } from '@pkmn/sim';
 import { evoluir, ganharExperiencia, trocarGolpe, type ResultadoProgresso } from '../../../shared/batalha/progresso';
 import { pokemonPorId } from '../dados';
@@ -71,7 +71,7 @@ function caixaInfo(doJogador: boolean) {
 const NOMES_ATRIBUTOS: Record<string, string> = { atk: 'Attack', def: 'Defense', spa: 'Sp. Atk', spd: 'Sp. Def', spe: 'Speed' };
 
 /** Linhas do resumo do Pokémon (mouse em cima dele na batalha). */
-function resumoPokemon(p: PokemonIndividual, doJogador: boolean): HTMLElement[] {
+function resumoPokemon(p: PokemonIndividual, doJogador: boolean, abilityConhecida: boolean): HTMLElement[] {
   const dados = pokemonPorId(p.especieId);
   const natureza = Dex.natures.get(p.natureza);
   const efeito = natureza.plus && natureza.minus ? `+${NOMES_ATRIBUTOS[natureza.plus]} −${NOMES_ATRIBUTOS[natureza.minus]}` : 'neutra';
@@ -83,7 +83,10 @@ function resumoPokemon(p: PokemonIndividual, doJogador: boolean): HTMLElement[] 
     selosTipos(dados),
     el('div', { class: 'resumo-linha' }, el('span', {}, 'Gênero'), el('strong', {}, seloGenero(p.genero) ?? '', p.genero === 'M' ? ' Macho' : p.genero === 'F' ? ' Fêmea' : 'Sem gênero')),
     linha('Nature', `${natureza.name} (${efeito})`),
-    linha('Ability', Dex.abilities.get(p.habilidade).name),
+    // ability do selvagem fica escondida (mostra as possíveis) até ela agir na batalha
+    abilityConhecida
+      ? linha('Ability', Dex.abilities.get(p.habilidade).name)
+      : linha('Abilities possíveis', [...new Set(Object.values(especie(p.especieId).abilities))].join(' / ')),
     linha('Speed (IV 0–31)', `${min}–${max}`),
     ...(doJogador ? [linha('Speed atual', String(atributos(p).spe))] : []),
   ];
@@ -138,7 +141,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
       const p = quem();
       if (!p) return;
       resumo.className = `resumo-pokemon ${lado}`;
-      resumo.replaceChildren(...resumoPokemon(p, lado === 'jogador'));
+      resumo.replaceChildren(...resumoPokemon(p, lado === 'jogador', lado === 'jogador' || batalha.habilidadeSelvagemRevelada));
       resumo.hidden = false;
     });
     lugar.addEventListener('mouseleave', () => (resumo.hidden = true));

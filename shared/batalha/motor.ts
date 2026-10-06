@@ -325,6 +325,21 @@ export class BatalhaSelvagem {
     return this.nomes[Number(apelido.slice(1))] ?? apelido;
   }
 
+  /**
+   * A ability do selvagem só aparece para o jogador depois que ela age na batalha
+   * (ex.: Intimidate baixando o Attack, Levitate dando imunidade, Rough Skin causando dano).
+   */
+  habilidadeSelvagemRevelada = false;
+
+  private revelaHabilidadeSelvagem(comando: string, args: string[], de: string | undefined): boolean {
+    if (comando === '-ability') return args[0]?.startsWith('p2') ?? false;
+    const deAbility = de?.startsWith('ability:') || args[1]?.startsWith('ability:');
+    if (!deAbility) return false;
+    // "[of] p2a: X" diz de quem é a ability; sem ele, é de quem aparece na linha
+    const dono = args.find((a) => a.startsWith('[of]'))?.slice(4).trim() ?? args[0];
+    return dono?.startsWith('p2') ?? false;
+  }
+
   private interpretar(linhas: string[]): EventoBatalha[] {
     const eventos: EventoBatalha[] = [];
     for (let i = 0; i < linhas.length; i++) {
@@ -338,6 +353,7 @@ export class BatalhaSelvagem {
       const [comando, ...args] = linha.slice(1).split('|');
       const de = args.find((a) => a.startsWith('[from]'))?.slice(6).trim();
       const quem = this.nome(args[0]);
+      if (this.revelaHabilidadeSelvagem(comando, args, de)) this.habilidadeSelvagemRevelada = true;
 
       switch (comando) {
         case 'switch':
