@@ -360,3 +360,8 @@ button.vaga:hover { border-color: var(--borda); }
 .icone-item.cat-tr { background: radial-gradient(circle, #222 0 18%, #f08ab8 19% 60%, #a84a78 61%); }
 .lista-golpes-escolha { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .linha-treinador { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+/* Ícones oficiais dos itens (Showdown 24×24 e PokéAPI 30×30, sem ampliar para não borrar) */
+.icone-sd { flex: 0 0 24px; width: 24px; height: 24px; margin: 0 4px; image-rendering: pixelated; }
+.icone-caixa { flex: 0 0 32px; width: 32px; height: 32px; display: grid; place-items: center; }
+.icone-png { image-rendering: pixelated; }

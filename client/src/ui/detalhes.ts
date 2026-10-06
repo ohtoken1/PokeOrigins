@@ -1,6 +1,7 @@
 import { Dex } from '@pkmn/sim';
 import { ATRIBUTOS, EV_MAX_TOTAL, atributos, especie, expParaNivel, hpMaximo, ppMaximo, type Atributo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { nomeItemEquipado } from '../../../shared/usoItens';
+import { traduzir } from '../../../shared/traducao';
 import { pokemonPorId } from '../dados';
 import { abrirJanela } from './janela';
 import { el, seloTipo, selosTipos, spritePokemon } from './dom';
@@ -65,7 +66,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
           { class: 'numeros' },
           `Poder ${m.basePower || '—'} · Precisão ${m.accuracy === true ? '—' : `${m.accuracy}%`} · PP ${g.pp}/${ppMaximo(g.id)}`,
         ),
-        m.shortDesc && el('p', {}, m.shortDesc),
+        m.shortDesc && el('p', {}, traduzir(m.shortDesc)),
       );
     }),
   );
@@ -87,7 +88,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
           el('dt', {}, 'Natureza'),
           el('dd', {}, natureza.name, natureza.plus ? el('small', {}, ` (+${NOMES[natureza.plus as Atributo]}, −${NOMES[natureza.minus as Atributo]})`) : el('small', {}, ' (neutra)')),
           el('dt', {}, 'Habilidade'),
-          el('dd', {}, habilidade.name, habilidade.shortDesc ? el('small', {}, ` — ${habilidade.shortDesc}`) : null),
+          el('dd', {}, habilidade.name, habilidade.shortDesc ? el('small', {}, ` — ${traduzir(habilidade.shortDesc)}`) : null),
           el('dt', {}, 'Item'),
           el('dd', {}, p.item ? nomeItemEquipado(p.item) : '—'),
           el('dt', {}, 'Experiência'),

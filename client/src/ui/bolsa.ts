@@ -7,6 +7,7 @@ import { pokemonPorId, pokemonsDaRegiao } from '../dados';
 import { salvar, type Save } from '../estado';
 import { abrirJanela } from './janela';
 import { el } from './dom';
+import { iconeItem } from './iconeItem';
 import { cartaoPokemon } from './time';
 
 const ACAO: Partial<Record<CategoriaLoja, string>> = {
@@ -193,7 +194,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
             el(
               'div',
               { class: 'linha-item' },
-              el('div', { class: `icone-item ${item.id} cat-${item.categoria}` }),
+              iconeItem(item),
               el('div', { class: 'texto' }, el('strong', {}, item.nome), el('p', {}, item.descricao)),
               el('span', { class: 'quantidade' }, `×${qtd}`),
               ACAO[item.categoria] &&

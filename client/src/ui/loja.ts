@@ -2,6 +2,7 @@ import { CATALOGO, CATEGORIAS, MOEDA, type CategoriaLoja, type ItemLoja } from '
 import { salvar, type Save } from '../estado';
 import { abrirJanela } from './janela';
 import { el } from './dom';
+import { iconeItem } from './iconeItem';
 
 const LIMITE_LISTA = 120;
 
@@ -65,7 +66,7 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
         el(
           'div',
           { class: 'linha-item' },
-          el('div', { class: `icone-item ${item.id} cat-${item.categoria}` }),
+          iconeItem(item),
           el('div', { class: 'texto' }, el('strong', {}, item.nome), el('p', {}, item.descricao)),
           el('span', { class: 'quantidade', title: 'Na bolsa' }, `×${save.itens[item.id] ?? 0}`),
           el('span', { class: 'preco' }, `${item.preco} ${MOEDA}`),

@@ -4,6 +4,7 @@
 import { Dex } from '@pkmn/sim';
 import maquinas from './data/maquinas.json';
 import { ITENS, type ItemId } from './itens';
+import { nomeCategoria, nomeTipo, traduzir } from './traducao';
 
 export type CategoriaLoja = 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'frutas' | 'tm' | 'tr';
 
@@ -55,14 +56,14 @@ function montarCatalogo(): ItemLoja[] {
 
   for (const id of PEDRAS_EVOLUCAO) {
     const i = Dex.items.get(id);
-    add({ id, nome: i.name, categoria: 'evolucao', descricao: i.shortDesc || i.desc || 'Faz certos Pokémon evoluírem.' });
+    add({ id, nome: i.name, categoria: 'evolucao', descricao: traduzir(i.shortDesc || i.desc) || 'Faz certos Pokémon evoluírem.' });
   }
   add({ id: CABO_DE_LIGACAO, nome: 'Linking Cord', categoria: 'evolucao', descricao: 'Faz evoluir Pokémon que evoluem por troca (se precisar de item, ele deve estar equipado).' });
 
   // itens de batalha e frutas: os padrões da 9ª geração, menos bolas e pedras de evolução
   for (const i of Dex.items.all()) {
     if (i.isNonstandard || i.isPokeball || PEDRAS_EVOLUCAO.includes(i.id)) continue;
-    add({ id: i.id, nome: i.name, categoria: i.isBerry ? 'frutas' : 'batalha', descricao: i.shortDesc || i.desc || '' });
+    add({ id: i.id, nome: i.name, categoria: i.isBerry ? 'frutas' : 'batalha', descricao: traduzir(i.shortDesc || i.desc) });
   }
 
   for (const m of maquinas as { id: string; golpe: string }[]) {
@@ -70,7 +71,7 @@ function montarCatalogo(): ItemLoja[] {
     const tr = m.id.startsWith('tr');
     const numero = m.id.slice(2);
     const nome = `${tr ? 'TR' : 'TM'}${tr ? numero.padStart(2, '0') : numero.padStart(3, '0')} ${golpe.name}`;
-    add({ id: m.id, nome, categoria: tr ? 'tr' : 'tm', golpe: golpe.id, descricao: `${golpe.type} · ${golpe.category} · Poder ${golpe.basePower || '—'} · ${golpe.shortDesc}` });
+    add({ id: m.id, nome, categoria: tr ? 'tr' : 'tm', golpe: golpe.id, descricao: `${nomeTipo(golpe.type)} · ${nomeCategoria(golpe.category)} · Poder ${golpe.basePower || '—'} · ${traduzir(golpe.shortDesc)}` });
   }
   return itens;
 }

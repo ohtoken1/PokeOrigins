@@ -17,7 +17,7 @@ Funciona: escolha do inicial de Kanto → menu da região com 5 biomas (Campos V
 Menus: **Bolsa** (`ui/bolsa.ts`, itens em `shared/itens.ts`: bolas e remédios, usáveis fora e dentro da batalha), **PC** (`ui/pc.ts`: mover time↔PC, reordenar, soltar), **ficha** do Pokémon ao clicar nele (`ui/detalhes.ts`: base, IV, EV, valor final, natureza, habilidade, golpes).
 Mapa: `client/src/jogo/mapa.ts` gera e desenha com tilesets em `client/public/tiles/` (créditos obrigatórios em `CREDITOS.md` e no rodapé da região): Buch (grama/mato/flores/areia) e Tuxemon core_outdoor_nature (árvores 2×3, rochas 2×2, pedrinhas) e core_outdoor_water (textura 6×6 em (9,0) e moldura 3×3 de margem em (6,1)). Lagos são retangulares e não tocam caminhos (a moldura só encaixa assim). `paletas.ts` define por bioma quais tiles e filtros CSS de cor (chão, objetos, líquido). 48×36 tiles de 16px, câmera com zoom 2×. Caixas (usina) e lápides (torre) ainda são desenhadas por código. Estilo de referência do dono: tileset estilo Pokémon GBA/DS (grama clara, mato alto, árvores redondas, água com margem, caminhos de areia).
 Sprites de Pokémon: **só ampliar por fator inteiro** (`alturaAlvo` em `spritePokemon` usa `zoom` 2×, 3×…); fator quebrado deixa o pixel art borrado/irregular.
-Nomes de golpes e itens ficam **em inglês** (decisão do dono).
+**Idioma (regra do dono):** todo texto visível ao jogador em **português** — inclusive descrições de itens, golpes e habilidades vindas do Showdown/PokéAPI (traduzir, nunca mostrar em inglês). Podem ficar em inglês só os **nomes** de golpes, itens e atributos (Attack, Sp. Atk, Sp. Def…).
 Teste (não definitivo): opção "Batalha com sprites 3D (teste)" no menu da região usa os GIFs 3D do Showdown (`client/src/batalha/sprites3d.ts`); padrão é pixel art.
 Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de teste).
 
@@ -71,3 +71,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - Catálogo: bolas/remédios nossos + pedras de evolução + Linking Cord (item nosso para evolução por troca) + itens de batalha e frutas padrão da 9ª gen do Showdown + TMs (Scarlet/Violet) e TRs (Sword/Shield) de `shared/data/maquinas.json` (`npm run maquinas`, GraphQL da PokéAPI).
 - Bolsa: remédios (usar), pedras/Linking Cord (evoluir; troca com item exige o item equipado e o consome), itens de batalha/frutas (equipar; o anterior volta à bolsa), TMs/TRs (ensinar se o learnset do Showdown tiver fonte "M" em qualquer geração; são gastos). PC tem "Tirar item".
 - Item equipado vai para a batalha do Showdown (`PokemonIndividual.item`); frutas comidas somem no fim.
+
+## Traduções (`shared/traducao.ts` + `shared/data/traducoes.json`)
+- Mapa "descrição em inglês do Showdown → português" (itens, golpes, habilidades; ~1.026 textos). Use sempre `traduzir()` ao mostrar `shortDesc`/`desc`; `nomeTipo()`/`nomeCategoria()` para tipo e categoria.
+- Ao adicionar conteúdo novo (outra região, itens novos), gerar a lista dos textos sem tradução, traduzir e acrescentar no JSON — nunca exibir a descrição em inglês.
