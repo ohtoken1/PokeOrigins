@@ -5,12 +5,15 @@ import { PALETAS } from './paletas';
 import { pokemonPorId } from '../dados';
 import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
 
-/** Tamanho da tela do jogo em pixels (a câmera mostra 30×20 tiles ampliados 2×). */
+/** Tamanho da tela do jogo em pixels (a câmera mostra ~37×25 tiles ampliados 1,6×). */
 export const LARGURA_TELA = 960;
 export const ALTURA_TELA = 640;
-const ZOOM = 2;
-/** Personagem e seguidor são desenhados com o dobro de detalhe e exibidos na metade do tamanho. */
+/** Zoom da câmera (era 2; 1,6 mostra mais mapa — pedido do dono — sem mudar o tamanho do personagem na tela). */
+const ZOOM = 1.6;
+/** Personagem e seguidor têm o dobro de detalhe; nesta escala cada pixel deles vira 1 pixel na tela, em qualquer zoom. */
 const ESCALA_DETALHE = 1 / ZOOM;
+/** Quanto o personagem/seguidor crescem no mundo para manter o tamanho de tela de quando o zoom era 2. */
+const COMPENSA_ZOOM = 2 / ZOOM;
 const DURACAO_PASSO = 160;
 
 /** Sprites da 5ª geração (Black/White): frente e costas, normal e shiny, já no tamanho relativo certo. */
@@ -212,7 +215,7 @@ export class BiomaScene extends Phaser.Scene {
       delay: 1400,
       loop: true,
       callback: () => {
-        const b = this.add.image(this.jogador.x + 3, this.jogador.y - 14, 'bolha').setScale(0.4).setDepth(5001);
+        const b = this.add.image(this.jogador.x + 3 * COMPENSA_ZOOM, this.jogador.y - 14 * COMPENSA_ZOOM, 'bolha').setScale(0.4).setDepth(5001);
         this.tweens.add({ targets: b, y: b.y - 30, x: b.x + 4, alpha: 0, duration: 1600, onComplete: () => b.destroy() });
       },
     });
@@ -291,7 +294,7 @@ export class BiomaScene extends Phaser.Scene {
     const { topo, base } = areaDesenhada(textura.getSourceImage() as HTMLImageElement);
     // altura na tela proporcional à altura real: o treinador (~1,4 m) tem ~16 px no mundo
     const altura = pokemonPorId(this.dadosSeguidor.especie).altura;
-    const alvo = Math.max(10, Math.min(44, (altura / 14) * 16));
+    const alvo = Math.max(10, Math.min(44, (altura / 14) * 16)) * COMPENSA_ZOOM;
     this.escalaSeguidor = alvo / Math.max(1, base - topo);
     const h = textura.getSourceImage().height;
     this.imgSeguidor.setTexture(chave).setOrigin(0.5, base / h).setScale(this.escalaSeguidor);
