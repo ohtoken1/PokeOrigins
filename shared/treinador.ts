@@ -4,7 +4,7 @@
 
 export const NIVEL_MAX_TREINADOR = 50;
 /** XP para ir do nível n ao n+1 = BASE × n^EXPOENTE. */
-const BASE = 6620;
+const BASE = 3310;
 const EXPOENTE = 1.9;
 /** Quantos níveis os Pokémon selvagens ganham por nível de treinador. */
 export const NIVEIS_SELVAGEM_POR_NIVEL_TREINADOR = 1.9;

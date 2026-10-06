@@ -11,7 +11,7 @@ export const CHANCE_SHINY = 1 / 512;
 export const CHANCE_ENCONTRO_POR_PASSO = 1;
 /** Peso fixo de lendários e míticos no sorteio (um comum tem ~45 a 255): ~0,1% num bioma. */
 export const PESO_LENDARIO = 1;
-/** Lendários e míticos só aparecem em encontros deste nível para cima. */
+/** Lendários e míticos aparecem desde o começo, mas nunca abaixo deste nível. */
 export const NIVEL_LENDARIO = 50;
 /** Quando o jogador escolhe o nível dos encontros, eles variam este tanto para cima/baixo. */
 export const VARIACAO_NIVEL_ESCOLHIDO = 2;
@@ -76,7 +76,6 @@ function faixasDeNivel(pokemons: PokemonBase[]): Map<number, Faixa> {
       const minAnterior = nivelMin(anterior);
       min = Math.max(minAnterior + 1, nivelDeEvolucao(p.id) ?? minAnterior + 1);
     }
-    if (p.lendario || p.mitico) min = Math.max(min, NIVEL_LENDARIO);
     min = Math.min(100, min);
     minimos.set(p.id, min);
     return min;
@@ -153,5 +152,6 @@ export function sortearEncontro(tabela: EntradaTabela[], [min, max]: Faixa, alea
     }
   }
   nivel = Math.max(escolhido.nivelMin, Math.min(escolhido.nivelMax, nivel));
+  if (escolhido.pokemon.lendario || escolhido.pokemon.mitico) nivel = Math.max(NIVEL_LENDARIO, nivel);
   return { pokemon: escolhido.pokemon, nivel, shiny: aleatorio() < CHANCE_SHINY };
 }

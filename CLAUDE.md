@@ -58,12 +58,12 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 
 ## Nível de treinador (`shared/treinador.ts`)
 - Níveis 1–50, separado do nível dos Pokémon. Ganha o MESMO XP que o Pokémon em campo ganha ao derrotar/capturar (pedido do dono). Derrota/fuga não dá XP.
-- Curva: subir do nível n pede `6620 × n^1,9` XP (total até o 50 ≈ 187 milhões; estimativa ≈ 100 mil vitórias contra selvagens — pedido do dono, porque batalhas contra NPC e eventos de fim de semana darão XP extra no futuro).
+- Curva: subir do nível n pede `3310 × n^1,9` XP (total até o 50 ≈ 93,7 milhões; simulação ≈ 50 mil vitórias ≈ 350 h a ~25 s por batalha). Metade da curva anterior, a pedido do dono.
 - Selvagens: faixa do bioma + `floor((nível − 1) × 1,9)`, até 100 (no 50: Campos Verdes 95–100).
 - Treinador 35+: controle no canto do mapa escolhe o nível dos encontros (±2, até o máximo natural); `save.nivelEncontro` (null = auto).
 
 ## Faixas de nível das formas (`shared/encontros.ts`)
-- Cada forma só aparece na sua faixa (Charmander 1–15, Charmeleon 16–35, Charizard 36–100): nível de evolução do Showdown. Formas que evoluem por pedra/troca/amizade (Raichu, Alakazam, Gengar, Eeveelutions…) NÃO aparecem nos mapas (pedido do dono); a forma anterior vai até o 100. Lendários/míticos só a partir do 50.
+- Cada forma só aparece na sua faixa (Charmander 1–15, Charmeleon 16–35, Charizard 36–100): nível de evolução do Showdown. Formas que evoluem por pedra/troca/amizade (Raichu, Alakazam, Gengar, Eeveelutions…) NÃO aparecem nos mapas (pedido do dono); a forma anterior vai até o 100. Lendários/míticos podem aparecer desde o treinador nível 1 (raros, peso `PESO_LENDARIO`), sempre no nível 50 ou mais.
 - O sorteio escolhe primeiro o nível (dentro da faixa) e depois um Pokémon cuja forma existe nesse nível.
 
 ## Loja e itens (`shared/loja.ts`, `shared/usoItens.ts`, `client/src/ui/loja.ts`, `ui/bolsa.ts`)
