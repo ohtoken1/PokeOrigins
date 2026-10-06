@@ -165,7 +165,7 @@ kbd { font: 600 0.7rem system-ui; padding: 1px 5px; border-radius: 4px; backgrou
 
 /* Batalha */
 .batalha-fundo {
-  position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 16px;
+  position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 16px;
   background: rgb(0 0 0 / 0.7); animation: aparecer 0.2s ease-out;
 }
 .batalha {
@@ -285,7 +285,7 @@ button.vaga:hover { border-color: var(--borda); }
 
 /* Janelas */
 .janela-fundo {
-  position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 16px;
+  position: fixed; inset: 0; z-index: 1010; display: grid; place-items: center; padding: 16px;
   background: rgb(0 0 0 / 0.6); animation: aparecer 0.15s ease-out;
 }
 .janela {

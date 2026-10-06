@@ -1,23 +1,9 @@
-// TESTE (não definitivo): sprites de batalha feitos dos modelos 3D dos jogos, do site do
-// Pokémon Showdown. Liga/desliga no menu da região; o padrão é o pixel art.
+// Sprites de batalha dos modelos 3D (site do Pokémon Showdown). O TESTE foi encerrado pelo dono:
+// a opção saiu do menu e a batalha é sempre em pixel art. Fica aqui caso volte a ser usado.
 import { especie } from '../../../shared/batalha/pokemon';
 
-const CHAVE = 'jogo-claude:sprites3d';
-
 export function usarSprites3D(): boolean {
-  try {
-    return localStorage.getItem(CHAVE) === 'sim';
-  } catch {
-    return false;
-  }
-}
-
-export function definirSprites3D(ligado: boolean): void {
-  try {
-    localStorage.setItem(CHAVE, ligado ? 'sim' : 'nao');
-  } catch {
-    // sem armazenamento: vale só até recarregar
-  }
+  return false;
 }
 
 export function urlSprite3D(especieId: number, opcoes: { shiny?: boolean; costas?: boolean } = {}): string {

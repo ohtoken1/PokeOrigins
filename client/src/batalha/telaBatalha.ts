@@ -13,6 +13,7 @@ import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '..
 import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { iconeItem } from '../ui/iconeItem';
 import { resumoPokemon } from '../ui/resumo';
+import { nomeCategoria, traduzir } from '../../../shared/traducao';
 import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarGolpe, animarRetorno, tremerArena } from './animacoes';
 
 export type ResultadoBatalha = 'vitoria' | 'derrota' | 'captura' | 'fuga';
@@ -238,12 +239,26 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
           'button',
           {
             class: 'botao golpe',
+            // descrição do golpe ao passar o mouse (traduzida)
+            title: (() => {
+              const m = Dex.moves.get(g.id);
+              const precisao = m.accuracy === true ? 'nunca erra' : `precisão ${m.accuracy}%`;
+              return `${traduzir(m.shortDesc || m.desc)}
+${nomeCategoria(m.category)} · ${precisao}${m.priority ? ` · prioridade ${m.priority > 0 ? '+' : ''}${m.priority}` : ''}`;
+            })(),
             style: { '--cor-tipo': corTipo(g.tipo) },
             disabled: g.desabilitado || (g.ppMax > 0 && g.pp <= 0),
             onclick: () => executar(() => batalha.usarGolpe(g.indice)),
           },
           el('strong', {}, g.nome),
-          el('span', { class: 'detalhes' }, seloTipo(g.tipo), g.ppMax > 0 ? `PP ${g.pp}/${g.ppMax}` : ''),
+          el(
+            'span',
+            { class: 'detalhes' },
+            seloTipo(g.tipo),
+            el('span', {}, nomeCategoria(g.categoria)),
+            el('span', {}, `Poder ${Dex.moves.get(g.id).basePower || '—'}`),
+            g.ppMax > 0 ? el('span', {}, `PP ${g.pp}/${g.ppMax}`) : '',
+          ),
         ),
       ),
       botao('← Voltar', menuPrincipal, { class: 'botao secundario voltar' }),
@@ -432,11 +447,11 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
       const evolucoes: { pos: number; para: number }[] = [];
       for (const pos of batalha.indices) {
         const p = save.time[pos];
-        if (p.hp <= 0) continue;
-        // EVs: todos do time que não estão desmaiados recebem (Exp. Share moderno)
+        // XP e EVs só para quem entrou em campo nesta batalha (pedido do dono: sem Exp. Share)
+        if (p.hp <= 0 || !batalha.participantes.has(pos)) continue;
         const ev = dadosSelvagem.evsDados;
         ganharEvs(p, { hp: ev.hp, atk: ev.ataque, def: ev.defesa, spa: ev.ataqueEspecial, spd: ev.defesaEspecial, spe: ev.velocidade });
-        const exp = expGanha(dadosSelvagem.experienciaBase ?? 50, selvagem.nivel, p.nivel, batalha.participantes.has(pos));
+        const exp = expGanha(dadosSelvagem.experienciaBase ?? 50, selvagem.nivel, p.nivel, true);
         const r = ganharExperiencia(p, exp, nomeDe, crescimentoDe);
         await mostrarProgresso(pos, r);
         if (r.evolucao) evolucoes.push({ pos, para: r.evolucao.para });
