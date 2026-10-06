@@ -35,7 +35,12 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   let cena: BiomaScene | undefined;
   const caixaTime = el('div', {});
   const atualizarTime = () => {
-    caixaTime.replaceChildren(painelTime(save.time));
+    caixaTime.replaceChildren(
+      painelTime(save.time, () => {
+        salvar(save);
+        atualizarTime();
+      }),
+    );
     // o primeiro do time anda atrás do jogador (a cena ainda não existe na primeira chamada)
     cena?.definirSeguidor(save.time[0]?.especieId ?? null);
   };

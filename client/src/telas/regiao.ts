@@ -4,7 +4,7 @@ import { BIOMAS } from '../../../shared/biomas';
 import { faixaDosEncontros, montarTabela, probabilidades } from '../../../shared/encontros';
 import { progressoTreinador } from '../../../shared/treinador';
 import { pokemonsDaRegiao } from '../dados';
-import { apagarSave, carregarSave, curarTime } from '../estado';
+import { apagarSave, carregarSave, curarTime, salvar } from '../estado';
 import { icone } from '../ui/icones';
 import { botoesMenus } from '../ui/menus';
 import { definirSprites3D, usarSprites3D } from '../batalha/sprites3d';
@@ -72,7 +72,10 @@ export const telaRegiao: Tela = (raiz, navegar) => {
             el('small', {}, treinador.necessario ? `${treinador.atual.toLocaleString('pt-BR')} / ${treinador.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo!'),
             el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${treinador.necessario ? (treinador.atual / treinador.necessario) * 100 : 100}%` } })),
           ),
-          painelTime(save.time),
+          painelTime(save.time, () => {
+            salvar(save);
+            navegar({ tela: 'regiao' });
+          }),
           el(
             'button',
             {

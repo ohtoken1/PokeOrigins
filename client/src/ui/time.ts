@@ -28,9 +28,60 @@ export function cartaoPokemon(p: PokemonDoJogador, atributos: Record<string, unk
   );
 }
 
-export function painelTime(time: PokemonDoJogador[]): HTMLElement {
-  const vagas = Array.from({ length: TAMANHO_MAXIMO_TIME }, (_, i) =>
-    time[i] ? cartaoPokemon(time[i], { onclick: () => abrirDetalhes(time[i]) }) : el('div', { class: 'vaga vazia' }),
+/**
+ * Painel do time. Com `aoReordenar`, dá para arrastar um Pokémon para outra vaga e mudar a ordem
+ * (o primeiro é quem entra na batalha e anda atrás do jogador); a lista `time` é alterada no lugar.
+ */
+export function painelTime(time: PokemonDoJogador[], aoReordenar?: () => void): HTMLElement {
+  // arrastou de verdade (não foi só um clique): o clique seguinte não abre a ficha
+  let arrastou = false;
+  const vagas: HTMLElement[] = Array.from({ length: TAMANHO_MAXIMO_TIME }, (_, i) =>
+    time[i] ? cartaoPokemon(time[i], { onclick: () => !arrastou && abrirDetalhes(time[i]) }) : el('div', { class: 'vaga vazia' }),
   );
+  if (aoReordenar)
+    vagas.forEach((vaga, origem) => {
+      if (!time[origem]) return;
+      vaga.title += ' · arraste para mudar a ordem';
+      vaga.classList.add('arrastavel');
+      vaga.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0) return;
+        const [x0, y0] = [e.clientX, e.clientY];
+        arrastou = false;
+        let alvo: number | null = null;
+        const mover = (ev: PointerEvent) => {
+          if (!arrastou && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 6) return;
+          if (!arrastou) {
+            arrastou = true;
+            vaga.setPointerCapture(ev.pointerId);
+            vaga.classList.add('arrastando');
+          }
+          vaga.style.translate = `${ev.clientX - x0}px ${ev.clientY - y0}px`;
+          // vaga embaixo do ponteiro (ignorando a que está sendo arrastada)
+          alvo = vagas.findIndex((v, j) => {
+            if (j === origem) return false;
+            const r = v.getBoundingClientRect();
+            return ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom;
+          });
+          if (alvo < 0) alvo = null;
+          vagas.forEach((v, j) => v.classList.toggle('alvo', j === alvo));
+        };
+        const soltar = () => {
+          window.removeEventListener('pointermove', mover);
+          vaga.classList.remove('arrastando');
+          vaga.style.translate = '';
+          vagas.forEach((v) => v.classList.remove('alvo'));
+          if (arrastou && alvo !== null) {
+            const destino = Math.min(alvo, time.length - 1);
+            const [p] = time.splice(origem, 1);
+            time.splice(destino, 0, p);
+            aoReordenar();
+          }
+          // deixa o clique (que vem logo depois) saber que foi um arraste
+          setTimeout(() => (arrastou = false));
+        };
+        window.addEventListener('pointermove', mover);
+        window.addEventListener('pointerup', soltar, { once: true });
+      });
+    });
   return el('div', { class: 'painel-time' }, el('h2', {}, `Seu time (${time.length}/${TAMANHO_MAXIMO_TIME})`), el('div', { class: 'vagas' }, vagas));
 }

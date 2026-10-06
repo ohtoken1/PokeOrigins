@@ -235,7 +235,7 @@ export const telaPokedex = (inicial?: number): Tela => (raiz) => {
   const encontros = mapaDeEncontros(todos);
   const save = carregarSave();
   const vistos = new Set(save?.vistos ?? []);
-  const capturados = new Set([...(save?.time ?? []), ...(save?.caixa ?? [])].map((p) => p.especieId));
+  const capturados = new Set(save?.capturados ?? []);
 
   let selecionado = inicial ?? todos[0]?.id ?? 1;
   const busca = el('input', { type: 'search', placeholder: 'Buscar por nome ou número…', class: 'dex-busca' }) as HTMLInputElement;

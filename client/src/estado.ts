@@ -21,6 +21,14 @@ export interface Save {
   /** Nível escolhido para os encontros (treinador 35+); null = automático. */
   nivelEncontro: number | null;
   vistos: number[];
+  /** Espécies que o jogador já teve (capturou, ganhou ou evoluiu), mesmo se soltou depois. */
+  capturados: number[];
+}
+
+/** Marca a espécie como capturada na Pokédex. */
+export function registrarCapturado(save: Save, especieId: number): void {
+  if (!save.vistos.includes(especieId)) save.vistos.push(especieId);
+  if (!save.capturados.includes(especieId)) save.capturados.push(especieId);
 }
 
 export const TAMANHO_MAXIMO_TIME = 6;
@@ -41,6 +49,7 @@ export function novoSave(regiao: string, inicial: number): Save {
     xpTreinador: 0,
     nivelEncontro: null,
     vistos: [inicial],
+    capturados: [inicial],
   };
 }
 
@@ -69,6 +78,8 @@ function normalizar(save: Save): Save {
   save.silver ??= SILVER_INICIAL;
   save.xpTreinador ??= 0;
   save.nivelEncontro ??= null;
+  // saves antigos: começa o histórico com quem está no time e no PC
+  save.capturados ??= [...new Set([...save.time, ...save.caixa].map((p) => p.especieId))];
   return save;
 }
 

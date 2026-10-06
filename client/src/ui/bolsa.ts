@@ -4,7 +4,7 @@ import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { CATEGORIAS, CABO_DE_LIGACAO, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { ehEquipavel, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
 import { pokemonPorId, pokemonsDaRegiao } from '../dados';
-import { salvar, type Save } from '../estado';
+import { registrarCapturado, salvar, type Save } from '../estado';
 import { abrirJanela } from './janela';
 import { el } from './dom';
 import { iconeItem } from './iconeItem';
@@ -70,7 +70,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
         // troca com item (ex.: Metal Coat): o item equipado é gasto na evolução
         if (item.id === CABO_DE_LIGACAO && especie(para).evoItem) p.item = null;
         const r = evoluir(p, para, (n) => pokemonPorId(n).nome);
-        if (!save.vistos.includes(para)) save.vistos.push(para);
+        registrarCapturado(save, para);
         for (const golpe of r.golpesPendentes) aprender(p, golpe, () => {}, () => {});
         return [`${quem} evoluiu para ${pokemonPorId(para).nome}!`, ...r.mensagens].join(' ');
       }

@@ -7,7 +7,7 @@ import { ITENS, type ItemId } from '../../../shared/itens';
 import { efeitoBola } from '../../../shared/bolas';
 import { nivelTreinador } from '../../../shared/treinador';
 import { MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
-import { curarTime, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
+import { curarTime, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
 import { corTipo, el, seloTipo, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarGolpe, animarRetorno, tremerArena } from './animacoes';
@@ -427,7 +427,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
         const novo = pokemonPorId(para);
         await animarEvolucao(spriteJogador as HTMLImageElement, modo3D ? urlSprite3D(para, { shiny: p.shiny, costas: true }) : ((p.shiny ? novo.sprites.gifCostasShiny : novo.sprites.gifCostas) ?? novo.sprites.costas ?? ''));
         const r = evoluir(p, para, nomeDe);
-        if (!save.vistos.includes(para)) save.vistos.push(para);
+        registrarCapturado(save, para);
         infoJogador.definir(p);
         await dizer(`Parabéns! ${antes} evoluiu para ${novo.nome}!`);
         await mostrarProgresso(pos, r);
@@ -436,6 +436,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
       await darXpTreinador();
       selvagem.hp = Math.max(1, selvagem.hp);
       if (curarAoCapturar) curar(selvagem);
+      registrarCapturado(save, selvagem.especieId);
       if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(selvagem);
       else {
         save.caixa.push(selvagem);
