@@ -3,10 +3,13 @@ import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
 import { regiaoPorId } from '../../../shared/regioes';
 import { CHANCE_ENCONTRO_POR_PASSO, montarTabela, probabilidades, sortearEncontro } from '../../../shared/encontros';
-import { BiomaScene, COLUNAS, LINHAS, TILE } from '../jogo/BiomaScene';
+import { ALTURA_TELA, BiomaScene, LARGURA_TELA } from '../jogo/BiomaScene';
+import { abrirBatalha } from '../batalha/telaBatalha';
 import { pokemonsDaRegiao } from '../dados';
-import { carregarSave, salvar, TAMANHO_MAXIMO_TIME } from '../estado';
+import { carregarSave, curarTime, novoPokemon, salvar } from '../estado';
 import { el, spritePokemon } from '../ui/dom';
+import { aoMudarJanelas } from '../ui/janela';
+import { botoesMenus } from '../ui/menus';
 import { mostrarEncontro } from '../ui/popupEncontro';
 import { painelTime } from '../ui/time';
 
@@ -53,24 +56,43 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         { class: 'barra' },
         el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'regiao' }) }, '← Voltar'),
         el('h1', {}, `${bioma.nome}`, el('small', {}, ` · ${regiao.nome}`)),
+        el(
+          'button',
+          {
+            class: 'botao secundario',
+            onclick: () => {
+              curarTime(save);
+              atualizarTime();
+            },
+          },
+          '❤ Curar time',
+        ),
+        ...botoesMenus(save, () => atualizarTime()),
         contador,
       ),
       el(
         'div',
         { class: 'layout-bioma' },
-        el('section', {}, areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. Pokémon aparecem quando você anda no mato.')),
+        el('section', {}, areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. A cada passo aparece um Pokémon: Enter para lutar, ou continue andando para fugir.')),
         el('aside', {}, caixaTime, el('h2', {}, 'Pokémon deste bioma'), listaChances),
       ),
     ),
   );
 
-  let fecharPopup: (() => void) | undefined;
+  let fecharEncontro: (() => void) | undefined;
+  const fugirDoEncontro = () => {
+    fecharEncontro?.();
+    fecharEncontro = undefined;
+  };
+
   const cena = new BiomaScene({
     bioma,
-    aoPisar: (celula) => {
+    aoPisar: () => {
+      // andar com um encontro aberto = fugir dele
+      fugirDoEncontro();
       save.passos++;
       atualizarContador();
-      if (celula !== 'zona' || tabela.length === 0 || Math.random() >= CHANCE_ENCONTRO_POR_PASSO) {
+      if (tabela.length === 0 || Math.random() >= CHANCE_ENCONTRO_POR_PASSO) {
         salvar(save);
         return;
       }
@@ -80,21 +102,27 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       salvar(save);
       atualizarContador();
 
-      cena.pausar(true);
-      const encerrar = () => {
-        fecharPopup?.();
-        fecharPopup = undefined;
-        cena.pausar(false);
-      };
-      fecharPopup = mostrarEncontro(document.body, encontro, {
-        podeCapturar: save.time.length < TAMANHO_MAXIMO_TIME,
-        capturar: () => {
-          save.time.push({ especieId: encontro.pokemon.id, nivel: encontro.nivel, shiny: encontro.shiny });
-          salvar(save);
-          atualizarTime();
-          encerrar();
+      const temQuemLute = save.time.some((p) => p.hp > 0);
+      fecharEncontro = mostrarEncontro(areaJogo, encontro, {
+        bloqueio: temQuemLute ? null : 'Seu time está desmaiado. Cure no Centro Pokémon.',
+        lutar: () => {
+          if (janelaAberta) return;
+          fugirDoEncontro();
+          emBatalha = true;
+          atualizarPausa();
+          abrirBatalha({
+            save,
+            bioma,
+            selvagem: novoPokemon(encontro.pokemon.id, encontro.nivel, encontro.shiny),
+            aoTerminar: (resultado) => {
+              if (resultado === 'derrota') return navegar({ tela: 'regiao' });
+              atualizarTime();
+              atualizarContador();
+              emBatalha = false;
+              atualizarPausa();
+            },
+          });
         },
-        fugir: encerrar,
       });
     },
   });
@@ -102,16 +130,28 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   const jogo = new Phaser.Game({
     type: Phaser.AUTO,
     parent: areaJogo,
-    width: COLUNAS * TILE,
-    height: LINHAS * TILE,
+    width: LARGURA_TELA,
+    height: ALTURA_TELA,
     pixelArt: true,
     backgroundColor: '#000000',
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_HORIZONTALLY },
     scene: cena,
   });
 
+  // o mapa fica parado durante a batalha e com PC/Bolsa/ficha abertos
+  let emBatalha = false;
+  let janelaAberta = false;
+  function atualizarPausa() {
+    cena.pausar(emBatalha || janelaAberta);
+  }
+  const pararDeOuvirJanelas = aoMudarJanelas((aberta) => {
+    janelaAberta = aberta;
+    atualizarPausa();
+  });
+
   return () => {
-    fecharPopup?.();
+    pararDeOuvirJanelas();
+    fugirDoEncontro();
     jogo.destroy(true);
   };
 };

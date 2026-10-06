@@ -1,7 +1,7 @@
 import type { Tela } from '../main';
 import { regiaoPorId } from '../../../shared/regioes';
 import { pokemonPorId } from '../dados';
-import { salvar } from '../estado';
+import { novoSave, salvar } from '../estado';
 import { el, selosTipos, spritePokemon } from '../ui/dom';
 
 export const telaEscolhaInicial: Tela = (raiz, navegar) => {
@@ -14,11 +14,11 @@ export const telaEscolhaInicial: Tela = (raiz, navegar) => {
       {
         class: 'cartao-inicial',
         onclick: () => {
-          salvar({ regiao: regiao.id, time: [{ especieId: id, nivel: 5, shiny: false }], passos: 0, vistos: [id] });
+          salvar(novoSave(regiao.id, id));
           navegar({ tela: 'regiao' });
         },
       },
-      spritePokemon(p),
+      el('div', { class: 'palco-inicial' }, spritePokemon(p, { alturaAlvo: 120 })),
       el('strong', {}, p.nome),
       selosTipos(p),
     );

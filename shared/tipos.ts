@@ -12,6 +12,8 @@ export interface PokemonBase {
     defesaEspecial: number;
     velocidade: number;
   };
+  /** EVs ganhos por quem derrota este Pokémon (ex.: { ataque: 1 }). */
+  evsDados: Partial<Record<'hp' | 'ataque' | 'defesa' | 'ataqueEspecial' | 'defesaEspecial' | 'velocidade', number>>;
   altura: number;
   peso: number;
   experienciaBase: number | null;

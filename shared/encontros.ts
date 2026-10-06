@@ -5,8 +5,12 @@ import type { PokemonBase } from './tipos';
 
 /** Chance de um Pokémon ser shiny. O original é 1/4096; aqui é configurável. */
 export const CHANCE_SHINY = 1 / 512;
-/** Chance de aparecer um Pokémon a cada passo dado no mato (1 = todo passo). */
-export const CHANCE_ENCONTRO_POR_PASSO = 0.3;
+/** Chance de aparecer um Pokémon a cada passo (1 = todo passo). */
+export const CHANCE_ENCONTRO_POR_PASSO = 1;
+/** Peso fixo de lendários e míticos no sorteio (um comum tem ~45 a 255): ~0,1% num bioma. */
+export const PESO_LENDARIO = 1;
+/** Nível dos lendários, como nos jogos originais de Kanto. */
+export const NIVEL_LENDARIO = 50;
 
 export interface EntradaTabela {
   pokemon: PokemonBase;
@@ -30,9 +34,13 @@ export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: num
   };
 
   return pokemons
-    .filter((p) => !p.lendario && !p.mitico && !excluir.includes(p.id))
+    .filter((p) => !excluir.includes(p.id))
     .filter((p) => p.tipos.some((t) => bioma.tipos.includes(t)))
-    .map((p) => ({ pokemon: p, peso: Math.max(1, p.taxaCaptura), estagio: estagio(p) }));
+    .map((p) => ({
+      pokemon: p,
+      peso: p.lendario || p.mitico ? PESO_LENDARIO : Math.max(1, p.taxaCaptura),
+      estagio: estagio(p),
+    }));
 }
 
 /** Probabilidade (0 a 1) de cada entrada sair, na mesma ordem da tabela. */
@@ -53,6 +61,7 @@ export function sortearEncontro(tabela: EntradaTabela[], bioma: Bioma, aleatorio
     }
   }
   const [min, max] = bioma.nivel;
-  const nivel = Math.min(100, min + Math.floor(aleatorio() * (max - min + 1)) + (escolhido.estagio - 1) * 10);
+  const lendario = escolhido.pokemon.lendario || escolhido.pokemon.mitico;
+  const nivel = lendario ? NIVEL_LENDARIO : Math.min(100, min + Math.floor(aleatorio() * (max - min + 1)) + (escolhido.estagio - 1) * 10);
   return { pokemon: escolhido.pokemon, nivel, shiny: aleatorio() < CHANCE_SHINY };
 }

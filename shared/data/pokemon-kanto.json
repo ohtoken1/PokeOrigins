@@ -15,6 +15,9 @@
    "defesaEspecial": 65,
    "velocidade": 45
   },
+  "evsDados": {
+   "ataqueEspecial": 1
+  },
   "altura": 7,
   "peso": 69,
   "experienciaBase": 64,
@@ -61,6 +64,10 @@
    "ataqueEspecial": 80,
    "defesaEspecial": 80,
    "velocidade": 60
+  },
+  "evsDados": {
+   "ataqueEspecial": 1,
+   "defesaEspecial": 1
   },
   "altura": 10,
   "peso": 130,
@@ -109,6 +116,10 @@
    "defesaEspecial": 100,
    "velocidade": 80
   },
+  "evsDados": {
+   "ataqueEspecial": 2,
+   "defesaEspecial": 1
+  },
   "altura": 20,
   "peso": 1000,
   "experienciaBase": 236,
@@ -155,6 +166,9 @@
    "defesaEspecial": 50,
    "velocidade": 65
   },
+  "evsDados": {
+   "velocidade": 1
+  },
   "altura": 6,
   "peso": 85,
   "experienciaBase": 62,
@@ -200,6 +214,10 @@
    "ataqueEspecial": 80,
    "defesaEspecial": 65,
    "velocidade": 80
+  },
+  "evsDados": {
+   "ataqueEspecial": 1,
+   "velocidade": 1
   },
   "altura": 11,
   "peso": 190,
@@ -248,6 +266,9 @@
    "defesaEspecial": 85,
    "velocidade": 100
   },
+  "evsDados": {
+   "ataqueEspecial": 3
+  },
   "altura": 17,
   "peso": 905,
   "experienciaBase": 240,
@@ -293,6 +314,9 @@
    "ataqueEspecial": 50,
    "defesaEspecial": 64,
    "velocidade": 43
+  },
+  "evsDados": {
+   "defesa": 1
   },
   "altura": 5,
   "peso": 90,
@@ -340,6 +364,10 @@
    "defesaEspecial": 80,
    "velocidade": 58
   },
+  "evsDados": {
+   "defesa": 1,
+   "defesaEspecial": 1
+  },
   "altura": 10,
   "peso": 225,
   "experienciaBase": 142,
@@ -385,6 +413,9 @@
    "ataqueEspecial": 85,
    "defesaEspecial": 105,
    "velocidade": 78
+  },
+  "evsDados": {
+   "defesaEspecial": 3
   },
   "altura": 16,
   "peso": 855,
@@ -432,6 +463,9 @@
    "defesaEspecial": 20,
    "velocidade": 45
   },
+  "evsDados": {
+   "hp": 1
+  },
   "altura": 3,
   "peso": 29,
   "experienciaBase": 39,
@@ -478,6 +512,9 @@
    "defesaEspecial": 25,
    "velocidade": 30
   },
+  "evsDados": {
+   "defesa": 2
+  },
   "altura": 7,
   "peso": 99,
   "experienciaBase": 72,
@@ -520,6 +557,10 @@
    "ataqueEspecial": 90,
    "defesaEspecial": 80,
    "velocidade": 70
+  },
+  "evsDados": {
+   "ataqueEspecial": 2,
+   "defesaEspecial": 1
   },
   "altura": 11,
   "peso": 320,
@@ -568,6 +609,9 @@
    "defesaEspecial": 20,
    "velocidade": 50
   },
+  "evsDados": {
+   "velocidade": 1
+  },
   "altura": 3,
   "peso": 32,
   "experienciaBase": 39,
@@ -615,6 +659,9 @@
    "defesaEspecial": 25,
    "velocidade": 35
   },
+  "evsDados": {
+   "defesa": 2
+  },
   "altura": 6,
   "peso": 100,
   "experienciaBase": 72,
@@ -657,6 +704,10 @@
    "ataqueEspecial": 45,
    "defesaEspecial": 80,
    "velocidade": 75
+  },
+  "evsDados": {
+   "ataque": 2,
+   "defesaEspecial": 1
   },
   "altura": 10,
   "peso": 295,
@@ -704,6 +755,9 @@
    "ataqueEspecial": 35,
    "defesaEspecial": 35,
    "velocidade": 56
+  },
+  "evsDados": {
+   "velocidade": 1
   },
   "altura": 3,
   "peso": 18,
@@ -756,6 +810,9 @@
    "defesaEspecial": 50,
    "velocidade": 71
   },
+  "evsDados": {
+   "velocidade": 2
+  },
   "altura": 11,
   "peso": 300,
   "experienciaBase": 122,
@@ -807,6 +864,9 @@
    "defesaEspecial": 70,
    "velocidade": 101
   },
+  "evsDados": {
+   "velocidade": 3
+  },
   "altura": 15,
   "peso": 395,
   "experienciaBase": 216,
@@ -857,6 +917,9 @@
    "defesaEspecial": 35,
    "velocidade": 72
   },
+  "evsDados": {
+   "velocidade": 1
+  },
   "altura": 3,
   "peso": 35,
   "experienciaBase": 51,
@@ -906,6 +969,9 @@
    "ataqueEspecial": 50,
    "defesaEspecial": 70,
    "velocidade": 97
+  },
+  "evsDados": {
+   "velocidade": 2
   },
   "altura": 7,
   "peso": 185,
@@ -958,6 +1024,9 @@
    "defesaEspecial": 31,
    "velocidade": 70
   },
+  "evsDados": {
+   "velocidade": 1
+  },
   "altura": 3,
   "peso": 20,
   "experienciaBase": 52,
@@ -1005,6 +1074,9 @@
    "defesaEspecial": 61,
    "velocidade": 100
   },
+  "evsDados": {
+   "velocidade": 2
+  },
   "altura": 12,
   "peso": 380,
   "experienciaBase": 155,
@@ -1050,6 +1122,9 @@
    "ataqueEspecial": 40,
    "defesaEspecial": 54,
    "velocidade": 55
+  },
+  "evsDados": {
+   "ataque": 1
   },
   "altura": 20,
   "peso": 69,
@@ -1101,6 +1176,9 @@
    "defesaEspecial": 79,
    "velocidade": 80
   },
+  "evsDados": {
+   "ataque": 2
+  },
   "altura": 35,
   "peso": 650,
   "experienciaBase": 157,
@@ -1151,6 +1229,9 @@
    "defesaEspecial": 50,
    "velocidade": 90
   },
+  "evsDados": {
+   "velocidade": 2
+  },
   "altura": 4,
   "peso": 60,
   "experienciaBase": 112,
@@ -1196,6 +1277,9 @@
    "ataqueEspecial": 90,
    "defesaEspecial": 80,
    "velocidade": 110
+  },
+  "evsDados": {
+   "velocidade": 3
   },
   "altura": 8,
   "peso": 300,
@@ -1243,6 +1327,9 @@
    "defesaEspecial": 30,
    "velocidade": 40
   },
+  "evsDados": {
+   "defesa": 1
+  },
   "altura": 6,
   "peso": 120,
   "experienciaBase": 60,
@@ -1289,6 +1376,9 @@
    "defesaEspecial": 55,
    "velocidade": 65
   },
+  "evsDados": {
+   "defesa": 2
+  },
   "altura": 10,
   "peso": 295,
   "experienciaBase": 158,
@@ -1334,6 +1424,9 @@
    "ataqueEspecial": 40,
    "defesaEspecial": 40,
    "velocidade": 41
+  },
+  "evsDados": {
+   "hp": 1
   },
   "altura": 4,
   "peso": 70,
@@ -1384,6 +1477,9 @@
    "ataqueEspecial": 55,
    "defesaEspecial": 55,
    "velocidade": 56
+  },
+  "evsDados": {
+   "hp": 2
   },
   "altura": 8,
   "peso": 200,
@@ -1436,6 +1532,9 @@
    "defesaEspecial": 85,
    "velocidade": 76
   },
+  "evsDados": {
+   "hp": 3
+  },
   "altura": 13,
   "peso": 600,
   "experienciaBase": 227,
@@ -1486,6 +1585,9 @@
    "defesaEspecial": 40,
    "velocidade": 50
   },
+  "evsDados": {
+   "ataque": 1
+  },
   "altura": 5,
   "peso": 90,
   "experienciaBase": 55,
@@ -1535,6 +1637,9 @@
    "ataqueEspecial": 55,
    "defesaEspecial": 55,
    "velocidade": 65
+  },
+  "evsDados": {
+   "ataque": 2
   },
   "altura": 9,
   "peso": 195,
@@ -1587,6 +1692,9 @@
    "defesaEspecial": 75,
    "velocidade": 85
   },
+  "evsDados": {
+   "ataque": 3
+  },
   "altura": 14,
   "peso": 620,
   "experienciaBase": 227,
@@ -1636,6 +1744,9 @@
    "ataqueEspecial": 60,
    "defesaEspecial": 65,
    "velocidade": 35
+  },
+  "evsDados": {
+   "hp": 2
   },
   "altura": 6,
   "peso": 75,
@@ -1687,6 +1798,9 @@
    "defesaEspecial": 90,
    "velocidade": 60
   },
+  "evsDados": {
+   "hp": 3
+  },
   "altura": 13,
   "peso": 400,
   "experienciaBase": 217,
@@ -1737,6 +1851,9 @@
    "defesaEspecial": 65,
    "velocidade": 65
   },
+  "evsDados": {
+   "velocidade": 1
+  },
   "altura": 6,
   "peso": 99,
   "experienciaBase": 60,
@@ -1782,6 +1899,10 @@
    "ataqueEspecial": 81,
    "defesaEspecial": 100,
    "velocidade": 100
+  },
+  "evsDados": {
+   "defesaEspecial": 1,
+   "velocidade": 1
   },
   "altura": 11,
   "peso": 199,
@@ -1829,6 +1950,9 @@
    "ataqueEspecial": 45,
    "defesaEspecial": 25,
    "velocidade": 20
+  },
+  "evsDados": {
+   "hp": 2
   },
   "altura": 5,
   "peso": 55,
@@ -1881,6 +2005,9 @@
    "defesaEspecial": 50,
    "velocidade": 45
   },
+  "evsDados": {
+   "hp": 3
+  },
   "altura": 10,
   "peso": 120,
   "experienciaBase": 196,
@@ -1932,6 +2059,9 @@
    "defesaEspecial": 40,
    "velocidade": 55
   },
+  "evsDados": {
+   "velocidade": 1
+  },
   "altura": 8,
   "peso": 75,
   "experienciaBase": 49,
@@ -1978,6 +2108,9 @@
    "ataqueEspecial": 65,
    "defesaEspecial": 75,
    "velocidade": 90
+  },
+  "evsDados": {
+   "velocidade": 2
   },
   "altura": 16,
   "peso": 550,
@@ -2026,6 +2159,9 @@
    "defesaEspecial": 65,
    "velocidade": 30
   },
+  "evsDados": {
+   "ataqueEspecial": 1
+  },
   "altura": 5,
   "peso": 54,
   "experienciaBase": 64,
@@ -2072,6 +2208,9 @@
    "ataqueEspecial": 85,
    "defesaEspecial": 75,
    "velocidade": 40
+  },
+  "evsDados": {
+   "ataqueEspecial": 2
   },
   "altura": 8,
   "peso": 86,
@@ -2120,6 +2259,9 @@
    "defesaEspecial": 90,
    "velocidade": 50
   },
+  "evsDados": {
+   "ataqueEspecial": 3
+  },
   "altura": 12,
   "peso": 186,
   "experienciaBase": 221,
@@ -2166,6 +2308,9 @@
    "ataqueEspecial": 45,
    "defesaEspecial": 55,
    "velocidade": 25
+  },
+  "evsDados": {
+   "ataque": 1
   },
   "altura": 3,
   "peso": 54,
@@ -2218,6 +2363,10 @@
    "defesaEspecial": 80,
    "velocidade": 30
   },
+  "evsDados": {
+   "ataque": 2,
+   "defesa": 1
+  },
   "altura": 10,
   "peso": 295,
   "experienciaBase": 142,
@@ -2268,6 +2417,9 @@
    "ataqueEspecial": 40,
    "defesaEspecial": 55,
    "velocidade": 45
+  },
+  "evsDados": {
+   "defesaEspecial": 1
   },
   "altura": 10,
   "peso": 300,
@@ -2320,6 +2472,10 @@
    "defesaEspecial": 75,
    "velocidade": 90
   },
+  "evsDados": {
+   "ataqueEspecial": 1,
+   "velocidade": 1
+  },
   "altura": 15,
   "peso": 125,
   "experienciaBase": 158,
@@ -2369,6 +2525,9 @@
    "ataqueEspecial": 35,
    "defesaEspecial": 45,
    "velocidade": 95
+  },
+  "evsDados": {
+   "velocidade": 1
   },
   "altura": 2,
   "peso": 8,
@@ -2420,6 +2579,9 @@
    "defesaEspecial": 70,
    "velocidade": 120
   },
+  "evsDados": {
+   "velocidade": 2
+  },
   "altura": 7,
   "peso": 333,
   "experienciaBase": 149,
@@ -2469,6 +2631,9 @@
    "ataqueEspecial": 40,
    "defesaEspecial": 40,
    "velocidade": 90
+  },
+  "evsDados": {
+   "velocidade": 1
   },
   "altura": 4,
   "peso": 42,
@@ -2520,6 +2685,9 @@
    "defesaEspecial": 65,
    "velocidade": 115
   },
+  "evsDados": {
+   "velocidade": 2
+  },
   "altura": 10,
   "peso": 320,
   "experienciaBase": 154,
@@ -2569,6 +2737,9 @@
    "ataqueEspecial": 65,
    "defesaEspecial": 50,
    "velocidade": 55
+  },
+  "evsDados": {
+   "ataqueEspecial": 1
   },
   "altura": 8,
   "peso": 196,
@@ -2620,6 +2791,9 @@
    "defesaEspecial": 80,
    "velocidade": 85
   },
+  "evsDados": {
+   "ataqueEspecial": 2
+  },
   "altura": 17,
   "peso": 766,
   "experienciaBase": 175,
@@ -2669,6 +2843,9 @@
    "ataqueEspecial": 35,
    "defesaEspecial": 45,
    "velocidade": 70
+  },
+  "evsDados": {
+   "ataque": 1
   },
   "altura": 5,
   "peso": 280,
@@ -2720,6 +2897,9 @@
    "defesaEspecial": 70,
    "velocidade": 95
   },
+  "evsDados": {
+   "ataque": 2
+  },
   "altura": 10,
   "peso": 320,
   "experienciaBase": 159,
@@ -2769,6 +2949,9 @@
    "ataqueEspecial": 70,
    "defesaEspecial": 50,
    "velocidade": 60
+  },
+  "evsDados": {
+   "ataque": 1
   },
   "altura": 7,
   "peso": 190,
@@ -2820,6 +3003,9 @@
    "defesaEspecial": 80,
    "velocidade": 95
   },
+  "evsDados": {
+   "ataque": 2
+  },
   "altura": 19,
   "peso": 1550,
   "experienciaBase": 194,
@@ -2870,6 +3056,9 @@
    "defesaEspecial": 40,
    "velocidade": 90
   },
+  "evsDados": {
+   "velocidade": 1
+  },
   "altura": 6,
   "peso": 124,
   "experienciaBase": 60,
@@ -2919,6 +3108,9 @@
    "ataqueEspecial": 50,
    "defesaEspecial": 50,
    "velocidade": 90
+  },
+  "evsDados": {
+   "velocidade": 2
   },
   "altura": 10,
   "peso": 200,
@@ -2971,6 +3163,9 @@
    "defesaEspecial": 90,
    "velocidade": 70
   },
+  "evsDados": {
+   "defesa": 3
+  },
   "altura": 13,
   "peso": 540,
   "experienciaBase": 230,
@@ -3020,6 +3215,9 @@
    "ataqueEspecial": 105,
    "defesaEspecial": 55,
    "velocidade": 90
+  },
+  "evsDados": {
+   "ataqueEspecial": 1
   },
   "altura": 9,
   "peso": 195,
@@ -3071,6 +3269,9 @@
    "defesaEspecial": 70,
    "velocidade": 105
   },
+  "evsDados": {
+   "ataqueEspecial": 2
+  },
   "altura": 13,
   "peso": 565,
   "experienciaBase": 140,
@@ -3120,6 +3321,9 @@
    "ataqueEspecial": 135,
    "defesaEspecial": 95,
    "velocidade": 120
+  },
+  "evsDados": {
+   "ataqueEspecial": 3
   },
   "altura": 15,
   "peso": 480,
@@ -3171,6 +3375,9 @@
    "defesaEspecial": 35,
    "velocidade": 35
   },
+  "evsDados": {
+   "ataque": 1
+  },
   "altura": 8,
   "peso": 195,
   "experienciaBase": 61,
@@ -3221,6 +3428,9 @@
    "defesaEspecial": 60,
    "velocidade": 45
   },
+  "evsDados": {
+   "ataque": 2
+  },
   "altura": 15,
   "peso": 705,
   "experienciaBase": 142,
@@ -3270,6 +3480,9 @@
    "ataqueEspecial": 65,
    "defesaEspecial": 85,
    "velocidade": 55
+  },
+  "evsDados": {
+   "ataque": 3
   },
   "altura": 16,
   "peso": 1300,
@@ -3322,6 +3535,9 @@
    "defesaEspecial": 30,
    "velocidade": 40
   },
+  "evsDados": {
+   "ataque": 1
+  },
   "altura": 7,
   "peso": 40,
   "experienciaBase": 60,
@@ -3368,6 +3584,9 @@
    "ataqueEspecial": 85,
    "defesaEspecial": 45,
    "velocidade": 55
+  },
+  "evsDados": {
+   "ataque": 2
   },
   "altura": 10,
   "peso": 64,
@@ -3416,6 +3635,9 @@
    "defesaEspecial": 70,
    "velocidade": 70
   },
+  "evsDados": {
+   "ataque": 3
+  },
   "altura": 17,
   "peso": 155,
   "experienciaBase": 221,
@@ -3462,6 +3684,9 @@
    "ataqueEspecial": 50,
    "defesaEspecial": 100,
    "velocidade": 70
+  },
+  "evsDados": {
+   "defesaEspecial": 1
   },
   "altura": 9,
   "peso": 455,
@@ -3514,6 +3739,9 @@
    "defesaEspecial": 120,
    "velocidade": 100
   },
+  "evsDados": {
+   "defesaEspecial": 2
+  },
   "altura": 16,
   "peso": 550,
   "experienciaBase": 180,
@@ -3564,6 +3792,9 @@
    "ataqueEspecial": 30,
    "defesaEspecial": 30,
    "velocidade": 20
+  },
+  "evsDados": {
+   "defesa": 1
   },
   "altura": 4,
   "peso": 200,
@@ -3616,6 +3847,9 @@
    "defesaEspecial": 45,
    "velocidade": 35
   },
+  "evsDados": {
+   "defesa": 2
+  },
   "altura": 10,
   "peso": 1050,
   "experienciaBase": 137,
@@ -3667,6 +3901,9 @@
    "defesaEspecial": 65,
    "velocidade": 45
   },
+  "evsDados": {
+   "defesa": 3
+  },
   "altura": 14,
   "peso": 3000,
   "experienciaBase": 223,
@@ -3717,6 +3954,9 @@
    "defesaEspecial": 65,
    "velocidade": 90
   },
+  "evsDados": {
+   "velocidade": 1
+  },
   "altura": 10,
   "peso": 300,
   "experienciaBase": 82,
@@ -3766,6 +4006,9 @@
    "ataqueEspecial": 80,
    "defesaEspecial": 80,
    "velocidade": 105
+  },
+  "evsDados": {
+   "velocidade": 2
   },
   "altura": 17,
   "peso": 950,
@@ -3818,6 +4061,9 @@
    "defesaEspecial": 40,
    "velocidade": 15
   },
+  "evsDados": {
+   "hp": 1
+  },
   "altura": 12,
   "peso": 360,
   "experienciaBase": 63,
@@ -3868,6 +4114,9 @@
    "ataqueEspecial": 100,
    "defesaEspecial": 80,
    "velocidade": 30
+  },
+  "evsDados": {
+   "defesa": 2
   },
   "altura": 16,
   "peso": 785,
@@ -3920,6 +4169,9 @@
    "defesaEspecial": 55,
    "velocidade": 45
   },
+  "evsDados": {
+   "ataqueEspecial": 1
+  },
   "altura": 3,
   "peso": 60,
   "experienciaBase": 65,
@@ -3970,6 +4222,9 @@
    "ataqueEspecial": 120,
    "defesaEspecial": 70,
    "velocidade": 70
+  },
+  "evsDados": {
+   "ataqueEspecial": 2
   },
   "altura": 10,
   "peso": 600,
@@ -4022,6 +4277,9 @@
    "defesaEspecial": 62,
    "velocidade": 60
   },
+  "evsDados": {
+   "ataque": 1
+  },
   "altura": 8,
   "peso": 150,
   "experienciaBase": 132,
@@ -4072,6 +4330,9 @@
    "ataqueEspecial": 35,
    "defesaEspecial": 35,
    "velocidade": 75
+  },
+  "evsDados": {
+   "ataque": 1
   },
   "altura": 14,
   "peso": 392,
@@ -4124,6 +4385,9 @@
    "defesaEspecial": 60,
    "velocidade": 110
   },
+  "evsDados": {
+   "ataque": 2
+  },
   "altura": 18,
   "peso": 852,
   "experienciaBase": 165,
@@ -4173,6 +4437,9 @@
    "ataqueEspecial": 45,
    "defesaEspecial": 70,
    "velocidade": 45
+  },
+  "evsDados": {
+   "defesaEspecial": 1
   },
   "altura": 11,
   "peso": 900,
@@ -4225,6 +4492,9 @@
    "defesaEspecial": 95,
    "velocidade": 70
   },
+  "evsDados": {
+   "defesaEspecial": 2
+  },
   "altura": 17,
   "peso": 1200,
   "experienciaBase": 166,
@@ -4274,6 +4544,9 @@
    "ataqueEspecial": 40,
    "defesaEspecial": 50,
    "velocidade": 25
+  },
+  "evsDados": {
+   "hp": 1
   },
   "altura": 9,
   "peso": 300,
@@ -4325,6 +4598,10 @@
    "defesaEspecial": 100,
    "velocidade": 50
   },
+  "evsDados": {
+   "hp": 1,
+   "ataque": 1
+  },
   "altura": 12,
   "peso": 300,
   "experienciaBase": 175,
@@ -4374,6 +4651,9 @@
    "ataqueEspecial": 45,
    "defesaEspecial": 25,
    "velocidade": 40
+  },
+  "evsDados": {
+   "defesa": 1
   },
   "altura": 3,
   "peso": 40,
@@ -4426,6 +4706,9 @@
    "defesaEspecial": 45,
    "velocidade": 70
   },
+  "evsDados": {
+   "defesa": 2
+  },
   "altura": 15,
   "peso": 1325,
   "experienciaBase": 184,
@@ -4477,6 +4760,9 @@
    "defesaEspecial": 35,
    "velocidade": 80
   },
+  "evsDados": {
+   "ataqueEspecial": 1
+  },
   "altura": 13,
   "peso": 1,
   "experienciaBase": 62,
@@ -4519,6 +4805,9 @@
    "ataqueEspecial": 115,
    "defesaEspecial": 55,
    "velocidade": 95
+  },
+  "evsDados": {
+   "ataqueEspecial": 2
   },
   "altura": 16,
   "peso": 1,
@@ -4563,6 +4852,9 @@
    "defesaEspecial": 75,
    "velocidade": 110
   },
+  "evsDados": {
+   "ataqueEspecial": 3
+  },
   "altura": 15,
   "peso": 405,
   "experienciaBase": 225,
@@ -4605,6 +4897,9 @@
    "ataqueEspecial": 30,
    "defesaEspecial": 45,
    "velocidade": 70
+  },
+  "evsDados": {
+   "defesa": 1
   },
   "altura": 88,
   "peso": 2100,
@@ -4656,6 +4951,9 @@
    "defesaEspecial": 90,
    "velocidade": 42
   },
+  "evsDados": {
+   "defesaEspecial": 1
+  },
   "altura": 10,
   "peso": 324,
   "experienciaBase": 66,
@@ -4705,6 +5003,9 @@
    "ataqueEspecial": 73,
    "defesaEspecial": 115,
    "velocidade": 67
+  },
+  "evsDados": {
+   "defesaEspecial": 2
   },
   "altura": 16,
   "peso": 756,
@@ -4756,6 +5057,9 @@
    "defesaEspecial": 25,
    "velocidade": 50
   },
+  "evsDados": {
+   "ataque": 1
+  },
   "altura": 4,
   "peso": 65,
   "experienciaBase": 65,
@@ -4805,6 +5109,9 @@
    "ataqueEspecial": 50,
    "defesaEspecial": 50,
    "velocidade": 75
+  },
+  "evsDados": {
+   "ataque": 2
   },
   "altura": 13,
   "peso": 600,
@@ -4856,6 +5163,9 @@
    "defesaEspecial": 55,
    "velocidade": 100
   },
+  "evsDados": {
+   "velocidade": 1
+  },
   "altura": 5,
   "peso": 104,
   "experienciaBase": 66,
@@ -4905,6 +5215,9 @@
    "ataqueEspecial": 80,
    "defesaEspecial": 80,
    "velocidade": 150
+  },
+  "evsDados": {
+   "velocidade": 2
   },
   "altura": 12,
   "peso": 666,
@@ -4957,6 +5270,9 @@
    "defesaEspecial": 45,
    "velocidade": 40
   },
+  "evsDados": {
+   "defesa": 1
+  },
   "altura": 4,
   "peso": 25,
   "experienciaBase": 65,
@@ -5004,6 +5320,9 @@
    "defesaEspecial": 75,
    "velocidade": 55
   },
+  "evsDados": {
+   "ataqueEspecial": 2
+  },
   "altura": 20,
   "peso": 1200,
   "experienciaBase": 186,
@@ -5049,6 +5368,9 @@
    "ataqueEspecial": 40,
    "defesaEspecial": 50,
    "velocidade": 35
+  },
+  "evsDados": {
+   "defesa": 1
   },
   "altura": 4,
   "peso": 65,
@@ -5100,6 +5422,9 @@
    "defesaEspecial": 80,
    "velocidade": 45
   },
+  "evsDados": {
+   "defesa": 2
+  },
   "altura": 10,
   "peso": 450,
   "experienciaBase": 149,
@@ -5149,6 +5474,9 @@
    "ataqueEspecial": 35,
    "defesaEspecial": 110,
    "velocidade": 87
+  },
+  "evsDados": {
+   "ataque": 2
   },
   "altura": 15,
   "peso": 498,
@@ -5200,6 +5528,9 @@
    "defesaEspecial": 110,
    "velocidade": 76
   },
+  "evsDados": {
+   "defesaEspecial": 2
+  },
   "altura": 14,
   "peso": 502,
   "experienciaBase": 159,
@@ -5249,6 +5580,9 @@
    "ataqueEspecial": 60,
    "defesaEspecial": 75,
    "velocidade": 30
+  },
+  "evsDados": {
+   "hp": 2
   },
   "altura": 12,
   "peso": 655,
@@ -5300,6 +5634,9 @@
    "defesaEspecial": 45,
    "velocidade": 35
   },
+  "evsDados": {
+   "defesa": 1
+  },
   "altura": 6,
   "peso": 10,
   "experienciaBase": 68,
@@ -5349,6 +5686,9 @@
    "ataqueEspecial": 85,
    "defesaEspecial": 70,
    "velocidade": 60
+  },
+  "evsDados": {
+   "defesa": 2
   },
   "altura": 12,
   "peso": 95,
@@ -5401,6 +5741,9 @@
    "defesaEspecial": 30,
    "velocidade": 25
   },
+  "evsDados": {
+   "defesa": 1
+  },
   "altura": 10,
   "peso": 1150,
   "experienciaBase": 69,
@@ -5452,6 +5795,9 @@
    "defesaEspecial": 45,
    "velocidade": 40
   },
+  "evsDados": {
+   "ataque": 2
+  },
   "altura": 19,
   "peso": 1200,
   "experienciaBase": 170,
@@ -5501,6 +5847,9 @@
    "ataqueEspecial": 35,
    "defesaEspecial": 105,
    "velocidade": 50
+  },
+  "evsDados": {
+   "hp": 2
   },
   "altura": 11,
   "peso": 346,
@@ -5552,6 +5901,9 @@
    "defesaEspecial": 40,
    "velocidade": 60
   },
+  "evsDados": {
+   "defesa": 1
+  },
   "altura": 10,
   "peso": 350,
   "experienciaBase": 87,
@@ -5601,6 +5953,9 @@
    "ataqueEspecial": 40,
    "defesaEspecial": 80,
    "velocidade": 90
+  },
+  "evsDados": {
+   "hp": 2
   },
   "altura": 22,
   "peso": 800,
@@ -5652,6 +6007,9 @@
    "defesaEspecial": 25,
    "velocidade": 60
   },
+  "evsDados": {
+   "ataqueEspecial": 1
+  },
   "altura": 4,
   "peso": 80,
   "experienciaBase": 59,
@@ -5701,6 +6059,10 @@
    "ataqueEspecial": 95,
    "defesaEspecial": 45,
    "velocidade": 85
+  },
+  "evsDados": {
+   "defesa": 1,
+   "ataqueEspecial": 1
   },
   "altura": 12,
   "peso": 250,
@@ -5752,6 +6114,9 @@
    "defesaEspecial": 50,
    "velocidade": 63
   },
+  "evsDados": {
+   "ataque": 1
+  },
   "altura": 6,
   "peso": 150,
   "experienciaBase": 64,
@@ -5802,6 +6167,9 @@
    "defesaEspecial": 80,
    "velocidade": 68
   },
+  "evsDados": {
+   "ataque": 2
+  },
   "altura": 13,
   "peso": 390,
   "experienciaBase": 158,
@@ -5851,6 +6219,9 @@
    "ataqueEspecial": 70,
    "defesaEspecial": 55,
    "velocidade": 85
+  },
+  "evsDados": {
+   "velocidade": 1
   },
   "altura": 8,
   "peso": 345,
@@ -5903,6 +6274,9 @@
    "defesaEspecial": 85,
    "velocidade": 115
   },
+  "evsDados": {
+   "velocidade": 2
+  },
   "altura": 11,
   "peso": 800,
   "experienciaBase": 182,
@@ -5953,6 +6327,9 @@
    "ataqueEspecial": 100,
    "defesaEspecial": 120,
    "velocidade": 90
+  },
+  "evsDados": {
+   "defesaEspecial": 2
   },
   "altura": 13,
   "peso": 545,
@@ -6005,6 +6382,9 @@
    "defesaEspecial": 80,
    "velocidade": 105
   },
+  "evsDados": {
+   "ataque": 1
+  },
   "altura": 15,
   "peso": 560,
   "experienciaBase": 100,
@@ -6056,6 +6436,9 @@
    "defesaEspecial": 95,
    "velocidade": 95
   },
+  "evsDados": {
+   "ataqueEspecial": 2
+  },
   "altura": 14,
   "peso": 406,
   "experienciaBase": 159,
@@ -6106,6 +6489,9 @@
    "defesaEspecial": 85,
    "velocidade": 105
   },
+  "evsDados": {
+   "velocidade": 2
+  },
   "altura": 11,
   "peso": 300,
   "experienciaBase": 172,
@@ -6152,6 +6538,9 @@
    "defesaEspecial": 85,
    "velocidade": 93
   },
+  "evsDados": {
+   "ataqueEspecial": 2
+  },
   "altura": 13,
   "peso": 445,
   "experienciaBase": 173,
@@ -6197,6 +6586,9 @@
    "ataqueEspecial": 55,
    "defesaEspecial": 70,
    "velocidade": 85
+  },
+  "evsDados": {
+   "ataque": 2
   },
   "altura": 15,
   "peso": 550,
@@ -6248,6 +6640,10 @@
    "defesaEspecial": 70,
    "velocidade": 110
   },
+  "evsDados": {
+   "ataque": 1,
+   "velocidade": 1
+  },
   "altura": 14,
   "peso": 884,
   "experienciaBase": 172,
@@ -6298,6 +6694,9 @@
    "defesaEspecial": 20,
    "velocidade": 80
   },
+  "evsDados": {
+   "velocidade": 1
+  },
   "altura": 9,
   "peso": 100,
   "experienciaBase": 40,
@@ -6345,6 +6744,9 @@
    "defesaEspecial": 100,
    "velocidade": 81
   },
+  "evsDados": {
+   "ataque": 2
+  },
   "altura": 65,
   "peso": 2350,
   "experienciaBase": 189,
@@ -6391,6 +6793,9 @@
    "ataqueEspecial": 85,
    "defesaEspecial": 95,
    "velocidade": 60
+  },
+  "evsDados": {
+   "hp": 2
   },
   "altura": 25,
   "peso": 2200,
@@ -6442,6 +6847,9 @@
    "defesaEspecial": 48,
    "velocidade": 48
   },
+  "evsDados": {
+   "hp": 1
+  },
   "altura": 3,
   "peso": 40,
   "experienciaBase": 101,
@@ -6487,6 +6895,9 @@
    "ataqueEspecial": 45,
    "defesaEspecial": 65,
    "velocidade": 55
+  },
+  "evsDados": {
+   "defesaEspecial": 1
   },
   "altura": 3,
   "peso": 65,
@@ -6538,6 +6949,9 @@
    "defesaEspecial": 95,
    "velocidade": 65
   },
+  "evsDados": {
+   "hp": 2
+  },
   "altura": 10,
   "peso": 290,
   "experienciaBase": 184,
@@ -6583,6 +6997,9 @@
    "ataqueEspecial": 110,
    "defesaEspecial": 95,
    "velocidade": 130
+  },
+  "evsDados": {
+   "velocidade": 2
   },
   "altura": 8,
   "peso": 245,
@@ -6630,6 +7047,9 @@
    "defesaEspecial": 110,
    "velocidade": 65
   },
+  "evsDados": {
+   "ataque": 2
+  },
   "altura": 9,
   "peso": 250,
   "experienciaBase": 184,
@@ -6675,6 +7095,9 @@
    "ataqueEspecial": 85,
    "defesaEspecial": 75,
    "velocidade": 40
+  },
+  "evsDados": {
+   "ataqueEspecial": 1
   },
   "altura": 8,
   "peso": 365,
@@ -6727,6 +7150,9 @@
    "defesaEspecial": 55,
    "velocidade": 35
   },
+  "evsDados": {
+   "defesa": 1
+  },
   "altura": 4,
   "peso": 75,
   "experienciaBase": 71,
@@ -6777,6 +7203,9 @@
    "ataqueEspecial": 115,
    "defesaEspecial": 70,
    "velocidade": 55
+  },
+  "evsDados": {
+   "defesa": 2
   },
   "altura": 10,
   "peso": 350,
@@ -6829,6 +7258,9 @@
    "defesaEspecial": 45,
    "velocidade": 55
   },
+  "evsDados": {
+   "defesa": 1
+  },
   "altura": 5,
   "peso": 115,
   "experienciaBase": 71,
@@ -6879,6 +7311,9 @@
    "ataqueEspecial": 65,
    "defesaEspecial": 70,
    "velocidade": 80
+  },
+  "evsDados": {
+   "ataque": 2
   },
   "altura": 13,
   "peso": 405,
@@ -6931,6 +7366,9 @@
    "defesaEspecial": 75,
    "velocidade": 130
   },
+  "evsDados": {
+   "velocidade": 2
+  },
   "altura": 18,
   "peso": 590,
   "experienciaBase": 180,
@@ -6980,6 +7418,9 @@
    "ataqueEspecial": 65,
    "defesaEspecial": 110,
    "velocidade": 30
+  },
+  "evsDados": {
+   "hp": 2
   },
   "altura": 21,
   "peso": 4600,
@@ -7032,6 +7473,9 @@
    "defesaEspecial": 125,
    "velocidade": 85
   },
+  "evsDados": {
+   "defesaEspecial": 3
+  },
   "altura": 17,
   "peso": 554,
   "experienciaBase": 261,
@@ -7078,6 +7522,9 @@
    "ataqueEspecial": 125,
    "defesaEspecial": 90,
    "velocidade": 100
+  },
+  "evsDados": {
+   "ataqueEspecial": 3
   },
   "altura": 16,
   "peso": 526,
@@ -7126,6 +7573,9 @@
    "defesaEspecial": 85,
    "velocidade": 90
   },
+  "evsDados": {
+   "ataqueEspecial": 3
+  },
   "altura": 20,
   "peso": 600,
   "experienciaBase": 261,
@@ -7172,6 +7622,9 @@
    "defesaEspecial": 50,
    "velocidade": 50
   },
+  "evsDados": {
+   "ataque": 1
+  },
   "altura": 18,
   "peso": 33,
   "experienciaBase": 60,
@@ -7217,6 +7670,9 @@
    "ataqueEspecial": 70,
    "defesaEspecial": 70,
    "velocidade": 70
+  },
+  "evsDados": {
+   "ataque": 2
   },
   "altura": 40,
   "peso": 165,
@@ -7265,6 +7721,9 @@
    "defesaEspecial": 100,
    "velocidade": 80
   },
+  "evsDados": {
+   "ataque": 3
+  },
   "altura": 22,
   "peso": 2100,
   "experienciaBase": 270,
@@ -7311,6 +7770,9 @@
    "defesaEspecial": 90,
    "velocidade": 130
   },
+  "evsDados": {
+   "ataqueEspecial": 3
+  },
   "altura": 20,
   "peso": 1220,
   "experienciaBase": 306,
@@ -7356,6 +7818,9 @@
    "ataqueEspecial": 100,
    "defesaEspecial": 100,
    "velocidade": 100
+  },
+  "evsDados": {
+   "hp": 3
   },
   "altura": 4,
   "peso": 40,

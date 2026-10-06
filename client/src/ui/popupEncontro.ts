@@ -2,48 +2,50 @@ import type { Encontro } from '../../../shared/encontros';
 import { el, selosTipos, spritePokemon } from './dom';
 
 export interface AcoesEncontro {
-  capturar(): void;
-  fugir(): void;
-  podeCapturar: boolean;
+  lutar(): void;
+  /** Motivo para não poder lutar (ex.: time todo desmaiado), ou null. */
+  bloqueio: string | null;
 }
 
-/** Mostra o pop-up "Um Pokémon selvagem apareceu!". Devolve uma função que fecha o pop-up. */
+/**
+ * Cartão "Um Pokémon selvagem apareceu!" no canto do mapa. Não trava o jogo:
+ * se o jogador continuar andando, quem chamou fecha o cartão (= fugiu).
+ * Enter ou o botão Lutar começam a batalha. Devolve a função que fecha o cartão.
+ */
 export function mostrarEncontro(raiz: HTMLElement, encontro: Encontro, acoes: AcoesEncontro): () => void {
   const { pokemon, nivel, shiny } = encontro;
 
   const aoTeclar = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') acoes.fugir();
+    if (e.key !== 'Enter' || acoes.bloqueio) return;
+    e.preventDefault();
+    acoes.lutar();
   };
   const fechar = () => {
     window.removeEventListener('keydown', aoTeclar);
-    fundo.remove();
+    cartao.remove();
   };
 
-  const fundo = el(
+  const cartao = el(
     'div',
-    { class: 'popup-fundo' },
+    { class: `encontro ${shiny ? 'shiny' : ''}`, role: 'status', 'aria-live': 'polite' },
+    el('div', { class: 'palco' }, spritePokemon(pokemon, { shiny, alturaAlvo: 96 })),
     el(
       'div',
-      { class: `popup ${shiny ? 'shiny' : ''}`, role: 'dialog', 'aria-label': `${pokemon.nome} selvagem` },
-      el('p', { class: 'aviso' }, shiny ? '✨ Um Pokémon SHINY apareceu! ✨' : 'Um Pokémon selvagem apareceu!'),
-      el('div', { class: 'palco' }, spritePokemon(pokemon, { shiny })),
+      { class: 'info' },
+      el('p', { class: 'aviso' }, shiny ? '✨ Pokémon SHINY!' : 'Pokémon selvagem!'),
       el('h2', {}, pokemon.nome, el('small', {}, ` Nv. ${nivel}`)),
       selosTipos(pokemon),
       el(
-        'div',
-        { class: 'acoes' },
-        el('button', { class: 'botao', disabled: true, title: 'O sistema de batalha é a próxima etapa' }, 'Lutar'),
-        el(
-          'button',
-          { class: 'botao', disabled: !acoes.podeCapturar, title: acoes.podeCapturar ? 'Temporário até existir batalha e Pokébola' : 'Time cheio', onclick: acoes.capturar },
-          'Capturar (teste)',
-        ),
-        el('button', { class: 'botao secundario', onclick: acoes.fugir }, 'Fugir'),
+        'button',
+        { class: 'botao', disabled: !!acoes.bloqueio, title: acoes.bloqueio ?? 'Atalho: Enter', onclick: acoes.lutar },
+        'Lutar ',
+        el('kbd', {}, 'Enter'),
       ),
+      el('p', { class: 'dica' }, acoes.bloqueio ?? 'Continue andando para fugir'),
     ),
   );
 
   window.addEventListener('keydown', aoTeclar);
-  raiz.append(fundo);
+  raiz.append(cartao);
   return fechar;
 }

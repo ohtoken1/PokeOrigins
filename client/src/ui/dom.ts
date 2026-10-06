@@ -50,8 +50,13 @@ const TIPOS: Record<string, { nome: string; cor: string }> = {
   fairy: { nome: 'Fada', cor: '#ef70ef' },
 };
 
+/** Aceita o tipo da PokéAPI ("fire") ou do Showdown ("Fire"). */
+export function corTipo(tipo: string): string {
+  return TIPOS[tipo.toLowerCase()]?.cor ?? '#777';
+}
+
 export function seloTipo(tipo: string): HTMLElement {
-  const info = TIPOS[tipo] ?? { nome: tipo, cor: '#777' };
+  const info = TIPOS[tipo.toLowerCase()] ?? { nome: tipo, cor: '#777' };
   return el('span', { class: 'tipo', style: { background: info.cor } }, info.nome);
 }
 
@@ -59,11 +64,19 @@ export function selosTipos(p: PokemonBase): HTMLElement {
   return el('div', { class: 'tipos' }, p.tipos.map(seloTipo));
 }
 
-/** Sprite do Pokémon: GIF animado quando existe, senão a imagem parada. */
-export function spritePokemon(p: PokemonBase, opcoes: { shiny?: boolean; animado?: boolean } = {}): HTMLImageElement {
-  const { shiny = false, animado = true } = opcoes;
-  const parado = shiny ? p.sprites.frenteShiny : p.sprites.frente;
-  const gif = shiny ? p.sprites.gifShiny : p.sprites.gif;
+/**
+ * Sprite do Pokémon: GIF animado quando existe, senão a imagem parada.
+ * `alturaAlvo` amplia por um fator INTEIRO (2×, 3×…) até perto dessa altura: ampliar por fator
+ * quebrado (1,5×) deixa os pixels de tamanhos diferentes e o sprite fica "mal pixelado".
+ */
+export function spritePokemon(
+  p: PokemonBase,
+  opcoes: { shiny?: boolean; animado?: boolean; costas?: boolean; alturaAlvo?: number } = {},
+): HTMLImageElement {
+  const { shiny = false, animado = true, costas = false, alturaAlvo } = opcoes;
+  const s = p.sprites;
+  const parado = costas ? (shiny ? s.costasShiny : s.costas) : shiny ? s.frenteShiny : s.frente;
+  const gif = costas ? (shiny ? s.gifCostasShiny : s.gifCostas) : shiny ? s.gifShiny : s.gif;
   const img = el('img', {
     class: 'sprite',
     alt: p.nome,
@@ -71,5 +84,13 @@ export function spritePokemon(p: PokemonBase, opcoes: { shiny?: boolean; animado
     loading: 'lazy',
   });
   if (animado && gif && parado) img.addEventListener('error', () => (img.src = parado), { once: true });
+  if (alturaAlvo) {
+    // os GIFs do Showdown já têm o tamanho relativo certo (Onix grande, Caterpie pequeno);
+    // só ampliamos os pequenos, no máximo 2×, olhando a maior dimensão (Exeggcute é largo)
+    img.addEventListener('load', () => {
+      const maior = Math.max(img.naturalWidth, img.naturalHeight);
+      img.style.zoom = String(Math.min(2, Math.max(1, Math.floor(alturaAlvo / maior))));
+    });
+  }
   return img;
 }

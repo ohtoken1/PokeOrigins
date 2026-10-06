@@ -49,7 +49,11 @@ async function baixarPokemon(id) {
     buscar(`${API}/pokemon-species/${id}`),
   ]);
   const stats = {};
-  for (const s of p.stats) stats[NOMES_STATS[s.stat.name]] = s.base_stat;
+  const evsDados = {}; // EVs que o Pokémon dá a quem o derrota
+  for (const s of p.stats) {
+    stats[NOMES_STATS[s.stat.name]] = s.base_stat;
+    if (s.effort) evsDados[NOMES_STATS[s.stat.name]] = s.effort;
+  }
   const showdown = p.sprites.other?.showdown ?? {};
 
   return {
@@ -58,6 +62,7 @@ async function baixarPokemon(id) {
     slug: p.name,
     tipos: [...p.types].sort((a, b) => a.slot - b.slot).map((t) => t.type.name),
     stats,
+    evsDados,
     altura: p.height,
     peso: p.weight,
     experienciaBase: p.base_experience,

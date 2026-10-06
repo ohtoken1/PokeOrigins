@@ -3,7 +3,8 @@ import { REGIOES, regiaoPorId } from '../../../shared/regioes';
 import { BIOMAS } from '../../../shared/biomas';
 import { montarTabela } from '../../../shared/encontros';
 import { pokemonsDaRegiao } from '../dados';
-import { apagarSave, carregarSave } from '../estado';
+import { apagarSave, carregarSave, curarTime } from '../estado';
+import { botoesMenus } from '../ui/menus';
 import { el, spritePokemon } from '../ui/dom';
 import { painelTime } from '../ui/time';
 
@@ -33,8 +34,7 @@ export const telaRegiao: Tela = (raiz, navegar) => {
         style: { '--cor-bioma': hex(bioma.cores.zona), '--cor-chao': hex(bioma.cores.chao) },
         onclick: () => navegar({ tela: 'bioma', biomaId: bioma.id }),
       },
-      el('div', { class: 'faixa' }, destaques.map((e) => spritePokemon(e.pokemon, { animado: false }))),
-      el('strong', {}, bioma.nome),
+      el('div', { class: 'faixa' }, destaques.map((e) => spritePokemon(e.pokemon, { animado: false }))),      el('strong', {}, bioma.nome),
       el('span', { class: 'desc' }, bioma.descricao),
       el('span', { class: 'meta' }, `${tabela.length} espécies · Nv. ${bioma.nivel[0]}–${bioma.nivel[1]}+`),
     );
@@ -62,6 +62,18 @@ export const telaRegiao: Tela = (raiz, navegar) => {
           el(
             'button',
             {
+              class: 'botao',
+              onclick: () => {
+                curarTime(save);
+                navegar({ tela: 'regiao' });
+              },
+            },
+            '❤ Centro Pokémon (curar time)',
+          ),
+          el('div', { class: 'linha-botoes' }, botoesMenus(save, () => navegar({ tela: 'regiao' }))),
+          el(
+            'button',
+            {
               class: 'botao secundario',
               onclick: () => {
                 if (confirm('Apagar seu progresso e escolher outro inicial?')) {
@@ -71,6 +83,11 @@ export const telaRegiao: Tela = (raiz, navegar) => {
               },
             },
             'Recomeçar',
+          ),
+          el(
+            'p',
+            { class: 'creditos' },
+            'Tiles: "Tuxemon Tileset" por Buch e "Pokemon-inspired 16x16 tiles" por Red_Voxel (CC-BY-SA 3.0, OpenGameArt). Dados: PokéAPI. Batalha: Pokémon Showdown.',
           ),
         ),
       ),
