@@ -5,7 +5,7 @@ import { PALETAS } from './paletas';
 import { pokemonPorId } from '../dados';
 import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
 import type { FolhasPersonagem } from '../personagem/lpc';
-import { ESPECIES_PMD, carregarPmd, type InfoPmd } from './seguidoresPmd';
+import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
 
 /** Tamanho da tela do jogo em pixels (a câmera mostra ~43×29 tiles ampliados 1,4×). */
 export const LARGURA_TELA = 960;
@@ -296,9 +296,9 @@ export class BiomaScene extends Phaser.Scene {
       this.seguidor.setVisible(false);
       return;
     }
-    // iniciais (não shiny): sprite de mapa do PMD, andando em 8 direções
-    if (!d.shiny && ESPECIES_PMD.has(d.especie)) {
-      carregarPmd(this, d.especie).then((info) => {
+    // sprite de mapa do PMD, andando em 8 direções (quem não tem usa a imagem de batalha)
+    if (temSpritePmd(d.especie, d.shiny)) {
+      carregarPmd(this, d.especie, d.shiny).then((info) => {
         if (this.dadosSeguidor !== d || !this.imgSeguidor?.active) return;
         if (!info) return this.usarImagemDeBatalha(d);
         this.pmd = info;

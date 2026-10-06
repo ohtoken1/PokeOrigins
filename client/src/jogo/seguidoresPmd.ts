@@ -1,10 +1,14 @@
 // Sprites de mapa do PMD SpriteCollab (client/public/seguidores/<número>): Pokémon que segue o jogador
-// andando com animação em 8 direções. Por enquanto só os iniciais e suas evoluções (pedido do dono);
-// os outros continuam com a imagem de batalha. Licença CC BY-NC 4.0 (créditos em CREDITOS.md).
+// andando com animação em 8 direções (961 espécies; shiny em 918). Quem não tem sprite usa a imagem
+// de batalha. Licença CC BY-NC 4.0 (créditos em CREDITOS.md).
 import Phaser from 'phaser';
+import { FAIXAS_COM_SHINY, FAIXAS_COM_SPRITE } from './seguidoresIndice';
 
-const LINHAS_INICIAIS = [1, 4, 7, 152, 155, 158, 252, 255, 258, 387, 390, 393, 495, 498, 501, 650, 653, 656, 722, 725, 728, 810, 813, 816, 906, 909, 912];
-export const ESPECIES_PMD = new Set(LINHAS_INICIAIS.flatMap((n) => [n, n + 1, n + 2]));
+const conjunto = (faixas: [number, number][]) => new Set(faixas.flatMap(([a, b]) => Array.from({ length: b - a + 1 }, (_, i) => a + i)));
+export const ESPECIES_PMD = conjunto(FAIXAS_COM_SPRITE);
+export const SHINY_PMD = conjunto(FAIXAS_COM_SHINY);
+/** Tem sprite de mapa para esta espécie (e para a versão shiny, se for shiny)? */
+export const temSpritePmd = (especie: number, shiny: boolean) => (shiny ? SHINY_PMD : ESPECIES_PMD).has(especie);
 
 /** Linhas da folha do PMD (8 direções). */
 export const DIRECAO_PMD = { baixo: 0, direita: 2, cima: 4, esquerda: 6 } as const;
@@ -63,27 +67,37 @@ function medir(img: HTMLImageElement, a: Anim): { origemY: number; largura: numb
   return { origemY: (base + 1) / a.altura, largura: Math.max(4, dir - esq + 1) };
 }
 
-const carregando = new Map<number, Promise<InfoPmd | null>>();
+const carregando = new Map<string, Promise<InfoPmd | null>>();
 
 /** Carrega as folhas de andar/parado e cria as animações (uma vez por espécie). */
-export function carregarPmd(cena: Phaser.Scene, especie: number): Promise<InfoPmd | null> {
-  if (!ESPECIES_PMD.has(especie)) return Promise.resolve(null);
-  const salvo = carregando.get(especie);
-  if (salvo) return salvo;
+export function carregarPmd(cena: Phaser.Scene, especie: number, shiny = false): Promise<InfoPmd | null> {
+  if (!temSpritePmd(especie, shiny)) return Promise.resolve(null);
   const numero = String(especie).padStart(4, '0');
-  const prefixo = `pmd-${numero}`;
+  const prefixo = `pmd-${numero}${shiny ? '-s' : ''}`;
+  const salvo = carregando.get(prefixo);
+  if (salvo) return salvo;
+  const pasta = `seguidores/${numero}${shiny ? '/shiny' : ''}`;
   const promessa = (async () => {
     const dados = await lerAnimData(numero);
     if (!dados) return null;
     await new Promise<void>((ok) => {
       for (const nome of ['Walk', 'Idle'] as const)
         if (!cena.textures.exists(`${prefixo}-${nome}`))
-          cena.load.spritesheet(`${prefixo}-${nome}`, `seguidores/${numero}/${nome}-Anim.png`, { frameWidth: dados[nome].largura, frameHeight: dados[nome].altura });
+          cena.load.spritesheet(`${prefixo}-${nome}`, `${pasta}/${nome}-Anim.png`, { frameWidth: dados[nome].largura, frameHeight: dados[nome].altura });
       cena.load.once(Phaser.Loader.Events.COMPLETE, () => ok());
       cena.load.start();
     });
     if (!cena.textures.exists(`${prefixo}-Walk`)) return null;
+    // sem folha "parado" (alguns Pokémon): parado usa o 1º quadro de andar
+    const temIdle = cena.textures.exists(`${prefixo}-Idle`);
     for (const nome of ['Walk', 'Idle'] as const) {
+      if (nome === 'Idle' && !temIdle) {
+        const colunas = Math.floor(cena.textures.get(`${prefixo}-Walk`).getSourceImage().width / dados.Walk.largura);
+        for (let linha = 0; linha < 8; linha++)
+          if (!cena.anims.exists(`${prefixo}-idle-${linha}`))
+            cena.anims.create({ key: `${prefixo}-idle-${linha}`, frames: cena.anims.generateFrameNumbers(`${prefixo}-Walk`, { start: linha * colunas, end: linha * colunas }), frameRate: 1, repeat: -1 });
+        continue;
+      }
       const a = dados[nome];
       const colunas = Math.floor(cena.textures.get(`${prefixo}-${nome}`).getSourceImage().width / a.largura);
       // durações do PMD em quadros de 1/60 s
@@ -101,9 +115,9 @@ export function carregarPmd(cena: Phaser.Scene, especie: number): Promise<InfoPm
     }
     const img = (nome: 'Walk' | 'Idle') => cena.textures.get(`${prefixo}-${nome}`).getSourceImage() as HTMLImageElement;
     const walk = medir(img('Walk'), dados.Walk);
-    const idle = cena.textures.exists(`${prefixo}-Idle`) ? medir(img('Idle'), dados.Idle) : walk;
+    const idle = temIdle ? medir(img('Idle'), dados.Idle) : walk;
     return { especie, prefixo, origemWalk: walk.origemY, origemIdle: idle.origemY, largura: walk.largura };
   })();
-  carregando.set(especie, promessa);
+  carregando.set(prefixo, promessa);
   return promessa;
 }

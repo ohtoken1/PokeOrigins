@@ -24,7 +24,7 @@ Pokédex só mostra nome, imagem e dados de quem foi **visto** (`save.vistos`/`c
 Batalha sempre em pixel art (o teste de sprites 3D foi encerrado; `sprites3d.ts` ficou desligado).
 Painel de administrador (`client/src/ui/admin.ts`, aba "⚙ Admin" fixa na esquerda, sem login por enquanto): chance de shiny, multiplicador de lendários / só lendários, chance de encontro por passo, Pokémon e nível forçados. Ajustes em `localStorage` (`jogo-claude:admin`), aplicados por `ajustarTabela`/`encontroForcado`/`sortearEncontro` em `shared/encontros.ts`.
 Personagem (`client/src/personagem/lpc.ts`, tela `telas/personagem.ts`): camadas do **LPC** em `client/public/lpc` (créditos obrigatórios) recoloridas pelas paletas do LPC + detalhes Pokémon desenhados por código (boné com logo, estampa, Pokébolas no cinto). Criação antes da roleta (`jogo-claude:aparencia-nova` → `save.aparencia`), edição pelo botão "✏️ Personagem" no menu da região. No mapa, quadros 64×64 (8 de andar, 4 por passo); o desenho antigo (`jogo/personagem.ts`) só aparece até o LPC carregar.
-Pokémon que segue: iniciais e evoluções (não shiny) usam sprites de mapa do **PMD SpriteCollab** (`client/public/seguidores`, `jogo/seguidoresPmd.ts`, CC BY-NC: atenção se o jogo virar comercial), andando em 8 direções; os outros, a imagem de batalha balançando.
+Pokémon que segue: 961 espécies (shiny em 918; lista em `jogo/seguidoresIndice.ts`) usam sprites de mapa do **PMD SpriteCollab** (`client/public/seguidores`, `jogo/seguidoresPmd.ts`, CC BY-NC: atenção se o jogo virar comercial), andando em 8 direções; os outros, a imagem de batalha balançando.
 Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de teste).
 
 ## Batalha (`shared/batalha/`)

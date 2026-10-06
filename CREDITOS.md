@@ -15,7 +15,7 @@ As cores dos tiles são alteradas por filtro em cada bioma. Versões modificadas
 
 ## Pokémon que segue o jogador (iniciais)
 - **PMD SpriteCollab** — vários artistas (créditos por espécie em `client/public/seguidores/<número>/credits.txt` e nomes em `credit_names.txt`) — CC BY-NC 4.0 (uso não comercial; ver `LICENSE-SpriteCollab.md`)
-  https://github.com/PMDCollab/SpriteCollab — `client/public/seguidores/` (andar e parado em 8 direções dos 27 iniciais e evoluções)
+  https://github.com/PMDCollab/SpriteCollab — `client/public/seguidores/` (andar e parado em 8 direções de 961 espécies; versão shiny de 918)
 
 ## Dados e sprites de Pokémon
 - PokéAPI — https://pokeapi.co
