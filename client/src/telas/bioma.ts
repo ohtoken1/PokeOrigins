@@ -11,7 +11,7 @@ import { ajustesAdmin, aoMudarAdmin } from '../ui/admin';
 import { carregarSave, curarTime, novoPokemon, salvar } from '../estado';
 import { el, spritePokemon } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
-import { botoesMenus } from '../ui/menus';
+import { botaoIcone, botoesMenus } from '../ui/menus';
 import { mostrarEncontro } from '../ui/popupEncontro';
 import { painelTime } from '../ui/time';
 
@@ -102,18 +102,11 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         { class: 'barra' },
         el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'regiao' }) }, '← Voltar'),
         el('h1', {}, `${bioma.nome}`, el('small', {}, ` · ${regiao.nome}`)),
-        el(
-          'button',
-          {
-            class: 'botao secundario',
-            onclick: () => {
-              curarTime(save);
-              atualizarTime();
-            },
-          },
-          '❤ Curar time',
-        ),
-        ...botoesMenus(save, () => atualizarTime()),
+        botaoIcone('❤️', 'Curar time', () => {
+          curarTime(save);
+          atualizarTime();
+        }),
+        ...botoesMenus(save, () => atualizarTime(), true),
         contador,
       ),
       el(

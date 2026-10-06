@@ -405,3 +405,4 @@ button.vaga:hover { border-color: var(--borda); }
 .admin-linha { display: flex; gap: 6px; }
 .admin-linha input { flex: 1; min-width: 0; }
 .admin-linha .botao { padding: 6px 10px; }
+.botao.botao-icone { font-size: 1.3rem; line-height: 1; padding: 6px 10px; }

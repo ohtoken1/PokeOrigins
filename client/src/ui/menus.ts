@@ -4,11 +4,19 @@ import { el } from './dom';
 import { abrirLoja } from './loja';
 import { abrirPC } from './pc';
 
-/** Botões "PC", "Bolsa" e "Loja" usados no menu da região e no bioma. */
-export function botoesMenus(save: Save, aoMudar: () => void): HTMLElement[] {
-  return [
-    el('button', { class: 'botao secundario', onclick: () => abrirPC(save, aoMudar) }, '🖥 PC'),
-    el('button', { class: 'botao secundario', onclick: () => abrirBolsa(save, aoMudar) }, '🎒 Bolsa'),
-    el('button', { class: 'botao secundario', onclick: () => abrirLoja(save, aoMudar) }, '🏪 Loja'),
+/** Botão só com ícone (o nome aparece ao passar o mouse). */
+export function botaoIcone(icone: string, nome: string, onclick: () => void): HTMLElement {
+  return el('button', { class: 'botao secundario botao-icone', title: nome, 'aria-label': nome, onclick }, icone);
+}
+
+/** Botões "PC", "Bolsa" e "Loja" usados no menu da região e no bioma (`soIcone` no bioma). */
+export function botoesMenus(save: Save, aoMudar: () => void, soIcone = false): HTMLElement[] {
+  const menus: [string, string, () => void][] = [
+    ['🖥️', 'PC', () => abrirPC(save, aoMudar)],
+    ['🎒', 'Bolsa', () => abrirBolsa(save, aoMudar)],
+    ['🏪', 'Loja', () => abrirLoja(save, aoMudar)],
   ];
+  return menus.map(([icone, nome, onclick]) =>
+    soIcone ? botaoIcone(icone, nome, onclick) : el('button', { class: 'botao secundario', onclick }, `${icone} ${nome}`),
+  );
 }
