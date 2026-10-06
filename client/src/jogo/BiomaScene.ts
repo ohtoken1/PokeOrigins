@@ -6,15 +6,15 @@ import { pokemonPorId } from '../dados';
 import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
 import type { FolhasPersonagem } from '../personagem/lpc';
 
-/** Tamanho da tela do jogo em pixels (a câmera mostra ~37×25 tiles ampliados 1,6×). */
+/** Tamanho da tela do jogo em pixels (a câmera mostra ~43×29 tiles ampliados 1,4×). */
 export const LARGURA_TELA = 960;
 export const ALTURA_TELA = 640;
-/** Zoom da câmera (era 2; 1,6 mostra mais mapa — pedido do dono — sem mudar o tamanho do personagem na tela). */
-const ZOOM = 1.6;
-/** Personagem e seguidor têm o dobro de detalhe; nesta escala cada pixel deles vira 1 pixel na tela, em qualquer zoom. */
-const ESCALA_DETALHE = 1 / ZOOM;
-/** Quanto o personagem/seguidor crescem no mundo para manter o tamanho de tela de quando o zoom era 2. */
-const COMPENSA_ZOOM = 2 / ZOOM;
+/** Zoom da câmera (pedido do dono: mais afastado; personagem e seguidor diminuem junto com o mapa). */
+const ZOOM = 1.4;
+/** Tamanho do personagem/seguidor no mundo (fixo: com zoom 1,6 cada pixel do desenho virava 1 pixel da tela). */
+const ESCALA_DETALHE = 1 / 1.6;
+/** Quanto o personagem/seguidor são maiores no mundo que o tamanho original (zoom 2 → 1,6). */
+const COMPENSA_ZOOM = 2 / 1.6;
 const DURACAO_PASSO = 160;
 /** Quadros da animação de andar do LPC por quadradinho (o ciclo tem 8). */
 const QUADROS_POR_PASSO = 3;
@@ -82,6 +82,9 @@ export class BiomaScene extends Phaser.Scene {
   /** o seguidor é um container (anda de tile em tile) com a imagem dentro (balança parado no lugar) */
   private seguidor!: Phaser.GameObjects.Container;
   private imgSeguidor!: Phaser.GameObjects.Image;
+  /** Sombras no chão (elipses) embaixo do jogador e do seguidor. */
+  private sombraJogador!: Phaser.GameObjects.Ellipse;
+  private sombraSeguidor!: Phaser.GameObjects.Ellipse;
   private pos = { x: 0, y: 0 };
   private posSeguidor = { x: 0, y: 0 };
   private dadosSeguidor: Seguidor | null = null;
@@ -164,6 +167,8 @@ export class BiomaScene extends Phaser.Scene {
     // balanço para cima e para baixo em 2 quadros, como os Pokémon que seguem nos jogos
     this.tweens.add({ targets: this.imgSeguidor, y: -1.5, duration: 260, yoyo: true, repeat: -1, ease: 'Stepped', easeParams: [2] });
     const [px, py] = this.pesDoTile(this.pos.x, this.pos.y);
+    this.sombraJogador = this.add.ellipse(px, py, 15, 5, 0x000000, 0.28);
+    this.sombraSeguidor = this.add.ellipse(sx, sy, 12, 4, 0x000000, 0.28).setVisible(false);
     this.jogador = this.add.image(px, py, 'jogador-baixo-0').setOrigin(0.5, 28 / 32).setScale(ESCALA_DETALHE);
     this.atualizarProfundidade();
     this.carregarSeguidor();
@@ -246,6 +251,7 @@ export class BiomaScene extends Phaser.Scene {
   }
 
   update() {
+    this.atualizarSombras();
     if (this.movendo) return;
     if (this.pausado) {
       this.direcaoPendente = undefined;
@@ -323,6 +329,17 @@ export class BiomaScene extends Phaser.Scene {
     }
     this.lpc = nome;
     this.jogador.setTexture(nome, `${this.linhaLpc}-0`).setOrigin(0.5, 61 / 64).setFlipX(false);
+  }
+
+  private atualizarSombras() {
+    if (!this.sombraJogador) return;
+    this.sombraJogador.setPosition(this.jogador.x, this.jogador.y - 1).setDepth(this.jogador.depth - 0.5);
+    const largura = Math.max(8, this.imgSeguidor.displayWidth * 0.6);
+    this.sombraSeguidor
+      .setPosition(this.seguidor.x, this.seguidor.y - 1)
+      .setSize(largura, largura * 0.32)
+      .setVisible(this.seguidor.visible)
+      .setDepth(this.seguidor.depth - 0.5);
   }
 
   private atualizarProfundidade() {

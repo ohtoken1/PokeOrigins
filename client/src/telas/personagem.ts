@@ -3,7 +3,7 @@
 import type { Tela } from '../main';
 import { carregarSave, salvar } from '../estado';
 import {
-  APARENCIA_PADRAO, BONES, CABELOS, CORES_CABELO, CORES_ROUPA, ESTAMPAS, PELES, carregarPaletas, montarPersonagem,
+  APARENCIA_PADRAO, CABELOS, CORES_CABELO, CORES_ROUPA, ESTAMPAS, PELES, carregarPaletas, montarPersonagem,
   type Aparencia, type FolhasPersonagem,
 } from '../personagem/lpc';
 import { el } from '../ui/dom';
@@ -30,6 +30,7 @@ export function limparAparenciaNova(): void {
 export const telaPersonagem: Tela = (raiz, navegar) => {
   const save = carregarSave();
   const a: Aparencia = { ...APARENCIA_PADRAO, ...(save?.aparencia ?? aparenciaNova() ?? {}) };
+  a.bone = 'nenhum';
   let direcao = 2;
   let folhas: FolhasPersonagem | null = null;
   let versao = 0;
@@ -71,7 +72,7 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
     const cor = (lista: string[], tabela: Record<string, string[]>) => lista.map((k): [string, string, string] => [k, k, meio(tabela[k])]);
     painel.replaceChildren(
       el('h3', {}, 'Estilo Pokémon'),
-      grupo('Boné', Object.entries(BONES), () => a.bone, (v) => (a.bone = v as Aparencia['bone'])),
+      // boné: guardado para depois (pedido do dono)
       grupo('Estampa da camiseta', Object.entries(ESTAMPAS), () => a.estampa, (v) => (a.estampa = v as Aparencia['estampa'])),
       grupo('Pokébolas no cinto', [['sim', 'Com'], ['nao', 'Sem']], () => (a.cinto ? 'sim' : 'nao'), (v) => (a.cinto = v === 'sim')),
       el('h3', {}, 'Corpo'),

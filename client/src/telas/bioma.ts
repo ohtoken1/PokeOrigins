@@ -234,7 +234,8 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   };
 
   // personagem do jogador (LPC + detalhes Pokémon); a cena troca o desenho quando ficar pronto
-  const aparencia = save.aparencia ?? APARENCIA_PADRAO;
+  // boné guardado para depois (pedido do dono): fica sem por enquanto
+  const aparencia = { ...(save.aparencia ?? APARENCIA_PADRAO), bone: 'nenhum' as const };
   opcoesCena.personagem = { chave: JSON.stringify(aparencia), folhas: montarPersonagem(aparencia) };
   const jogo = mostrarJogo(areaJogo, opcoesCena);
   cena = jogo.cena;

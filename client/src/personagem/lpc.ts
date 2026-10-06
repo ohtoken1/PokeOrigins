@@ -28,7 +28,7 @@ export const APARENCIA_PADRAO: Aparencia = {
   camiseta: 'blue',
   calca: 'navy',
   tenis: 'red',
-  bone: 'vermelho',
+  bone: 'nenhum',
   estampa: 'pokebola',
   cinto: true,
 };
@@ -249,7 +249,7 @@ export async function montarPersonagem(a: Aparencia): Promise<FolhasPersonagem> 
           const cores: Record<string, string> = { r: '#e8443c', k: CONTORNO, w: '#f4f4f4' };
           const meio = Math.round((cintura.esq + cintura.dir) / 2);
           const x0 = linha === 2 ? meio - 5 : linha === 0 ? meio + 3 : linha === 1 ? meio + 1 : meio - 3;
-          const y0 = cintura.topo + 1;
+          const y0 = cintura.topo + 3;
           bola.forEach((l, j) =>
             [...l].forEach((ch, i) => {
               const x = x0 + i, y = y0 + j;
