@@ -100,7 +100,22 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
     }, '↻ Virar'),
   );
 
+  // nome de treinador (username): aparece em cima do personagem no mapa
+  const campoNome = el('input', { class: 'campo-nome', type: 'text', maxlength: 16, placeholder: 'Ex.: Ash', value: a.nome ?? '' }) as HTMLInputElement;
+  const avisoNome = el('small', { class: 'aviso-nome' }, '');
+  const nomeSobre = el('div', { class: 'nome-sobre' }, campoNome.value);
+  campoNome.addEventListener('input', () => {
+    avisoNome.textContent = '';
+    nomeSobre.textContent = campoNome.value.trim();
+  });
   const concluir = () => {
+    const nome = campoNome.value.trim().replace(/\s+/g, ' ');
+    if (nome.length < 3) {
+      avisoNome.textContent = 'Escolha um nome de 3 a 16 letras.';
+      campoNome.focus();
+      return;
+    }
+    a.nome = nome;
     if (save) {
       save.aparencia = { ...a };
       salvar(save);
@@ -124,7 +139,9 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
       el(
         'div',
         { class: 'layout-personagem' },
-        el('section', { class: 'palco-personagem' }, el('div', { class: 'chao-personagem' }, canvas), direcoes,
+        el('section', { class: 'palco-personagem' },
+          el('label', { class: 'grupo-nome' }, el('span', {}, 'Nome de treinador'), campoNome, avisoNome),
+          el('div', { class: 'chao-personagem' }, nomeSobre, canvas), direcoes,
           el('button', { class: 'botao grande', onclick: concluir }, save ? 'Salvar' : 'Continuar →')),
         painel,
       ),

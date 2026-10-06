@@ -748,3 +748,47 @@ button.vaga:hover { border-color: var(--borda); }
 .cor-personagem { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--borda); cursor: pointer; padding: 0; }
 .creditos-lpc { display: block; margin-top: 16px; color: var(--texto-2); font-size: 0.7rem; }
 .editar-personagem { padding: 3px 8px; font-size: 0.75rem; }
+
+/* Cartão de informações do golpe (batalha, aprender golpe, bolsa) */
+.dica-golpe {
+  position: fixed; z-index: 100000; width: 250px; padding: 10px 12px; border-radius: 12px; pointer-events: none;
+  display: flex; flex-direction: column; gap: 6px; font-size: 0.82rem; color: var(--texto); line-height: 1.35;
+  background: rgb(16 30 50 / 0.82); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  border: 1px solid var(--borda); box-shadow: 0 10px 24px rgb(0 0 0 / 0.4);
+}
+.dica-golpe[hidden] { display: none; }
+.dica-golpe-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 0.95rem; }
+.dica-golpe-numeros { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 10px; padding: 6px 0; border-top: 1px solid var(--borda); border-bottom: 1px solid var(--borda); }
+.dica-golpe-linha { display: flex; justify-content: space-between; gap: 6px; }
+.dica-golpe-linha span { color: var(--texto-2); }
+.dica-golpe-desc { margin: 0; color: var(--texto-2); }
+/* golpe novo em destaque na pergunta "esquecer qual?" */
+.golpe-novo {
+  color: var(--cor-tipo, var(--destaque)); font-weight: 800; cursor: help;
+  text-decoration: underline dotted; text-underline-offset: 3px; pointer-events: auto;
+}
+
+/* zoom temporário do mapa */
+.zoom-mapa {
+  position: absolute; right: 10px; top: 10px; z-index: 5; display: flex; align-items: center; gap: 6px; padding: 4px 6px; line-height: 1;
+  background: rgb(16 30 50 / 0.7); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); border-radius: 10px;
+  font-size: 0.75rem; color: var(--texto-2);
+}
+.zoom-mapa button { width: 24px; height: 24px; border: 1px solid var(--borda); border-radius: 6px; background: var(--painel-2); color: var(--texto); cursor: pointer; font-weight: 800; }
+
+/* arrastar no time: sem seleção de texto nem arraste nativo da imagem */
+.vaga.arrastavel { user-select: none; -webkit-user-select: none; touch-action: none; }
+.vaga.arrastavel img { -webkit-user-drag: none; user-drag: none; pointer-events: none; }
+
+/* nome de treinador na criação de personagem */
+.grupo-nome { width: 100%; display: flex; flex-direction: column; gap: 4px; }
+.grupo-nome > span { font-size: 0.72rem; color: var(--texto-2); text-transform: uppercase; letter-spacing: 0.05em; }
+.campo-nome { padding: 8px 10px; border-radius: 10px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto); font: inherit; font-weight: 700; }
+.campo-nome:focus { outline: 2px solid var(--destaque); outline-offset: 1px; }
+.aviso-nome { color: #ef6a6a; min-height: 1em; }
+.aviso-nome:empty { display: none; }
+.chao-personagem { position: relative; }
+.nome-sobre {
+  position: absolute; top: 20px; left: 50%; translate: -50% 0; font-weight: 800; font-size: 0.85rem; color: #fff;
+  text-shadow: 0 0 3px #16243a, 0 0 3px #16243a, 0 1px 2px #16243a; white-space: nowrap; pointer-events: none;
+}

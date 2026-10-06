@@ -54,11 +54,15 @@ export function ganharExperiencia(
   r.mensagens.push(`${nome} ganhou ${quantidade} pontos de experiência!`);
 
   const crescimento = crescimentoDe(p.especieId);
+  // vários níveis de uma vez (ex.: 20 → 30) viram UMA mensagem com o nível final (pedido do dono);
+  // os golpes aprendidos no caminho vêm depois dela
+  const nivelAntes = p.nivel;
+  const aprendidos: ResultadoProgresso = { mensagens: [], golpesPendentes: r.golpesPendentes, evolucao: null };
   while (p.nivel < NIVEL_MAXIMO && p.exp >= expParaNivel(crescimento, p.nivel + 1)) {
     mudarNivelOuEspecie(p, { nivel: p.nivel + 1 });
-    r.mensagens.push(`${nome} subiu para o nível ${p.nivel}!`);
-    for (const golpe of golpesNoNivel(p.especieId, p.nivel)) aprender(p, golpe, nome, r);
+    for (const golpe of golpesNoNivel(p.especieId, p.nivel)) aprender(p, golpe, nome, aprendidos);
   }
+  if (p.nivel > nivelAntes) r.mensagens.push(`${nome} subiu para o nível ${p.nivel}!`, ...aprendidos.mensagens);
   if (p.nivel >= NIVEL_MAXIMO) p.exp = expParaNivel(crescimento, NIVEL_MAXIMO);
 
   const para = evolucaoPorNivel(p.especieId, p.nivel);

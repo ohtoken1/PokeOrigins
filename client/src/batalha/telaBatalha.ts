@@ -1,6 +1,6 @@
 import type { Bioma } from '../../../shared/biomas';
 import { BatalhaSelvagem, type EventoBatalha, type Lado } from '../../../shared/batalha/motor';
-import { atributos, curar, especie, expGanha, expParaNivel, faixaVelocidade, ganharEvs, hpMaximo, nomeGolpe, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { atributos, curar, especie, expGanha, expParaNivel, faixaVelocidade, ganharEvs, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { Dex } from '@pkmn/sim';
 import { evoluir, ganharExperiencia, trocarGolpe, type ResultadoProgresso } from '../../../shared/batalha/progresso';
 import { pokemonPorId } from '../dados';
@@ -14,6 +14,7 @@ import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '..
 import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { iconeItem } from '../ui/iconeItem';
 import { resumoPokemon } from '../ui/resumo';
+import { dicaGolpe } from '../ui/dicaGolpe';
 import { nomeCategoria, traduzir } from '../../../shared/traducao';
 import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarGolpe, animarRetorno, tremerArena } from './animacoes';
 
@@ -236,17 +237,11 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     if (pedido.tipo !== 'acao') return menuPrincipal();
     acoes.replaceChildren(
       ...pedido.golpes.map((g) =>
-        el(
+        // cartão com as informações do golpe ao passar o mouse
+        dicaGolpe(el(
           'button',
           {
             class: 'botao golpe',
-            // descrição do golpe ao passar o mouse (traduzida)
-            title: (() => {
-              const m = Dex.moves.get(g.id);
-              const precisao = m.accuracy === true ? 'nunca erra' : `precisão ${m.accuracy}%`;
-              return `${traduzir(m.shortDesc || m.desc)}
-${nomeCategoria(m.category)} · ${precisao}${m.priority ? ` · prioridade ${m.priority > 0 ? '+' : ''}${m.priority}` : ''}`;
-            })(),
             style: { '--cor-tipo': corTipo(g.tipo) },
             disabled: g.desabilitado || (g.ppMax > 0 && g.pp <= 0),
             onclick: () => executar(() => batalha.usarGolpe(g.indice)),
@@ -260,7 +255,7 @@ ${nomeCategoria(m.category)} · ${precisao}${m.priority ? ` · prioridade ${m.pr
             el('span', {}, `Poder ${Dex.moves.get(g.id).basePower || '—'}`),
             g.ppMax > 0 ? el('span', {}, `PP ${g.pp}/${g.ppMax}`) : '',
           ),
-        ),
+        ), g.id, g.ppMax > 0 ? () => ({ atual: g.pp, max: g.ppMax }) : undefined),
       ),
       botao('← Voltar', menuPrincipal, { class: 'botao secundario voltar' }),
     );
@@ -396,10 +391,15 @@ ${nomeCategoria(m.category)} · ${precisao}${m.priority ? ` · prioridade ${m.pr
   // ---------- fim da batalha ----------
   async function perguntarGolpe(p: PokemonIndividual, novo: string) {
     const nome = nomeDe(p.especieId);
-    mensagem.textContent = `${nome} quer aprender ${nomeGolpe(novo)}, mas já conhece 4 golpes. Esquecer qual?`;
+    // golpe novo em destaque, com o cartão de informações ao passar o mouse
+    mensagem.replaceChildren(
+      `${nome} quer aprender `,
+      dicaGolpe(el('span', { class: 'golpe-novo', style: { '--cor-tipo': corTipo(Dex.moves.get(novo).type) } }, nomeGolpe(novo)), novo),
+      ', mas já conhece 4 golpes. Esquecer qual?',
+    );
     const escolha = await new Promise<number | null>((resolver) =>
       acoes.replaceChildren(
-        ...p.golpes.map((g, i) => botao(nomeGolpe(g.id), () => resolver(i), { class: 'botao golpe' })),
+        ...p.golpes.map((g, i) => dicaGolpe(botao(nomeGolpe(g.id), () => resolver(i), { class: 'botao golpe', style: { '--cor-tipo': corTipo(Dex.moves.get(g.id).type) } }), g.id, () => ({ atual: g.pp, max: ppMaximo(g.id) }))),
         botao(`Não aprender ${nomeGolpe(novo)}`, () => resolver(null), { class: 'botao secundario' }),
       ),
     );

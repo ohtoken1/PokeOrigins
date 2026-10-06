@@ -6,7 +6,9 @@ import { ehEquipavel, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina 
 import { pokemonPorId, todosOsPokemons } from '../dados';
 import { registrarCapturado, salvar, type Save } from '../estado';
 import { abrirJanela } from './janela';
-import { el } from './dom';
+import { corTipo, el } from './dom';
+import { dicaGolpe } from './dicaGolpe';
+import { Dex } from '@pkmn/sim';
 import { iconeItem } from './iconeItem';
 import { cartaoPokemon } from './time';
 import { abrirJanelaTicket } from './ticket';
@@ -107,12 +109,12 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
       return el(
         'div',
         { class: 'bolsa' },
-        el('p', {}, `${nome(m.p)} quer aprender ${nomeGolpe(m.golpe)}, mas já conhece 4 golpes. Esquecer qual?`),
+        el('p', {}, `${nome(m.p)} quer aprender `, dicaGolpe(el('span', { class: 'golpe-novo', style: { '--cor-tipo': corTipo(Dex.moves.get(m.golpe).type) } }, nomeGolpe(m.golpe)), m.golpe), ', mas já conhece 4 golpes. Esquecer qual?'),
         el(
           'div',
           { class: 'lista-golpes-escolha' },
           m.p.golpes.map((g, i) =>
-            el(
+            dicaGolpe(el(
               'button',
               {
                 class: 'botao secundario',
@@ -125,7 +127,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                 },
               },
               nomeGolpe(g.id),
-            ),
+            ), g.id, () => ({ atual: g.pp, max: ppMaximo(g.id) })),
           ),
         ),
         el(

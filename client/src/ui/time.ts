@@ -60,16 +60,20 @@ export function painelTime(time: PokemonDoJogador[], aoReordenar?: () => void): 
     vagas.forEach((vaga, origem) => {
       if (!time[origem]) return;
       vaga.classList.add('arrastavel');
+      // a imagem do Pokémon não pode ser "arrastada" pelo navegador (isso travava o clique)
+      vaga.addEventListener('dragstart', (e) => e.preventDefault());
       vaga.addEventListener('pointerdown', (e) => {
         if (e.button !== 0) return;
+        e.preventDefault();
         const [x0, y0] = [e.clientX, e.clientY];
         arrastou = false;
         let alvo: number | null = null;
+        // todos os eventos seguintes vêm para esta vaga, mesmo com o mouse fora dela
+        vaga.setPointerCapture(e.pointerId);
         const mover = (ev: PointerEvent) => {
           if (!arrastou && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 6) return;
           if (!arrastou) {
             arrastou = true;
-            vaga.setPointerCapture(ev.pointerId);
             vaga.classList.add('arrastando');
           }
           vaga.style.translate = `${ev.clientX - x0}px ${ev.clientY - y0}px`;
@@ -82,12 +86,15 @@ export function painelTime(time: PokemonDoJogador[], aoReordenar?: () => void): 
           if (alvo < 0) alvo = null;
           vagas.forEach((v, j) => v.classList.toggle('alvo', j === alvo));
         };
-        const soltar = () => {
-          window.removeEventListener('pointermove', mover);
+        const terminar = (ev: PointerEvent) => {
+          vaga.removeEventListener('pointermove', mover);
+          vaga.removeEventListener('pointerup', terminar);
+          vaga.removeEventListener('pointercancel', terminar);
+          if (vaga.hasPointerCapture(ev.pointerId)) vaga.releasePointerCapture(ev.pointerId);
           vaga.classList.remove('arrastando');
           vaga.style.translate = '';
           vagas.forEach((v) => v.classList.remove('alvo'));
-          if (arrastou && alvo !== null) {
+          if (ev.type === 'pointerup' && arrastou && alvo !== null) {
             const destino = Math.min(alvo, time.length - 1);
             const [p] = time.splice(origem, 1);
             time.splice(destino, 0, p);
@@ -96,8 +103,9 @@ export function painelTime(time: PokemonDoJogador[], aoReordenar?: () => void): 
           // deixa o clique (que vem logo depois) saber que foi um arraste
           setTimeout(() => (arrastou = false));
         };
-        window.addEventListener('pointermove', mover);
-        window.addEventListener('pointerup', soltar, { once: true });
+        vaga.addEventListener('pointermove', mover);
+        vaga.addEventListener('pointerup', terminar);
+        vaga.addEventListener('pointercancel', terminar);
       });
     });
   return el('div', { class: 'painel-time' }, el('h2', {}, `Seu time (${time.length}/${TAMANHO_MAXIMO_TIME})`), el('div', { class: 'vagas' }, vagas));

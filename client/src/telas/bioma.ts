@@ -237,8 +237,28 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   // boné guardado para depois (pedido do dono): fica sem por enquanto
   const aparencia = { ...(save.aparencia ?? APARENCIA_PADRAO), bone: 'nenhum' as const };
   opcoesCena.personagem = { chave: JSON.stringify(aparencia), folhas: montarPersonagem(aparencia) };
+  opcoesCena.nomeJogador = save.aparencia?.nome;
   const jogo = mostrarJogo(areaJogo, opcoesCena);
   cena = jogo.cena;
+
+  // TEMPORÁRIO (testes do dono): zoom do mapa com botões +/− e com a rodinha do mouse em cima do mapa
+  {
+    const valor = el('span', {}, '');
+    const mudar = (passo: number) => {
+      const z = cena()?.mudarZoom(passo);
+      if (z) valor.textContent = `${z.toFixed(1)}×`;
+    };
+    areaJogo.append(
+      el('div', { class: 'zoom-mapa', title: 'Zoom do mapa (temporário)' },
+        el('button', { onclick: () => mudar(-0.1), title: 'Afastar' }, '−'), valor, el('button', { onclick: () => mudar(0.1), title: 'Aproximar' }, '+')),
+    );
+    areaJogo.addEventListener('wheel', (e) => {
+      if (!(e.target instanceof HTMLCanvasElement)) return;
+      e.preventDefault();
+      mudar(e.deltaY < 0 ? 0.1 : -0.1);
+    }, { passive: false });
+    setTimeout(() => mudar(0), 500);
+  }
 
   // o mapa fica parado durante a batalha e com PC/Bolsa/ficha abertos
   let emBatalha = false;

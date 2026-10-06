@@ -12,6 +12,8 @@ export const LARGURA_TELA = 960;
 export const ALTURA_TELA = 640;
 /** Zoom da câmera (pedido do dono: mais afastado; personagem e seguidor diminuem junto com o mapa). */
 const ZOOM = 1.4;
+/** Zoom escolhido nos botões +/− do mapa (TEMPORÁRIO, para testes do dono); vale para todos os biomas. */
+let zoomEscolhido = ZOOM;
 /** Tamanho do personagem/seguidor no mundo (fixo: com zoom 1,6 cada pixel do desenho virava 1 pixel da tela). */
 const ESCALA_DETALHE = 1 / 1.6;
 /** Quanto o personagem/seguidor são maiores no mundo que o tamanho original (zoom 2 → 1,6). */
@@ -71,6 +73,8 @@ export interface OpcoesBioma {
   aoPisar(): void;
   /** Personagem LPC montado (chega depois; até lá aparece o desenho antigo). `chave` identifica a aparência. */
   personagem?: { chave: string; folhas: Promise<FolhasPersonagem> };
+  /** Nome de treinador, mostrado em cima do personagem. */
+  nomeJogador?: string;
 }
 
 const DIRECOES_POR_TECLA: Record<string, [number, number]> = {
@@ -95,6 +99,8 @@ export class BiomaScene extends Phaser.Scene {
   /** Sombras no chão (elipses) embaixo do jogador e do seguidor. */
   private sombraJogador!: Phaser.GameObjects.Ellipse;
   private sombraSeguidor!: Phaser.GameObjects.Ellipse;
+  /** nome de treinador em cima da cabeça */
+  private nomeJogador: Phaser.GameObjects.Text | null = null;
   private pos = { x: 0, y: 0 };
   private posSeguidor = { x: 0, y: 0 };
   private dadosSeguidor: Seguidor | null = null;
@@ -184,11 +190,18 @@ export class BiomaScene extends Phaser.Scene {
     this.jogador = this.add.image(px, py, 'jogador-baixo-0').setOrigin(0.5, 28 / 32).setScale(ESCALA_DETALHE);
     this.atualizarProfundidade();
     this.carregarSeguidor();
+    this.nomeJogador = null;
+    if (this.opcoes.nomeJogador)
+      this.nomeJogador = this.add
+        .text(px, py, this.opcoes.nomeJogador, { fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#ffffff', stroke: '#16243a', strokeThickness: 2 })
+        .setOrigin(0.5, 1)
+        .setResolution(4)
+        .setDepth(100000);
     this.opcoes.personagem?.folhas.then((f) => this.usarPersonagemLpc(this.opcoes.personagem!.chave, f));
     if (paleta.submerso) this.efeitosSubmersos();
 
     const camera = this.cameras.main;
-    camera.setZoom(ZOOM).setBounds(0, 0, LARGURA * TAM, ALTURA * TAM).setRoundPixels(true);
+    camera.setZoom(zoomEscolhido).setBounds(0, 0, LARGURA * TAM, ALTURA * TAM).setRoundPixels(true);
     camera.startFollow(this.jogador, true);
 
     const teclado = this.input.keyboard!;
@@ -367,9 +380,18 @@ export class BiomaScene extends Phaser.Scene {
     this.sombraJogador.setSize(16, 5);
   }
 
+  /** TEMPORÁRIO: aproxima/afasta a câmera (botões +/− e rodinha do mouse no mapa). Devolve o zoom atual. */
+  mudarZoom(passo: number): number {
+    zoomEscolhido = Math.round(Math.max(0.6, Math.min(3, zoomEscolhido + passo)) * 10) / 10;
+    this.cameras.main?.setZoom(zoomEscolhido);
+    return zoomEscolhido;
+  }
+
   private atualizarSombras() {
     if (!this.sombraJogador) return;
     this.sombraJogador.setPosition(this.jogador.x, this.jogador.y - 1).setDepth(this.jogador.depth - 0.5);
+    // nome acima da cabeça (o personagem LPC tem ~30 px de altura no mundo)
+    this.nomeJogador?.setPosition(Math.round(this.jogador.x), Math.round(this.jogador.y - (this.lpc ? 30 : 22)));
     const largura = this.pmd ? Math.max(8, this.pmd.largura * ESCALA_PMD * 0.75) : Math.max(8, this.imgSeguidor.displayWidth * 0.45);
     this.sombraSeguidor
       .setPosition(this.seguidor.x, this.seguidor.y - 1)

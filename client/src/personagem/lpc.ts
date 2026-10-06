@@ -18,6 +18,8 @@ export interface Aparencia {
   bone: Bone;
   estampa: Estampa;
   cinto: boolean;
+  /** Nome de treinador (username), mostrado em cima do personagem no mapa. */
+  nome?: string;
 }
 
 export const APARENCIA_PADRAO: Aparencia = {
