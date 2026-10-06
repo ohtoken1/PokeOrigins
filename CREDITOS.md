@@ -13,6 +13,10 @@ As cores dos tiles são alteradas por filtro em cada bioma. Versões modificadas
   https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator — `client/public/lpc/` (corpo, cabeça, olhos, cabelos, camiseta, calça, tênis; cores trocadas pelas paletas do próprio LPC)
 - Boné, estampas da camiseta e Pokébolas do cinto: desenho próprio (código em `client/src/personagem/lpc.ts`).
 
+## Pokémon que segue o jogador (iniciais)
+- **PMD SpriteCollab** — vários artistas (créditos por espécie em `client/public/seguidores/<número>/credits.txt` e nomes em `credit_names.txt`) — CC BY-NC 4.0 (uso não comercial; ver `LICENSE-SpriteCollab.md`)
+  https://github.com/PMDCollab/SpriteCollab — `client/public/seguidores/` (andar e parado em 8 direções dos 27 iniciais e evoluções)
+
 ## Dados e sprites de Pokémon
 - PokéAPI — https://pokeapi.co
 - Motor de batalha: Pokémon Showdown via `@pkmn/sim` (MIT)

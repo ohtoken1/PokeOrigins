@@ -5,6 +5,7 @@ import { PALETAS } from './paletas';
 import { pokemonPorId } from '../dados';
 import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
 import type { FolhasPersonagem } from '../personagem/lpc';
+import { ESPECIES_PMD, carregarPmd, type InfoPmd } from './seguidoresPmd';
 
 /** Tamanho da tela do jogo em pixels (a câmera mostra ~43×29 tiles ampliados 1,4×). */
 export const LARGURA_TELA = 960;
@@ -17,6 +18,8 @@ const ESCALA_DETALHE = 1 / 1.6;
 const COMPENSA_ZOOM = 2 / 1.6;
 /** Escala do personagem LPC (quadro 64×64) no mundo: 20% menor que a do desenho antigo (pedido do dono). */
 const ESCALA_LPC = 0.5;
+/** Escala dos sprites de mapa do PMD (Pokémon que segue). */
+const ESCALA_PMD = 0.75;
 const DURACAO_PASSO = 160;
 /** Quadros da animação de andar do LPC por quadradinho (o ciclo tem 8). */
 const QUADROS_POR_PASSO = 3;
@@ -83,7 +86,12 @@ export class BiomaScene extends Phaser.Scene {
   private jogador!: Phaser.GameObjects.Image;
   /** o seguidor é um container (anda de tile em tile) com a imagem dentro (balança parado no lugar) */
   private seguidor!: Phaser.GameObjects.Container;
-  private imgSeguidor!: Phaser.GameObjects.Image;
+  private imgSeguidor!: Phaser.GameObjects.Sprite;
+  /** balanço da imagem de batalha (o sprite do PMD já tem animação própria) */
+  private balanco!: Phaser.Tweens.Tween;
+  /** seguidor com sprite de mapa do PMD (andando em 8 direções) e a linha da direção atual */
+  private pmd: InfoPmd | null = null;
+  private linhaPmd = 0;
   /** Sombras no chão (elipses) embaixo do jogador e do seguidor. */
   private sombraJogador!: Phaser.GameObjects.Ellipse;
   private sombraSeguidor!: Phaser.GameObjects.Ellipse;
@@ -130,6 +138,8 @@ export class BiomaScene extends Phaser.Scene {
     this.direcaoPendente = undefined;
     this.lpc = null;
     this.linhaLpc = 2;
+    this.pmd = null;
+    this.linhaPmd = 0;
   }
 
   preload() {
@@ -164,10 +174,10 @@ export class BiomaScene extends Phaser.Scene {
     this.add.image(0, 0, chaveMapa).setOrigin(0);
 
     const [sx, sy] = this.pesDoTile(this.posSeguidor.x, this.posSeguidor.y);
-    this.imgSeguidor = this.add.image(0, 0, '__DEFAULT').setOrigin(0.5, 0.9).setScale(ESCALA_DETALHE);
+    this.imgSeguidor = this.add.sprite(0, 0, '__DEFAULT').setOrigin(0.5, 0.9).setScale(ESCALA_DETALHE);
     this.seguidor = this.add.container(sx, sy, [this.imgSeguidor]).setVisible(false);
     // balanço para cima e para baixo em 2 quadros, como os Pokémon que seguem nos jogos
-    this.tweens.add({ targets: this.imgSeguidor, y: -1.5, duration: 260, yoyo: true, repeat: -1, ease: 'Stepped', easeParams: [2] });
+    this.balanco = this.tweens.add({ targets: this.imgSeguidor, y: -1.5, duration: 260, yoyo: true, repeat: -1, ease: 'Stepped', easeParams: [2] });
     const [px, py] = this.pesDoTile(this.pos.x, this.pos.y);
     this.sombraJogador = this.add.ellipse(px, py, 15, 5, 0x000000, 0.28);
     this.sombraSeguidor = this.add.ellipse(sx, sy, 12, 4, 0x000000, 0.28).setVisible(false);
@@ -286,6 +296,29 @@ export class BiomaScene extends Phaser.Scene {
       this.seguidor.setVisible(false);
       return;
     }
+    // iniciais (não shiny): sprite de mapa do PMD, andando em 8 direções
+    if (!d.shiny && ESPECIES_PMD.has(d.especie)) {
+      carregarPmd(this, d.especie).then((info) => {
+        if (this.dadosSeguidor !== d || !this.imgSeguidor?.active) return;
+        if (!info) return this.usarImagemDeBatalha(d);
+        this.pmd = info;
+        this.balanco.pause();
+        this.imgSeguidor.y = 0;
+        this.imgSeguidor.setFlipX(false).setOrigin(0.5, info.origemIdle).setScale(ESCALA_PMD);
+        this.escalaSeguidor = ESCALA_PMD;
+        this.imgSeguidor.play(`${info.prefixo}-idle-${this.linhaPmd}`);
+        this.seguidor.setVisible(true);
+      });
+      return;
+    }
+    this.usarImagemDeBatalha(d);
+  }
+
+  /** Seguidor com a imagem de batalha (frente/costas), balançando. */
+  private usarImagemDeBatalha(d: Seguidor) {
+    this.pmd = null;
+    this.imgSeguidor.stop();
+    this.balanco.resume();
     const aplicar = () => {
       if (this.dadosSeguidor !== d) return;
       this.mostrarLadoSeguidor();
@@ -304,7 +337,7 @@ export class BiomaScene extends Phaser.Scene {
 
   /** Frente (ou costas, andando para cima) do Pokémon que segue. */
   private mostrarLadoSeguidor() {
-    if (!this.dadosSeguidor) return;
+    if (!this.dadosSeguidor || this.pmd) return;
     let chave = this.chaveSeguidor(this.olhandoParaCima);
     // sem imagem de costas (algumas espécies novas): usa a de frente
     if (!this.textures.exists(chave)) chave = this.chaveSeguidor(false);
@@ -331,13 +364,13 @@ export class BiomaScene extends Phaser.Scene {
     }
     this.lpc = nome;
     this.jogador.setTexture(nome, `${this.linhaLpc}-0`).setOrigin(0.5, 61 / 64).setFlipX(false).setScale(ESCALA_LPC);
-    this.sombraJogador.setSize(12, 4);
+    this.sombraJogador.setSize(16, 5);
   }
 
   private atualizarSombras() {
     if (!this.sombraJogador) return;
     this.sombraJogador.setPosition(this.jogador.x, this.jogador.y - 1).setDepth(this.jogador.depth - 0.5);
-    const largura = Math.max(8, this.imgSeguidor.displayWidth * 0.6);
+    const largura = this.pmd ? Math.max(8, this.pmd.largura * ESCALA_PMD * 0.75) : Math.max(8, this.imgSeguidor.displayWidth * 0.45);
     this.sombraSeguidor
       .setPosition(this.seguidor.x, this.seguidor.y - 1)
       .setSize(largura, largura * 0.32)
@@ -413,13 +446,26 @@ export class BiomaScene extends Phaser.Scene {
       const sdx = destino.x - this.posSeguidor.x;
       const sdy = destino.y - this.posSeguidor.y;
       this.posSeguidor = { ...destino };
+      const [fx, fy] = this.pesDoTile(destino.x, destino.y);
+      if (this.pmd) {
+        // PMD: anima andando na direção do passo; parado volta à animação de respirar
+        const pmd = this.pmd;
+        this.linhaPmd = sdy > 0 ? 0 : sdx > 0 ? 2 : sdy < 0 ? 4 : 6;
+        this.imgSeguidor.play(`${pmd.prefixo}-walk-${this.linhaPmd}`, true).setOrigin(0.5, pmd.origemWalk);
+        this.tweens.add({
+          targets: this.seguidor, x: fx, y: fy, duration: DURACAO_PASSO,
+          onComplete: () => this.time.delayedCall(60, () => {
+            if (!this.movendo && this.pmd === pmd) this.imgSeguidor.play(`${pmd.prefixo}-idle-${this.linhaPmd}`, true).setOrigin(0.5, pmd.origemIdle);
+          }),
+        });
+        return;
+      }
       // os sprites olham para a esquerda; espelha para a direita; andando para cima mostra as costas
       if (sdx) this.imgSeguidor.setFlipX(sdx > 0);
       if (sdy || sdx) {
         this.olhandoParaCima = sdy < 0;
         this.mostrarLadoSeguidor();
       }
-      const [fx, fy] = this.pesDoTile(destino.x, destino.y);
       this.tweens.add({ targets: this.seguidor, x: fx, y: fy, duration: DURACAO_PASSO });
       // pulinho
       this.tweens.add({ targets: this.imgSeguidor, scaleY: this.escalaSeguidor * 0.9, scaleX: this.escalaSeguidor * 1.05, duration: DURACAO_PASSO / 2, yoyo: true });
