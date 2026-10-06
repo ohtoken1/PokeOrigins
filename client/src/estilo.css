@@ -615,22 +615,26 @@ button.vaga:hover { border-color: var(--borda); }
 .revelar-ivs .aviso { width: 100%; color: #ef6a6a; }
 .revelar-ivs .aviso:empty { display: none; }
 
-/* Tickets */
+/* Tickets: só a roleta é colorida; chances e prêmios ficam em seções com setinha */
 .janela.janela-ticket { width: min(620px, 94vw); }
-.janela-ticket .ticket { display: flex; flex-direction: column; gap: 12px; align-items: stretch; min-width: 0; }
+.janela-ticket .ticket { display: flex; flex-direction: column; gap: 10px; align-items: stretch; min-width: 0; }
 .janela-ticket .janela-corpo { overflow-x: hidden; }
-.raridades { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; }
-.raridade { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px; border-radius: 10px; }
-.raridade small { opacity: 0.8; }
 /* cores por raridade: branco (comum), azul (raro), roxo (épico), laranja (lendário) */
 .fundo-comum { background: #eef1f6; color: #1f2633; }
 .fundo-raro { background: #3d86ea; color: #fff; }
 .fundo-epico { background: #8d4fe0; color: #fff; }
 .fundo-lendario { background: #f08a1c; color: #fff; }
-.raridade-comum { color: #dfe5ee; }
-.raridade-raro { color: #5aa8ff; }
-.raridade-epico { color: #b77cff; }
-.raridade-lendario { color: #ffa53a; }
+.bolinha { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
+.bolinha.fundo-comum { box-shadow: inset 0 0 0 1px #8a93a3; }
+.ticket-secao { border-top: 1px solid var(--borda); padding: 8px 0 2px; }
+.ticket-secao > summary { cursor: pointer; list-style: none; display: flex; align-items: center; font-size: 0.9rem; color: var(--texto); user-select: none; }
+.ticket-secao > summary::-webkit-details-marker { display: none; }
+.ticket-secao > summary::before { content: '›'; display: inline-block; width: 14px; margin-right: 4px; font-size: 1.1rem; line-height: 1; color: var(--texto-2); transition: transform 0.15s; }
+.ticket-secao[open] > summary::before { transform: rotate(90deg); }
+.ticket-sub { border-top: 0; padding: 4px 0 2px 16px; }
+.ticket-sub > summary { font-size: 0.85rem; color: var(--texto-2); }
+.ticket-sub .premios { justify-content: flex-start; padding: 6px 0 4px 18px; }
+.ticket-chance { display: flex; justify-content: space-between; padding: 3px 0 3px 18px; font-size: 0.85rem; color: var(--texto-2); }
 .roleta.roleta-ticket { width: 100%; max-width: none; height: 104px; margin: 0; }
 .roleta-ticket .roleta-marcador { width: 4px; border: 0; border-radius: 2px; background: #fff; box-shadow: 0 0 10px #fff; }
 .casa-roleta {
@@ -644,17 +648,19 @@ button.vaga:hover { border-color: var(--borda); }
 .ticket-resultado { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
 .ticket-resultado:empty { display: none; }
 .ticket-resultado small { color: var(--texto-2); }
-.ticket-raridade { font-weight: 800; font-size: 1.2rem; margin: 0; }
-.ticket-linha .ticket-raridade { font-size: 0.85rem; min-width: 72px; }
+.ticket-raridade { font-weight: 800; font-size: 1.1rem; margin: 0; }
 .premios { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-.premio { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 10px; border-radius: 10px; }
-.premio .sprite { width: 72px; height: 72px; }
-.premio small { opacity: 0.8; }
+.premio {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 10px; border-radius: 10px;
+  background: var(--painel-2); border: 1px solid var(--borda); color: var(--texto);
+}
+.premio .sprite { width: 64px; height: 64px; }
+.premio small { color: var(--texto-2); }
 .premio-silver { font-size: 1.6rem; }
-.ticket-lista summary { cursor: pointer; color: var(--texto-2); }
-.ticket-linha { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-.ticket-linha .premios { justify-content: flex-start; }
-.ticket-linha .premio .sprite { width: 48px; height: 48px; }
+.ticket-sub .premio { flex-direction: row; gap: 6px; padding: 4px 10px; }
+.ticket-sub .premio .sprite { width: 36px; height: 36px; margin: -4px 0; }
+.ticket-sub .premio .premio-silver { font-size: 1.1rem; }
+.ticket-sub .premio strong { font-size: 0.8rem; font-weight: 600; }
 
 /* Carteira: silver e gold separados, acima do painel do treinador */
 .carteira { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }

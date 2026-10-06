@@ -31,7 +31,8 @@ function entregar(save: Save, r: ResultadoTicket): string[] {
 }
 
 function cartaoPremio(premio: Premio, shiny: boolean, raridade: Raridade): HTMLElement {
-  const classe = `premio fundo-${raridade}`;
+  // fundo neutro (só a roleta é colorida); a raridade aparece na bolinha do título
+  const classe = `premio premio-${raridade}`;
   if (premio.tipo === 'pokemon') {
     const dados = pokemonPorId(premio.especie);
     return el('div', { class: classe }, spritePokemon(dados, { shiny, animado: false }), el('strong', {}, `${dados.nome}${shiny ? ' ✨' : ''}`), el('small', {}, `Nv. ${premio.nivel}`));
@@ -94,8 +95,14 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
     ticket.nome,
     () => {
       const qtd = save.itens[ticketId] ?? 0;
-      const legenda = RARIDADES.filter((r) => ticket.premios[r.id].length).map((r) =>
-        el('div', { class: `raridade fundo-${r.id}` }, el('strong', {}, r.nome), el('small', {}, `${(r.chance * 100).toLocaleString('pt-BR')}%`)),
+      const raridades = RARIDADES.filter((r) => ticket.premios[r.id].length);
+      const bolinha = (r: Raridade) => el('span', { class: `bolinha fundo-${r}` });
+      // chances: fechado; a setinha abre a lista
+      const chances = el(
+        'details',
+        { class: 'ticket-secao' },
+        el('summary', {}, 'Chances'),
+        ...raridades.map((r) => el('div', { class: 'ticket-chance' }, el('span', {}, bolinha(r.id), r.nome), el('span', {}, `${(r.chance * 100).toLocaleString('pt-BR')}%`))),
       );
       const faixa = el('div', { class: 'roleta-faixa' });
       const roleta = el('div', { class: 'roleta roleta-ticket' }, el('div', { class: 'roleta-marcador' }), faixa);
@@ -125,7 +132,7 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
         // as casas passam e param no prêmio sorteado (posição ALVO), com um leve desvio dentro da casa
         encher([r.pacote, r.raridade]);
         void faixa.offsetWidth;
-        const desvio = (Math.random() - 0.5) * LARGURA_CASA * 0.7;
+        const desvio = (Math.random() - 0.5) * LARGURA_CASA * 0.4;
         const deslocamento = ALVO * LARGURA_CASA - (roleta.clientWidth / 2 - LARGURA_CASA / 2) + desvio;
         faixa.style.transition = 'transform 5s cubic-bezier(0.12, 0.7, 0.15, 1)';
         faixa.style.transform = `translateX(${-deslocamento}px)`;
@@ -133,7 +140,7 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
           faixa.children[ALVO]?.classList.add('sorteado');
           const nome = RARIDADES.find((x) => x.id === r.raridade)!.nome;
           resultado.replaceChildren(
-            el('p', { class: `ticket-raridade raridade-${r.raridade}` }, `${nome}!`),
+            el('p', { class: 'ticket-raridade' }, bolinha(r.raridade), `${nome}!`),
             el('div', { class: 'premios' }, ...r.pacote.map((p, k) => cartaoPremio(p, r.shiny[k], r.raridade))),
             ...frases.map((f) => el('small', {}, f)),
           );
@@ -144,21 +151,22 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
       });
 
       // o que pode sair em cada raridade
+      // prêmios possíveis: fechado; dentro, uma setinha por raridade
       const lista = el(
         'details',
-        { class: 'ticket-lista' },
+        { class: 'ticket-secao' },
         el('summary', {}, 'Prêmios possíveis'),
-        ...RARIDADES.filter((r) => ticket.premios[r.id].length).map((r) =>
+        ...raridades.map((r) =>
           el(
-            'div',
-            { class: 'ticket-linha' },
-            el('span', { class: `ticket-raridade raridade-${r.id}` }, r.nome),
+            'details',
+            { class: 'ticket-secao ticket-sub' },
+            el('summary', {}, bolinha(r.id), r.nome),
             el('div', { class: 'premios' }, ...ticket.premios[r.id].flatMap((pacote) => pacote.map((p) => cartaoPremio(p, false, r.id)))),
           ),
         ),
       );
 
-      return el('div', { class: 'ticket' }, el('p', { class: 'meta' }, ticket.descricao), el('div', { class: 'raridades' }, ...legenda), roleta, botao, resultado, lista);
+      return el('div', { class: 'ticket' }, el('p', { class: 'meta' }, ticket.descricao), chances, roleta, botao, resultado, lista);
     },
     { classe: 'janela-ticket' },
   );
