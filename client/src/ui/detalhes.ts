@@ -7,6 +7,8 @@ import { abrirJanela } from './janela';
 import { irPara } from './navegacao';
 import { el, seloGenero, seloNT, seloTipo, selosTipos, spritePokemon } from './dom';
 import { barraHp } from './time';
+import { PRECO_REVELAR_IVS } from '../../../shared/loja';
+import { saveDoPokemon, salvar } from '../estado';
 
 const NOMES: Record<Atributo, string> = { hp: 'HP', atk: 'Ataque', def: 'Defesa', spa: 'At. Esp.', spd: 'Def. Esp.', spe: 'Velocidade' };
 const CATEGORIAS: Record<string, string> = { Physical: 'Físico', Special: 'Especial', Status: 'Status' };
@@ -15,6 +17,37 @@ const STATUS: Record<string, string> = { brn: 'Queimado', par: 'Paralisado', slp
 /** Ficha completa do Pokémon: atributos (base, IV, EV, valor final), natureza, habilidade e golpes. */
 export function abrirDetalhes(p: PokemonIndividual): void {
   abrirJanela(pokemonPorId(p.especieId).nome, () => fichaPokemon(p), { classe: 'janela-detalhes' });
+}
+
+/** Caixa "IVs ocultos" com as opções de pagar para revelar (silver agora; gold preparado para depois). */
+function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | null {
+  if (p.ivsRevelados) return null;
+  const save = saveDoPokemon(p);
+  const aviso = el('small', { class: 'aviso' }, '');
+  const pagar = (moeda: 'silver' | 'gold') => {
+    if (!save) return;
+    const preco = PRECO_REVELAR_IVS[moeda];
+    if (save[moeda] < preco) {
+      aviso.textContent = moeda === 'gold' ? 'Gold ainda não está disponível no jogo.' : `Silver insuficiente (você tem ${save.silver}).`;
+      return;
+    }
+    save[moeda] -= preco;
+    p.ivsRevelados = true;
+    salvar(save);
+    aoRevelar();
+  };
+  return el(
+    'div',
+    { class: 'revelar-ivs' },
+    el('div', {}, el('strong', {}, '🔒 IVs ocultos'), el('small', {}, 'Pague para ver os IVs deste Pokémon.')),
+    el(
+      'div',
+      { class: 'botoes' },
+      el('button', { class: 'botao', disabled: !save, onclick: () => pagar('silver') }, `Revelar · ${PRECO_REVELAR_IVS.silver} silver`),
+      el('button', { class: 'botao secundario', disabled: !save, title: 'Gold ainda não está disponível', onclick: () => pagar('gold') }, `Revelar · ${PRECO_REVELAR_IVS.gold} gold`),
+    ),
+    aviso,
+  );
 }
 
 export function fichaPokemon(p: PokemonIndividual): HTMLElement {
@@ -44,13 +77,15 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
           {},
           el('th', {}, NOMES[a], ' ', marca(a)),
           el('td', {}, el('span', { class: 'barrinha', style: { '--v': String(Math.min(1, base[a] / 180)) } }), String(base[a])),
-          el('td', { class: p.ivs[a] === 31 ? 'perfeito' : '' }, `${p.ivs[a]}/31`),
+          p.ivsRevelados
+            ? el('td', { class: p.ivs[a] === 31 ? 'perfeito' : '' }, `${p.ivs[a]}/31`)
+            : el('td', { class: 'oculto', title: 'IV oculto' }, '?'),
           el('td', {}, String(p.evs[a])),
           el('td', { class: 'valor' }, a === 'hp' ? `${p.hp}/${max}` : String(valores[a])),
         ),
       ),
     ),
-    el('tfoot', {}, el('tr', {}, el('th', {}, 'Total'), el('td', {}, String(totalBase)), el('td', {}, `${ATRIBUTOS.reduce((s, a) => s + p.ivs[a], 0)}/186`), el('td', {}, `${totalEvs}/${EV_MAX_TOTAL}`), el('td'))),
+    el('tfoot', {}, el('tr', {}, el('th', {}, 'Total'), el('td', {}, String(totalBase)), el('td', {}, p.ivsRevelados ? `${ATRIBUTOS.reduce((s, a) => s + p.ivs[a], 0)}/186` : '?'), el('td', {}, `${totalEvs}/${EV_MAX_TOTAL}`), el('td'))),
   );
 
   const golpes = el(
@@ -72,7 +107,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
     }),
   );
 
-  return el(
+  const ficha: HTMLElement = el(
     'div',
     { class: 'ficha' },
     el(
@@ -104,7 +139,8 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
         el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${p.nivel >= 100 ? 100 : ((p.exp - atual) / Math.max(1, proximo - atual)) * 100}%` } })),
       ),
     ),
-    el('section', {}, el('h4', {}, 'Atributos'), tabela),
+    el('section', {}, el('h4', {}, 'Atributos'), tabela, revelarIvs(p, () => ficha.replaceWith(fichaPokemon(p)))),
     el('section', {}, el('h4', {}, 'Golpes'), golpes),
   );
+  return ficha;
 }

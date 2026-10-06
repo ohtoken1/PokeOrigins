@@ -4,8 +4,8 @@ import type { Paleta } from './paletas';
 import { corComFiltro, imagemComFiltro } from './filtroCor';
 
 export const TAM = 16;
-export const LARGURA = 96;
-export const ALTURA = 72;
+export const LARGURA = 77;
+export const ALTURA = 58;
 /** Quantas vezes o mapa é maior que o original de 48×36 (quantidade de lagos, bosques, mato…). */
 const ESCALA = (LARGURA * ALTURA) / (48 * 36);
 

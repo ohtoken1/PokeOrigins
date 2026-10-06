@@ -9,7 +9,7 @@ import { mostrarJogo } from '../jogo/jogoUnico';
 import { abrirBatalha } from '../batalha/telaBatalha';
 import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons } from '../dados';
 import { ajustesAdmin, aoMudarAdmin } from '../ui/admin';
-import { carregarSave, curarTime, novoPokemon, salvar } from '../estado';
+import { carregarSave, usarSave, curarTime, novoPokemon, salvar } from '../estado';
 import { el, selosTipos, spritePokemon } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
 import { botaoIcone, botoesMenus } from '../ui/menus';
@@ -20,6 +20,7 @@ import { atalhosBiomas } from '../ui/atalhosBiomas';
 export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   const save = carregarSave();
   if (!save) return navegar({ tela: 'inicial' });
+  usarSave(save);
   const bioma = biomaPorId(biomaId);
   const regiao = regiaoPorId(save.regiao);
   const tabelaNormal = montarTabela(bioma, pokemonsDaRegiao(regiao.id), [], todosOsPokemons());
@@ -65,7 +66,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       const entrada = entradaPorId.get(p.id);
       const lendario = p.lendario || p.mitico;
       const info = chance > 0
-        ? `${(chance * 100).toFixed(chance < 0.00001 ? 4 : chance < 0.001 ? 3 : 2)}%`
+        ? `${(chance * 100).toFixed(chance < 0.0001 ? 4 : chance < 0.001 ? 3 : 2)}%`
         : entrada
           ? `Nv. ${lendario ? `${Math.max(NIVEL_LENDARIO, entrada.nivelMin)}+` : `${entrada.nivelMin}–${entrada.nivelMax}`}`
           : comoEvolui(p);
@@ -108,7 +109,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
           },
           spritePokemon(p, { animado: false }),
           capturado ? el('span', { class: 'marca-capturado', title: 'Capturado' }) : null,
-          chance > 0 ? el('small', {}, `${(chance * 100).toFixed(chance < 0.00001 ? 4 : chance < 0.001 ? 3 : 2)}%`) : null,
+          chance > 0 ? el('small', {}, `${(chance * 100).toFixed(chance < 0.0001 ? 4 : chance < 0.001 ? 3 : 2)}%`) : null,
         );
         return botao;
       }),

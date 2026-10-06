@@ -36,6 +36,8 @@ export const PRECOS: Record<string, number> = {};
 /** Silver inicial e recompensa por vitória: provisórios até o dono definir a economia. */
 export const SILVER_INICIAL = 1000;
 export const SILVER_POR_VITORIA = 10;
+/** Preço para revelar os IVs de um Pokémon capturado (provisório). Gold ainda não existe no jogo: preparado para depois. */
+export const PRECO_REVELAR_IVS = { silver: 100, gold: 1 };
 
 /** Pedras que fazem Pokémon evoluir ao serem usadas. */
 export const PEDRAS_EVOLUCAO = ['firestone', 'waterstone', 'thunderstone', 'leafstone', 'moonstone', 'sunstone', 'shinystone', 'duskstone', 'dawnstone', 'icestone'];

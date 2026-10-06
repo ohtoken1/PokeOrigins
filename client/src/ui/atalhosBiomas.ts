@@ -17,7 +17,7 @@ const carregarImagem = (src: string) =>
   });
 
 /** Recorte de 10×10 tiles do mapa do bioma, reduzido para 60×60. */
-const CHAVE_CACHE = 'jogo-claude:miniaturas-v2';
+const CHAVE_CACHE = 'jogo-claude:miniaturas-v3';
 const cacheSalvo = (): Record<string, string> => {
   try {
     return JSON.parse(localStorage.getItem(CHAVE_CACHE) ?? '{}');

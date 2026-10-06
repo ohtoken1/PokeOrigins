@@ -19,6 +19,8 @@ export interface Save {
   itens: Record<string, number>;
   /** Moeda do jogo. */
   silver: number;
+  /** Moeda premium (ainda não implementada: começa em 0). */
+  gold: number;
   passos: number;
   /** XP total do treinador (o nível sai de shared/treinador.ts). */
   xpTreinador: number;
@@ -73,6 +75,7 @@ function novoInicial(especieId: number): PokemonDoJogador {
   for (const a of Object.keys(p.ivs) as (keyof typeof p.ivs)[]) p.ivs[a] = IV_INICIAL;
   p.hp = hpMaximo(p);
   p.inegociavel = true;
+  p.ivsRevelados = true;
   return p;
 }
 
@@ -83,6 +86,7 @@ export function novoSave(regiao: string, inicial: number): Save {
     caixa: [],
     itens: { ...ITENS_INICIAIS },
     silver: SILVER_INICIAL,
+    gold: 0,
     passos: 0,
     xpTreinador: 0,
     nivelEncontro: null,
@@ -102,6 +106,8 @@ function normalizar(save: Save): Save {
   const atualizar = (p: PokemonDoJogador) => {
     const novo = p.golpes ? p : novoPokemon(p.especieId, p.nivel, p.shiny);
     novo.evs ??= atributosZerados();
+    // o inicial já nasce com IVs conhecidos (20)
+    if (novo.inegociavel) novo.ivsRevelados ??= true;
     return novo;
   };
   save.time = save.time.map(atualizar);
@@ -116,6 +122,7 @@ function normalizar(save: Save): Save {
   }
   save.itens = itens;
   save.silver ??= SILVER_INICIAL;
+  save.gold ??= 0;
   save.xpTreinador ??= 0;
   save.nivelEncontro ??= null;
   // saves antigos: começa o histórico com quem está no time e no PC
@@ -130,6 +137,16 @@ export function carregarSave(): Save | null {
   } catch {
     return null;
   }
+}
+
+// save da tela de jogo aberta (região/bioma): quem dono dos Pokémon mostrados nas fichas
+let saveEmUso: Save | null = null;
+export function usarSave(save: Save): void {
+  saveEmUso = save;
+}
+/** O save em uso, se este Pokémon for dele (time ou PC). */
+export function saveDoPokemon(p: PokemonDoJogador): Save | null {
+  return saveEmUso && (saveEmUso.time.includes(p) || saveEmUso.caixa.includes(p)) ? saveEmUso : null;
 }
 
 export function salvar(save: Save): void {

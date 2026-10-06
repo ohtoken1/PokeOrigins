@@ -601,3 +601,16 @@ button.vaga:hover { border-color: var(--borda); }
 .ficha-morador small { color: var(--texto-2); font-size: 0.78rem; }
 .ficha-morador small.capturado { color: #3fd46b; }
 .ficha-morador small.visto { color: #6aa8ff; }
+
+/* IVs ocultos na ficha */
+.tabela-atributos td.oculto { color: var(--texto-2); font-weight: 700; }
+.revelar-ivs {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; padding: 10px;
+  background: var(--painel-2); border: 1px dashed var(--borda); border-radius: 12px;
+}
+.revelar-ivs > div:first-child { display: flex; flex-direction: column; gap: 2px; }
+.revelar-ivs small { color: var(--texto-2); font-size: 0.78rem; }
+.revelar-ivs .botoes { display: flex; gap: 6px; }
+.revelar-ivs .botao { padding: 6px 10px; font-size: 0.8rem; }
+.revelar-ivs .aviso { width: 100%; color: #ef6a6a; }
+.revelar-ivs .aviso:empty { display: none; }

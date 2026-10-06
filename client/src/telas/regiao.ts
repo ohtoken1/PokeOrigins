@@ -4,7 +4,7 @@ import { BIOMAS } from '../../../shared/biomas';
 import { faixaDosEncontros, montarTabela, probabilidades } from '../../../shared/encontros';
 import { progressoTreinador } from '../../../shared/treinador';
 import { pokemonsDaRegiao, todosOsPokemons } from '../dados';
-import { apagarSave, carregarSave, curarTime, salvar } from '../estado';
+import { apagarSave, carregarSave, curarTime, salvar, usarSave } from '../estado';
 import { icone } from '../ui/icones';
 import { botoesMenus } from '../ui/menus';
 import { el, spritePokemon } from '../ui/dom';
@@ -15,6 +15,7 @@ const hex = (cor: number) => `#${cor.toString(16).padStart(6, '0')}`;
 export const telaRegiao: Tela = (raiz, navegar) => {
   const save = carregarSave();
   if (!save) return navegar({ tela: 'inicial' });
+  usarSave(save);
   const regiao = regiaoPorId(save.regiao);
   const pokemons = pokemonsDaRegiao(regiao.id);
   const treinador = progressoTreinador(save.xpTreinador);
