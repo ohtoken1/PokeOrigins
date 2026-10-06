@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import type { Bioma } from '../../../shared/biomas';
 import { ALTURA, LARGURA, TAM, desenharMapa, gerarMapa, type Mapa } from './mapa';
 import { PALETAS } from './paletas';
-import { desenharPersonagem, urlIconePokemon, type Direcao } from './personagem';
+import { desenharPersonagem, urlIconePokemon, type Direcao, type Quadro } from './personagem';
 
 /** Tamanho da tela do jogo em pixels (a câmera mostra 21×15 tiles ampliados 2×). */
 export const LARGURA_TELA = 672;
@@ -36,6 +36,9 @@ export class BiomaScene extends Phaser.Scene {
   private posSeguidor = { x: 0, y: 0 };
   private especieSeguidor: number | null;
   private movendo = false;
+  private direcao: Direcao = 'baixo';
+  /** alterna a perna que vai à frente a cada passo */
+  private passos = 0;
   private pausado = false;
   private direcaoPendente: [number, number] | undefined;
   private setas!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -63,13 +66,14 @@ export class BiomaScene extends Phaser.Scene {
 
     const imagem = (chave: string) => this.textures.get(chave).getSourceImage() as HTMLImageElement;
     this.textures.addCanvas('mapa', desenharMapa(this.mapa, paleta, bioma.id, { buch: imagem('buch'), natureza: imagem('natureza'), agua: imagem('agua') }));
-    for (const direcao of ['baixo', 'cima', 'lado'] as Direcao[]) this.textures.addCanvas(`jogador-${direcao}`, desenharPersonagem(direcao));
+    for (const direcao of ['baixo', 'cima', 'lado'] as Direcao[])
+      for (const quadro of [0, 1, 2] as Quadro[]) this.textures.addCanvas(`jogador-${direcao}-${quadro}`, desenharPersonagem(direcao, quadro));
     this.add.image(0, 0, 'mapa').setOrigin(0);
 
     const [sx, sy] = this.pesDoTile(this.posSeguidor.x, this.posSeguidor.y);
     this.seguidor = this.add.image(sx, sy, '__DEFAULT').setOrigin(0.5, 0.9).setScale(ESCALA_DETALHE).setVisible(false);
     const [px, py] = this.pesDoTile(this.pos.x, this.pos.y);
-    this.jogador = this.add.image(px, py, 'jogador-baixo').setOrigin(0.5, 28 / 32).setScale(ESCALA_DETALHE);
+    this.jogador = this.add.image(px, py, 'jogador-baixo-0').setOrigin(0.5, 28 / 32).setScale(ESCALA_DETALHE);
     this.atualizarProfundidade();
     this.carregarSeguidor();
 
@@ -146,7 +150,8 @@ export class BiomaScene extends Phaser.Scene {
   private tentarMover(dx: number, dy: number) {
     // vira para a direção mesmo se o caminho estiver bloqueado
     const direcao: Direcao = dy < 0 ? 'cima' : dy > 0 ? 'baixo' : 'lado';
-    this.jogador.setTexture(`jogador-${direcao}`).setFlipX(dx > 0);
+    this.direcao = direcao;
+    this.jogador.setTexture(`jogador-${direcao}-0`).setFlipX(dx > 0);
 
     const x = this.pos.x + dx;
     const y = this.pos.y + dy;
@@ -157,6 +162,8 @@ export class BiomaScene extends Phaser.Scene {
     this.pos = { x, y };
     this.movendo = true;
 
+    this.passos++;
+    this.jogador.setTexture(`jogador-${direcao}-${this.passos % 2 ? 1 : 2}`);
     const [px, py] = this.pesDoTile(x, y);
     this.tweens.add({
       targets: this.jogador,
@@ -166,6 +173,7 @@ export class BiomaScene extends Phaser.Scene {
       onUpdate: () => this.atualizarProfundidade(),
       onComplete: () => {
         this.movendo = false;
+        this.jogador.setTexture(`jogador-${this.direcao}-0`);
         this.atualizarProfundidade();
         this.opcoes.aoPisar();
       },
