@@ -30,7 +30,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
   - Pokémon do jogador entram como `P<posição no time>` e o selvagem como `S0`; os nomes exibidos vêm dos nossos dados.
   - Showdown não tem batalha selvagem: captura (fórmula 3ª/4ª gen, bônus de status da 5ª+) e fuga (fórmula 3ª/4ª gen) são nossas. Quando o jogador perde a vez (bola falhou / fuga falhou), usamos o volátil `mustrecharge` para o selvagem agir sozinho e escondemos a mensagem de "recarga".
   - O selvagem escolhe um golpe aleatório válido (IA simples).
-- `pokemon.ts` — indivíduo (IVs 0–31; **shiny 15–31**, `IV_MIN_SHINY`; natureza, habilidade, gênero, golpes com PP, HP, status), golpes por nível do learnset do Showdown (geração mais recente da espécie), atributos, curvas de XP, fórmula de XP da 7ª gen+; XP e EVs só para quem entrou em campo na batalha (sem Exp. Share, pedido do dono), evolução só por nível.
+- `pokemon.ts` — indivíduo (IVs 0–31; **shiny 15–31**, `IV_MIN_SHINY`; natureza, habilidade, gênero, golpes com PP, HP, status), golpes por nível do learnset do Showdown (geração mais recente da espécie), atributos, curvas de XP, fórmula de XP da 7ª gen+; XP e EVs (vitória ou captura) só para quem entrou em campo na batalha (sem Exp. Share, pedido do dono), evolução só por nível.
 - `progresso.ts` — XP → níveis → golpes novos (com 4 golpes o jogador escolhe qual esquecer) → evolução.
 - PP: sem PP Ups (máximo = PP base). HP/status/PP persistem entre batalhas; Centro Pokémon cura. Derrota = cura e volta ao menu da região.
 - Interface e animações: `client/src/batalha/` (físico = avanço, especial = projétil da cor do tipo, status = anel; Pokébola com tremidas; evolução piscando).
@@ -55,7 +55,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 ## Convenções
 - Código, nomes e comentários em **português** (sem acentos em identificadores).
 - Regras de jogo (probabilidades, níveis, chance de shiny) ficam em `shared/` como constantes fáceis de ajustar.
-- Bioma = lista de tipos; cada Pokémon mora em UM bioma só: o do seu tipo principal (ex.: Gastly Fantasma/Veneno → Torre). Pedido do dono. Exceções por linha evolutiva em `BIOMA_FIXO` (`shared/encontros.ts`): Porygon → Torre, Zubat → Caverna, Grimer e Koffing → Vulcão, Dratini → Mar Profundo. Lendários/míticos e iniciais não aparecem soltos.
+- Bioma = lista de tipos; cada Pokémon mora em UM bioma só: o do seu tipo principal (ex.: Gastly Fantasma/Veneno → Torre). Pedido do dono. Exceções por linha evolutiva em `BIOMA_FIXO` (`shared/encontros.ts`): Porygon → Torre, Zubat → Caverna, Grimer e Koffing → Vulcão, Dratini → Mar Profundo. Iniciais aparecem soltos normalmente (como qualquer outro).
 - `CHANCE_ENCONTRO_POR_PASSO = 1` (pedido do dono: todo passo tem Pokémon, não precisa ser no mato).
 - Peso no sorteio = taxa de captura oficial (mais fácil de capturar = mais comum). Evoluções aparecem com +10 níveis por estágio.
 - Windows/PowerShell: depois de instalar algo, o PATH pode precisar ser recarregado no shell.

@@ -27,7 +27,7 @@ function mapaDeEncontros(todos: PokemonBase[]): Map<number, { bioma: string; ent
   const mapa = new Map<number, { bioma: string; entrada: EntradaTabela }>();
   for (const r of REGIOES.filter((x) => x.disponivel))
     for (const b of BIOMAS)
-      for (const entrada of montarTabela(b, pokemonsDaRegiao(r.id), r.iniciais, todos)) mapa.set(entrada.pokemon.id, { bioma: `${r.nome} · ${b.nome}`, entrada });
+      for (const entrada of montarTabela(b, pokemonsDaRegiao(r.id), [], todos)) mapa.set(entrada.pokemon.id, { bioma: `${r.nome} · ${b.nome}`, entrada });
   return mapa;
 }
 
@@ -166,9 +166,7 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
   const biomaP = BIOMAS.find((b) => b.id === biomaDoPokemon(p));
   const comoAparece = onde
     ? `Solto · Nv. ${p.lendario || p.mitico ? `${Math.max(NIVEL_LENDARIO, onde.entrada.nivelMin)}+ (raro)` : `${onde.entrada.nivelMin}–${onde.entrada.nivelMax}`}`
-    : REGIOES.some((r) => r.iniciais.includes(p.id))
-      ? 'Inicial (roleta do começo do jogo)'
-      : `Só evoluindo · ${comoEvolui(p)}`;
+    : `Só evoluindo · ${comoEvolui(p)}`;
   const textoOnde = el('span', { class: 'dex-onde' },
     el('span', { class: 'dex-chip' }, regiaoP?.nome ?? '—'),
     el('span', { class: 'dex-chip' }, biomaP?.nome ?? '—'),
@@ -258,9 +256,9 @@ ${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) }
         linha('XP base', String(p.experienciaBase ?? '—')),
         linha('EVs ao derrotar', evs),
         // nomes de ability e egg group ficam em inglês (regra do dono)
-        linha('Abilities', p.habilidades.map((h) => `${Dex.abilities.get(h.nome).name || h.nome}${h.oculta ? ' (H)' : ''}`).join(' / ')),
         linha('Egg Groups', s.eggGroups.join(', ')),
         linha('Onde encontrar', textoOnde),
+        linha('Captura base', `${capturaBase(p.taxaCaptura)} (Poké Ball, HP cheio)`),
       ),
     ),
     el('section', {}, el('h3', {}, 'Atributos base'), atributos),
@@ -279,6 +277,15 @@ ${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) }
 }
 
 /** Pokébola pequena desenhada em SVG (marca de "capturado" na lista). */
+/** Chance de captura com Poké Ball, HP cheio e sem status (fórmula da 3ª/4ª geração, a mesma da batalha). */
+function capturaBase(taxa: number): string {
+  const a = Math.floor(taxa / 3);
+  if (a >= 255) return '100%';
+  const b = Math.floor(65536 / Math.pow(255 / Math.max(1, a), 0.1875));
+  const chance = Math.pow(b / 65536, 4) * 100;
+  return `${chance < 1 ? chance.toFixed(2) : chance.toFixed(1)}%`;
+}
+
 function pokebolinha(): HTMLElement {
   const marca = el('span', { class: 'dex-marca capturado', title: 'Capturado' });
   marca.innerHTML =

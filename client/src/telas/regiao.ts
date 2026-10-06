@@ -39,7 +39,7 @@ export const telaRegiao: Tela = (raiz, navegar) => {
   );
 
   const cartoesBiomas = BIOMAS.map((bioma) => {
-    const tabela = montarTabela(bioma, pokemons, regiao.iniciais, todosOsPokemons());
+    const tabela = montarTabela(bioma, pokemons, [], todosOsPokemons());
     const faixa = faixaDosEncontros(bioma, treinador.nivel);
     const chances = probabilidades(tabela, faixa);
     const possiveis = tabela.filter((_, i) => chances[i] > 0);

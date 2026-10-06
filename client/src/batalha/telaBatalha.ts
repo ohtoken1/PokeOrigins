@@ -440,10 +440,8 @@ ${nomeCategoria(m.category)} · ${precisao}${m.priority ? ` · prioridade ${m.pr
     acoes.replaceChildren();
     batalha.sincronizar();
 
-    if (resultado === 'vitoria') {
-      await darXpTreinador();
-      save.silver += SILVER_POR_VITORIA;
-      await dizer(`Você ganhou ${SILVER_POR_VITORIA} ${MOEDA}!`);
+    // vitória e captura dão XP e EVs a quem entrou em campo
+    const darXpTime = async () => {
       const evolucoes: { pos: number; para: number }[] = [];
       for (const pos of batalha.indices) {
         const p = save.time[pos];
@@ -469,8 +467,16 @@ ${nomeCategoria(m.category)} · ${precisao}${m.priority ? ` · prioridade ${m.pr
         await dizer(`Parabéns! ${antes} evoluiu para ${novo.nome}!`);
         await mostrarProgresso(pos, r);
       }
+    };
+
+    if (resultado === 'vitoria') {
+      await darXpTreinador();
+      save.silver += SILVER_POR_VITORIA;
+      await dizer(`Você ganhou ${SILVER_POR_VITORIA} ${MOEDA}!`);
+      await darXpTime();
     } else if (resultado === 'captura') {
       await darXpTreinador();
+      await darXpTime();
       selvagem.hp = Math.max(1, selvagem.hp);
       if (curarAoCapturar) curar(selvagem);
       registrarCapturado(save, selvagem.especieId);

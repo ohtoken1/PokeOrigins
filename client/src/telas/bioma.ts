@@ -22,7 +22,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   if (!save) return navegar({ tela: 'inicial' });
   const bioma = biomaPorId(biomaId);
   const regiao = regiaoPorId(save.regiao);
-  const tabelaNormal = montarTabela(bioma, pokemonsDaRegiao(regiao.id), regiao.iniciais, todosOsPokemons());
+  const tabelaNormal = montarTabela(bioma, pokemonsDaRegiao(regiao.id), [], todosOsPokemons());
   // tabela com os ajustes do painel de administrador (lendários mais/menos comuns…)
   let tabela = ajustarTabela(tabelaNormal, ajustesAdmin());
   const nivelDoTreinador = nivelTreinador(save.xpTreinador);
@@ -50,7 +50,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
 
   // todos os Pokémon que moram neste bioma: com % só quem pode aparecer na faixa de nível atual;
   // os de outras faixas mostram o nível, e os que só vêm por evolução (pedra/troca/amizade) mostram como
-  const moradores = pokemonsDaRegiao(regiao.id).filter((p) => biomaDoPokemon(p) === bioma.id && !regiao.iniciais.includes(p.id));
+  const moradores = pokemonsDaRegiao(regiao.id).filter((p) => biomaDoPokemon(p) === bioma.id);
   const listaChances = el('ol', { class: 'lista-chances' });
   const atualizarChances = () => {
     const nivelFixo = ajustesAdmin().nivel;
