@@ -17,10 +17,20 @@ export const CHANCE_ENCONTRO_POR_PASSO = 1;
  */
 export const PESO_BASE_LINHA = 100;
 export const PESO_POR_TAXA = 0.3;
-/** Chance FIXA por encontro de cada linha de inicial (pedido do dono: 1 em 10 mil). */
+/** Chance FIXA por encontro de aparecer ALGUM inicial do bioma (pedido do dono: 1 em 10 mil); dentro dela, sorteia qual. */
 export const CHANCE_INICIAL = 1 / 10000;
-/** Chance FIXA por encontro de cada lendário, mítico ou Ultra Beast (pedido do dono: 1 em 20 mil). */
+/** Chance FIXA por encontro de aparecer algum lendário (e, separadamente, algum mítico / alguma Ultra Beast): 1 em 20 mil. */
 export const CHANCE_LENDARIO = 1 / 20000;
+/** Categorias raras: cada uma tem a sua chance total, dividida igualmente entre as linhas dela no bioma. */
+export type GrupoRaro = 'inicial' | 'lendario' | 'mitico' | 'ultra';
+
+function grupoRaro(p: PokemonBase, base: PokemonBase): GrupoRaro | null {
+  if (p.lendario) return 'lendario';
+  if (p.mitico) return 'mitico';
+  if ((especie(p.id).tags ?? []).includes('Ultra Beast')) return 'ultra';
+  if (TODOS_INICIAIS.includes(base.id)) return 'inicial';
+  return null;
+}
 /** Lendários e míticos aparecem desde o começo, mas nunca abaixo deste nível. */
 export const NIVEL_LENDARIO = 50;
 
@@ -57,7 +67,9 @@ export interface EntradaTabela {
   peso: number;
   /** Número da forma base da linha (Caterpie, Metapod e Butterfree → 10): a linha divide a chance. */
   linha: number;
-  /** Chance fixa da linha por encontro (iniciais, lendários, míticos, Ultra Beasts), fora do sorteio por peso. */
+  /** Categoria rara (inicial, lendário, mítico, Ultra Beast): fora do sorteio por peso. */
+  grupo: GrupoRaro | null;
+  /** Chance TOTAL da categoria por encontro (dividida entre as linhas dela no bioma); null nos comuns. */
   chanceFixa: number | null;
   /** Faixa de nível em que esta forma aparece (ex.: Charmander 1–15, Charmeleon 16–35, Charizard 36–100). */
   nivelMin: number;
@@ -159,8 +171,9 @@ export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: num
       const [nivelMin, nivelMax] = faixas.get(p.id)!;
       const base = baseDaLinha(p, porSlug);
       const peso = PESO_BASE_LINHA + base.taxaCaptura * PESO_POR_TAXA;
-      const chanceFixa = ehLendario(p) ? CHANCE_LENDARIO : TODOS_INICIAIS.includes(base.id) ? CHANCE_INICIAL : null;
-      return { pokemon: p, peso, linha: base.id, chanceFixa, nivelMin, nivelMax };
+      const grupo = grupoRaro(p, base);
+      const chanceFixa = grupo === null ? null : grupo === 'inicial' ? CHANCE_INICIAL : CHANCE_LENDARIO;
+      return { pokemon: p, peso, linha: base.id, grupo, chanceFixa, nivelMin, nivelMax };
     });
 }
 
@@ -196,6 +209,7 @@ const cabe = (e: EntradaTabela, nivel: number) => nivel >= e.nivelMin && nivel <
 
 interface Linha {
   peso: number;
+  grupo: GrupoRaro | null;
   chanceFixa: number | null;
   formas: EntradaTabela[];
   /** níveis da faixa em que alguma forma da linha existe */
@@ -210,20 +224,32 @@ function linhasNaFaixa(tabela: EntradaTabela[], [min, max]: Faixa): Linha[] {
   for (const formas of grupos.values()) {
     const niveis: number[] = [];
     for (let n = min; n <= max; n++) if (formas.some((e) => cabe(e, n))) niveis.push(n);
-    if (niveis.length) linhas.push({ peso: Math.max(...formas.map((e) => e.peso)), chanceFixa: formas[0].chanceFixa, formas, niveis });
+    if (niveis.length) linhas.push({ peso: Math.max(...formas.map((e) => e.peso)), grupo: formas[0].grupo, chanceFixa: formas[0].chanceFixa, formas, niveis });
   }
   return linhas;
 }
 
 /**
- * Chance (0 a 1) de cada linha sair: as de chance fixa (iniciais 1/10 mil, lendários 1/20 mil) ficam com ela,
- * e as outras dividem o resto pelo peso. Sem linhas comuns (admin "só lendários"), as fixas dividem tudo.
+ * Chance (0 a 1) de cada linha sair. Cada categoria rara presente tem uma chance TOTAL fixa
+ * (algum inicial 1/10 mil; algum lendário 1/20 mil; mítico e Ultra Beast idem), dividida igualmente
+ * entre as linhas dela (Regice e Kyogre no mesmo bioma: 1/20 mil para "lendário", e aí 50% cada).
+ * As comuns dividem o resto pelo peso. Sem comuns (admin "só lendários"), as raras dividem tudo.
  */
 function chancesDasLinhas(linhas: Linha[]): number[] {
-  const fixas = linhas.reduce((soma, l) => soma + (l.chanceFixa ?? 0), 0);
-  const pesoComuns = linhas.reduce((soma, l) => soma + (l.chanceFixa === null ? l.peso : 0), 0);
-  if (!pesoComuns || fixas >= 1) return linhas.map((l) => (l.chanceFixa ?? 0) / fixas);
-  return linhas.map((l) => (l.chanceFixa !== null ? l.chanceFixa : ((1 - fixas) * l.peso) / pesoComuns));
+  const porGrupo = new Map<GrupoRaro, { chance: number; linhas: number }>();
+  for (const l of linhas)
+    if (l.grupo !== null) {
+      const g = porGrupo.get(l.grupo) ?? { chance: 0, linhas: 0 };
+      porGrupo.set(l.grupo, { chance: Math.max(g.chance, l.chanceFixa ?? 0), linhas: g.linhas + 1 });
+    }
+  const fixas = [...porGrupo.values()].reduce((soma, g) => soma + g.chance, 0);
+  const pesoComuns = linhas.reduce((soma, l) => soma + (l.grupo === null ? l.peso : 0), 0);
+  const daRara = (l: Linha) => {
+    const g = porGrupo.get(l.grupo!)!;
+    return g.chance / g.linhas;
+  };
+  if (!pesoComuns || fixas >= 1) return linhas.map((l) => (l.grupo === null || !fixas ? 0 : daRara(l) / fixas));
+  return linhas.map((l) => (l.grupo !== null ? daRara(l) : ((1 - fixas) * l.peso) / pesoComuns));
 }
 
 /**
