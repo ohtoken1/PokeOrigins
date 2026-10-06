@@ -25,7 +25,10 @@ let ajustes: AjustesEncontro = carregar();
 
 function carregar(): AjustesEncontro {
   try {
-    return { ...AJUSTES_PADRAO, ...JSON.parse(localStorage.getItem(CHAVE) ?? '{}') };
+    const salvos = { ...AJUSTES_PADRAO, ...JSON.parse(localStorage.getItem(CHAVE) ?? '{}') };
+    // o padrão antigo de shiny (1/512) foi trocado: segue o padrão novo
+    if (Math.abs(salvos.chanceShiny - 1 / 512) < 1e-12) salvos.chanceShiny = AJUSTES_PADRAO.chanceShiny;
+    return salvos;
   } catch {
     return { ...AJUSTES_PADRAO };
   }
@@ -132,7 +135,7 @@ function conteudo(): HTMLElement[] {
     })(),
     el('h4', {}, 'Encontros'),
     campo('Chance de shiny', seletor(OPCOES_SHINY, a.chanceShiny, (v) => mudar({ chanceShiny: v }))),
-    campo('Lendários e míticos', seletor(OPCOES_LENDARIO, a.multLendario, (v) => mudar({ multLendario: v }))),
+    campo('Lendários, míticos e Ultra Beasts', seletor(OPCOES_LENDARIO, a.multLendario, (v) => mudar({ multLendario: v }))),
     el('label', { class: 'admin-check' }, soLendarios, ' Só lendários do bioma'),
     campo('Encontro por passo', valorPasso, chancePasso),
     campo('Pokémon forçado', especie),

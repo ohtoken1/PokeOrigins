@@ -65,7 +65,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       const entrada = entradaPorId.get(p.id);
       const lendario = p.lendario || p.mitico;
       const info = chance > 0
-        ? `${(chance * 100).toFixed(p.lendario || p.mitico ? 3 : 2)}%`
+        ? `${(chance * 100).toFixed(chance < 0.001 ? 3 : 2)}%`
         : entrada
           ? `Nv. ${lendario ? `${Math.max(NIVEL_LENDARIO, entrada.nivelMin)}+` : `${entrada.nivelMin}–${entrada.nivelMax}`}`
           : comoEvolui(p);
@@ -108,7 +108,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
           },
           spritePokemon(p, { animado: false }),
           capturado ? el('span', { class: 'marca-capturado', title: 'Capturado' }) : null,
-          chance > 0 ? el('small', {}, `${(chance * 100).toFixed(p.lendario || p.mitico ? 3 : 2)}%`) : null,
+          chance > 0 ? el('small', {}, `${(chance * 100).toFixed(chance < 0.001 ? 3 : 2)}%`) : null,
         );
         return botao;
       }),

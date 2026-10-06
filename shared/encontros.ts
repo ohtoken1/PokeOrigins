@@ -1,12 +1,13 @@
 // Sorteio de Pokémon selvagens. Fica em shared/ porque, no MMO, quem vai sortear é o
 // servidor (para ninguém trapacear); por enquanto o cliente usa o mesmo código.
 import { BIOMAS, type Bioma } from './biomas';
-import { nivelDeEvolucao } from './batalha/pokemon';
+import { especie, nivelDeEvolucao } from './batalha/pokemon';
+import { TODOS_INICIAIS } from './regioes';
 import type { PokemonBase } from './tipos';
 import { FAIXA_NIVEIS_ENCONTRO, nivelMaximoEncontro } from './treinador';
 
 /** Chance de um Pokémon ser shiny. O original é 1/4096; aqui é configurável. */
-export const CHANCE_SHINY = 1 / 512;
+export const CHANCE_SHINY = 1 / 1500;
 /** Chance de aparecer um Pokémon a cada passo (1 = todo passo). */
 export const CHANCE_ENCONTRO_POR_PASSO = 1;
 /**
@@ -16,8 +17,10 @@ export const CHANCE_ENCONTRO_POR_PASSO = 1;
  */
 export const PESO_BASE_LINHA = 100;
 export const PESO_POR_TAXA = 0.3;
-/** Peso fixo de lendários e míticos no sorteio (uma linha comum tem ~100 a 180). */
-export const PESO_LENDARIO = 1;
+/** Chance FIXA por encontro de cada linha de inicial (pedido do dono: 1 em 10 mil). */
+export const CHANCE_INICIAL = 1 / 10000;
+/** Chance FIXA por encontro de cada lendário, mítico ou Ultra Beast (pedido do dono: 1 em 20 mil). */
+export const CHANCE_LENDARIO = 1 / 20000;
 /** Lendários e míticos aparecem desde o começo, mas nunca abaixo deste nível. */
 export const NIVEL_LENDARIO = 50;
 
@@ -54,6 +57,8 @@ export interface EntradaTabela {
   peso: number;
   /** Número da forma base da linha (Caterpie, Metapod e Butterfree → 10): a linha divide a chance. */
   linha: number;
+  /** Chance fixa da linha por encontro (iniciais, lendários, míticos, Ultra Beasts), fora do sorteio por peso. */
+  chanceFixa: number | null;
   /** Faixa de nível em que esta forma aparece (ex.: Charmander 1–15, Charmeleon 16–35, Charizard 36–100). */
   nivelMin: number;
   nivelMax: number;
@@ -64,6 +69,9 @@ export interface Encontro {
   nivel: number;
   shiny: boolean;
 }
+
+/** Lendários, míticos e Ultra Beasts: chance fixa, nível 50+. */
+const ehLendario = (p: PokemonBase) => p.lendario || p.mitico || (especie(p.id).tags ?? []).includes('Ultra Beast');
 
 /**
  * Cada Pokémon mora em um único bioma: o do seu tipo principal (o primeiro).
@@ -150,8 +158,9 @@ export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: num
     .map((p) => {
       const [nivelMin, nivelMax] = faixas.get(p.id)!;
       const base = baseDaLinha(p, porSlug);
-      const peso = p.lendario || p.mitico ? PESO_LENDARIO : PESO_BASE_LINHA + base.taxaCaptura * PESO_POR_TAXA;
-      return { pokemon: p, peso, linha: base.id, nivelMin, nivelMax };
+      const peso = PESO_BASE_LINHA + base.taxaCaptura * PESO_POR_TAXA;
+      const chanceFixa = ehLendario(p) ? CHANCE_LENDARIO : TODOS_INICIAIS.includes(base.id) ? CHANCE_INICIAL : null;
+      return { pokemon: p, peso, linha: base.id, chanceFixa, nivelMin, nivelMax };
     });
 }
 
@@ -166,11 +175,12 @@ export function faixaDosEncontros(_bioma: Bioma, nivelTreinador: number, tetoEsc
   return [Math.max(1, teto - FAIXA_NIVEIS_ENCONTRO), teto];
 }
 
-const ehLendario = (p: PokemonBase) => p.lendario || p.mitico;
 
 /** Aplica os ajustes de administrador nos pesos da tabela (sem lendários no bioma, "só lendários" é ignorado). */
 export function ajustarTabela(tabela: EntradaTabela[], ajustes: AjustesEncontro): EntradaTabela[] {
-  let nova = tabela.map((e) => (ehLendario(e.pokemon) ? { ...e, peso: e.peso * ajustes.multLendario } : e)).filter((e) => e.peso > 0);
+  let nova = tabela
+    .map((e) => (ehLendario(e.pokemon) ? { ...e, chanceFixa: (e.chanceFixa ?? 0) * ajustes.multLendario } : e))
+    .filter((e) => e.chanceFixa !== 0);
   if (ajustes.soLendarios && nova.some((e) => ehLendario(e.pokemon))) nova = nova.filter((e) => ehLendario(e.pokemon));
   return nova;
 }
@@ -186,6 +196,7 @@ const cabe = (e: EntradaTabela, nivel: number) => nivel >= e.nivelMin && nivel <
 
 interface Linha {
   peso: number;
+  chanceFixa: number | null;
   formas: EntradaTabela[];
   /** níveis da faixa em que alguma forma da linha existe */
   niveis: number[];
@@ -199,9 +210,20 @@ function linhasNaFaixa(tabela: EntradaTabela[], [min, max]: Faixa): Linha[] {
   for (const formas of grupos.values()) {
     const niveis: number[] = [];
     for (let n = min; n <= max; n++) if (formas.some((e) => cabe(e, n))) niveis.push(n);
-    if (niveis.length) linhas.push({ peso: Math.max(...formas.map((e) => e.peso)), formas, niveis });
+    if (niveis.length) linhas.push({ peso: Math.max(...formas.map((e) => e.peso)), chanceFixa: formas[0].chanceFixa, formas, niveis });
   }
   return linhas;
+}
+
+/**
+ * Chance (0 a 1) de cada linha sair: as de chance fixa (iniciais 1/10 mil, lendários 1/20 mil) ficam com ela,
+ * e as outras dividem o resto pelo peso. Sem linhas comuns (admin "só lendários"), as fixas dividem tudo.
+ */
+function chancesDasLinhas(linhas: Linha[]): number[] {
+  const fixas = linhas.reduce((soma, l) => soma + (l.chanceFixa ?? 0), 0);
+  const pesoComuns = linhas.reduce((soma, l) => soma + (l.chanceFixa === null ? l.peso : 0), 0);
+  if (!pesoComuns || fixas >= 1) return linhas.map((l) => (l.chanceFixa ?? 0) / fixas);
+  return linhas.map((l) => (l.chanceFixa !== null ? l.chanceFixa : ((1 - fixas) * l.peso) / pesoComuns));
 }
 
 /**
@@ -211,12 +233,13 @@ function linhasNaFaixa(tabela: EntradaTabela[], [min, max]: Faixa): Linha[] {
 export function probabilidades(tabela: EntradaTabela[], faixa: Faixa): number[] {
   const chances = new Map<EntradaTabela, number>();
   const linhas = linhasNaFaixa(tabela, faixa);
-  const total = linhas.reduce((soma, l) => soma + l.peso, 0);
-  for (const l of linhas)
+  const chanceLinha = chancesDasLinhas(linhas);
+  linhas.forEach((l, i) => {
     for (const n of l.niveis) {
       const formas = l.formas.filter((e) => cabe(e, n));
-      for (const e of formas) chances.set(e, (chances.get(e) ?? 0) + l.peso / total / l.niveis.length / formas.length);
+      for (const e of formas) chances.set(e, (chances.get(e) ?? 0) + chanceLinha[i] / l.niveis.length / formas.length);
     }
+  });
   return tabela.map((e) => chances.get(e) ?? 0);
 }
 
@@ -236,7 +259,8 @@ export function sortearEncontro(tabela: EntradaTabela[], [min, max]: Faixa, alea
   let escolhido: EntradaTabela;
   let nivel: number;
   if (linhas.length) {
-    const linha = sortearPorPeso(linhas, aleatorio);
+    const chanceLinha = chancesDasLinhas(linhas);
+    const linha = sortearPorPeso(linhas.map((l, i) => ({ ...l, peso: chanceLinha[i] })), aleatorio);
     nivel = linha.niveis[Math.floor(aleatorio() * linha.niveis.length)];
     const formas = linha.formas.filter((e) => cabe(e, nivel));
     escolhido = formas[Math.floor(aleatorio() * formas.length)];

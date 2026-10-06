@@ -43,7 +43,12 @@ export const telaRegiao: Tela = (raiz, navegar) => {
     const faixa = faixaDosEncontros(bioma, treinador.nivel);
     const chances = probabilidades(tabela, faixa);
     const possiveis = tabela.filter((_, i) => chances[i] > 0);
-    const destaques = [...possiveis].sort((a, b) => b.peso - a.peso).slice(0, 4);
+    const destaques = tabela
+      .map((e, i) => ({ e, chance: chances[i] }))
+      .filter(({ chance }) => chance > 0)
+      .sort((a, b) => b.chance - a.chance)
+      .slice(0, 4)
+      .map(({ e }) => e);
     return el(
       'button',
       {
