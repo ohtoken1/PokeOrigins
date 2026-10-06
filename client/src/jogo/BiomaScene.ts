@@ -158,16 +158,18 @@ export class BiomaScene extends Phaser.Scene {
     bolha.destroy();
     this.add
       .particles(0, 0, 'bolha', {
-        x: { min: 0, max: w },
-        y: { min: 0, max: h },
+        // só em volta do que a câmera mostra (antes nasciam bolhas no mapa inteiro)
+        x: { min: -260, max: 260 },
+        y: { min: -170, max: 170 },
         speedY: { min: -14, max: -28 },
         speedX: { min: -4, max: 4 },
         scale: { min: 0.35, max: 0.8 },
         alpha: { start: 0.8, end: 0 },
         lifespan: { min: 2500, max: 5000 },
-        frequency: 10,
+        frequency: 45,
       })
-      .setDepth(5001);
+      .setDepth(5001)
+      .startFollow(this.jogador);
     // bolhas saindo do jogador de vez em quando
     this.time.addEvent({
       delay: 1400,

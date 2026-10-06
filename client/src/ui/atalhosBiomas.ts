@@ -17,11 +17,34 @@ const carregarImagem = (src: string) =>
   });
 
 /** Recorte de 10×10 tiles do mapa do bioma, reduzido para 60×60. */
+const CHAVE_CACHE = 'jogo-claude:miniaturas-v1';
+const cacheSalvo = (): Record<string, string> => {
+  try {
+    return JSON.parse(localStorage.getItem(CHAVE_CACHE) ?? '{}');
+  } catch {
+    return {};
+  }
+};
+
+/** Espera o navegador ficar livre (para não travar o jogo desenhando miniaturas). */
+const quandoLivre = () => new Promise<void>((ok) => ('requestIdleCallback' in window ? requestIdleCallback(() => ok(), { timeout: 2000 }) : setTimeout(ok, 200)));
+let fila = Promise.resolve();
+
 function miniatura(biomaId: string): Promise<string> {
   let pronta = miniaturas.get(biomaId);
   if (pronta) return pronta;
+  // já desenhada antes (guardada no navegador): não precisa gerar o mapa de novo
+  const salva = cacheSalvo()[biomaId];
+  if (salva) {
+    pronta = Promise.resolve(salva);
+    miniaturas.set(biomaId, pronta);
+    return pronta;
+  }
   tilesets ??= Promise.all(['tiles/tuxemon-buch.png', 'tiles/core_outdoor_nature.png', 'tiles/core_outdoor_water.png'].map(carregarImagem));
-  pronta = tilesets.then(([buch, natureza, agua]) => {
+  // uma miniatura por vez, só quando o navegador estiver livre
+  fila = fila.then(quandoLivre);
+  const vez = fila;
+  pronta = Promise.all([tilesets, vez]).then(([[buch, natureza, agua]]) => {
     const paleta = PALETAS[biomaId] ?? PALETAS.grama;
     const mapa = gerarMapa(biomaId, paleta);
     const completo = desenharMapa(mapa, paleta, biomaId, { buch, natureza, agua });
@@ -41,8 +64,15 @@ function miniatura(biomaId: string): Promise<string> {
         if (nota > melhor.nota) melhor = { x, y, nota };
       }
     ctx.drawImage(completo, melhor.x * TAM, melhor.y * TAM, lado, lado, 0, 0, 60, 60);
-    return c.toDataURL();
+    const url = c.toDataURL();
+    try {
+      localStorage.setItem(CHAVE_CACHE, JSON.stringify({ ...cacheSalvo(), [biomaId]: url }));
+    } catch {
+      /* sem espaço: gera de novo da próxima vez */
+    }
+    return url;
   });
+  fila = pronta.then(() => undefined, () => undefined);
   miniaturas.set(biomaId, pronta);
   return pronta;
 }
