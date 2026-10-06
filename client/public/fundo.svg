@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice">
+  <!-- Fundo do site: anoitecer calmo num vale, lua em forma de Pokébola, lago e vaga-lumes. Desenhado à mão (sem imagens de terceiros). -->
+  <defs>
+    <linearGradient id="ceu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0f1d33"/>
+      <stop offset="0.45" stop-color="#1d3556"/>
+      <stop offset="0.72" stop-color="#3a5878"/>
+      <stop offset="0.86" stop-color="#5f7c96"/>
+    </linearGradient>
+    <radialGradient id="brilhoLua" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f4f1e6" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#f4f1e6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="lago" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4d6c88"/>
+      <stop offset="1" stop-color="#1c3048"/>
+    </linearGradient>
+    <radialGradient id="vagalume" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff4b8" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#fff4b8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#ceu)"/>
+
+  <!-- estrelas -->
+  <g fill="#e8eef8">
+    <circle cx="140" cy="90" r="1.6" opacity="0.7"/><circle cx="310" cy="190" r="1.2" opacity="0.5"/>
+    <circle cx="460" cy="70" r="1.8" opacity="0.8"/><circle cx="620" cy="160" r="1.1" opacity="0.5"/>
+    <circle cx="780" cy="60" r="1.4" opacity="0.6"/><circle cx="930" cy="210" r="1" opacity="0.4"/>
+    <circle cx="1080" cy="110" r="1.6" opacity="0.7"/><circle cx="1240" cy="40" r="1.2" opacity="0.5"/>
+    <circle cx="1720" cy="150" r="1.5" opacity="0.6"/><circle cx="1850" cy="60" r="1.2" opacity="0.5"/>
+    <circle cx="1650" cy="260" r="1" opacity="0.4"/><circle cx="240" cy="300" r="1" opacity="0.35"/>
+    <circle cx="1010" cy="300" r="1.1" opacity="0.35"/><circle cx="60" cy="240" r="1.3" opacity="0.5"/>
+    <circle cx="1560" cy="90" r="1" opacity="0.45"/><circle cx="700" cy="280" r="0.9" opacity="0.35"/>
+  </g>
+
+  <!-- lua em forma de Pokébola, bem suave -->
+  <circle cx="1440" cy="230" r="190" fill="url(#brilhoLua)"/>
+  <g opacity="0.92">
+    <circle cx="1440" cy="230" r="78" fill="#efece0"/>
+    <path d="M1362 230 a78 78 0 0 1 156 0 z" fill="#f3d9d2"/>
+    <rect x="1362" y="226" width="156" height="8" fill="#b9c2cf"/>
+    <circle cx="1440" cy="230" r="17" fill="#b9c2cf"/>
+    <circle cx="1440" cy="230" r="10" fill="#efece0"/>
+  </g>
+
+  <!-- nuvens finas -->
+  <g fill="#c9d6e6" opacity="0.12">
+    <ellipse cx="420" cy="260" rx="220" ry="18"/>
+    <ellipse cx="520" cy="280" rx="160" ry="12"/>
+    <ellipse cx="1180" cy="330" rx="260" ry="16"/>
+    <ellipse cx="1700" cy="380" rx="200" ry="14"/>
+  </g>
+
+  <!-- bando de Pidgey ao longe -->
+  <g fill="none" stroke="#1a2c45" stroke-width="3" stroke-linecap="round" opacity="0.55">
+    <path d="M760 330 q10 -10 20 0 q10 -10 20 0"/>
+    <path d="M820 300 q8 -8 16 0 q8 -8 16 0"/>
+    <path d="M870 340 q7 -7 14 0 q7 -7 14 0"/>
+  </g>
+
+  <!-- montanhas ao fundo -->
+  <path d="M0 640 L180 520 L320 590 L520 450 L700 560 L860 500 L1040 600 L1240 470 L1420 570 L1600 500 L1780 580 L1920 520 L1920 1080 L0 1080 Z" fill="#344f6d" opacity="0.85"/>
+  <path d="M0 700 L220 600 L400 660 L600 580 L820 680 L1000 620 L1200 690 L1400 610 L1620 680 L1800 630 L1920 670 L1920 1080 L0 1080 Z" fill="#2b4562"/>
+
+  <!-- colinas -->
+  <path d="M0 790 C240 720 420 740 640 780 C860 820 1040 760 1260 740 C1480 720 1700 770 1920 750 L1920 1080 L0 1080 Z" fill="#23405a"/>
+
+  <!-- lago com reflexo da lua -->
+  <path d="M520 860 C700 820 1220 820 1420 860 C1520 880 1480 930 1300 940 C1060 955 760 950 600 930 C460 912 430 880 520 860 Z" fill="url(#lago)"/>
+  <g fill="#efece0" opacity="0.28">
+    <rect x="1340" y="862" width="70" height="3" rx="1.5"/>
+    <rect x="1320" y="876" width="100" height="3" rx="1.5"/>
+    <rect x="1350" y="890" width="60" height="3" rx="1.5"/>
+  </g>
+
+  <!-- primeiro plano: grama e árvores redondas -->
+  <path d="M0 900 C200 860 380 880 520 900 C620 915 600 960 700 980 C900 1010 1100 990 1300 975 C1500 960 1700 900 1920 880 L1920 1080 L0 1080 Z" fill="#1a3249"/>
+  <g fill="#162b40">
+    <rect x="148" y="800" width="10" height="70"/><circle cx="153" cy="790" r="48"/><circle cx="120" cy="815" r="34"/><circle cx="188" cy="812" r="36"/>
+    <rect x="1730" y="780" width="10" height="80"/><circle cx="1735" cy="768" r="54"/><circle cx="1700" cy="796" r="36"/><circle cx="1775" cy="794" r="38"/>
+    <rect x="1840" y="820" width="8" height="60"/><circle cx="1844" cy="812" r="38"/>
+  </g>
+  <!-- mato alto -->
+  <g fill="#14273b">
+    <path d="M300 1000 l10 -40 l8 40 l10 -52 l9 52 l10 -38 l8 38 z"/>
+    <path d="M1480 990 l10 -36 l8 36 l10 -48 l9 48 l10 -34 l8 34 z"/>
+    <path d="M980 1040 l9 -30 l7 30 l9 -42 l8 42 l9 -28 l7 28 z"/>
+  </g>
+
+  <!-- vaga-lumes -->
+  <g>
+    <circle cx="420" cy="880" r="14" fill="url(#vagalume)"/><circle cx="420" cy="880" r="2" fill="#fff6c4"/>
+    <circle cx="610" cy="820" r="12" fill="url(#vagalume)"/><circle cx="610" cy="820" r="1.8" fill="#fff6c4"/>
+    <circle cx="1180" cy="900" r="14" fill="url(#vagalume)"/><circle cx="1180" cy="900" r="2" fill="#fff6c4"/>
+    <circle cx="1560" cy="850" r="12" fill="url(#vagalume)"/><circle cx="1560" cy="850" r="1.8" fill="#fff6c4"/>
+    <circle cx="260" cy="960" r="12" fill="url(#vagalume)"/><circle cx="260" cy="960" r="1.8" fill="#fff6c4"/>
+    <circle cx="1650" cy="960" r="14" fill="url(#vagalume)"/><circle cx="1650" cy="960" r="2" fill="#fff6c4"/>
+    <circle cx="860" cy="1000" r="11" fill="url(#vagalume)"/><circle cx="860" cy="1000" r="1.6" fill="#fff6c4"/>
+  </g>
+</svg>
