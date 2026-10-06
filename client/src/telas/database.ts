@@ -5,6 +5,7 @@ import type { Tela } from '../main';
 import { CATALOGO, CATEGORIAS, MOEDA } from '../../../shared/loja';
 import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
 import type { PokemonBase } from '../../../shared/tipos';
+import { ORDEM_TIERS, tierDoPokemon } from '../../../shared/tiers';
 import { pokemonsDaRegiao } from '../dados';
 import { el, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { iconeItem } from '../ui/iconeItem';
@@ -26,25 +27,30 @@ interface Secao<T> {
   /** texto usado na busca */
   busca: (linha: T) => string;
   aoClicar?: (linha: T) => void;
-  /** filtro por tipo (Pokémon e golpes) */
-  tipos?: (linha: T) => string[];
+  /** caixas de filtro (tipo, tier, categoria…): a linha passa se algum valor dela bater com o escolhido */
+  filtros?: Filtro<T>[];
 }
 
 const POR_PAGINA = 100;
+interface Filtro<T> {
+  todos: string;
+  opcoes: [valor: string, texto: string][];
+  valores: (linha: T) => string[];
+}
+
 const TODOS_TIPOS = ['normal', 'fire', 'water', 'grass', 'electric', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
 
 /** Tabela com busca, ordenação e "mostrar mais". */
 function tabela<T>(secao: Secao<T>): HTMLElement {
   const campo = el('input', { type: 'search', class: 'db-busca', placeholder: `Buscar em ${secao.nome.toLowerCase()}…` }) as HTMLInputElement;
   const contador = el('span', { class: 'meta' });
-  const tipos = secao.tipos;
-  const filtro = el('select', { class: 'db-busca db-filtro' },
-    el('option', { value: '' }, 'Todos os tipos'),
-    ...TODOS_TIPOS.map((t) => el('option', { value: t }, nomeTipo(t))),
-  ) as HTMLSelectElement;
-  filtro.addEventListener('change', () => {
-    limite = POR_PAGINA;
-    desenhar();
+  const filtros = (secao.filtros ?? []).map((f) => {
+    const caixa = el('select', { class: 'db-busca db-filtro' }, el('option', { value: '' }, f.todos), ...f.opcoes.map(([v, t]) => el('option', { value: v }, t))) as HTMLSelectElement;
+    caixa.addEventListener('change', () => {
+      limite = POR_PAGINA;
+      desenhar();
+    });
+    return { f, caixa };
   });
   const corpo = el('tbody');
   const mais = el('button', { class: 'botao secundario db-mais' }, 'Mostrar mais');
@@ -65,7 +71,7 @@ function tabela<T>(secao: Secao<T>): HTMLElement {
   const desenhar = () => {
     const termo = campo.value.trim().toLowerCase();
     let linhas = secao.linhas.filter(
-      (l) => (!termo || secao.busca(l).toLowerCase().includes(termo)) && (!tipos || !filtro.value || tipos(l).some((t) => t.toLowerCase() === filtro.value)),
+      (l) => (!termo || secao.busca(l).toLowerCase().includes(termo)) && filtros.every(({ f, caixa }) => !caixa.value || f.valores(l).includes(caixa.value)),
     );
     if (ordem) {
       const { i, asc } = ordem;
@@ -100,7 +106,7 @@ function tabela<T>(secao: Secao<T>): HTMLElement {
   return el(
     'div',
     { class: 'db-secao' },
-    el('div', { class: 'db-ferramentas' }, campo, tipos ? filtro : null, contador),
+    el('div', { class: 'db-ferramentas' }, campo, ...filtros.map((x) => x.caixa), contador),
     el('div', { class: 'db-rolagem' }, el('table', { class: 'db-tabela' }, el('thead', {}, el('tr', {}, ...cabecalhos)), corpo)),
     mais,
   );
@@ -109,6 +115,12 @@ function tabela<T>(secao: Secao<T>): HTMLElement {
 const ATRIBUTOS: [keyof PokemonBase['stats'], string][] = [
   ['hp', 'HP'], ['ataque', 'Atk'], ['defesa', 'Def'], ['ataqueEspecial', 'SpA'], ['defesaEspecial', 'SpD'], ['velocidade', 'Spe'],
 ];
+const filtroTipos = <T,>(tiposDe: (linha: T) => string[]): Filtro<T> => ({
+  todos: 'Todos os tipos',
+  opcoes: TODOS_TIPOS.map((t) => [t, nomeTipo(t)]),
+  valores: (l) => tiposDe(l).map((t) => t.toLowerCase()),
+});
+const posicaoTier = (t: string) => (ORDEM_TIERS.includes(t) ? ORDEM_TIERS.indexOf(t) : ORDEM_TIERS.length);
 const total = (p: PokemonBase) => ATRIBUTOS.reduce((s, [a]) => s + p.stats[a], 0);
 const numero = (v: number | true) => (v === true ? '—' : v ? String(v) : '—');
 
@@ -130,12 +142,16 @@ export const telaDatabase: Tela = (raiz, navegar) => {
       linhas: pokemons,
       busca: (p: PokemonBase) => `${p.id} ${p.nome} ${p.tipos.join(' ')}`,
       aoClicar: (p: PokemonBase) => navegar({ tela: 'pokedex', id: p.id }),
-      tipos: (p: PokemonBase) => p.tipos,
+      filtros: [
+        filtroTipos((p: PokemonBase) => p.tipos),
+        { todos: 'Todas as tiers', opcoes: ORDEM_TIERS.map((t) => [t, t]), valores: (p: PokemonBase) => [tierDoPokemon(p.id)] },
+      ],
       colunas: [
         { titulo: '#', celula: (p) => String(p.id).padStart(3, '0'), ordem: (p) => p.id, classe: 'num' },
         { titulo: '', celula: (p) => spritePokemon(p, { animado: false }), classe: 'db-sprite' },
         { titulo: 'Nome', celula: (p) => p.nome, ordem: (p) => p.nome },
         { titulo: 'Tipos', celula: (p) => selosTipos(p), ordem: (p) => p.tipos.join() },
+        { titulo: 'Tier', celula: (p) => el('span', { class: 'db-tier' }, tierDoPokemon(p.id)), ordem: (p) => posicaoTier(tierDoPokemon(p.id)) },
         ...ATRIBUTOS.map(([a, nome]): Coluna<PokemonBase> => ({ titulo: nome, celula: (p) => String(p.stats[a]), ordem: (p) => p.stats[a], classe: 'num' })),
         { titulo: 'Total', celula: (p) => el('strong', {}, String(total(p))), ordem: total, classe: 'num' },
       ],
@@ -174,7 +190,10 @@ export const telaDatabase: Tela = (raiz, navegar) => {
       nome: 'Golpes',
       linhas: Dex.moves.all().filter((m) => !m.isNonstandard && !m.isZ && !m.isMax),
       busca: (m) => `${m.name} ${m.type} ${traduzir(m.shortDesc || m.desc)}`,
-      tipos: (m) => [m.type],
+      filtros: [
+        filtroTipos((m) => [m.type]),
+        { todos: 'Todas as categorias', opcoes: ['Physical', 'Special', 'Status'].map((c) => [c, nomeCategoria(c)]), valores: (m) => [m.category] },
+      ],
       colunas: [
         { titulo: 'Nome', celula: (m) => m.name, ordem: (m) => m.name },
         { titulo: 'Tipo', celula: (m) => seloTipo(m.type), ordem: (m) => m.type },
