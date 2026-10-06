@@ -677,3 +677,16 @@ button.vaga:hover { border-color: var(--borda); }
 .moeda-gold .moeda-icone { background: radial-gradient(circle at 35% 35%, #fff6c8, #f2c230 45%, #a87412); box-shadow: inset 0 0 0 2px #c9961f; }
 .moeda-gold strong { color: #f5c842; }
 .botao.botao-gold { background: #f2c230; color: #2a1d00; }
+
+/* Fundos levemente transparentes (pedido do dono): janelas, ficha e resumo ao passar o mouse deixam ver o que está atrás */
+.janela-fundo { background: rgb(0 0 0 / 0.3); }
+.janela {
+  background: rgb(27 47 74 / 0.8);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  --painel: rgb(27 47 74 / 0.5);
+  --painel-2: rgb(35 58 88 / 0.55);
+}
+.resumo-pokemon {
+  background: rgb(16 30 50 / 0.78);
+  -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+}
