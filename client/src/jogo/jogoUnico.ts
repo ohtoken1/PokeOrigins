@@ -29,7 +29,9 @@ export function mostrarJogo(area: HTMLElement, opcoes: OpcoesBioma): { cena: () 
     jogo.loop.wake();
   }
   const atual = jogo;
-  atual.scene.start('bioma', opcoes);
+  // começa no quadro seguinte: dá tempo da página mostrar o "Carregando mapa…" antes de desenhar
+  let tirado = false;
+  setTimeout(() => !tirado && atual.scene.start('bioma', opcoes), 30);
 
   return {
     cena: () => {
@@ -37,6 +39,7 @@ export function mostrarJogo(area: HTMLElement, opcoes: OpcoesBioma): { cena: () 
       return c?.sys.isActive() ? c : null;
     },
     tirar: () => {
+      tirado = true;
       atual.scene.stop('bioma');
       // sem mapa na tela, o jogo dorme (não gasta nada) até o próximo bioma
       atual.loop.sleep();

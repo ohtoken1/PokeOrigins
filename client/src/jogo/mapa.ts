@@ -1,6 +1,7 @@
 ﻿// Gera o mapa de um bioma e desenha em pixel art (tiles de 16px, ampliados 2× pela câmera).
 // Tudo é desenhado por código até termos um tileset de verdade.
 import type { Paleta } from './paletas';
+import { corComFiltro, imagemComFiltro } from './filtroCor';
 
 export const TAM = 16;
 export const LARGURA = 96;
@@ -178,24 +179,23 @@ const AREIA: [number, number] = [4, 5];
 const AGUA: [number, number] = [9, 0];
 const MARGEM: [number, number] = [6, 1];
 
-/** Cópia do tileset com o filtro de cor do bioma já aplicado. */
+/** Cópia do tileset com o filtro de cor do bioma (calculado por nós; guardada para as próximas vezes). */
+const copiasFiltradas = new Map<CanvasImageSource, Map<string, CanvasImageSource>>();
 function comFiltro(img: CanvasImageSource, filtro: string): CanvasImageSource {
   if (filtro === 'none') return img;
-  const { width, height } = img as HTMLImageElement;
-  const c = document.createElement('canvas');
-  c.width = width;
-  c.height = height;
-  const ctx = c.getContext('2d')!;
-  ctx.filter = filtro;
-  ctx.drawImage(img, 0, 0);
-  return c;
+  let porFiltro = copiasFiltradas.get(img);
+  if (!porFiltro) copiasFiltradas.set(img, (porFiltro = new Map()));
+  let copia = porFiltro.get(filtro);
+  if (!copia) porFiltro.set(filtro, (copia = imagemComFiltro(img, filtro)));
+  return copia;
 }
 
 export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilesets: Tilesets): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = LARGURA * TAM;
   canvas.height = ALTURA * TAM;
-  const ctx = canvas.getContext('2d')!;
+  // canvas na memória comum (não na placa de vídeo): milhares de desenhos pequenos ficam bem mais rápidos
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
   ctx.imageSmoothingEnabled = false;
   const r = aleatorioComSemente(`${semente}:desenho`);
   const { terreno } = mapa;
@@ -204,6 +204,8 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
   const buch = comFiltro(tilesets.buch, paleta.filtro);
   const natureza = comFiltro(tilesets.natureza, paleta.filtroObjetos);
   const agua = comFiltro(tilesets.agua, paleta.filtroLiquido);
+  // cor da borda dos caminhos já com o filtro do bioma (calculada uma vez, não a cada tile)
+  const corBorda = corComFiltro('#c8a860', paleta.filtro);
   const tile = (src: CanvasImageSource, [tx, ty]: [number, number], px: number, py: number, w = 1, h = 1) =>
     ctx.drawImage(src, tx * TAM, ty * TAM, w * TAM, h * TAM, px, py, w * TAM, h * TAM);
 
@@ -243,11 +245,8 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
           [!ehCaminho(t(x - 1, y)), px, py, 1, TAM],
           [!ehCaminho(t(x + 1, y)), px + TAM - 1, py, 1, TAM],
         ];
-        ctx.save();
-        ctx.filter = paleta.filtro;
-        ctx.fillStyle = '#c8a860';
+        ctx.fillStyle = corBorda;
         for (const [ativo, bx, by, bw, bh] of bordas) if (ativo) ctx.fillRect(bx, by, bw, bh);
-        ctx.restore();
       }
     }
 
@@ -266,10 +265,10 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
     } else if (paleta.obstaculo === 'coral') {
       // fundo do mar: maioria corais, algumas rochas
       if (paleta.rochas && (g.x * 5 + g.y * 3) % 7 === 0) tile(natureza, escolher(paleta.rochas), g.x * TAM, g.y * TAM, 2, 2);
-      else desenharCoral(ctx, g.x * TAM, g.y * TAM, CORES_CORAL[(g.x * 3 + g.y * 5) % CORES_CORAL.length], aleatorioComSemente(`${g.x},${g.y}`));
+      else ctx.drawImage(coralPronto((g.x * 3 + g.y * 5) % CORES_CORAL.length, (g.x * 7 + g.y * 11) % 6), g.x * TAM - 8, g.y * TAM - 16);
     } else if (paleta.obstaculo === 'rocha' && paleta.rochas) {
       tile(natureza, escolher(paleta.rochas), g.x * TAM, g.y * TAM, 2, 2);
-    } else desenharGrande(ctx, g.x * TAM, g.y * TAM, paleta);
+    } else ctx.drawImage(grandePronto(paleta), g.x * TAM, g.y * TAM);
   }
 
   if (paleta.submerso) {
@@ -283,6 +282,23 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
 }
 
 /** Obstáculos sem tile no tileset (caixas da usina, lápides da torre), desenhados por código. */
+/** Desenhos feitos por código ficam prontos uma vez e depois só são copiados (bem mais rápido). */
+const prontos = new Map<string, HTMLCanvasElement>();
+function pronto(chave: string, largura: number, altura: number, desenhar: (ctx: Ctx) => void): HTMLCanvasElement {
+  let c = prontos.get(chave);
+  if (!c) {
+    c = document.createElement('canvas');
+    [c.width, c.height] = [largura, altura];
+    desenhar(c.getContext('2d')!);
+    prontos.set(chave, c);
+  }
+  return c;
+}
+const grandePronto = (paleta: Paleta) => pronto(`${paleta.obstaculo}:${paleta.copa.join()}`, 32, 32, (ctx) => desenharGrande(ctx, 0, 0, paleta));
+/** 4 cores × 6 formatos de coral; o coral passa 16 px acima e 8 px para os lados do espaço 2×2. */
+const coralPronto = (cor: number, formato: number) =>
+  pronto(`coral:${cor}:${formato}`, 48, 52, (ctx) => desenharCoral(ctx, 8, 16, CORES_CORAL[cor], aleatorioComSemente(`coral${formato}`)));
+
 function desenharGrande(ctx: Ctx, ox: number, oy: number, paleta: Paleta) {
   const [contorno, escuro, medio, claro] = paleta.copa;
   const cx = ox + 16;
