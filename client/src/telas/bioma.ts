@@ -149,6 +149,8 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       salvar(save);
       atualizarContador();
 
+      // o indivíduo já nasce aqui para o cartão mostrar o gênero
+      const selvagem = novoPokemon(encontro.pokemon.id, encontro.nivel, encontro.shiny);
       const temQuemLute = save.time.some((p) => p.hp > 0);
       fecharEncontro = mostrarEncontro(areaJogo, encontro, {
         bloqueio: temQuemLute ? null : 'Seu time está desmaiado. Cure no Centro Pokémon.',
@@ -160,7 +162,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
           abrirBatalha({
             save,
             bioma,
-            selvagem: novoPokemon(encontro.pokemon.id, encontro.nivel, encontro.shiny),
+            selvagem,
             aoTerminar: (resultado) => {
               if (resultado === 'derrota') return navegar({ tela: 'regiao' });
               atualizarTime();
@@ -170,7 +172,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
             },
           });
         },
-      });
+      }, selvagem.genero);
     },
   });
 

@@ -1,6 +1,7 @@
 import type { Bioma } from '../../../shared/biomas';
 import { BatalhaSelvagem, type EventoBatalha, type Lado } from '../../../shared/batalha/motor';
-import { curar, expGanha, expParaNivel, ganharEvs, hpMaximo, nomeGolpe, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { atributos, curar, expGanha, expParaNivel, faixaVelocidade, ganharEvs, hpMaximo, nomeGolpe, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { Dex } from '@pkmn/sim';
 import { evoluir, ganharExperiencia, trocarGolpe, type ResultadoProgresso } from '../../../shared/batalha/progresso';
 import { pokemonPorId } from '../dados';
 import { ITENS, type ItemId } from '../../../shared/itens';
@@ -8,7 +9,7 @@ import { efeitoBola } from '../../../shared/bolas';
 import { nivelTreinador } from '../../../shared/treinador';
 import { MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
 import { curarTime, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
-import { corTipo, el, seloTipo, spritePokemon } from '../ui/dom';
+import { corTipo, el, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarGolpe, animarRetorno, tremerArena } from './animacoes';
 
@@ -67,6 +68,27 @@ function caixaInfo(doJogador: boolean) {
   };
 }
 
+const NOMES_ATRIBUTOS: Record<string, string> = { atk: 'Attack', def: 'Defense', spa: 'Sp. Atk', spd: 'Sp. Def', spe: 'Speed' };
+
+/** Linhas do resumo do Pokémon (mouse em cima dele na batalha). */
+function resumoPokemon(p: PokemonIndividual, doJogador: boolean): HTMLElement[] {
+  const dados = pokemonPorId(p.especieId);
+  const natureza = Dex.natures.get(p.natureza);
+  const efeito = natureza.plus && natureza.minus ? `+${NOMES_ATRIBUTOS[natureza.plus]} −${NOMES_ATRIBUTOS[natureza.minus]}` : 'neutra';
+  const genero = p.genero === 'M' ? '♂ Macho' : p.genero === 'F' ? '♀ Fêmea' : 'Sem gênero';
+  const [min, max] = faixaVelocidade(p);
+  const linha = (rotulo: string, valor: string) => el('div', { class: 'resumo-linha' }, el('span', {}, rotulo), el('strong', {}, valor));
+  return [
+    el('div', { class: 'resumo-titulo' }, el('strong', {}, `${dados.nome}${p.shiny ? ' ✨' : ''}`), el('small', {}, ` Nv. ${p.nivel}`)),
+    selosTipos(dados),
+    linha('Gênero', genero),
+    linha('Nature', `${natureza.name} (${efeito})`),
+    linha('Ability', Dex.abilities.get(p.habilidade).name),
+    linha('Speed (IV 0–31)', `${min}–${max}`),
+    ...(doJogador ? [linha('Speed atual', String(atributos(p).spe))] : []),
+  ];
+}
+
 export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalha): void {
   const dadosSelvagem = pokemonPorId(selvagem.especieId);
   const batalha = new BatalhaSelvagem(
@@ -93,6 +115,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
   spriteSelvagem.classList.add('sprite-selvagem');
   let spriteJogador = el('img', { class: 'sprite sprite-jogador', alt: '' });
   const lugarJogador = el('div', { class: 'lugar lugar-jogador' }, spriteJogador);
+  const lugarSelvagem = el('div', { class: 'lugar lugar-selvagem' }, spriteSelvagem);
   const infoSelvagem = caixaInfo(false);
   const infoJogador = caixaInfo(true);
   infoSelvagem.definir(selvagem);
@@ -102,10 +125,27 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     'div',
     { class: 'arena', style: { '--chao': hex(bioma.cores.chao), '--zona': hex(bioma.cores.zona) } },
     infoSelvagem.raiz,
-    el('div', { class: 'lugar lugar-selvagem' }, spriteSelvagem),
+    lugarSelvagem,
     lugarJogador,
     infoJogador.raiz,
   );
+  // resumo ao passar o mouse em cima de um Pokémon (natureza, gênero, faixa de Speed…)
+  const resumo = el('div', { class: 'resumo-pokemon' });
+  resumo.hidden = true;
+  arena.append(resumo);
+  const mostrarResumo = (lugar: HTMLElement, lado: 'selvagem' | 'jogador', quem: () => PokemonIndividual | undefined) => {
+    lugar.addEventListener('mouseenter', () => {
+      const p = quem();
+      if (!p) return;
+      resumo.className = `resumo-pokemon ${lado}`;
+      resumo.replaceChildren(...resumoPokemon(p, lado === 'jogador'));
+      resumo.hidden = false;
+    });
+    lugar.addEventListener('mouseleave', () => (resumo.hidden = true));
+  };
+  mostrarResumo(lugarSelvagem, 'selvagem', () => selvagem);
+  mostrarResumo(lugarJogador, 'jogador', () => save.time[batalha.ativo]);
+
   const mensagem = el('p', { class: 'mensagem' });
   const acoes = el('div', { class: 'acoes-batalha' });
   const painel = el('div', { class: 'painel-batalha' }, mensagem, acoes);

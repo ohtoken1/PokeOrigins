@@ -129,6 +129,12 @@ export function atributos(p: BaseDeAtributos): Atributos {
   return resultado;
 }
 
+/** Speed mínima e máxima que o Pokémon teria com IV 0 e IV 31 (mesma natureza, EVs e nível). */
+export function faixaVelocidade(p: BaseDeAtributos): [number, number] {
+  const com = (iv: number) => atributos({ ...p, ivs: { ...p.ivs, spe: iv } }).spe;
+  return [com(0), com(31)];
+}
+
 export function hpMaximo(p: BaseDeAtributos): number {
   return atributos(p).hp;
 }

@@ -148,6 +148,16 @@ aside { display: flex; flex-direction: column; gap: 16px; }
 .encontro .tipos { justify-content: flex-start; }
 .encontro .botao { padding: 6px 12px; margin-top: 2px; }
 .encontro .dica { margin: 0; font-size: 0.72rem; color: #e8ecf4; }
+.encontro { transform-origin: 0 0; }
+.encontro .genero.M { color: #6ab4ff; }
+.encontro .genero.F { color: #ff7ab8; }
+.encontro-tamanho { position: absolute; top: 4px; right: 4px; display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s; }
+.encontro:hover .encontro-tamanho { opacity: 1; }
+.encontro-tamanho button {
+  width: 22px; height: 22px; padding: 0; border-radius: 6px; cursor: pointer; line-height: 1; font-weight: 700;
+  background: rgb(20 36 58 / 0.85); color: var(--texto); border: 1px solid var(--borda); text-shadow: none;
+}
+.encontro-tamanho button:hover { background: var(--painel-2); }
 .encontro .botao { text-shadow: none; cursor: pointer; }
 kbd { font: 600 0.7rem system-ui; padding: 1px 5px; border-radius: 4px; background: rgb(0 0 0 / 0.2); }
 
@@ -423,3 +433,16 @@ button.vaga:hover { border-color: var(--borda); }
 .vaga.arrastavel { cursor: grab; touch-action: none; }
 .vaga.arrastando { position: relative; z-index: 10; opacity: 0.85; cursor: grabbing; pointer-events: none; }
 .vaga.alvo { outline: 2px dashed var(--destaque); outline-offset: 2px; }
+/* resumo do Pokémon ao passar o mouse na batalha */
+.lugar { cursor: help; }
+.resumo-pokemon {
+  position: absolute; z-index: 20; width: 230px; padding: 10px 12px; border-radius: 10px; pointer-events: none;
+  background: rgb(16 30 50 / 0.95); border: 1px solid var(--borda); box-shadow: 0 8px 20px rgb(0 0 0 / 0.4);
+  display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; color: var(--texto); line-height: 1.3;
+}
+.resumo-pokemon.selvagem { top: 64px; right: calc(12% + 210px); }
+.resumo-pokemon.jogador { bottom: 24px; left: calc(8% + 250px); }
+.resumo-pokemon .tipos { justify-content: flex-start; margin-bottom: 2px; }
+.resumo-titulo small { color: var(--texto-2); }
+.resumo-linha { display: flex; justify-content: space-between; gap: 10px; }
+.resumo-linha span { color: var(--texto-2); }
