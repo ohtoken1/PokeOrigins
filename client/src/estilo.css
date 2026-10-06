@@ -571,3 +571,33 @@ button.vaga:hover { border-color: var(--borda); }
 /* lista do bioma: quem não aparece na faixa atual fica apagado */
 .lista-chances li.fora-da-faixa { opacity: 0.45; }
 .lista-chances li.fora-da-faixa small { font-size: 0.68rem; }
+
+/* atalhos minimizados dos Pokémon do bioma */
+.atalhos-moradores {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 4px; padding: 8px; max-height: 300px; overflow-y: auto;
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 14px;
+}
+.morador {
+  position: relative; display: flex; flex-direction: column; align-items: center; padding: 2px 0 1px; min-height: 46px;
+  background: var(--painel-2); border: 1px solid transparent; border-radius: 10px; cursor: pointer; opacity: 0.5; color: var(--texto);
+}
+.morador.visto { opacity: 1; }
+.morador.fora-da-faixa { opacity: 0.3; filter: grayscale(0.7); }
+.morador:hover { border-color: var(--borda); opacity: 1; }
+.morador.selecionado { border-color: #6aa8ff; opacity: 1; filter: none; }
+.morador .sprite { width: 56px; height: 56px; margin: -10px 0 -12px; }
+.morador small { font-size: 0.62rem; color: var(--texto-2); font-variant-numeric: tabular-nums; }
+.marca-capturado {
+  position: absolute; top: 3px; right: 3px; width: 8px; height: 8px; border-radius: 50%;
+  background: linear-gradient(#e33 50%, #fff 50%); border: 1px solid #222;
+}
+.ficha-morador:empty { display: none; }
+.ficha-morador {
+  display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 8px;
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 14px;
+}
+.ficha-morador .sprite { width: 64px; height: 64px; flex: none; }
+.ficha-morador > div { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.ficha-morador small { color: var(--texto-2); font-size: 0.78rem; }
+.ficha-morador small.capturado { color: #3fd46b; }
+.ficha-morador small.visto { color: #6aa8ff; }

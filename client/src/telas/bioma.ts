@@ -10,7 +10,7 @@ import { abrirBatalha } from '../batalha/telaBatalha';
 import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons } from '../dados';
 import { ajustesAdmin, aoMudarAdmin } from '../ui/admin';
 import { carregarSave, curarTime, novoPokemon, salvar } from '../estado';
-import { el, spritePokemon } from '../ui/dom';
+import { el, selosTipos, spritePokemon } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
 import { botaoIcone, botoesMenus } from '../ui/menus';
 import { mostrarEncontro } from '../ui/popupEncontro';
@@ -51,7 +51,10 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   // todos os Pokémon que moram neste bioma: com % só quem pode aparecer na faixa de nível atual;
   // os de outras faixas mostram o nível, e os que só vêm por evolução (pedra/troca/amizade) mostram como
   const moradores = pokemonsDaRegiao(regiao.id).filter((p) => biomaDoPokemon(p) === bioma.id);
-  const listaChances = el('ol', { class: 'lista-chances' });
+  // atalhos minimizados: um botãozinho com o sprite de cada morador; clicar mostra a ficha curta embaixo
+  const listaChances = el('div', { class: 'atalhos-moradores' });
+  const fichaMorador = el('div', { class: 'ficha-morador' });
+  let selecionado: number | null = null;
   const atualizarChances = () => {
     const nivelFixo = ajustesAdmin().nivel;
     const chances = probabilidades(tabela, nivelFixo === null ? faixaAtual() : [nivelFixo, nivelFixo]);
@@ -69,20 +72,48 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       return { p, chance, info, solto: !!entrada };
     });
     linhas.sort((a, b) => b.chance - a.chance || Number(b.solto) - Number(a.solto) || a.p.id - b.p.id);
-    listaChances.replaceChildren(
-      ...linhas.map(({ p, chance, info, solto }) =>
+    const mostrarFicha = () => {
+      const linha = linhas.find((l) => l.p.id === selecionado);
+      if (!linha) return fichaMorador.replaceChildren();
+      const { p, chance, info, solto } = linha;
+      const capturado = save.capturados.includes(p.id);
+      const visto = save.vistos.includes(p.id);
+      fichaMorador.replaceChildren(
+        spritePokemon(p, { animado: false }),
         el(
-          'li',
+          'div',
+          {},
+          el('strong', {}, `#${p.id} ${p.nome}`),
+          selosTipos(p),
+          el('small', {}, chance > 0 ? `Aparição agora: ${info}` : solto ? `Aparece em outra faixa: ${info}` : `Não aparece solto: ${info}`),
+          el('small', { class: capturado ? 'capturado' : visto ? 'visto' : 'nunca' }, capturado ? '● Já capturado' : visto ? '○ Já visto (não capturado)' : '— Nunca visto'),
+        ),
+        el('button', { class: 'botao secundario', title: 'Ver na Pokédex', onclick: () => navegar({ tela: 'pokedex', id: p.id }) }, 'Pokédex'),
+      );
+    };
+    listaChances.replaceChildren(
+      ...linhas.map(({ p, chance, info, solto }) => {
+        const capturado = save.capturados.includes(p.id);
+        const botao = el(
+          'button',
           {
-            class: `${save.vistos.includes(p.id) ? 'visto' : ''} ${chance > 0 ? '' : 'fora-da-faixa'}`,
-            title: chance > 0 ? 'Pode aparecer agora' : solto ? 'Aparece em outra faixa de nível' : `Não aparece solto: ${info}`,
+            class: `morador ${save.vistos.includes(p.id) ? 'visto' : ''} ${chance > 0 ? '' : 'fora-da-faixa'} ${selecionado === p.id ? 'selecionado' : ''}`,
+            title: `${p.nome} · ${chance > 0 ? info : solto ? `outra faixa (${info})` : info}`,
+            onclick: () => {
+              selecionado = selecionado === p.id ? null : p.id;
+              listaChances.querySelectorAll('.morador').forEach((b) => b.classList.remove('selecionado'));
+              if (selecionado !== null) botao.classList.add('selecionado');
+              mostrarFicha();
+            },
           },
           spritePokemon(p, { animado: false }),
-          el('span', {}, p.nome),
-          el('small', {}, info),
-        ),
-      ),
+          capturado ? el('span', { class: 'marca-capturado', title: 'Capturado' }) : null,
+          chance > 0 ? el('small', {}, `${(chance * 100).toFixed(1)}%`) : null,
+        );
+        return botao;
+      }),
     );
+    mostrarFicha();
   };
   atualizarChances();
 
@@ -135,7 +166,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         'div',
         { class: 'layout-bioma' },
         el('section', {}, atalhosBiomas(bioma.id, (id) => navegar({ tela: 'bioma', biomaId: id })), areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. A cada passo aparece um Pokémon: Enter para lutar, ou continue andando para fugir.')),
-        el('aside', {}, caixaTime, tituloChances, listaChances),
+        el('aside', {}, caixaTime, tituloChances, listaChances, fichaMorador),
       ),
     ),
   );
