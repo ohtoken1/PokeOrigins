@@ -1,0 +1,68 @@
+/* Pokédex */
+.tela.tela-pokedex { max-width: 1340px; }
+.dex-cabecalho { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.layout-pokedex { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start; }
+.dex-coluna { display: flex; flex-direction: column; gap: 8px; position: sticky; top: 64px; }
+.dex-busca, .dex-filtro { background: var(--painel-2); color: var(--texto); border: 1px solid var(--borda); border-radius: 8px; padding: 8px 10px; font: inherit; }
+.dex-lista { list-style: none; margin: 0; padding: 4px; overflow-y: auto; max-height: calc(100vh - 210px); background: var(--painel); border: 1px solid var(--borda); border-radius: 12px; }
+.dex-lista li { display: flex; align-items: center; gap: 8px; padding: 2px 8px; border-radius: 8px; cursor: pointer; }
+.dex-lista li:hover { background: var(--painel-2); }
+.dex-lista li.ativo { background: var(--painel-2); box-shadow: inset 3px 0 0 var(--destaque); }
+.dex-lista .sprite { width: 40px; height: 40px; object-fit: contain; }
+.dex-num { color: var(--texto-2); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+.dex-nome { flex: 1; font-weight: 600; }
+.dex-marca { color: var(--texto-2); }
+.dex-marca.capturado { color: var(--destaque); }
+.dex-painel { min-width: 0; }
+.dex-ficha { display: flex; flex-direction: column; gap: 16px; }
+.dex-ficha section, .dex-topo { background: var(--painel); border: 1px solid var(--borda); border-radius: 12px; padding: 16px; }
+.dex-ficha h3 { margin: 0 0 10px; font-size: 0.8rem; color: var(--texto-2); text-transform: uppercase; letter-spacing: 0.05em; }
+.dex-topo { display: grid; grid-template-columns: 240px 1fr; gap: 20px; }
+.dex-palco { height: 220px; display: grid; place-items: center; border-radius: 12px; overflow: hidden; background: radial-gradient(ellipse 36% 8% at 50% 88%, rgb(0 0 0 / 0.3) 0 99%, transparent 100%), var(--painel-2); }
+.dex-botoes { display: flex; gap: 6px; margin-top: 8px; }
+.dex-botoes .botao { flex: 1; padding: 6px; }
+.dex-botoes .botao.ligado { background: var(--destaque); color: #000; }
+.dex-resumo { display: flex; flex-direction: column; gap: 6px; }
+.dex-resumo .tipos { justify-content: flex-start; margin-bottom: 4px; }
+.dex-titulo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dex-titulo h2 { margin: 0; font-size: 1.6rem; }
+.dex-numero { color: var(--texto-2); font-variant-numeric: tabular-nums; }
+.dex-selo { font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--painel-2); border: 1px solid var(--borda); }
+.dex-selo.lendario { color: #ff6a5a; border-color: #ff6a5a; }
+.dex-linha { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; border-bottom: 1px solid rgb(255 255 255 / 0.05); font-size: 0.9rem; }
+.dex-linha span { color: var(--texto-2); }
+.dex-linha strong { text-align: right; font-weight: 600; }
+.dex-atributos { display: flex; flex-direction: column; gap: 6px; }
+.dex-atributo { display: grid; grid-template-columns: 80px 40px 1fr; align-items: center; gap: 10px; font-size: 0.9rem; }
+.dex-atributo > span:first-child { color: var(--texto-2); }
+.dex-atributo strong { text-align: right; font-variant-numeric: tabular-nums; }
+.dex-atributo.total { border-top: 1px solid var(--borda); padding-top: 6px; }
+.dex-barra { height: 8px; border-radius: 4px; background: var(--painel-2); overflow: hidden; }
+.dex-barra span { display: block; height: 100%; border-radius: 4px; }
+.dex-habilidades { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.dex-habilidades p { margin: 4px 0 0; font-size: 0.85rem; color: var(--texto-2); }
+.dex-habilidades .oculta { color: var(--texto-2); font-style: italic; }
+.dex-efetividade { display: flex; flex-direction: column; gap: 8px; }
+.dex-ef-linha { display: flex; align-items: center; gap: 10px; }
+.dex-ef-mult { width: 54px; font-weight: 700; }
+.dex-ef-linha .tipos { flex-wrap: wrap; justify-content: flex-start; }
+.dex-evolucao { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dex-estagio { display: flex; flex-wrap: wrap; gap: 6px; }
+.dex-seta { color: var(--texto-2); font-size: 1.4rem; }
+.dex-evo { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 12px; background: var(--painel-2); border: 1px solid var(--borda); border-radius: 10px; cursor: pointer; }
+.dex-evo.atual { border-color: var(--destaque); }
+.dex-evo .sprite { width: 72px; height: 72px; object-fit: contain; }
+.dex-evo small { color: var(--texto-2); font-size: 0.72rem; }
+.dex-golpes { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.dex-golpes th { text-align: left; color: var(--texto-2); font-weight: 600; padding: 4px 6px; border-bottom: 1px solid var(--borda); }
+.dex-golpes td { padding: 4px 6px; border-bottom: 1px solid rgb(255 255 255 / 0.05); }
+.dex-golpes tr:hover td { background: var(--painel-2); }
+.dex-golpes .tipos, .dex-golpes .tipo { justify-content: flex-start; }
+.dex-tms { display: flex; flex-wrap: wrap; gap: 6px; max-height: 260px; overflow-y: auto; }
+.dex-tm { font-size: 0.8rem; padding: 3px 8px; border-radius: 6px; background: var(--painel-2); border: 1px solid var(--borda); }
+.dex-tm small { color: var(--texto-2); }
+@media (max-width: 860px) {
+  .layout-pokedex, .dex-topo { grid-template-columns: 1fr; }
+  .dex-coluna { position: static; }
+  .dex-lista { max-height: 260px; }
+}
