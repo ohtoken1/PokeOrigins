@@ -212,6 +212,11 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
         continue;
       }
 
+      if (paleta.submerso) {
+        desenharFundoDoMar(ctx, tipo, px, py, r, (v) => v === 'caminho' || v === null, t(x, y - 1), t(x, y + 1), t(x - 1, y), t(x + 1, y), () => tile(buch, AREIA, px, py));
+        continue;
+      }
+
       // grama do tileset é a base do resto
       tile(buch, GRAMAS[Math.floor(r() * GRAMAS.length)], px, py);
 
@@ -235,7 +240,10 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
       }
     }
 
-  for (const f of mapa.flores) tile(buch, FLORES[(f.dx + f.dy) % FLORES.length], f.x * TAM, f.y * TAM);
+  for (const f of mapa.flores) {
+    if (paleta.submerso) desenharConcha(ctx, f.x * TAM, f.y * TAM, f.dx + f.dy);
+    else tile(buch, FLORES[(f.dx + f.dy) % FLORES.length], f.x * TAM, f.y * TAM);
+  }
   for (const p of mapa.pedrinhas) tile(natureza, paleta.pedrinhas[(p.x + p.y) % paleta.pedrinhas.length], p.x * TAM, p.y * TAM);
 
   // grandes em ordem de cima para baixo, para os de baixo cobrirem os de cima
@@ -244,11 +252,22 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
     if (paleta.obstaculo === 'arvore' && paleta.arvores) {
       // árvore de 2×3 tiles: a copa passa 1 tile acima do espaço 2×2 que ela bloqueia
       tile(natureza, escolher(paleta.arvores), g.x * TAM, (g.y - 1) * TAM, 2, 3);
+    } else if (paleta.obstaculo === 'coral') {
+      // fundo do mar: maioria corais, algumas rochas
+      if (paleta.rochas && (g.x * 5 + g.y * 3) % 7 === 0) tile(natureza, escolher(paleta.rochas), g.x * TAM, g.y * TAM, 2, 2);
+      else desenharCoral(ctx, g.x * TAM, g.y * TAM, CORES_CORAL[(g.x * 3 + g.y * 5) % CORES_CORAL.length], aleatorioComSemente(`${g.x},${g.y}`));
     } else if (paleta.obstaculo === 'rocha' && paleta.rochas) {
       tile(natureza, escolher(paleta.rochas), g.x * TAM, g.y * TAM, 2, 2);
     } else desenharGrande(ctx, g.x * TAM, g.y * TAM, paleta);
   }
 
+  if (paleta.submerso) {
+    // tudo fica azulado, como visto debaixo d'água
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.fillStyle = '#6aa6e6';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.globalCompositeOperation = 'source-over';
+  }
   return canvas;
 }
 
@@ -292,4 +311,123 @@ function desenharGrande(ctx: Ctx, ox: number, oy: number, paleta: Paleta) {
       break;
     }
   }
+}
+
+// ---------- fundo do mar (desenhado por código) ----------
+
+/** Cores dos corais: contorno, escuro, médio, claro. */
+const CORES_CORAL: [string, string, string, string][] = [
+  ['#4a1428', '#b83a58', '#f2727e', '#ffc2b8'], // rosa
+  ['#4a2010', '#c0582a', '#f59a4a', '#ffd49a'], // laranja
+  ['#2a1446', '#6a3aa8', '#a070e0', '#d8c0ff'], // roxo
+  ['#3a3410', '#a89020', '#e8cc40', '#fff0a0'], // amarelo
+];
+
+/** Areia (chão mais escuro, trilhas mais claras), algas no lugar do mato. */
+function desenharFundoDoMar(
+  ctx: Ctx, tipo: Terreno, px: number, py: number, r: () => number, ehTrilha: (v: Terreno | null) => boolean,
+  cima: Terreno | null, baixo: Terreno | null, esq: Terreno | null, dir: Terreno | null, areia: () => void,
+) {
+  areia();
+  if (tipo === 'caminho') {
+    ctx.fillStyle = 'rgba(255,250,220,0.18)';
+    ctx.fillRect(px, py, TAM, TAM);
+    ctx.fillStyle = 'rgba(90,70,40,0.35)';
+    if (!ehTrilha(cima)) ctx.fillRect(px, py, TAM, 1);
+    if (!ehTrilha(baixo)) ctx.fillRect(px, py + TAM - 1, TAM, 1);
+    if (!ehTrilha(esq)) ctx.fillRect(px, py, 1, TAM);
+    if (!ehTrilha(dir)) ctx.fillRect(px + TAM - 1, py, 1, TAM);
+    return;
+  }
+  // chão: areia mais funda, com ondinhas e pontinhos
+  ctx.fillStyle = 'rgba(40,60,70,0.28)';
+  ctx.fillRect(px, py, TAM, TAM);
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  const oy = Math.floor(r() * 12) + 2;
+  for (let i = 0; i < 6; i++) ctx.fillRect(px + 2 + i * 2, py + oy + (i % 2), 2, 1);
+  ctx.fillStyle = 'rgba(30,40,40,0.25)';
+  for (let i = 0; i < 2; i++) ctx.fillRect(px + Math.floor(r() * 15), py + Math.floor(r() * 15), 1, 1);
+
+  if (tipo === 'mato') {
+    // 3 algas onduladas
+    for (let k = 0; k < 3; k++) {
+      const base = px + 2 + k * 5 + Math.floor(r() * 2);
+      const altura = 9 + Math.floor(r() * 6);
+      const fase = r() * 6;
+      for (let i = 0; i < altura; i++) {
+        const x = base + Math.round(Math.sin(i / 2.2 + fase) * 1.2);
+        ctx.fillStyle = '#1e5a34';
+        ctx.fillRect(x - 1, py + TAM - 1 - i, 3, 1);
+        ctx.fillStyle = i > altura - 3 ? '#8ad070' : '#3f9a4c';
+        ctx.fillRect(x, py + TAM - 1 - i, 1, 1);
+      }
+    }
+  }
+}
+
+function desenharConcha(ctx: Ctx, px: number, py: number, variante: number) {
+  const cx = px + 8;
+  const cy = py + 9;
+  if (variante % 2 === 0) {
+    // estrela-do-mar
+    const cor = variante % 4 === 0 ? '#ff8a5a' : '#ffcc4a';
+    ctx.fillStyle = '#7a3a20';
+    ctx.fillRect(cx - 1, cy - 4, 3, 9);
+    ctx.fillRect(cx - 4, cy - 1, 9, 3);
+    ctx.fillStyle = cor;
+    ctx.fillRect(cx, cy - 3, 1, 7);
+    ctx.fillRect(cx - 3, cy, 7, 1);
+    ctx.fillRect(cx - 1, cy - 1, 3, 3);
+  } else {
+    // concha em leque
+    ctx.fillStyle = '#8a6a5a';
+    ctx.fillRect(cx - 3, cy - 2, 7, 4);
+    ctx.fillRect(cx - 2, cy - 3, 5, 1);
+    ctx.fillRect(cx - 1, cy + 2, 3, 1);
+    ctx.fillStyle = '#f4e0d0';
+    ctx.fillRect(cx - 2, cy - 2, 5, 3);
+    ctx.fillStyle = '#c8a090';
+    ctx.fillRect(cx - 1, cy - 2, 1, 3);
+    ctx.fillRect(cx + 1, cy - 2, 1, 3);
+  }
+}
+
+/** Coral ramificado num espaço de 2×2 tiles (passa um pouco acima, como as árvores). */
+function desenharCoral(ctx: Ctx, ox: number, oy: number, [contorno, escuro, medio, claro]: [string, string, string, string], r: () => number) {
+  const cx = ox + 16;
+  elipse(ctx, cx, oy + 28, 13, 3, 'rgba(0,0,0,0.25)');
+  // base de pedra
+  elipse(ctx, cx, oy + 27, 10, 4, '#4a5560');
+  elipse(ctx, cx, oy + 26, 8, 3, '#6a7884');
+
+  const galhos: [number, number, number, number, number][] = [];
+  const crescer = (x: number, y: number, angulo: number, tamanho: number, nivel: number) => {
+    const x2 = x + Math.cos(angulo) * tamanho;
+    const y2 = y + Math.sin(angulo) * tamanho;
+    galhos.push([x, y, x2, y2, nivel]);
+    if (nivel >= 3) return;
+    for (let i = 0; i < 2; i++) {
+      const abertura = (i - 0.5) * 0.8 + (r() - 0.5) * 0.3;
+      crescer(x2, y2, angulo + abertura, tamanho * (0.75 + r() * 0.15), nivel + 1);
+    }
+  };
+  // leque de galhos saindo da base
+  const hastes = 3 + Math.floor(r() * 2);
+  for (let i = 0; i < hastes; i++) crescer(cx + (i - (hastes - 1) / 2) * 2, oy + 25, -Math.PI / 2 + (i - (hastes - 1) / 2) * 0.55 + (r() - 0.5) * 0.2, 6 + r() * 2, 1);
+
+  const linha = (x1: number, y1: number, x2: number, y2: number, largura: number, cor: string) => {
+    ctx.fillStyle = cor;
+    const passos = Math.max(1, Math.ceil(Math.hypot(x2 - x1, y2 - y1)));
+    for (let i = 0; i <= passos; i++) {
+      const x = Math.round(x1 + ((x2 - x1) * i) / passos - largura / 2);
+      const y = Math.round(y1 + ((y2 - y1) * i) / passos - largura / 2);
+      ctx.fillRect(x, y, largura, largura);
+    }
+  };
+  const largura = (nivel: number) => Math.max(2, 4 - nivel);
+  for (const [x1, y1, x2, y2, n] of galhos) linha(x1, y1, x2, y2, largura(n) + 2, contorno);
+  for (const [x1, y1, x2, y2, n] of galhos) linha(x1, y1, x2, y2, largura(n), n < 2 ? escuro : medio);
+  for (const [x1, y1, x2, y2, n] of galhos) if (n >= 2) linha(x1 - 0.5, y1 - 0.5, x2 - 0.5, y2 - 0.5, 1, claro);
+  // pontas arredondadas e claras
+  for (const [, , x2, y2, n] of galhos) if (n === 3) circulo(ctx, Math.round(x2), Math.round(y2), 1, claro);
 }

@@ -1,6 +1,6 @@
 // Visual de cada bioma: quais árvores/pedras do tileset usar e os filtros de cor.
 // Coordenadas (coluna, linha) no core_outdoor_nature do Tuxemon.
-export type Obstaculo = 'arvore' | 'rocha' | 'caixa' | 'lapide';
+export type Obstaculo = 'arvore' | 'rocha' | 'caixa' | 'lapide' | 'coral';
 
 export interface Paleta {
   obstaculo: Obstaculo;
@@ -20,10 +20,11 @@ export interface Paleta {
   filtroObjetos: string;
   /** filtro CSS da água (vira lava, abismo, veneno…) */
   filtroLiquido: string;
+  /** fundo do mar: chão de areia, algas no lugar do mato, conchas, luz e bolhas */
+  submerso?: boolean;
 }
 
 const ARVORES_VERDES: [number, number][] = [[48, 0], [44, 0], [50, 0], [46, 0]];
-const PINHEIROS_AZULADOS: [number, number][] = [[44, 4], [46, 4]];
 const ROCHA_MARROM: [number, number][] = [[42, 2]];
 const ROCHA_CINZA: [number, number][] = [[42, 6]];
 const PEDRINHAS_MARRONS: [number, number][] = [[40, 0], [41, 0], [40, 1], [41, 1]];
@@ -40,15 +41,17 @@ export const PALETAS: Record<string, Paleta> = {
     filtroObjetos: 'none',
     filtroLiquido: 'none',
   },
+  // fundo do mar: corais (desenhados por código) e rochas; "lagos" viram fossas escuras
   agua: {
-    obstaculo: 'arvore',
-    arvores: PINHEIROS_AZULADOS,
+    obstaculo: 'coral',
+    rochas: ROCHA_CINZA,
     pedrinhas: PEDRINHAS_CINZAS,
-    copa: ['#1a4a40', '#2a7060', '#3f9a7a', '#6cc89a'],
-    lagos: 9,
-    filtro: 'hue-rotate(-12deg) saturate(1.15)',
-    filtroObjetos: 'none',
-    filtroLiquido: 'none',
+    copa: ['#4a1428', '#b83a58', '#f2727e', '#ffc2b8'],
+    lagos: 6,
+    filtro: 'saturate(0.2) brightness(1.08)',
+    filtroObjetos: 'saturate(0.6) brightness(0.85)',
+    filtroLiquido: 'brightness(0.32) saturate(1.5)',
+    submerso: true,
   },
   vulcao: {
     obstaculo: 'rocha',

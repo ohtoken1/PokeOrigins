@@ -76,6 +76,7 @@ export class BiomaScene extends Phaser.Scene {
     this.jogador = this.add.image(px, py, 'jogador-baixo-0').setOrigin(0.5, 28 / 32).setScale(ESCALA_DETALHE);
     this.atualizarProfundidade();
     this.carregarSeguidor();
+    if (paleta.submerso) this.efeitosSubmersos();
 
     const camera = this.cameras.main;
     camera.setZoom(ZOOM).setBounds(0, 0, LARGURA * TAM, ALTURA * TAM).setRoundPixels(true);
@@ -89,6 +90,48 @@ export class BiomaScene extends Phaser.Scene {
     teclado.on('keydown', (e: KeyboardEvent) => {
       const direcao = DIRECOES_POR_TECLA[e.key.toLowerCase()];
       if (direcao) this.direcaoPendente = direcao;
+    });
+  }
+
+  /** Fundo do mar: feixes de luz balançando, bolhas subindo e o personagem azulado. */
+  private efeitosSubmersos() {
+    const [w, h] = [LARGURA * TAM, ALTURA * TAM];
+    this.jogador.setTint(0xc8e4ff);
+    this.seguidor.setTint(0xc8e4ff);
+
+    const luz = this.add.graphics().setDepth(5000).setBlendMode(Phaser.BlendModes.ADD);
+    for (let i = 0; i < 9; i++) {
+      const x = (i + 0.3) * (w / 9);
+      luz.fillStyle(0xbfe8ff, 0.05);
+      luz.fillPoints([new Phaser.Geom.Point(x, 0), new Phaser.Geom.Point(x + 28, 0), new Phaser.Geom.Point(x + 28 + 160, h), new Phaser.Geom.Point(x + 90, h)], true);
+    }
+    this.tweens.add({ targets: luz, alpha: 0.45, x: 24, duration: 3200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+
+    const bolha = this.add.graphics();
+    bolha.lineStyle(1, 0xe8f8ff, 0.9).strokeCircle(4, 4, 3);
+    bolha.fillStyle(0xffffff, 0.9).fillRect(2, 2, 1, 1);
+    bolha.generateTexture('bolha', 8, 8);
+    bolha.destroy();
+    this.add
+      .particles(0, 0, 'bolha', {
+        x: { min: 0, max: w },
+        y: { min: 0, max: h },
+        speedY: { min: -14, max: -28 },
+        speedX: { min: -4, max: 4 },
+        scale: { min: 0.35, max: 0.8 },
+        alpha: { start: 0.8, end: 0 },
+        lifespan: { min: 2500, max: 5000 },
+        frequency: 40,
+      })
+      .setDepth(5001);
+    // bolhas saindo do jogador de vez em quando
+    this.time.addEvent({
+      delay: 1400,
+      loop: true,
+      callback: () => {
+        const b = this.add.image(this.jogador.x + 3, this.jogador.y - 14, 'bolha').setScale(0.4).setDepth(5001);
+        this.tweens.add({ targets: b, y: b.y - 30, x: b.x + 4, alpha: 0, duration: 1600, onComplete: () => b.destroy() });
+      },
     });
   }
 
