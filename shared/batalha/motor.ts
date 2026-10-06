@@ -191,8 +191,9 @@ export class BatalhaSelvagem {
    * Arremessa uma Pokébola (fórmula da 3ª/4ª geração, bônus de status da 5ª em diante).
    * Se falhar, o selvagem ataca de graça.
    */
-  arremessarBola(bola: EfeitoBola): { capturou: boolean; tremidas: number; eventos: EventoBatalha[] } {
-    if (bola.garantida) return { capturou: true, tremidas: 3, eventos: [] };
+  /** `chance` = probabilidade (0 a 1) de capturar com esse arremesso (as 4 checagens de tremida). */
+  arremessarBola(bola: EfeitoBola): { capturou: boolean; tremidas: number; chance: number; eventos: EventoBatalha[] } {
+    if (bola.garantida) return { capturou: true, tremidas: 3, chance: 1, eventos: [] };
     const alvo = this.batalha.p2.active[0];
     const bonusBola = bola.bonus;
     const taxa = Math.max(1, Math.min(255, this.taxaCaptura + bola.ajusteTaxa));
@@ -200,13 +201,15 @@ export class BatalhaSelvagem {
     const a = Math.floor((((3 * alvo.maxhp - 2 * alvo.hp) * taxa * bonusBola) / (3 * alvo.maxhp)) * bonusStatus);
 
     let tremidas = 0;
+    let chance = 1;
     if (a >= 255) tremidas = 4;
     else {
       const b = Math.floor(65536 / (255 / Math.max(1, a)) ** 0.1875);
+      chance = Math.min(1, b / 65536) ** 4;
       while (tremidas < 4 && Math.floor(this.aleatorio() * 65536) < b) tremidas++;
     }
-    if (tremidas === 4) return { capturou: true, tremidas: 3, eventos: [] };
-    return { capturou: false, tremidas, eventos: this.turnoGratisDoSelvagem() };
+    if (tremidas === 4) return { capturou: true, tremidas: 3, chance, eventos: [] };
+    return { capturou: false, tremidas, chance, eventos: this.turnoGratisDoSelvagem() };
   }
 
   /**

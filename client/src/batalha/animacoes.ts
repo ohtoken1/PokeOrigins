@@ -1,6 +1,6 @@
 // Animações básicas da batalha (Web Animations API). Fáceis de trocar por efeitos melhores depois.
 import { corTipo, el } from '../ui/dom';
-import { iconeItem } from '../ui/iconeItem';
+import { Dex } from '@pkmn/sim';
 
 /** Espera a animação acabar; com a aba em segundo plano o navegador congela animações, então há um limite de tempo. */
 const esperarAnimacao = (a: Animation) => {
@@ -144,18 +144,27 @@ export async function animarBola(arena: HTMLElement, alvo: HTMLElement, tremidas
   const de = { x: arena.clientWidth * 0.2, y: arena.clientHeight * 0.95 };
   const chao = { x: para.x, y: para.y + alvo.clientHeight * 0.35 };
   // sprite oficial da bola arremessada (Great Ball, Ultra Ball…)
-  const bola = el('div', { class: 'pokebola com-sprite' }, iconeItem({ id: bolaId, categoria: 'bolas' }));
+  // imagem da PokéAPI ("Ultra Ball" → ultra-ball.png); se faltar, volta à bola desenhada
+  const arquivo = (Dex.items.get(bolaId).name || 'Poke Ball').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]+/g, '-');
+  const img = el('img', { src: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${arquivo}.png`, alt: '' });
+  const bola = el('div', { class: 'pokebola com-sprite' }, img);
+  img.addEventListener('error', () => {
+    bola.className = 'pokebola';
+    img.remove();
+  });
   arena.append(bola);
   const pos = (p: { x: number; y: number }, extra = '') => ({ transform: `translate(${p.x}px,${p.y}px) translate(-50%,-50%) ${extra}` });
 
   await esperarAnimacao(
-    bola.animate([pos(de, 'rotate(0)'), pos({ x: (de.x + para.x) / 2, y: para.y - 120 }, 'rotate(360deg)'), pos(para, 'rotate(720deg)')], {
+    bola.animate([pos(de, 'rotate(0)'), pos({ x: (de.x + para.x) / 2, y: Math.max(30, para.y - 45) }, 'rotate(360deg)'), pos(para, 'rotate(720deg)')], {
       duration: 550,
       easing: 'ease-out',
     }),
   );
   await esperarAnimacao(alvo.animate([{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(0)', filter: 'brightness(4)' }], { duration: 300, fill: 'forwards' }));
   await esperarAnimacao(bola.animate([pos(para), pos(chao)], { duration: 300, easing: 'ease-in', fill: 'forwards' }));
+  // fixa a posição no chão (sem depender da animação continuar valendo)
+  Object.assign(bola.style, pos(chao));
 
   for (let i = 0; i < tremidas; i++) {
     await new Promise((r) => setTimeout(r, 350));

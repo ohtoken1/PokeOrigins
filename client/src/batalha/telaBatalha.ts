@@ -11,6 +11,7 @@ import { MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
 import { curarTime, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
+import { iconeItem } from '../ui/iconeItem';
 import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarGolpe, animarRetorno, tremerArena } from './animacoes';
 
 export type ResultadoBatalha = 'vitoria' | 'derrota' | 'captura' | 'fuga';
@@ -245,10 +246,10 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
 
     mensagem.textContent = `O que ${nomeDe(save.time[batalha.ativo].especieId)} vai fazer?`;
     acoes.replaceChildren(
-      botao('Lutar', menuGolpes, { class: 'botao grande lutar' }),
-      botao('Bolsa', menuBolsa, { class: 'botao grande bolsa' }),
-      botao('Pokémon', () => menuPokemon(false), { class: 'botao grande pokemon', disabled: !pedido.podeTrocar }),
-      botao('Fugir', tentarFugir, { class: 'botao grande fugir', disabled: !pedido.podeFugir }),
+      botao([el('span', { class: 'emote' }, '⚔️'), 'Lutar'] as never, menuGolpes, { class: 'botao grande lutar' }),
+      botao([el('span', { class: 'emote' }, '🎒'), 'Bolsa'] as never, menuBolsa, { class: 'botao grande bolsa' }),
+      botao([el('span', { class: 'emote' }, '🔄'), 'Pokémon'] as never, () => menuPokemon(false), { class: 'botao grande pokemon', disabled: !pedido.podeTrocar }),
+      botao([el('span', { class: 'emote' }, '🏃'), 'Fugir'] as never, tentarFugir, { class: 'botao grande fugir', disabled: !pedido.podeFugir }),
     );
   }
 
@@ -279,7 +280,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
       ...(Object.keys(ITENS) as ItemId[])
         .filter((id) => (save.itens[id] ?? 0) > 0 && !ITENS[id].reviverTime)
         .map((id) =>
-          botao(`${ITENS[id].nome} ×${save.itens[id]}`, () => (ITENS[id].categoria === 'bola' ? arremessar(id) : menuAlvoRemedio(id)), {
+          botao([iconeItem({ id, categoria: ITENS[id].categoria === 'bola' ? 'bolas' : 'remedios' }), el('span', {}, ITENS[id].nome), el('small', {}, `×${save.itens[id]}`)] as never, () => (ITENS[id].categoria === 'bola' ? arremessar(id) : menuAlvoRemedio(id)), {
             class: `botao item ${ITENS[id].categoria}`,
             title: ITENS[id].descricao,
           }),
@@ -376,7 +377,9 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
       bioma: bioma.id,
       jaPossui: [...save.time, ...save.caixa].some((p) => p.especieId === selvagem.especieId),
     });
-    const { capturou, tremidas, eventos } = batalha.arremessarBola(efeito);
+    const { capturou, tremidas, chance, eventos } = batalha.arremessarBola(efeito);
+    const porcentagem = chance >= 1 ? '100' : chance < 0.001 ? '<0,1' : (chance * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+    mensagem.textContent = `Você arremessou uma ${ITENS[bola].nome}! Chance de captura: ${porcentagem}%`;
     if (capturou && bola === 'healball') curarAoCapturar = true;
     await animarBola(arena, spriteSelvagem, tremidas, capturou, bola);
     if (capturou) {

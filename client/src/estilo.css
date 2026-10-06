@@ -214,10 +214,23 @@ kbd { font: 600 0.7rem system-ui; padding: 1px 5px; border-radius: 4px; backgrou
 .acoes-batalha:empty { display: none; }
 .acoes-batalha .botao { padding: 12px; }
 .botao.grande { font-size: 1.05rem; }
-.botao.lutar { background: #ef5350; color: #fff; }
-.botao.bolsa { background: #f3c623; }
-.botao.pokemon { background: #3fd46b; }
-.botao.fugir { background: #4aa8ff; color: #fff; }
+/* botões da batalha: escuros e discretos, com uma faixa da cor da ação */
+.acoes-batalha .botao.grande, .acoes-batalha .botao.item {
+  display: flex; align-items: center; gap: 8px; color: var(--texto);
+  background: var(--painel-2); border: 1px solid var(--borda); border-left: 4px solid var(--acento, var(--borda));
+}
+.acoes-batalha .botao.grande { justify-content: center; }
+.acoes-batalha .botao.grande:hover:not(:disabled), .acoes-batalha .botao.item:hover:not(:disabled) { background: #2c4668; filter: none; }
+.botao.lutar { --acento: #ef5350; }
+.botao.bolsa { --acento: #e2b23a; }
+.botao.pokemon { --acento: #3fd46b; }
+.botao.fugir { --acento: #4aa8ff; }
+.botao .emote { font-size: 1.1rem; line-height: 1; }
+.acoes-batalha .botao.item { justify-content: flex-start; font-weight: 600; }
+.acoes-batalha .botao.item.bola { --acento: #ef5350; }
+.acoes-batalha .botao.item.remedio { --acento: #3fd46b; }
+.acoes-batalha .botao.item small { margin-left: auto; color: var(--texto-2); }
+.acoes-batalha .botao.item .icone-sd, .acoes-batalha .botao.item .icone-caixa { flex: 0 0 24px; margin: -4px 0; }
 .botao.golpe {
   display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left;
   background: var(--painel-2); color: var(--texto); border: 2px solid var(--cor-tipo, var(--borda));
@@ -236,9 +249,9 @@ kbd { font: 600 0.7rem system-ui; padding: 1px 5px; border-radius: 4px; backgrou
   background: linear-gradient(180deg, #ee3b3b 0 46%, #222 46% 54%, #fafafa 54%);
   box-shadow: inset 0 0 0 2px #222;
 }
-.pokebola.com-sprite { background: none; box-shadow: none; border-radius: 0; width: 48px; height: 48px; display: grid; place-items: center; }
+.pokebola.com-sprite { background: none; box-shadow: none; border-radius: 0; width: 30px; height: 30px; display: grid; place-items: center; }
 .pokebola.com-sprite::after { display: none; }
-.pokebola.com-sprite > * { zoom: 2; margin: 0; }
+.pokebola.com-sprite img { width: 30px; height: 30px; image-rendering: pixelated; display: block; }
 .pokebola::after {
   content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; translate: -50% -50%;
   border-radius: 50%; background: #fafafa; box-shadow: 0 0 0 2px #222;
