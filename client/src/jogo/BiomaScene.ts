@@ -14,6 +14,9 @@ export const ALTURA_TELA = 640;
 const ZOOM = 1.4;
 /** Zoom escolhido nos botões +/− do mapa (TEMPORÁRIO, para testes do dono); vale para todos os biomas. */
 let zoomEscolhido = ZOOM;
+/** Nome de treinador: fonte desenhada grande e reduzida para ficar nítida; tamanho final na tela (px). */
+const FONTE_NOME = 32;
+const TAMANHO_NOME_TELA = 13;
 /** Tamanho do personagem/seguidor no mundo (fixo: com zoom 1,6 cada pixel do desenho virava 1 pixel da tela). */
 const ESCALA_DETALHE = 1 / 1.6;
 /** Quanto o personagem/seguidor são maiores no mundo que o tamanho original (zoom 2 → 1,6). */
@@ -193,10 +196,14 @@ export class BiomaScene extends Phaser.Scene {
     this.nomeJogador = null;
     if (this.opcoes.nomeJogador)
       this.nomeJogador = this.add
-        .text(px, py, this.opcoes.nomeJogador, { fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#ffffff', stroke: '#16243a', strokeThickness: 2 })
+        .text(px, py, this.opcoes.nomeJogador, { fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: '#ffffff', stroke: '#16243a', strokeThickness: 5 })
         .setOrigin(0.5, 1)
-        .setResolution(4)
         .setDepth(100000);
+    if (this.nomeJogador) {
+      // o jogo usa filtro "pixel art" (NEAREST): no texto isso deixa as letras serrilhadas, então suaviza
+      this.nomeJogador.texture.setFilter(Phaser.Textures.FilterMode.LINEAR);
+      this.ajustarNome();
+    }
     this.opcoes.personagem?.folhas.then((f) => this.usarPersonagemLpc(this.opcoes.personagem!.chave, f));
     if (paleta.submerso) this.efeitosSubmersos();
 
@@ -384,14 +391,21 @@ export class BiomaScene extends Phaser.Scene {
   mudarZoom(passo: number): number {
     zoomEscolhido = Math.round(Math.max(0.6, Math.min(3, zoomEscolhido + passo)) * 10) / 10;
     this.cameras.main?.setZoom(zoomEscolhido);
+    this.ajustarNome();
     return zoomEscolhido;
+  }
+
+  /** O nome fica sempre com ~13 px na tela, em qualquer zoom (o texto é desenhado grande e reduzido). */
+  private ajustarNome() {
+    this.nomeJogador?.setScale(TAMANHO_NOME_TELA / (FONTE_NOME * zoomEscolhido));
   }
 
   private atualizarSombras() {
     if (!this.sombraJogador) return;
     this.sombraJogador.setPosition(this.jogador.x, this.jogador.y - 1).setDepth(this.jogador.depth - 0.5);
     // nome acima da cabeça (o personagem LPC tem ~30 px de altura no mundo)
-    this.nomeJogador?.setPosition(Math.round(this.jogador.x), Math.round(this.jogador.y - (this.lpc ? 30 : 22)));
+    // mesma posição do personagem (sem arredondar à parte, senão treme ao andar)
+    this.nomeJogador?.setPosition(this.jogador.x, this.jogador.y - (this.lpc ? 30 : 22));
     const largura = this.pmd ? Math.max(8, this.pmd.largura * ESCALA_PMD * 0.75) : Math.max(8, this.imgSeguidor.displayWidth * 0.45);
     this.sombraSeguidor
       .setPosition(this.seguidor.x, this.seguidor.y - 1)
