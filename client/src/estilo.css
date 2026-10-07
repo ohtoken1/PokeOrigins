@@ -804,3 +804,17 @@ button.vaga:hover { border-color: var(--borda); }
 .opcoes-erro { color: #ef6a6a; }
 .opcoes-erro:empty { display: none; }
 .opcoes-secao .botao { align-self: flex-start; }
+
+/* Tier pela soma dos IVs (S+ … F) */
+.selo-tier {
+  display: inline-block; margin-left: 6px; min-width: 22px; padding: 1px 6px; border-radius: 6px; text-align: center; vertical-align: middle;
+  font-size: 0.7rem; font-weight: 900; letter-spacing: 0.02em; color: #fff; cursor: help; text-shadow: 0 1px 0 rgb(0 0 0 / 0.35);
+}
+.tier-sp { background: linear-gradient(135deg, #ffe066, #ff9f1c 55%, #ff5fa2); color: #3a1d00; text-shadow: none; box-shadow: 0 0 8px rgb(255 190 60 / 0.6); }
+.tier-s { background: #f0a020; color: #2a1800; text-shadow: none; }
+.tier-a { background: #a35be8; }
+.tier-b { background: #3c86e0; }
+.tier-c { background: #2fa860; }
+.tier-d { background: #7a8a4a; }
+.tier-e { background: #6c7686; }
+.tier-f { background: #7a5040; }

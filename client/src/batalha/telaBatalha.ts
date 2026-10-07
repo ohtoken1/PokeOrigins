@@ -9,6 +9,7 @@ import { efeitoBola } from '../../../shared/bolas';
 import { nivelTreinador } from '../../../shared/treinador';
 import { MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
 import { sortearTicketDaBatalha } from '../../../shared/tickets';
+import { tierIv } from '../../../shared/tierIv';
 import { curarTime, guardarNoPC, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
@@ -370,7 +371,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     if (capturou && bola === 'healball') curarAoCapturar = true;
     await animarBola(arena, spriteSelvagem, tremidas, capturou, bola);
     if (capturou) {
-      await dizer(`Pegou! ${dadosSelvagem.nome} foi capturado!`);
+      await dizer(`Pegou! ${dadosSelvagem.nome} foi capturado! Tier ${tierIv(selvagem)}.`);
       return finalizar('captura');
     }
     await dizer(FRASES_FALHA[tremidas]);

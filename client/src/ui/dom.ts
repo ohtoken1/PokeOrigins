@@ -1,3 +1,5 @@
+import type { PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { faixaDoTier, tierIv } from '../../../shared/tierIv';
 import type { PokemonBase } from '../../../shared/tipos';
 
 type Filho = Node | string | null | undefined | false;
@@ -61,6 +63,14 @@ export function seloGenero(g: 'M' | 'F' | 'N'): HTMLElement | null {
 /** Selo "NT" (inegociável): o Pokémon não pode ser trocado com outros jogadores. */
 export function seloNT(p: { inegociavel?: boolean }): HTMLElement | null {
   return p.inegociavel ? el('span', { class: 'selo-nt', title: 'NT · Inegociável: não pode ser trocado com outros jogadores' }, '🔒 NT') : null;
+}
+
+/** Selo do tier pela soma dos IVs (S+ … F). */
+export function seloTier(p: Pick<PokemonIndividual, 'ivs'>): HTMLElement {
+  const tier = tierIv(p);
+  const [min, max] = faixaDoTier(tier);
+  const classe = tier === 'S+' ? 'sp' : tier.toLowerCase();
+  return el('span', { class: `selo-tier tier-${classe}`, title: `Tier ${tier} · soma dos IVs entre ${min} e ${max} (de 186)` }, tier);
 }
 
 export function corTipo(tipo: string): string {
