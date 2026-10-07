@@ -1,12 +1,26 @@
 // Janela de abrir ticket: uma roleta (como a do inicial) com os prêmios enfileirados, cada casa na cor da
 // raridade (branco comum, azul raro, roxo épico, laranja lendário), que para no prêmio sorteado.
-import { RARIDADES, abrirTicket, ticketPorId, type Pacote, type Premio, type Raridade, type ResultadoTicket } from '../../../shared/tickets';
+import {
+  abrirTicket,
+  chancesDasRaridades,
+  ticketPorId,
+  type LinhaPremio,
+  type Premio,
+  type Raridade,
+  type ResultadoTicket,
+} from '../../../shared/tickets';
 import { itemDaLoja } from '../../../shared/loja';
+import { sortearIvs } from '../../../shared/ovos';
+import { IV_MIN_SHINY, hpMaximo } from '../../../shared/batalha/pokemon';
+import { adicionarVip } from '../../../shared/vip';
 import { pokemonPorId } from '../dados';
 import { TAMANHO_MAXIMO_TIME, guardarNoPC, novoPokemon, registrarCapturado, salvar, type Save } from '../estado';
 import { abrirJanela } from './janela';
 import { el, spritePokemon } from './dom';
 import { iconeItem } from './iconeItem';
+
+const numero = (n: number) => n.toLocaleString('pt-BR');
+const porcentagem = (c: number) => `${numero(Math.round(c * 10000) / 100)}%`;
 
 /** Entrega os prêmios no save; devolve uma frase por prêmio. */
 function entregar(save: Save, r: ResultadoTicket): string[] {
@@ -17,9 +31,20 @@ function entregar(save: Save, r: ResultadoTicket): string[] {
     }
     if (premio.tipo === 'silver') {
       save.silver += premio.quantidade;
-      return `+${premio.quantidade} silver.`;
+      return `+${numero(premio.quantidade)} silver.`;
+    }
+    if (premio.tipo === 'gold') {
+      save.gold += premio.quantidade;
+      return `+${numero(premio.quantidade)} gold.`;
+    }
+    if (premio.tipo === 'vip') {
+      adicionarVip(save, premio.dias);
+      return `+${premio.dias} dia${premio.dias > 1 ? 's' : ''} de VIP na sua conta.`;
     }
     const p = novoPokemon(premio.especie, premio.nivel, r.shiny[i]);
+    // IVs mínimos do ticket (ex.: 15+); shiny continua com 15+ no mínimo
+    p.ivs = sortearIvs(0, Math.max(premio.ivMinimo, r.shiny[i] ? IV_MIN_SHINY : 0));
+    p.hp = hpMaximo(p);
     registrarCapturado(save, premio.especie);
     const nome = `${pokemonPorId(premio.especie).nome}${r.shiny[i] ? ' ✨' : ''}`;
     if (save.time.length < TAMANHO_MAXIMO_TIME) {
@@ -30,35 +55,37 @@ function entregar(save: Save, r: ResultadoTicket): string[] {
   });
 }
 
-function cartaoPremio(premio: Premio, shiny: boolean, raridade: Raridade): HTMLElement {
-  // fundo neutro (só a roleta é colorida); a raridade aparece na bolinha do título
-  const classe = `premio premio-${raridade}`;
+/** Imagem e textos de um prêmio (serve para a roleta e para os cartões). */
+function visualPremio(premio: Premio, shiny = false): { imagem: HTMLElement; nome: string; qtd: string } {
   if (premio.tipo === 'pokemon') {
     const dados = pokemonPorId(premio.especie);
-    return el('div', { class: classe }, spritePokemon(dados, { shiny, animado: false }), el('strong', {}, `${dados.nome}${shiny ? ' ✨' : ''}`), el('small', {}, `Nv. ${premio.nivel}`));
+    return { imagem: spritePokemon(dados, { shiny, animado: false }), nome: `${dados.nome}${shiny ? ' ✨' : ''}`, qtd: `Nv. ${premio.nivel} · IVs ${premio.ivMinimo}+` };
   }
-  if (premio.tipo === 'silver') return el('div', { class: classe }, el('div', { class: 'premio-silver' }, '🪙'), el('strong', {}, `${premio.quantidade} silver`));
+  if (premio.tipo === 'silver' || premio.tipo === 'gold')
+    return { imagem: el('span', { class: `icone-moeda moeda-${premio.tipo}` }), nome: premio.tipo === 'silver' ? 'Silver' : 'Gold', qtd: numero(premio.quantidade) };
+  if (premio.tipo === 'vip') return { imagem: el('span', { class: 'icone-vip' }, 'VIP'), nome: 'VIP', qtd: `${premio.dias} dia${premio.dias > 1 ? 's' : ''}` };
+  if (premio.tipo === 'aleatorio') {
+    const [exemplo, nome] =
+      premio.grupo === 'terashard' ? ['terashard-stellar', 'Tera Shard aleatória'] : premio.grupo === 'bola' ? ['pokeball', 'Pokébola aleatória'] : ['flameplate', 'Plate aleatória'];
+    const item = itemDaLoja(exemplo);
+    return { imagem: el('div', { class: 'icone-aleatorio' }, item ? iconeItem(item) : '', el('b', {}, '?')), nome, qtd: `×${premio.quantidade}` };
+  }
   const item = itemDaLoja(premio.id);
-  return el('div', { class: classe }, item ? iconeItem(item) : null, el('strong', {}, item?.nome ?? premio.id), el('small', {}, `×${premio.quantidade}`));
+  return { imagem: item ? iconeItem(item) : el('span', {}, premio.id), nome: item?.nome ?? premio.id, qtd: `×${premio.quantidade}` };
 }
 
-/** Casinha da roleta: a imagem do prêmio principal do pacote (o Pokémon, se tiver) no fundo da cor da raridade. */
-function casaRoleta(pacote: Pacote, raridade: Raridade): HTMLElement {
+function cartaoPremio(premio: Premio, shiny: boolean, raridade: Raridade, chance?: number): HTMLElement {
+  // fundo neutro (só a roleta é colorida); a raridade aparece na bolinha do título
+  const v = visualPremio(premio, shiny);
+  return el('div', { class: `premio premio-${raridade}` }, v.imagem, el('strong', {}, v.nome), el('small', {}, v.qtd), chance !== undefined ? el('small', { class: 'premio-chance' }, porcentagem(chance)) : null);
+}
+
+/** Casinha da roleta: a imagem do prêmio no fundo da cor da raridade. */
+function casaRoleta(pacote: Premio[], raridade: Raridade): HTMLElement {
   const principal = pacote.find((p) => p.tipo === 'pokemon') ?? pacote[0];
-  let imagem: HTMLElement;
-  let qtd = '';
-  if (principal.tipo === 'pokemon') {
-    imagem = spritePokemon(pokemonPorId(principal.especie), { animado: false });
-    if (pacote.length > 1) qtd = `+${pacote.length - 1}`;
-  } else if (principal.tipo === 'silver') {
-    imagem = el('div', { class: 'premio-silver' }, '🪙');
-    qtd = String(principal.quantidade);
-  } else {
-    const item = itemDaLoja(principal.id);
-    imagem = item ? iconeItem(item) : el('span', {}, principal.id);
-    qtd = `×${principal.quantidade}`;
-  }
-  return el('div', { class: `casa-roleta fundo-${raridade}` }, imagem, qtd ? el('small', {}, qtd) : null);
+  const v = visualPremio(principal);
+  const qtd = principal.tipo === 'pokemon' ? (pacote.length > 1 ? `+${pacote.length - 1}` : '') : v.qtd;
+  return el('div', { class: `casa-roleta fundo-${raridade}` }, v.imagem, qtd ? el('small', {}, qtd) : null);
 }
 
 /** Raridade das casas "de enfeite" da roleta: mais variada que a real, para os prêmios raros passarem na tela. */
@@ -76,8 +103,9 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
   const ticket = ticketPorId(ticketId);
   if (!ticket) return;
   let girando = false;
-  const possiveis = ENFEITE.filter(([r]) => ticket.premios[r].length);
-  const enfeite = (): [Pacote, Raridade] => {
+  const linhasDe = (r: Raridade) => ticket.premios.filter((l) => l.raridade === r);
+  const possiveis = ENFEITE.filter(([r]) => linhasDe(r).length);
+  const enfeite = (): [Premio[], Raridade] => {
     let sorteio = Math.random() * possiveis.reduce((s, [, c]) => s + c, 0);
     let raridade = possiveis[possiveis.length - 1][0];
     for (const [r, c] of possiveis) {
@@ -87,26 +115,26 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
         break;
       }
     }
-    const pacotes = ticket.premios[raridade];
-    return [pacotes[Math.floor(Math.random() * pacotes.length)], raridade];
+    const linhas = linhasDe(raridade);
+    return [linhas[Math.floor(Math.random() * linhas.length)].pacote, raridade];
   };
 
   abrirJanela(
     ticket.nome,
     () => {
       const qtd = save.itens[ticketId] ?? 0;
-      const raridades = RARIDADES.filter((r) => ticket.premios[r.id].length);
+      const raridades = chancesDasRaridades(ticket);
       const bolinha = (r: Raridade) => el('span', { class: `bolinha fundo-${r}` });
       // chances: fechado; a setinha abre a lista
       const chances = el(
         'details',
         { class: 'ticket-secao' },
         el('summary', {}, 'Chances'),
-        ...raridades.map((r) => el('div', { class: 'ticket-chance' }, el('span', {}, bolinha(r.id), r.nome), el('span', {}, `${(r.chance * 100).toLocaleString('pt-BR')}%`))),
+        ...raridades.map((r) => el('div', { class: 'ticket-chance' }, el('span', {}, bolinha(r.id), r.nome), el('span', {}, porcentagem(r.chance)))),
       );
       const faixa = el('div', { class: 'roleta-faixa' });
       const roleta = el('div', { class: 'roleta roleta-ticket' }, el('div', { class: 'roleta-marcador' }), faixa);
-      const encher = (fim?: [Pacote, Raridade]) => {
+      const encher = (fim?: [Premio[], Raridade]) => {
         const casas = Array.from({ length: CASAS }, (_, i) => (i === ALVO && fim ? fim : enfeite()));
         faixa.style.transition = 'none';
         faixa.style.transform = 'translateX(0)';
@@ -114,7 +142,7 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
       };
       encher();
       const resultado = el('div', { class: 'ticket-resultado' });
-      const botao = el('button', { class: 'botao grande', disabled: qtd <= 0 }, qtd > 0 ? `🎟️ Abrir ticket (você tem ${qtd})` : 'Você não tem este ticket') as HTMLButtonElement;
+      const botao = el('button', { class: 'botao grande', disabled: qtd <= 0 }, qtd > 0 ? `Abrir ticket (você tem ${qtd})` : 'Você não tem este ticket') as HTMLButtonElement;
 
       botao.addEventListener('click', () => {
         if (girando || (save.itens[ticketId] ?? 0) <= 0) return;
@@ -138,7 +166,7 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
         faixa.style.transform = `translateX(${-deslocamento}px)`;
         setTimeout(() => {
           faixa.children[ALVO]?.classList.add('sorteado');
-          const nome = RARIDADES.find((x) => x.id === r.raridade)!.nome;
+          const nome = raridades.find((x) => x.id === r.raridade)?.nome ?? '';
           resultado.replaceChildren(
             el('p', { class: 'ticket-raridade' }, bolinha(r.raridade), `${nome}!`),
             el('div', { class: 'premios' }, ...r.pacote.map((p, k) => cartaoPremio(p, r.shiny[k], r.raridade))),
@@ -146,12 +174,12 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
           );
           girando = false;
           botao.disabled = (save.itens[ticketId] ?? 0) <= 0;
-          botao.textContent = botao.disabled ? 'Sem mais tickets' : `🎟️ Abrir outro (você tem ${save.itens[ticketId]})`;
+          botao.textContent = botao.disabled ? 'Sem mais tickets' : `Abrir outro (você tem ${save.itens[ticketId]})`;
         }, 5100);
       });
 
-      // o que pode sair em cada raridade
-      // prêmios possíveis: fechado; dentro, uma setinha por raridade
+      // prêmios possíveis: fechado; dentro, uma setinha por raridade, cada prêmio com a sua chance
+      const cartoesDa = (linhas: LinhaPremio[], r: Raridade) => linhas.flatMap((l) => l.pacote.map((p) => cartaoPremio(p, false, r, l.chance)));
       const lista = el(
         'details',
         { class: 'ticket-secao' },
@@ -160,8 +188,8 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
           el(
             'details',
             { class: 'ticket-secao ticket-sub' },
-            el('summary', {}, bolinha(r.id), r.nome),
-            el('div', { class: 'premios' }, ...ticket.premios[r.id].flatMap((pacote) => pacote.map((p) => cartaoPremio(p, false, r.id)))),
+            el('summary', {}, bolinha(r.id), `${r.nome} · ${porcentagem(r.chance)}`),
+            el('div', { class: 'premios' }, ...cartoesDa(linhasDe(r.id), r.id)),
           ),
         ),
       );

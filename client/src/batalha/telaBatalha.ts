@@ -1,3 +1,4 @@
+import { bonusVip } from '../../../shared/vip';
 import { AMIZADE_POR_BATALHA, ganharAmizade } from '../../../shared/amizade';
 import { trocarSpriteForma } from '../ui/formas';
 import type { Bioma } from '../../../shared/biomas';
@@ -513,7 +514,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
   /** O treinador ganha o mesmo XP que o Pokémon derrotado/capturado dá ao Pokémon em campo. */
   async function darXpTreinador() {
     const nivelAtivo = save.time[batalha.ativo]?.nivel ?? 1;
-    const xp = expGanha(dadosSelvagem.experienciaBase ?? 50, selvagem.nivel, nivelAtivo, true);
+    const xp = Math.round(expGanha(dadosSelvagem.experienciaBase ?? 50, selvagem.nivel, nivelAtivo, true) * bonusVip(save, 'xpTreinador'));
     const antes = nivelTreinador(save.xpTreinador);
     save.xpTreinador += xp;
     await dizer(`Você ganhou ${xp} XP de treinador!`);
@@ -575,8 +576,9 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
 
     if (resultado === 'vitoria') {
       await darXpTreinador();
-      save.silver += SILVER_POR_VITORIA;
-      await dizer(`Você ganhou ${SILVER_POR_VITORIA} ${MOEDA}!`);
+      const silver = Math.round(SILVER_POR_VITORIA * bonusVip(save, 'silver'));
+      save.silver += silver;
+      await dizer(`Você ganhou ${silver} ${MOEDA}!`);
       await darXpTime();
     } else if (resultado === 'captura') {
       await darXpTreinador();

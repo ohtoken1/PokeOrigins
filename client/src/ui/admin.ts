@@ -1,3 +1,4 @@
+import { adicionarVip, tempoRestanteVip, vipAtivo } from '../../../shared/vip';
 import { TODOS_OS_ITENS } from '../../../shared/loja';
 import { TICKETS } from '../../../shared/tickets';
 import { OVOS } from '../../../shared/ovos';
@@ -159,6 +160,34 @@ function conteudo(): HTMLElement[] {
       }, 'Dar');
       return el('div', {}, lista, el('div', { class: 'admin-linha' }, campoItem, campoQtd, dar), aviso);
     })(),
+    el('h4', {}, 'VIP'),
+    el('div', { class: 'admin-linha' },
+      ...[1, 7].map((dias) =>
+        el('button', {
+          class: 'botao secundario',
+          disabled: !save,
+          onclick: () => {
+            const atual = carregarSave();
+            if (!atual) return;
+            adicionarVip(atual, dias);
+            salvar(atual);
+            aoMudarSave?.();
+          },
+        }, `+${dias} dia${dias > 1 ? 's' : ''}`),
+      ),
+      el('button', {
+        class: 'botao secundario',
+        disabled: !save,
+        onclick: () => {
+          const atual = carregarSave();
+          if (!atual) return;
+          atual.vipAte = null;
+          salvar(atual);
+          aoMudarSave?.();
+        },
+      }, 'Tirar VIP'),
+    ),
+    el('small', { class: 'meta' }, save && vipAtivo(save) ? `VIP ativo, acaba em ${tempoRestanteVip(save)}` : 'Sem VIP'),
     el('h4', {}, 'Tickets e ovos'),
     ...TICKETS.map((t) =>
       el(

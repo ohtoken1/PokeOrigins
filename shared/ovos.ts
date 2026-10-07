@@ -1,6 +1,7 @@
-// Ovos Misteriosos: ao chocar, sai QUALQUER Pokémon (comum, lendário, mítico… chance igual para todos)
-// com IVs garantidos de um tier ou superior (pedido do dono). Fica em shared/ porque, no MMO, quem
-// sorteia é o servidor.
+// Ovos: ao chocar, sai um Pokémon do grupo do ovo (chance igual entre eles), nível 1, 5% shiny.
+// - Ovo Misterioso S/A: QUALQUER Pokémon, com IVs garantidos do tier ou superior.
+// - Ovo Lendário (Ticket Lendário): um lendário; Ovo Inicial (Ticket Inicial): um dos 27 iniciais. IVs normais.
+// Fica em shared/ porque, no MMO, quem sorteia é o servidor.
 import type { Atributos } from './batalha/pokemon';
 import { TIERS_IV } from './tierIv';
 
@@ -8,8 +9,12 @@ export interface Ovo {
   /** id na bolsa */
   id: string;
   nome: string;
-  /** tier mínimo garantido (soma dos IVs) */
-  tier: 'S' | 'A';
+  /** letra e cor do ícone */
+  letra: 'S' | 'A' | 'L' | 'I';
+  /** quem pode nascer */
+  grupo: 'todos' | 'lendarios' | 'iniciais';
+  /** tier mínimo garantido (soma dos IVs); sem tier = IVs normais (0–31) */
+  tier?: 'S' | 'A';
   descricao: string;
 }
 
@@ -19,8 +24,10 @@ export const NIVEL_OVO = 1;
 export const CHANCE_SHINY_OVO = 0.05;
 
 export const OVOS: Ovo[] = [
-  { id: 'ovo-misterioso-s', nome: 'Ovo Misterioso S', tier: 'S', descricao: 'Choca um Pokémon qualquer (até lendário) com IVs de tier S ou superior (soma 145+). 5% de chance de shiny.' },
-  { id: 'ovo-misterioso-a', nome: 'Ovo Misterioso A', tier: 'A', descricao: 'Choca um Pokémon qualquer (até lendário) com IVs de tier A ou superior (soma 120+). 5% de chance de shiny.' },
+  { id: 'ovo-misterioso-s', nome: 'Ovo Misterioso S', letra: 'S', grupo: 'todos', tier: 'S', descricao: 'Choca um Pokémon qualquer (até lendário) com IVs de tier S ou superior (soma 145+). 5% de chance de shiny.' },
+  { id: 'ovo-misterioso-a', nome: 'Ovo Misterioso A', letra: 'A', grupo: 'todos', tier: 'A', descricao: 'Choca um Pokémon qualquer (até lendário) com IVs de tier A ou superior (soma 120+). 5% de chance de shiny.' },
+  { id: 'ovo-lendario', nome: 'Ovo Lendário', letra: 'L', grupo: 'lendarios', descricao: 'Choca um Pokémon lendário qualquer (chance igual para todos). 5% de chance de shiny.' },
+  { id: 'ovo-inicial', nome: 'Ovo Inicial', letra: 'I', grupo: 'iniciais', descricao: 'Choca um dos 27 iniciais de todas as regiões (chance igual para todos). 5% de chance de shiny.' },
 ];
 
 export const ovoPorId = (id: string) => OVOS.find((o) => o.id === id);
@@ -51,5 +58,5 @@ export interface ResultadoOvo {
 export function chocarOvo(ovo: Ovo, especies: number[], minimoShiny: number, aleatorio = Math.random): ResultadoOvo {
   const especie = especies[Math.floor(aleatorio() * especies.length)];
   const shiny = aleatorio() < CHANCE_SHINY_OVO;
-  return { especie, shiny, ivs: sortearIvs(minimoDoTier(ovo.tier), shiny ? minimoShiny : 0, aleatorio) };
+  return { especie, shiny, ivs: sortearIvs(ovo.tier ? minimoDoTier(ovo.tier) : 0, shiny ? minimoShiny : 0, aleatorio) };
 }

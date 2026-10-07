@@ -351,40 +351,78 @@ As duas aparecem **separadas na carteira**, acima do painel do treinador.
 Itens **raros**, para que certos prêmios não sejam algo que todo mundo tem.
 
 ### Como funciona
-1. **Abrir:** abra o ticket na Bolsa.
-2. **Raridade:** uma roleta passa pelos prêmios e para na raridade sorteada:
+1. **Abrir:** abra o ticket na Bolsa. Uma roleta passa pelos prêmios e para no sorteado.
+2. **Cada prêmio tem a sua chance** (do total). A cor na roleta mostra a raridade.
+3. **Na janela do ticket:** "Chances" mostra o total de cada raridade, e "Prêmios possíveis" mostra cada prêmio com a sua porcentagem.
 
-| Raridade | Cor na roleta | Chance |
+| Raridade | Cor na roleta | Chance total |
 |---|---|---|
 | Comum | ⚪ branco | 70% |
-| Raro | 🔵 azul | 22% |
-| Épico | 🟣 roxo | 7% |
+| Raro | 🔵 azul | 24% |
+| Épico | 🟣 roxo | 5% |
 | Lendário | 🟠 laranja | 1% |
 
-3. **Prêmio:** dentro da raridade, sai um **pacote**, com chance igual entre os pacotes. Um pacote pode trazer vários itens juntos.
-
 ### Como conseguir
-- **1 chance em 1.000** a cada vitória ou captura.
+- **1 chance em 1.000** a cada vitória ou captura (o ticket é sorteado entre todos).
 - Também pelo painel Admin, durante os testes.
 
-### Tickets existentes
-**🎟️ Ticket de Kyogre**
-- **Lendário:** Kyogre nível 50, com **5% de chance de vir shiny**, junto com a **Blue Orb**, que transforma o Kyogre em **Primal Kyogre** na batalha.
-- **Outras raridades:** rascunho para testes (bolas, remédios, silver, Master Ball…).
+### Prêmios iguais em quase todos os tickets
+| Raridade | Prêmio | Chance |
+|---|---|---|
+| Comum | 4× Tera Shard (tipo aleatório) | 70% |
+| Raro | 30 gold | 6% |
+| Raro | 1 dia de VIP | 6% |
+| Raro | 50× Pokébola aleatória (qualquer uma, menos Master Ball) | 6% |
+| Raro | 500.000 silver | 6% |
+| Épico | 100 gold | 1% |
+| Épico | 7 dias de VIP | 1% |
+| Épico | 1× Master Ball | 1% |
+| Épico | 1.000.000 silver | 1% |
+| Épico | 1× Ovo Misterioso A | 1% |
 
-### Ovos Misteriosos
-Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa por Pokémon de todas as regiões e para no sorteado:
+### Lendário de cada ticket (1% no total, dividido por igual)
+Os Pokémon vêm no **nível 50**, com **5% de chance de shiny** e **cada IV de 15 a 31** (Arceus: de 10 a 31).
 
-| Ovo | O que garante |
+| Ticket | Prêmios lendários |
 |---|---|
-| **Ovo Misterioso S** | IVs de tier **S ou superior** (soma 145+) |
-| **Ovo Misterioso A** | IVs de tier **A ou superior** (soma 120+) |
+| **Ticket de Kyogre** | Kyogre, Blue Orb, Skin Kyogre, Skin Kyogre Shiny (0,25% cada) |
+| **Ticket de Groudon** | Groudon, Red Orb, Skin Groudon, Skin Groudon Shiny (0,25% cada) |
+| **Ticket de Giratina** | Giratina, Griseous Core, Skin Giratina, Skin Giratina Shiny (0,25% cada) |
+| **Ticket de Hoopa** | Hoopa, Prison Bottle, Skin Hoopa, Skin Hoopa Shiny (0,25% cada) |
+| **Ticket de Dialga** | Dialga, Adamant Crystal, Skin Dialga, Skin Dialga Shiny (0,25% cada) |
+| **Ticket de Palkia** | Palkia, Lustrous Globe, Skin Palkia, Skin Palkia Shiny (0,25% cada) |
+| **Ticket de Arceus** | Arceus com IVs 10+ (1%). **Épico diferente:** uma Plate aleatória (5%); sem os outros épicos |
+| **Ticket Therian** | Landorus, Thundurus, Tornadus, Enamorus e Reveal Glass (0,2% cada) |
+| **Ticket de Kyurem** | Kyurem, DNA Splicers, Skin Kyurem, Skin Kyurem Shiny (0,25% cada) |
+| **Ticket de Zacian** | Zacian, Rusted Sword, Skin Zacian, Skin Zacian Shiny (0,25% cada) |
+| **Ticket de Zamazenta** | Zamazenta, Rusted Shield, Skin Zamazenta, Skin Zamazenta Shiny (0,25% cada) |
+| **Ticket de Ogerpon** | Ogerpon, Teal Mask, Hearthflame Mask, Wellspring Mask, Cornerstone Mask (0,2% cada) |
+| **Ticket Lendário** | sempre um **Ovo Lendário** (100%) |
+| **Ticket Inicial** | sempre um **Ovo Inicial** (100%) |
 
-- **Qualquer Pokémon** pode nascer, com **chance igual para todos**: comum, lendário, mítico, Ultra Beast…
+**Skins** e os itens **Prison Bottle, DNA Splicers, Reveal Glass e Teal Mask** são itens nossos: por enquanto só existem na Bolsa (abas Skins e Itens-chave). A utilidade deles vem depois. As formas Therian, Unbound e Black/White Kyurem ainda não existem no jogo.
+
+### VIP
+- Um **bônus na sua conta por um tempo** (1 dia, 7 dias…). Ganhar mais VIP com ele ativo **soma** ao tempo que falta.
+- Enquanto está ativo, aparece um selo **VIP** com o tempo restante embaixo da carteira.
+- **Os bônus ainda vão ser definidos** (hoje o VIP não muda nada). Já está preparado para dar mais silver por vitória e mais XP de treinador.
+- Quando existirem contas, o VIP fica guardado na conta.
+
+### Ovos
+Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pokémon possíveis e para no sorteado:
+
+| Ovo | Quem nasce | O que garante |
+|---|---|---|
+| **Ovo Misterioso S** | qualquer Pokémon | IVs de tier **S ou superior** (soma 145+) |
+| **Ovo Misterioso A** | qualquer Pokémon | IVs de tier **A ou superior** (soma 120+) |
+| **Ovo Lendário** | um lendário (sem míticos) | IVs normais |
+| **Ovo Inicial** | um dos 27 iniciais | IVs normais |
+
+- **Chance igual** para todos do grupo do ovo (nos Misteriosos: comum, lendário, mítico, Ultra Beast…).
 - **5% de chance de shiny.**
 - O Pokémon nasce no **nível 1** e vai para o time (ou para o PC, se o time estiver cheio).
 - Os IVs continuam ocultos até a avaliação, mas o tier mínimo é garantido.
-- Por enquanto, os ovos só vêm pelo painel Admin (testes).
+- Saem dos tickets (Ovo Misterioso A no épico; Ovo Lendário e Ovo Inicial nos tickets deles) e do painel Admin (testes).
 
 ---
 
@@ -472,6 +510,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
+- Tickets da planilha do dono: 14 tickets (Kyogre, Groudon, Giratina, Hoopa, Dialga, Palkia, Arceus, Therian, Kyurem, Zacian, Zamazenta, Ogerpon, Lendário, Inicial) com a chance de cada prêmio; skins e itens-chave; Ovo Lendário e Ovo Inicial; pré-sistema de VIP.
 - Time com arrastar, PC com 20 boxes e ficha completa do Pokémon.
 - Pokémon que te segue animado em 8 direções, com sombra.
 
@@ -509,9 +548,8 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Tiers próprios do jogo**, no lugar dos tiers provisórios do Smogon.
 
 ### 🎟️ Tickets
-- Tickets para outros lendários com item de forma: **Groudon** (Red Orb → Primal), **Rayquaza**, **Giratina** (Griseous Orb/Core → Origin) e mais.
-- Definir os prêmios de comum, raro e épico de cada ticket.
-- Mostrar o **desenho da forma Primal/Origin** na batalha (hoje a forma muda nos atributos, mas não na imagem).
+- Utilidade das **skins** e dos itens Prison Bottle, DNA Splicers, Reveal Glass e Teal Mask (formas Unbound, Black/White Kyurem, Therian).
+- Definir os **bônus do VIP**.
 
 ### 🧢 Personagem
 - **Boné de treinador** com logo de Pokébola (guardado para refazer com mais capricho).

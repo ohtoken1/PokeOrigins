@@ -90,7 +90,9 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - Mensagens de item na batalha: `-item`, `-enditem`, dano de Life Orb/Rocky Helmet.
 
 ## Tickets (`shared/tickets.ts`, `client/src/ui/ticket.ts`)
-- Item raro da bolsa (aba Tickets). Abrir sorteia a raridade (`RARIDADES`: comum 70%, raro 22%, épico 7%, lendário 1%) e depois um **pacote** dessa raridade (ex.: Kyogre Nv. 50 com chance de shiny + Blue Orb). Conteúdo é rascunho: o dono vai definir cada ticket (Groudon, Rayquaza, Giratina…).
+- Item raro da bolsa (aba Tickets). Conteúdo = planilha do dono (`Tickets.xlsx`): cada `LinhaPremio` tem raridade (cor), **chance do total** (as de um ticket somam 1) e o pacote. `abrirTicket` sorteia a linha pela chance e resolve `aleatorio` (Tera Shard / Pokébola menos Master / Plate). Prêmios: item, silver, gold, vip (dias), pokemon (nível 50, `ivMinimo` 15 ou 10, 5% shiny). 14 tickets; comum/raro/épico iguais (`COMUM`, `RARO`, `EPICO`), lendário divide 1%.
+- Itens nossos (`shared/itensCustom.ts`): skins (`skin-<nome>[-shiny]`, ícone = sprite numa moldura) e itens-chave (Prison Bottle, DNA Splicers, Reveal Glass, Teal Mask), sem uso ainda (pedido do dono).
+- VIP (`shared/vip.ts`): PRÉ-SISTEMA. `save.vipAte` (ms), `adicionarVip` soma dias, `bonusVip` (multiplicadores `BONUS_VIP`, hoje 1) já aplicado no silver por vitória e no XP de treinador; selo na carteira; Admin +1/+7 dias.
 - Obtenção: `CHANCE_TICKET_POR_BATALHA` (1/1000 ao vencer/capturar) e botão no Admin. Itens de forma de lendários ficam fora da loja (aba "Itens de lendários" da bolsa, equipar). Showdown faz a Primal Reversion e a tela troca o sprite.
 
 ## Professores de golpes (`shared/professores.ts`, `client/src/telas/golpes.ts`)
@@ -103,7 +105,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - Contadores em `save.estatisticas` (`registrarCapturaNoRanking`, só captura em batalha); saves antigos começam pelos Pokémon que têm (menos o NT).
 
 ## Ovos Misteriosos (`shared/ovos.ts`, `client/src/ui/ovo.ts`)
-- Itens da aba "Ovos" da bolsa (fora da loja): **Ovo Misterioso S** (soma de IVs ≥145) e **A** (≥120). Chocar = roleta como a do ticket; espécie com chance igual entre TODAS as carregadas (lendários inclusive), shiny 5% (`CHANCE_SHINY_OVO`), nível 1 (`NIVEL_OVO`), IVs sorteados até cair no tier (`sortearIvs`). Ícone próprio (`iconeOvo`, cor do tier, como os discos de TM). Obtenção por enquanto só no Admin.
+- Itens da aba "Ovos" da bolsa (fora da loja): **Ovo Misterioso S** (soma de IVs ≥145) e **A** (≥120); **Ovo Lendário** (`grupo: 'lendarios'`, só `lendario`, IVs normais) e **Ovo Inicial** (27 iniciais). Chocar = roleta como a do ticket; espécie com chance igual entre TODAS as carregadas (lendários inclusive), shiny 5% (`CHANCE_SHINY_OVO`), nível 1 (`NIVEL_OVO`), IVs sorteados até cair no tier (`sortearIvs`). Ícone próprio (`iconeOvo`, cor do tier, como os discos de TM). Obtenção por enquanto só no Admin.
 
 ## Traduções (`shared/traducao.ts` + `shared/data/traducoes.json`)
 - Mapa "descrição em inglês do Showdown → português" (itens, golpes, habilidades; ~1.026 textos). Use sempre `traduzir()` ao mostrar `shortDesc`/`desc`; `nomeTipo()`/`nomeCategoria()` para tipo e categoria.

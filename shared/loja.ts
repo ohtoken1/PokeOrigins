@@ -6,12 +6,16 @@ import { Dex } from '@pkmn/sim';
 import maquinas from './data/maquinas.json';
 import { ITENS, type ItemId } from './itens';
 import { TICKETS } from './tickets';
+import { TIPOS_TERA } from './tera';
+import { ITENS_CUSTOM } from './itensCustom';
+
+export { TIPOS_TERA };
 import { OVOS } from './ovos';
 import { nomeCategoria, nomeTipo, traduzir } from './traducao';
 
 export type CategoriaLoja =
   | 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'frutas' | 'gems' | 'placas' | 'memorias' | 'zcristais' | 'lendarios'
-  | 'terashards' | 'tm' | 'tr' | 'tickets' | 'ovos';
+  | 'terashards' | 'chave' | 'skins' | 'tm' | 'tr' | 'tickets' | 'ovos';
 
 /** Abas da loja. */
 export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
@@ -31,6 +35,8 @@ export const CATEGORIAS_FORA_DA_LOJA: { id: CategoriaLoja; nome: string }[] = [
   { id: 'zcristais', nome: 'Z-Crystals' },
   { id: 'lendarios', nome: 'Itens de lendários' },
   { id: 'terashards', nome: 'Tera Shards' },
+  { id: 'chave', nome: 'Itens-chave' },
+  { id: 'skins', nome: 'Skins' },
   { id: 'tickets', nome: 'Tickets' },
   { id: 'ovos', nome: 'Ovos' },
 ];
@@ -55,6 +61,8 @@ export interface ItemLoja {
   naLoja: boolean;
   /** Tera Shards: tipo que a shard dá */
   teraTipo?: string;
+  /** skins: de qual Pokémon */
+  skin?: { especie: number; shiny: boolean };
 }
 
 /** Moeda do jogo. */
@@ -85,7 +93,6 @@ const ehLendario = (nome: string) => (Dex.species.get(nome).tags ?? []).some((t)
 
 /** Tera Shards: juntando esta quantidade, troca o Tera Type de um Pokémon (como em Scarlet/Violet). */
 export const SHARDS_POR_TROCA = 50;
-export const TIPOS_TERA = ['Normal', 'Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug', 'Rock', 'Ghost', 'Dragon', 'Dark', 'Steel', 'Fairy', 'Stellar'];
 /** Imagens das Tera Shards (Serebii; não existem no Showdown nem na PokéAPI). */
 const imagemShard = (tipo: string) => `https://www.serebii.net/itemdex/sprites/sv/${tipo.toLowerCase()}terashard.png`;
 
@@ -162,6 +169,8 @@ function montarCatalogo(): ItemLoja[] {
 /** Todos os itens do jogo (Database, bolsa e Admin). */
 export const TODOS_OS_ITENS: ItemLoja[] = [
   ...montarCatalogo(),
+  // itens nossos: skins e itens-chave (sem uso por enquanto)
+  ...ITENS_CUSTOM.map((i): ItemLoja => ({ ...i, preco: 0, naLoja: false })),
   ...TICKETS.map((t): ItemLoja => ({ id: t.id, nome: t.nome, categoria: 'tickets', descricao: t.descricao, preco: 0, naLoja: false, sprite: 'eon-ticket' })),
   ...OVOS.map((o): ItemLoja => ({ id: o.id, nome: o.nome, categoria: 'ovos', descricao: o.descricao, preco: 0, naLoja: false })),
 ];

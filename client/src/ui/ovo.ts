@@ -3,6 +3,7 @@
 import { IV_MIN_SHINY, hpMaximo } from '../../../shared/batalha/pokemon';
 import { NIVEL_OVO, chocarOvo, ovoPorId, type ResultadoOvo } from '../../../shared/ovos';
 import { pokemonPorId, todosOsPokemons } from '../dados';
+import { TODOS_INICIAIS } from '../../../shared/regioes';
 import { TAMANHO_MAXIMO_TIME, guardarNoPC, novoPokemon, registrarCapturado, salvar, type Save } from '../estado';
 import { abrirJanela } from './janela';
 import { el, selosTipos, spritePokemon } from './dom';
@@ -40,7 +41,8 @@ function entregar(save: Save, r: ResultadoOvo): string {
 export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): void {
   const ovo = ovoPorId(ovoId);
   if (!ovo) return;
-  const especies = todosOsPokemons().map((p) => p.id);
+  const especies =
+    ovo.grupo === 'iniciais' ? TODOS_INICIAIS : todosOsPokemons().filter((p) => ovo.grupo === 'todos' || p.lendario).map((p) => p.id);
   const qualquer = () => especies[Math.floor(Math.random() * especies.length)];
   let girando = false;
 
@@ -87,7 +89,7 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
               spritePokemon(dados, { shiny: r.shiny, animado: false }),
               el('strong', {}, `${dados.nome}${r.shiny ? ' ✨' : ''}`),
               selosTipos(dados),
-              el('small', {}, `Nv. ${NIVEL_OVO} · IVs tier ${ovo.tier} ou superior`),
+              el('small', {}, `Nv. ${NIVEL_OVO}${ovo.tier ? ` · IVs tier ${ovo.tier} ou superior` : ''}`),
             ),
             el('small', {}, frase),
           );
@@ -101,7 +103,7 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
       return el(
         'div',
         { class: 'ticket' },
-        el('div', { class: 'ovo-topo' }, iconeOvo(ovo.tier), el('p', { class: 'meta' }, ovo.descricao)),
+        el('div', { class: 'ovo-topo' }, iconeOvo(ovo.letra), el('p', { class: 'meta' }, ovo.descricao)),
         roleta,
         botao,
         resultado,

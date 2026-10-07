@@ -3,7 +3,14 @@
 import { Dex } from '@pkmn/sim';
 import type { ItemLoja } from '../../../shared/loja';
 import { ITENS } from '../../../shared/itens';
-import { el } from './dom';
+import { el, spritePokemon } from './dom';
+import { ovoPorId } from '../../../shared/ovos';
+import { pokemonPorId } from '../dados';
+
+/** Ícone de skin: o Pokémon pequeno numa moldura dourada (prateada no shiny). */
+export function iconeSkin(especie: number, shiny: boolean): HTMLElement {
+  return el('div', { class: `icone-skin ${shiny ? 'skin-shiny' : ''}` }, spritePokemon(pokemonPorId(especie), { shiny, animado: false }));
+}
 
 const FOLHA_SHOWDOWN = 'https://play.pokemonshowdown.com/sprites/itemicons-sheet.png';
 const ITENS_POKEAPI = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items';
@@ -13,8 +20,15 @@ const POR_LINHA = 16;
 
 
 /** Ícone do Ovo Misterioso (desenho próprio, cor do tier como os discos de TM têm a cor do tipo). */
+const CORES_OVO: Record<string, [string, string, string, string]> = {
+  S: ['#ffd23a', '#e09a12', '#fff4c0', '#7a4a00'],
+  A: ['#b57cff', '#7a3ad8', '#ecd9ff', '#2e0a5e'],
+  L: ['#ff8a3d', '#d4471a', '#ffe0b8', '#5e1600'],
+  I: ['#6fdc7a', '#2e9e45', '#e2ffd9', '#0f4a1c'],
+};
+
 export function iconeOvo(tier: string): HTMLElement {
-  const [base, sombra, pinta, contorno] = tier === 'S' ? ['#ffd23a', '#e09a12', '#fff4c0', '#7a4a00'] : ['#b57cff', '#7a3ad8', '#ecd9ff', '#2e0a5e'];
+  const [base, sombra, pinta, contorno] = CORES_OVO[tier] ?? CORES_OVO.A;
   const caixa = el('div', { class: `icone-ovo ovo-${tier.toLowerCase()}` });
   caixa.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" shape-rendering="crispEdges" aria-hidden="true">
     <path d="M12 2.5c4.2 0 7.5 6.2 7.5 11.2 0 4.6-3.4 7.8-7.5 7.8s-7.5-3.2-7.5-7.8C4.5 8.7 7.8 2.5 12 2.5z" fill="${base}" stroke="${contorno}" stroke-width="1.4"/>
@@ -26,9 +40,10 @@ export function iconeOvo(tier: string): HTMLElement {
   return caixa;
 }
 
-export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 'sprite' | 'imagem'>): HTMLElement {
+export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 'sprite' | 'imagem'> & { skin?: ItemLoja['skin'] }): HTMLElement {
   const reserva = () => el('div', { class: `icone-item ${item.id} cat-${item.categoria}` });
-  if (item.categoria === 'ovos') return iconeOvo(item.id.endsWith('-s') ? 'S' : 'A');
+  if (item.categoria === 'ovos') return iconeOvo(ovoPorId(item.id)?.letra ?? 'A');
+  if (item.skin) return iconeSkin(item.skin.especie, item.skin.shiny);
   if (item.imagem) {
     const img = el('img', { class: 'icone-png icone-imagem', src: item.imagem, alt: '', loading: 'lazy', referrerpolicy: 'no-referrer' });
     img.addEventListener('error', () => img.replaceWith(reserva()), { once: true });
