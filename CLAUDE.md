@@ -38,6 +38,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - `pokemon.ts` — indivíduo (IVs 0–31; **shiny 15–31**, `IV_MIN_SHINY`; natureza, habilidade, gênero, golpes com PP, HP, status), golpes por nível do learnset do Showdown (geração mais recente da espécie), atributos, curvas de XP, fórmula de XP da 7ª gen+; XP e EVs (vitória ou captura) só para quem entrou em campo na batalha (sem Exp. Share, pedido do dono), evolução só por nível.
 - `progresso.ts` — XP → níveis → golpes novos (com 4 golpes o jogador escolhe qual esquecer) → evolução.
 - PP: sem PP Ups (máximo = PP base). HP/status/PP persistem entre batalhas; Centro Pokémon cura. Derrota = cura e volta ao menu da região.
+- Fundo de batalha: sorteado a cada batalha entre os do bioma (`FUNDOS_BATALHA` em `telaBatalha.ts`, imagens dos jogos oficiais em `client/public/batalha/`, via Showdown).
 - Interface e animações: `client/src/batalha/` (físico = avanço, especial = projétil da cor do tipo, status = anel; Pokébola com tremidas; evolução piscando).
 
 ## Próximas etapas (ordem combinada)

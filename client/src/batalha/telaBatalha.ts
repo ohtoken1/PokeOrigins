@@ -73,8 +73,26 @@ function caixaInfo(doJogador: boolean) {
   };
 }
 
+/**
+ * Fundos de batalha dos jogos oficiais (XY, ORAS e BW, via Pokémon Showdown) em client/public/batalha;
+ * cada batalha sorteia um do bioma (pedido do dono).
+ */
+const FUNDOS_BATALHA: Record<string, string[]> = {
+  grama: ['grama-1.jpg', 'grama-2.jpg', 'grama-3.png'],
+  agua: ['agua-1.jpg', 'agua-2.jpg', 'agua-3.jpg'],
+  vulcao: ['vulcao-1.png', 'vulcao-2.jpg', 'vulcao-3.jpg'],
+  caverna: ['caverna-1.jpg', 'caverna-2.jpg'],
+  torre: ['torre-1.jpg', 'torre-2.jpg'],
+};
+/** Sorteia o fundo do bioma para esta batalha. */
+function sortearFundo(biomaId: string): string | null {
+  const lista = FUNDOS_BATALHA[biomaId];
+  return lista ? `batalha/${lista[Math.floor(Math.random() * lista.length)]}` : null;
+}
+
 export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalha): void {
   const dadosSelvagem = pokemonPorId(selvagem.especieId);
+  const imagemFundo = sortearFundo(bioma.id);
   const batalha = new BatalhaSelvagem(
     save.time,
     save.time.map((p) => nomeDe(p.especieId)),
@@ -107,7 +125,10 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
 
   const arena = el(
     'div',
-    { class: 'arena', style: { '--chao': hex(bioma.cores.chao), '--zona': hex(bioma.cores.zona) } },
+    {
+      class: `arena ${imagemFundo ? 'com-fundo' : ''}`,
+      style: { '--chao': hex(bioma.cores.chao), '--zona': hex(bioma.cores.zona), '--fundo-batalha': imagemFundo ? `url(${imagemFundo})` : 'none' },
+    },
     infoSelvagem.raiz,
     lugarSelvagem,
     lugarJogador,

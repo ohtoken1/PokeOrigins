@@ -837,3 +837,6 @@ button.vaga:hover { border-color: var(--borda); }
 }
 .casa-roleta.casa-shiny, .premio.casa-shiny { box-shadow: 0 0 0 2px #ffd23a, 0 0 14px rgb(255 210 58 / 0.7); }
 .ovo-nasceu .tipos { justify-content: center; }
+
+/* fundo de batalha dos jogos oficiais (sorteado por bioma) */
+.arena.com-fundo { background: var(--fundo-batalha) center bottom / cover no-repeat, #1b2f4a; }

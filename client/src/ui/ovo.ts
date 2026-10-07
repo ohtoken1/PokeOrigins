@@ -11,6 +11,8 @@ import { iconeOvo } from './iconeItem';
 const LARGURA_CASA = 92;
 const CASAS = 44;
 const ALVO = 38;
+/** Duração da roleta do ovo (mais lenta que a do ticket, para dar expectativa). */
+const DURACAO_ROLETA = 9000;
 
 const raro = (id: number) => {
   const p = pokemonPorId(id);
@@ -66,14 +68,15 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
         save.itens[ovoId] -= 1;
         if (save.itens[ovoId] <= 0) delete save.itens[ovoId];
         const r = chocarOvo(ovo, especies, IV_MIN_SHINY);
+        // o Pokémon já fica salvo (fechar a janela no meio não perde nada),
+        // mas o time na tela só atualiza quando a roleta parar (para não estragar a surpresa)
         const frase = entregar(save, r);
         salvar(save);
-        aoMudar();
 
         encher(r);
         void faixa.offsetWidth;
         const desvio = (Math.random() - 0.5) * LARGURA_CASA * 0.4;
-        faixa.style.transition = 'transform 5s cubic-bezier(0.12, 0.7, 0.15, 1)';
+        faixa.style.transition = `transform ${DURACAO_ROLETA}ms cubic-bezier(0.08, 0.6, 0.1, 1)`;
         faixa.style.transform = `translateX(${-(ALVO * LARGURA_CASA - (roleta.clientWidth / 2 - LARGURA_CASA / 2) + desvio)}px)`;
         setTimeout(() => {
           faixa.children[ALVO]?.classList.add('sorteado');
@@ -88,10 +91,11 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
             ),
             el('small', {}, frase),
           );
+          aoMudar();
           girando = false;
           botao.disabled = (save.itens[ovoId] ?? 0) <= 0;
           botao.textContent = botao.disabled ? 'Sem mais ovos' : `🥚 Chocar outro (você tem ${save.itens[ovoId]})`;
-        }, 5100);
+        }, DURACAO_ROLETA + 150);
       });
 
       return el(
