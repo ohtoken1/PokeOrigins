@@ -1095,3 +1095,12 @@ button.vaga:hover { border-color: var(--borda); }
 /* Roletas de Pokémon: Ultra Beast vermelho, mítico roxo (lendário continua laranja) */
 .fundo-ultra { background: #d93a3a; color: #fff; }
 .fundo-mitico { background: #8d4fe0; color: #fff; }
+
+/* Atalho da Pokédex no canto de cima, à esquerda */
+.atalho-pokedex { display: grid; place-items: center; width: 38px; height: 38px; margin-right: -12px; padding: 0; border: 0; border-radius: 10px; background: none; cursor: pointer; transition: transform 0.15s, background 0.15s; }
+.atalho-pokedex:hover { background: var(--painel-2); transform: rotate(-6deg) scale(1.08); }
+.atalho-pokedex.ativa { background: rgb(255 203 5 / 0.15); box-shadow: inset 0 0 0 2px var(--destaque); }
+.icone-pokedex { display: grid; place-items: center; filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.4)); }
+/* menus do topo: abrem para a direita a partir da aba (o último, para a esquerda) e não quebram linha */
+.menu-topo { left: 0; right: auto; white-space: nowrap; }
+.aba-com-menu:last-child .menu-topo { left: auto; right: 0; }

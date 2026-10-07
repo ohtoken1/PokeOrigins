@@ -449,7 +449,12 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 
 ## 15. Comunidade
 
-A aba **Comunidade**, na barra do topo, já existe com **Amigos** e **Clã**. As duas ficam **"em breve"**, porque dependem de contas e do servidor online.
+A barra do topo tem:
+- **ícone da Pokédex** (canto esquerdo): atalho direto para a Pokédex;
+- **Jogar**: Mapas (regiões e biomas), **Duelos com treinadores** e **Ginásios** (os dois "em breve");
+- **Golpes**: Move Reminder e Move Tutor;
+- **Informações**: Opções, Ranking e Database;
+- **Comunidade**: **Amigos** e **Clã**, os dois **"em breve"**, porque dependem de contas e do servidor online.
 
 ### Ranking
 A aba **Ranking**, na barra do topo, tem 8 rankings. **Por enquanto só você aparece**: a lista com todos os jogadores precisa do servidor online.
@@ -511,6 +516,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
+- Barra do topo reorganizada: ícone da Pokédex, Jogar (Mapas, Duelos, Ginásios), Informações (Opções, Ranking, Database).
 - Roletas de ovos: Ultra Beast com fundo vermelho e mítico com fundo roxo.
 - Tickets Lendário e Inicial removidos; roleta do Ovo Inicial com fundo da cor do tipo.
 - Abrir tickets e chocar ovos de 1, 3 ou 5 de uma vez (uma roleta por tentativa, empilhadas); Ovo Lendário com míticos e Ultra Beasts (só a primeira forma da linha).
