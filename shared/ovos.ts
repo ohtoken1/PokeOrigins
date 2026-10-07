@@ -1,6 +1,6 @@
 // Ovos: ao chocar, sai um Pokémon do grupo do ovo (chance igual entre eles), nível 1, 5% shiny.
 // - Ovo Misterioso S/A: QUALQUER Pokémon, com IVs garantidos do tier ou superior.
-// - Ovo Lendário (Ticket Lendário): um lendário; Ovo Inicial (Ticket Inicial): um dos 27 iniciais. IVs normais.
+// - Ovo Lendário: lendário/mítico/Ultra Beast (forma base); Ovo Inicial: um dos 27 iniciais. IVs normais.
 // Fica em shared/ porque, no MMO, quem sorteia é o servidor.
 import type { Atributos } from './batalha/pokemon';
 import { TIERS_IV } from './tierIv';

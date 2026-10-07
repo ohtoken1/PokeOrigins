@@ -1088,3 +1088,6 @@ button.vaga:hover { border-color: var(--borda); }
 .area-roletas { display: flex; flex-direction: column; gap: 6px; width: 100%; }
 .area-roletas.varias .roleta.roleta-ticket { height: 84px; }
 .area-roletas.varias .casa-roleta { transform: scale(0.88); }
+
+/* Roleta do Ovo Inicial: fundo na cor do tipo */
+.casa-roleta.fundo-tipo { background: radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--cor-tipo) 80%, #fff 10%), color-mix(in srgb, var(--cor-tipo) 45%, #000) 75%); }

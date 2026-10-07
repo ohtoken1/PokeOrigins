@@ -106,18 +106,6 @@ export const TICKETS: Ticket[] = [
   deLendario('Zamazenta', 889, 'rustedshield'),
   padrao('ticket-ogerpon', 'Ticket de Ogerpon', 'Abra para sortear um prêmio. No lendário: Ogerpon (IVs 15+, 5% de chance de shiny) ou uma das 4 máscaras.',
     pokemon(1017), item('tealmask'), item('hearthflamemask'), item('wellspringmask'), item('cornerstonemask')),
-  {
-    id: 'ticket-lendario',
-    nome: 'Ticket Lendário',
-    descricao: 'Abra para ganhar um Ovo Lendário.',
-    premios: [linha('lendario', 1, item('ovo-lendario'))],
-  },
-  {
-    id: 'ticket-inicial',
-    nome: 'Ticket Inicial',
-    descricao: 'Abra para ganhar um Ovo Inicial.',
-    premios: [linha('lendario', 1, item('ovo-inicial'))],
-  },
 ];
 
 export function ticketPorId(id: string): Ticket | undefined {

@@ -6,7 +6,7 @@ import { pokemonPorId, todosOsPokemons } from '../dados';
 import { TODOS_INICIAIS } from '../../../shared/regioes';
 import { TAMANHO_MAXIMO_TIME, guardarNoPC, novoPokemon, registrarCapturado, salvar, type Save } from '../estado';
 import { abrirJanela } from './janela';
-import { el, selosTipos, spritePokemon } from './dom';
+import { corTipo, el, selosTipos, spritePokemon } from './dom';
 import { iconeOvo } from './iconeItem';
 import { areaRoletas, botoesQuantidade } from './abrirVarios';
 import { ehLendario } from '../../../shared/encontros';
@@ -20,8 +20,11 @@ const raro = (id: number) => {
   return p.lendario || p.mitico;
 };
 
-function casa(id: number, shiny = false): HTMLElement {
-  return el('div', { class: `casa-roleta ${raro(id) ? 'fundo-lendario' : 'fundo-comum'} ${shiny ? 'casa-shiny' : ''}` }, spritePokemon(pokemonPorId(id), { shiny, animado: false }));
+/** Casa da roleta; `porTipo` (Ovo Inicial): fundo na cor do tipo, como na roleta do inicial. */
+function casa(id: number, shiny = false, porTipo = false): HTMLElement {
+  const dados = pokemonPorId(id);
+  const fundo = porTipo ? 'fundo-tipo' : raro(id) ? 'fundo-lendario' : 'fundo-comum';
+  return el('div', { class: `casa-roleta ${fundo} ${shiny ? 'casa-shiny' : ''}`, style: porTipo ? { '--cor-tipo': corTipo(dados.tipos[0]) } : {} }, spritePokemon(dados, { shiny, animado: false }));
 }
 
 /** Coloca o Pokémon do ovo no time (ou no PC) e devolve a frase de onde ele foi. */
@@ -56,7 +59,8 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
     () => {
       const qtd = save.itens[ovoId] ?? 0;
       // uma roleta por ovo chocado (uma em cima da outra)
-      const roletas = areaRoletas(() => casa(qualquer()));
+      const porTipo = ovo.grupo === 'iniciais';
+      const roletas = areaRoletas(() => casa(qualquer(), false, porTipo));
       const resultado = el('div', { class: 'ticket-resultado' });
       const chocarVarios = (n: number) => {
         if (girando || (save.itens[ovoId] ?? 0) < n) return;
@@ -72,7 +76,7 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
         salvar(save);
         const r = todos[0];
 
-        roletas.girar(todos.map((x) => casa(x.especie, x.shiny)), DURACAO_ROLETA, () => {
+        roletas.girar(todos.map((x) => casa(x.especie, x.shiny, porTipo)), DURACAO_ROLETA, () => {
           const shinies = todos.filter((x) => x.shiny).length;
           resultado.replaceChildren(
             el('p', { class: 'ticket-raridade' }, n > 1 ? `${n} ovos chocaram!${shinies ? ` ${shinies} shiny!` : ''}` : r.shiny ? '✨ Shiny! ✨' : 'O ovo chocou!'),

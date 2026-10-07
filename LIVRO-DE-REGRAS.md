@@ -400,8 +400,6 @@ Os Pokémon vêm no **nível 50**, com **5% de chance de shiny** e **cada IV de 
 | **Ticket de Zacian** | Zacian, Rusted Sword, Skin Zacian, Skin Zacian Shiny (0,25% cada) |
 | **Ticket de Zamazenta** | Zamazenta, Rusted Shield, Skin Zamazenta, Skin Zamazenta Shiny (0,25% cada) |
 | **Ticket de Ogerpon** | Ogerpon, Teal Mask, Hearthflame Mask, Wellspring Mask, Cornerstone Mask (0,2% cada) |
-| **Ticket Lendário** | sempre um **Ovo Lendário** (100%) |
-| **Ticket Inicial** | sempre um **Ovo Inicial** (100%) |
 
 **Skins** e os itens **Prison Bottle, DNA Splicers, Reveal Glass e Teal Mask** são itens nossos: por enquanto só existem na Bolsa (abas Skins e Itens-chave). A utilidade deles vem depois. As formas Therian, Unbound e Black/White Kyurem ainda não existem no jogo.
 
@@ -425,7 +423,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 - **5% de chance de shiny.**
 - O Pokémon nasce no **nível 1** e vai para o time (ou para o PC, se o time estiver cheio).
 - Os IVs continuam ocultos até a avaliação, mas o tier mínimo é garantido.
-- Saem dos tickets (Ovo Misterioso A no épico; Ovo Lendário e Ovo Inicial nos tickets deles) e do painel Admin (testes).
+- Saem dos tickets (Ovo Misterioso A no épico) e do painel Admin (testes; Ovo Lendário e Ovo Inicial por enquanto só pelo Admin). Na roleta do **Ovo Inicial**, cada Pokémon tem o fundo da cor do seu tipo.
 
 ---
 
@@ -513,6 +511,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
+- Tickets Lendário e Inicial removidos; roleta do Ovo Inicial com fundo da cor do tipo.
 - Abrir tickets e chocar ovos de 1, 3 ou 5 de uma vez (uma roleta por tentativa, empilhadas); Ovo Lendário com míticos e Ultra Beasts (só a primeira forma da linha).
 - Terastal na batalha, duração de clima e terreno no canto da arena, imagens das Tera Shards guardadas no jogo.
 - Tickets da planilha do dono: 14 tickets (Kyogre, Groudon, Giratina, Hoopa, Dialga, Palkia, Arceus, Therian, Kyurem, Zacian, Zamazenta, Ogerpon, Lendário, Inicial) com a chance de cada prêmio; skins e itens-chave; Ovo Lendário e Ovo Inicial; pré-sistema de VIP.
