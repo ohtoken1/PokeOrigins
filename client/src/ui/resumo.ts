@@ -25,10 +25,8 @@ export function resumoPokemon(p: PokemonIndividual, opcoes: { abilityConhecida: 
       ? linha('Ability', Dex.abilities.get(p.habilidade).name)
       : linha('Abilities possíveis', [...new Set(Object.values(especie(p.especieId).abilities))].join(' / ')),
   ];
-  if (!opcoes.completo) {
-    linhas.push(linha('Speed (IV 0–31)', `${min}–${max}`));
-    return linhas;
-  }
+  // selvagem na batalha: nada que dependa dos IVs (pedido do dono)
+  if (!opcoes.completo) return linhas;
   const valores = atributos(p);
   linhas.push(
     linha('HP', `${p.hp}/${hpMaximo(p)}`),
