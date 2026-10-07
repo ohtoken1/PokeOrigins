@@ -768,13 +768,6 @@ button.vaga:hover { border-color: var(--borda); }
   text-decoration: underline dotted; text-underline-offset: 3px; pointer-events: auto;
 }
 
-/* zoom temporário do mapa */
-.zoom-mapa {
-  position: absolute; right: 10px; top: 10px; z-index: 5; display: flex; align-items: center; gap: 6px; padding: 4px 6px; line-height: 1;
-  background: rgb(16 30 50 / 0.7); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); border-radius: 10px;
-  font-size: 0.75rem; color: var(--texto-2);
-}
-.zoom-mapa button { width: 24px; height: 24px; border: 1px solid var(--borda); border-radius: 6px; background: var(--painel-2); color: var(--texto); cursor: pointer; font-weight: 800; }
 
 /* arrastar no time: sem seleção de texto nem arraste nativo da imagem */
 .vaga.arrastavel { user-select: none; -webkit-user-select: none; touch-action: none; }
@@ -792,3 +785,22 @@ button.vaga:hover { border-color: var(--borda); }
   position: absolute; top: 20px; left: 50%; translate: -50% 0; font-weight: 800; font-size: 0.85rem; color: #fff;
   text-shadow: 0 0 3px #16243a, 0 0 3px #16243a, 0 1px 2px #16243a; white-space: nowrap; pointer-events: none;
 }
+
+/* Opções */
+.tela-opcoes { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.opcoes-salvo { margin-left: 10px; color: #3fd46b; font-weight: 700; }
+.opcoes-secao {
+  display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 16px;
+  background: rgb(27 47 74 / 0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
+}
+.opcoes-secao h2 { font-size: 1.05rem; margin: 0; }
+.opcoes-campo { display: flex; flex-direction: column; gap: 6px; }
+.opcoes-campo > span { font-size: 0.72rem; color: var(--texto-2); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
+.opcoes-campo small, .opcoes-secao > small { color: var(--texto-2); }
+.opcoes-campo input[type="text"] { padding: 9px 11px; border-radius: 10px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto); font: inherit; max-width: 360px; }
+.opcoes-linha { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.opcoes-linha input[type="range"] { flex: 1 1 220px; max-width: 360px; }
+.opcoes-check { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.opcoes-erro { color: #ef6a6a; }
+.opcoes-erro:empty { display: none; }
+.opcoes-secao .botao { align-self: flex-start; }

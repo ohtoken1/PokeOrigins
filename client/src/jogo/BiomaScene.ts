@@ -7,13 +7,12 @@ import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
 import type { FolhasPersonagem } from '../personagem/lpc';
 import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
 
-/** Tamanho da tela do jogo em pixels (a câmera mostra ~43×29 tiles ampliados 1,4×). */
+/** Tamanho da tela do jogo em pixels (a câmera mostra 40×27 tiles ampliados 1,5×). */
 export const LARGURA_TELA = 960;
 export const ALTURA_TELA = 640;
-/** Zoom da câmera (pedido do dono: mais afastado; personagem e seguidor diminuem junto com o mapa). */
-const ZOOM = 1.4;
-/** Zoom escolhido nos botões +/− do mapa (TEMPORÁRIO, para testes do dono); vale para todos os biomas. */
-let zoomEscolhido = ZOOM;
+/** Zoom da câmera, fixo (pedido do dono: 1,5; o jogador não muda). */
+const ZOOM = 1.5;
+const zoomEscolhido = ZOOM;
 /** Nome de treinador: fonte desenhada grande e reduzida para ficar nítida; tamanho final na tela (px). */
 const FONTE_NOME = 32;
 const TAMANHO_NOME_TELA = 13;
@@ -385,14 +384,6 @@ export class BiomaScene extends Phaser.Scene {
     this.lpc = nome;
     this.jogador.setTexture(nome, `${this.linhaLpc}-0`).setOrigin(0.5, 61 / 64).setFlipX(false).setScale(ESCALA_LPC);
     this.sombraJogador.setSize(16, 5);
-  }
-
-  /** TEMPORÁRIO: aproxima/afasta a câmera (botões +/− e rodinha do mouse no mapa). Devolve o zoom atual. */
-  mudarZoom(passo: number): number {
-    zoomEscolhido = Math.round(Math.max(0.6, Math.min(3, zoomEscolhido + passo)) * 10) / 10;
-    this.cameras.main?.setZoom(zoomEscolhido);
-    this.ajustarNome();
-    return zoomEscolhido;
   }
 
   /** O nome fica sempre com ~13 px na tela, em qualquer zoom (o texto é desenhado grande e reduzido). */

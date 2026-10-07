@@ -1,0 +1,97 @@
+// Aba Opções (barra do topo): nome de treinador, nome real, mostrar o nome no mapa e o teto dos encontros.
+import type { Tela } from '../main';
+import { carregarSave, salvar } from '../estado';
+import { APARENCIA_PADRAO } from '../personagem/lpc';
+import { nivelMaximoEncontro, nivelTreinador } from '../../../shared/treinador';
+import { el } from '../ui/dom';
+
+export const telaOpcoes: Tela = (raiz, navegar) => {
+  const save = carregarSave();
+  const tela = el('main', { class: 'tela tela-opcoes' }, el('h1', {}, 'Opções'));
+  raiz.append(tela);
+  if (!save) {
+    tela.append(
+      el('p', { class: 'sub' }, 'Comece um jogo para ver as opções.'),
+      el('button', { class: 'botao', onclick: () => navegar({ tela: 'inicial' }) }, 'Começar'),
+    );
+    return;
+  }
+
+  const salvo = el('small', { class: 'opcoes-salvo', role: 'status' }, '');
+  let relogio = 0;
+  const avisarSalvo = (texto = 'Salvo') => {
+    salvar(save);
+    salvo.textContent = `✓ ${texto}`;
+    clearTimeout(relogio);
+    relogio = window.setTimeout(() => (salvo.textContent = ''), 1800);
+  };
+  const secao = (titulo: string, ...filhos: (HTMLElement | null)[]) => el('section', { class: 'opcoes-secao' }, el('h2', {}, titulo), ...filhos);
+  const campo = (rotulo: string, controle: HTMLElement, ajuda?: string) =>
+    el('label', { class: 'opcoes-campo' }, el('span', {}, rotulo), controle, ajuda ? el('small', {}, ajuda) : null);
+
+  // ---------- perfil ----------
+  const nomeTreinador = el('input', { id: 'op-nome', type: 'text', maxlength: 16, value: save.aparencia?.nome ?? '', placeholder: 'Ex.: Ash' }) as HTMLInputElement;
+  const erroNome = el('small', { class: 'opcoes-erro' }, '');
+  nomeTreinador.addEventListener('change', () => {
+    const nome = nomeTreinador.value.trim().replace(/\s+/g, ' ');
+    if (nome.length < 3) {
+      erroNome.textContent = 'Use de 3 a 16 letras.';
+      nomeTreinador.value = save.aparencia?.nome ?? '';
+      return;
+    }
+    erroNome.textContent = '';
+    save.aparencia = { ...APARENCIA_PADRAO, ...save.aparencia, nome };
+    avisarSalvo('Nome de treinador salvo');
+  });
+  const nomeReal = el('input', { id: 'op-nome-real', type: 'text', maxlength: 60, value: save.nomeReal ?? '', placeholder: 'Ex.: Maria Souza' }) as HTMLInputElement;
+  nomeReal.addEventListener('change', () => {
+    save.nomeReal = nomeReal.value.trim();
+    avisarSalvo('Nome real salvo');
+  });
+  const mostrarNome = el('input', { id: 'op-mostrar-nome', type: 'checkbox', checked: save.mostrarNome !== false }) as HTMLInputElement;
+  mostrarNome.addEventListener('change', () => {
+    save.mostrarNome = mostrarNome.checked;
+    avisarSalvo();
+  });
+
+  // ---------- encontros ----------
+  const teto = nivelMaximoEncontro(nivelTreinador(save.xpTreinador));
+  const valor = el('strong', {}, '');
+  const deslizante = el('input', { id: 'op-encontros', type: 'range', min: 1, max: teto, value: Math.min(save.nivelEncontro ?? teto, teto) }) as HTMLInputElement;
+  const auto = el('input', { id: 'op-encontros-auto', type: 'checkbox', checked: save.nivelEncontro === null }) as HTMLInputElement;
+  const mostrarValor = () => {
+    deslizante.disabled = auto.checked;
+    valor.textContent = auto.checked ? `Nv. ${teto} (máximo do seu nível)` : `Nv. ${deslizante.value}`;
+  };
+  const aplicar = () => {
+    save.nivelEncontro = auto.checked ? null : Number(deslizante.value);
+    mostrarValor();
+    avisarSalvo();
+  };
+  deslizante.addEventListener('input', mostrarValor);
+  deslizante.addEventListener('change', aplicar);
+  auto.addEventListener('change', aplicar);
+  mostrarValor();
+
+  tela.append(
+    el('p', { class: 'sub' }, 'As mudanças são salvas sozinhas.', salvo),
+    secao(
+      'Perfil',
+      campo('Nome de treinador', nomeTreinador, 'Aparece em cima do seu personagem no mapa (3 a 16 letras).'),
+      erroNome,
+      campo('Nome real', nomeReal, 'Opcional. Só você vê, por enquanto.'),
+      el('label', { class: 'opcoes-check' }, mostrarNome, ' Mostrar meu nome em cima do personagem'),
+      el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'personagem' }) }, 'Mudar o visual do personagem'),
+    ),
+    secao(
+      'Encontros',
+      el('div', { class: 'opcoes-campo' },
+        el('span', {}, 'Nível máximo dos Pokémon selvagens'),
+        el('div', { class: 'opcoes-linha' }, deslizante, valor),
+        el('label', { class: 'opcoes-check' }, auto, ' Automático (sempre o máximo do seu nível de treinador)'),
+        el('small', {}, 'Só dá para escolher um nível menor que o seu máximo, nunca maior. Os encontros vão de 4 níveis abaixo até o nível escolhido.'),
+      ),
+    ),
+  );
+  return () => clearTimeout(relogio);
+};

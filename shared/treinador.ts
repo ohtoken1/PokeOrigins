@@ -1,11 +1,11 @@
-// Nível de treinador (1 a 50), separado do nível dos Pokémon.
+// Nível de treinador (1 a 20), separado do nível dos Pokémon.
 // O treinador ganha o mesmo XP que o Pokémon derrotado/capturado dá; a curva é lenta de propósito
 // (no futuro haverá recompensas por nível alcançado).
 
-export const NIVEL_MAX_TREINADOR = 50;
-/** XP para ir do nível n ao n+1 = BASE × n^EXPOENTE. */
-const BASE = 242;
-const EXPOENTE = 2.6;
+export const NIVEL_MAX_TREINADOR = 20;
+/** XP para ir do nível n ao n+1 = BASE × n^EXPOENTE (o XP total até o 20 é o mesmo que ia até o 50 antes). */
+const BASE = 262;
+const EXPOENTE = 3.8;
 
 export function xpParaSubir(nivel: number): number {
   return Math.floor(BASE * nivel ** EXPOENTE);
@@ -35,10 +35,10 @@ export function progressoTreinador(xpTotal: number): { nivel: number; atual: num
   return { nivel, atual: xpTotal - xpTotalParaNivel(nivel), necessario: xpParaSubir(nivel) };
 }
 
-/** Os encontros vão do (teto − 10) ao teto. */
-export const FAIXA_NIVEIS_ENCONTRO = 10;
+/** Os encontros vão do (teto − 4) ao teto: 5 níveis (treinador 1 → 1–5, treinador 2 → 6–10…). */
+export const FAIXA_NIVEIS_ENCONTRO = 4;
 
-/** Nível máximo dos Pokémon selvagens: 2× o nível de treinador (treinador 50 → 100). */
+/** Nível máximo dos Pokémon selvagens: 5× o nível de treinador (treinador 20 → 100). */
 export function nivelMaximoEncontro(nivelTreinador: number): number {
-  return Math.min(100, 2 * nivelTreinador);
+  return Math.min(100, 5 * nivelTreinador);
 }

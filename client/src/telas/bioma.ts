@@ -130,26 +130,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   atualizarTitulo();
 
   const areaJogo = el('div', { class: 'area-jogo' });
-  // escolher um teto MENOR para os encontros (canto do mapa); disponível em qualquer nível
-  {
-    const valor = el('strong', {}, '');
-    const deslizante = el('input', { type: 'range', min: 1, max: faixaNatural[1], value: save.nivelEncontro ?? faixaNatural[1] });
-    const auto = el('input', { type: 'checkbox', checked: save.nivelEncontro === null });
-    const aplicar = () => {
-      save.nivelEncontro = auto.checked ? null : Number(deslizante.value);
-      deslizante.disabled = auto.checked;
-      valor.textContent = auto.checked ? `Nv. ${faixaNatural[1]} (máx.)` : `Nv. ${deslizante.value}`;
-      salvar(save);
-      atualizarChances();
-      atualizarTitulo();
-    };
-    deslizante.addEventListener('input', aplicar);
-    auto.addEventListener('change', aplicar);
-    // não deixar as setas do teclado mexerem no controle em vez de andar
-    deslizante.addEventListener('keydown', (e) => e.preventDefault());
-    areaJogo.append(el('div', { class: 'nivel-encontros' }, el('span', {}, 'Encontros até: ', valor), deslizante, el('label', {}, auto, ' Auto')));
-    aplicar();
-  }
+  // o teto dos encontros agora é escolhido na aba Opções (barra do topo)
   raiz.append(
     el(
       'main',
@@ -237,28 +218,10 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   // boné guardado para depois (pedido do dono): fica sem por enquanto
   const aparencia = { ...(save.aparencia ?? APARENCIA_PADRAO), bone: 'nenhum' as const };
   opcoesCena.personagem = { chave: JSON.stringify(aparencia), folhas: montarPersonagem(aparencia) };
-  opcoesCena.nomeJogador = save.aparencia?.nome;
+  opcoesCena.nomeJogador = save.mostrarNome === false ? undefined : save.aparencia?.nome;
   const jogo = mostrarJogo(areaJogo, opcoesCena);
   cena = jogo.cena;
 
-  // TEMPORÁRIO (testes do dono): zoom do mapa com botões +/− e com a rodinha do mouse em cima do mapa
-  {
-    const valor = el('span', {}, '');
-    const mudar = (passo: number) => {
-      const z = cena()?.mudarZoom(passo);
-      if (z) valor.textContent = `${z.toFixed(1)}×`;
-    };
-    areaJogo.append(
-      el('div', { class: 'zoom-mapa', title: 'Zoom do mapa (temporário)' },
-        el('button', { onclick: () => mudar(-0.1), title: 'Afastar' }, '−'), valor, el('button', { onclick: () => mudar(0.1), title: 'Aproximar' }, '+')),
-    );
-    areaJogo.addEventListener('wheel', (e) => {
-      if (!(e.target instanceof HTMLCanvasElement)) return;
-      e.preventDefault();
-      mudar(e.deltaY < 0 ? 0.1 : -0.1);
-    }, { passive: false });
-    setTimeout(() => mudar(0), 500);
-  }
 
   // o mapa fica parado durante a batalha e com PC/Bolsa/ficha abertos
   let emBatalha = false;

@@ -32,6 +32,10 @@ export interface Save {
   capturados: number[];
   /** Visual do personagem (camadas LPC + detalhes Pokémon); sem isso, usa APARENCIA_PADRAO. */
   aparencia?: Aparencia;
+  /** Nome real (opcional, aba Opções). */
+  nomeReal?: string;
+  /** Mostrar o nome de treinador em cima do personagem (padrão: sim). */
+  mostrarNome?: boolean;
 }
 
 /** Marca a espécie como capturada na Pokédex. */

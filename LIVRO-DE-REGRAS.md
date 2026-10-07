@@ -106,11 +106,11 @@ O bioma é o do **tipo principal** do Pokémon. Exemplo: Gastly é Ghost/Poison,
 ### 3.2 Nível dos selvagens
 O nível depende do **seu nível de treinador** e é igual em todos os biomas:
 
-- **Teto** = 2 × nível de treinador, no máximo 100.
-- **Faixa** = do teto − 10 até o teto.
-- Exemplo: treinador nível 20 → selvagens do nível 30 ao 40.
+- **Teto** = 5 × nível de treinador, no máximo 100.
+- **Faixa** = do teto − 4 até o teto (5 níveis).
+- Exemplos: treinador nível 1 → selvagens do nível 1 ao 5; nível 2 → 6 ao 10; nível 20 → 96 ao 100.
 
-No canto do mapa há um controle **"Encontros até"**. Ele deixa você escolher um teto **menor** (nunca maior), para caçar Pokémon de nível baixo.
+Na aba **Opções** (barra do topo) você escolhe um teto **menor** (nunca maior), para caçar Pokémon de nível baixo.
 
 ### 3.3 Cada forma tem a sua faixa de nível
 A forma que aparece depende do nível:
@@ -172,9 +172,9 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 
 ## 5. Nível de treinador
 
-- **Níveis:** de 1 a 50, separado do nível dos Pokémon.
+- **Níveis:** de 1 a 20, separado do nível dos Pokémon.
 - **Como ganha XP:** o treinador ganha o **mesmo XP** que o Pokémon em campo ganha ao **derrotar ou capturar**. Derrota e fuga não dão XP.
-- **Curva:** subir do nível *n* custa 242 × *n*^2,6 XP. O começo é rápido e o final é pesado; chegar ao 50 leva cerca de 50 mil vitórias.
+- **Curva:** subir do nível *n* custa 262 × *n*^3,8 XP. O começo é rápido e o final é bem pesado (o nível 20 é para quem joga muito).
 - **Efeito:** o nível de treinador define o teto dos selvagens (veja a [seção 3.2](#32-nível-dos-selvagens)).
 
 ---
@@ -383,7 +383,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Todas as 9 regiões (Pokémon 1 a 1025) e os 5 biomas por região, com mapas gerados.
 - Encontro a cada passo, num cartão que não trava o jogo.
 - Batalhas pelo simulador do Showdown, com captura, fuga, XP, EVs, golpes novos e evolução.
-- Nível de treinador (1–50) controlando o nível dos selvagens.
+- Nível de treinador (1–20) controlando o nível dos selvagens (5 níveis de selvagens por nível de treinador).
 
 **Início do jogo**
 - Criação de personagem (LPC) com nome de treinador e detalhes Pokémon.
@@ -408,7 +408,8 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Wallpapers calmos no menu e um diferente para cada bioma.
 - Janelas semitransparentes.
 - Cartão de informações dos golpes ao passar o mouse.
-- Aba Comunidade (Amigos e Clã em breve).
+- Aba Comunidade (Amigos e Clã em breve) e aba Opções (nome de treinador, nome real, nome no mapa, teto dos encontros).
+- Câmera do mapa com zoom fixo.
 - Painel Admin para testes: chances, Pokémon forçado, moedas, tickets e Pokédex revelada.
 
 ---

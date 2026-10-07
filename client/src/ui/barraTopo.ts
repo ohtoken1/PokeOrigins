@@ -9,6 +9,7 @@ const ABAS: Aba[] = [
   { nome: 'Jogar', tela: 'jogar', destino: () => (carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' }) },
   { nome: 'Pokédex', tela: 'pokedex', destino: () => ({ tela: 'pokedex' }) },
   { nome: 'Database', tela: 'database', destino: () => ({ tela: 'database' }) },
+  { nome: 'Opções', tela: 'opcoes', destino: () => ({ tela: 'opcoes' }) },
 ];
 
 const COMUNIDADE: { nome: string; destino: Destino }[] = [
