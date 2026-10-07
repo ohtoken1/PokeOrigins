@@ -16,7 +16,15 @@ export type EventoBatalha =
   | { tipo: 'status'; lado: Lado; status: string | null; texto?: string }
   | { tipo: 'impacto'; forte: boolean; texto: string }
   | { tipo: 'desmaio'; lado: Lado; texto: string }
-  | { tipo: 'fim'; vencedor: Lado };
+  | { tipo: 'fim'; vencedor: Lado }
+  /** Mudança de estágio de atributo (+1 Attack…); `definir` = valor absoluto (Belly Drum). */
+  | { tipo: 'boost'; lado: Lado; atributo: string; quantidade: number; definir?: boolean; texto: string }
+  /** Estágios zerados (Haze/Clear Smog); lado null = os dois. */
+  | { tipo: 'zerarBoosts'; lado: Lado | null; texto?: string }
+  /** Clima em campo (id do Showdown: RainDance, SunnyDay, Sandstorm, Snow…), null = acabou. */
+  | { tipo: 'clima'; clima: string | null; texto?: string }
+  /** Terreno em campo (Electric/Grassy/Misty/Psychic Terrain), null = acabou. */
+  | { tipo: 'terreno'; terreno: string | null; texto?: string };
 
 export interface OpcaoGolpe {
   indice: number;
@@ -61,12 +69,24 @@ const NOMES_ATRIBUTOS: Record<string, string> = {
   accuracy: 'Precisão',
   evasion: 'Evasão',
 };
+/** Terrenos (o nome do golpe fica em inglês, como os outros nomes de golpe). */
+const TERRENOS: Record<string, string> = {
+  'Electric Terrain': 'Electric Terrain',
+  'Grassy Terrain': 'Grassy Terrain',
+  'Misty Terrain': 'Misty Terrain',
+  'Psychic Terrain': 'Psychic Terrain',
+};
+
 const CLIMAS: Record<string, string> = {
   RainDance: 'Começou a chover!',
   SunnyDay: 'O sol ficou muito forte!',
   Sandstorm: 'Uma tempestade de areia começou!',
   Snowscape: 'Começou a nevar!',
   Hail: 'Começou a cair granizo!',
+  Snow: 'Começou a nevar!',
+  DesolateLand: 'O sol ficou extremamente forte!',
+  PrimordialSea: 'Começou uma chuva torrencial!',
+  DeltaStream: 'Um vento misterioso protege os Pokémon voadores!',
   none: 'O clima voltou ao normal.',
 };
 
@@ -452,7 +472,25 @@ export class BatalhaSelvagem {
           const n = Number(args[2]);
           const verbo = comando === '-boost' ? 'aumentou' : 'diminuiu';
           const intensidade = n === 0 ? ` não pode mais ${comando === '-boost' ? 'aumentar' : 'diminuir'}` : n >= 3 ? ` ${verbo} drasticamente` : n === 2 ? ` ${verbo} muito` : ` ${verbo}`;
-          eventos.push({ tipo: 'mensagem', texto: `${NOMES_ATRIBUTOS[args[1]] ?? args[1]} de ${quem}${intensidade}!` });
+          eventos.push({ tipo: 'boost', lado: this.lado(args[0]), atributo: args[1], quantidade: comando === '-boost' ? n : -n, texto: `${NOMES_ATRIBUTOS[args[1]] ?? args[1]} de ${quem}${intensidade}!` });
+          break;
+        }
+        case '-setboost':
+          eventos.push({ tipo: 'boost', lado: this.lado(args[0]), atributo: args[1], quantidade: Number(args[2]), definir: true, texto: `${NOMES_ATRIBUTOS[args[1]] ?? args[1]} de ${quem} foi ao máximo!` });
+          break;
+        case '-clearboost':
+          eventos.push({ tipo: 'zerarBoosts', lado: this.lado(args[0]), texto: `Os atributos de ${quem} voltaram ao normal!` });
+          break;
+        case '-clearallboost':
+          eventos.push({ tipo: 'zerarBoosts', lado: null, texto: 'Os atributos de todos voltaram ao normal!' });
+          break;
+        case '-fieldstart':
+        case '-fieldend': {
+          const terreno = args[0].replace(/^move: /, '');
+          const nome = TERRENOS[terreno];
+          if (!nome) break;
+          if (comando === '-fieldstart') eventos.push({ tipo: 'terreno', terreno, texto: `${nome} cobriu o campo de batalha!` });
+          else eventos.push({ tipo: 'terreno', terreno: null, texto: `${nome} sumiu do campo.` });
           break;
         }
         case '-start': {
@@ -469,7 +507,7 @@ export class BatalhaSelvagem {
           if (args[1] === 'confusion') eventos.push({ tipo: 'mensagem', texto: `${quem} não está mais confuso!` });
           break;
         case '-weather':
-          if (!args.includes('[upkeep]') && CLIMAS[args[0]]) eventos.push({ tipo: 'mensagem', texto: CLIMAS[args[0]] });
+          if (!args.includes('[upkeep]')) eventos.push({ tipo: 'clima', clima: args[0] === 'none' ? null : args[0], texto: CLIMAS[args[0]] });
           break;
         case '-prepare':
           eventos.push({ tipo: 'mensagem', texto: `${quem} está se preparando!` });

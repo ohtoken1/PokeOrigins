@@ -34,6 +34,15 @@ const crescimentoDe = (especieId: number) => pokemonPorId(especieId).crescimento
 const ROTULOS_STATUS: Record<string, string> = { brn: 'QUE', par: 'PAR', slp: 'DOR', frz: 'CON', psn: 'ENV', tox: 'ENV' };
 const FRASES_FALHA = ['Ah, não! O Pokémon escapou!', 'Ahh! Parecia que tinha conseguido!', 'Argh! Foi quase!', 'Droga! Foi por pouco!'];
 
+/** Nomes dos atributos nos estágios (em inglês, como os nomes de atributo do jogo). */
+const NOMES_BOOST: Record<string, string> = { atk: 'Attack', def: 'Defense', spa: 'Sp. Atk', spd: 'Sp. Def', spe: 'Speed', accuracy: 'Accuracy', evasion: 'Evasion' };
+
+/** Classe CSS do efeito visual de cada clima e terreno. */
+const CLASSE_CLIMA: Record<string, string> = {
+  RainDance: 'chuva', PrimordialSea: 'chuva', SunnyDay: 'sol', DesolateLand: 'sol', Sandstorm: 'areia', Hail: 'neve', Snow: 'neve', Snowscape: 'neve', DeltaStream: 'vento',
+};
+const CLASSE_TERRENO: Record<string, string> = { 'Electric Terrain': 'eletrico', 'Grassy Terrain': 'grama', 'Misty Terrain': 'nevoa', 'Psychic Terrain': 'psiquico' };
+
 function caixaInfo(doJogador: boolean) {
   const nome = el('strong');
   const status = el('span', { class: 'chip-status' });
@@ -41,16 +50,34 @@ function caixaInfo(doJogador: boolean) {
   const preenchido = el('div', { class: 'preenchido verde' });
   const numeros = el('small', { class: 'numeros' });
   const exp = el('div', { class: 'preenchido' });
+  // estágios de atributo (+1 Attack, −2 Speed…) em cima da caixa, como nos jogos
+  const linhaBoosts = el('div', { class: 'boosts' });
+  const boosts: Record<string, number> = {};
+  const desenharBoosts = () =>
+    linhaBoosts.replaceChildren(
+      ...Object.entries(boosts)
+        .filter(([, v]) => v !== 0)
+        .map(([a, v]) => el('span', { class: `chip-boost ${v > 0 ? 'sobe' : 'desce'}` }, `${NOMES_BOOST[a] ?? a} ${v > 0 ? '+' : '−'}${Math.abs(v)}`)),
+    );
   const raiz = el(
     'div',
     { class: `caixa-info ${doJogador ? 'do-jogador' : 'do-selvagem'}` },
+    linhaBoosts,
     el('div', { class: 'linha' }, nome, status, nivel),
     el('div', { class: 'linha-hp' }, el('span', { class: 'rotulo' }, 'HP'), el('div', { class: 'barra-hp' }, preenchido)),
     doJogador && numeros,
-    doJogador && el('div', { class: 'barra-exp' }, exp),
+    doJogador && el('div', { class: 'linha-exp' }, el('span', { class: 'rotulo rotulo-exp' }, 'EXP'), el('div', { class: 'barra-exp' }, exp)),
   );
   return {
     raiz,
+    boost(atributo: string, quantidade: number, definir = false) {
+      boosts[atributo] = Math.max(-6, Math.min(6, definir ? quantidade : (boosts[atributo] ?? 0) + quantidade));
+      desenharBoosts();
+    },
+    zerarBoosts() {
+      for (const a of Object.keys(boosts)) delete boosts[a];
+      desenharBoosts();
+    },
     hp(hp: number, max: number) {
       const fracao = max > 0 ? Math.max(0, hp) / max : 0;
       preenchido.style.width = `${fracao * 100}%`;
@@ -63,7 +90,7 @@ function caixaInfo(doJogador: boolean) {
     },
     definir(p: PokemonIndividual) {
       nome.replaceChildren(nomeDe(p.especieId), seloGenero(p.genero) ?? '', p.shiny ? ' ✨' : '');
-      nivel.textContent = `Nv. ${p.nivel}`;
+      nivel.textContent = `Nv.${p.nivel}`;
       this.status(p.status);
       const c = crescimentoDe(p.especieId);
       const atual = expParaNivel(c, p.nivel);
@@ -138,6 +165,11 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
   const resumo = el('div', { class: 'resumo-pokemon' });
   resumo.hidden = true;
   arena.append(resumo);
+  // efeitos de clima (por cima de tudo, menos das caixas) e de terreno (no chão)
+  const camadaTerreno = el('div', { class: 'camada-terreno' });
+  const camadaClima = el('div', { class: 'camada-clima' });
+  arena.prepend(camadaTerreno);
+  arena.append(camadaClima);
   const mostrarResumo = (lugar: HTMLElement, lado: 'selvagem' | 'jogador', quem: () => PokemonIndividual | undefined) => {
     lugar.addEventListener('mouseenter', () => {
       const p = quem();
@@ -196,6 +228,8 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
           await dizer(ev.texto);
           break;
         case 'entrar':
+          // quem entra em campo começa sem estágios de atributo
+          info(ev.lado).zerarBoosts();
           if (ev.lado === 'jogador') {
             colocarJogador(ev.indice);
             infoJogador.hp(ev.hp, ev.hpMax);
@@ -219,6 +253,26 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
         }
         case 'status':
           info(ev.lado).status(ev.status);
+          if (ev.texto) await dizer(ev.texto);
+          break;
+        case 'boost':
+          info(ev.lado).boost(ev.atributo, ev.quantidade, ev.definir);
+          await dizer(ev.texto);
+          break;
+        case 'zerarBoosts':
+          if (ev.lado) info(ev.lado).zerarBoosts();
+          else {
+            infoJogador.zerarBoosts();
+            infoSelvagem.zerarBoosts();
+          }
+          if (ev.texto) await dizer(ev.texto);
+          break;
+        case 'clima':
+          camadaClima.className = `camada-clima ${ev.clima ? `clima-${CLASSE_CLIMA[ev.clima] ?? ''}` : ''}`;
+          if (ev.texto) await dizer(ev.texto);
+          break;
+        case 'terreno':
+          camadaTerreno.className = `camada-terreno ${ev.terreno ? `terreno-${CLASSE_TERRENO[ev.terreno] ?? ''}` : ''}`;
           if (ev.texto) await dizer(ev.texto);
           break;
         case 'impacto':
@@ -480,8 +534,21 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
         const p = save.time[pos];
         const antes = nomeDe(p.especieId);
         if (pos !== batalha.ativo) colocarJogador(pos);
-        await dizer(`O quê? ${antes} está evoluindo!`);
         const novo = pokemonPorId(para);
+        // como nos jogos: dá para parar a evolução (ela é oferecida de novo no próximo nível)
+        mensagem.textContent = `O quê? ${antes} quer evoluir para ${novo.nome}!`;
+        const evoluirAgora = await new Promise<boolean>((resolver) =>
+          acoes.replaceChildren(
+            botao('Deixar evoluir', () => resolver(true), { class: 'botao' }),
+            botao('Parar a evolução', () => resolver(false), { class: 'botao secundario' }),
+          ),
+        );
+        acoes.replaceChildren();
+        if (!evoluirAgora) {
+          await dizer(`${antes} não evoluiu.`);
+          continue;
+        }
+        await dizer(`${antes} está evoluindo!`);
         await animarEvolucao(spriteJogador as HTMLImageElement, modo3D ? urlSprite3D(para, { shiny: p.shiny, costas: true }) : ((p.shiny ? novo.sprites.gifCostasShiny : novo.sprites.gifCostas) ?? novo.sprites.costas ?? ''));
         const r = evoluir(p, para, nomeDe);
         registrarCapturado(save, para);

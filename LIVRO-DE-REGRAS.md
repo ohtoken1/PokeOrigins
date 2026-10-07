@@ -187,6 +187,9 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 - **PP:** sem PP Up. O máximo é o PP base do golpe.
 - **HP, status e PP continuam entre batalhas.** Para recuperar, use o **Centro Pokémon** ou remédios.
 - **Derrota:** o time inteiro é curado e você volta ao menu da região.
+- **Fundo de batalha:** sorteado a cada luta entre os cenários do bioma (imagens dos jogos oficiais).
+- **Estágios de atributo** (+1 Attack, −2 Speed…) aparecem como etiquetas junto da caixa de HP de cada Pokémon e somem quando ele sai de campo.
+- **Clima e terreno** aparecem na arena: chuva caindo, sol forte, tempestade de areia, neve; terreno elétrico, de grama, de névoa ou psíquico no chão.
 - **Informações:** passar o mouse num golpe mostra poder, precisão, PP, categoria, prioridade e descrição. Passar o mouse no selvagem mostra o resumo dele; a habilidade só aparece depois de ser revelada na luta.
 
 ---
@@ -228,7 +231,7 @@ Level, Love, Moon, Heavy, Fast, Repeat e Dream Ball funcionam como nos jogos.
 - **Vários níveis de uma vez** aparecem como **uma mensagem só**, com o nível final.
 - **Golpes novos:** com menos de 4 golpes, o Pokémon aprende sozinho. Com 4, você escolhe qual esquecer (ou desiste). O golpe novo aparece colorido, e passar o mouse mostra o que ele faz.
 - **Evolução:**
-  - por nível: acontece no fim da batalha;
+  - por nível: acontece no fim da batalha, e você pode **deixar evoluir** ou **parar a evolução** (ela é oferecida de novo no próximo nível);
   - por pedra, troca, amizade etc.: usa o item na Bolsa. A **Linking Cord** substitui a troca; se a troca exige um item, o Pokémon precisa estar segurando esse item.
 
 ---
