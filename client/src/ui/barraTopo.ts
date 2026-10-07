@@ -1,4 +1,4 @@
-// Barra no topo do site: ícone da Pokédex (atalho), Jogar (Mapas, Duelos com treinadores, Ginásios), Golpes,
+// Barra no topo do site: ícone da Pokédex (atalho), Jogar (Mapas, Cidade, Continentes, Duelos com treinadores, Ginásios), Golpes,
 // Informações (Opções, Ranking, Database) e Comunidade (Amigos, Clã). Menus com setinha abrem ao clicar.
 import type { Destino, Navegar } from '../main';
 import { carregarSave } from '../estado';
@@ -12,9 +12,11 @@ const ABAS: Aba[] = [
   {
     nome: 'Jogar',
     menu: true,
-    telas: ['inicial', 'regiao', 'bioma', 'personagem', 'duelos', 'ginasios'],
+    telas: ['inicial', 'regiao', 'bioma', 'personagem', 'cidade', 'continentes', 'duelos', 'ginasios'],
     itens: [
       { nome: 'Mapas', destino: () => (carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' }) },
+      { nome: 'Cidade', destino: () => ({ tela: 'comunidade', secao: 'cidade' }), emBreve: true },
+      { nome: 'Continentes', destino: () => ({ tela: 'comunidade', secao: 'continentes' }), emBreve: true },
       { nome: 'Duelos com treinadores', destino: () => ({ tela: 'comunidade', secao: 'duelos' }), emBreve: true },
       { nome: 'Ginásios', destino: () => ({ tela: 'comunidade', secao: 'ginasios' }), emBreve: true },
     ],

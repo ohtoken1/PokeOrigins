@@ -451,7 +451,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 
 A barra do topo tem:
 - **ícone da Pokédex** (canto esquerdo): atalho direto para a Pokédex;
-- **Jogar**: Mapas (regiões e biomas), **Duelos com treinadores** e **Ginásios** (os dois "em breve");
+- **Jogar**: Mapas (regiões e biomas), **Cidade**, **Continentes**, **Duelos com treinadores** e **Ginásios** (os quatro últimos "em breve");
 - **Golpes**: Move Reminder e Move Tutor;
 - **Informações**: Opções, Ranking e Database;
 - **Comunidade**: **Amigos** e **Clã**, os dois **"em breve"**, porque dependem de contas e do servidor online.
