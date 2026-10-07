@@ -1083,3 +1083,8 @@ button.vaga:hover { border-color: var(--borda); }
 .botoes-quantidade { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; }
 .botoes-quantidade .botao.secundario { min-width: 52px; font-weight: 800; }
 .frases-premio { display: flex; flex-direction: column; gap: 2px; max-height: 120px; overflow-y: auto; }
+
+/* Várias roletas (abrir ×3/×5): uma em cima da outra, um pouco mais baixas */
+.area-roletas { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+.area-roletas.varias .roleta.roleta-ticket { height: 84px; }
+.area-roletas.varias .casa-roleta { transform: scale(0.88); }

@@ -8,13 +8,10 @@ import { TAMANHO_MAXIMO_TIME, guardarNoPC, novoPokemon, registrarCapturado, salv
 import { abrirJanela } from './janela';
 import { el, selosTipos, spritePokemon } from './dom';
 import { iconeOvo } from './iconeItem';
-import { botoesQuantidade } from './abrirVarios';
+import { areaRoletas, botoesQuantidade } from './abrirVarios';
 import { ehLendario } from '../../../shared/encontros';
 import { especie } from '../../../shared/batalha/pokemon';
 
-const LARGURA_CASA = 92;
-const CASAS = 44;
-const ALVO = 38;
 /** Duração da roleta do ovo (mais lenta que a do ticket, para dar expectativa). */
 const DURACAO_ROLETA = 9000;
 
@@ -58,14 +55,8 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
     ovo.nome,
     () => {
       const qtd = save.itens[ovoId] ?? 0;
-      const faixa = el('div', { class: 'roleta-faixa' });
-      const roleta = el('div', { class: 'roleta roleta-ticket' }, el('div', { class: 'roleta-marcador' }), faixa);
-      const encher = (fim?: ResultadoOvo) => {
-        faixa.style.transition = 'none';
-        faixa.style.transform = 'translateX(0)';
-        faixa.replaceChildren(...Array.from({ length: CASAS }, (_, i) => (i === ALVO && fim ? casa(fim.especie, fim.shiny) : casa(qualquer()))));
-      };
-      encher();
+      // uma roleta por ovo chocado (uma em cima da outra)
+      const roletas = areaRoletas(() => casa(qualquer()));
       const resultado = el('div', { class: 'ticket-resultado' });
       const chocarVarios = (n: number) => {
         if (girando || (save.itens[ovoId] ?? 0) < n) return;
@@ -79,17 +70,9 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
         const todos = Array.from({ length: n }, () => chocarOvo(ovo, especies, IV_MIN_SHINY));
         const frases = todos.map((x) => entregar(save, x));
         salvar(save);
-        // a roleta para no melhor: shiny primeiro, depois lendário/mítico
-        const nota = (x: ResultadoOvo) => (x.shiny ? 2 : 0) + (raro(x.especie) ? 1 : 0);
-        const r = todos.reduce((a, b) => (nota(b) > nota(a) ? b : a));
+        const r = todos[0];
 
-        encher(r);
-        void faixa.offsetWidth;
-        const desvio = (Math.random() - 0.5) * LARGURA_CASA * 0.4;
-        faixa.style.transition = `transform ${DURACAO_ROLETA}ms cubic-bezier(0.08, 0.6, 0.1, 1)`;
-        faixa.style.transform = `translateX(${-(ALVO * LARGURA_CASA - (roleta.clientWidth / 2 - LARGURA_CASA / 2) + desvio)}px)`;
-        setTimeout(() => {
-          faixa.children[ALVO]?.classList.add('sorteado');
+        roletas.girar(todos.map((x) => casa(x.especie, x.shiny)), DURACAO_ROLETA, () => {
           const shinies = todos.filter((x) => x.shiny).length;
           resultado.replaceChildren(
             el('p', { class: 'ticket-raridade' }, n > 1 ? `${n} ovos chocaram!${shinies ? ` ${shinies} shiny!` : ''}` : r.shiny ? '✨ Shiny! ✨' : 'O ovo chocou!'),
@@ -110,7 +93,7 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
           girando = false;
           botoes = botoesQuantidade('Chocar', save.itens[ovoId] ?? 0, chocarVarios);
           areaBotoes.replaceChildren(botoes.raiz);
-        }, DURACAO_ROLETA + 150);
+        });
       };
       let botoes = botoesQuantidade('Chocar', qtd, chocarVarios);
       const areaBotoes = el('div', {}, botoes.raiz);
@@ -119,7 +102,7 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
         'div',
         { class: 'ticket' },
         el('div', { class: 'ovo-topo' }, iconeOvo(ovo.letra), el('p', { class: 'meta' }, ovo.descricao)),
-        roleta,
+        roletas.raiz,
         areaBotoes,
         resultado,
       );

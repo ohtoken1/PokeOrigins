@@ -92,7 +92,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 ## Tickets (`shared/tickets.ts`, `client/src/ui/ticket.ts`)
 - Item raro da bolsa (aba Tickets). Conteúdo = planilha do dono (`Tickets.xlsx`): cada `LinhaPremio` tem raridade (cor), **chance do total** (as de um ticket somam 1) e o pacote. `abrirTicket` sorteia a linha pela chance e resolve `aleatorio` (Tera Shard / Pokébola menos Master / Plate). Prêmios: item, silver, gold, vip (dias), pokemon (nível 50, `ivMinimo` 15 ou 10, 5% shiny). 14 tickets; comum/raro/épico iguais (`COMUM`, `RARO`, `EPICO`), lendário divide 1%.
 - Itens nossos (`shared/itensCustom.ts`): skins (`skin-<nome>[-shiny]`, ícone = sprite numa moldura) e itens-chave (Prison Bottle, DNA Splicers, Reveal Glass, Teal Mask), sem uso ainda (pedido do dono).
-- Abrir/chocar 1, 3, 5 ou 10 de uma vez (`ui/abrirVarios.ts`): a roleta para no melhor resultado e mostra todos.
+- Abrir/chocar 1, 3 ou 5 de uma vez (`ui/abrirVarios.ts`, `areaRoletas`): uma roleta por tentativa, empilhadas, cada uma para no seu resultado (paradas uma depois da outra).
 - VIP (`shared/vip.ts`): PRÉ-SISTEMA. `save.vipAte` (ms), `adicionarVip` soma dias, `bonusVip` (multiplicadores `BONUS_VIP`, hoje 1) já aplicado no silver por vitória e no XP de treinador; selo na carteira; Admin +1/+7 dias.
 - Obtenção: `CHANCE_TICKET_POR_BATALHA` (1/1000 ao vencer/capturar) e botão no Admin. Itens de forma de lendários ficam fora da loja (aba "Itens de lendários" da bolsa, equipar). Showdown faz a Primal Reversion e a tela troca o sprite.
 
