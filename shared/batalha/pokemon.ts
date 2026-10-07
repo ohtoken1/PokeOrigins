@@ -34,7 +34,14 @@ export interface PokemonIndividual {
   ivsRevelados?: boolean;
   /** Só a FAIXA de cada IV à mostra (0–5, 6–10… 26–31), comprada com silver. */
   ivsFaixa?: boolean;
+  /** Amizade 0–255 (shared/amizade.ts); sem valor = AMIZADE_INICIAL. */
+  amizade?: number;
+  /** Tera Type (troca com Tera Shards); sem valor = o primeiro tipo da espécie. */
+  teraTipo?: string;
 }
+
+/** Amizade de quem nasce/é capturado (valor-base da maioria das espécies na 8ª/9ª geração). */
+export const AMIZADE_INICIAL = 50;
 
 /** IV mínimo de um Pokémon shiny (cada atributo vem entre 15 e 31). */
 export const IV_MIN_SHINY = 15;
@@ -231,6 +238,7 @@ export function gerarIndividuo(
     golpes: golpesIniciais(numero, nivel),
     hp: 0,
     status: null,
+    amizade: AMIZADE_INICIAL,
   };
   individuo.hp = hpMaximo(individuo);
   return individuo;

@@ -1006,3 +1006,22 @@ button.vaga:hover { border-color: var(--borda); }
 .ranking-tabela .posicao.p1 { color: #ffd34d; }
 .ranking-tabela .posicao.p2 { color: #d6dde6; }
 .ranking-tabela .posicao.p3 { color: #e09a5a; }
+
+/* Item segurado no cartão do time/PC */
+.vaga { position: relative; }
+.canto-item { position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; border-radius: 50%; background: rgb(0 0 0 / 0.35); display: grid; place-items: center; pointer-events: none; }
+.canto-item .icone-caixa, .canto-item .icone-sd { transform: scale(0.85); }
+.dd-item { display: flex; align-items: center; gap: 4px; }
+/* Amizade */
+.amizade { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.amizade-barra { width: 90px; height: 7px; border-radius: 4px; background: rgb(255 255 255 / 0.12); overflow: hidden; }
+.amizade-barra > span { display: block; height: 100%; background: linear-gradient(90deg, #ff8fb8, #ff4f8b); }
+/* Z-Move */
+.botao-z.ligado { background: linear-gradient(135deg, #ffe066, #ff9f1c); color: #2a1d00; border-color: transparent; font-weight: 800; }
+.botao.golpe.golpe-z { box-shadow: 0 0 0 2px #ffd34d, 0 0 14px #ffb70088; }
+/* Admin: dar item */
+.admin-item { flex: 1; min-width: 0; }
+.admin-qtd { width: 64px; }
+
+/* Tera Shards: imagem grande (160px) reduzida ao tamanho dos outros ícones */
+.icone-png.icone-imagem { width: 28px; height: 28px; object-fit: contain; image-rendering: auto; }

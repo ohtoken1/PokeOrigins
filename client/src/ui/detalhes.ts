@@ -7,12 +7,21 @@ import { abrirJanela } from './janela';
 import { irPara } from './navegacao';
 import { el, seloGenero, seloNT, seloTier, seloTipo, selosTipos, spritePokemon } from './dom';
 import { barraHp } from './time';
-import { PRECO_REVELAR_IVS, faixaDoIv } from '../../../shared/loja';
+import { PRECO_REVELAR_IVS, faixaDoIv, itemDaLoja } from '../../../shared/loja';
+import { AMIZADE_MAXIMA, amizadeDe, textoAmizade } from '../../../shared/amizade';
+import { iconeItem } from './iconeItem';
 import { saveDoPokemon, salvar } from '../estado';
 
 const NOMES: Record<Atributo, string> = { hp: 'HP', atk: 'Ataque', def: 'Defesa', spa: 'At. Esp.', spd: 'Def. Esp.', spe: 'Velocidade' };
 const CATEGORIAS: Record<string, string> = { Physical: 'Físico', Special: 'Especial', Status: 'Status' };
 const STATUS: Record<string, string> = { brn: 'Queimado', par: 'Paralisado', slp: 'Dormindo', frz: 'Congelado', psn: 'Envenenado', tox: 'Gravemente envenenado' };
+
+/** Medidor de amizade: barrinha rosa + frase como a do "medidor de amizade" dos jogos. */
+export function medidorAmizade(valor: number): HTMLElement {
+  return el('span', { class: 'amizade', title: `${valor}/${AMIZADE_MAXIMA}` },
+    el('span', { class: 'amizade-barra' }, el('span', { style: { width: `${(valor / AMIZADE_MAXIMA) * 100}%` } })),
+    el('small', {}, `${valor}/${AMIZADE_MAXIMA} · ${textoAmizade(valor)}`));
+}
 
 /** Ficha completa do Pokémon: atributos (base, IV, EV, valor final), natureza, habilidade e golpes. */
 export function abrirDetalhes(p: PokemonIndividual): void {
@@ -144,7 +153,11 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
           el('dt', {}, 'Ability'),
           el('dd', {}, habilidade.name, habilidade.shortDesc ? el('small', {}, ` — ${traduzir(habilidade.shortDesc)}`) : null),
           el('dt', {}, 'Item'),
-          el('dd', {}, p.item ? nomeItemEquipado(p.item) : '—'),
+          el('dd', { class: 'dd-item' }, ...(p.item ? [iconeItem(itemDaLoja(p.item) ?? { id: p.item, categoria: 'batalha' }), nomeItemEquipado(p.item)] : ['—', el('small', {}, ' (equipe pela Bolsa)')])),
+          el('dt', {}, 'Amizade'),
+          el('dd', {}, medidorAmizade(amizadeDe(p))),
+          el('dt', {}, 'Tera Type'),
+          el('dd', {}, seloTipo(p.teraTipo ?? especie(p.especieId).types[0])),
           el('dt', {}, 'Experiência'),
           el('dd', {}, `${p.exp}`, p.nivel < 100 ? el('small', {}, ` (faltam ${proximo - p.exp} para o Nv. ${p.nivel + 1})`) : null),
         ),

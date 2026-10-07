@@ -1,7 +1,7 @@
 import { especie, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { evoluir, trocarGolpe } from '../../../shared/batalha/progresso';
 import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
-import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
+import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { ehEquipavel, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
 import { pokemonPorId, todosOsPokemons } from '../dados';
 import { registrarCapturado, salvar, type Save } from '../estado';
@@ -18,9 +18,15 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
   remedios: 'Usar',
   evolucao: 'Usar',
   batalha: 'Equipar',
+  frutas: 'Equipar',
+  gems: 'Equipar',
+  placas: 'Equipar',
+  memorias: 'Equipar',
+  zcristais: 'Equipar',
+  lendarios: 'Equipar',
+  terashards: 'Usar',
   tm: 'Ensinar',
   tr: 'Ensinar',
-  especiais: 'Equipar',
   tickets: 'Abrir',
   ovos: 'Chocar',
 };
@@ -82,14 +88,29 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
         for (const golpe of r.golpesPendentes) aprender(p, golpe, () => {}, () => {});
         return [`${quem} evoluiu para ${pokemonPorId(para).nome}!`, ...r.mensagens].join(' ');
       }
-      case 'especiais':
-      case 'batalha': {
+      case 'batalha':
+      case 'frutas':
+      case 'gems':
+      case 'placas':
+      case 'memorias':
+      case 'zcristais':
+      case 'lendarios': {
         if (!ehEquipavel(item.id)) return 'Esse item não pode ser equipado.';
         gastar(item.id);
         const antigo = p.item;
         if (antigo) save.itens[antigo] = (save.itens[antigo] ?? 0) + 1;
         p.item = item.id;
         return `${quem} agora segura ${item.nome}.${antigo ? ` (${nomeItemEquipado(antigo)} voltou para a bolsa)` : ''}`;
+      }
+      case 'terashards': {
+        // como em Scarlet/Violet: SHARDS_POR_TROCA shards do tipo trocam o Tera Type
+        const tipo = item.teraTipo!;
+        if ((p.teraTipo ?? especie(p.especieId).types[0]) === tipo) return `O Tera Type de ${quem} já é ${tipo}.`;
+        if ((save.itens[item.id] ?? 0) < SHARDS_POR_TROCA) return `Precisa de ${SHARDS_POR_TROCA} ${item.nome} (você tem ${save.itens[item.id] ?? 0}).`;
+        save.itens[item.id] -= SHARDS_POR_TROCA;
+        if (save.itens[item.id] <= 0) delete save.itens[item.id];
+        p.teraTipo = tipo;
+        return `O Tera Type de ${quem} agora é ${tipo}!`;
       }
       case 'tm':
       case 'tr': {

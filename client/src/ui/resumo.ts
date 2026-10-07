@@ -3,6 +3,7 @@
 import { Dex } from '@pkmn/sim';
 import { atributos, especie, faixaVelocidade, hpMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { nomeItemEquipado } from '../../../shared/usoItens';
+import { AMIZADE_MAXIMA, amizadeDe } from '../../../shared/amizade';
 import { pokemonPorId } from '../dados';
 import { el, seloGenero, seloNT, seloTipo, selosTipos, seloTier } from './dom';
 
@@ -31,6 +32,8 @@ export function resumoPokemon(p: PokemonIndividual, opcoes: { abilityConhecida: 
   linhas.push(
     linha('HP', `${p.hp}/${hpMaximo(p)}`),
     linha('Item', p.item ? nomeItemEquipado(p.item) : '—'),
+    linha('Amizade', `${amizadeDe(p)}/${AMIZADE_MAXIMA}`),
+    linha('Tera Type', seloTipo(p.teraTipo ?? especie(p.especieId).types[0])),
     // atributos um embaixo do outro, com barrinha (▲/▼ = o que a Nature aumenta/diminui)
     el(
       'div',

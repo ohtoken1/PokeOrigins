@@ -192,6 +192,9 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 - **Estágios de atributo** (+1 Attack, −2 Speed…) aparecem como etiquetas junto da caixa de HP de cada Pokémon e somem quando ele sai de campo.
 - **Clima e terreno** aparecem na arena: chuva caindo, sol forte, tempestade de areia, neve; terreno elétrico, de grama, de névoa ou psíquico no chão.
 - **Informações:** passar o mouse num golpe mostra poder, precisão, PP, categoria, prioridade e descrição. Passar o mouse no selvagem mostra o resumo dele; a habilidade só aparece depois de ser revelada na luta.
+- **Itens segurados (held items):** o item que o Pokémon segura funciona na batalha como nos jogos (Leftovers, Focus Sash, Choice Scarf, frutas…), e a batalha avisa quando ele age. Itens gastos voltam no fim da batalha; **frutas comidas somem**.
+- **Z-Moves:** quem segura um **Z-Crystal** ganha o botão **Z-Move** no menu de golpes. Ligado, os golpes viram Z-Moves (ex.: Thunder Shock → Gigavolt Havoc, poder 100). **Uma vez por batalha.**
+- **Formas por item:** Giratina com Griseous Core entra na Origin Forme; Dialga/Palkia com Adamant Crystal/Lustrous Globe também; Arceus muda de tipo com Plates ou Z-Crystals de tipo; Silvally com Memories; Genesect com Drives; Ogerpon com as máscaras. Kyogre e Groudon fazem a **Primal Reversion** com Blue/Red Orb, e Zacian/Zamazenta viram Crowned com Rusted Sword/Shield. A imagem na batalha muda junto.
 
 ---
 
@@ -233,7 +236,14 @@ Level, Love, Moon, Heavy, Fast, Repeat e Dream Ball funcionam como nos jogos.
 - **Golpes novos:** com menos de 4 golpes, o Pokémon aprende sozinho. Com 4, você escolhe qual esquecer (ou desiste). O golpe novo aparece colorido, e passar o mouse mostra o que ele faz.
 - **Evolução:**
   - por nível: acontece no fim da batalha, e você pode **deixar evoluir** ou **parar a evolução** (ela é oferecida de novo no próximo nível);
-  - por pedra, troca, amizade etc.: usa o item na Bolsa. A **Linking Cord** substitui a troca; se a troca exige um item, o Pokémon precisa estar segurando esse item.
+  - por **amizade**: ao subir de nível com amizade **160 ou mais** (Golbat → Crobat, Pichu → Pikachu…). Os que dependem da hora usam o relógio do computador: Eevee vira **Espeon de dia (6h–18h)** e **Umbreon à noite**;
+  - por pedra, troca etc.: usa o item na Bolsa. A **Linking Cord** substitui a troca; se a troca exige um item, o Pokémon precisa estar segurando esse item.
+
+### 8.1 Amizade
+- Vai de **0 a 255**. Todo Pokémon começa com **50**.
+- Sobe **+5 a cada batalha** em que o Pokémon entra em campo (contra selvagens e, quando existirem, treinadores NPC), seja qual for o resultado.
+- A ficha mostra uma barrinha e uma frase: "Ainda desconfiado" (0–49), "Está se acostumando com você" (50–99), "Gosta de você" (100–149), "Gosta muito de você" (150–199), "Muito apegado a você" (200–254), "Melhores amigos!" (255).
+- Golpes como Return e Frustration usam a amizade.
 
 ---
 
@@ -270,7 +280,8 @@ O inicial (IV 20 em tudo, soma 120) é sempre **A**.
 ### 10.1 Time
 - **Tamanho:** até **6 Pokémon**.
 - **Ordem:** arraste para mudar. O **primeiro** entra na batalha e anda atrás de você.
-- **Informações:** clicar abre a **ficha completa** (atributos, IVs, EVs, natureza, habilidade, item e golpes). Passar o mouse mostra um resumo.
+- **Informações:** clicar abre a **ficha completa** (atributos, IVs, EVs, natureza, habilidade, item, amizade, Tera Type e golpes). Passar o mouse mostra um resumo.
+- **Item segurado:** aparece como um ícone pequeno no canto do cartão do Pokémon. Para dar um item, use **Equipar** na Bolsa; para tirar, use o PC.
 
 ### 10.2 PC
 - **Espaço:** **20 boxes de 30 Pokémon** (600 vagas).
@@ -316,9 +327,11 @@ As duas aparecem **separadas na carteira**, acima do painel do treinador.
 | **Pokébolas** | as 25 bolas |
 | **Remédios** | Potions, Revives, curas de status, Ethers/Elixirs, Sacred Ash… |
 | **Evolução** | pedras, Linking Cord, maçãs, armaduras, Dragon Scale e outros itens de evoluir |
-| **Itens de batalha** | itens padrão da 9ª geração (sem frutas, plates, memories, itens exclusivos de lendários, itens de EV/IV e itens sem uso em batalha) |
+| **Itens de batalha** | itens de batalha de todas as gerações (incensos, Thick Club, Leek…), sem os que ficam fora da loja |
 | **TMs** | as de Scarlet/Violet |
 | **TRs** | as de Sword/Shield |
+
+**Fora da loja** (por enquanto só pelo Admin e por tickets): **Berries**, **Gems**, **Plates**, **Memories**, **Z-Crystals**, **Itens de lendários** (orbes, Griseous Core, Adamant Crystal, Lustrous Globe, Rusted Sword/Shield, Drives, máscaras da Ogerpon, Soul Dew…) e **Tera Shards**. Ficam fora do jogo: Mega Stones (a Mega Evolução ainda não existe), fósseis, cartas, Bottle Caps e itens sem uso.
 
 ### 12.2 Bolsa
 | Tipo de item | O que fazer |
@@ -327,7 +340,8 @@ As duas aparecem **separadas na carteira**, acima do painel do treinador.
 | **Evolução** | usar e evoluir |
 | **Itens de batalha** | equipar (o item anterior volta para a bolsa); frutas comidas somem no fim da batalha |
 | **TMs/TRs** | ensinar, se o Pokémon puder aprender; são gastas ao usar |
-| **Especiais** | itens de forma que **não são vendidos** (ex.: Blue Orb); equipar |
+| **Berries, Gems, Plates, Memories, Z-Crystals, Itens de lendários** | equipar |
+| **Tera Shards** | junte **50 do mesmo tipo** e use num Pokémon para trocar o **Tera Type** dele (como em Scarlet/Violet). A Terastalização na batalha ainda não existe |
 | **Tickets** | abrir (veja a [seção 13](#13-tickets)) |
 
 ---
@@ -389,6 +403,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa por Pokém
 
 ### Database
 - **Tabelas:** Pokémon, itens, habilidades e golpes, com busca, ordenação e filtros.
+- **Itens:** mostra **todos os itens do jogo**, inclusive os de fora da loja. Filtros por categoria (Pokébolas, Remédios, Evolução, Itens de batalha, Berries, Gems, Plates, Memories, Z-Crystals, Itens de lendários, Tera Shards…) e por "vendidos na loja" ou "fora da loja".
 - **Tiers:** **provisoriamente**, são os do Smogon/Showdown, até definirmos os nossos.
 
 ---
@@ -469,6 +484,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Roleta do inicial com fundo da cor do tipo de cada Pokémon.
 - Professores renomeados para Move Reminder e Move Tutor; o Move Tutor agora ensina só golpes de tutor (sem TMs nem Egg Moves).
 - Pokédex mostra os golpes do Move Tutor; aba Ranking (geral, capturas, shiny, lendários, nível, medalhas, silver e gold).
+- Todos os itens do jogo (Berries, Gems, Plates, Memories, Z-Crystals, itens de lendários, Tera Shards) na Database com filtros; Z-Moves; formas por item (Giratina-Origin, Arceus…); amizade (+5 por batalha) e evolução por amizade; Tera Type; ícone do item segurado no cartão.
 - Aba Comunidade (Amigos e Clã em breve) e aba Opções (nome de treinador, nome real, nome no mapa, teto dos encontros).
 - Câmera do mapa com zoom fixo.
 - Painel Admin para testes: chances, Pokémon forçado, moedas, tickets e Pokédex revelada.

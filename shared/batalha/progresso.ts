@@ -1,4 +1,5 @@
 // Experiência, subida de nível, golpes novos e evolução depois de uma batalha.
+import { evolucaoPorAmizade } from '../amizade';
 import {
   especie,
   evolucaoPorNivel,
@@ -65,7 +66,8 @@ export function ganharExperiencia(
   if (p.nivel > nivelAntes) r.mensagens.push(`${nome} subiu para o nível ${p.nivel}!`, ...aprendidos.mensagens);
   if (p.nivel >= NIVEL_MAXIMO) p.exp = expParaNivel(crescimento, NIVEL_MAXIMO);
 
-  const para = evolucaoPorNivel(p.especieId, p.nivel);
+  // por nível; ou, se subiu de nível com amizade alta, por amizade (Golbat → Crobat, Eevee → Espeon/Umbreon…)
+  const para = evolucaoPorNivel(p.especieId, p.nivel) ?? (p.nivel > nivelAntes ? evolucaoPorAmizade(p) : null);
   if (para && especie(para)) r.evolucao = { de: p.especieId, para };
   return r;
 }

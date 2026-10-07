@@ -26,9 +26,14 @@ export function iconeOvo(tier: string): HTMLElement {
   return caixa;
 }
 
-export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 'sprite'>): HTMLElement {
+export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 'sprite' | 'imagem'>): HTMLElement {
   const reserva = () => el('div', { class: `icone-item ${item.id} cat-${item.categoria}` });
   if (item.categoria === 'ovos') return iconeOvo(item.id.endsWith('-s') ? 'S' : 'A');
+  if (item.imagem) {
+    const img = el('img', { class: 'icone-png icone-imagem', src: item.imagem, alt: '', loading: 'lazy', referrerpolicy: 'no-referrer' });
+    img.addEventListener('error', () => img.replaceWith(reserva()), { once: true });
+    return el('div', { class: 'icone-caixa' }, img);
+  }
 
   const sd = Dex.items.get(item.id);
   if (sd.exists && sd.spritenum) {

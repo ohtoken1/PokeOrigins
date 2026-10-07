@@ -78,13 +78,20 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 
 ## Loja e itens (`shared/loja.ts`, `shared/usoItens.ts`, `client/src/ui/loja.ts`, `ui/bolsa.ts`)
 - Moeda: **silver** (`save.silver`). Provisório: todo item custa 1 (`PRECO_PADRAO`, ajustes em `PRECOS`), começa com 1000 e ganha 10 por vitória — o dono vai definir a economia.
-- Catálogo: bolas/remédios nossos + Evolução (pedras, Linking Cord e itens "Evolves…": maçãs, bules, armaduras, Dragon Scale…; usar = evoluir) + itens de batalha padrão da 9ª gen do Showdown SEM frutas, plates/memories, itens de lendários/míticos, itens sem uso em batalha e de EV/IV (regras em `classificarItem`) + TMs (Scarlet/Violet) e TRs (Sword/Shield) de `shared/data/maquinas.json` (`npm run maquinas`, GraphQL da PokéAPI).
+- Catálogo: bolas/remédios nossos + Evolução (pedras, Linking Cord e itens "Evolves…": maçãs, bules, armaduras, Dragon Scale…; usar = evoluir) + itens de batalha de todas as gerações do Showdown (sem frutas, gems, plates, memories, Z-Crystals e itens de lendários, que existem no jogo mas fora da loja; regras em `classificarItem`) + TMs (Scarlet/Violet) e TRs (Sword/Shield) de `shared/data/maquinas.json` (`npm run maquinas`, GraphQL da PokéAPI).
 - Bolsa: remédios (usar), pedras/Linking Cord (evoluir; troca com item exige o item equipado e o consome), itens de batalha/frutas (equipar; o anterior volta à bolsa), TMs/TRs (ensinar se o learnset do Showdown tiver fonte "M" em qualquer geração; são gastos). PC tem "Tirar item".
 - Item equipado vai para a batalha do Showdown (`PokemonIndividual.item`); frutas comidas somem no fim.
 
+## Itens fora da loja, formas, Z-Moves, amizade e Tera
+- `TODOS_OS_ITENS` (`shared/loja.ts`) = tudo; `CATALOGO` = só `naLoja`. `classificarItem` põe cada item do Showdown numa categoria (`frutas`, `gems`, `placas`, `memorias`, `zcristais` — checar zMove ANTES de onPlate —, `lendarios`, `batalha`, `evolucao`) ou fora do jogo (Mega Stones, fósseis, cartas, itens Gen 2). Loja = bolas, remédios, evolução, batalha, TMs, TRs (pedido do dono: Plates, Z-Crystals e itens de lendários fora). Tera Shards são nossas (`terashard-<tipo>`, imagem do Serebii, `SHARDS_POR_TROCA` = 50 → `p.teraTipo`; Terastalização na batalha ainda não). Admin: "Dar item" com qualquer item.
+- Formas por item (`shared/formas.ts`, `especieComItem`): o simulador NÃO troca Giratina/Arceus/Silvally/Genesect/Ogerpon/Dialga/Palkia sozinho, então o set já vai com a forma; Primal e Crowned o simulador faz. Sprites das formas: `shared/data/formas-sprites.json` (`node scripts/formas-sprites.mjs`, PokéAPI; o Showdown não libera CORS) e `client/src/ui/formas.ts`; eventos `entrar.forma` e `forma` (detailschange).
+- Z-Moves: `Pedido.zGolpes` (canZMove do Showdown), `usarGolpe(i, true)` manda `move i zmove`; botão "Z-Move" no menu de golpes.
+- Amizade (`shared/amizade.ts`): 0–255, começa em 50 (`AMIZADE_INICIAL`), +5 por batalha para quem entrou em campo (`AMIZADE_POR_BATALHA`, qualquer resultado), vai para o Showdown como `happiness`. Evolução por amizade ≥160 ao subir de nível (`evolucaoPorAmizade`, dia/noite pelo relógio).
+- Mensagens de item na batalha: `-item`, `-enditem`, dano de Life Orb/Rocky Helmet.
+
 ## Tickets (`shared/tickets.ts`, `client/src/ui/ticket.ts`)
 - Item raro da bolsa (aba Tickets). Abrir sorteia a raridade (`RARIDADES`: comum 70%, raro 22%, épico 7%, lendário 1%) e depois um **pacote** dessa raridade (ex.: Kyogre Nv. 50 com chance de shiny + Blue Orb). Conteúdo é rascunho: o dono vai definir cada ticket (Groudon, Rayquaza, Giratina…).
-- Obtenção: `CHANCE_TICKET_POR_BATALHA` (1/1000 ao vencer/capturar) e botão no Admin. Itens de forma (`ITENS_ESPECIAIS`: orbes) ficam fora da loja, aba "Especiais" da bolsa (equipar). Showdown faz a Primal Reversion; a tela de batalha ainda não troca o sprite para a forma Primal.
+- Obtenção: `CHANCE_TICKET_POR_BATALHA` (1/1000 ao vencer/capturar) e botão no Admin. Itens de forma de lendários ficam fora da loja (aba "Itens de lendários" da bolsa, equipar). Showdown faz a Primal Reversion e a tela troca o sprite.
 
 ## Professores de golpes (`shared/professores.ts`, `client/src/telas/golpes.ts`)
 - Aba "Golpes" na barra do topo: **Move Reminder** (golpes por nível ≤ nível atual que o Pokémon não sabe; `PRECO_RELEMBRAR` 50 silver) e **Move Tutor** (só golpes de tutor, fonte "T", de qualquer geração (Scarlet/Violet quase não tem tutor), somando as formas anteriores; sem TM nem Egg Move, pedido do dono; `PRECO_TUTOR` 100 silver). Com 4 golpes, escolhe qual esquecer.

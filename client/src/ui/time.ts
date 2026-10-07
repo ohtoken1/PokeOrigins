@@ -1,3 +1,6 @@
+import { nomeItemEquipado } from '../../../shared/usoItens';
+import { itemDaLoja } from '../../../shared/loja';
+import { iconeItem } from './iconeItem';
 import { expParaNivel, hpMaximo } from '../../../shared/batalha/pokemon';
 import { pokemonPorId } from '../dados';
 import { TAMANHO_MAXIMO_TIME, type PokemonDoJogador } from '../estado';
@@ -23,6 +26,7 @@ export function cartaoPokemon(p: PokemonDoJogador, atributos: Record<string, unk
     },
     spritePokemon(dados, { shiny: p.shiny, animado: false }),
     p.inegociavel ? el('span', { class: 'canto-nt', title: 'NT · Inegociável' }, 'NT') : null,
+    p.item ? el('span', { class: 'canto-item', title: `Segurando ${nomeItemEquipado(p.item)}` }, iconeItem(itemDaLoja(p.item) ?? { id: p.item, categoria: 'batalha' })) : null,
     el('span', {}, `${dados.nome}${p.shiny ? ' ✨' : ''}`),
     el('small', {}, `Nv. ${p.nivel}`),
     barraHp(p.hp, max),

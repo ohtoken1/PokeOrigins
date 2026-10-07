@@ -52,9 +52,6 @@ export const TICKETS: Ticket[] = [
   },
 ];
 
-/** Itens que não são vendidos na loja, mas podem sair de tickets (orbes e itens de forma de lendários). */
-export const ITENS_ESPECIAIS = ['blueorb', 'redorb', 'griseousorb', 'griseouscore'];
-
 export function ticketPorId(id: string): Ticket | undefined {
   return TICKETS.find((t) => t.id === id);
 }

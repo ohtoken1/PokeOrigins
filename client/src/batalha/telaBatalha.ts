@@ -1,3 +1,5 @@
+import { AMIZADE_POR_BATALHA, ganharAmizade } from '../../../shared/amizade';
+import { trocarSpriteForma } from '../ui/formas';
 import type { Bioma } from '../../../shared/biomas';
 import { BatalhaSelvagem, type EventoBatalha, type Lado } from '../../../shared/batalha/motor';
 import { atributos, curar, especie, expGanha, expParaNivel, faixaVelocidade, ganharEvs, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
@@ -232,6 +234,8 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
           info(ev.lado).zerarBoosts();
           if (ev.lado === 'jogador') {
             colocarJogador(ev.indice);
+            // forma que depende do item (Giratina-Origin, Arceus-Fire…)
+            trocarSpriteForma(spriteJogador as HTMLImageElement, ev.forma, { shiny: save.time[ev.indice].shiny, costas: true });
             infoJogador.hp(ev.hp, ev.hpMax);
             if (ev.texto) mensagem.textContent = ev.texto;
             await animarEntrada(spriteJogador);
@@ -283,6 +287,11 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
           await animarDesmaio(sprite(ev.lado));
           await dizer(ev.texto);
           break;
+        case 'forma':
+          // Primal Reversion e outras mudanças de forma no meio da batalha
+          trocarSpriteForma(sprite(ev.lado) as HTMLImageElement, ev.forma, { shiny: ev.lado === 'jogador' ? save.time[batalha.ativo].shiny : selvagem.shiny, costas: ev.lado === 'jogador' });
+          if (ev.texto) await dizer(ev.texto);
+          break;
         case 'fim':
           break;
       }
@@ -300,38 +309,42 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
 
     mensagem.textContent = `O que ${nomeDe(save.time[batalha.ativo].especieId)} vai fazer?`;
     acoes.replaceChildren(
-      botao([el('span', { class: 'emote' }, '⚔️'), 'Lutar'] as never, menuGolpes, { class: 'botao grande lutar' }),
+      botao([el('span', { class: 'emote' }, '⚔️'), 'Lutar'] as never, () => menuGolpes(), { class: 'botao grande lutar' }),
       botao([el('span', { class: 'emote' }, '🎒'), 'Bolsa'] as never, menuBolsa, { class: 'botao grande bolsa' }),
       botao([el('span', { class: 'emote' }, '🔄'), 'Pokémon'] as never, () => menuPokemon(false), { class: 'botao grande pokemon', disabled: !pedido.podeTrocar }),
       botao([el('span', { class: 'emote' }, '🏃'), 'Fugir'] as never, tentarFugir, { class: 'botao grande fugir', disabled: !pedido.podeFugir }),
     );
   }
 
-  function menuGolpes() {
+  function menuGolpes(usarZ = false) {
     const pedido = batalha.pedido();
     if (pedido.tipo !== 'acao') return menuPrincipal();
+    const z = pedido.zGolpes;
     acoes.replaceChildren(
-      ...pedido.golpes.map((g) =>
+      ...pedido.golpes.map((g, i) =>
         // cartão com as informações do golpe ao passar o mouse
         dicaGolpe(el(
           'button',
           {
-            class: 'botao golpe',
+            class: `botao golpe ${usarZ && z?.[i] ? 'golpe-z' : ''}`,
             style: { '--cor-tipo': corTipo(g.tipo) },
-            disabled: g.desabilitado || (g.ppMax > 0 && g.pp <= 0),
-            onclick: () => executar(() => batalha.usarGolpe(g.indice)),
+            disabled: g.desabilitado || (g.ppMax > 0 && g.pp <= 0) || (usarZ && !z?.[i]),
+            onclick: () => executar(() => batalha.usarGolpe(g.indice, usarZ && !!z?.[i])),
           },
-          el('strong', {}, g.nome),
+          el('strong', {}, usarZ && z?.[i] ? z[i]! : g.nome),
           el(
             'span',
             { class: 'detalhes' },
             seloTipo(g.tipo),
             el('span', {}, nomeCategoria(g.categoria)),
-            el('span', {}, `Poder ${Dex.moves.get(g.id).basePower || '—'}`),
+            // Z-Move: poder do Z (ex.: Thunder Shock 40 → Gigavolt Havoc 100); Z de golpe de status não tem poder
+            el('span', {}, `Poder ${(usarZ && z?.[i] ? (Dex.moves.get(g.id).category === 'Status' ? 0 : Dex.moves.get(g.id).zMove?.basePower) : Dex.moves.get(g.id).basePower) || '—'}`),
             g.ppMax > 0 ? el('span', {}, `PP ${g.pp}/${g.ppMax}`) : '',
           ),
         ), g.id, g.ppMax > 0 ? () => ({ atual: g.pp, max: g.ppMax }) : undefined),
       ),
+      // Z-Crystal segurado: liga/desliga o Z-Move (uma vez por batalha)
+      z ? botao(usarZ ? 'Z-Move ligado' : 'Z-Move', () => menuGolpes(!usarZ), { class: `botao secundario botao-z ${usarZ ? 'ligado' : ''}` }) : '',
       botao('← Voltar', menuPrincipal, { class: 'botao secundario voltar' }),
     );
   }
@@ -515,6 +528,8 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
   async function finalizar(resultado: ResultadoBatalha) {
     acoes.replaceChildren();
     batalha.sincronizar();
+    // amizade: +AMIZADE_POR_BATALHA para quem entrou em campo (antes do XP: pode evoluir por amizade ao subir)
+    for (const pos of batalha.participantes) ganharAmizade(save.time[pos], AMIZADE_POR_BATALHA);
 
     // vitória e captura dão XP e EVs a quem entrou em campo
     const darXpTime = async () => {

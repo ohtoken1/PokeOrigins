@@ -1,15 +1,19 @@
-// Catálogo da loja: bolas e remédios do jogo + itens do Pokémon Showdown (pedras de evolução,
-// itens de batalha, frutas) + TMs (Scarlet/Violet) e TRs (Sword/Shield) da PokéAPI.
+// Todos os itens do jogo: bolas e remédios nossos + itens do Pokémon Showdown (pedras, itens de batalha, frutas,
+// gems, plates, memories, Z-Crystals, itens de lendários) + Tera Shards + TMs (Scarlet/Violet) e TRs (Sword/Shield).
+// `naLoja` diz o que a loja vende (regras do dono em classificarItem); o resto sai de tickets/Admin.
 // Preços provisórios (1 silver); o dono vai ajustar a economia em PRECOS.
 import { Dex } from '@pkmn/sim';
 import maquinas from './data/maquinas.json';
 import { ITENS, type ItemId } from './itens';
-import { ITENS_ESPECIAIS, TICKETS } from './tickets';
+import { TICKETS } from './tickets';
 import { OVOS } from './ovos';
 import { nomeCategoria, nomeTipo, traduzir } from './traducao';
 
-export type CategoriaLoja = 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'tm' | 'tr' | 'especiais' | 'tickets' | 'ovos';
+export type CategoriaLoja =
+  | 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'frutas' | 'gems' | 'placas' | 'memorias' | 'zcristais' | 'lendarios'
+  | 'terashards' | 'tm' | 'tr' | 'tickets' | 'ovos';
 
+/** Abas da loja. */
 export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
   { id: 'bolas', nome: 'Pokébolas' },
   { id: 'remedios', nome: 'Remédios' },
@@ -18,8 +22,21 @@ export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
   { id: 'tm', nome: 'TMs' },
   { id: 'tr', nome: 'TRs' },
 ];
-/** Abas da bolsa: as da loja + itens que só saem de tickets. */
-export const CATEGORIAS_BOLSA: { id: CategoriaLoja; nome: string }[] = [...CATEGORIAS, { id: 'especiais', nome: 'Especiais' }, { id: 'tickets', nome: 'Tickets' }, { id: 'ovos', nome: 'Ovos' }];
+/** Categorias fora da loja (saem de tickets e, por enquanto, do Admin). */
+export const CATEGORIAS_FORA_DA_LOJA: { id: CategoriaLoja; nome: string }[] = [
+  { id: 'frutas', nome: 'Berries' },
+  { id: 'gems', nome: 'Gems' },
+  { id: 'placas', nome: 'Plates' },
+  { id: 'memorias', nome: 'Memories' },
+  { id: 'zcristais', nome: 'Z-Crystals' },
+  { id: 'lendarios', nome: 'Itens de lendários' },
+  { id: 'terashards', nome: 'Tera Shards' },
+  { id: 'tickets', nome: 'Tickets' },
+  { id: 'ovos', nome: 'Ovos' },
+];
+/** Abas da bolsa e filtros da Database: todas. */
+export const CATEGORIAS_BOLSA: { id: CategoriaLoja; nome: string }[] = [...CATEGORIAS, ...CATEGORIAS_FORA_DA_LOJA];
+export const nomeCategoriaItem = (c: CategoriaLoja) => CATEGORIAS_BOLSA.find((x) => x.id === c)?.nome ?? c;
 
 export interface ItemLoja {
   /** id usado na bolsa (ids do Showdown para itens de batalha: "eviolite", "firestone"…) */
@@ -32,6 +49,12 @@ export interface ItemLoja {
   golpe?: string;
   /** imagem da PokéAPI (sprites/items/<sprite>.png) para itens sem ícone no Showdown */
   sprite?: string;
+  /** endereço completo da imagem (Tera Shards, que não existem no Showdown nem na PokéAPI) */
+  imagem?: string;
+  /** vendido na loja? (false: só tickets/Admin) */
+  naLoja: boolean;
+  /** Tera Shards: tipo que a shard dá */
+  teraTipo?: string;
 }
 
 /** Moeda do jogo. */
@@ -60,23 +83,42 @@ const preco = (id: string) => PRECOS[id] ?? PRECO_PADRAO;
 
 const ehLendario = (nome: string) => (Dex.species.get(nome).tags ?? []).some((t) => /Legendary|Mythical/.test(t));
 
+/** Tera Shards: juntando esta quantidade, troca o Tera Type de um Pokémon (como em Scarlet/Violet). */
+export const SHARDS_POR_TROCA = 50;
+export const TIPOS_TERA = ['Normal', 'Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug', 'Rock', 'Ghost', 'Dragon', 'Dark', 'Steel', 'Fairy', 'Stellar'];
+/** Imagens das Tera Shards (Serebii; não existem no Showdown nem na PokéAPI). */
+const imagemShard = (tipo: string) => `https://www.serebii.net/itemdex/sprites/sv/${tipo.toLowerCase()}terashard.png`;
+
 /**
- * Regras do dono para a loja: fora frutas, gems, plates/memories, itens exclusivos de lendários/míticos,
- * itens sem uso em batalha e itens de treino de EV/IV; itens cuja função é evoluir vão para "Evolução".
+ * Categoria de um item do Showdown, ou null se ele fica fora do jogo (sem uso: fósseis, cartas, Bottle Caps,
+ * itens da 2ª geração, Mega Stones — Mega Evolução ainda não existe no jogo).
+ * Regras do dono para a LOJA: só bolas, remédios, evolução e itens de batalha; frutas, gems, plates, memories,
+ * Z-Crystals e itens de lendários ficam fora dela.
  */
-function classificarItem(i: ReturnType<typeof Dex.items.get>): 'batalha' | 'evolucao' | 'fora' {
+function classificarItem(i: ReturnType<typeof Dex.items.get>): CategoriaLoja | null {
   const desc = i.shortDesc || i.desc || '';
-  if (i.isBerry || i.isGem) return 'fora';
-  if (i.onPlate || /plate$|memory$/.test(i.id)) return 'fora';
-  if (i.itemUser?.length && i.itemUser.every(ehLendario)) return 'fora';
+  if (i.isNonstandard && i.isNonstandard !== 'Past') return null;
+  if (i.isPokeball || i.megaStone || /^tr\d\d$/.test(i.id)) return null;
+  if (/^\(Gen \d\)|No competitive use|Though this feather|big nugget|Hyper Training|Can be revived|Can revive|Cannot be given/i.test(desc)) return null;
+  if (i.id === 'machobrace') return null;
+  if (i.isBerry) return i.isNonstandard ? null : 'frutas';
+  if (i.isGem) return 'gems';
+  // Z-Crystals de tipo também têm onPlate (Arceus muda de tipo com eles): checar antes das Plates
+  if (i.zMove) return 'zcristais';
+  if (i.onPlate || /plate$/.test(i.id)) return 'placas';
+  if (/memory$/.test(i.id)) return 'memorias';
+  if (i.itemUser?.length && i.itemUser.every(ehLendario)) return 'lendarios';
   if (/^Evolves/.test(desc)) return 'evolucao';
-  if (/No competitive use|Though this feather|big nugget|Hyper Training|Klutz Ability does not ignore/i.test(desc) || i.id === 'machobrace') return 'fora';
   return 'batalha';
 }
+const NA_LOJA = new Set<CategoriaLoja>(['bolas', 'remedios', 'evolucao', 'batalha', 'tm', 'tr']);
 
 function montarCatalogo(): ItemLoja[] {
   const itens: ItemLoja[] = [];
-  const add = (item: Omit<ItemLoja, 'preco'>) => itens.push({ ...item, preco: preco(item.id) });
+  const add = (item: Omit<ItemLoja, 'preco' | 'naLoja'>) => {
+    const naLoja = NA_LOJA.has(item.categoria);
+    itens.push({ ...item, naLoja, preco: naLoja ? preco(item.id) : 0 });
+  };
 
   for (const id of Object.keys(ITENS) as ItemId[]) {
     const i = ITENS[id];
@@ -89,13 +131,23 @@ function montarCatalogo(): ItemLoja[] {
   }
   add({ id: CABO_DE_LIGACAO, nome: 'Linking Cord', categoria: 'evolucao', descricao: 'Faz evoluir Pokémon que evoluem por troca (se precisar de item, ele deve estar equipado).' });
 
-  // itens padrão da 9ª geração: os de evoluir vão para "Evolução", os de batalha para "Itens de batalha"
+  // todos os itens do Showdown que têm uso no jogo (inclusive os de gerações passadas: incensos, Z-Crystals, gems…)
   for (const i of Dex.items.all()) {
-    if (i.isNonstandard || i.isPokeball || PEDRAS_EVOLUCAO.includes(i.id)) continue;
-    const tipo = classificarItem(i);
-    if (tipo === 'fora') continue;
-    add({ id: i.id, nome: i.name, categoria: tipo, descricao: traduzir(i.shortDesc || i.desc) });
+    if (!i.exists || PEDRAS_EVOLUCAO.includes(i.id)) continue;
+    const categoria = classificarItem(i);
+    if (!categoria) continue;
+    add({ id: i.id, nome: i.name, categoria, descricao: traduzir(i.shortDesc || i.desc) });
   }
+
+  for (const tipo of TIPOS_TERA)
+    add({
+      id: `terashard-${tipo.toLowerCase()}`,
+      nome: `${tipo} Tera Shard`,
+      categoria: 'terashards',
+      teraTipo: tipo,
+      imagem: imagemShard(tipo),
+      descricao: `Junte ${SHARDS_POR_TROCA} para mudar o Tera Type de um Pokémon para ${tipo}.`,
+    });
 
   for (const m of maquinas as { id: string; golpe: string }[]) {
     const golpe = Dex.moves.get(m.golpe);
@@ -107,17 +159,15 @@ function montarCatalogo(): ItemLoja[] {
   return itens;
 }
 
-export const CATALOGO: ItemLoja[] = montarCatalogo();
-/** Fora da loja: itens de forma de lendários e tickets (só saem de tickets / batalhas). */
-const FORA_DA_LOJA: ItemLoja[] = [
-  ...ITENS_ESPECIAIS.map((id): ItemLoja => {
-    const i = Dex.items.get(id);
-    return { id, nome: i.name, categoria: 'especiais', descricao: traduzir(i.shortDesc || i.desc), preco: 0 };
-  }),
-  ...TICKETS.map((t): ItemLoja => ({ id: t.id, nome: t.nome, categoria: 'tickets', descricao: t.descricao, preco: 0, sprite: 'eon-ticket' })),
-  ...OVOS.map((o): ItemLoja => ({ id: o.id, nome: o.nome, categoria: 'ovos', descricao: o.descricao, preco: 0 })),
+/** Todos os itens do jogo (Database, bolsa e Admin). */
+export const TODOS_OS_ITENS: ItemLoja[] = [
+  ...montarCatalogo(),
+  ...TICKETS.map((t): ItemLoja => ({ id: t.id, nome: t.nome, categoria: 'tickets', descricao: t.descricao, preco: 0, naLoja: false, sprite: 'eon-ticket' })),
+  ...OVOS.map((o): ItemLoja => ({ id: o.id, nome: o.nome, categoria: 'ovos', descricao: o.descricao, preco: 0, naLoja: false })),
 ];
-const porId = new Map([...CATALOGO, ...FORA_DA_LOJA].map((i) => [i.id, i]));
+/** O que a loja vende. */
+export const CATALOGO: ItemLoja[] = TODOS_OS_ITENS.filter((i) => i.naLoja);
+const porId = new Map(TODOS_OS_ITENS.map((i) => [i.id, i]));
 
 export function itemDaLoja(id: string): ItemLoja | undefined {
   return porId.get(id);

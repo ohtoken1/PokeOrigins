@@ -1,3 +1,4 @@
+import { TODOS_OS_ITENS } from '../../../shared/loja';
 import { TICKETS } from '../../../shared/tickets';
 import { OVOS } from '../../../shared/ovos';
 // Painel de administrador (aba na esquerda) para testar encontros: shiny, lendários, chance por passo,
@@ -135,6 +136,29 @@ function conteudo(): HTMLElement[] {
       });
       return campo(`${moeda === 'gold' ? 'Gold' : 'Silver'} (tem ${save ? save[moeda].toLocaleString('pt-BR') : 0})`, el('div', { class: 'admin-linha' }, campoQtd, dar));
     }),
+    el('h4', {}, 'Itens'),
+    (() => {
+      // qualquer item do jogo (inclusive os de fora da loja: Plates, Z-Crystals, Tera Shards, Berries…)
+      const lista = el('datalist', { id: 'admin-itens' }, ...TODOS_OS_ITENS.map((i) => el('option', { value: i.nome })));
+      const campoItem = el('input', { list: 'admin-itens', placeholder: 'Nome do item', class: 'admin-item' }) as HTMLInputElement;
+      const campoQtd = el('input', { type: 'number', min: '1', value: '1', class: 'admin-qtd' }) as HTMLInputElement;
+      const aviso = el('small', { class: 'meta' });
+      const dar = el('button', {
+        class: 'botao secundario',
+        disabled: !save,
+        onclick: () => {
+          const atual = carregarSave();
+          const item = TODOS_OS_ITENS.find((i) => i.nome.toLowerCase() === campoItem.value.trim().toLowerCase());
+          if (!atual || !item) return void (aviso.textContent = 'Item não encontrado.');
+          const qtd = Math.max(1, Math.round(Number(campoQtd.value) || 1));
+          atual.itens[item.id] = (atual.itens[item.id] ?? 0) + qtd;
+          salvar(atual);
+          aviso.textContent = `+${qtd} ${item.nome}`;
+          aoMudarSave?.();
+        },
+      }, 'Dar');
+      return el('div', {}, lista, el('div', { class: 'admin-linha' }, campoItem, campoQtd, dar), aviso);
+    })(),
     el('h4', {}, 'Tickets e ovos'),
     ...TICKETS.map((t) =>
       el(

@@ -1,8 +1,9 @@
 // Batalha contra Pokémon selvagem usando o simulador do Pokémon Showdown (regras oficiais
 // da 9ª geração: dano, tipos, golpes, habilidades, status). O Showdown não tem batalha
 // selvagem, então captura e fuga são feitas aqui, com as fórmulas dos jogos originais.
+import { especieComItem } from '../formas';
 import { Battle, Dex } from '@pkmn/sim';
-import { especie, ppMaximo, type PokemonIndividual } from './pokemon';
+import { AMIZADE_INICIAL, especie, ppMaximo, type PokemonIndividual } from './pokemon';
 import { aplicarRemedio, usarRemedio, type Item } from '../itens';
 import type { EfeitoBola } from '../bolas';
 
@@ -10,7 +11,10 @@ export type Lado = 'jogador' | 'selvagem';
 
 export type EventoBatalha =
   | { tipo: 'mensagem'; texto: string }
-  | { tipo: 'entrar'; lado: Lado; indice: number; hp: number; hpMax: number; texto?: string }
+  /** `forma` = espécie no Showdown (ex.: "Giratina-Origin", "Arceus-Fire"), para o sprite da forma certa. */
+  | { tipo: 'entrar'; lado: Lado; indice: number; hp: number; hpMax: number; forma: string; texto?: string }
+  /** Mudou de forma no meio da batalha (Primal Reversion…). */
+  | { tipo: 'forma'; lado: Lado; forma: string; texto?: string }
   | { tipo: 'golpe'; lado: Lado; alvo: Lado | null; golpe: string; tipoGolpe: string; categoria: string; texto: string }
   | { tipo: 'hp'; lado: Lado; hp: number; hpMax: number; texto?: string }
   | { tipo: 'status'; lado: Lado; status: string | null; texto?: string }
@@ -38,7 +42,8 @@ export interface OpcaoGolpe {
 }
 
 export type Pedido =
-  | { tipo: 'acao'; golpes: OpcaoGolpe[]; podeTrocar: boolean; podeFugir: boolean }
+  /** `zGolpes[i]` = nome do Z-Move do golpe i (Pokémon segurando Z-Crystal), ou null. */
+  | { tipo: 'acao'; golpes: OpcaoGolpe[]; podeTrocar: boolean; podeFugir: boolean; zGolpes: (string | null)[] | null }
   | { tipo: 'troca' }
   | { tipo: 'fim' };
 
@@ -93,7 +98,10 @@ const CLIMAS: Record<string, string> = {
 function conjuntoShowdown(p: PokemonIndividual, nome: string) {
   return {
     name: nome,
-    species: especie(p.especieId).name,
+    // formas que dependem do item (Giratina-Origin, Arceus-Fire…): o simulador não troca sozinho
+    species: especieComItem(p.especieId, p.item),
+    happiness: p.amizade ?? AMIZADE_INICIAL,
+    teraType: p.teraTipo ?? especie(p.especieId).types[0],
     level: p.nivel,
     moves: p.golpes.map((g) => g.id),
     ability: p.habilidade,
@@ -189,7 +197,8 @@ export class BatalhaSelvagem {
       };
     });
     const preso = !!(ativo.trapped || ativo.maybeTrapped);
-    return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso };
+    const zGolpes = Array.isArray(ativo.canZMove) ? (ativo.canZMove as ({ move: string } | null)[]).map((z) => z?.move ?? null) : null;
+    return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso, zGolpes };
   }
 
   /** Posições no time dos Pokémon que podem entrar no lugar do atual. */
@@ -198,8 +207,9 @@ export class BatalhaSelvagem {
     return this.objetos.filter((o) => o !== ativo && !o.fainted && o.hp > 0).map((o) => this.indices[this.objetos.indexOf(o)]);
   }
 
-  usarGolpe(indice: number): EventoBatalha[] {
-    return this.jogar(`move ${indice}`);
+  /** `z` = usar como Z-Move (precisa segurar o Z-Crystal certo; uma vez por batalha). */
+  usarGolpe(indice: number, z = false): EventoBatalha[] {
+    return this.jogar(`move ${indice}${z ? ' zmove' : ''}`);
   }
 
   trocar(posicaoNoTime: number): EventoBatalha[] {
@@ -385,7 +395,36 @@ export class BatalhaSelvagem {
           const lado = this.lado(args[0]);
           const [hp, hpMax] = args[2].split(' ')[0].split('/').map(Number);
           const indice = lado === 'jogador' ? Number(args[0].split(': ')[1].slice(1)) : 0;
-          eventos.push({ tipo: 'entrar', lado, indice, hp, hpMax: hpMax ?? hp, texto: lado === 'jogador' ? `Vai, ${quem}!` : undefined });
+          eventos.push({ tipo: 'entrar', lado, indice, hp, hpMax: hpMax ?? hp, forma: args[1].split(',')[0], texto: lado === 'jogador' ? `Vai, ${quem}!` : undefined });
+          break;
+        }
+        case 'detailschange':
+        case '-formechange':
+          eventos.push({ tipo: 'forma', lado: this.lado(args[0]), forma: args[1].split(',')[0] });
+          break;
+        case '-primal':
+          eventos.push({ tipo: 'mensagem', texto: `${quem} fez a Primal Reversion e voltou à sua forma primitiva!` });
+          break;
+        case '-zpower':
+          eventos.push({ tipo: 'mensagem', texto: `${quem} se cercou de Z-Power!` });
+          break;
+        case '-item': {
+          // item revelado (Air Balloon, Frisk…) ou trocado (Trick, Thief)
+          const item = Dex.items.get(args[1]).name;
+          if (de?.startsWith('move: ')) eventos.push({ tipo: 'mensagem', texto: `${quem} recebeu ${item}!` });
+          else if (item === 'Air Balloon') eventos.push({ tipo: 'mensagem', texto: `${quem} está flutuando com um Air Balloon!` });
+          else eventos.push({ tipo: 'mensagem', texto: `${quem} está segurando ${item}!` });
+          break;
+        }
+        case '-enditem': {
+          // item gasto (Focus Sash, White Herb, fruta comida, Air Balloon estourado…) ou perdido (Knock Off)
+          const item = Dex.items.get(args[1]).name;
+          let texto = `${quem} usou ${item}!`;
+          if (args.includes('[eat]')) texto = `${quem} comeu ${item}!`;
+          else if (item === 'Air Balloon') texto = `O Air Balloon de ${quem} estourou!`;
+          else if (de?.startsWith('move: ')) texto = `${quem} perdeu ${item}!`;
+          else if (de === 'stealeat') texto = `${this.nome(args.find((a) => a.startsWith('[of]'))?.slice(4).trim() ?? '')} comeu ${item}!`;
+          eventos.push({ tipo: 'mensagem', texto });
           break;
         }
         case 'move': {
@@ -412,7 +451,13 @@ export class BatalhaSelvagem {
           else if (de === 'Recoil') texto = `${quem} sofreu dano de recuo!`;
           else if (de === 'confusion') texto = 'Ele se feriu na confusão!';
           else if (de === 'drain') texto = `${this.nome(args.find((a) => a.startsWith('[of]'))?.slice(4).trim() ?? '')} teve a energia drenada!`;
-          else if (de?.startsWith('item: ')) texto = `${quem} recuperou HP com ${de.slice(6)}!`;
+          else if (de?.startsWith('item: ')) {
+            const item = de.slice(6);
+            const dono = args.find((a) => a.startsWith('[of]'))?.slice(4).trim();
+            if (comando === '-heal') texto = `${quem} recuperou HP com ${item}!`;
+            else if (dono) texto = `${quem} foi ferido pelo ${item} de ${this.nome(dono)}!`;
+            else texto = `${quem} perdeu HP por causa do ${item}!`;
+          }
           else if (de === 'Sandstorm' || de === 'Hail') texto = `${quem} foi atingido pelo clima!`;
           else if (de) texto = `${quem} foi afetado por ${de.replace(/^(move|ability): /, '')}!`;
           eventos.push({ tipo: 'hp', lado: this.lado(args[0]), hp: hp || 0, hpMax: hpMax ?? 0, texto });

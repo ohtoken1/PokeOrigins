@@ -2,7 +2,7 @@
 // com busca e ordenação por coluna. Textos em português (descrições traduzidas).
 import { Dex } from '@pkmn/sim';
 import type { Tela } from '../main';
-import { CATALOGO, CATEGORIAS, MOEDA } from '../../../shared/loja';
+import { CATEGORIAS_BOLSA, MOEDA, TODOS_OS_ITENS, nomeCategoriaItem } from '../../../shared/loja';
 import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
 import type { PokemonBase } from '../../../shared/tipos';
 import { ORDEM_TIERS, tierDoPokemon } from '../../../shared/tiers';
@@ -168,16 +168,20 @@ export const telaDatabase: Tela = (raiz, navegar) => {
       id: 'itens',
       nome: 'Itens',
       // TMs e TRs ficam fora (já aparecem como golpes)
-      linhas: CATALOGO.filter((i) => i.categoria !== 'tm' && i.categoria !== 'tr'),
-      busca: (i) => `${i.nome} ${i.descricao} ${CATEGORIAS.find((c) => c.id === i.categoria)?.nome}`,
+      linhas: TODOS_OS_ITENS.filter((i) => i.categoria !== 'tm' && i.categoria !== 'tr'),
+      busca: (i) => `${i.nome} ${i.descricao} ${nomeCategoriaItem(i.categoria)}`,
+      filtros: [
+        { todos: 'Categorias', opcoes: CATEGORIAS_BOLSA.filter((c) => c.id !== 'tm' && c.id !== 'tr').map((c) => [c.id, c.nome]), valores: (i) => [i.categoria] },
+        { todos: 'Loja e fora da loja', opcoes: [['loja', 'Vendidos na loja'], ['fora', 'Fora da loja']], valores: (i) => [i.naLoja ? 'loja' : 'fora'] },
+      ],
       colunas: [
         { titulo: '', celula: (i) => iconeItem(i), classe: 'db-icone' },
         { titulo: 'Nome', celula: (i) => i.nome, ordem: (i) => i.nome },
-        { titulo: 'Categoria', celula: (i) => CATEGORIAS.find((c) => c.id === i.categoria)?.nome ?? i.categoria, ordem: (i) => CATEGORIAS.findIndex((c) => c.id === i.categoria) },
+        { titulo: 'Categoria', celula: (i) => nomeCategoriaItem(i.categoria), ordem: (i) => CATEGORIAS_BOLSA.findIndex((c) => c.id === i.categoria) },
         { titulo: 'Efeito', celula: (i) => i.descricao, classe: 'desc' },
-        { titulo: 'Preço', celula: (i) => `${i.preco} ${MOEDA}`, ordem: (i) => i.preco, classe: 'num' },
+        { titulo: 'Loja', celula: (i) => (i.naLoja ? `${i.preco} ${MOEDA}` : el('span', { class: 'meta' }, 'Fora da loja')), ordem: (i) => (i.naLoja ? i.preco : 1e9), classe: 'num' },
       ],
-    } satisfies Secao<(typeof CATALOGO)[number]>,
+    } satisfies Secao<(typeof TODOS_OS_ITENS)[number]>,
     {
       id: 'habilidades',
       nome: 'Abilities',
