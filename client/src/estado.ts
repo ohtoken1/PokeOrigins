@@ -3,6 +3,7 @@ import { atributosZerados, curar, gerarIndividuo, hpMaximo, type PokemonIndividu
 import { IV_INICIAL } from '../../shared/regioes';
 import { ITENS_INICIAIS } from '../../shared/itens';
 import { SILVER_INICIAL } from '../../shared/loja';
+import { ehLendario } from '../../shared/encontros';
 import { pokemonPorId } from './dados';
 import type { Aparencia } from './personagem/lpc';
 
@@ -36,6 +37,24 @@ export interface Save {
   nomeReal?: string;
   /** Mostrar o nome de treinador em cima do personagem (padrão: sim). */
   mostrarNome?: boolean;
+  /** Contadores para os rankings (capturas em batalha; ovos e tickets não contam). */
+  estatisticas?: Estatisticas;
+}
+
+export interface Estatisticas {
+  capturas: number;
+  capturasShiny: number;
+  /** Lendários, míticos e Ultra Beasts. */
+  capturasLendarios: number;
+  medalhas: number;
+}
+
+/** Conta uma captura feita em batalha (para os rankings). */
+export function registrarCapturaNoRanking(save: Save, p: PokemonDoJogador): void {
+  const e = save.estatisticas!;
+  e.capturas++;
+  if (p.shiny) e.capturasShiny++;
+  if (ehLendario(pokemonPorId(p.especieId))) e.capturasLendarios++;
 }
 
 /** Marca a espécie como capturada na Pokédex. */
@@ -135,6 +154,16 @@ function normalizar(save: Save): Save {
   save.nivelEncontro ??= null;
   // saves antigos: começa o histórico com quem está no time e no PC
   save.capturados ??= [...new Set([...save.time, ...save.caixa].map((p) => p.especieId))];
+  // saves antigos: começa a contar pelos Pokémon que o jogador tem hoje (menos o inicial NT)
+  if (!save.estatisticas) {
+    const tem = [...save.time, ...save.caixa].filter((p) => !p.inegociavel);
+    save.estatisticas = {
+      capturas: tem.length,
+      capturasShiny: tem.filter((p) => p.shiny).length,
+      capturasLendarios: tem.filter((p) => ehLendario(pokemonPorId(p.especieId))).length,
+      medalhas: 0,
+    };
+  }
   return save;
 }
 

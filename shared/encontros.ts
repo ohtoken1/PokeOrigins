@@ -83,7 +83,7 @@ export interface Encontro {
 }
 
 /** Lendários, míticos e Ultra Beasts: chance fixa, nível 50+. */
-const ehLendario = (p: PokemonBase) => p.lendario || p.mitico || (especie(p.id).tags ?? []).includes('Ultra Beast');
+export const ehLendario = (p: PokemonBase) => p.lendario || p.mitico || (especie(p.id).tags ?? []).includes('Ultra Beast');
 
 /**
  * Cada Pokémon mora em um único bioma: o do seu tipo principal (o primeiro).

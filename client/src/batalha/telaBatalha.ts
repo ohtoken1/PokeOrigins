@@ -9,7 +9,7 @@ import { efeitoBola } from '../../../shared/bolas';
 import { nivelTreinador } from '../../../shared/treinador';
 import { MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
 import { sortearTicketDaBatalha } from '../../../shared/tickets';
-import { curarTime, guardarNoPC, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
+import { curarTime, guardarNoPC, registrarCapturaNoRanking, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { iconeItem } from '../ui/iconeItem';
@@ -569,6 +569,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
       selvagem.hp = Math.max(1, selvagem.hp);
       if (curarAoCapturar) curar(selvagem);
       registrarCapturado(save, selvagem.especieId);
+      registrarCapturaNoRanking(save, selvagem);
       if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(selvagem);
       else {
         const box = guardarNoPC(save, selvagem);

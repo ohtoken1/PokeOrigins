@@ -20,14 +20,19 @@ export function golpesParaRelembrar(p: PokemonIndividual): string[] {
   return [...ids].sort(porNome);
 }
 
-/** Golpes de tutor de qualquer geração da espécie, somando as formas anteriores. */
+/** Golpes de tutor que o Pokémon ainda não sabe. */
 export function golpesDoTutor(p: PokemonIndividual): string[] {
+  return golpesDeTutorDaEspecie(p.especieId).filter((id) => !conhece(p, id));
+}
+
+/** Golpes de tutor de qualquer geração da espécie, somando as formas anteriores (também usado na Pokédex). */
+export function golpesDeTutorDaEspecie(especieId: number): string[] {
   const learnsetDe = (id: string) => Dex.species.getLearnsetData(id as Parameters<typeof Dex.species.getLearnsetData>[0]).learnset ?? {};
   const ids = new Set<string>();
   // a espécie e as formas anteriores
-  for (let s = especie(p.especieId); s?.exists; s = s.prevo ? Dex.species.get(s.prevo) : (null as never)) {
+  for (let s = especie(especieId); s?.exists; s = s.prevo ? Dex.species.get(s.prevo) : (null as never)) {
     for (const [id, origens] of Object.entries(learnsetDe(s.id)))
-      if (origens.some((o) => o.endsWith('T')) && Dex.moves.get(id).exists && !conhece(p, id)) ids.add(id);
+      if (origens.some((o) => o.endsWith('T')) && Dex.moves.get(id).exists) ids.add(id);
     if (!s.prevo) break;
   }
   return [...ids].sort(porNome);

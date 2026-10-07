@@ -987,3 +987,22 @@ button.vaga:hover { border-color: var(--borda); }
   @keyframes psiquico { 50% { filter: hue-rotate(25deg) brightness(1.15); } }
 }
 .arena .lugar { z-index: 2; }
+
+/* Aba Ranking */
+.tela-ranking { max-width: 760px; margin: 0 auto; }
+.ranking-corpo { display: flex; flex-direction: column; gap: 12px; }
+.ranking-abas { display: flex; gap: 6px; flex-wrap: wrap; }
+.ranking-descricao { margin: 0; color: var(--texto-2); font-size: 0.9rem; }
+.ranking-tabela {
+  width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; border-radius: 12px; overflow: hidden;
+  background: var(--painel); border: 1px solid var(--borda);
+}
+.ranking-tabela th, .ranking-tabela td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--borda); }
+.ranking-tabela th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--texto-2); }
+.ranking-tabela th:last-child, .ranking-tabela td.valor { text-align: right; }
+.ranking-tabela td.valor { font-weight: 800; }
+.ranking-tabela tr.eu td { background: rgb(255 203 5 / 0.08); }
+.ranking-tabela .posicao { width: 48px; font-weight: 900; }
+.ranking-tabela .posicao.p1 { color: #ffd34d; }
+.ranking-tabela .posicao.p2 { color: #d6dde6; }
+.ranking-tabela .posicao.p3 { color: #e09a5a; }

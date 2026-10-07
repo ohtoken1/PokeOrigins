@@ -9,12 +9,13 @@ import { telaDatabase } from './telas/database';
 import { telaPersonagem } from './telas/personagem';
 import { telaOpcoes } from './telas/opcoes';
 import { telaGolpes } from './telas/golpes';
+import { telaRanking } from './telas/ranking';
 import { telaComunidade, type SecaoComunidade } from './telas/comunidade';
 import { montarPainelAdmin } from './ui/admin';
 import { montarBarraTopo } from './ui/barraTopo';
 import { definirNavegacao } from './ui/navegacao';
 
-export type Destino = { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes' } | { tela: 'comunidade'; secao: SecaoComunidade };
+export type Destino = { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes' } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade };
 export type Navegar = (destino: Destino) => void;
 /** Cada tela desenha dentro de `raiz` e pode devolver uma função de limpeza. */
 export type Tela = (raiz: HTMLElement, navegar: Navegar) => (() => void) | void;
@@ -37,6 +38,7 @@ const navegar: Navegar = (destino) => {
   else if (destino.tela === 'personagem') limparTelaAtual = telaPersonagem(raiz, navegar);
   else if (destino.tela === 'opcoes') limparTelaAtual = telaOpcoes(raiz, navegar);
   else if (destino.tela === 'golpes') limparTelaAtual = telaGolpes(raiz, navegar);
+  else if (destino.tela === 'ranking') limparTelaAtual = telaRanking(raiz, navegar);
   else if (destino.tela === 'comunidade') limparTelaAtual = telaComunidade(destino.secao)(raiz, navegar);
   else limparTelaAtual = telaBioma(destino.biomaId)(raiz, navegar);
 };

@@ -88,7 +88,12 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 
 ## Professores de golpes (`shared/professores.ts`, `client/src/telas/golpes.ts`)
 - Aba "Golpes" na barra do topo: **Move Reminder** (golpes por nível ≤ nível atual que o Pokémon não sabe; `PRECO_RELEMBRAR` 50 silver) e **Move Tutor** (só golpes de tutor, fonte "T", de qualquer geração (Scarlet/Violet quase não tem tutor), somando as formas anteriores; sem TM nem Egg Move, pedido do dono; `PRECO_TUTOR` 100 silver). Com 4 golpes, escolhe qual esquecer.
+- Pokédex: botão "Move Tutor" (`golpesDeTutorDaEspecie`).
 - PC: segurar o clique marca para soltar vários (`aoSegurar` em `ui/arrastar.ts`).
+
+## Ranking (`shared/ranking.ts`, `client/src/telas/ranking.ts`)
+- Aba "Ranking": geral (pontos `PONTOS_GERAL`, provisório; silver/gold não contam), capturas, shiny, lendários (lendário+mítico+UB, `ehLendario`), nível de treinador, medalhas de torneio (em breve), silver, gold. Sem servidor, só o próprio jogador aparece.
+- Contadores em `save.estatisticas` (`registrarCapturaNoRanking`, só captura em batalha); saves antigos começam pelos Pokémon que têm (menos o NT).
 
 ## Ovos Misteriosos (`shared/ovos.ts`, `client/src/ui/ovo.ts`)
 - Itens da aba "Ovos" da bolsa (fora da loja): **Ovo Misterioso S** (soma de IVs ≥145) e **A** (≥120). Chocar = roleta como a do ticket; espécie com chance igual entre TODAS as carregadas (lendários inclusive), shiny 5% (`CHANCE_SHINY_OVO`), nível 1 (`NIVEL_OVO`), IVs sorteados até cair no tier (`sortearIvs`). Ícone próprio (`iconeOvo`, cor do tier, como os discos de TM). Obtenção por enquanto só no Admin.

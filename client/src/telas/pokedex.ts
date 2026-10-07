@@ -7,6 +7,7 @@ import { NIVEL_LENDARIO, biomaDoPokemon, montarTabela, type EntradaTabela } from
 import { comoEvolui } from '../../../shared/evolucoes';
 import { especie, golpesPorNivel } from '../../../shared/batalha/pokemon';
 import maquinas from '../../../shared/data/maquinas.json';
+import { golpesDeTutorDaEspecie } from '../../../shared/professores';
 import { REGIOES } from '../../../shared/regioes';
 import { CATEGORIAS_POKEMON, categoriasDoPokemon } from '../../../shared/categorias';
 import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
@@ -216,8 +217,10 @@ ${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) }
   }));
   const ovos = golpesDeOvo(p);
   const listaOvos = el('div', { class: 'dex-tms' }, ...ovos.map((id) => chipGolpe(id)));
+  const tutor = golpesDeTutorDaEspecie(p.id);
+  const listaTutor = el('div', { class: 'dex-tms' }, ...tutor.map((id) => chipGolpe(id)));
 
-  // TMs/TRs e Egg Moves ficam guardados em botões (abre um de cada vez)
+  // TMs/TRs, Egg Moves e Move Tutor ficam guardados em botões (abre um de cada vez)
   const conteudoGolpesExtras = el('div', { class: 'dex-extras' });
   const botoesExtras: HTMLButtonElement[] = [];
   const botaoExtra = (texto: string, lista: HTMLElement, quantidade: number) => {
@@ -270,7 +273,7 @@ ${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) }
       'section',
       {},
       el('h3', {}, 'Outros golpes'),
-      el('div', { class: 'dex-botoes-extras' }, botaoExtra('TMs e TRs', listaTms, tms.length), botaoExtra('Egg Moves', listaOvos, ovos.length)),
+      el('div', { class: 'dex-botoes-extras' }, botaoExtra('TMs e TRs', listaTms, tms.length), botaoExtra('Egg Moves', listaOvos, ovos.length), botaoExtra('Move Tutor', listaTutor, tutor.length)),
       conteudoGolpesExtras,
     ),
   );

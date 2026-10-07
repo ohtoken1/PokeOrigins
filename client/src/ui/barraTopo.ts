@@ -10,6 +10,7 @@ const ABAS: Aba[] = [
   { nome: 'Pokédex', tela: 'pokedex', destino: () => ({ tela: 'pokedex' }) },
   { nome: 'Database', tela: 'database', destino: () => ({ tela: 'database' }) },
   { nome: 'Golpes', tela: 'golpes', destino: () => ({ tela: 'golpes' }) },
+  { nome: 'Ranking', tela: 'ranking', destino: () => ({ tela: 'ranking' }) },
   { nome: 'Opções', tela: 'opcoes', destino: () => ({ tela: 'opcoes' }) },
 ];
 

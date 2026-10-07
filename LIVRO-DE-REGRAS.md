@@ -383,7 +383,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa por Pokém
   - imagem normal, shiny e de costas;
   - atributos e habilidades;
   - dano recebido por tipo;
-  - evolução, golpes por nível, TMs/TRs e Egg Moves;
+  - evolução, golpes por nível, TMs/TRs, Egg Moves e golpes do **Move Tutor**;
   - **onde encontrar** (região, bioma, faixa de nível ou como evolui) e **captura base**.
 - **Filtros:** região, tipo e categoria (Comum, Incomum, Raro, Inicial, Bebê, Lendário, Mítico, Ultra Beast, Paradoxo).
 
@@ -396,6 +396,22 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa por Pokém
 ## 15. Comunidade
 
 A aba **Comunidade**, na barra do topo, já existe com **Amigos** e **Clã**. As duas ficam **"em breve"**, porque dependem de contas e do servidor online.
+
+### Ranking
+A aba **Ranking**, na barra do topo, tem 8 rankings. **Por enquanto só você aparece**: a lista com todos os jogadores precisa do servidor online.
+
+| Ranking | O que conta |
+|---|---|
+| **Geral** | pontos (provisório): 1 por captura, 25 por shiny, 50 por lendário, 100 por nível de treinador, 200 por medalha de torneio. Silver e gold não contam |
+| **Capturas** | Pokémon capturados em batalha (ovos e tickets não contam) |
+| **Capturas shiny** | shiny capturados em batalha |
+| **Lendários** | lendários, míticos e Ultra Beasts capturados em batalha |
+| **Nível** | nível de treinador (empate: quem tem mais XP) |
+| **Medalhas de torneio** | em breve, junto com os torneios |
+| **Silver** | silver na carteira |
+| **Gold** | gold na carteira |
+
+Em saves antigos, a contagem começou pelos Pokémon que você já tinha (menos o inicial).
 
 ---
 
@@ -452,6 +468,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Aba Golpes (Relembrador e Tutor), soltar vários Pokémon de uma vez no PC.
 - Roleta do inicial com fundo da cor do tipo de cada Pokémon.
 - Professores renomeados para Move Reminder e Move Tutor; o Move Tutor agora ensina só golpes de tutor (sem TMs nem Egg Moves).
+- Pokédex mostra os golpes do Move Tutor; aba Ranking (geral, capturas, shiny, lendários, nível, medalhas, silver e gold).
 - Aba Comunidade (Amigos e Clã em breve) e aba Opções (nome de treinador, nome real, nome no mapa, teto dos encontros).
 - Câmera do mapa com zoom fixo.
 - Painel Admin para testes: chances, Pokémon forçado, moedas, tickets e Pokédex revelada.
