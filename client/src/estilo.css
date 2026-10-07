@@ -562,9 +562,13 @@ button.vaga:hover { border-color: var(--borda); }
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent); mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
 }
 .roleta-faixa { display: flex; height: 100%; will-change: transform; }
-.roleta-item { flex: 0 0 96px; display: grid; place-items: center; }
+.roleta-item {
+  flex: 0 0 96px; display: grid; place-items: center; box-sizing: border-box; border: 2px solid transparent; border-radius: 10px;
+  background: radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--cor-tipo) 75%, transparent), color-mix(in srgb, var(--cor-tipo) 35%, transparent) 70%);
+  background-clip: padding-box; border-inline-width: 3px;
+}
 .roleta-item .sprite { width: 80px; height: 80px; object-fit: contain; }
-.roleta-item.sorteado { background: rgb(255 203 5 / 0.15); }
+.roleta-item.sorteado { box-shadow: inset 0 0 0 2px #fff8; }
 .roleta-marcador { position: absolute; left: 50%; top: 0; bottom: 0; width: 96px; translate: -50% 0; border: 3px solid var(--destaque); border-radius: 10px; z-index: 1; pointer-events: none; }
 .roleta-resultado { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 8px; }
 .roleta-resultado h2 { font-size: 1.6rem; margin: 0; }

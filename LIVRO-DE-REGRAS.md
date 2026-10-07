@@ -50,6 +50,7 @@ Cada jogador **não escolhe** o inicial. Ele é sorteado numa roleta:
 - Entram os **27 iniciais de todas as regiões**, de Bulbasaur a Quaxly.
 - **Todos têm a mesma chance** (1 em 27).
 - O resultado fica guardado: recarregar a página não sorteia de novo.
+- Cada Pokémon da roleta tem um fundo da cor do seu tipo (Fire vermelho, Water azul, Grass verde).
 
 ### 1.3 O inicial é especial
 - **IVs 20 em todos os atributos.** É um Pokémon sólido, mas nunca perfeito.
@@ -449,6 +450,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Janelas semitransparentes.
 - Cartão de informações dos golpes ao passar o mouse.
 - Aba Golpes (Relembrador e Tutor), soltar vários Pokémon de uma vez no PC.
+- Roleta do inicial com fundo da cor do tipo de cada Pokémon.
 - Aba Comunidade (Amigos e Clã em breve) e aba Opções (nome de treinador, nome real, nome no mapa, teto dos encontros).
 - Câmera do mapa com zoom fixo.
 - Painel Admin para testes: chances, Pokémon forçado, moedas, tickets e Pokédex revelada.

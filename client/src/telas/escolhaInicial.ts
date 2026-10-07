@@ -5,7 +5,7 @@ import type { Tela } from '../main';
 import { REGIOES, TODOS_INICIAIS } from '../../../shared/regioes';
 import { pokemonPorId } from '../dados';
 import { novoSave, salvar } from '../estado';
-import { el, selosTipos, spritePokemon } from '../ui/dom';
+import { corTipo, el, selosTipos, spritePokemon } from '../ui/dom';
 import { aparenciaNova, limparAparenciaNova } from './personagem';
 
 const CHAVE_SORTEIO = 'jogo-claude:sorteio-inicial';
@@ -67,7 +67,7 @@ export const telaEscolhaInicial: Tela = (raiz, navegar) => {
   const faixa = el(
     'div',
     { class: 'roleta-faixa' },
-    ...itens.map((id) => el('div', { class: 'roleta-item' }, spritePokemon(pokemonPorId(id), { animado: false }))),
+    ...itens.map((id) => el('div', { class: 'roleta-item', style: { '--cor-tipo': corTipo(pokemonPorId(id).tipos[0]) } }, spritePokemon(pokemonPorId(id), { animado: false }))),
   );
   const janela = el('div', { class: 'roleta' }, el('div', { class: 'roleta-marcador' }), faixa);
   const resultado = el('div', { class: 'roleta-resultado' });
