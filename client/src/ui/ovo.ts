@@ -8,6 +8,9 @@ import { TAMANHO_MAXIMO_TIME, guardarNoPC, novoPokemon, registrarCapturado, salv
 import { abrirJanela } from './janela';
 import { el, selosTipos, spritePokemon } from './dom';
 import { iconeOvo } from './iconeItem';
+import { botoesQuantidade } from './abrirVarios';
+import { ehLendario } from '../../../shared/encontros';
+import { especie } from '../../../shared/batalha/pokemon';
 
 const LARGURA_CASA = 92;
 const CASAS = 44;
@@ -41,8 +44,13 @@ function entregar(save: Save, r: ResultadoOvo): string {
 export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): void {
   const ovo = ovoPorId(ovoId);
   if (!ovo) return;
+  // Ovo Lendário: lendários, míticos e Ultra Beasts, só a primeira forma da linha (Cosmog, não Lunala; Type: Null, não Silvally)
   const especies =
-    ovo.grupo === 'iniciais' ? TODOS_INICIAIS : todosOsPokemons().filter((p) => ovo.grupo === 'todos' || p.lendario).map((p) => p.id);
+    ovo.grupo === 'iniciais'
+      ? TODOS_INICIAIS
+      : todosOsPokemons()
+          .filter((p) => ovo.grupo === 'todos' || (ehLendario(p) && !p.evoluiDe && !especie(p.id).prevo))
+          .map((p) => p.id);
   const qualquer = () => especies[Math.floor(Math.random() * especies.length)];
   let girando = false;
 
@@ -59,21 +67,21 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
       };
       encher();
       const resultado = el('div', { class: 'ticket-resultado' });
-      const botao = el('button', { class: 'botao grande', disabled: qtd <= 0 }, qtd > 0 ? `🥚 Chocar (você tem ${qtd})` : 'Você não tem este ovo') as HTMLButtonElement;
-
-      botao.addEventListener('click', () => {
-        if (girando || (save.itens[ovoId] ?? 0) <= 0) return;
+      const chocarVarios = (n: number) => {
+        if (girando || (save.itens[ovoId] ?? 0) < n) return;
         girando = true;
-        botao.disabled = true;
+        botoes.travar(true);
         resultado.replaceChildren();
-        // gasta o ovo e entrega o Pokémon já no começo (fechar a janela no meio não perde nada)
-        save.itens[ovoId] -= 1;
-        if (save.itens[ovoId] <= 0) delete save.itens[ovoId];
-        const r = chocarOvo(ovo, especies, IV_MIN_SHINY);
-        // o Pokémon já fica salvo (fechar a janela no meio não perde nada),
+        // gasta os ovos e entrega os Pokémon já no começo (fechar a janela no meio não perde nada),
         // mas o time na tela só atualiza quando a roleta parar (para não estragar a surpresa)
-        const frase = entregar(save, r);
+        save.itens[ovoId] -= n;
+        if (save.itens[ovoId] <= 0) delete save.itens[ovoId];
+        const todos = Array.from({ length: n }, () => chocarOvo(ovo, especies, IV_MIN_SHINY));
+        const frases = todos.map((x) => entregar(save, x));
         salvar(save);
+        // a roleta para no melhor: shiny primeiro, depois lendário/mítico
+        const nota = (x: ResultadoOvo) => (x.shiny ? 2 : 0) + (raro(x.especie) ? 1 : 0);
+        const r = todos.reduce((a, b) => (nota(b) > nota(a) ? b : a));
 
         encher(r);
         void faixa.offsetWidth;
@@ -82,30 +90,37 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
         faixa.style.transform = `translateX(${-(ALVO * LARGURA_CASA - (roleta.clientWidth / 2 - LARGURA_CASA / 2) + desvio)}px)`;
         setTimeout(() => {
           faixa.children[ALVO]?.classList.add('sorteado');
-          const dados = pokemonPorId(r.especie);
+          const shinies = todos.filter((x) => x.shiny).length;
           resultado.replaceChildren(
-            el('p', { class: 'ticket-raridade' }, r.shiny ? '✨ Shiny! ✨' : 'O ovo chocou!'),
-            el('div', { class: `premio ovo-nasceu ${r.shiny ? 'casa-shiny' : ''}` },
-              spritePokemon(dados, { shiny: r.shiny, animado: false }),
-              el('strong', {}, `${dados.nome}${r.shiny ? ' ✨' : ''}`),
-              selosTipos(dados),
-              el('small', {}, `Nv. ${NIVEL_OVO}${ovo.tier ? ` · IVs tier ${ovo.tier} ou superior` : ''}`),
+            el('p', { class: 'ticket-raridade' }, n > 1 ? `${n} ovos chocaram!${shinies ? ` ${shinies} shiny!` : ''}` : r.shiny ? '✨ Shiny! ✨' : 'O ovo chocou!'),
+            el('div', { class: 'premios' },
+              ...todos.map((x) => {
+                const dados = pokemonPorId(x.especie);
+                return el('div', { class: `premio ovo-nasceu ${x.shiny ? 'casa-shiny' : ''}` },
+                  spritePokemon(dados, { shiny: x.shiny, animado: false }),
+                  el('strong', {}, `${dados.nome}${x.shiny ? ' ✨' : ''}`),
+                  selosTipos(dados),
+                  el('small', {}, `Nv. ${NIVEL_OVO}${ovo.tier ? ` · IVs tier ${ovo.tier} ou superior` : ''}`),
+                );
+              }),
             ),
-            el('small', {}, frase),
+            el('div', { class: 'frases-premio' }, ...frases.map((f) => el('small', {}, f))),
           );
           aoMudar();
           girando = false;
-          botao.disabled = (save.itens[ovoId] ?? 0) <= 0;
-          botao.textContent = botao.disabled ? 'Sem mais ovos' : `🥚 Chocar outro (você tem ${save.itens[ovoId]})`;
+          botoes = botoesQuantidade('Chocar', save.itens[ovoId] ?? 0, chocarVarios);
+          areaBotoes.replaceChildren(botoes.raiz);
         }, DURACAO_ROLETA + 150);
-      });
+      };
+      let botoes = botoesQuantidade('Chocar', qtd, chocarVarios);
+      const areaBotoes = el('div', {}, botoes.raiz);
 
       return el(
         'div',
         { class: 'ticket' },
         el('div', { class: 'ovo-topo' }, iconeOvo(ovo.letra), el('p', { class: 'meta' }, ovo.descricao)),
         roleta,
-        botao,
+        areaBotoes,
         resultado,
       );
     },

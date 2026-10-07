@@ -1078,3 +1078,8 @@ button.vaga:hover { border-color: var(--borda); }
 .sprite.terastalizado { filter: drop-shadow(0 0 6px #bff3ff) drop-shadow(0 0 2px #fff) saturate(1.25) brightness(1.08); }
 .botao-tera.ligado { background: linear-gradient(135deg, #ffffff, var(--cor-tipo)); color: #10202e; border-color: transparent; font-weight: 800; }
 .botao.golpe.golpe-tera { box-shadow: 0 0 0 2px #bff3ff, 0 0 14px #7fd3ff99; }
+
+/* Abrir/chocar várias vezes */
+.botoes-quantidade { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; }
+.botoes-quantidade .botao.secundario { min-width: 52px; font-weight: 800; }
+.frases-premio { display: flex; flex-direction: column; gap: 2px; max-height: 120px; overflow-y: auto; }

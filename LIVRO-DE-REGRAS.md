@@ -355,7 +355,8 @@ Itens **raros**, para que certos prêmios não sejam algo que todo mundo tem.
 ### Como funciona
 1. **Abrir:** abra o ticket na Bolsa. Uma roleta passa pelos prêmios e para no sorteado.
 2. **Cada prêmio tem a sua chance** (do total). A cor na roleta mostra a raridade.
-3. **Na janela do ticket:** "Chances" mostra o total de cada raridade, e "Prêmios possíveis" mostra cada prêmio com a sua porcentagem.
+3. **Abrir vários:** os botões **×3, ×5 e ×10** abrem vários de uma vez (vale também para chocar ovos). A roleta gira uma vez só e para no prêmio mais raro (nos ovos, no shiny ou no lendário); embaixo aparecem todos os prêmios.
+4. **Na janela do ticket:** "Chances" mostra o total de cada raridade, e "Prêmios possíveis" mostra cada prêmio com a sua porcentagem.
 
 | Raridade | Cor na roleta | Chance total |
 |---|---|---|
@@ -417,7 +418,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 |---|---|---|
 | **Ovo Misterioso S** | qualquer Pokémon | IVs de tier **S ou superior** (soma 145+) |
 | **Ovo Misterioso A** | qualquer Pokémon | IVs de tier **A ou superior** (soma 120+) |
-| **Ovo Lendário** | um lendário (sem míticos) | IVs normais |
+| **Ovo Lendário** | um lendário, mítico ou Ultra Beast, **só a primeira forma da linha** (Cosmog e não Lunala; Type: Null e não Silvally; Meltan e não Melmetal) | IVs normais |
 | **Ovo Inicial** | um dos 27 iniciais | IVs normais |
 
 - **Chance igual** para todos do grupo do ovo (nos Misteriosos: comum, lendário, mítico, Ultra Beast…).
@@ -512,6 +513,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
+- Abrir tickets e chocar ovos de 1, 3, 5 ou 10 de uma vez; Ovo Lendário com míticos e Ultra Beasts (só a primeira forma da linha).
 - Terastal na batalha, duração de clima e terreno no canto da arena, imagens das Tera Shards guardadas no jogo.
 - Tickets da planilha do dono: 14 tickets (Kyogre, Groudon, Giratina, Hoopa, Dialga, Palkia, Arceus, Therian, Kyurem, Zacian, Zamazenta, Ogerpon, Lendário, Inicial) com a chance de cada prêmio; skins e itens-chave; Ovo Lendário e Ovo Inicial; pré-sistema de VIP.
 - Time com arrastar, PC com 20 boxes e ficha completa do Pokémon.

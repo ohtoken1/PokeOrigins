@@ -26,7 +26,7 @@ export const CHANCE_SHINY_OVO = 0.05;
 export const OVOS: Ovo[] = [
   { id: 'ovo-misterioso-s', nome: 'Ovo Misterioso S', letra: 'S', grupo: 'todos', tier: 'S', descricao: 'Choca um Pokémon qualquer (até lendário) com IVs de tier S ou superior (soma 145+). 5% de chance de shiny.' },
   { id: 'ovo-misterioso-a', nome: 'Ovo Misterioso A', letra: 'A', grupo: 'todos', tier: 'A', descricao: 'Choca um Pokémon qualquer (até lendário) com IVs de tier A ou superior (soma 120+). 5% de chance de shiny.' },
-  { id: 'ovo-lendario', nome: 'Ovo Lendário', letra: 'L', grupo: 'lendarios', descricao: 'Choca um Pokémon lendário qualquer (chance igual para todos). 5% de chance de shiny.' },
+  { id: 'ovo-lendario', nome: 'Ovo Lendário', letra: 'L', grupo: 'lendarios', descricao: 'Choca um lendário, mítico ou Ultra Beast (só a primeira forma da linha, ex.: Cosmog; chance igual para todos). 5% de chance de shiny.' },
   { id: 'ovo-inicial', nome: 'Ovo Inicial', letra: 'I', grupo: 'iniciais', descricao: 'Choca um dos 27 iniciais de todas as regiões (chance igual para todos). 5% de chance de shiny.' },
 ];
 

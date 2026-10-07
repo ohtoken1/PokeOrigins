@@ -18,6 +18,10 @@ import { TAMANHO_MAXIMO_TIME, guardarNoPC, novoPokemon, registrarCapturado, salv
 import { abrirJanela } from './janela';
 import { el, spritePokemon } from './dom';
 import { iconeItem } from './iconeItem';
+import { botoesQuantidade } from './abrirVarios';
+
+/** Ordem para escolher em qual prêmio a roleta para quando abre vários (o mais raro). */
+const PESO_RARIDADE: Record<Raridade, number> = { comum: 0, raro: 1, epico: 2, lendario: 3 };
 
 const numero = (n: number) => n.toLocaleString('pt-BR');
 const porcentagem = (c: number) => `${numero(Math.round(c * 10000) / 100)}%`;
@@ -142,20 +146,20 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
       };
       encher();
       const resultado = el('div', { class: 'ticket-resultado' });
-      const botao = el('button', { class: 'botao grande', disabled: qtd <= 0 }, qtd > 0 ? `Abrir ticket (você tem ${qtd})` : 'Você não tem este ticket') as HTMLButtonElement;
-
-      botao.addEventListener('click', () => {
-        if (girando || (save.itens[ticketId] ?? 0) <= 0) return;
+      const abrirVarios = (n: number) => {
+        if (girando || (save.itens[ticketId] ?? 0) < n) return;
         girando = true;
-        botao.disabled = true;
+        botoes.travar(true);
         resultado.replaceChildren();
-        // gasta o ticket e entrega o prêmio já no começo (fechar a janela no meio não perde nada)
-        save.itens[ticketId] -= 1;
+        // gasta os tickets e entrega os prêmios já no começo (fechar a janela no meio não perde nada)
+        save.itens[ticketId] -= n;
         if (save.itens[ticketId] <= 0) delete save.itens[ticketId];
-        const r = abrirTicket(ticket);
-        const frases = entregar(save, r);
+        const todos = Array.from({ length: n }, () => abrirTicket(ticket));
+        const frases = todos.flatMap((x) => entregar(save, x));
         salvar(save);
         aoMudar();
+        // a roleta para no prêmio mais raro; embaixo aparecem todos
+        const r = todos.reduce((a, b) => (PESO_RARIDADE[b.raridade] > PESO_RARIDADE[a.raridade] ? b : a));
 
         // as casas passam e param no prêmio sorteado (posição ALVO), com um leve desvio dentro da casa
         encher([r.pacote, r.raridade]);
@@ -168,15 +172,17 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
           faixa.children[ALVO]?.classList.add('sorteado');
           const nome = raridades.find((x) => x.id === r.raridade)?.nome ?? '';
           resultado.replaceChildren(
-            el('p', { class: 'ticket-raridade' }, bolinha(r.raridade), `${nome}!`),
-            el('div', { class: 'premios' }, ...r.pacote.map((p, k) => cartaoPremio(p, r.shiny[k], r.raridade))),
-            ...frases.map((f) => el('small', {}, f)),
+            el('p', { class: 'ticket-raridade' }, bolinha(r.raridade), n > 1 ? `${n} tickets abertos · o melhor: ${nome}!` : `${nome}!`),
+            el('div', { class: 'premios' }, ...todos.flatMap((x) => x.pacote.map((p, k) => cartaoPremio(p, x.shiny[k], x.raridade)))),
+            el('div', { class: 'frases-premio' }, ...frases.map((f) => el('small', {}, f))),
           );
           girando = false;
-          botao.disabled = (save.itens[ticketId] ?? 0) <= 0;
-          botao.textContent = botao.disabled ? 'Sem mais tickets' : `Abrir outro (você tem ${save.itens[ticketId]})`;
+          botoes = botoesQuantidade('Abrir', save.itens[ticketId] ?? 0, abrirVarios);
+          areaBotoes.replaceChildren(botoes.raiz);
         }, 5100);
-      });
+      };
+      let botoes = botoesQuantidade('Abrir', qtd, abrirVarios);
+      const areaBotoes = el('div', {}, botoes.raiz);
 
       // prêmios possíveis: fechado; dentro, uma setinha por raridade, cada prêmio com a sua chance
       const cartoesDa = (linhas: LinhaPremio[], r: Raridade) => linhas.flatMap((l) => l.pacote.map((p) => cartaoPremio(p, false, r, l.chance)));
@@ -194,7 +200,7 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
         ),
       );
 
-      return el('div', { class: 'ticket' }, el('p', { class: 'meta' }, ticket.descricao), chances, roleta, botao, resultado, lista);
+      return el('div', { class: 'ticket' }, el('p', { class: 'meta' }, ticket.descricao), chances, roleta, areaBotoes, resultado, lista);
     },
     { classe: 'janela-ticket' },
   );
