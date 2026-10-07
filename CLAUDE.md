@@ -87,7 +87,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - Obtenção: `CHANCE_TICKET_POR_BATALHA` (1/1000 ao vencer/capturar) e botão no Admin. Itens de forma (`ITENS_ESPECIAIS`: orbes) ficam fora da loja, aba "Especiais" da bolsa (equipar). Showdown faz a Primal Reversion; a tela de batalha ainda não troca o sprite para a forma Primal.
 
 ## Professores de golpes (`shared/professores.ts`, `client/src/telas/golpes.ts`)
-- Aba "Golpes" na barra do topo: **Relembrador** (golpes por nível ≤ nível atual que o Pokémon não sabe; `PRECO_RELEMBRAR` 50 silver) e **Tutor** (golpes T/M/E da geração mais recente da espécie, somando as formas anteriores; `PRECO_TUTOR` 100 silver). Com 4 golpes, escolhe qual esquecer.
+- Aba "Golpes" na barra do topo: **Move Reminder** (golpes por nível ≤ nível atual que o Pokémon não sabe; `PRECO_RELEMBRAR` 50 silver) e **Move Tutor** (só golpes de tutor, fonte "T", de qualquer geração (Scarlet/Violet quase não tem tutor), somando as formas anteriores; sem TM nem Egg Move, pedido do dono; `PRECO_TUTOR` 100 silver). Com 4 golpes, escolhe qual esquecer.
 - PC: segurar o clique marca para soltar vários (`aoSegurar` em `ui/arrastar.ts`).
 
 ## Ovos Misteriosos (`shared/ovos.ts`, `client/src/ui/ovo.ts`)

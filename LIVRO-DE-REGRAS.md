@@ -290,8 +290,8 @@ Na barra do topo, a aba **Golpes** tem dois professores. Escolha o Pokémon do t
 
 | Professor | O que ensina | Preço (provisório) |
 |---|---|---|
-| **Relembrador de Golpes** | qualquer golpe que a espécie aprende **por nível** até o nível atual, inclusive os esquecidos | 50 silver |
-| **Tutor de Golpes** | o que a espécie aprende na **geração mais recente** dos jogos por tutor, TM ou ovo (Egg Moves, inclusive os das formas anteriores) | 100 silver |
+| **Move Reminder** | qualquer golpe que a espécie aprende **por nível** até o nível atual, inclusive os esquecidos | 50 silver |
+| **Move Tutor** | só os golpes de **tutor**, de **qualquer geração** dos jogos (inclusive os das formas anteriores); TMs e Egg Moves não entram | 100 silver |
 
 ---
 
@@ -451,6 +451,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Cartão de informações dos golpes ao passar o mouse.
 - Aba Golpes (Relembrador e Tutor), soltar vários Pokémon de uma vez no PC.
 - Roleta do inicial com fundo da cor do tipo de cada Pokémon.
+- Professores renomeados para Move Reminder e Move Tutor; o Move Tutor agora ensina só golpes de tutor (sem TMs nem Egg Moves).
 - Aba Comunidade (Amigos e Clã em breve) e aba Opções (nome de treinador, nome real, nome no mapa, teto dos encontros).
 - Câmera do mapa com zoom fixo.
 - Painel Admin para testes: chances, Pokémon forçado, moedas, tickets e Pokédex revelada.

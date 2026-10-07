@@ -1,7 +1,8 @@
 // Professores de golpes (aba "Golpes" da barra do topo):
-// - Relembrador: golpes que a espécie aprende por nível até o nível atual (inclusive os esquecidos).
-// - Tutor: tudo o que a espécie aprende na geração mais recente dos jogos por outro meio que não o nível
-//   (tutor, TM, Egg Moves — inclusive os das formas anteriores, como nos jogos).
+// - Move Reminder: golpes que a espécie aprende por nível até o nível atual (inclusive os esquecidos).
+// - Move Tutor: só os golpes de tutor (fonte "T" do Showdown) de QUALQUER geração, inclusive os das formas
+//   anteriores. TMs e Egg Moves NÃO entram (pedido do dono). Scarlet/Violet quase não tem tutor (793 espécies
+//   ficariam sem nada), por isso todas as gerações.
 import { Dex } from '@pkmn/sim';
 import { especie, golpesPorNivel, type PokemonIndividual } from './batalha/pokemon';
 
@@ -19,16 +20,14 @@ export function golpesParaRelembrar(p: PokemonIndividual): string[] {
   return [...ids].sort(porNome);
 }
 
-/** Golpes da geração mais recente da espécie que não são por nível (tutor, TM, ovo), somando as formas anteriores. */
+/** Golpes de tutor de qualquer geração da espécie, somando as formas anteriores. */
 export function golpesDoTutor(p: PokemonIndividual): string[] {
   const learnsetDe = (id: string) => Dex.species.getLearnsetData(id as Parameters<typeof Dex.species.getLearnsetData>[0]).learnset ?? {};
-  const proprio = learnsetDe(especie(p.especieId).id);
-  const gen = Math.max(0, ...Object.values(proprio).flat().map((f) => Number(f[0]) || 0));
   const ids = new Set<string>();
-  // a espécie e as formas anteriores (Egg Moves de Pichu valem para Pikachu e Raichu)
+  // a espécie e as formas anteriores
   for (let s = especie(p.especieId); s?.exists; s = s.prevo ? Dex.species.get(s.prevo) : (null as never)) {
     for (const [id, origens] of Object.entries(learnsetDe(s.id)))
-      if (origens.some((o) => o.startsWith(String(gen)) && /[TME]$/.test(o)) && Dex.moves.get(id).exists && !conhece(p, id)) ids.add(id);
+      if (origens.some((o) => o.endsWith('T')) && Dex.moves.get(id).exists && !conhece(p, id)) ids.add(id);
     if (!s.prevo) break;
   }
   return [...ids].sort(porNome);

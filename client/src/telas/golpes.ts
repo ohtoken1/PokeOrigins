@@ -1,4 +1,4 @@
-// Aba "Golpes": Relembrador (golpes por nível já esquecidos) e Tutor (tutor/Egg Moves da geração mais recente).
+// Aba "Golpes": Move Reminder (golpes por nível já esquecidos) e Move Tutor (só golpes de tutor, de qualquer geração).
 import { Dex } from '@pkmn/sim';
 import type { Tela } from '../main';
 import { ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
@@ -13,14 +13,14 @@ import { corTipo, el, seloTipo, spritePokemon } from '../ui/dom';
 type Professor = 'relembrar' | 'tutor';
 const PROFESSORES: Record<Professor, { nome: string; fala: string; preco: number; lista: (p: PokemonIndividual) => string[] }> = {
   relembrar: {
-    nome: 'Relembrador de Golpes',
+    nome: 'Move Reminder',
     fala: 'Posso fazer seu Pokémon lembrar de qualquer golpe que ele aprende por nível até o nível atual, até os que ele esqueceu.',
     preco: PRECO_RELEMBRAR,
     lista: golpesParaRelembrar,
   },
   tutor: {
-    nome: 'Tutor de Golpes',
-    fala: 'Ensino qualquer golpe que a espécie aprende na geração mais recente dos jogos (tutor, TM e Egg Moves), menos os de nível.',
+    nome: 'Move Tutor',
+    fala: 'Ensino os golpes de tutor que a espécie aprendeu em qualquer jogo (sem TMs nem Egg Moves).',
     preco: PRECO_TUTOR,
     lista: golpesDoTutor,
   },
