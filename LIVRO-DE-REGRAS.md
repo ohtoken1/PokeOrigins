@@ -345,6 +345,20 @@ Itens **raros**, para que certos prêmios não sejam algo que todo mundo tem.
 - **Lendário:** Kyogre nível 50, com **5% de chance de vir shiny**, junto com a **Blue Orb**, que transforma o Kyogre em **Primal Kyogre** na batalha.
 - **Outras raridades:** rascunho para testes (bolas, remédios, silver, Master Ball…).
 
+### Ovos Misteriosos
+Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa por Pokémon de todas as regiões e para no sorteado:
+
+| Ovo | O que garante |
+|---|---|
+| **Ovo Misterioso S** | IVs de tier **S ou superior** (soma 145+) |
+| **Ovo Misterioso A** | IVs de tier **A ou superior** (soma 120+) |
+
+- **Qualquer Pokémon** pode nascer, com **chance igual para todos**: comum, lendário, mítico, Ultra Beast…
+- **5% de chance de shiny.**
+- O Pokémon nasce no **nível 1** e vai para o time (ou para o PC, se o time estiver cheio).
+- Os IVs continuam ocultos até a avaliação, mas o tier mínimo é garantido.
+- Por enquanto, os ovos só vêm pelo painel Admin (testes).
+
 ---
 
 ## 14. Pokédex e Database
@@ -413,6 +427,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Moedas silver e gold, separadas na carteira.
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
+- Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
 - Time com arrastar, PC com 20 boxes e ficha completa do Pokémon.
 - Pokémon que te segue animado em 8 direções, com sombra.
 

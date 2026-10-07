@@ -1,4 +1,5 @@
 import { TICKETS } from '../../../shared/tickets';
+import { OVOS } from '../../../shared/ovos';
 // Painel de administrador (aba na esquerda) para testar encontros: shiny, lendários, chance por passo,
 // Pokémon e nível forçados. Provisório: sem login; os ajustes ficam só neste navegador.
 import { AJUSTES_PADRAO, CHANCE_SHINY, type AjustesEncontro } from '../../../shared/encontros';
@@ -134,7 +135,7 @@ function conteudo(): HTMLElement[] {
       });
       return campo(`${moeda === 'gold' ? 'Gold' : 'Silver'} (tem ${save ? save[moeda].toLocaleString('pt-BR') : 0})`, el('div', { class: 'admin-linha' }, campoQtd, dar));
     }),
-    el('h4', {}, 'Tickets'),
+    el('h4', {}, 'Tickets e ovos'),
     ...TICKETS.map((t) =>
       el(
         'button',
@@ -150,6 +151,23 @@ function conteudo(): HTMLElement[] {
           },
         },
         `+1 ${t.nome}`,
+      ),
+    ),
+    ...OVOS.map((o) =>
+      el(
+        'button',
+        {
+          class: 'botao secundario',
+          disabled: !save,
+          onclick: () => {
+            const atual = carregarSave();
+            if (!atual) return;
+            atual.itens[o.id] = (atual.itens[o.id] ?? 0) + 1;
+            salvar(atual);
+            aoMudarSave?.();
+          },
+        },
+        `+1 ${o.nome}`,
       ),
     ),
     el('h4', {}, 'Pokédex'),

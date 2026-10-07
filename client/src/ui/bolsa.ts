@@ -12,6 +12,7 @@ import { Dex } from '@pkmn/sim';
 import { iconeItem } from './iconeItem';
 import { cartaoPokemon } from './time';
 import { abrirJanelaTicket } from './ticket';
+import { abrirJanelaOvo } from './ovo';
 
 const ACAO: Partial<Record<CategoriaLoja, string>> = {
   remedios: 'Usar',
@@ -21,6 +22,7 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
   tr: 'Ensinar',
   especiais: 'Equipar',
   tickets: 'Abrir',
+  ovos: 'Chocar',
 };
 
 type Modo =
@@ -209,7 +211,12 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                     class: 'botao',
                     onclick: () => {
                       aviso = '';
-                      if (item.categoria === 'tickets') {
+                      if (item.categoria === 'ovos') {
+                        abrirJanelaOvo(save, item.id, () => {
+                          aoMudar();
+                          refazer();
+                        });
+                      } else if (item.categoria === 'tickets') {
                         // abre o ticket numa janela própria (sorteio animado)
                         abrirJanelaTicket(save, item.id, () => {
                           aoMudar();

@@ -85,6 +85,9 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - Item raro da bolsa (aba Tickets). Abrir sorteia a raridade (`RARIDADES`: comum 70%, raro 22%, épico 7%, lendário 1%) e depois um **pacote** dessa raridade (ex.: Kyogre Nv. 50 com chance de shiny + Blue Orb). Conteúdo é rascunho: o dono vai definir cada ticket (Groudon, Rayquaza, Giratina…).
 - Obtenção: `CHANCE_TICKET_POR_BATALHA` (1/1000 ao vencer/capturar) e botão no Admin. Itens de forma (`ITENS_ESPECIAIS`: orbes) ficam fora da loja, aba "Especiais" da bolsa (equipar). Showdown faz a Primal Reversion; a tela de batalha ainda não troca o sprite para a forma Primal.
 
+## Ovos Misteriosos (`shared/ovos.ts`, `client/src/ui/ovo.ts`)
+- Itens da aba "Ovos" da bolsa (fora da loja): **Ovo Misterioso S** (soma de IVs ≥145) e **A** (≥120). Chocar = roleta como a do ticket; espécie com chance igual entre TODAS as carregadas (lendários inclusive), shiny 5% (`CHANCE_SHINY_OVO`), nível 1 (`NIVEL_OVO`), IVs sorteados até cair no tier (`sortearIvs`). Ícone próprio (`iconeOvo`, cor do tier, como os discos de TM). Obtenção por enquanto só no Admin.
+
 ## Traduções (`shared/traducao.ts` + `shared/data/traducoes.json`)
 - Mapa "descrição em inglês do Showdown → português" (itens, golpes, habilidades; ~1.026 textos). Use sempre `traduzir()` ao mostrar `shortDesc`/`desc`; `nomeTipo()`/`nomeCategoria()` para tipo e categoria.
 - Ao adicionar conteúdo novo (outra região, itens novos), gerar a lista dos textos sem tradução, traduzir e acrescentar no JSON — nunca exibir a descrição em inglês.

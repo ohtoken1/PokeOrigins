@@ -5,9 +5,10 @@ import { Dex } from '@pkmn/sim';
 import maquinas from './data/maquinas.json';
 import { ITENS, type ItemId } from './itens';
 import { ITENS_ESPECIAIS, TICKETS } from './tickets';
+import { OVOS } from './ovos';
 import { nomeCategoria, nomeTipo, traduzir } from './traducao';
 
-export type CategoriaLoja = 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'tm' | 'tr' | 'especiais' | 'tickets';
+export type CategoriaLoja = 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'tm' | 'tr' | 'especiais' | 'tickets' | 'ovos';
 
 export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
   { id: 'bolas', nome: 'Pokébolas' },
@@ -18,7 +19,7 @@ export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
   { id: 'tr', nome: 'TRs' },
 ];
 /** Abas da bolsa: as da loja + itens que só saem de tickets. */
-export const CATEGORIAS_BOLSA: { id: CategoriaLoja; nome: string }[] = [...CATEGORIAS, { id: 'especiais', nome: 'Especiais' }, { id: 'tickets', nome: 'Tickets' }];
+export const CATEGORIAS_BOLSA: { id: CategoriaLoja; nome: string }[] = [...CATEGORIAS, { id: 'especiais', nome: 'Especiais' }, { id: 'tickets', nome: 'Tickets' }, { id: 'ovos', nome: 'Ovos' }];
 
 export interface ItemLoja {
   /** id usado na bolsa (ids do Showdown para itens de batalha: "eviolite", "firestone"…) */
@@ -114,6 +115,7 @@ const FORA_DA_LOJA: ItemLoja[] = [
     return { id, nome: i.name, categoria: 'especiais', descricao: traduzir(i.shortDesc || i.desc), preco: 0 };
   }),
   ...TICKETS.map((t): ItemLoja => ({ id: t.id, nome: t.nome, categoria: 'tickets', descricao: t.descricao, preco: 0, sprite: 'eon-ticket' })),
+  ...OVOS.map((o): ItemLoja => ({ id: o.id, nome: o.nome, categoria: 'ovos', descricao: o.descricao, preco: 0 })),
 ];
 const porId = new Map([...CATALOGO, ...FORA_DA_LOJA].map((i) => [i.id, i]));
 

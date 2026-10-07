@@ -824,3 +824,16 @@ button.vaga:hover { border-color: var(--borda); }
 .tier-a { --metal: linear-gradient(180deg, #f2d8ff 0%, #b06cff 50%, #6a22c8 100%); --contorno: #2a0a50; }
 .tier-b { --metal: linear-gradient(180deg, #d8ecff 0%, #5aa8ff 50%, #1f5cc0 100%); --contorno: #08224a; }
 .tier-c { --metal: linear-gradient(180deg, #eef2f6 0%, #a8b4c4 50%, #5f6b7c 100%); --contorno: #1e2530; }
+
+/* Ovos Misteriosos */
+.icone-ovo { width: 32px; height: 32px; display: grid; place-items: center; flex: none; }
+.icone-ovo svg { width: 28px; height: 28px; filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.35)); }
+.ovo-topo { display: flex; align-items: center; gap: 10px; }
+.ovo-topo .icone-ovo { width: 48px; height: 48px; }
+.ovo-topo .icone-ovo svg { width: 44px; height: 44px; }
+@media (prefers-reduced-motion: no-preference) {
+  .ovo-topo .icone-ovo svg { animation: ovo-balanca 1.6s ease-in-out infinite; transform-origin: 50% 90%; }
+  @keyframes ovo-balanca { 0%, 60%, 100% { transform: rotate(0); } 70% { transform: rotate(-9deg); } 80% { transform: rotate(8deg); } 90% { transform: rotate(-4deg); } }
+}
+.casa-roleta.casa-shiny, .premio.casa-shiny { box-shadow: 0 0 0 2px #ffd23a, 0 0 14px rgb(255 210 58 / 0.7); }
+.ovo-nasceu .tipos { justify-content: center; }
