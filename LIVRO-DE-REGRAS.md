@@ -423,7 +423,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 - **5% de chance de shiny.**
 - O Pokémon nasce no **nível 1** e vai para o time (ou para o PC, se o time estiver cheio).
 - Os IVs continuam ocultos até a avaliação, mas o tier mínimo é garantido.
-- Saem dos tickets (Ovo Misterioso A no épico) e do painel Admin (testes; Ovo Lendário e Ovo Inicial por enquanto só pelo Admin). Na roleta do **Ovo Inicial**, cada Pokémon tem o fundo da cor do seu tipo.
+- Saem dos tickets (Ovo Misterioso A no épico) e do painel Admin (testes; Ovo Lendário e Ovo Inicial por enquanto só pelo Admin). Na roleta do **Ovo Inicial**, cada Pokémon tem o fundo da cor do seu tipo. Nas outras roletas de ovos, o fundo mostra a categoria: **lendário laranja, mítico roxo, Ultra Beast vermelho**, os outros branco.
 
 ---
 
@@ -511,6 +511,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
+- Roletas de ovos: Ultra Beast com fundo vermelho e mítico com fundo roxo.
 - Tickets Lendário e Inicial removidos; roleta do Ovo Inicial com fundo da cor do tipo.
 - Abrir tickets e chocar ovos de 1, 3 ou 5 de uma vez (uma roleta por tentativa, empilhadas); Ovo Lendário com míticos e Ultra Beasts (só a primeira forma da linha).
 - Terastal na batalha, duração de clima e terreno no canto da arena, imagens das Tera Shards guardadas no jogo.

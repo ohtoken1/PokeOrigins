@@ -1091,3 +1091,7 @@ button.vaga:hover { border-color: var(--borda); }
 
 /* Roleta do Ovo Inicial: fundo na cor do tipo */
 .casa-roleta.fundo-tipo { background: radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--cor-tipo) 80%, #fff 10%), color-mix(in srgb, var(--cor-tipo) 45%, #000) 75%); }
+
+/* Roletas de Pokémon: Ultra Beast vermelho, mítico roxo (lendário continua laranja) */
+.fundo-ultra { background: #d93a3a; color: #fff; }
+.fundo-mitico { background: #8d4fe0; color: #fff; }

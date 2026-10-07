@@ -15,15 +15,19 @@ import { especie } from '../../../shared/batalha/pokemon';
 /** Duração da roleta do ovo (mais lenta que a do ticket, para dar expectativa). */
 const DURACAO_ROLETA = 9000;
 
-const raro = (id: number) => {
+/** Fundo da casa pela categoria: Ultra Beast vermelho, mítico roxo, lendário laranja, os outros branco. */
+function fundoCategoria(id: number): string {
   const p = pokemonPorId(id);
-  return p.lendario || p.mitico;
-};
+  if ((especie(id).tags ?? []).includes('Ultra Beast')) return 'fundo-ultra';
+  if (p.mitico) return 'fundo-mitico';
+  if (p.lendario) return 'fundo-lendario';
+  return 'fundo-comum';
+}
 
 /** Casa da roleta; `porTipo` (Ovo Inicial): fundo na cor do tipo, como na roleta do inicial. */
 function casa(id: number, shiny = false, porTipo = false): HTMLElement {
   const dados = pokemonPorId(id);
-  const fundo = porTipo ? 'fundo-tipo' : raro(id) ? 'fundo-lendario' : 'fundo-comum';
+  const fundo = porTipo ? 'fundo-tipo' : fundoCategoria(id);
   return el('div', { class: `casa-roleta ${fundo} ${shiny ? 'casa-shiny' : ''}`, style: porTipo ? { '--cor-tipo': corTipo(dados.tipos[0]) } : {} }, spritePokemon(dados, { shiny, animado: false }));
 }
 
