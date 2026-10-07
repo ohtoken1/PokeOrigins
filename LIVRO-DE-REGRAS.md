@@ -516,6 +516,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
+- Cartões dos biomas com o cenário de batalha do bioma em cima e a parte do texto transparente.
 - Barra do topo reorganizada: ícone da Pokédex, Jogar (Mapas, Duelos, Ginásios), Informações (Opções, Ranking, Database).
 - Roletas de ovos: Ultra Beast com fundo vermelho e mítico com fundo roxo.
 - Tickets Lendário e Inicial removidos; roleta do Ovo Inicial com fundo da cor do tipo.

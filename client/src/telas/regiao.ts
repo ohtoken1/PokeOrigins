@@ -1,3 +1,4 @@
+import { FUNDOS_BATALHA } from '../batalha/telaBatalha';
 import { tempoRestanteVip, vipAtivo } from '../../../shared/vip';
 import type { Tela } from '../main';
 import { REGIOES, regiaoPorId } from '../../../shared/regioes';
@@ -55,7 +56,8 @@ export const telaRegiao: Tela = (raiz, navegar) => {
       'button',
       {
         class: 'cartao-bioma',
-        style: { '--cor-bioma': hex(bioma.cores.zona), '--cor-chao': hex(bioma.cores.chao) },
+        // em cima, o primeiro fundo de batalha do bioma (o mesmo cenário das lutas)
+        style: { '--cor-bioma': hex(bioma.cores.zona), '--cor-chao': hex(bioma.cores.chao), '--fundo-bioma': FUNDOS_BATALHA[bioma.id] ? `url(batalha/${FUNDOS_BATALHA[bioma.id][0]})` : 'none' },
         onclick: () => navegar({ tela: 'bioma', biomaId: bioma.id }),
       },
       el('div', { class: 'faixa' }, destaques.map((e) => spritePokemon(e.pokemon, { animado: false }))),      el('strong', {}, bioma.nome),

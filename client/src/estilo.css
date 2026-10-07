@@ -1104,3 +1104,10 @@ button.vaga:hover { border-color: var(--borda); }
 /* menus do topo: abrem para a direita a partir da aba (o último, para a esquerda) e não quebram linha */
 .menu-topo { left: 0; right: auto; white-space: nowrap; }
 .aba-com-menu:last-child .menu-topo { left: auto; right: 0; }
+
+/* Cartões dos biomas: em cima o cenário de batalha do bioma; a parte do texto mais transparente (pedido do dono) */
+.cartao-bioma { background: rgb(27 47 74 / 0.4); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.cartao-bioma .faixa {
+  height: 92px; background: var(--fundo-bioma) center 70% / cover no-repeat, linear-gradient(160deg, var(--cor-chao), var(--cor-bioma));
+}
+.cartao-bioma .faixa .sprite { filter: drop-shadow(0 3px 2px rgb(0 0 0 / 0.45)); }

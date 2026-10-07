@@ -119,7 +119,7 @@ function caixaInfo(doJogador: boolean) {
  * Fundos de batalha dos jogos oficiais (XY, ORAS e BW, via Pokémon Showdown) em client/public/batalha;
  * cada batalha sorteia um do bioma (pedido do dono).
  */
-const FUNDOS_BATALHA: Record<string, string[]> = {
+export const FUNDOS_BATALHA: Record<string, string[]> = {
   grama: ['grama-1.jpg', 'grama-2.jpg', 'grama-3.png'],
   agua: ['agua-1.jpg', 'agua-2.jpg', 'agua-3.jpg'],
   vulcao: ['vulcao-1.png', 'vulcao-2.jpg', 'vulcao-3.jpg'],
