@@ -23,3 +23,6 @@ As cores dos tiles são alteradas por filtro em cada bioma. Versões modificadas
 ## Dados e sprites de Pokémon
 - PokéAPI — https://pokeapi.co
 - Motor de batalha: Pokémon Showdown via `@pkmn/sim` (MIT)
+
+## Imagens de itens
+- Tera Shards e Teal Mask: imagens oficiais de Scarlet/Violet (© Nintendo/Game Freak/The Pokémon Company), obtidas do Serebii (serebii.net) — `client/public/itens/`.

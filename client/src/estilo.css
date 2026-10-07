@@ -1045,3 +1045,36 @@ button.vaga:hover { border-color: var(--borda); }
 .premio .premio-chance { font-weight: 800; color: var(--destaque); }
 .selo-vip-conta { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 10px; border: 1px solid #8a6a1c; background: rgb(255 201 60 / 0.08); }
 .selo-vip-conta small { color: var(--texto-2); }
+
+/* Canto esquerdo de cima da arena: caixa do selvagem + clima/terreno com turnos */
+.canto-esquerdo { position: absolute; left: 16px; top: 16px; z-index: 3; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; pointer-events: none; }
+.canto-esquerdo .caixa-info.do-selvagem { position: relative; left: auto; top: auto; pointer-events: auto; }
+.painel-campo { display: flex; flex-direction: column; gap: 4px; }
+.chip-campo {
+  display: flex; align-items: baseline; gap: 8px; padding: 3px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 700;
+  color: #fff; background: rgb(10 20 35 / 0.72); border-left: 4px solid var(--cor-campo, #9ab); box-shadow: 0 2px 6px rgb(0 0 0 / 0.3);
+}
+.chip-campo small { font-weight: 600; color: #cfd8e6; font-size: 0.72rem; }
+.chip-campo.clima-chuva, .chip-campo.clima-chuvaforte { --cor-campo: #4d9bff; }
+.chip-campo.clima-sol, .chip-campo.clima-solforte { --cor-campo: #ffb02e; }
+.chip-campo.clima-areia { --cor-campo: #d8a85a; }
+.chip-campo.clima-neve { --cor-campo: #bfe6ff; }
+.chip-campo.clima-vento { --cor-campo: #9fd6c8; }
+.chip-campo.terreno-eletrico { --cor-campo: #ffe03a; }
+.chip-campo.terreno-grama { --cor-campo: #5fd35f; }
+.chip-campo.terreno-nevoa { --cor-campo: #ff9ad5; }
+.chip-campo.terreno-psiquico { --cor-campo: #d36bff; }
+
+/* Terastal: aba ao lado direito do Pokémon + brilho de cristal */
+.aba-tera {
+  position: absolute; left: calc(50% + 38px); bottom: 34px; z-index: 4; display: flex; flex-direction: column; align-items: center;
+  padding: 4px 10px 5px; clip-path: polygon(12% 0, 88% 0, 100% 50%, 88% 100%, 12% 100%, 0 50%);
+  background: linear-gradient(135deg, #ffffffcc, var(--cor-tipo) 45%, color-mix(in srgb, var(--cor-tipo) 60%, #000) 100%);
+  color: #fff; text-shadow: 0 1px 2px #000a; animation: aba-tera-entra 0.5s ease-out;
+}
+.aba-tera small { font-size: 0.55rem; font-weight: 900; letter-spacing: 0.18em; }
+.aba-tera strong { font-size: 0.8rem; font-style: italic; font-weight: 900; }
+@keyframes aba-tera-entra { from { opacity: 0; transform: translateX(-12px) scale(0.8); } to { opacity: 1; transform: none; } }
+.sprite.terastalizado { filter: drop-shadow(0 0 6px #bff3ff) drop-shadow(0 0 2px #fff) saturate(1.25) brightness(1.08); }
+.botao-tera.ligado { background: linear-gradient(135deg, #ffffff, var(--cor-tipo)); color: #10202e; border-color: transparent; font-weight: 800; }
+.botao.golpe.golpe-tera { box-shadow: 0 0 0 2px #bff3ff, 0 0 14px #7fd3ff99; }

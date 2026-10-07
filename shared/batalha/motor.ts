@@ -13,6 +13,8 @@ export type EventoBatalha =
   | { tipo: 'mensagem'; texto: string }
   /** `forma` = espécie no Showdown (ex.: "Giratina-Origin", "Arceus-Fire"), para o sprite da forma certa. */
   | { tipo: 'entrar'; lado: Lado; indice: number; hp: number; hpMax: number; forma: string; texto?: string }
+  /** Terastalizou: o tipo vira o Tera Type (uma vez por batalha). */
+  | { tipo: 'tera'; lado: Lado; teraTipo: string; texto: string }
   /** Mudou de forma no meio da batalha (Primal Reversion…). */
   | { tipo: 'forma'; lado: Lado; forma: string; texto?: string }
   | { tipo: 'golpe'; lado: Lado; alvo: Lado | null; golpe: string; tipoGolpe: string; categoria: string; texto: string }
@@ -43,7 +45,8 @@ export interface OpcaoGolpe {
 
 export type Pedido =
   /** `zGolpes[i]` = nome do Z-Move do golpe i (Pokémon segurando Z-Crystal), ou null. */
-  | { tipo: 'acao'; golpes: OpcaoGolpe[]; podeTrocar: boolean; podeFugir: boolean; zGolpes: (string | null)[] | null }
+  /** `tera` = Tera Type se ainda pode terastalizar nesta batalha, ou null. */
+  | { tipo: 'acao'; golpes: OpcaoGolpe[]; podeTrocar: boolean; podeFugir: boolean; zGolpes: (string | null)[] | null; tera: string | null }
   | { tipo: 'troca' }
   | { tipo: 'fim' };
 
@@ -198,7 +201,8 @@ export class BatalhaSelvagem {
     });
     const preso = !!(ativo.trapped || ativo.maybeTrapped);
     const zGolpes = Array.isArray(ativo.canZMove) ? (ativo.canZMove as ({ move: string } | null)[]).map((z) => z?.move ?? null) : null;
-    return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso, zGolpes };
+    const tera = typeof ativo.canTerastallize === 'string' ? (ativo.canTerastallize as string) : null;
+    return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso, zGolpes, tera };
   }
 
   /** Posições no time dos Pokémon que podem entrar no lugar do atual. */
@@ -207,9 +211,22 @@ export class BatalhaSelvagem {
     return this.objetos.filter((o) => o !== ativo && !o.fainted && o.hp > 0).map((o) => this.indices[this.objetos.indexOf(o)]);
   }
 
-  /** `z` = usar como Z-Move (precisa segurar o Z-Crystal certo; uma vez por batalha). */
-  usarGolpe(indice: number, z = false): EventoBatalha[] {
-    return this.jogar(`move ${indice}${z ? ' zmove' : ''}`);
+  /** `especial`: 'z' = usar como Z-Move (Z-Crystal certo); 'tera' = terastalizar antes de atacar. Os dois: uma vez por batalha. */
+  usarGolpe(indice: number, especial: 'z' | 'tera' | null = null): EventoBatalha[] {
+    return this.jogar(`move ${indice}${especial === 'z' ? ' zmove' : especial === 'tera' ? ' terastallize' : ''}`);
+  }
+
+  /** Clima e terreno em campo agora, com os turnos que faltam (null = não acaba sozinho, ex.: clima Primal). */
+  campo(): { clima: string | null; turnosClima: number | null; terreno: string | null; turnosTerreno: number | null } {
+    const f = this.batalha.field;
+    const clima = f.weather ? f.getWeather().name : null;
+    const terreno = f.terrain ? f.getTerrain().name : null;
+    return {
+      clima,
+      turnosClima: clima && f.weatherState.duration ? f.weatherState.duration : null,
+      terreno,
+      turnosTerreno: terreno && f.terrainState.duration ? f.terrainState.duration : null,
+    };
   }
 
   trocar(posicaoNoTime: number): EventoBatalha[] {
@@ -404,6 +421,9 @@ export class BatalhaSelvagem {
           break;
         case '-primal':
           eventos.push({ tipo: 'mensagem', texto: `${quem} fez a Primal Reversion e voltou à sua forma primitiva!` });
+          break;
+        case '-terastallize':
+          eventos.push({ tipo: 'tera', lado: this.lado(args[0]), teraTipo: args[1], texto: `${quem} terastalizou! Agora é do tipo ${args[1]}!` });
           break;
         case '-zpower':
           eventos.push({ tipo: 'mensagem', texto: `${quem} se cercou de Z-Power!` });

@@ -93,8 +93,8 @@ const ehLendario = (nome: string) => (Dex.species.get(nome).tags ?? []).some((t)
 
 /** Tera Shards: juntando esta quantidade, troca o Tera Type de um Pokémon (como em Scarlet/Violet). */
 export const SHARDS_POR_TROCA = 50;
-/** Imagens das Tera Shards (Serebii; não existem no Showdown nem na PokéAPI). */
-const imagemShard = (tipo: string) => `https://www.serebii.net/itemdex/sprites/sv/${tipo.toLowerCase()}terashard.png`;
+/** Imagens das Tera Shards (baixadas do Serebii para client/public/itens; não existem no Showdown nem na PokéAPI). */
+const imagemShard = (tipo: string) => `itens/terashard-${tipo.toLowerCase()}.png`;
 
 /**
  * Categoria de um item do Showdown, ou null se ele fica fora do jogo (sem uso: fósseis, cartas, Bottle Caps,

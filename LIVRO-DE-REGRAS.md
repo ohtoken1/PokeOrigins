@@ -191,6 +191,8 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 - **Fundo de batalha:** sorteado a cada luta entre os cenários do bioma (imagens dos jogos oficiais).
 - **Estágios de atributo** (+1 Attack, −2 Speed…) aparecem como etiquetas junto da caixa de HP de cada Pokémon e somem quando ele sai de campo.
 - **Clima e terreno** aparecem na arena: chuva caindo, sol forte, tempestade de areia, neve; terreno elétrico, de grama, de névoa ou psíquico no chão.
+- **Duração:** no canto esquerdo de cima, embaixo da caixa do selvagem, aparece o clima e o terreno em campo com os **turnos que faltam** (5 turnos normalmente; 8 com Damp Rock, Heat Rock etc. ou Terrain Extender; os climas Primal não acabam sozinhos).
+- **Terastal:** uma vez por batalha, o botão **Terastalizar (tipo)** no menu de golpes faz o Pokémon virar o **Tera Type** dele antes de atacar (troca o Tera Type com Tera Shards). Ao terastalizar, aparece uma **aba TERA** com o tipo ao lado direito do Pokémon e ele ganha um brilho de cristal; some quando ele sai de campo.
 - **Informações:** passar o mouse num golpe mostra poder, precisão, PP, categoria, prioridade e descrição. Passar o mouse no selvagem mostra o resumo dele; a habilidade só aparece depois de ser revelada na luta.
 - **Itens segurados (held items):** o item que o Pokémon segura funciona na batalha como nos jogos (Leftovers, Focus Sash, Choice Scarf, frutas…), e a batalha avisa quando ele age. Itens gastos voltam no fim da batalha; **frutas comidas somem**.
 - **Z-Moves:** quem segura um **Z-Crystal** ganha o botão **Z-Move** no menu de golpes. Ligado, os golpes viram Z-Moves (ex.: Thunder Shock → Gigavolt Havoc, poder 100). **Uma vez por batalha.**
@@ -341,7 +343,7 @@ As duas aparecem **separadas na carteira**, acima do painel do treinador.
 | **Itens de batalha** | equipar (o item anterior volta para a bolsa); frutas comidas somem no fim da batalha |
 | **TMs/TRs** | ensinar, se o Pokémon puder aprender; são gastas ao usar |
 | **Berries, Gems, Plates, Memories, Z-Crystals, Itens de lendários** | equipar |
-| **Tera Shards** | junte **50 do mesmo tipo** e use num Pokémon para trocar o **Tera Type** dele (como em Scarlet/Violet). A Terastalização na batalha ainda não existe |
+| **Tera Shards** | junte **50 do mesmo tipo** e use num Pokémon para trocar o **Tera Type** dele (como em Scarlet/Violet) |
 | **Tickets** | abrir (veja a [seção 13](#13-tickets)) |
 
 ---
@@ -510,6 +512,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
+- Terastal na batalha, duração de clima e terreno no canto da arena, imagens das Tera Shards guardadas no jogo.
 - Tickets da planilha do dono: 14 tickets (Kyogre, Groudon, Giratina, Hoopa, Dialga, Palkia, Arceus, Therian, Kyurem, Zacian, Zamazenta, Ogerpon, Lendário, Inicial) com a chance de cada prêmio; skins e itens-chave; Ovo Lendário e Ovo Inicial; pré-sistema de VIP.
 - Time com arrastar, PC com 20 boxes e ficha completa do Pokémon.
 - Pokémon que te segue animado em 8 direções, com sombra.

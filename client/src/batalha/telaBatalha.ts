@@ -44,6 +44,18 @@ const NOMES_BOOST: Record<string, string> = { atk: 'Attack', def: 'Defense', spa
 const CLASSE_CLIMA: Record<string, string> = {
   RainDance: 'chuva', PrimordialSea: 'chuva', SunnyDay: 'sol', DesolateLand: 'sol', Sandstorm: 'areia', Hail: 'neve', Snow: 'neve', Snowscape: 'neve', DeltaStream: 'vento',
 };
+/** Nomes dos climas no quadro do canto (terrenos ficam em inglês, regra do dono). */
+const NOMES_CLIMA: Record<string, string> = {
+  RainDance: 'Chuva',
+  SunnyDay: 'Sol forte',
+  Sandstorm: 'Tempestade de areia',
+  Snow: 'Neve',
+  Snowscape: 'Neve',
+  Hail: 'Granizo',
+  DesolateLand: 'Sol extremo',
+  PrimordialSea: 'Chuva torrencial',
+  DeltaStream: 'Ventos misteriosos',
+};
 const CLASSE_TERRENO: Record<string, string> = { 'Electric Terrain': 'eletrico', 'Grassy Terrain': 'grama', 'Misty Terrain': 'nevoa', 'Psychic Terrain': 'psiquico' };
 
 function caixaInfo(doJogador: boolean) {
@@ -153,13 +165,15 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
   infoSelvagem.definir(selvagem);
   infoSelvagem.hp(selvagem.hp, hpMaximo(selvagem));
 
+  // canto esquerdo de cima: caixa do selvagem e, embaixo dela, clima/terreno com os turnos que faltam
+  const painelCampo = el('div', { class: 'painel-campo' });
   const arena = el(
     'div',
     {
       class: `arena ${imagemFundo ? 'com-fundo' : ''}`,
       style: { '--chao': hex(bioma.cores.chao), '--zona': hex(bioma.cores.zona), '--fundo-batalha': imagemFundo ? `url(${imagemFundo})` : 'none' },
     },
-    infoSelvagem.raiz,
+    el('div', { class: 'canto-esquerdo' }, infoSelvagem.raiz, painelCampo),
     lugarSelvagem,
     lugarJogador,
     infoJogador.raiz,
@@ -212,6 +226,27 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
   };
 
   const sprite = (lado: Lado) => (lado === 'jogador' ? spriteJogador : spriteSelvagem);
+  const lugar = (lado: Lado) => (lado === 'jogador' ? lugarJogador : lugarSelvagem);
+
+  /** Atualiza o quadro de clima/terreno (nome + turnos que faltam). */
+  const atualizarCampo = () => {
+    const c = batalha.campo();
+    const chip = (nome: string, turnos: number | null, classe: string) =>
+      el('div', { class: `chip-campo ${classe}` }, el('span', {}, nome), el('small', {}, turnos === null ? 'sem fim' : `${turnos} turno${turnos === 1 ? '' : 's'}`));
+    painelCampo.replaceChildren(
+      ...[c.clima ? chip(NOMES_CLIMA[c.clima] ?? c.clima, c.turnosClima, `clima-${CLASSE_CLIMA[c.clima] ?? ''}`) : null, c.terreno ? chip(c.terreno, c.turnosTerreno, `terreno-${CLASSE_TERRENO[c.terreno] ?? ''}`) : null].filter(
+        (x): x is HTMLDivElement => !!x,
+      ),
+    );
+  };
+
+  /** Aba do Terastal ao lado direito do Pokémon (some quando ele sai de campo). */
+  const marcarTera = (lado: Lado, tipo: string | null) => {
+    const l = lugar(lado);
+    l.querySelector('.aba-tera')?.remove();
+    sprite(lado).classList.toggle('terastalizado', !!tipo);
+    if (tipo) l.append(el('div', { class: 'aba-tera', style: { '--cor-tipo': tipo === 'Stellar' ? '#7fd3ff' : corTipo(tipo) } }, el('small', {}, 'TERA'), el('strong', {}, tipo)));
+  };
   const info = (lado: Lado) => (lado === 'jogador' ? infoJogador : infoSelvagem);
 
   function colocarJogador(posicao: number) {
@@ -231,8 +266,9 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
           await dizer(ev.texto);
           break;
         case 'entrar':
-          // quem entra em campo começa sem estágios de atributo
+          // quem entra em campo começa sem estágios de atributo (e sem Terastal)
           info(ev.lado).zerarBoosts();
+          marcarTera(ev.lado, null);
           if (ev.lado === 'jogador') {
             colocarJogador(ev.indice);
             // forma que depende do item (Giratina-Origin, Arceus-Fire…)
@@ -274,10 +310,12 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
           break;
         case 'clima':
           camadaClima.className = `camada-clima ${ev.clima ? `clima-${CLASSE_CLIMA[ev.clima] ?? ''}` : ''}`;
+          atualizarCampo();
           if (ev.texto) await dizer(ev.texto);
           break;
         case 'terreno':
           camadaTerreno.className = `camada-terreno ${ev.terreno ? `terreno-${CLASSE_TERRENO[ev.terreno] ?? ''}` : ''}`;
+          atualizarCampo();
           if (ev.texto) await dizer(ev.texto);
           break;
         case 'impacto':
@@ -286,6 +324,11 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
           break;
         case 'desmaio':
           await animarDesmaio(sprite(ev.lado));
+          await dizer(ev.texto);
+          break;
+        case 'tera':
+          marcarTera(ev.lado, ev.teraTipo);
+          void animarDano(sprite(ev.lado));
           await dizer(ev.texto);
           break;
         case 'forma':
@@ -308,6 +351,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     if (pedido.tipo === 'fim') return finalizar(batalha.vencedor === 'jogador' ? 'vitoria' : 'derrota');
     if (pedido.tipo === 'troca') return menuPokemon(true);
 
+    atualizarCampo();
     mensagem.textContent = `O que ${nomeDe(save.time[batalha.ativo].especieId)} vai fazer?`;
     acoes.replaceChildren(
       botao([el('span', { class: 'emote' }, '⚔️'), 'Lutar'] as never, () => menuGolpes(), { class: 'botao grande lutar' }),
@@ -317,20 +361,22 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     );
   }
 
-  function menuGolpes(usarZ = false) {
+  /** `modo`: 'z' = Z-Move ligado; 'tera' = Terastalizar ligado (os dois não juntos). */
+  function menuGolpes(modo: 'z' | 'tera' | null = null) {
     const pedido = batalha.pedido();
     if (pedido.tipo !== 'acao') return menuPrincipal();
     const z = pedido.zGolpes;
+    const usarZ = modo === 'z';
     acoes.replaceChildren(
       ...pedido.golpes.map((g, i) =>
         // cartão com as informações do golpe ao passar o mouse
         dicaGolpe(el(
           'button',
           {
-            class: `botao golpe ${usarZ && z?.[i] ? 'golpe-z' : ''}`,
+            class: `botao golpe ${usarZ && z?.[i] ? 'golpe-z' : ''} ${modo === 'tera' ? 'golpe-tera' : ''}`,
             style: { '--cor-tipo': corTipo(g.tipo) },
             disabled: g.desabilitado || (g.ppMax > 0 && g.pp <= 0) || (usarZ && !z?.[i]),
-            onclick: () => executar(() => batalha.usarGolpe(g.indice, usarZ && !!z?.[i])),
+            onclick: () => executar(() => batalha.usarGolpe(g.indice, usarZ && z?.[i] ? 'z' : modo === 'tera' ? 'tera' : null)),
           },
           el('strong', {}, usarZ && z?.[i] ? z[i]! : g.nome),
           el(
@@ -345,7 +391,14 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
         ), g.id, g.ppMax > 0 ? () => ({ atual: g.pp, max: g.ppMax }) : undefined),
       ),
       // Z-Crystal segurado: liga/desliga o Z-Move (uma vez por batalha)
-      z ? botao(usarZ ? 'Z-Move ligado' : 'Z-Move', () => menuGolpes(!usarZ), { class: `botao secundario botao-z ${usarZ ? 'ligado' : ''}` }) : '',
+      z ? botao(usarZ ? 'Z-Move ligado' : 'Z-Move', () => menuGolpes(usarZ ? null : 'z'), { class: `botao secundario botao-z ${usarZ ? 'ligado' : ''}` }) : '',
+      // Terastal: uma vez por batalha; o Pokémon vira o Tera Type dele antes de atacar
+      pedido.tera
+        ? botao(modo === 'tera' ? `Terastalizar ligado (${pedido.tera})` : `Terastalizar (${pedido.tera})`, () => menuGolpes(modo === 'tera' ? null : 'tera'), {
+            class: `botao secundario botao-tera ${modo === 'tera' ? 'ligado' : ''}`,
+            style: { '--cor-tipo': pedido.tera === 'Stellar' ? '#7fd3ff' : corTipo(pedido.tera) },
+          })
+        : '',
       botao('← Voltar', menuPrincipal, { class: 'botao secundario voltar' }),
     );
   }
