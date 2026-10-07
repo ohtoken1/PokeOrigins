@@ -65,12 +65,14 @@ export function seloNT(p: { inegociavel?: boolean }): HTMLElement | null {
   return p.inegociavel ? el('span', { class: 'selo-nt', title: 'NT · Inegociável: não pode ser trocado com outros jogadores' }, '🔒 NT') : null;
 }
 
-/** Selo do tier pela soma dos IVs (S+ … F). */
-export function seloTier(p: Pick<PokemonIndividual, 'ivs'>): HTMLElement {
+/** Selo do tier pela soma dos IVs (S+ … C), no estilo de rank de jogo. Só depois da avaliação (silver ou gold). */
+export function seloTier(p: Pick<PokemonIndividual, 'ivs' | 'ivsFaixa' | 'ivsRevelados'>): HTMLElement | null {
+  if (!p.ivsFaixa && !p.ivsRevelados) return null;
   const tier = tierIv(p);
   const [min, max] = faixaDoTier(tier);
   const classe = tier === 'S+' ? 'sp' : tier.toLowerCase();
-  return el('span', { class: `selo-tier tier-${classe}`, title: `Tier ${tier} · soma dos IVs entre ${min} e ${max} (de 186)` }, tier);
+  return el('span', { class: `selo-tier tier-${classe}`, title: `Tier ${tier} · soma dos IVs entre ${min} e ${max} (de 186)` },
+    el('span', { class: 'letra' }, tier.replace('+', '')), tier.endsWith('+') ? el('span', { class: 'mais' }, '+') : null);
 }
 
 export function corTipo(tipo: string): string {

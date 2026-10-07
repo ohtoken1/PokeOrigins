@@ -247,7 +247,7 @@ Os IVs de um Pokémon capturado **começam escondidos** ("?" na ficha). Há dois
 - O inicial já vem com os IVs revelados (IV 20).
 
 ### Tier do Pokémon
-Todo Pokémon capturado ganha um **tier** pela **soma dos 6 IVs** (de 0 a 186). Ele aparece na ficha, no resumo ao passar o mouse e na mensagem de captura, mesmo com os IVs ainda ocultos:
+Todo Pokémon ganha um **tier** pela **soma dos 6 IVs** (de 0 a 186). O tier só aparece **depois da avaliação** (silver ou gold), na ficha e no resumo ao passar o mouse:
 
 | Tier | Soma dos IVs |
 |---|---|
@@ -255,10 +255,7 @@ Todo Pokémon capturado ganha um **tier** pela **soma dos 6 IVs** (de 0 a 186). 
 | **S** | 145 a 170 |
 | **A** | 120 a 144 |
 | **B** | 95 a 119 |
-| **C** | 70 a 94 |
-| **D** | 45 a 69 |
-| **E** | 20 a 44 |
-| **F** | 0 a 19 |
+| **C** | 94 ou menos |
 
 O inicial (IV 20 em tudo, soma 120) é sempre **A**.
 
@@ -412,7 +409,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Captura pela fórmula da 3ª/4ª geração, com a chance mostrada a cada arremesso.
 
 **Pokémon e economia**
-- IVs ocultos: faixa com silver, valor exato com gold. Tier do Pokémon (S+ a F) pela soma dos IVs.
+- IVs ocultos: faixa com silver, valor exato com gold. Tier do Pokémon (S+ a C) pela soma dos IVs, visível depois da avaliação.
 - Moedas silver e gold, separadas na carteira.
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.

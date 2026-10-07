@@ -1,5 +1,5 @@
 // Tier de um Pokémon pela soma dos IVs (0 a 186), pedido do dono:
-// S+ 171+, S 145–170, A 120–144, B 95–119, C 70–94, D 45–69, E 20–44, F até 19.
+// S+ 171+, S 145–170, A 120–144, B 95–119, C 94 ou menos. Só aparece depois da avaliação (silver ou gold).
 import type { PokemonIndividual } from './batalha/pokemon';
 
 export const TIERS_IV: { tier: string; minimo: number }[] = [
@@ -7,10 +7,7 @@ export const TIERS_IV: { tier: string; minimo: number }[] = [
   { tier: 'S', minimo: 145 },
   { tier: 'A', minimo: 120 },
   { tier: 'B', minimo: 95 },
-  { tier: 'C', minimo: 70 },
-  { tier: 'D', minimo: 45 },
-  { tier: 'E', minimo: 20 },
-  { tier: 'F', minimo: 0 },
+  { tier: 'C', minimo: 0 },
 ];
 
 export const somaIvs = (p: Pick<PokemonIndividual, 'ivs'>) => Object.values(p.ivs).reduce((s, v) => s + v, 0);

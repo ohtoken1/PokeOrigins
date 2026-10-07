@@ -805,16 +805,22 @@ button.vaga:hover { border-color: var(--borda); }
 .opcoes-erro:empty { display: none; }
 .opcoes-secao .botao { align-self: flex-start; }
 
-/* Tier pela soma dos IVs (S+ … F) */
+/* Tier pela soma dos IVs (S+ … C): letra de rank grossa, inclinada, com metal e contorno (estilo Grand Chase) */
 .selo-tier {
-  display: inline-block; margin-left: 6px; min-width: 22px; padding: 1px 6px; border-radius: 6px; text-align: center; vertical-align: middle;
-  font-size: 0.7rem; font-weight: 900; letter-spacing: 0.02em; color: #fff; cursor: help; text-shadow: 0 1px 0 rgb(0 0 0 / 0.35);
+  display: inline-flex; align-items: flex-start; margin-left: 8px; vertical-align: middle; cursor: help; line-height: 1;
+  font-family: Impact, 'Arial Black', 'Segoe UI Black', system-ui, sans-serif; font-style: italic; font-weight: 900;
+  transform: skewX(-6deg); filter: drop-shadow(0 2px 0 rgb(0 0 0 / 0.55)) drop-shadow(0 0 6px var(--brilho, transparent));
 }
-.tier-sp { background: linear-gradient(135deg, #ffe066, #ff9f1c 55%, #ff5fa2); color: #3a1d00; text-shadow: none; box-shadow: 0 0 8px rgb(255 190 60 / 0.6); }
-.tier-s { background: #f0a020; color: #2a1800; text-shadow: none; }
-.tier-a { background: #a35be8; }
-.tier-b { background: #3c86e0; }
-.tier-c { background: #2fa860; }
-.tier-d { background: #7a8a4a; }
-.tier-e { background: #6c7686; }
-.tier-f { background: #7a5040; }
+.selo-tier .letra, .selo-tier .mais {
+  background: var(--metal); -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-text-stroke: 1px var(--contorno); paint-order: stroke fill;
+}
+.selo-tier .letra { font-size: 1.45rem; letter-spacing: -0.02em; }
+.selo-tier .mais { font-size: 0.95rem; margin-left: 1px; margin-top: -2px; }
+.resumo-titulo .selo-tier .letra { font-size: 1.15rem; }
+.resumo-titulo .selo-tier .mais { font-size: 0.8rem; }
+.tier-sp { --metal: linear-gradient(180deg, #fff7c2 0%, #ffd23a 35%, #ff8a1c 60%, #ff4fa0 100%); --contorno: #5a1a00; --brilho: rgb(255 200 60 / 0.75); }
+.tier-s { --metal: linear-gradient(180deg, #fff3b0 0%, #ffc61a 50%, #c47800 100%); --contorno: #4a2a00; --brilho: rgb(255 190 40 / 0.45); }
+.tier-a { --metal: linear-gradient(180deg, #f2d8ff 0%, #b06cff 50%, #6a22c8 100%); --contorno: #2a0a50; }
+.tier-b { --metal: linear-gradient(180deg, #d8ecff 0%, #5aa8ff 50%, #1f5cc0 100%); --contorno: #08224a; }
+.tier-c { --metal: linear-gradient(180deg, #eef2f6 0%, #a8b4c4 50%, #5f6b7c 100%); --contorno: #1e2530; }
