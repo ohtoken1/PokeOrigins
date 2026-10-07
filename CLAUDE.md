@@ -86,6 +86,10 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - Item raro da bolsa (aba Tickets). Abrir sorteia a raridade (`RARIDADES`: comum 70%, raro 22%, épico 7%, lendário 1%) e depois um **pacote** dessa raridade (ex.: Kyogre Nv. 50 com chance de shiny + Blue Orb). Conteúdo é rascunho: o dono vai definir cada ticket (Groudon, Rayquaza, Giratina…).
 - Obtenção: `CHANCE_TICKET_POR_BATALHA` (1/1000 ao vencer/capturar) e botão no Admin. Itens de forma (`ITENS_ESPECIAIS`: orbes) ficam fora da loja, aba "Especiais" da bolsa (equipar). Showdown faz a Primal Reversion; a tela de batalha ainda não troca o sprite para a forma Primal.
 
+## Professores de golpes (`shared/professores.ts`, `client/src/telas/golpes.ts`)
+- Aba "Golpes" na barra do topo: **Relembrador** (golpes por nível ≤ nível atual que o Pokémon não sabe; `PRECO_RELEMBRAR` 50 silver) e **Tutor** (golpes T/M/E da geração mais recente da espécie, somando as formas anteriores; `PRECO_TUTOR` 100 silver). Com 4 golpes, escolhe qual esquecer.
+- PC: segurar o clique marca para soltar vários (`aoSegurar` em `ui/arrastar.ts`).
+
 ## Ovos Misteriosos (`shared/ovos.ts`, `client/src/ui/ovo.ts`)
 - Itens da aba "Ovos" da bolsa (fora da loja): **Ovo Misterioso S** (soma de IVs ≥145) e **A** (≥120). Chocar = roleta como a do ticket; espécie com chance igual entre TODAS as carregadas (lendários inclusive), shiny 5% (`CHANCE_SHINY_OVO`), nível 1 (`NIVEL_OVO`), IVs sorteados até cair no tier (`sortearIvs`). Ícone próprio (`iconeOvo`, cor do tier, como os discos de TM). Obtenção por enquanto só no Admin.
 

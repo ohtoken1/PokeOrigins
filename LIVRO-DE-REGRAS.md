@@ -275,6 +275,7 @@ O inicial (IV 20 em tudo, soma 120) é sempre **A**.
 - **Espaço:** **20 boxes de 30 Pokémon** (600 vagas).
 - **Arrastar:** entre o time, as boxes e as abas das boxes.
 - **Soltar** um Pokémon pede confirmação, porque não tem volta.
+- **Soltar vários:** segure o clique num Pokémon para marcá-lo; depois, cada clique marca ou desmarca outros. O botão "Soltar N" solta todos juntos (com confirmação). O time precisa ficar com pelo menos 1.
 - **Tirar item** devolve o item equipado para a bolsa.
 
 ### 10.3 O Pokémon que te segue
@@ -282,6 +283,14 @@ O inicial (IV 20 em tudo, soma 120) é sempre **A**.
 - **Shiny:** se o seu Pokémon é shiny, quem te segue também aparece shiny.
 - **Pokémon grandes** ficam 2 passos atrás, para não "entrar" no treinador.
 - 961 das 1025 espécies têm animação. As que não têm aparecem com a imagem de batalha, balançando.
+
+### 10.4 Professores de golpes (aba Golpes)
+Na barra do topo, a aba **Golpes** tem dois professores. Escolha o Pokémon do time e o golpe; se ele já souber 4, você escolhe qual esquecer.
+
+| Professor | O que ensina | Preço (provisório) |
+|---|---|---|
+| **Relembrador de Golpes** | qualquer golpe que a espécie aprende **por nível** até o nível atual, inclusive os esquecidos | 50 silver |
+| **Tutor de Golpes** | o que a espécie aprende na **geração mais recente** dos jogos por tutor, TM ou ovo (Egg Moves, inclusive os das formas anteriores) | 100 silver |
 
 ---
 
@@ -439,6 +448,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Wallpapers calmos no menu e um diferente para cada bioma.
 - Janelas semitransparentes.
 - Cartão de informações dos golpes ao passar o mouse.
+- Aba Golpes (Relembrador e Tutor), soltar vários Pokémon de uma vez no PC.
 - Aba Comunidade (Amigos e Clã em breve) e aba Opções (nome de treinador, nome real, nome no mapa, teto dos encontros).
 - Câmera do mapa com zoom fixo.
 - Painel Admin para testes: chances, Pokémon forçado, moedas, tickets e Pokédex revelada.

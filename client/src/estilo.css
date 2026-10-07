@@ -897,3 +897,53 @@ button.vaga:hover { border-color: var(--borda); }
 }
 /* a caixa do selvagem fica no topo da arena: os estágios aparecem embaixo dela */
 .caixa-info.do-selvagem .boosts { bottom: auto; top: calc(100% + 4px); }
+
+/* PC: marcados para soltar juntos */
+.vaga.marcada { outline: 3px solid #e85a5a; outline-offset: -3px; position: relative; }
+.vaga.marcada::after { content: '✓'; position: absolute; top: 3px; left: 5px; width: 16px; height: 16px; border-radius: 50%; background: #e85a5a; color: #fff; font-size: 0.7rem; font-weight: 900; display: grid; place-items: center; }
+.soltar-grupo { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-height: 240px; overflow-y: auto; }
+.soltar-mini { display: flex; flex-direction: column; align-items: center; width: 72px; }
+.soltar-mini .sprite { width: 56px; height: 56px; }
+.soltar-mini small { font-size: 0.65rem; color: var(--texto-2); text-align: center; }
+
+/* Aba Golpes: Relembrador e Tutor */
+.tela-golpes { max-width: 860px; margin: 0 auto; }
+.golpes-corpo { display: flex; flex-direction: column; gap: 12px; }
+.golpes-abas { display: flex; gap: 6px; flex-wrap: wrap; }
+.golpes-npc {
+  display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 14px;
+  background: rgb(27 47 74 / 0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
+}
+.golpes-npc p { margin: 2px 0 0; color: var(--texto-2); font-size: 0.88rem; }
+.golpes-npc-icone {
+  width: 44px; height: 44px; flex: none; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: 1.2rem;
+  background: var(--destaque); color: #2a1d00; border: 2px solid #fff3;
+}
+.golpes-carteira { color: var(--texto-2); font-size: 0.85rem; }
+.golpes-time { display: flex; gap: 8px; flex-wrap: wrap; }
+.golpes-pokemon {
+  display: flex; flex-direction: column; align-items: center; width: 92px; padding: 4px; border-radius: 12px; cursor: pointer;
+  background: var(--painel); border: 2px solid var(--borda); color: var(--texto);
+}
+.golpes-pokemon.ativo { border-color: var(--destaque); }
+.golpes-pokemon .sprite { width: 56px; height: 56px; }
+.golpes-pokemon small { font-size: 0.68rem; text-align: center; }
+.golpes-aviso { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--painel-2); border: 1px solid var(--borda); }
+.rotulo-secao { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--texto-2); }
+.golpes-atuais { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.golpes-atuais .rotulo-secao { width: 100%; }
+.golpe-atual {
+  display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 10px; color: var(--texto);
+  background: var(--painel); border: 1px solid var(--borda); border-left: 4px solid var(--cor-tipo); font: inherit;
+}
+.golpe-atual:disabled { opacity: 1; cursor: default; }
+.golpe-atual.escolher { cursor: pointer; border-color: #e85a5a; }
+.golpe-atual.escolher:hover { background: rgb(232 90 90 / 0.15); }
+.golpes-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
+.golpe-oferta {
+  display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px;
+  background: var(--painel); border: 1px solid var(--borda); border-left: 4px solid var(--cor-tipo);
+}
+.golpe-oferta-nome { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.golpe-oferta small { color: var(--texto-2); }
+.golpe-oferta .botao { align-self: flex-start; padding: 5px 10px; font-size: 0.8rem; }

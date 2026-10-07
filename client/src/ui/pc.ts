@@ -17,6 +17,8 @@ let boxAtual = 0;
 export function abrirPC(save: Save, aoMudar: () => void): void {
   let selecionado: PokemonDoJogador | null = null;
   let verFicha = false;
+  /** Marcados para soltar juntos (segurar o clique num Pokémon marca; depois, cada clique marca/desmarca). */
+  const marcados = new Set<PokemonDoJogador>();
 
   const mudou = () => {
     salvar(save);
@@ -111,16 +113,57 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
     );
   }
 
+  /** Confirmação para soltar vários de uma vez. */
+  function confirmarSoltarVarios(lista: PokemonDoJogador[], depois: () => void) {
+    const janela = abrirJanela(
+      `Soltar ${lista.length} Pokémon`,
+      () =>
+        el(
+          'div',
+          { class: 'soltar' },
+          el('div', { class: 'soltar-grupo' }, ...lista.map((p) => el('div', { class: 'soltar-mini' }, spritePokemon(pokemonPorId(p.especieId), { shiny: p.shiny, animado: false }), el('small', {}, `${nome(p)} Nv. ${p.nivel}`)))),
+          el('p', {}, `Soltar estes ${lista.length} Pokémon? Eles vão embora e não voltam mais.`),
+          lista.some((p) => p.item) ? el('p', { class: 'meta' }, 'Os itens que eles seguravam voltam para a bolsa.') : null,
+          el(
+            'div',
+            { class: 'soltar-botoes' },
+            el('button', { class: 'botao secundario', onclick: () => janela.fechar() }, 'Cancelar'),
+            el('button', {
+              class: 'botao perigo',
+              onclick: () => {
+                for (const p of lista) {
+                  if (p.item) save.itens[p.item] = (save.itens[p.item] ?? 0) + 1;
+                  remover(p);
+                }
+                janela.fechar();
+                depois();
+              },
+            }, `Soltar ${lista.length}`),
+          ),
+        ),
+      { classe: 'janela-soltar' },
+    );
+  }
+
   abrirJanela(
     'PC de Pokémon',
     (janela) => {
       const refazer = () => janela.redesenhar();
       if (selecionado && !save.time.includes(selecionado) && !save.caixa.includes(selecionado)) selecionado = null;
+      for (const m of [...marcados]) if (!save.time.includes(m) && !save.caixa.includes(m)) marcados.delete(m);
+      const marcar = (q: PokemonDoJogador) => {
+        if (marcados.has(q)) marcados.delete(q);
+        else marcados.add(q);
+        refazer();
+      };
 
       const cartao = (p: PokemonDoJogador, alvo: Record<string, string | number>) => {
-        const c = cartaoPokemon(p, { class: `vaga ${selecionado === p ? 'selecionada' : ''} ${p.hp <= 0 ? 'desmaiado' : ''}`, ...prefixar(alvo) });
+        const c = cartaoPokemon(p, { class: `vaga ${selecionado === p && !marcados.size ? 'selecionada' : ''} ${marcados.has(p) ? 'marcada' : ''} ${p.hp <= 0 ? 'desmaiado' : ''}`, ...prefixar(alvo) });
         tornarArrastavel(c, {
+          aoSegurar: () => marcar(p),
           aoClicar: () => {
+            // com algum marcado, o clique marca/desmarca em vez de abrir as opções
+            if (marcados.size) return marcar(p);
             selecionado = p;
             verFicha = false;
             refazer();
@@ -256,7 +299,24 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
         el(
           'div',
           { class: 'acoes-pc' },
-          p ? [el('strong', {}, `${nome(p)} Nv. ${p.nivel}`), ...acoes] : el('span', { class: 'meta' }, 'Clique num Pokémon para ver as opções, ou arraste para mover.'),
+          marcados.size
+            ? (() => {
+                const lista = [...marcados];
+                const timeTodo = save.time.length > 0 && save.time.every((t) => marcados.has(t));
+                return [
+                  el('strong', {}, `${lista.length} marcado${lista.length > 1 ? 's' : ''} para soltar`),
+                  el('button', {
+                    class: 'botao perigo',
+                    disabled: timeTodo,
+                    title: timeTodo ? 'O time precisa ficar com pelo menos 1 Pokémon' : '',
+                    onclick: () => confirmarSoltarVarios(lista, () => (marcados.clear(), (selecionado = null), mudou(), refazer())),
+                  }, `Soltar ${lista.length}`),
+                  el('button', { class: 'botao secundario', onclick: () => (marcados.clear(), refazer()) }, 'Cancelar'),
+                ];
+              })()
+            : p
+              ? [el('strong', {}, `${nome(p)} Nv. ${p.nivel}`), ...acoes]
+              : el('span', { class: 'meta' }, 'Clique num Pokémon para ver as opções, arraste para mover, ou segure o clique para marcar vários e soltar juntos.'),
         ),
       );
       // "Ver ficha": a ficha abre à esquerda e o PC vai para a direita
