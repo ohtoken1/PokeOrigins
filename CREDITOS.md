@@ -27,6 +27,10 @@ As cores dos tiles são alteradas por filtro em cada bioma. Versões modificadas
 ## Imagens de itens
 - Tera Shards e Teal Mask: imagens oficiais de Scarlet/Violet (© Nintendo/Game Freak/The Pokémon Company), obtidas do Serebii (serebii.net) — `client/public/itens/`.
 
+## Mega Evolução
+- Símbolo da Mega Evolução (© Nintendo/Game Freak/The Pokémon Company), arquivo "Megaevolución icono.svg" do WikiDex (wikidex.net) — `client/public/batalha/mega-evolucao.svg`.
+- Sprites das Megas: PokéAPI (github.com/PokeAPI/sprites); ícones das Mega Stones: folha de ícones do Pokémon Showdown.
+
 ## Imagens dos treinadores
 - Sprites dos personagens (líderes de ginásio, Elite Four, campeões, rivais e outros) do Pokémon Showdown (play.pokemonshowdown.com/sprites/trainers; arte dos jogos oficiais © Nintendo/Game Freak/The Pokémon Company e artistas da comunidade do Showdown) — `client/public/treinadores/`.
 

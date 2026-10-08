@@ -1,19 +1,21 @@
 // Gera shared/data/formas-sprites.json: forma do Showdown (ex.: "Arceus-Fire") → nome do arquivo de sprite
 // na PokéAPI (ex.: "493-fire" ou "10007"). Só as formas que mudam por item segurado (Arceus, Silvally,
-// Genesect, Giratina/Dialga/Palkia-Origin, Ogerpon) e as de batalha (Primal, Crowned, Ultra Necrozma).
+// Genesect, Giratina/Dialga/Palkia-Origin, Ogerpon), as de batalha (Primal, Crowned, Ultra Necrozma) e as Megas.
 // Uso: node scripts/formas-sprites.mjs
 import { writeFileSync } from 'node:fs';
 import { Dex } from '@pkmn/sim';
 
 const formas = Dex.species
   .all()
-  .filter((s) => s.num > 0 && (s.requiredItem || s.requiredItems) && !/Mega/.test(s.name))
+  .filter((s) => s.num > 0 && s.isNonstandard !== 'CAP' && (s.requiredItem || s.requiredItems || s.isMega))
   .map((s) => s.name);
 
 const candidatos = (nome) => {
   const id = nome.toLowerCase().replace(/[^a-z0-9-]/g, '');
   const lista = [id];
   if (id.startsWith('ogerpon-')) lista.unshift(id.replace(/^ogerpon-(\w+)/, 'ogerpon-$1-mask'));
+  // Megas com gênero no nome (Meowstic-M-Mega → meowstic-male-mega)
+  if (/-mega/.test(id)) lista.push(id.replace(/-m-mega/, '-male-mega').replace(/-f-mega/, '-female-mega'));
   return lista;
 };
 

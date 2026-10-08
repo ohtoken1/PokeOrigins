@@ -19,6 +19,10 @@ import { pokemonsDaRegiao, todosOsPokemons } from '../dados';
 import { carregarSave } from '../estado';
 import { pokedexRevelada } from '../ui/admin';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
+import { megasDaEspecie, tierDaMega, type Mega } from '../../../shared/megas';
+import { itemDaLoja, textoPreco } from '../../../shared/loja';
+import { megaComoPokemon } from '../ui/formas';
+import { iconeItem } from '../ui/iconeItem';
 
 
 const CRESCIMENTO: Record<string, string> = { fast: 'Rápido', medium: 'Médio', 'medium-slow': 'Médio-lento', slow: 'Lento' };
@@ -92,7 +96,9 @@ function fichaOculta(p: PokemonBase): HTMLElement {
   );
 }
 
-function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeof mapaDeEncontros>, abrir: (id: number) => void, visto: (id: number) => boolean): HTMLElement {
+type Abrir = (id: number, mega?: string) => void;
+
+function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeof mapaDeEncontros>, abrir: Abrir, visto: (id: number) => boolean): HTMLElement {
   if (!visto(p.id)) return fichaOculta(p);
   const s = especie(p.id);
   const estado = { shiny: false, costas: false };
@@ -153,6 +159,8 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
   };
   const porEstagio: PokemonBase[][] = [];
   for (const q of cadeia) (porEstagio[estagio(q)] ??= []).push(q);
+  // Megas da linha: entram como o último estágio (Charizard → Mega Charizard X / Y)
+  const megas = cadeia.flatMap((q) => megasDaEspecie(q.id).map((m) => ({ m, base: q })));
   const evolucao = el(
     'div',
     { class: 'dex-evolucao' },
@@ -168,6 +176,20 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
         ),
       ),
     ]),
+    ...(megas.length
+      ? [
+          el('span', { class: 'dex-seta dex-seta-mega' }, el('img', { src: 'batalha/mega-evolucao.svg', alt: 'Mega Evolução' })),
+          el('div', { class: 'dex-estagio' },
+            ...megas.map(({ m, base }) =>
+              el('button', { class: `dex-evo dex-evo-mega ${visto(base.id) ? '' : 'oculto'}`, onclick: () => abrir(base.id, m.forma) },
+                spritePokemon(megaComoPokemon(m, base), { animado: false }),
+                el('span', {}, visto(base.id) ? m.nome : '???'),
+                el('small', {}, textoRequisitoMega(m)),
+              ),
+            ),
+          ),
+        ]
+      : []),
   );
 
   // onde encontrar
@@ -291,7 +313,7 @@ ${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) }
     el('section', {}, el('h3', {}, 'Atributos base'), atributos),
     el('section', {}, el('h3', {}, 'Abilities'), habilidades),
     el('section', {}, el('h3', {}, 'Dano recebido por tipo'), efetividade),
-    el('section', {}, el('h3', {}, 'Evolução'), cadeia.length > 1 ? evolucao : el('p', { class: 'dica' }, 'Não evolui.')),
+    el('section', {}, el('h3', {}, 'Evolução'), cadeia.length > 1 || megas.length ? evolucao : el('p', { class: 'dica' }, 'Não evolui.')),
     el('section', {}, el('h3', {}, 'Golpes por nível'), golpes),
     el(
       'section',
@@ -300,6 +322,75 @@ ${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) }
       el('div', { class: 'dex-botoes-extras' }, botaoExtra('TMs e TRs', listaTms, tms.length), botaoExtra('Egg Moves', listaOvos, ovos.length), botaoExtra('Move Tutor', listaTutor, tutor.length)),
       conteudoGolpesExtras,
     ),
+  );
+}
+
+/** Como a Mega acontece ("Segurando Charizardite X" / "Sabendo Dragon Ascent"). */
+function textoRequisitoMega(m: Mega): string {
+  if (m.pedra) return `Segurando ${itemDaLoja(m.pedra)?.nome ?? Dex.items.get(m.pedra).name}`;
+  return `Sabendo ${Dex.moves.get(m.golpe ?? '').name}`;
+}
+
+/** Ficha da Mega: tipos, atributos (com a diferença para a forma normal), ability, tier, fraquezas e a Mega Stone. */
+function fichaMega(m: Mega, base: PokemonBase, abrir: Abrir): HTMLElement {
+  const p = megaComoPokemon(m, base);
+  const estado = { shiny: false, costas: false };
+  const palco = el('div', { class: 'dex-palco' });
+  const desenharSprite = () => palco.replaceChildren(spritePokemon(p, { shiny: estado.shiny, costas: estado.costas, palco: true, chao: 0.88 }));
+  desenharSprite();
+  const alternar = (chave: 'shiny' | 'costas', texto: string) => {
+    const b = el('button', { class: 'botao secundario' }, texto);
+    b.addEventListener('click', () => {
+      estado[chave] = !estado[chave];
+      b.classList.toggle('ligado', estado[chave]);
+      desenharSprite();
+    });
+    return b;
+  };
+  const total = (q: PokemonBase) => ATRIBUTOS.reduce((soma, [a]) => soma + q.stats[a], 0);
+  const diferenca = (d: number) => (d ? el('small', { class: `dex-dif ${d > 0 ? 'mais' : 'menos'}` }, d > 0 ? `+${d}` : String(d)) : null);
+  const atributos = el('div', { class: 'dex-atributos' },
+    ...ATRIBUTOS.map(([a, nome]) =>
+      el('div', { class: 'dex-atributo' },
+        el('span', {}, nome),
+        el('strong', {}, String(p.stats[a]), ' ', diferenca(p.stats[a] - base.stats[a])),
+        el('span', { class: 'dex-barra' }, el('span', { style: { width: `${Math.min(100, (p.stats[a] / 200) * 100)}%`, background: `hsl(${Math.min(140, p.stats[a])} 70% 50%)` } })),
+      ),
+    ),
+    el('div', { class: 'dex-atributo total' }, el('span', {}, 'Total'), el('strong', {}, String(total(p)), ' ', diferenca(total(p) - total(base))), el('span')),
+  );
+  const habilidade = Dex.abilities.get(m.habilidade);
+  const grupos = fraquezas(p.tipos);
+  const ROTULOS: [number, string][] = [[4, '4×'], [2, '2×'], [0.5, '½×'], [0.25, '¼×'], [0, 'Imune']];
+  const efetividade = el('div', { class: 'dex-efetividade' },
+    ...ROTULOS.filter(([mult]) => grupos.has(mult)).map(([mult, rotulo]) =>
+      el('div', { class: 'dex-ef-linha' }, el('span', { class: 'dex-ef-mult' }, rotulo), el('div', { class: 'tipos' }, grupos.get(mult)!.map((t) => seloTipo(t)))),
+    ),
+  );
+  const pedra = m.pedra ? itemDaLoja(m.pedra) : undefined;
+  const outras = megasDaEspecie(base.id).filter((x) => x.forma !== m.forma);
+  return el('article', { class: 'dex-ficha dex-ficha-mega' },
+    el('div', { class: 'dex-topo' },
+      el('div', {}, palco, el('div', { class: 'dex-botoes' }, alternar('shiny', '✨ Shiny'), alternar('costas', 'Costas'))),
+      el('div', { class: 'dex-resumo' },
+        el('div', { class: 'dex-titulo' },
+          el('span', { class: 'dex-numero' }, `#${String(base.id).padStart(4, '0')}`),
+          el('h2', {}, m.nome),
+          el('span', { class: 'dex-selo mega' }, el('img', { src: 'batalha/mega-evolucao.svg', alt: '' }), 'Mega'),
+          m.nova ? el('span', { class: 'dex-selo' }, 'Legends: Z-A') : null,
+        ),
+        selosTipos(p),
+        linha('Forma normal', el('button', { class: 'botao secundario dex-voltar-base', onclick: () => abrir(base.id) }, `← ${base.nome}`)),
+        linha('Como megaevoluir', textoRequisitoMega(m)),
+        pedra ? linha('Mega Stone', el('span', { class: 'dex-pedra' }, iconeItem(pedra), pedra.nome, el('small', {}, ` · loja: ${textoPreco(pedra)}`))) : null,
+        linha('Tier', tierDaMega(m)),
+        linha('Na batalha', 'Uma vez por batalha, pelo botão Mega Evolução; volta ao normal no fim da batalha.'),
+        outras.length ? linha('Outras Megas', el('span', {}, ...outras.map((o) => el('button', { class: 'botao secundario', onclick: () => abrir(base.id, o.forma) }, o.nome)))) : null,
+      ),
+    ),
+    el('section', {}, el('h3', {}, 'Atributos base'), atributos),
+    el('section', {}, el('h3', {}, 'Ability'), el('div', { class: 'dex-habilidades' }, el('div', {}, el('strong', {}, habilidade.name), el('p', {}, traduzir(habilidade.shortDesc || habilidade.desc))))),
+    el('section', {}, el('h3', {}, 'Dano recebido por tipo'), efetividade),
   );
 }
 
@@ -323,7 +414,7 @@ function pokebolinha(): HTMLElement {
   return marca;
 }
 
-export const telaPokedex = (inicial?: number): Tela => (raiz) => {
+export const telaPokedex = (inicial?: number, megaInicial?: string): Tela => (raiz) => {
   const todos = todosOsPokemons();
   const encontros = mapaDeEncontros(todos);
   const save = carregarSave();
@@ -350,10 +441,11 @@ export const telaPokedex = (inicial?: number): Tela => (raiz) => {
   const lista = el('ol', { class: 'dex-lista' });
   const painel = el('div', { class: 'dex-painel' });
 
-  const abrir = (id: number) => {
+  const abrir: Abrir = (id, mega) => {
     selecionado = id;
     const p = todos.find((q) => q.id === id);
-    if (p) painel.replaceChildren(ficha(p, todos, encontros, abrir, visto));
+    const m = mega && visto(id) ? megasDaEspecie(id).find((x) => x.forma === mega) : undefined;
+    if (p) painel.replaceChildren(m ? fichaMega(m, p, abrir) : ficha(p, todos, encontros, abrir, visto));
     for (const item of lista.children) item.classList.toggle('ativo', (item as HTMLElement).dataset.id === String(id));
     painel.scrollTop = 0;
   };
@@ -384,7 +476,7 @@ export const telaPokedex = (inicial?: number): Tela => (raiz) => {
   filtroRegiao.addEventListener('change', desenharLista);
   filtroCategoria.addEventListener('change', desenharLista);
   desenharLista();
-  abrir(selecionado);
+  abrir(selecionado, megaInicial);
 
   raiz.append(
     el('main', { class: 'tela tela-pokedex' },

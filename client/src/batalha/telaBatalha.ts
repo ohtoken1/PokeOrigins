@@ -2,6 +2,7 @@ import { bonificacao } from '../bonificacao';
 import { bonusVip } from '../../../shared/vip';
 import { AMIZADE_POR_BATALHA, ganharAmizade } from '../../../shared/amizade';
 import { trocarSpriteForma } from '../ui/formas';
+import { megaPorForma } from '../../../shared/megas';
 import type { Bioma } from '../../../shared/biomas';
 import { BatalhaSelvagem, type EventoBatalha, type Lado } from '../../../shared/batalha/motor';
 import { atributos, curar, especie, expGanha, expParaNivel, faixaVelocidade, ganharEvs, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
@@ -106,6 +107,10 @@ function caixaInfo(doJogador: boolean) {
     status(s: string | null) {
       status.textContent = s ? ROTULOS_STATUS[s] ?? s.toUpperCase() : '';
       status.className = `chip-status ${s ?? ''}`;
+    },
+    /** Troca o nome mostrado (Mega Evolução: "Mega Charizard X"). */
+    renomear(texto: string) {
+      if (nome.firstChild) nome.firstChild.textContent = texto;
     },
     definir(p: PokemonIndividual) {
       nome.replaceChildren(nomeDe(p.especieId), seloGenero(p.genero) ?? '', p.shiny ? ' ✨' : '');
@@ -320,6 +325,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           // quem entra em campo começa sem estágios de atributo (e sem Terastal)
           info(ev.lado).zerarBoosts();
           marcarTera(ev.lado, null);
+          sprite(ev.lado).classList.remove('megaevoluido');
           if (ev.lado === 'selvagem' && treinador && treinador.equipe[ev.indice] && treinador.equipe[ev.indice] !== selvagem) {
             // o treinador mandou outro Pokémon: troca a imagem e a caixa de HP
             selvagem = treinador.equipe[ev.indice];
@@ -396,6 +402,22 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           void animarDano(sprite(ev.lado));
           await dizer(ev.texto);
           break;
+        case 'mega': {
+          // Mega Evolução: o símbolo aparece sobre o Pokémon, brilho de arco-íris e troca do sprite
+          const alvo = sprite(ev.lado) as HTMLImageElement;
+          const simbolo = el('img', { class: 'mega-simbolo-anim', src: 'batalha/mega-evolucao.svg', alt: '' });
+          lugar(ev.lado).append(simbolo);
+          alvo.classList.add('megaevoluindo');
+          await esperar(900);
+          trocarSpriteForma(alvo, ev.forma, { shiny: ev.lado === 'jogador' ? save.time[batalha.ativo].shiny : selvagem.shiny, costas: ev.lado === 'jogador' });
+          await esperar(500);
+          alvo.classList.remove('megaevoluindo');
+          alvo.classList.add('megaevoluido');
+          info(ev.lado).renomear(megaPorForma(ev.forma)?.nome ?? ev.forma);
+          simbolo.remove();
+          await dizer(ev.texto);
+          break;
+        }
         case 'forma':
           // Primal Reversion e outras mudanças de forma no meio da batalha
           trocarSpriteForma(sprite(ev.lado) as HTMLImageElement, ev.forma, { shiny: ev.lado === 'jogador' ? save.time[batalha.ativo].shiny : selvagem.shiny, costas: ev.lado === 'jogador' });
@@ -426,8 +448,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     );
   }
 
-  /** `modo`: 'z' = Z-Move ligado; 'tera' = Terastalizar ligado (os dois não juntos). */
-  function menuGolpes(modo: 'z' | 'tera' | null = null) {
+  /** `modo`: 'z' = Z-Move ligado; 'tera' = Terastalizar ligado; 'mega' = Mega Evolução ligada (um de cada vez). */
+  function menuGolpes(modo: 'z' | 'tera' | 'mega' | null = null) {
     const pedido = batalha.pedido();
     if (pedido.tipo !== 'acao') return menuPrincipal();
     const z = pedido.zGolpes;
@@ -438,10 +460,10 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         dicaGolpe(el(
           'button',
           {
-            class: `botao golpe ${usarZ && z?.[i] ? 'golpe-z' : ''} ${modo === 'tera' ? 'golpe-tera' : ''}`,
+            class: `botao golpe ${usarZ && z?.[i] ? 'golpe-z' : ''} ${modo === 'tera' ? 'golpe-tera' : ''} ${modo === 'mega' ? 'golpe-mega' : ''}`,
             style: { '--cor-tipo': corTipo(g.tipo) },
             disabled: g.desabilitado || (g.ppMax > 0 && g.pp <= 0) || (usarZ && !z?.[i]),
-            onclick: () => executar(() => batalha.usarGolpe(g.indice, usarZ && z?.[i] ? 'z' : modo === 'tera' ? 'tera' : null)),
+            onclick: () => executar(() => batalha.usarGolpe(g.indice, usarZ && z?.[i] ? 'z' : modo === 'tera' || modo === 'mega' ? modo : null)),
           },
           el('strong', {}, usarZ && z?.[i] ? z[i]! : g.nome),
           el(
@@ -462,6 +484,13 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         ? botao(modo === 'tera' ? `Terastalizar ligado (${pedido.tera})` : `Terastalizar (${pedido.tera})`, () => menuGolpes(modo === 'tera' ? null : 'tera'), {
             class: `botao secundario botao-tera ${modo === 'tera' ? 'ligado' : ''}`,
             style: { '--cor-tipo': pedido.tera === 'Stellar' ? '#7fd3ff' : corTipo(pedido.tera) },
+          })
+        : '',
+      // Mega Evolução: segurando a Mega Stone dele (uma vez por batalha), com o símbolo da Mega
+      pedido.mega
+        ? botao([el('img', { class: 'mega-simbolo', src: 'batalha/mega-evolucao.svg', alt: '' }), modo === 'mega' ? 'Mega Evolução ligada' : 'Mega Evolução'] as never, () => menuGolpes(modo === 'mega' ? null : 'mega'), {
+            class: `botao secundario botao-mega ${modo === 'mega' ? 'ligado' : ''}`,
+            title: 'Megaevolui antes de atacar (uma vez por batalha)',
           })
         : '',
       botao('← Voltar', menuPrincipal, { class: 'botao secundario voltar' }),

@@ -8,13 +8,14 @@ import { ITENS, type ItemId } from './itens';
 import { TICKETS } from './tickets';
 import { TIPOS_TERA } from './tera';
 import { ITENS_CUSTOM } from './itensCustom';
+import { MEGA_STONES, PRECO_MEGA_STONE_GOLD, megaDaPedra } from './megas';
 
 export { TIPOS_TERA };
 import { OVOS } from './ovos';
 import { nomeCategoria, nomeTipo, traduzir } from './traducao';
 
 export type CategoriaLoja =
-  | 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'frutas' | 'gems' | 'placas' | 'memorias' | 'zcristais' | 'lendarios'
+  | 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'megapedras' | 'frutas' | 'gems' | 'placas' | 'memorias' | 'zcristais' | 'lendarios'
   | 'terashards' | 'chave' | 'skins' | 'tm' | 'tr' | 'tickets' | 'ovos';
 
 /** Abas da loja. */
@@ -23,6 +24,7 @@ export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
   { id: 'remedios', nome: 'Remédios' },
   { id: 'evolucao', nome: 'Evolução' },
   { id: 'batalha', nome: 'Itens de batalha' },
+  { id: 'megapedras', nome: 'Mega Stones' },
   { id: 'tm', nome: 'TMs' },
   { id: 'tr', nome: 'TRs' },
 ];
@@ -59,6 +61,8 @@ export interface ItemLoja {
   imagem?: string;
   /** vendido na loja? (false: só tickets/Admin) */
   naLoja: boolean;
+  /** moeda do preço na loja (padrão: silver; Mega Stones: gold) */
+  moeda?: 'silver' | 'gold';
   /** Tera Shards: tipo que a shard dá */
   teraTipo?: string;
   /** skins: de qual Pokémon */
@@ -67,6 +71,8 @@ export interface ItemLoja {
 
 /** Moeda do jogo. */
 export const MOEDA = 'silver';
+/** Preço com a moeda certa ("1 silver", "1 gold"). */
+export const textoPreco = (i: Pick<ItemLoja, 'preco' | 'moeda'>, quantidade = 1) => `${(i.preco * quantidade).toLocaleString('pt-BR')} ${i.moeda ?? MOEDA}`;
 export const PRECO_PADRAO = 1;
 /** Preços específicos (id do item → preço). Vazio por enquanto: tudo custa PRECO_PADRAO. */
 export const PRECOS: Record<string, number> = {};
@@ -98,14 +104,16 @@ const imagemShard = (tipo: string) => `itens/terashard-${tipo.toLowerCase()}.png
 
 /**
  * Categoria de um item do Showdown, ou null se ele fica fora do jogo (sem uso: fósseis, cartas, Bottle Caps,
- * itens da 2ª geração, Mega Stones — Mega Evolução ainda não existe no jogo).
+ * itens da 2ª geração, Mega Stones de Megas que o jogo não tem).
  * Regras do dono para a LOJA: só bolas, remédios, evolução e itens de batalha; frutas, gems, plates, memories,
  * Z-Crystals e itens de lendários ficam fora dela.
  */
 function classificarItem(i: ReturnType<typeof Dex.items.get>): CategoriaLoja | null {
   const desc = i.shortDesc || i.desc || '';
+  // Mega Stones (inclusive as de Legends: Z-A, "Future" no Showdown): vendidas por gold
+  if (i.megaStone) return MEGA_STONES.has(i.id) ? 'megapedras' : null;
   if (i.isNonstandard && i.isNonstandard !== 'Past') return null;
-  if (i.isPokeball || i.megaStone || /^tr\d\d$/.test(i.id)) return null;
+  if (i.isPokeball || /^tr\d\d$/.test(i.id)) return null;
   if (/^\(Gen \d\)|No competitive use|Though this feather|big nugget|Hyper Training|Can be revived|Can revive|Cannot be given/i.test(desc)) return null;
   if (i.id === 'machobrace') return null;
   if (i.isBerry) return i.isNonstandard ? null : 'frutas';
@@ -118,13 +126,15 @@ function classificarItem(i: ReturnType<typeof Dex.items.get>): CategoriaLoja | n
   if (/^Evolves/.test(desc)) return 'evolucao';
   return 'batalha';
 }
-const NA_LOJA = new Set<CategoriaLoja>(['bolas', 'remedios', 'evolucao', 'batalha', 'tm', 'tr']);
+const NA_LOJA = new Set<CategoriaLoja>(['bolas', 'remedios', 'evolucao', 'batalha', 'megapedras', 'tm', 'tr']);
 
 function montarCatalogo(): ItemLoja[] {
   const itens: ItemLoja[] = [];
   const add = (item: Omit<ItemLoja, 'preco' | 'naLoja'>) => {
     const naLoja = NA_LOJA.has(item.categoria);
-    itens.push({ ...item, naLoja, preco: naLoja ? preco(item.id) : 0 });
+    // Mega Stones custam gold (pedido do dono)
+    if (item.categoria === 'megapedras') itens.push({ ...item, naLoja, moeda: 'gold', preco: PRECOS[item.id] ?? PRECO_MEGA_STONE_GOLD });
+    else itens.push({ ...item, naLoja, preco: naLoja ? preco(item.id) : 0 });
   };
 
   for (const id of Object.keys(ITENS) as ItemId[]) {
@@ -143,7 +153,9 @@ function montarCatalogo(): ItemLoja[] {
     if (!i.exists || PEDRAS_EVOLUCAO.includes(i.id)) continue;
     const categoria = classificarItem(i);
     if (!categoria) continue;
-    add({ id: i.id, nome: i.name, categoria, descricao: traduzir(i.shortDesc || i.desc) });
+    const mega = categoria === 'megapedras' ? megaDaPedra(i.id) : undefined;
+    const descricao = mega ? `Segurando, ${mega.nome.replace(/^Mega /, '')} pode megaevoluir em ${mega.nome} na batalha (uma vez por batalha).` : traduzir(i.shortDesc || i.desc);
+    add({ id: i.id, nome: i.name, categoria, descricao });
   }
 
   for (const tipo of TIPOS_TERA)

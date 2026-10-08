@@ -198,6 +198,7 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 - **Dano:** depois de cada golpe, a mensagem da batalha diz quanto HP o alvo perdeu e quanto isso é da vida máxima.
 - **Ficha do seu Pokémon:** passar o mouse no seu Pokémon (ou na caixa de HP dele) mostra HP máximo, Attack, Defense, Sp. Atk, Sp. Def, Speed, Nature, Ability, item, amizade, Tera Type e golpes.
 - **Itens segurados (held items):** o item que o Pokémon segura funciona na batalha como nos jogos (Leftovers, Focus Sash, Choice Scarf, frutas…), e a batalha avisa quando ele age. Itens gastos voltam no fim da batalha; **frutas comidas somem**.
+- **Mega Evolução:** quem entra na batalha segurando a **Mega Stone** dele (ex.: Charizard com Charizardite X) ganha o botão **Mega Evolução** (com o símbolo da Mega) no menu de golpes. Ligado, ele megaevolui antes de atacar: o símbolo aparece sobre ele, brilha e vira a Mega, com tipos, atributos e Ability da Mega. **Uma vez por batalha**; no fim da batalha volta ao normal. Rayquaza megaevolui sabendo **Dragon Ascent** (sem pedra). Inclui as Megas novas de Legends: Z-A (Mega Clefable, Mega Dragonite, Mega Garchomp Z…). Quem segura Mega Stone não terastaliza (regra do Showdown).
 - **Z-Moves:** quem segura um **Z-Crystal** ganha o botão **Z-Move** no menu de golpes. Ligado, os golpes viram Z-Moves (ex.: Thunder Shock → Gigavolt Havoc, poder 100). **Uma vez por batalha.**
 - **Formas por item:** Giratina com Griseous Core entra na Origin Forme; Dialga/Palkia com Adamant Crystal/Lustrous Globe também; Arceus muda de tipo com Plates ou Z-Crystals de tipo; Silvally com Memories; Genesect com Drives; Ogerpon com as máscaras. Kyogre e Groudon fazem a **Primal Reversion** com Blue/Red Orb, e Zacian/Zamazenta viram Crowned com Rusted Sword/Shield. A imagem na batalha muda junto.
 
@@ -362,10 +363,11 @@ As duas aparecem **separadas na carteira**, acima do painel do treinador.
 | **Remédios** | Potions, Revives, curas de status, Ethers/Elixirs, Sacred Ash… |
 | **Evolução** | pedras, Linking Cord, maçãs, armaduras, Dragon Scale e outros itens de evoluir |
 | **Itens de batalha** | itens de batalha de todas as gerações (incensos, Thick Club, Leek…), sem os que ficam fora da loja |
+| **Mega Stones** | as 88 Mega Stones (inclusive as de Legends: Z-A), **1 gold cada** |
 | **TMs** | as de Scarlet/Violet |
 | **TRs** | as de Sword/Shield |
 
-**Fora da loja** (por enquanto só pelo Admin e por tickets): **Berries**, **Gems**, **Plates**, **Memories**, **Z-Crystals**, **Itens de lendários** (orbes, Griseous Core, Adamant Crystal, Lustrous Globe, Rusted Sword/Shield, Drives, máscaras da Ogerpon, Soul Dew…) e **Tera Shards**. Ficam fora do jogo: Mega Stones (a Mega Evolução ainda não existe), fósseis, cartas, Bottle Caps e itens sem uso.
+**Fora da loja** (por enquanto só pelo Admin e por tickets): **Berries**, **Gems**, **Plates**, **Memories**, **Z-Crystals**, **Itens de lendários** (orbes, Griseous Core, Adamant Crystal, Lustrous Globe, Rusted Sword/Shield, Drives, máscaras da Ogerpon, Soul Dew…) e **Tera Shards**. Ficam fora do jogo: fósseis, cartas, Bottle Caps e itens sem uso.
 
 ### 12.2 Bolsa
 | Tipo de item | O que fazer |
@@ -468,7 +470,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
   - imagem normal, shiny e de costas;
   - atributos e habilidades;
   - dano recebido por tipo;
-  - evolução, golpes por nível, TMs/TRs, Egg Moves e golpes do **Move Tutor**;
+  - evolução (as **Megas** aparecem como o último estágio da linha, com a Mega Stone de cada uma; clicar abre a **ficha da Mega**: tipos, atributos com a diferença para a forma normal, Ability, tier, fraquezas e a pedra), golpes por nível, TMs/TRs, Egg Moves e golpes do **Move Tutor**;
   - **onde encontrar** (região, bioma, faixa de nível ou como evolui) e **captura base**;
   - **chance de aparição** por encontro (ou **chance do lendário**, nos lendários, míticos e Ultra Beasts) e **chance de shiny**, em porcentagem e em "1 em N" (ex.: 0,005% = 1 em 20.000). Valem para o seu nível de treinador atual e já contam os bônus ativos.
 - **Filtros:** região, tipo e categoria (Comum, Incomum, Raro, Inicial, Bebê, Lendário, Mítico, Ultra Beast, Paradoxo).
@@ -476,7 +478,8 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 ### Database
 - **Tabelas:** Pokémon, itens, habilidades e golpes, com busca, ordenação e filtros.
 - **Itens:** mostra **todos os itens do jogo**, inclusive os de fora da loja. Filtros por categoria (Pokébolas, Remédios, Evolução, Itens de batalha, Berries, Gems, Plates, Memories, Z-Crystals, Itens de lendários, Tera Shards…) e por "vendidos na loja" ou "fora da loja".
-- **Tiers:** **provisoriamente**, são os do Smogon/Showdown, até definirmos os nossos.
+- **Megas:** cada Mega tem a **sua própria linha** na tabela de Pokémon (logo depois da forma normal), com tipos, atributos e tier próprios; o filtro de categorias tem **Megas**.
+- **Tiers:** **provisoriamente**, são os do Smogon/Showdown, até definirmos os nossos (as Megas usam a tier da National Dex; as de Legends: Z-A ainda não têm).
 
 ---
 
@@ -567,6 +570,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
 - Ícone da Pokédex no cabeçalho, ao lado do nome, com o progresso da Pokédex; barra do passe com 0 / 100 XP por nível.
+- **Mega Evolução:** 89 Megas (com as de Legends: Z-A), botão com o símbolo da Mega na batalha, Mega Stones na loja por 1 gold, Megas na Database (linhas próprias) e na Pokédex (estágio da evolução e ficha própria).
 - Alola com 8 desafios (Capitães e Kahunas) e selos próprios (não são itens).
 - Insígnias com o desenho oficial de cada ginásio, no cabeçalho e na tela dos Ginásios.
 - Ginásios das 9 regiões (8 líderes; 4 Kahunas em Alola) com insígnias no cabeçalho; imagens dos treinadores nos duelos, ginásios e batalhas.

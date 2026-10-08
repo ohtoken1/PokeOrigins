@@ -18,6 +18,7 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
   remedios: 'Usar',
   evolucao: 'Usar',
   batalha: 'Equipar',
+  megapedras: 'Equipar',
   frutas: 'Equipar',
   gems: 'Equipar',
   placas: 'Equipar',
@@ -89,6 +90,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
         return [`${quem} evoluiu para ${pokemonPorId(para).nome}!`, ...r.mensagens].join(' ');
       }
       case 'batalha':
+      case 'megapedras':
       case 'frutas':
       case 'gems':
       case 'placas':

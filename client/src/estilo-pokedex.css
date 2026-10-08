@@ -107,3 +107,14 @@
 .dex-onde { display: inline-flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; align-items: center; }
 .dex-chip { padding: 1px 8px; border-radius: 999px; font-size: 0.75rem; background: var(--painel-2); border: 1px solid var(--borda); }
 .dex-onde small { width: 100%; text-align: right; color: var(--texto-2); font-weight: 500; }
+
+/* Megas na Pokédex (último estágio da linha evolutiva e ficha própria) */
+.dex-seta-mega img { width: 26px; height: 26px; object-fit: contain; }
+.dex-evo-mega { border-color: #e7429166; background: linear-gradient(160deg, var(--painel-2), #e7429118 60%, #00b9ef18); }
+.dex-selo.mega { display: inline-flex; align-items: center; gap: 4px; color: #fff; border-color: transparent; background: linear-gradient(120deg, #f08300, #aacf52 35%, #00b9ef 62%, #e74291); text-shadow: 0 1px 2px #0008; }
+.dex-selo.mega img { width: 14px; height: 14px; filter: brightness(0) invert(1); }
+.dex-dif { font-size: 0.72rem; font-weight: 700; }
+.dex-dif.mais { color: #4ade80; }
+.dex-dif.menos { color: #f87171; }
+.dex-pedra { display: inline-flex; align-items: center; gap: 6px; }
+.dex-voltar-base { padding: 2px 10px; }

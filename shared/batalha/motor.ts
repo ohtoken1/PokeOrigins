@@ -2,6 +2,7 @@
 // da 9ª geração: dano, tipos, golpes, habilidades, status). O Showdown não tem batalha
 // selvagem, então captura e fuga são feitas aqui, com as fórmulas dos jogos originais.
 import { especieComItem } from '../formas';
+import { megaPorForma } from '../megas';
 import { Battle, Dex } from '@pkmn/sim';
 import { AMIZADE_INICIAL, especie, ppMaximo, type PokemonIndividual } from './pokemon';
 import { aplicarRemedio, usarRemedio, type Item } from '../itens';
@@ -16,6 +17,8 @@ export type EventoBatalha = (
   | { tipo: 'entrar'; lado: Lado; indice: number; hp: number; hpMax: number; forma: string; texto?: string }
   /** Terastalizou: o tipo vira o Tera Type (uma vez por batalha). */
   | { tipo: 'tera'; lado: Lado; teraTipo: string; texto: string }
+  /** Megaevoluiu: `forma` = espécie Mega no Showdown ("Charizard-Mega-X"). */
+  | { tipo: 'mega'; lado: Lado; forma: string; texto: string }
   /** Mudou de forma no meio da batalha (Primal Reversion…). */
   | { tipo: 'forma'; lado: Lado; forma: string; texto?: string }
   | { tipo: 'golpe'; lado: Lado; alvo: Lado | null; golpe: string; tipoGolpe: string; categoria: string; texto: string }
@@ -49,8 +52,8 @@ export interface OpcaoGolpe {
 
 export type Pedido =
   /** `zGolpes[i]` = nome do Z-Move do golpe i (Pokémon segurando Z-Crystal), ou null. */
-  /** `tera` = Tera Type se ainda pode terastalizar nesta batalha, ou null. */
-  | { tipo: 'acao'; golpes: OpcaoGolpe[]; podeTrocar: boolean; podeFugir: boolean; zGolpes: (string | null)[] | null; tera: string | null }
+  /** `tera` = Tera Type se ainda pode terastalizar nesta batalha, ou null. `mega` = pode megaevoluir agora (Mega Stone certa). */
+  | { tipo: 'acao'; golpes: OpcaoGolpe[]; podeTrocar: boolean; podeFugir: boolean; zGolpes: (string | null)[] | null; tera: string | null; mega: boolean }
   | { tipo: 'troca' }
   | { tipo: 'fim' };
 
@@ -218,7 +221,8 @@ export class BatalhaSelvagem {
     const zGolpes = Array.isArray(ativo.canZMove) ? (ativo.canZMove as ({ move: string } | null)[]).map((z) => z?.move ?? null) : null;
     const tera = typeof ativo.canTerastallize === 'string' ? (ativo.canTerastallize as string) : null;
     // contra treinador não dá para fugir
-    return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso && !this.treinador, zGolpes, tera };
+    const mega = !!ativo.canMegaEvo;
+    return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso && !this.treinador, zGolpes, tera, mega };
   }
 
   /** Posições no time dos Pokémon que podem entrar no lugar do atual. */
@@ -227,9 +231,13 @@ export class BatalhaSelvagem {
     return this.objetos.filter((o) => o !== ativo && !o.fainted && o.hp > 0).map((o) => this.indices[this.objetos.indexOf(o)]);
   }
 
-  /** `especial`: 'z' = usar como Z-Move (Z-Crystal certo); 'tera' = terastalizar antes de atacar. Os dois: uma vez por batalha. */
-  usarGolpe(indice: number, especial: 'z' | 'tera' | null = null): EventoBatalha[] {
-    return this.jogar(`move ${indice}${especial === 'z' ? ' zmove' : especial === 'tera' ? ' terastallize' : ''}`);
+  /**
+   * `especial`: 'z' = usar como Z-Move (Z-Crystal certo); 'tera' = terastalizar antes de atacar;
+   * 'mega' = megaevoluir antes de atacar (Mega Stone certa). Cada um: uma vez por batalha.
+   */
+  usarGolpe(indice: number, especial: 'z' | 'tera' | 'mega' | null = null): EventoBatalha[] {
+    const sufixo = { z: ' zmove', tera: ' terastallize', mega: ' mega' };
+    return this.jogar(`move ${indice}${especial ? sufixo[especial] : ''}`);
   }
 
   /** Clima e terreno em campo agora, com os turnos que faltam (null = não acaba sozinho, ex.: clima Primal). */
@@ -483,9 +491,14 @@ export class BatalhaSelvagem {
           eventos.push({ tipo: 'turno', numero: Number(args[0]), registro: null });
           break;
         case 'detailschange':
-        case '-formechange':
-          eventos.push({ tipo: 'forma', lado: this.lado(args[0]), forma: args[1].split(',')[0] });
+        case '-formechange': {
+          const forma = args[1].split(',')[0];
+          const mega = comando === 'detailschange' ? megaPorForma(forma) : undefined;
+          // Mega Evolução: o "|-mega|" que vem logo depois só repete a informação
+          if (mega) eventos.push({ tipo: 'mega', lado: this.lado(args[0]), forma, texto: `${quem} megaevoluiu em ${mega.nome}!` });
+          else eventos.push({ tipo: 'forma', lado: this.lado(args[0]), forma });
           break;
+        }
         case '-primal':
           eventos.push({ tipo: 'mensagem', texto: `${quem} fez a Primal Reversion e voltou à sua forma primitiva!` });
           break;

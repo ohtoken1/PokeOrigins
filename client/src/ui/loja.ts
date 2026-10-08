@@ -1,4 +1,4 @@
-import { CATALOGO, CATEGORIAS, MOEDA, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
+import { CATALOGO, CATEGORIAS, textoPreco, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { salvar, type Save } from '../estado';
 import { abrirJanela } from './janela';
 import { el } from './dom';
@@ -6,7 +6,7 @@ import { iconeItem } from './iconeItem';
 
 const LIMITE_LISTA = 120;
 
-/** Loja: todos os itens do jogo, por categoria, com busca. Paga em silver. */
+/** Loja: todos os itens do jogo, por categoria, com busca. Paga em silver (Mega Stones em gold). */
 export function abrirLoja(save: Save, aoMudar: () => void): void {
   let categoria: CategoriaLoja = 'bolas';
   let busca = '';
@@ -17,18 +17,20 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
   const abas = el('nav', { class: 'abas abas-loja' });
   const campoBusca = el('input', { type: 'search', placeholder: 'Buscar item ou golpe…', class: 'busca' });
 
-  const atualizarSaldo = () => (saldo.textContent = `${save.silver.toLocaleString('pt-BR')} ${MOEDA}`);
+  const atualizarSaldo = () => (saldo.textContent = `${save.silver.toLocaleString('pt-BR')} silver · ${save.gold.toLocaleString('pt-BR')} gold`);
+  const carteira = (item: ItemLoja) => (item.moeda === 'gold' ? save.gold : save.silver);
 
   const comprar = (item: ItemLoja, quantidade: number) => {
     const custo = item.preco * quantidade;
-    if (save.silver < custo) {
-      aviso.textContent = `Silver insuficiente para ${quantidade}× ${item.nome}.`;
+    if (carteira(item) < custo) {
+      aviso.textContent = `${item.moeda === 'gold' ? 'Gold' : 'Silver'} insuficiente para ${quantidade}× ${item.nome}.`;
     } else {
-      save.silver -= custo;
+      if (item.moeda === 'gold') save.gold -= custo;
+      else save.silver -= custo;
       save.itens[item.id] = (save.itens[item.id] ?? 0) + quantidade;
       salvar(save);
       aoMudar();
-      aviso.textContent = `Comprou ${quantidade}× ${item.nome} por ${custo} ${MOEDA}.`;
+      aviso.textContent = `Comprou ${quantidade}× ${item.nome} por ${textoPreco(item, quantidade)}.`;
     }
     aviso.hidden = false;
     atualizarSaldo();
@@ -69,9 +71,9 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
           iconeItem(item),
           el('div', { class: 'texto' }, el('strong', {}, item.nome), el('p', {}, item.descricao)),
           el('span', { class: 'quantidade', title: 'Na bolsa' }, `×${save.itens[item.id] ?? 0}`),
-          el('span', { class: 'preco' }, `${item.preco} ${MOEDA}`),
-          el('button', { class: 'botao', disabled: save.silver < item.preco, onclick: () => comprar(item, 1) }, 'Comprar'),
-          el('button', { class: 'botao secundario', disabled: save.silver < item.preco * 10, onclick: () => comprar(item, 10) }, '×10'),
+          el('span', { class: `preco ${item.moeda === 'gold' ? 'preco-gold' : ''}` }, textoPreco(item)),
+          el('button', { class: 'botao', disabled: carteira(item) < item.preco, onclick: () => comprar(item, 1) }, 'Comprar'),
+          el('button', { class: 'botao secundario', disabled: carteira(item) < item.preco * 10, onclick: () => comprar(item, 10) }, '×10'),
         ),
       ),
       ...(itens.length > LIMITE_LISTA ? [el('p', { class: 'meta' }, `Mostrando ${LIMITE_LISTA} de ${itens.length}. Use a busca para achar o resto.`)] : []),

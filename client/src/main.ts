@@ -22,7 +22,7 @@ import { montarBarraTopo } from './ui/barraTopo';
 import { montarCabecalho } from './ui/cabecalho';
 import { definirNavegacao } from './ui/navegacao';
 
-export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes' } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' };
+export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes' } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' };
 export type Navegar = (destino: Destino) => void;
 /** Cada tela desenha dentro de `raiz` e pode devolver uma função de limpeza. */
 export type Tela = (raiz: HTMLElement, navegar: Navegar) => (() => void) | void;
@@ -43,7 +43,7 @@ const navegar: Navegar = (destino) => {
   if (destino.tela === 'inicio') limparTelaAtual = telaInicio(raiz, navegar);
   else if (destino.tela === 'inicial') limparTelaAtual = telaEscolhaInicial(raiz, navegar);
   else if (destino.tela === 'regiao') limparTelaAtual = telaRegiao(raiz, navegar);
-  else if (destino.tela === 'pokedex') limparTelaAtual = telaPokedex(destino.id)(raiz, navegar);
+  else if (destino.tela === 'pokedex') limparTelaAtual = telaPokedex(destino.id, destino.mega)(raiz, navegar);
   else if (destino.tela === 'database') limparTelaAtual = telaDatabase(raiz, navegar);
   else if (destino.tela === 'personagem') limparTelaAtual = telaPersonagem(raiz, navegar);
   else if (destino.tela === 'opcoes') limparTelaAtual = telaOpcoes(raiz, navegar);

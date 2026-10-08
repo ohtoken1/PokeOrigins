@@ -1076,6 +1076,32 @@ button.vaga:hover { border-color: var(--borda); }
 .aba-tera strong { font-size: 0.8rem; font-style: italic; font-weight: 900; }
 @keyframes aba-tera-entra { from { opacity: 0; transform: translateX(-12px) scale(0.8); } to { opacity: 1; transform: none; } }
 .sprite.terastalizado { filter: drop-shadow(0 0 6px #bff3ff) drop-shadow(0 0 2px #fff) saturate(1.25) brightness(1.08); }
+/* Mega Evolução: botão com o símbolo (WikiDex) e animação na arena */
+.botao-mega { display: inline-flex; align-items: center; gap: 0.4rem; }
+.botao-mega .mega-simbolo { width: 1.3rem; height: 1.3rem; object-fit: contain; filter: drop-shadow(0 0 2px #fff8); }
+.botao-mega.ligado { background: linear-gradient(120deg, #f08300, #aacf52 35%, #00b9ef 62%, #e74291); color: #fff; text-shadow: 0 1px 2px #0009; border-color: transparent; font-weight: 800; }
+.botao-mega.ligado .mega-simbolo { filter: brightness(0) invert(1) drop-shadow(0 0 3px #fff); animation: mega-gira 2.4s linear infinite; }
+.golpe-mega { box-shadow: 0 0 0 2px #e74291aa, 0 0 10px #00b9ef88; }
+@keyframes mega-gira { to { transform: rotate(360deg); } }
+.mega-simbolo-anim {
+  position: absolute; left: 50%; top: 40%; width: 96px; height: 96px; margin: -48px 0 0 -48px; z-index: 5; pointer-events: none;
+  filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 18px #00b9ef);
+  animation: mega-simbolo 1.4s ease-out forwards;
+}
+@keyframes mega-simbolo {
+  0% { opacity: 0; transform: scale(0.2) rotate(-90deg); }
+  35% { opacity: 1; transform: scale(1.15) rotate(0deg); }
+  70% { opacity: 1; transform: scale(1) rotate(20deg); }
+  100% { opacity: 0; transform: scale(1.8) rotate(40deg); }
+}
+.sprite.megaevoluindo { animation: mega-brilho 1.4s ease-in-out; }
+@keyframes mega-brilho {
+  0%, 100% { filter: none; }
+  30% { filter: brightness(3) drop-shadow(0 0 12px #e74291); }
+  55% { filter: brightness(4) drop-shadow(0 0 16px #00b9ef); }
+  75% { filter: brightness(2.5) drop-shadow(0 0 12px #aacf52); }
+}
+.sprite.megaevoluido { filter: drop-shadow(0 0 4px #e7429188) drop-shadow(0 0 2px #00b9ef88); }
 .botao-tera.ligado { background: linear-gradient(135deg, #ffffff, var(--cor-tipo)); color: #10202e; border-color: transparent; font-weight: 800; }
 .botao.golpe.golpe-tera { box-shadow: 0 0 0 2px #bff3ff, 0 0 14px #7fd3ff99; }
 
@@ -1400,3 +1426,7 @@ button.vaga:hover { border-color: var(--borda); }
 .ginasio-insignia .insignia-img { width: 40px; height: 40px; }
 .cab-insignias-lista { align-items: center; }
 .cab-insignias .insignia-img { width: 26px; height: 26px; }
+
+/* Database: nome das Megas com o símbolo */
+.db-nome-mega { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; }
+.db-nome-mega img { width: 16px; height: 16px; object-fit: contain; }

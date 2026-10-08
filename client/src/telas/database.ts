@@ -2,7 +2,7 @@
 // com busca e ordenação por coluna. Textos em português (descrições traduzidas).
 import { Dex } from '@pkmn/sim';
 import type { Tela } from '../main';
-import { CATEGORIAS_BOLSA, MOEDA, TODOS_OS_ITENS, nomeCategoriaItem } from '../../../shared/loja';
+import { CATEGORIAS_BOLSA, TODOS_OS_ITENS, nomeCategoriaItem, textoPreco } from '../../../shared/loja';
 import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
 import type { PokemonBase } from '../../../shared/tipos';
 import { ORDEM_TIERS, tierDoPokemon } from '../../../shared/tiers';
@@ -11,6 +11,12 @@ import { REGIOES } from '../../../shared/regioes';
 import { CATEGORIAS_POKEMON, categoriasDoPokemon } from '../../../shared/categorias';
 import { el, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { iconeItem } from '../ui/iconeItem';
+import { MEGAS, megasDaEspecie, tierDaMega, type Mega } from '../../../shared/megas';
+import { megaComoPokemon } from '../ui/formas';
+
+/** Linha da tabela de Pokémon: a espécie, ou uma Mega (linha separada, com atributos e tier próprios). */
+type LinhaPokemon = PokemonBase & { mega?: Mega };
+const tierDaLinha = (p: LinhaPokemon) => (p.mega ? tierDaMega(p.mega) : tierDoPokemon(p.id));
 
 interface Coluna<T> {
   titulo: string;
@@ -128,10 +134,12 @@ const numero = (v: number | true) => (v === true ? '—' : v ? String(v) : '—'
 
 export const telaDatabase: Tela = (raiz, navegar) => {
   const pokemons = todosOsPokemons();
+  // cada Mega vem logo depois da espécie normal
+  const linhasPokemon: LinhaPokemon[] = pokemons.flatMap((p) => [p, ...megasDaEspecie(p.id).map((m) => ({ ...megaComoPokemon(m, p), mega: m }))]);
 
   // quais Pokémon do jogo têm cada habilidade
   const donos = new Map<string, PokemonBase[]>();
-  for (const p of pokemons)
+  for (const p of linhasPokemon)
     for (const h of p.habilidades) {
       const id = Dex.abilities.get(h.nome).id;
       donos.set(id, [...(donos.get(id) ?? []), p]);
@@ -141,29 +149,29 @@ export const telaDatabase: Tela = (raiz, navegar) => {
     {
       id: 'pokemon',
       nome: 'Pokémon',
-      linhas: pokemons,
-      busca: (p: PokemonBase) => `${p.id} ${p.nome} ${p.tipos.join(' ')}`,
-      aoClicar: (p: PokemonBase) => navegar({ tela: 'pokedex', id: p.id }),
+      linhas: linhasPokemon,
+      busca: (p: LinhaPokemon) => `${p.id} ${p.nome} ${p.tipos.join(' ')}${p.mega ? ' mega' : ''}`,
+      aoClicar: (p: LinhaPokemon) => navegar({ tela: 'pokedex', id: p.id, mega: p.mega?.forma }),
       filtros: [
-        filtroTipos((p: PokemonBase) => p.tipos),
+        filtroTipos((p: LinhaPokemon) => p.tipos),
         {
           todos: 'Regiões',
           opcoes: REGIOES.filter((r) => r.disponivel).map((r) => [r.id, r.nome]),
-          valores: (p: PokemonBase) => [REGIOES.find((r) => p.id >= r.pokedex[0] && p.id <= r.pokedex[1])?.id ?? ''],
+          valores: (p: LinhaPokemon) => [REGIOES.find((r) => p.id >= r.pokedex[0] && p.id <= r.pokedex[1])?.id ?? ''],
         },
-        { todos: 'Tiers', opcoes: ORDEM_TIERS.map((t) => [t, t]), valores: (p: PokemonBase) => [tierDoPokemon(p.id)] },
-        { todos: 'Categorias', opcoes: CATEGORIAS_POKEMON, valores: categoriasDoPokemon },
+        { todos: 'Tiers', opcoes: ORDEM_TIERS.map((t) => [t, t]), valores: (p: LinhaPokemon) => [tierDaLinha(p)] },
+        { todos: 'Categorias', opcoes: [...CATEGORIAS_POKEMON, ['mega', `Megas (${MEGAS.length})`]], valores: (p: LinhaPokemon) => (p.mega ? ['mega'] : categoriasDoPokemon(p)) },
       ],
       colunas: [
         { titulo: '#', celula: (p) => String(p.id).padStart(3, '0'), ordem: (p) => p.id, classe: 'num' },
         { titulo: '', celula: (p) => spritePokemon(p, { animado: false }), classe: 'db-sprite' },
-        { titulo: 'Nome', celula: (p) => p.nome, ordem: (p) => p.nome },
+        { titulo: 'Nome', celula: (p) => (p.mega ? el('span', { class: 'db-nome-mega' }, el('img', { src: 'batalha/mega-evolucao.svg', alt: '' }), p.nome) : p.nome), ordem: (p) => p.nome },
         { titulo: 'Tipos', celula: (p) => selosTipos(p), ordem: (p) => p.tipos.join() },
-        { titulo: 'Tier', celula: (p) => el('span', { class: 'db-tier' }, tierDoPokemon(p.id)), ordem: (p) => posicaoTier(tierDoPokemon(p.id)) },
-        ...ATRIBUTOS.map(([a, nome]): Coluna<PokemonBase> => ({ titulo: nome, celula: (p) => String(p.stats[a]), ordem: (p) => p.stats[a], classe: 'num' })),
+        { titulo: 'Tier', celula: (p) => el('span', { class: 'db-tier' }, tierDaLinha(p)), ordem: (p) => posicaoTier(tierDaLinha(p)) },
+        ...ATRIBUTOS.map(([a, nome]): Coluna<LinhaPokemon> => ({ titulo: nome, celula: (p) => String(p.stats[a]), ordem: (p) => p.stats[a], classe: 'num' })),
         { titulo: 'Total', celula: (p) => el('strong', {}, String(total(p))), ordem: total, classe: 'num' },
       ],
-    } satisfies Secao<PokemonBase>,
+    } satisfies Secao<LinhaPokemon>,
     {
       id: 'itens',
       nome: 'Itens',
@@ -179,7 +187,7 @@ export const telaDatabase: Tela = (raiz, navegar) => {
         { titulo: 'Nome', celula: (i) => i.nome, ordem: (i) => i.nome },
         { titulo: 'Categoria', celula: (i) => nomeCategoriaItem(i.categoria), ordem: (i) => CATEGORIAS_BOLSA.findIndex((c) => c.id === i.categoria) },
         { titulo: 'Efeito', celula: (i) => i.descricao, classe: 'desc' },
-        { titulo: 'Loja', celula: (i) => (i.naLoja ? `${i.preco} ${MOEDA}` : el('span', { class: 'meta' }, 'Fora da loja')), ordem: (i) => (i.naLoja ? i.preco : 1e9), classe: 'num' },
+        { titulo: 'Loja', celula: (i) => (i.naLoja ? textoPreco(i) : el('span', { class: 'meta' }, 'Fora da loja')), ordem: (i) => (i.naLoja ? i.preco * (i.moeda === 'gold' ? 1e4 : 1) : 1e9), classe: 'num' },
       ],
     } satisfies Secao<(typeof TODOS_OS_ITENS)[number]>,
     {
