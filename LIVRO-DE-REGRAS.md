@@ -539,7 +539,8 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
 - Aba Minha conta (Meu perfil, Achievements, Minhas skins, Opções); chances de aparição, de lendário e de shiny na Pokédex.
-- Cabeçalho maior; Início Passe de batalha (vitrine) na tela de Início; Log na Administração (em breve).
+- Cabeçalho maior com selos dos bônus ativos e atalhos estilo Pokébola; passe de batalha com 30 níveis e botão Missões.
+- Cabeçalho fixo com informações do treinador e atalhos; Passe de batalha (vitrine) na tela de Início; Log na Administração (em breve).
 - Aba Administração com Bonificação (silver, XP, shiny e lendário de 1x a 3x); Buscar jogadores na Comunidade.
 - Batalha: registro dos turnos com o dano de cada golpe, contador de turnos e ficha do seu Pokémon ao passar o mouse.
 - Tela de Início com o time lado a lado (aba Início na barra do topo).
