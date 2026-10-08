@@ -28,6 +28,25 @@ function pedestal(p: PokemonDoJogador): HTMLElement {
   );
 }
 
+/** Passe de batalha: por enquanto só a vitrine (a mecânica e as recompensas ainda vão ser definidas). */
+const NIVEIS_PASSE = 10;
+function passeDeBatalha(): HTMLElement {
+  const casa = (nivel: number, premium: boolean) =>
+    el('div', { class: `passe-casa ${premium ? 'premium' : 'gratis'}`, title: 'Recompensa a definir' }, el('span', { class: 'passe-cadeado' }, '?'));
+  return el(
+    'section',
+    { class: 'passe-batalha' },
+    el('div', { class: 'passe-topo' },
+      el('div', {}, el('h2', {}, 'Passe de batalha'), el('small', { class: 'meta' }, 'Temporada 1 · recompensas e mecânica em breve')),
+      el('span', { class: 'selo-em-breve' }, 'Em breve')),
+    el('div', { class: 'passe-progresso' }, el('small', {}, `Nível 0 de ${NIVEIS_PASSE}`), el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: '0%' } }))),
+    el('div', { class: 'passe-trilha' },
+      el('div', { class: 'passe-rotulos' }, el('small', {}, 'Grátis'), el('small', {}, 'Premium')),
+      ...Array.from({ length: NIVEIS_PASSE }, (_, i) =>
+        el('div', { class: 'passe-coluna' }, el('small', { class: 'passe-nivel' }, String(i + 1)), casa(i + 1, false), casa(i + 1, true)))),
+  );
+}
+
 export const telaInicio: Tela = (raiz, navegar) => {
   const save = carregarSave();
   const tela = el('main', { class: 'tela tela-inicio' });
@@ -48,5 +67,6 @@ export const telaInicio: Tela = (raiz, navegar) => {
       ...Array.from({ length: TAMANHO_MAXIMO_TIME }, (_, i) => (save.time[i] ? pedestal(save.time[i]) : el('div', { class: 'pedestal vazio' }, el('small', {}, 'Vaga livre')))),
     ),
     el('div', { class: 'inicio-botoes' }, el('button', { class: 'botao grande', onclick: () => navegar({ tela: 'regiao' }) }, 'Ir para os Mapas')),
+    passeDeBatalha(),
   );
 };

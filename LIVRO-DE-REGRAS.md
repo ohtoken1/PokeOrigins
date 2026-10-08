@@ -454,12 +454,15 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 
 A barra do topo tem:
 - **ícone da Pokédex** (canto esquerdo): atalho direto para a Pokédex;
-- **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (cada Pokémon grande, com nível, tipos, HP e item; clique para ver a ficha) e um botão para ir aos Mapas;
+- **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (cada Pokémon grande, com nível, tipos, HP e item; clique para ver a ficha), um botão para ir aos Mapas e, embaixo, o **Passe de batalha** (Temporada 1, 10 níveis com trilha grátis e premium; mecânica e recompensas **em breve**);
 - **Jogar**: Mapas (regiões e biomas), **Cidade**, **Continentes**, **Duelos com treinadores** e **Ginásios** (os quatro últimos "em breve");
 - **Golpes**: Move Reminder e Move Tutor;
 - **Informações**: Opções, Ranking e Database;
 - **Comunidade**: **Buscar jogadores** (digite o nome de um treinador para ver o perfil: nível, Pokédex, capturas e time; sem servidor, só encontra você mesmo), **Amigos** e **Clã** (os dois **"em breve"**, porque dependem de contas e do servidor online);
-- **Administração** (só para contas de administrador; enquanto não há contas, aparece para todos): **Bonificação** e, em breve, Jogadores, Eventos e Anúncios.
+- **Administração** (só para contas de administrador; enquanto não há contas, aparece para todos): **Bonificação** e, em breve, **Log** (tudo o que entra e sai no jogo, para achar abuso de bug), Jogadores, Eventos e Anúncios.
+
+### Cabeçalho fixo
+Embaixo da barra do topo fica um **cabeçalho** que acompanha todas as telas (menos a criação do personagem, a roleta do inicial e o mapa do bioma, que precisam do espaço): nome do treinador, **VIP** ou não, nível e barra de XP de treinador, **região** atual, **Pokédex da região** (capturados e %), **insígnias** (0/8 até os ginásios existirem), **silver** e **gold**, e atalhos para **Centro Pokémon** (cura o time), **Pokémarket**, **Bolsa**, **PC** e **Mapas**.
 
 ### Bonificação
 A administração pode multiplicar, para todos os jogadores, de **1x até 3x** (1x, 1,5x, 2x, 2,5x, 3x):
@@ -533,6 +536,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
+- Cabeçalho fixo com informações do treinador e atalhos; Passe de batalha (vitrine) na tela de Início; Log na Administração (em breve).
 - Aba Administração com Bonificação (silver, XP, shiny e lendário de 1x a 3x); Buscar jogadores na Comunidade.
 - Batalha: registro dos turnos com o dano de cada golpe, contador de turnos e ficha do seu Pokémon ao passar o mouse.
 - Tela de Início com o time lado a lado (aba Início na barra do topo).

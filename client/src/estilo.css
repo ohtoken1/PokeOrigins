@@ -1195,3 +1195,49 @@ button.vaga:hover { border-color: var(--borda); }
 .perfil-time { display: flex; flex-wrap: wrap; gap: 8px; }
 .perfil-pokemon { display: flex; flex-direction: column; align-items: center; width: 100px; padding: 6px; border-radius: 10px; border: 1px solid var(--borda); background: var(--painel); color: var(--texto); cursor: pointer; font: inherit; }
 .perfil-pokemon small { font-size: 0.68rem; text-align: center; }
+
+/* Cabeçalho fixo (embaixo da barra do topo) */
+.cabecalho-jogo { position: sticky; top: 48px; z-index: 790; background: rgb(16 30 50 / 0.82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-bottom: 1px solid var(--borda); }
+.cabecalho-jogo[hidden] { display: none; }
+.cabecalho-conteudo { max-width: 1340px; margin: 0 auto; padding: 6px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; font-size: 0.8rem; }
+.cab-grupo { display: flex; align-items: center; gap: 8px; }
+.cab-grupo > small { color: var(--texto-2); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.cab-treinador { gap: 14px; }
+.cab-nome { display: flex; align-items: center; gap: 6px; font-size: 0.95rem; }
+.cab-nome .icone-vip { padding: 1px 6px; font-size: 0.68rem; }
+.cab-sem-vip { font-size: 0.65rem; color: var(--texto-2); border: 1px dashed var(--borda); border-radius: 6px; padding: 1px 5px; }
+.cab-xp { display: flex; flex-direction: column; gap: 2px; min-width: 120px; }
+.cab-xp small { color: var(--texto-2); font-size: 0.7rem; }
+.cab-xp .barra-exp { margin: 0; }
+.cab-dex { display: flex; flex-direction: column; gap: 2px; padding: 2px 8px; border: 1px solid var(--borda); border-radius: 8px; background: none; color: var(--texto); font: inherit; font-size: 0.72rem; cursor: pointer; }
+.cab-dex:hover { border-color: var(--destaque); }
+.cab-dex-barra { display: block; width: 100%; height: 3px; border-radius: 2px; background: rgb(255 255 255 / 0.12); overflow: hidden; }
+.cab-dex-barra > span { display: block; height: 100%; background: #e85a5a; }
+.cab-insignias-lista { display: flex; gap: 3px; }
+.insignia { width: 12px; height: 12px; border-radius: 3px; transform: rotate(45deg); }
+.insignia.vazia { border: 1.5px solid rgb(255 255 255 / 0.25); }
+.cab-moedas { gap: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.cab-moeda { display: inline-flex; align-items: center; gap: 5px; }
+.cab-moeda .icone-moeda { width: 16px; height: 16px; }
+.cab-atalhos { margin-left: auto; gap: 4px; }
+.atalho-cabecalho { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 8px; border: 1px solid transparent; background: none; color: var(--texto); font: inherit; font-size: 0.75rem; cursor: pointer; }
+.atalho-cabecalho:hover { background: var(--painel-2); border-color: var(--borda); }
+.atalho-cabecalho .icone svg { width: 16px; height: 16px; }
+.cabecalho-aviso { color: #6fdc7a; font-weight: 700; font-size: 0.75rem; }
+@media (max-width: 1100px) { .atalho-cabecalho span:not(.icone) { display: none; } }
+
+/* Passe de batalha (vitrine) */
+.passe-batalha { margin-top: 22px; padding: 14px 16px; border-radius: 16px; background: rgb(27 47 74 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); }
+.passe-topo { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.passe-topo h2 { margin: 0; font-size: 1.1rem; }
+.passe-progresso { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+.passe-progresso small { white-space: nowrap; color: var(--texto-2); }
+.passe-progresso .barra-exp { flex: 1; margin: 0; }
+.passe-trilha { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+.passe-rotulos { display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; padding-bottom: 2px; }
+.passe-rotulos small { height: 54px; display: grid; align-items: center; color: var(--texto-2); font-weight: 700; font-size: 0.72rem; }
+.passe-coluna { flex: 0 0 64px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.passe-nivel { font-weight: 800; color: var(--texto-2); font-size: 0.72rem; }
+.passe-casa { width: 58px; height: 54px; border-radius: 10px; display: grid; place-items: center; border: 1px solid var(--borda); background: rgb(255 255 255 / 0.05); }
+.passe-casa.premium { background: linear-gradient(135deg, rgb(255 201 60 / 0.18), rgb(255 138 31 / 0.12)); border-color: #8a6a1c; }
+.passe-cadeado { font-weight: 900; color: var(--texto-2); opacity: 0.7; }

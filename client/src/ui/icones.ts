@@ -4,6 +4,7 @@ const TRACOS: Record<string, string> = {
   computador: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/>',
   mochila:
     '<path d="M6 10a6 6 0 0 1 12 0v9a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1z"/><path d="M9 4.8V4a3 3 0 0 1 6 0v.8"/><path d="M9 14h6v3H9z"/>',
+  mapa: '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>',
   loja: '<path d="M4 9l1.5-5h13L20 9"/><path d="M4 9h16a2.7 2.7 0 0 1-5.3 0 2.7 2.7 0 0 1-5.4 0A2.7 2.7 0 0 1 4 9z"/><path d="M5.5 12v8h13v-8M10 20v-5h4v5"/>',
 };
 

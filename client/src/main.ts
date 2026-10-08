@@ -16,6 +16,7 @@ import { telaJogadores } from './telas/jogadores';
 import { telaComunidade, type SecaoComunidade } from './telas/comunidade';
 import { montarPainelAdmin } from './ui/admin';
 import { montarBarraTopo } from './ui/barraTopo';
+import { montarCabecalho } from './ui/cabecalho';
 import { definirNavegacao } from './ui/navegacao';
 
 export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes' } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' };
@@ -27,10 +28,12 @@ const raiz = document.getElementById('app')!;
 let limparTelaAtual: (() => void) | void;
 let destinoAtual: Destino = { tela: 'inicial' };
 let marcarAba: ((destino: Destino) => void) | undefined;
+let atualizarCabecalho: ((destino: Destino) => void) | undefined;
 
 const navegar: Navegar = (destino) => {
   destinoAtual = destino;
   marcarAba?.(destino);
+  atualizarCabecalho?.(destino);
   limparTelaAtual?.();
   raiz.replaceChildren();
   window.scrollTo(0, 0);
@@ -51,6 +54,7 @@ const navegar: Navegar = (destino) => {
 
 montarPainelAdmin(() => navegar(destinoAtual));
 marcarAba = montarBarraTopo(navegar);
+atualizarCabecalho = montarCabecalho(navegar);
 definirNavegacao(navegar);
 // com save, o jogo abre na tela de Início (o time lado a lado)
 navegar(carregarSave() ? { tela: 'inicio' } : { tela: 'inicial' });

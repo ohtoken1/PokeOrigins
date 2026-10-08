@@ -5,10 +5,15 @@ import { NOMES_BONUS, VALORES_BONUS, textoBonus, type ChaveBonus } from '../../.
 import { bonificacao, definirBonus, ehAdministrador } from '../bonificacao';
 import { el } from '../ui/dom';
 
-export type SecaoAdministracao = 'bonificacao' | 'jogadores' | 'eventos' | 'anuncios';
+export type SecaoAdministracao = 'bonificacao' | 'log' | 'jogadores' | 'eventos' | 'anuncios';
 
 export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBreve?: string }[] = [
   { id: 'bonificacao', nome: 'Bonificação' },
+  {
+    id: 'log',
+    nome: 'Log',
+    emBreve: 'Registro de tudo o que acontece no jogo: o que entra e sai (silver, gold, itens, Pokémon, tickets), quem fez e quando — para achar abuso de bug. Vai ser ligado com o servidor.',
+  },
   { id: 'jogadores', nome: 'Jogadores', emBreve: 'Ver e editar contas, banir e dar itens a jogadores (precisa do servidor).' },
   { id: 'eventos', nome: 'Eventos', emBreve: 'Agendar eventos, como fim de semana com bônus ou Pokémon especiais.' },
   { id: 'anuncios', nome: 'Anúncios', emBreve: 'Mandar avisos para todos os jogadores.' },
