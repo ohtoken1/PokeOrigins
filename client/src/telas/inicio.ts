@@ -29,7 +29,7 @@ function pedestal(p: PokemonDoJogador): HTMLElement {
 }
 
 /** Passe de batalha: por enquanto só a vitrine (a mecânica e as recompensas ainda vão ser definidas). */
-const NIVEIS_PASSE = 10;
+const NIVEIS_PASSE = 30;
 function passeDeBatalha(): HTMLElement {
   const casa = (nivel: number, premium: boolean) =>
     el('div', { class: `passe-casa ${premium ? 'premium' : 'gratis'}`, title: 'Recompensa a definir' }, el('span', { class: 'passe-cadeado' }, '?'));
