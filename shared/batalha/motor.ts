@@ -9,7 +9,8 @@ import type { EfeitoBola } from '../bolas';
 
 export type Lado = 'jogador' | 'selvagem';
 
-export type EventoBatalha =
+/** `registro`: frase para o chat lateral da batalha (se faltar, usa `texto`; null = não registra). */
+export type EventoBatalha = (
   | { tipo: 'mensagem'; texto: string }
   /** `forma` = espécie no Showdown (ex.: "Giratina-Origin", "Arceus-Fire"), para o sprite da forma certa. */
   | { tipo: 'entrar'; lado: Lado; indice: number; hp: number; hpMax: number; forma: string; texto?: string }
@@ -30,7 +31,10 @@ export type EventoBatalha =
   /** Clima em campo (id do Showdown: RainDance, SunnyDay, Sandstorm, Snow…), null = acabou. */
   | { tipo: 'clima'; clima: string | null; texto?: string }
   /** Terreno em campo (Electric/Grassy/Misty/Psychic Terrain), null = acabou. */
-  | { tipo: 'terreno'; terreno: string | null; texto?: string };
+  | { tipo: 'terreno'; terreno: string | null; texto?: string }
+  /** Começou um turno novo (contador ao lado da janela). */
+  | { tipo: 'turno'; numero: number }
+) & { registro?: string | null };
 
 export interface OpcaoGolpe {
   indice: number;
@@ -391,8 +395,14 @@ export class BatalhaSelvagem {
     return dono?.startsWith('p2') ?? false;
   }
 
+  /** HP de cada lado (para calcular o dano de cada golpe). */
+  private hpLado: Record<Lado, { hp: number; max: number }> = { jogador: { hp: 0, max: 1 }, selvagem: { hp: 0, max: 1 } };
+  /** Último golpe usado (para juntar "usou X" com o dano no chat lateral). */
+  private ultimoGolpe: { quem: string; golpe: string; evento: EventoBatalha; acertos: number } | null = null;
+
   private interpretar(linhas: string[]): EventoBatalha[] {
     const eventos: EventoBatalha[] = [];
+    const porcento = (n: number) => `${(Math.round(n * 10) / 10).toLocaleString('pt-BR')}%`;
     for (let i = 0; i < linhas.length; i++) {
       let linha = linhas[i];
       // "|split|p1" vem antes de duas versões da mesma linha (secreta e pública): fica a secreta
@@ -412,9 +422,18 @@ export class BatalhaSelvagem {
           const lado = this.lado(args[0]);
           const [hp, hpMax] = args[2].split(' ')[0].split('/').map(Number);
           const indice = lado === 'jogador' ? Number(args[0].split(': ')[1].slice(1)) : 0;
-          eventos.push({ tipo: 'entrar', lado, indice, hp, hpMax: hpMax ?? hp, forma: args[1].split(',')[0], texto: lado === 'jogador' ? `Vai, ${quem}!` : undefined });
+          this.hpLado[lado] = { hp, max: hpMax ?? hp };
+          eventos.push({
+            tipo: 'entrar', lado, indice, hp, hpMax: hpMax ?? hp, forma: args[1].split(',')[0],
+            texto: lado === 'jogador' ? `Vai, ${quem}!` : undefined,
+            registro: lado === 'jogador' ? `Vai, ${quem}!` : null,
+          });
           break;
         }
+        case 'turn':
+          this.ultimoGolpe = null;
+          eventos.push({ tipo: 'turno', numero: Number(args[0]), registro: null });
+          break;
         case 'detailschange':
         case '-formechange':
           eventos.push({ tipo: 'forma', lado: this.lado(args[0]), forma: args[1].split(',')[0] });
@@ -449,7 +468,7 @@ export class BatalhaSelvagem {
         }
         case 'move': {
           const golpe = Dex.moves.get(args[1]);
-          eventos.push({
+          const evento: EventoBatalha = {
             tipo: 'golpe',
             lado: this.lado(args[0]),
             alvo: args[2] ? this.lado(args[2]) : null,
@@ -457,7 +476,9 @@ export class BatalhaSelvagem {
             tipoGolpe: golpe.type,
             categoria: golpe.category,
             texto: `${quem} usou ${golpe.name}!`,
-          });
+          };
+          eventos.push(evento);
+          this.ultimoGolpe = { quem, golpe: golpe.name, evento, acertos: 0 };
           break;
         }
         case '-damage':
@@ -465,7 +486,12 @@ export class BatalhaSelvagem {
         case '-sethp': {
           const [hpTexto] = args[1].split(' ');
           const [hp, hpMax] = hpTexto.split('/').map(Number);
+          const ladoHp = this.lado(args[0]);
+          const antes = this.hpLado[ladoHp];
+          const max = hpMax || antes.max || 1;
+          this.hpLado[ladoHp] = { hp: hp || 0, max };
           let texto: string | undefined;
+          let registro: string | undefined;
           if (de === 'brn') texto = `${quem} foi ferido pela queimadura!`;
           else if (de === 'psn' || de === 'tox') texto = `${quem} foi ferido pelo veneno!`;
           else if (de === 'Recoil') texto = `${quem} sofreu dano de recuo!`;
@@ -480,7 +506,25 @@ export class BatalhaSelvagem {
           }
           else if (de === 'Sandstorm' || de === 'Hail') texto = `${quem} foi atingido pelo clima!`;
           else if (de) texto = `${quem} foi afetado por ${de.replace(/^(move|ability): /, '')}!`;
-          eventos.push({ tipo: 'hp', lado: this.lado(args[0]), hp: hp || 0, hpMax: hpMax ?? 0, texto });
+          else if (comando === '-damage' && antes.hp > (hp || 0)) {
+            // dano de golpe: quanto tirou e quanto isso é da vida máxima
+            const dano = antes.hp - (hp || 0);
+            const parte = porcento((dano / max) * 100);
+            texto = `${quem} perdeu ${dano} de HP (${parte} da vida)!`;
+            const g = this.ultimoGolpe;
+            if (g) {
+              g.acertos++;
+              if (g.acertos === 1) {
+                g.evento.registro = null;
+                registro = `${g.quem} usou ${g.golpe} e causou ${dano} de dano (${parte} da vida)`;
+              } else registro = `${g.golpe} acertou de novo: ${dano} de dano (${parte} da vida)`;
+            }
+          }
+          if (texto && comando === '-damage' && !registro && antes.hp > (hp || 0)) {
+            registro = `${texto.replace(/!$/, '')} (${antes.hp - (hp || 0)} de dano, ${porcento(((antes.hp - (hp || 0)) / max) * 100)} da vida)`;
+          }
+          // desmaiado vem como "0 fnt" (sem o máximo): usa o máximo guardado
+          eventos.push({ tipo: 'hp', lado: ladoHp, hp: hp || 0, hpMax: max, texto, registro });
           break;
         }
         case 'faint':

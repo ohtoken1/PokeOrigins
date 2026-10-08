@@ -187,22 +187,44 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
   const camadaClima = el('div', { class: 'camada-clima' });
   arena.prepend(camadaTerreno);
   arena.append(camadaClima);
+  const resumoFixo = el('div', { class: 'resumo-pokemon resumo-fixo', hidden: true });
   const mostrarResumo = (lugar: HTMLElement, lado: 'selvagem' | 'jogador', quem: () => PokemonIndividual | undefined) => {
     lugar.addEventListener('mouseenter', () => {
       const p = quem();
       if (!p) return;
+      if (lado === 'jogador') {
+        // a ficha do seu Pokémon é maior que a arena: flutua por cima da janela (fora do corte da arena)
+        const r = arena.getBoundingClientRect();
+        if (!resumoFixo.isConnected) fundo.append(resumoFixo);
+        resumoFixo.replaceChildren(...resumoPokemon(p, { abilityConhecida: true, completo: true }));
+        Object.assign(resumoFixo.style, { left: `${r.left + r.width * 0.36}px`, top: `${r.top + 8}px`, maxHeight: `${window.innerHeight - r.top - 16}px` });
+        resumoFixo.hidden = false;
+        return;
+      }
       resumo.className = `resumo-pokemon ${lado}`;
-      resumo.replaceChildren(...resumoPokemon(p, { abilityConhecida: lado === 'jogador' || batalha.habilidadeSelvagemRevelada }));
+      resumo.replaceChildren(...resumoPokemon(p, { abilityConhecida: batalha.habilidadeSelvagemRevelada }));
       resumo.hidden = false;
     });
-    lugar.addEventListener('mouseleave', () => (resumo.hidden = true));
+    lugar.addEventListener('mouseleave', () => (resumo.hidden = resumoFixo.hidden = true));
   };
   mostrarResumo(lugarSelvagem, 'selvagem', () => selvagem);
+  // o seu Pokémon: ficha completa (HP máximo, atributos, ability, item, golpes) ao passar o mouse
+  mostrarResumo(lugarJogador, 'jogador', () => save.time[batalha.ativo]);
+  mostrarResumo(infoJogador.raiz, 'jogador', () => save.time[batalha.ativo]);
 
   const mensagem = el('p', { class: 'mensagem' });
   const acoes = el('div', { class: 'acoes-batalha' });
   const painel = el('div', { class: 'painel-batalha' }, mensagem, acoes);
-  const fundo = el('div', { class: 'batalha-fundo' }, el('div', { class: 'batalha' }, arena, painel));
+  // contador de turnos (à esquerda da janela) e chat com o que aconteceu (à direita)
+  const contadorTurno = el('strong', {}, '1');
+  const contador = el('div', { class: 'contador-turnos' }, el('small', {}, 'Turno'), contadorTurno);
+  const listaRegistro = el('div', { class: 'registro-lista' });
+  const chat = el('aside', { class: 'registro-batalha' }, el('h4', {}, 'Registro da batalha'), listaRegistro);
+  const registrar = (texto: string, classe = '') => {
+    listaRegistro.append(el('p', { class: classe }, texto));
+    listaRegistro.scrollTop = listaRegistro.scrollHeight;
+  };
+  const fundo = el('div', { class: 'batalha-fundo' }, el('div', { class: 'batalha-area' }, contador, el('div', { class: 'batalha' }, arena, painel), chat));
   document.body.append(fundo);
 
   // ---------- mensagens (clique para adiantar) ----------
@@ -220,7 +242,10 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
       const timer = setTimeout(fim, ms);
       pular = fim;
     });
+  /** true enquanto os eventos do simulador tocam (eles já vão para o chat pelo `registro`). */
+  let tocandoEventos = false;
   const dizer = (texto: string) => {
+    if (!tocandoEventos) registrar(texto);
     mensagem.textContent = texto;
     return esperar(650 + texto.length * 18);
   };
@@ -260,8 +285,24 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
 
   // ---------- reprodução dos eventos do simulador ----------
   async function reproduzir(eventos: EventoBatalha[]) {
+    tocandoEventos = true;
+    try {
+      await tocarEventos(eventos);
+    } finally {
+      tocandoEventos = false;
+    }
+  }
+
+  async function tocarEventos(eventos: EventoBatalha[]) {
     for (const ev of eventos) {
+      // chat lateral: a frase do evento (registro) ou o texto dele
+      const frase = ev.registro === undefined ? ('texto' in ev ? ev.texto : undefined) : ev.registro;
+      if (frase) registrar(frase);
       switch (ev.tipo) {
+        case 'turno':
+          contadorTurno.textContent = String(ev.numero);
+          registrar(`Turno ${ev.numero}`, 'registro-turno');
+          break;
         case 'mensagem':
           await dizer(ev.texto);
           break;

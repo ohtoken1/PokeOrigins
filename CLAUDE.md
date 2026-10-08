@@ -39,6 +39,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - `progresso.ts` — XP → níveis → golpes novos (com 4 golpes o jogador escolhe qual esquecer) → evolução.
 - PP: sem PP Ups (máximo = PP base). HP/status/PP persistem entre batalhas; Centro Pokémon cura. Derrota = cura e volta ao menu da região.
 - Fundo de batalha: sorteado a cada batalha entre os do bioma (`FUNDOS_BATALHA` em `telaBatalha.ts`, imagens dos jogos oficiais em `client/public/batalha/`, via Showdown).
+- Registro lateral: cada `EventoBatalha` tem `registro` opcional (frase do chat; null = não registra; senão usa `texto`); o motor junta "usou X" + dano (`hpLado`, `ultimoGolpe`) e emite `turno` (contador à esquerda). `dizer` fora dos eventos também registra. Ficha do seu Pokémon ao passar o mouse: `resumoFixo` (position fixed, fora do corte da arena).
 - Interface e animações: `client/src/batalha/` (físico = avanço, especial = projétil da cor do tipo, status = anel; Pokébola com tremidas; evolução piscando).
 
 ## Próximas etapas (ordem combinada)
