@@ -440,7 +440,8 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
   - atributos e habilidades;
   - dano recebido por tipo;
   - evolução, golpes por nível, TMs/TRs, Egg Moves e golpes do **Move Tutor**;
-  - **onde encontrar** (região, bioma, faixa de nível ou como evolui) e **captura base**.
+  - **onde encontrar** (região, bioma, faixa de nível ou como evolui) e **captura base**;
+  - **chance de aparição** por encontro (ou **chance do lendário**, nos lendários, míticos e Ultra Beasts) e **chance de shiny**, em porcentagem e em "1 em N" (ex.: 0,005% = 1 em 20.000). Valem para o seu nível de treinador atual e já contam os bônus ativos.
 - **Filtros:** região, tipo e categoria (Comum, Incomum, Raro, Inicial, Bebê, Lendário, Mítico, Ultra Beast, Paradoxo).
 
 ### Database
@@ -457,7 +458,8 @@ A barra do topo tem:
 - **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (com nível, tipos, HP e item; clique para ver a ficha) e, embaixo, o **Passe de batalha** (Temporada 1, 30 níveis com trilha grátis e premium; botão **Missões** com as missões diárias, semanais e da temporada que vão dar XP do passe; mecânica, missões e recompensas **em breve**);
 - **Jogar**: Mapas (regiões e biomas), **Cidade**, **Continentes**, **Duelos com treinadores** e **Ginásios** (os quatro últimos "em breve");
 - **Golpes**: Move Reminder e Move Tutor;
-- **Informações**: Opções, Ranking e Database;
+- **Informações**: Ranking e Database;
+- **Minha conta**: **Meu perfil** (nível, Pokédex, capturas e time; botão para editar o personagem), **Achievements** (10 conquistas com progresso: capturas, shiny, lendário, Pokédex, time completo, nível de treinador, silver; recompensas em breve), **Minhas skins** (as skins que você ganha vão para cá, não para a Bolsa) e **Opções**;
 - **Comunidade**: **Buscar jogadores** (digite o nome de um treinador para ver o perfil: nível, Pokédex, capturas e time; sem servidor, só encontra você mesmo), **Amigos** e **Clã** (os dois **"em breve"**, porque dependem de contas e do servidor online);
 - **Administração** (só para contas de administrador; enquanto não há contas, aparece para todos): **Bonificação** e, em breve, **Log** (tudo o que entra e sai no jogo, para achar abuso de bug), Jogadores, Eventos e Anúncios.
 
@@ -536,7 +538,8 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
-- Cabeçalho fixo com informações do treinador e atalhos; Passe de batalha (vitrine) na tela de Início; Log na Administração (em breve).
+- Aba Minha conta (Meu perfil, Achievements, Minhas skins, Opções); chances de aparição, de lendário e de shiny na Pokédex.
+- Cabeçalho maior; Início Passe de batalha (vitrine) na tela de Início; Log na Administração (em breve).
 - Aba Administração com Bonificação (silver, XP, shiny e lendário de 1x a 3x); Buscar jogadores na Comunidade.
 - Batalha: registro dos turnos com o dano de cada golpe, contador de turnos e ficha do seu Pokémon ao passar o mouse.
 - Tela de Início com o time lado a lado (aba Início na barra do topo).
