@@ -1452,3 +1452,9 @@ button.vaga:hover { border-color: var(--borda); }
 .bola-time.desmaiado { filter: grayscale(1) brightness(0.6); }
 /* golpe do adversário com pouco PP (1/4 ou menos) */
 .resumo-golpe.pouco-pp small { color: #ff6b6b; font-weight: 800; }
+
+/* Pokémon trancado no PC (cadeado no cartão e botão Trancar) */
+.cadeado { display: inline-flex; align-items: center; color: #ffd84a; }
+.canto-trancado { position: absolute; top: 15px; right: 4px; pointer-events: none; filter: drop-shadow(0 1px 1px #000a); }
+.botao-trancar { display: inline-flex; align-items: center; gap: 6px; }
+.botao-trancar.ligado { border-color: #ffd84a; color: #ffd84a; }

@@ -142,6 +142,11 @@ export class BatalhaSelvagem {
   private lidas = 0;
   /** Pokémon do jogador no simulador, na mesma ordem de `indices`. */
   private objetos: PokemonSim[];
+  /**
+   * Pokémon do adversário no simulador, na ordem do time dele (`adversarios`). O simulador REORDENA `p2.pokemon` a
+   * cada troca (quem entra vai para a posição 0), então nunca usar a posição de lá como posição no time.
+   */
+  private objetosAdv: PokemonSim[];
   /** Posições no time do jogador de quem está na batalha (desmaiados ficam de fora). */
   readonly indices: number[];
   /** Posições no time de quem chegou a lutar (ganham experiência completa). */
@@ -158,7 +163,7 @@ export class BatalhaSelvagem {
    */
   golpesUsadosAdversario(): { id: string; nome: string; tipo: string; gastos: number; ppMax: number; restantes: number }[] {
     const indice = this.adversarioAtivo;
-    const sim = this.batalha.p2.pokemon[indice];
+    const sim = this.objetosAdv[indice];
     return (this.golpesVistos.get(indice) ?? []).map((id) => {
       const g = Dex.moves.get(id);
       const slot = sim?.moveSlots.find((s) => s.id === id);
@@ -171,7 +176,7 @@ export class BatalhaSelvagem {
   /** Posição (no time do adversário) de quem está em campo do outro lado. */
   get adversarioAtivo(): number {
     const ativo = this.batalha.p2.active[0];
-    return ativo ? Math.max(0, this.batalha.p2.pokemon.indexOf(ativo)) : 0;
+    return ativo ? Math.max(0, this.objetosAdv.indexOf(ativo)) : 0;
   }
   private tentativasFuga = 0;
   private ignorarRecarga = false;
@@ -196,7 +201,8 @@ export class BatalhaSelvagem {
     this.batalha.setPlayer('p2', { name: treinador ? treinador.nome : 'Selvagem', team: this.adversarios.map((p, k) => conjuntoShowdown(p, `S${k}`)) as never });
     this.objetos = this.batalha.p1.pokemon.slice();
     this.objetos.forEach((sim, k) => aplicarEstado(sim, time[this.indices[k]]));
-    this.batalha.p2.pokemon.forEach((sim, k) => aplicarEstado(sim, this.adversarios[k]));
+    this.objetosAdv = this.batalha.p2.pokemon.slice();
+    this.objetosAdv.forEach((sim, k) => aplicarEstado(sim, this.adversarios[k]));
   }
 
   /** Começa a batalha (sai da tela de "prévia de time") e devolve a entrada dos Pokémon. */
@@ -376,7 +382,7 @@ export class BatalhaSelvagem {
       }
     };
     this.objetos.forEach((sim, k) => copiar(sim, this.time[this.indices[k]]));
-    this.batalha.p2.pokemon.forEach((sim, k) => copiar(sim, this.adversarios[k]));
+    this.objetosAdv.forEach((sim, k) => copiar(sim, this.adversarios[k]));
   }
 
   // ---------- interno ----------
@@ -564,10 +570,12 @@ export class BatalhaSelvagem {
           };
           eventos.push(evento);
           this.ultimoGolpe = { quem, golpe: golpe.name, evento, acertos: 0, avisos: [] };
-          // golpe do adversário fica "conhecido" (Struggle não conta: não é golpe dele)
+          // golpe do adversário fica "conhecido" (Struggle não conta: não é golpe dele). A posição vem do próprio log
+          // ("p2a: S1" = 2º do time): quando o log é lido, o simulador já pode ter trocado para o próximo Pokémon
           if (evento.lado === 'selvagem' && golpe.id !== 'struggle') {
-            const vistos = this.golpesVistos.get(this.adversarioAtivo) ?? [];
-            if (!vistos.includes(golpe.id)) this.golpesVistos.set(this.adversarioAtivo, [...vistos, golpe.id]);
+            const indice = Number(args[0].split(': ')[1]?.slice(1)) || 0;
+            const vistos = this.golpesVistos.get(indice) ?? [];
+            if (!vistos.includes(golpe.id)) this.golpesVistos.set(indice, [...vistos, golpe.id]);
           }
           break;
         }

@@ -30,6 +30,13 @@ export interface PokemonIndividual {
   item?: string | null;
   /** NT = inegociável: não pode ser trocado com outros jogadores (ex.: o inicial). */
   inegociavel?: boolean;
+  /**
+   * ID único do Pokémon do jogador, em ordem de captura (1, 2, 3…: quem chegou antes tem o número menor), para trocas e
+   * transferências; o save dá o próximo número a quem não tem. No MMO o servidor é quem vai numerar.
+   */
+  uid?: number;
+  /** Trancado no PC: não pode ser solto (nem sozinho, nem marcado com outros). */
+  trancado?: boolean;
   /** IVs exatos à mostra na ficha (capturados nascem ocultos; gold revela o valor exato). */
   ivsRevelados?: boolean;
   /** Só a FAIXA de cada IV à mostra (0–5, 6–10… 26–31), comprada com silver. */

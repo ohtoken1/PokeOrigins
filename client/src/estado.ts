@@ -43,6 +43,8 @@ export interface Save {
   vipAte?: number | null;
   /** Contadores para os rankings (capturas em batalha; ovos e tickets não contam). */
   estatisticas?: Estatisticas;
+  /** Próximo ID de Pokémon (em ordem de captura). */
+  proximoIdPokemon?: number;
 }
 
 export interface Estatisticas {
@@ -132,6 +134,28 @@ export function curarTime(save: Save): void {
   salvar(save);
 }
 
+/** ID para mostrar: "#000001". */
+export const formatarId = (uid: number) => `#${String(uid).padStart(6, '0')}`;
+
+/**
+ * Todo Pokémon do jogador tem um ID único em ordem de chegada: quem não tem (acabou de ser capturado, saiu de ovo
+ * ou ticket) recebe o próximo número. Saves antigos: o inicial (NT) primeiro, depois o time e o PC na ordem em que estão.
+ */
+function garantirIds(save: Save): void {
+  const todos = [...save.time, ...save.caixa];
+  const usados = new Set<number>();
+  let proximo = Math.max(save.proximoIdPokemon ?? 1, ...todos.map((p) => (p.uid ?? 0) + 1));
+  const semId: PokemonDoJogador[] = [];
+  for (const p of todos) {
+    // ID repetido (cópia de objeto) também ganha um novo
+    if (p.uid && !usados.has(p.uid)) usados.add(p.uid);
+    else semId.push(p);
+  }
+  semId.sort((a, b) => Number(!!b.inegociavel) - Number(!!a.inegociavel));
+  for (const p of semId) p.uid = proximo++;
+  save.proximoIdPokemon = proximo;
+}
+
 /** Completa saves de versões antigas do jogo com os campos novos. */
 function normalizar(save: Save): Save {
   const atualizar = (p: PokemonDoJogador) => {
@@ -145,6 +169,7 @@ function normalizar(save: Save): Save {
   save.caixa = (save.caixa ?? []).map(atualizar);
   // saves antigos (PC sem boxes): distribui pela ordem, 30 por box
   save.caixa.forEach((p, i) => (p.box ??= Math.min(NUMERO_BOXES - 1, Math.floor(i / TAMANHO_BOX))));
+  garantirIds(save);
 
   const itens: Record<string, number> = { ...ITENS_INICIAIS, ...(save.itens ?? {}) };
   if ('pokebola' in itens) {
@@ -201,6 +226,8 @@ export function saveDoPokemon(p: PokemonDoJogador): Save | null {
 
 export function salvar(save: Save): void {
   emMemoria = save;
+  // quem entrou no time/PC desde o último save (captura, ovo, ticket…) ganha o ID único aqui
+  garantirIds(save);
   try {
     localStorage.setItem(CHAVE, JSON.stringify(save));
   } catch {

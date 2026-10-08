@@ -327,6 +327,8 @@ O inicial (IV 20 em tudo, soma 120) é sempre **A**.
 - **Soltar** um Pokémon pede confirmação, porque não tem volta.
 - **Soltar vários:** segure o clique num Pokémon para marcá-lo; depois, cada clique marca ou desmarca outros. O botão "Soltar N" solta todos juntos (com confirmação). O time precisa ficar com pelo menos 1.
 - **Tirar item** devolve o item equipado para a bolsa.
+- **Trancar:** o botão **Trancar** (cadeado) protege o Pokémon: trancado, ele não pode ser solto (o botão Soltar fica desligado e ele não entra na lista de "soltar vários"). Um cadeado aparece no cartão. **Destrancar** desfaz.
+- **ID do Pokémon:** cada Pokémon seu tem um **ID único em ordem de captura** (#000001, #000002…: quem chegou antes tem o número menor), mostrado na ficha. Serve para identificá-lo em trocas e transferências. Saves antigos: o inicial ganha o #000001 e os outros seguem a ordem do time e do PC.
 
 ### 10.3 O Pokémon que te segue
 - O primeiro do time anda atrás de você no mapa, com **sombra** e **animação de andar em 8 direções**.
@@ -573,6 +575,8 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
 - Ícone da Pokédex no cabeçalho, ao lado do nome, com o progresso da Pokédex; barra do passe com 0 / 100 XP por nível.
+- **ID único** de cada Pokémon (ordem de captura) e **trancar** no PC.
+- Correção: depois que o Pokémon do treinador desmaiava, o próximo mostrava os golpes do anterior (o simulador reordena o time do adversário a cada troca).
 - Batalha: time do treinador como Pokébolas até cada Pokémon entrar; resumo do adversário com os golpes já usados e o PP restante (contando PP Max).
 - **Animações** dos golpes (imagens do Showdown), da Mega Evolução, da Primal Reversion e das mudanças de forma; evolução por pedra/Linking Cord com a mesma animação da evolução por nível.
 - Correção: Pokémon recém-capturado aparece na hora na Bolsa e no PC abertos pelo cabeçalho (antes só depois do F5). Os estágios de atributo do adversário (Accuracy −1…) ficam à direita da caixa dele, sem cobrir o clima/terreno.

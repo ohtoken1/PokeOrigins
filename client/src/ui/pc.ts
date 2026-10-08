@@ -5,7 +5,7 @@ import { tornarArrastavel } from './arrastar';
 import { fichaPokemon } from './detalhes';
 import { abrirJanela } from './janela';
 import { el, spritePokemon } from './dom';
-import { cartaoPokemon } from './time';
+import { cadeado, cartaoPokemon } from './time';
 
 /** Box aberta por último (continua a mesma ao reabrir o PC). */
 let boxAtual = 0;
@@ -153,7 +153,8 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
       for (const m of [...marcados]) if (!save.time.includes(m) && !save.caixa.includes(m)) marcados.delete(m);
       const marcar = (q: PokemonDoJogador) => {
         if (marcados.has(q)) marcados.delete(q);
-        else marcados.add(q);
+        // trancado não entra na lista de soltar
+        else if (!q.trancado) marcados.add(q);
         refazer();
       };
 
@@ -270,10 +271,18 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
             } }, 'Mover')),
           );
         }
+        // trancar: o Pokémon não pode ser solto até destrancar (proteção contra soltar sem querer)
         acoes.push(
+          el('button', { class: `botao secundario botao-trancar ${p.trancado ? 'ligado' : ''}`, onclick: () => ((p.trancado = !p.trancado), mudou(), refazer()) },
+            cadeado(), p.trancado ? 'Destrancar' : 'Trancar'),
           el(
             'button',
-            { class: 'botao perigo', disabled: noTime(p) && save.time.length <= 1, onclick: () => confirmarSoltar(p, () => ((selecionado = null), mudou(), refazer())) },
+            {
+              class: 'botao perigo',
+              disabled: !!p.trancado || (noTime(p) && save.time.length <= 1),
+              title: p.trancado ? 'Trancado: destranque para poder soltar' : '',
+              onclick: () => confirmarSoltar(p, () => ((selecionado = null), mudou(), refazer())),
+            },
             'Soltar',
           ),
         );

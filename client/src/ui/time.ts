@@ -14,6 +14,13 @@ export function barraHp(hp: number, hpMax: number): HTMLElement {
   return el('div', { class: 'barra-hp' }, el('div', { class: `preenchido ${cor}`, style: { width: `${fracao * 100}%` } }));
 }
 
+/** Cadeado desenhado (Pokémon trancado no PC: não pode ser solto). */
+export function cadeado(classe = ''): HTMLElement {
+  const s = el('span', { class: `cadeado ${classe}`, title: 'Trancado: não pode ser solto' });
+  s.innerHTML = '<svg viewBox="0 0 12 14" width="11" height="13" aria-hidden="true"><path d="M3 6V4.2a3 3 0 0 1 6 0V6" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="1.2" y="6" width="9.6" height="7" rx="1.6" fill="currentColor"/><rect x="5.3" y="8.3" width="1.4" height="2.6" rx=".7" fill="#1b2433"/></svg>';
+  return s;
+}
+
 /** Cartãozinho de um Pokémon (time, PC, escolha de alvo de item). */
 export function cartaoPokemon(p: PokemonDoJogador, atributos: Record<string, unknown> = {}): HTMLElement {
   const dados = pokemonPorId(p.especieId);
@@ -26,6 +33,7 @@ export function cartaoPokemon(p: PokemonDoJogador, atributos: Record<string, unk
     },
     spritePokemon(dados, { shiny: p.shiny, animado: false }),
     p.inegociavel ? el('span', { class: 'canto-nt', title: 'NT · Inegociável' }, 'NT') : null,
+    p.trancado ? cadeado('canto-trancado') : null,
     p.item ? el('span', { class: 'canto-item', title: `Segurando ${nomeItemEquipado(p.item)}` }, iconeItem(itemDaLoja(p.item) ?? { id: p.item, categoria: 'batalha' })) : null,
     el('span', {}, `${dados.nome}${p.shiny ? ' ✨' : ''}`),
     el('small', {}, `Nv. ${p.nivel}`),
