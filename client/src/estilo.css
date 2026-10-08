@@ -899,8 +899,8 @@ button.vaga:hover { border-color: var(--borda); }
   .terreno-grama, .terreno-nevoa, .terreno-psiquico { animation: respira 2.4s ease-in-out infinite alternate; }
   @keyframes respira { from { opacity: 0.7; } to { opacity: 1; } }
 }
-/* a caixa do selvagem fica no topo da arena: os estágios aparecem embaixo dela */
-.caixa-info.do-selvagem .boosts { bottom: auto; top: calc(100% + 4px); }
+/* a caixa do selvagem fica no topo da arena e embaixo dela fica o clima/terreno: os estágios aparecem à direita da caixa */
+.caixa-info.do-selvagem .boosts { bottom: auto; top: 0; left: calc(100% + 6px); flex-direction: column; flex-wrap: nowrap; align-items: flex-start; max-width: none; width: max-content; }
 
 /* PC: marcados para soltar juntos */
 .vaga.marcada { outline: 3px solid #e85a5a; outline-offset: -3px; position: relative; }

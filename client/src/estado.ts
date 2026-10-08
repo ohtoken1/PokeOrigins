@@ -171,10 +171,19 @@ function normalizar(save: Save): Save {
   return save;
 }
 
+/**
+ * O save fica num objeto só, compartilhado por todas as telas e menus (cabeçalho, PC, Bolsa, Admin, batalha).
+ * Antes cada um lia uma cópia do localStorage: um Pokémon capturado no bioma não aparecia na Bolsa/PC abertos
+ * pelo cabeçalho até apertar F5 (e uma cópia velha podia apagar o que a outra salvou).
+ */
+let emMemoria: Save | null = null;
+
 export function carregarSave(): Save | null {
+  if (emMemoria) return emMemoria;
   try {
     const texto = localStorage.getItem(CHAVE);
-    return texto ? normalizar(JSON.parse(texto) as Save) : null;
+    emMemoria = texto ? normalizar(JSON.parse(texto) as Save) : null;
+    return emMemoria;
   } catch {
     return null;
   }
@@ -191,6 +200,7 @@ export function saveDoPokemon(p: PokemonDoJogador): Save | null {
 }
 
 export function salvar(save: Save): void {
+  emMemoria = save;
   try {
     localStorage.setItem(CHAVE, JSON.stringify(save));
   } catch {
@@ -199,6 +209,7 @@ export function salvar(save: Save): void {
 }
 
 export function apagarSave(): void {
+  emMemoria = null;
   try {
     localStorage.removeItem(CHAVE);
   } catch {

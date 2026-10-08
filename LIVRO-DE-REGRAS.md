@@ -570,6 +570,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
 - Ícone da Pokédex no cabeçalho, ao lado do nome, com o progresso da Pokédex; barra do passe com 0 / 100 XP por nível.
+- Correção: Pokémon recém-capturado aparece na hora na Bolsa e no PC abertos pelo cabeçalho (antes só depois do F5). Os estágios de atributo do adversário (Accuracy −1…) ficam à direita da caixa dele, sem cobrir o clima/terreno.
 - Selvagem: resumo volta a mostrar a Speed mínima–máxima. Mega Zygarde (ainda sem sprite em pixel art) usa o sprite do Zygarde normal com o brilho da Mega.
 - **Cidade** (Jogar → Cidade): mapa da cidade inicial, só com o chão por enquanto (140 × 100 quadrados, praça central e avenidas).
 - **Exp. Share:** item para segurar; quem segura ganha XP e EVs da vitória/captura mesmo sem entrar em campo.
