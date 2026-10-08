@@ -21,7 +21,7 @@ const ABAS: Aba[] = [
       { nome: 'Cidade', destino: () => ({ tela: 'comunidade', secao: 'cidade' }), emBreve: true },
       { nome: 'Continentes', destino: () => ({ tela: 'comunidade', secao: 'continentes' }), emBreve: true },
       { nome: 'Duelos com treinadores', destino: () => ({ tela: 'duelos' }) },
-      { nome: 'Ginásios', destino: () => ({ tela: 'comunidade', secao: 'ginasios' }), emBreve: true },
+      { nome: 'Ginásios', destino: () => ({ tela: 'ginasios' }) },
     ],
   },
   { nome: 'Golpes', telas: ['golpes'], itens: [{ nome: 'Golpes', destino: () => ({ tela: 'golpes' }) }] },

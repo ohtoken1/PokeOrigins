@@ -30,7 +30,7 @@ export interface OpcoesBatalha {
   selvagem: PokemonIndividual;
   bioma: Bioma;
   /** Duelo contra treinador NPC (sem captura nem fuga; recompensa em silver ao vencer). */
-  treinador?: { nome: string; titulo: string; equipe: PokemonIndividual[]; recompensa: number };
+  treinador?: { nome: string; titulo: string; equipe: PokemonIndividual[]; recompensa: number; imagem?: string; mensagemVitoria?: string };
   aoTerminar(resultado: ResultadoBatalha): void;
 }
 
@@ -182,6 +182,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       style: { '--chao': hex(bioma.cores.chao), '--zona': hex(bioma.cores.zona), '--fundo-batalha': imagemFundo ? `url(${imagemFundo})` : 'none' },
     },
     el('div', { class: 'canto-esquerdo' }, infoSelvagem.raiz, painelCampo),
+    // retrato do treinador (duelos e ginásios), no canto de cima à direita
+    treinador?.imagem ? el('img', { class: 'retrato-batalha', src: treinador.imagem, alt: treinador.nome }) : '',
     lugarSelvagem,
     lugarJogador,
     infoJogador.raiz,
@@ -700,7 +702,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     };
 
     if (resultado === 'vitoria') {
-      if (treinador) await dizer(`Você venceu ${treinador.titulo} ${treinador.nome}!`);
+      if (treinador) await dizer(`Você venceu ${treinador.nome}!`);
+      if (treinador?.mensagemVitoria) await dizer(treinador.mensagemVitoria);
       await darXpTreinador();
       // duelo: recompensa da dificuldade do treinador; selvagem: o silver normal por vitória
       const silver = Math.round((treinador ? treinador.recompensa : SILVER_POR_VITORIA) * bonusVip(save, 'silver') * bonificacao().silver);
@@ -741,7 +744,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
 
   // ---------- início ----------
   (async () => {
-    if (treinador) await dizer(`${treinador.titulo} ${treinador.nome} quer batalhar!`);
+    if (treinador) await dizer(`${treinador.nome}, ${treinador.titulo}, quer batalhar!`);
     await animarEntrada(spriteSelvagem);
     await dizer(treinador ? `${treinador.nome} enviou ${dadosSelvagem.nome}!` : `Um ${dadosSelvagem.nome} selvagem apareceu!`);
     await reproduzir(batalha.iniciar());

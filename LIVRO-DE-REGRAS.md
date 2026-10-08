@@ -204,7 +204,7 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 ---
 
 ### 6.1 Duelos com treinadores (Jogar → Duelos com treinadores)
-- Um treinador é **sorteado entre 50 personagens** dos jogos e do anime (sem líderes de ginásio): rivais (Silver, Wally, Barry, Hop…), Elite Four (Lorelei, Bruno, Agatha, Will, Koga, Karen…), chefes de equipes vilãs (Maxie, Archie, Cyrus, Lysandre, N, Ghetsis…), campeões (Lance, Blue, Red, Steven, Wallace, Cynthia, Leon…) e Ash. Os times seguem os dos jogos/anime. O botão **Sortear outro** troca o treinador; embaixo há a lista de todos.
+- Um treinador é **sorteado entre 50 personagens** dos jogos e do anime (sem líderes de ginásio): rivais (Silver, Wally, Barry, Hop…), Elite Four (Lorelei, Bruno, Agatha, Will, Koga, Karen…), chefes de equipes vilãs (Maxie, Archie, Cyrus, Lysandre, N, Ghetsis…), campeões (Lance, Blue, Red, Steven, Wallace, Cynthia, Leon…) e Ash. Os times seguem os dos jogos/anime. O cartão mostra a **imagem do personagem**, o time e a recompensa; o botão **Sortear outro** troca o treinador.
 - **Nível:** a **média dos níveis do seu time**. As formas voltam para a evolução certa daquele nível (ex.: Garchomp no Nv. 20 vira Gible).
 - **Tamanho do time dele:** o mesmo número de Pokémon do seu time (+1 nos muito difíceis e lendários), usando os mais fortes do time dele.
 - **Sem EVs.** IVs baixos e iguais em todos os atributos, pela força do treinador:
@@ -219,6 +219,18 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 
 - **Regras do duelo:** não dá para fugir nem jogar Pokébola. O treinador manda o próximo Pokémon quando um desmaia. Na maioria das vezes ele escolhe o golpe que mais machuca (tipo, STAB e poder).
 - **Vitória:** silver da dificuldade (com bônus de VIP e da administração), XP e EVs de **todos** os Pokémon dele para quem lutou, XP de treinador e amizade +5. **Derrota:** o time é curado, sem recompensa.
+- Na batalha, o **retrato do treinador** fica no canto de cima, à direita.
+
+### 6.2 Ginásios (Jogar → Ginásios)
+- Abas por região, com os **8 líderes de cada região** e os times deles nos jogos (Brock, Misty, Lt. Surge… até Grusha, de Paldea). **Alola** tem os **4 Kahunas** (Hala, Olivia, Nanu, Hapu), que valem selos.
+- Mesmas regras dos duelos: nível = média do seu time, formas do nível certo, sem EVs. Os IVs e a recompensa crescem com a ordem do ginásio:
+
+| Ginásio | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---|---|---|---|---|---|---|---|---|
+| IVs | 5 | 5 | 6 | 6 | 8 | 8 | 9 | 10 |
+| Silver | 200 | 300 | 400 | 500 | 600 | 700 | 850 | 1.000 |
+
+- **Vencer** dá a **insígnia** (uma vez) e o silver (toda vez; depois de ganhar, o botão vira **Revanche**). As insígnias aparecem na tela dos Ginásios e no **cabeçalho**, na cor do tipo do ginásio (as da região atual; clicar abre os Ginásios).
 
 ## 7. Captura
 
@@ -472,7 +484,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 
 A barra do topo tem:
 - **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (com nível, tipos, HP e item; clique para ver a ficha) e, embaixo, o **Passe de batalha** (Temporada 1, 30 níveis com trilha grátis e premium; cada nível pede **100 XP do passe** (barra 0 / 100 XP); botão **Missões** com as missões diárias, semanais e da temporada que vão dar XP do passe; mecânica, missões e recompensas **em breve**);
-- **Jogar**: Mapas (regiões e biomas), **Duelos com treinadores**, **Cidade**, **Continentes** e **Ginásios** (os três últimos "em breve");
+- **Jogar**: Mapas (regiões e biomas), **Duelos com treinadores**, **Ginásios**, **Cidade** e **Continentes** (os dois últimos "em breve");
 - **Golpes**: Move Reminder e Move Tutor;
 - **Informações**: Ranking e Database;
 - **Minha conta**: **Meu perfil** (nível, Pokédex, capturas e time; botão para editar o personagem), **Achievements** (10 conquistas com progresso: capturas, shiny, lendário, Pokédex, time completo, nível de treinador, silver; recompensas em breve), **Minhas skins** (as skins que você ganha vão para cá, não para a Bolsa) e **Opções**;
@@ -480,7 +492,7 @@ A barra do topo tem:
 - **Administração** (só para contas de administrador; enquanto não há contas, aparece para todos): **Bonificação** e, em breve, **Log** (tudo o que entra e sai no jogo, para achar abuso de bug), Jogadores, Eventos e Anúncios.
 
 ### Cabeçalho fixo
-Embaixo da barra do topo fica um **cabeçalho** que acompanha todas as telas, inclusive o mapa do bioma (só some na criação do personagem e na roleta do inicial): o **ícone da Pokédex** (atalho) com quanto você já capturou da Pokédex da região (ex.: 1/151 · 0,7%), nome do treinador, **VIP** ou não, nível e barra de XP de treinador, **região** atual, **insígnias** (0/8 até os ginásios existirem), os **selos dos bônus ativos** (ex.: "Silver 1,5x", "XP 2x", "Shiny 2x"; só informam), **silver** e **gold**, e, logo abaixo dele à direita, os atalhos em **botões redondos estilo Pokébola** (pretos, com borda e faixa brancas e o desenho do destino no centro; o nome aparece ao passar o mouse) : **Centro Pokémon** (cura o time), **Pokémarket**, **Bolsa**, **PC** e **Mapas**.
+Embaixo da barra do topo fica um **cabeçalho** que acompanha todas as telas, inclusive o mapa do bioma (só some na criação do personagem e na roleta do inicial): o **ícone da Pokédex** (atalho) com quanto você já capturou da Pokédex da região (ex.: 1/151 · 0,7%), nome do treinador, **VIP** ou não, nível e barra de XP de treinador, **região** atual, **insígnias** da região (ganhas nos Ginásios), os **selos dos bônus ativos** (ex.: "Silver 1,5x", "XP 2x", "Shiny 2x"; só informam), **silver** e **gold**, e, logo abaixo dele à direita, os atalhos em **botões redondos estilo Pokébola** (pretos, com borda e faixa brancas e o desenho do destino no centro; o nome aparece ao passar o mouse) : **Centro Pokémon** (cura o time), **Pokémarket**, **Bolsa**, **PC** e **Mapas**.
 
 ### Bonificação
 A administração pode multiplicar, para todos os jogadores, de **1x até 3x** (1x, 1,5x, 2x, 2,5x, 3x):
@@ -555,6 +567,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
 - Ícone da Pokédex no cabeçalho, ao lado do nome, com o progresso da Pokédex; barra do passe com 0 / 100 XP por nível.
+- Ginásios das 9 regiões (8 líderes; 4 Kahunas em Alola) com insígnias no cabeçalho; imagens dos treinadores nos duelos, ginásios e batalhas.
 - Duelos com treinadores: 50 treinadores dos jogos e do anime, nível da média do seu time, recompensa em silver por dificuldade; registro da batalha com os avisos no fim da frase do golpe.
 - Aba Minha conta (Meu perfil, Achievements, Minhas skins, Opções); chances de aparição, de lendário e de shiny na Pokédex.
 - Cabeçalho maior com selos dos bônus ativos e atalhos estilo Pokébola; passe de batalha com 30 níveis e botão Missões.

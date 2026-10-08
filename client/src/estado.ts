@@ -37,6 +37,8 @@ export interface Save {
   nomeReal?: string;
   /** Mostrar o nome de treinador em cima do personagem (padrão: sim). */
   mostrarNome?: boolean;
+  /** Insígnias conquistadas (ids dos líderes de ginásio, shared/ginasios.ts). */
+  insignias?: string[];
   /** VIP: data/hora (ms) em que acaba (shared/vip.ts). PRÉ-SISTEMA: no MMO fica na conta. */
   vipAte?: number | null;
   /** Contadores para os rankings (capturas em batalha; ovos e tickets não contam). */

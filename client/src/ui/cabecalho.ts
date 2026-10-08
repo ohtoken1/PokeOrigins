@@ -1,6 +1,8 @@
 // Cabeçalho fixo embaixo da barra do topo, em todas as telas (menos as que precisam do espaço: criação do
 // personagem e roleta do inicial; no mapa do bioma ele aparece, pedido do dono). Mostra nome, VIP, XP de treinador, região, Pokédex da região,
 // insígnias, silver/gold e atalhos (Centro Pokémon, Pokémarket, Bolsa, PC, Mapas).
+import { lideresDaRegiao } from '../../../shared/ginasios';
+import { insigniaVisual } from '../telas/ginasios';
 import { selosBonus } from './selosBonus';
 import type { Destino, Navegar } from '../main';
 import { regiaoPorId } from '../../../shared/regioes';
@@ -16,8 +18,6 @@ import { abrirPC } from './pc';
 
 /** Telas sem o cabeçalho (precisam de mais espaço ou ainda não há jogo). */
 const SEM_CABECALHO: Destino['tela'][] = ['inicial', 'personagem'];
-/** Insígnias do jogo (ainda não existem: ginásios em breve). */
-const TOTAL_INSIGNIAS = 8;
 
 export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
   const raiz = el('header', { class: 'cabecalho-jogo', hidden: true });
@@ -48,6 +48,7 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
     const capturadosDex = save.capturados.filter((n) => n >= ini && n <= fim).length;
     const parteDex = Math.round((capturadosDex / totalDex) * 1000) / 10;
     const vip = vipAtivo(save);
+    const lideres = lideresDaRegiao(save.regiao);
     const atalho = (nome: NomeIcone, texto: string, acao: () => void) =>
       el('button', { class: 'atalho-hex', title: texto, 'aria-label': texto, onclick: acao }, icone(nome));
 
@@ -72,9 +73,10 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
         el('div', { class: 'cab-grupo cab-regiao' },
           el('small', {}, 'Região'),
           el('strong', {}, regiao?.nome ?? save.regiao)),
-        el('div', { class: 'cab-grupo cab-insignias', title: 'Insígnias: chegam com os Ginásios (em breve)' },
-          el('small', {}, `Insígnias 0/${TOTAL_INSIGNIAS}`),
-          el('div', { class: 'cab-insignias-lista' }, ...Array.from({ length: TOTAL_INSIGNIAS }, () => el('span', { class: 'insignia vazia' })))),
+        // insígnias da região atual (clicar abre os Ginásios)
+        el('button', { class: 'cab-grupo cab-insignias', title: 'Insígnias: vença os Ginásios', onclick: () => navegar({ tela: 'ginasios' }) },
+          el('small', {}, `Insígnias ${lideres.filter((l) => (save.insignias ?? []).includes(l.id)).length}/${lideres.length}`),
+          el('div', { class: 'cab-insignias-lista' }, ...lideres.map((l) => insigniaVisual(l, (save.insignias ?? []).includes(l.id))))),
         // bônus da administração (Shiny 2x, XP 2x…), só informativo
         selosBonus(),
         el('div', { class: 'cab-grupo cab-moedas' },

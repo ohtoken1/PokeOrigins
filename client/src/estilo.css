@@ -1357,3 +1357,35 @@ button.vaga:hover { border-color: var(--borda); }
 .linha-treinador-npc small { color: var(--texto-2); }
 .mini-time { display: flex; flex-wrap: wrap; }
 .mini-time .sprite { width: 32px; height: 32px; }
+
+/* Retratos dos treinadores (sprites do Showdown, pixel art) */
+.retrato-npc { width: 80px; height: 80px; object-fit: contain; image-rendering: pixelated; flex: none; filter: drop-shadow(0 3px 3px rgb(0 0 0 / 0.45)); }
+.duelo-topo { align-items: center; }
+.duelo-nome { flex: 1; }
+.mini-retrato { display: inline-flex; align-items: center; gap: 6px; }
+.mini-retrato img { width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; }
+.linha-treinador-npc { grid-template-columns: 170px 210px 1fr; }
+.retrato-batalha {
+  position: absolute; top: 6px; right: 8px; z-index: 1; width: 96px; height: 96px; object-fit: contain; image-rendering: pixelated;
+  opacity: 0.9; filter: drop-shadow(0 4px 4px rgb(0 0 0 / 0.5)); animation: retrato-entra 0.6s ease-out; pointer-events: none;
+}
+@keyframes retrato-entra { from { opacity: 0; transform: translateX(30px); } to { opacity: 0.9; transform: none; } }
+/* Insígnias: losango na cor do tipo do ginásio */
+.insignia.ganha { background: linear-gradient(135deg, #fff, var(--cor-tipo) 55%, color-mix(in srgb, var(--cor-tipo) 60%, #000)); box-shadow: 0 0 6px color-mix(in srgb, var(--cor-tipo) 70%, transparent); border: 1.5px solid #fff; }
+.cab-insignias { background: none; border: 0; color: var(--texto); font: inherit; cursor: pointer; padding: 0; }
+/* Ginásios */
+.tela-ginasios { max-width: 980px; margin: 0 auto; }
+.ginasios-corpo { display: flex; flex-direction: column; gap: 12px; }
+.abas-regioes-ginasio { display: flex; flex-wrap: wrap; gap: 6px; }
+.ginasios-resumo { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.lista-ginasios { display: grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: 10px; }
+.cartao-ginasio {
+  display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--borda); border-left: 5px solid var(--cor-tipo);
+  background: rgb(27 47 74 / 0.5); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.cartao-ginasio.vencido { background: linear-gradient(90deg, color-mix(in srgb, var(--cor-tipo) 14%, transparent), rgb(27 47 74 / 0.5)); }
+.ginasio-texto { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ginasio-texto h3 { margin: 0; display: flex; align-items: center; gap: 6px; }
+.ginasio-insignia { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; }
+.cartao-ginasio .mini-time .sprite { width: 40px; height: 40px; }
+.lista-treinadores h3 { margin: 0 0 4px; font-size: 1rem; }

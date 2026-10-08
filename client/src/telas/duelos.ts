@@ -2,11 +2,14 @@
 // e a recompensa, e abre a batalha. Lista de todos os treinadores embaixo.
 import type { Tela } from '../main';
 import { BIOMAS } from '../../../shared/biomas';
-import { IV_POR_DIFICULDADE, NOMES_DIFICULDADE, RECOMPENSA_POR_DIFICULDADE, TREINADORES_NPC, montarTimeNpc, nivelDoDuelo, sortearTreinador, type Dificuldade, type TreinadorNpc } from '../../../shared/treinadoresNpc';
+import { NOMES_DIFICULDADE, RECOMPENSA_POR_DIFICULDADE, montarTimeNpc, sortearTreinador, type Dificuldade, type TreinadorNpc } from '../../../shared/treinadoresNpc';
 import { abrirBatalha } from '../batalha/telaBatalha';
 import { pokemonPorId } from '../dados';
 import { carregarSave, salvar } from '../estado';
 import { el, spritePokemon } from '../ui/dom';
+
+/** Imagem do personagem (sprites do Pokémon Showdown, guardados em client/public/treinadores). */
+export const imagemTreinador = (id: string) => `treinadores/${id}.png`;
 
 const estrelas = (d: Dificuldade) => el('span', { class: `estrelas dificuldade-${d}`, title: NOMES_DIFICULDADE[d] }, '★'.repeat(d), el('span', { class: 'apagadas' }, '★'.repeat(5 - d)));
 
@@ -19,7 +22,6 @@ export const telaDuelos: Tela = (raiz, navegar) => {
     return;
   }
   const crescimentoDe = (n: number) => pokemonPorId(n).crescimento;
-  const nivel = nivelDoDuelo(save.time);
   let npc: TreinadorNpc = sortearTreinador();
   let equipe = montarTimeNpc(npc, save.time, crescimentoDe);
   const cartao = el('section', { class: 'cartao-duelo' });
@@ -29,17 +31,15 @@ export const telaDuelos: Tela = (raiz, navegar) => {
     const podeLutar = save.time.some((p) => p.hp > 0);
     cartao.replaceChildren(
       el('div', { class: 'duelo-topo' },
-        el('div', {}, el('small', { class: 'meta' }, npc.titulo), el('h2', {}, npc.nome)),
+        el('img', { class: 'retrato-npc', src: imagemTreinador(npc.id), alt: npc.nome }),
+        el('div', { class: 'duelo-nome' }, el('small', { class: 'meta' }, npc.titulo), el('h2', {}, npc.nome)),
         el('div', { class: 'duelo-dificuldade' }, estrelas(npc.dificuldade), el('small', {}, NOMES_DIFICULDADE[npc.dificuldade]))),
       el('div', { class: 'duelo-time' },
         ...equipe.map((p) => {
           const d = pokemonPorId(p.especieId);
           return el('div', { class: 'duelo-pokemon' }, spritePokemon(d, { animado: false }), el('small', {}, `${d.nome} · Nv. ${p.nivel}`));
         })),
-      el('div', { class: 'duelo-info' },
-        el('span', {}, `Nível ${nivel} (média do seu time)`),
-        el('span', {}, `IVs ${IV_POR_DIFICULDADE[npc.dificuldade]} · sem EVs`),
-        el('strong', {}, `Recompensa: ${recompensa.toLocaleString('pt-BR')} silver`)),
+      el('div', { class: 'duelo-info' }, el('strong', {}, `Recompensa: ${recompensa.toLocaleString('pt-BR')} silver`)),
       el('div', { class: 'duelo-botoes' },
         el('button', {
           class: 'botao grande',
@@ -50,7 +50,7 @@ export const telaDuelos: Tela = (raiz, navegar) => {
               save,
               selvagem: equipe[0],
               bioma: BIOMAS[Math.floor(Math.random() * BIOMAS.length)],
-              treinador: { nome: npc.nome, titulo: npc.titulo, equipe, recompensa },
+              treinador: { nome: npc.nome, titulo: npc.titulo, equipe, recompensa, imagem: imagemTreinador(npc.id) },
               aoTerminar: () => {
                 salvar(save);
                 navegar({ tela: 'duelos' });
@@ -63,16 +63,5 @@ export const telaDuelos: Tela = (raiz, navegar) => {
   };
   desenhar();
 
-  // todos os treinadores, por dificuldade
-  const lista = el('details', { class: 'lista-treinadores' },
-    el('summary', {}, `Todos os treinadores (${TREINADORES_NPC.length})`),
-    ...([1, 2, 3, 4, 5] as Dificuldade[]).map((d) =>
-      el('div', { class: 'grupo-treinadores' },
-        el('h4', {}, estrelas(d), ` ${NOMES_DIFICULDADE[d]} · ${RECOMPENSA_POR_DIFICULDADE[d].toLocaleString('pt-BR')} silver`),
-        ...TREINADORES_NPC.filter((x) => x.dificuldade === d).map((x) =>
-          el('div', { class: 'linha-treinador-npc' },
-            el('strong', {}, x.nome), el('small', {}, x.titulo),
-            el('span', { class: 'mini-time' }, ...x.time.map((n) => spritePokemon(pokemonPorId(n), { animado: false }))))))),
-  );
-  tela.append(el('p', { class: 'sub' }, 'Um treinador é sorteado entre 50 personagens dos jogos e do anime. O time dele fica no nível médio do seu time.'), cartao, lista);
+  tela.append(el('p', { class: 'sub' }, 'Um treinador é sorteado entre 50 personagens dos jogos e do anime.'), cartao);
 };
