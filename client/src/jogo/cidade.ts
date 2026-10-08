@@ -162,7 +162,8 @@ export function gerarMapaCidade(): Mapa {
     let fim = y;
     while (fim < y + 2 && dentro(col, fim) && terreno[fim][col] === 'pedra') fim++;
     const emenda = dentro(col, fim) && terreno[fim][col] === 'caminho' ? fim * TAM + 1 : y * TAM;
-    trilhas.push({ x: px, y: linha * TAM, w, h: emenda - linha * TAM });
+    // começa 6 px por baixo do prédio (sem faixa de grama entre a porta e a trilha)
+    trilhas.push({ x: px, y: linha * TAM - 6, w, h: emenda - linha * TAM + 6 });
     // sem flor nem árvore em cima da trilha
     for (let yy = linha; yy < y; yy++) for (let xx = Math.floor(px / TAM); xx <= Math.floor((px + w - 1) / TAM); xx++) ocupado[yy][xx] = true;
   };

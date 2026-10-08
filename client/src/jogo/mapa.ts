@@ -325,7 +325,7 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
     areia.getContext('2d')!.drawImage(buch, AREIA[0] * TAM, AREIA[1] * TAM, TAM, TAM, 0, 0, TAM, TAM);
     const padrao = ctx.createPattern(areia, 'repeat')!;
     for (const tr of mapa.trilhas) {
-      // linha a linha: bordas um pouco tortas, cantos de cima arredondados e abrindo em curva onde encontra a rua
+      // linha a linha: bordas um pouco tortas e abrindo em curva onde encontra a rua
       const ra = aleatorioComSemente(`trilha:${tr.x},${tr.y}`);
       let [esq, dir] = [0, 0];
       for (let yy = 0; yy < tr.h; yy++) {
@@ -334,11 +334,10 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
           dir = Math.max(-1, Math.min(1, dir + Math.round(ra() * 2 - 1)));
         }
         const fim = tr.h - yy;
-        // abre em curva nos últimos 16 px (calçada) e alarga um pouco junto à porta
+        // abre em curva nos últimos 16 px (calçada); o começo fica escondido embaixo do prédio
         const abertura = fim <= 16 ? Math.round(((16 - fim) * (16 - fim)) / 40) : 0;
-        const topo = yy < 5 ? -Math.round(((5 - yy) * (5 - yy)) / 10) : 0;
-        const x0 = tr.x - esq - abertura + topo;
-        const x1 = tr.x + tr.w + dir + abertura - topo;
+        const x0 = tr.x - esq - abertura;
+        const x1 = tr.x + tr.w + dir + abertura;
         ctx.fillStyle = padrao;
         ctx.fillRect(x0, tr.y + yy, x1 - x0, 1);
         ctx.fillStyle = corBorda;
