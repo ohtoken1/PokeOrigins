@@ -1,5 +1,5 @@
 // Itens nossos (não existem no Showdown): skins de lendários e itens-chave de forma (Prison Bottle, DNA Splicers,
-// Reveal Glass, Teal Mask, Dynamax Band, Terastallizer Band). Por enquanto só existem (tickets/Admin); a utilidade vem depois (pedido do dono).
+// Reveal Glass, Teal Mask). Por enquanto só existem e saem dos tickets; a utilidade vem depois (pedido do dono).
 
 export type CategoriaCustom = 'skins' | 'chave';
 
@@ -40,7 +40,4 @@ export const ITENS_CUSTOM: ItemCustom[] = [
   { id: 'dnasplicers', nome: 'DNA Splicers', categoria: 'chave', sprite: 'dna-splicers', descricao: 'Junta o Kyurem com Reshiram ou Zekrom (White/Black Kyurem). Uso em breve.' },
   { id: 'revealglass', nome: 'Reveal Glass', categoria: 'chave', sprite: 'reveal-glass', descricao: 'Troca Tornadus, Thundurus, Landorus e Enamorus entre as formas Incarnate e Therian. Uso em breve.' },
   { id: 'tealmask', nome: 'Teal Mask', categoria: 'chave', imagem: 'itens/tealmask.png', descricao: 'A máscara turquesa da Ogerpon. Uso em breve.' },
-  // ícones desenhados por nós (client/public/itens)
-  { id: 'dynamaxband', nome: 'Dynamax Band', categoria: 'chave', imagem: 'itens/dynamaxband.svg', descricao: 'Pulseira com uma Wishing Star que permite Dynamax e Gigantamax. Uso em breve.' },
-  { id: 'terastallizerband', nome: 'Terastallizer Band', categoria: 'chave', imagem: 'itens/terastallizerband.svg', descricao: 'Pulseira com um cristal Tera que permite terastalizar. Uso em breve.' },
 ];

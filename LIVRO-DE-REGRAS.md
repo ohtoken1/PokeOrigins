@@ -192,7 +192,7 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 - **Estágios de atributo** (+1 Attack, −2 Speed…) aparecem como etiquetas junto da caixa de HP de cada Pokémon e somem quando ele sai de campo.
 - **Clima e terreno** aparecem na arena: chuva caindo, sol forte, tempestade de areia, neve; terreno elétrico, de grama, de névoa ou psíquico no chão.
 - **Duração:** no canto esquerdo de cima, embaixo da caixa do selvagem, aparece o clima e o terreno em campo com os **turnos que faltam** (5 turnos normalmente; 8 com Damp Rock, Heat Rock etc. ou Terrain Extender; os climas Primal não acabam sozinhos).
-- **Terastal:** uma vez por batalha, o botão **Terastalizar (tipo)** no menu de golpes faz o Pokémon virar o **Tera Type** dele antes de atacar (troca o Tera Type com Tera Shards). Ao terastalizar, aparece uma **aba TERA** com o tipo ao lado direito do Pokémon e ele ganha um brilho de cristal; some quando ele sai de campo.
+- **Terastal:** só para quem está **segurando a Terastallizer Band** (item de batalha da loja). Uma vez por batalha, o botão **Terastalizar (tipo)** no menu de golpes faz o Pokémon virar o **Tera Type** dele antes de atacar (troca o Tera Type com Tera Shards). Ao terastalizar, aparece uma **aba TERA** com o tipo ao lado direito do Pokémon e ele ganha um brilho de cristal; some quando ele sai de campo.
 - **Informações:** passar o mouse num golpe mostra poder, precisão, PP, categoria, prioridade e descrição. Passar o mouse no selvagem mostra o resumo dele; a habilidade só aparece depois de ser revelada na luta.
 - **Registro e turnos:** à direita da janela de batalha fica o **Registro da batalha**, com tudo o que aconteceu em cada turno (ex.: "Deoxys usou Zen Headbutt e causou 150 de dano (53,4% da vida)"); à esquerda, o **contador de turnos**. Em telas estreitas o registro vai para baixo da janela.
 - **Dano:** depois de cada golpe, a mensagem da batalha diz quanto HP o alvo perdeu e quanto isso é da vida máxima.
@@ -572,7 +572,8 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Ícone da Pokédex no cabeçalho, ao lado do nome, com o progresso da Pokédex; barra do passe com 0 / 100 XP por nível.
 - **Exp. Share:** item para segurar; quem segura ganha XP e EVs da vitória/captura mesmo sem entrar em campo.
 - **Rayquazite:** o Rayquaza agora megaevolui com pedra, como os outros.
-- Itens-chave novos: **Dynamax Band** e **Terastallizer Band** (uso em breve).
+- **Terastallizer Band** (item de batalha): obrigatória para terastalizar. **Dynamax Band** (item de batalha; o Dynamax ainda não existe).
+- **Zygarde** megaevolui direto com a Zygardite (sem precisar virar Complete).
 - **Mega Evolução:** 89 Megas (com as de Legends: Z-A), botão com o símbolo da Mega na batalha, Mega Stones na loja por 1 gold, Megas na Database (linhas próprias) e na Pokédex (estágio da evolução e ficha própria).
 - Alola com 8 desafios (Capitães e Kahunas) e selos próprios (não são itens).
 - Insígnias com o desenho oficial de cada ginásio, no cabeçalho e na tela dos Ginásios.

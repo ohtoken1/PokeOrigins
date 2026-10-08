@@ -20,6 +20,9 @@ dadosItens[RAYQUAZITE] ??= {
     return !item.megaStone?.[source.baseSpecies.baseSpecies];
   },
 };
+// Zygardite: no Legends: Z-A só o Zygarde Complete megaevolui (e ele só vira Complete com Power Construct, que o
+// nosso Zygarde não tem). Aqui o Zygarde normal megaevolui direto com a pedra, como os outros (pedido do dono).
+Object.assign((dadosItens.zygardite as { megaStone: Record<string, string> }).megaStone, { Zygarde: 'Zygarde-Mega' });
 /** Pedras nossas: Mega → id da pedra (as do Showdown vêm do `requiredItem`). */
 const PEDRAS_NOSSAS: Record<string, string> = { 'Rayquaza-Mega': RAYQUAZITE };
 

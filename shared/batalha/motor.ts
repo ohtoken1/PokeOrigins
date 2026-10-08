@@ -3,6 +3,7 @@
 // selvagem, então captura e fuga são feitas aqui, com as fórmulas dos jogos originais.
 import { especieComItem } from '../formas';
 import { megaPorForma } from '../megas';
+import { TERASTALLIZER_BAND } from '../loja';
 import { Battle, Dex } from '@pkmn/sim';
 import { AMIZADE_INICIAL, especie, ppMaximo, type PokemonIndividual } from './pokemon';
 import { aplicarRemedio, usarRemedio, type Item } from '../itens';
@@ -220,7 +221,9 @@ export class BatalhaSelvagem {
     });
     const preso = !!(ativo.trapped || ativo.maybeTrapped);
     const zGolpes = Array.isArray(ativo.canZMove) ? (ativo.canZMove as ({ move: string } | null)[]).map((z) => z?.move ?? null) : null;
-    const tera = typeof ativo.canTerastallize === 'string' ? (ativo.canTerastallize as string) : null;
+    // Terastal só segurando a Terastallizer Band (pedido do dono)
+    const comBanda = this.time[this.ativo]?.item === TERASTALLIZER_BAND;
+    const tera = comBanda && typeof ativo.canTerastallize === 'string' ? (ativo.canTerastallize as string) : null;
     // contra treinador não dá para fugir
     // Mega só com Mega Stone (sem o atalho do Rayquaza por Dragon Ascent: pedido do dono)
     const mega = !!ativo.canMegaEvo && !!this.batalha.p1.active[0]?.getItem().megaStone;
