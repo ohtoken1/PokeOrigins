@@ -462,7 +462,7 @@ A barra do topo tem:
 - **Administração** (só para contas de administrador; enquanto não há contas, aparece para todos): **Bonificação** e, em breve, **Log** (tudo o que entra e sai no jogo, para achar abuso de bug), Jogadores, Eventos e Anúncios.
 
 ### Cabeçalho fixo
-Embaixo da barra do topo fica um **cabeçalho** que acompanha todas as telas (menos a criação do personagem, a roleta do inicial e o mapa do bioma, que precisam do espaço): nome do treinador, **VIP** ou não, nível e barra de XP de treinador, **região** atual, **Pokédex da região** (capturados e %), **insígnias** (0/8 até os ginásios existirem), **silver** e **gold**, e, logo abaixo dele à direita, os atalhos em **botões redondos estilo Pokébola** (pretos, com borda e faixa brancas e o desenho do destino no centro; o nome aparece ao passar o mouse) : **Centro Pokémon** (cura o time), **Pokémarket**, **Bolsa**, **PC** e **Mapas**.
+Embaixo da barra do topo fica um **cabeçalho** que acompanha todas as telas, inclusive o mapa do bioma (só some na criação do personagem e na roleta do inicial): nome do treinador, **VIP** ou não, nível e barra de XP de treinador, **região** atual, **Pokédex da região** (capturados e %), **insígnias** (0/8 até os ginásios existirem), os **selos dos bônus ativos** (ex.: "Silver 1,5x", "XP 2x", "Shiny 2x"; só informam), **silver** e **gold**, e, logo abaixo dele à direita, os atalhos em **botões redondos estilo Pokébola** (pretos, com borda e faixa brancas e o desenho do destino no centro; o nome aparece ao passar o mouse) : **Centro Pokémon** (cura o time), **Pokémarket**, **Bolsa**, **PC** e **Mapas**.
 
 ### Bonificação
 A administração pode multiplicar, para todos os jogadores, de **1x até 3x** (1x, 1,5x, 2x, 2,5x, 3x):
@@ -474,7 +474,7 @@ A administração pode multiplicar, para todos os jogadores, de **1x até 3x** (
 | **Aparição de shiny** | chance de um selvagem ser shiny (ex.: 3x → 1 em 500) |
 | **Aparição de lendário** | chance de lendários, míticos e Ultra Beasts |
 
-Com algum bônus ligado, aparece um aviso **"Bônus ativo"** no menu da região. Ele soma com o VIP (multiplica junto). Por enquanto fica guardado só no navegador; com o servidor, vale para todo mundo.
+Com algum bônus ligado, aparecem **selos** no cabeçalho (ex.: "Shiny 2x", "XP 2x"), em todas as telas e mapas. Ele soma com o VIP (multiplica junto). Por enquanto fica guardado só no navegador; com o servidor, vale para todo mundo.
 
 ### Ranking
 A aba **Ranking**, na barra do topo, tem 8 rankings. **Por enquanto só você aparece**: a lista com todos os jogadores precisa do servidor online.

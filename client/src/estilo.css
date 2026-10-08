@@ -1259,3 +1259,17 @@ button.vaga:hover { border-color: var(--borda); }
 .atalho-hex:hover { transform: translateY(-2px) rotate(-12deg); box-shadow: 0 5px 10px rgb(0 0 0 / 0.55), 0 0 0 2px rgb(255 255 255 / 0.25); }
 .cab-atalhos-fora .cabecalho-aviso { pointer-events: none; margin-left: 4px; text-shadow: 0 1px 3px #000; }
 .cab-moedas { margin-left: auto; }
+
+/* Selos dos bônus ativos (cabeçalho e mapa do bioma) */
+.selos-bonus { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.selo-bonus {
+  padding: 2px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 800; white-space: nowrap; cursor: default;
+  color: #2a1d00; background: linear-gradient(135deg, #fff1a8, #ffc93c); box-shadow: 0 0 0 1px #8a6a1c;
+}
+.selo-bonus.bonus-shiny { background: linear-gradient(135deg, #e9f6ff, #9fd8ff); color: #0e2a40; box-shadow: 0 0 0 1px #3d7fb0; }
+.selo-bonus.bonus-lendario { background: linear-gradient(135deg, #ffd8b0, #f08a1c); color: #3a1600; box-shadow: 0 0 0 1px #8a4a10; }
+.selo-bonus.bonus-xp { background: linear-gradient(135deg, #d6ffd9, #6fdc7a); color: #0f3a17; box-shadow: 0 0 0 1px #2e7a3a; }
+.cabecalho-conteudo .selos-bonus { margin-left: auto; }
+.cabecalho-conteudo .selos-bonus + .cab-moedas { margin-left: 0; }
+/* mapa do bioma: espaço à direita da barra para os atalhos Pokébola do cabeçalho */
+.tela-bioma > .barra { padding-right: 260px; }
