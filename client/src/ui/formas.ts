@@ -12,7 +12,17 @@ export function trocarSpriteForma(img: HTMLImageElement, forma: string, { shiny 
   if (!arquivo) return false;
   const pasta = `${costas ? 'back/' : ''}${shiny ? 'shiny/' : ''}`;
   const png = `${BASE}/${pasta}${arquivo}.png`;
-  img.addEventListener('error', () => img.src !== png && (img.src = png), { once: true });
+  // sem GIF tenta o PNG; sem PNG também, volta a imagem que estava (nunca fica a imagem quebrada)
+  const anterior = img.src;
+  const aoFalhar = () => {
+    if (img.src !== png) img.src = png;
+    else {
+      img.removeEventListener('error', aoFalhar);
+      img.src = anterior;
+    }
+  };
+  img.addEventListener('error', aoFalhar);
+  img.addEventListener('load', () => img.removeEventListener('error', aoFalhar), { once: true });
   img.src = `${BASE}/other/showdown/${pasta}${arquivo}.gif`;
   return true;
 }
@@ -30,7 +40,8 @@ export function megaComoPokemon(m: Mega, base: PokemonBase): PokemonBase {
     tipos: m.tipos,
     stats: m.stats,
     habilidades: [{ nome: m.habilidade, oculta: false }],
-    sprites: {
+    // Mega sem sprite em pixel art (Mega Zygarde): usa o da forma normal
+    sprites: !a ? base.sprites : {
       frente: url(''),
       frenteShiny: url('shiny/'),
       costas: url('back/'),

@@ -32,6 +32,11 @@ for (const nome of formas) {
     else if (d.pokemon?.url) achou = d.pokemon.url.split('/').filter(Boolean).pop();
     break;
   }
+  // só vale se a imagem em pixel art existir (ex.: Mega Zygarde ainda não tem nenhuma; fica com o sprite normal)
+  if (achou) {
+    const png = await fetch(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${achou}.png`, { method: 'HEAD' });
+    if (!png.ok) achou = null;
+  }
   if (achou) saida[nome] = achou;
   console.log(nome.padEnd(28), achou ?? '— sem sprite');
 }
