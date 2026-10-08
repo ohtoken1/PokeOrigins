@@ -1159,7 +1159,8 @@ button.vaga:hover { border-color: var(--borda); }
 .contador-turnos small { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--texto-2); font-weight: 800; }
 .contador-turnos strong { font-size: 1.8rem; font-variant-numeric: tabular-nums; line-height: 1; color: var(--destaque); }
 .registro-batalha {
-  flex: 0 0 280px; display: flex; flex-direction: column; min-height: 0; max-height: 100%; border-radius: 14px; overflow: hidden;
+  /* altura limitada: o registro rola por dentro em vez de esticar a janela da batalha */
+  flex: 0 0 280px; display: flex; flex-direction: column; min-height: 0; max-height: min(620px, calc(100vh - 40px)); align-self: stretch; border-radius: 14px; overflow: hidden;
   background: rgb(16 30 50 / 0.85); border: 2px solid var(--borda); box-shadow: 0 10px 24px rgb(0 0 0 / 0.4);
 }
 .registro-batalha h4 { margin: 0; padding: 10px 12px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-2); border-bottom: 1px solid var(--borda); }
@@ -1458,3 +1459,13 @@ button.vaga:hover { border-color: var(--borda); }
 .canto-trancado { position: absolute; top: 15px; right: 4px; pointer-events: none; filter: drop-shadow(0 1px 1px #000a); }
 .botao-trancar { display: inline-flex; align-items: center; gap: 6px; }
 .botao-trancar.ligado { border-color: #ffd84a; color: #ffd84a; }
+
+/* resumo do seu Pokémon na batalha: atributo com estágio (+1, −2…) */
+.resumo-atributo strong.estagio-sobe { color: #ff8a80; }
+.resumo-atributo strong.estagio-desce { color: #82b1ff; }
+.resumo-atributo strong small { font-size: 0.7rem; }
+.resumo-atributo { grid-template-columns: 70px 1fr 52px; }
+/* Início: arrastar para trocar a ordem do time */
+.fila-time .pedestal.arrastavel { touch-action: none; }
+.fila-time .pedestal.arrastando { z-index: 5; opacity: 0.85; pointer-events: none; }
+.fila-time .pedestal.alvo { border-color: var(--destaque); box-shadow: 0 0 0 2px var(--destaque); }

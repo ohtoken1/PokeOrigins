@@ -272,7 +272,7 @@ const ROTEIROS: Record<string, (ctx: Contexto) => Promise<void>> = {
   razorleaf: (c) => folhas(c), magicalleaf: (c) => folhas(c), leafstorm: (c) => folhas(c), petaldance: (c) => folhas(c, 'petal'), petalblizzard: (c) => folhas(c, 'petal'), leafblade: (c) => contato(c, 'corte'),
   absorb: drenar, megadrain: drenar, gigadrain: drenar, drainpunch: drenar, leechlife: drenar, hornleech: drenar, dreameater: drenar,
   solarbeam: (c) => jato(c, 'energyball', 12, 44), energyball: (c) => bola(c, 'energyball', 70),
-  psychic: (c) => tingir(c, '#ff7ad9', 500).then(() => ondas(c, '#ff7ad9')), psybeam: (c) => jato(c, 'mistball', 9, 34), confusion: (c) => ondas(c, '#ff7ad9'), psyshock: (c) => chuva(c, 'mistball', 5, 40), futuresight: (c) => tingir(c, '#ff7ad9', 600),
+  psychic: (c) => tingir(c, '#ff7ad9', 500).then(() => ondas(c, '#ff7ad9')), psybeam: (c) => jato(c, 'mistball', 9, 34), confusion: (c) => ondas(c, '#ff7ad9'), psyshock: (c) => jato(c, 'mistball', 7, 40, 30), futuresight: (c) => tingir(c, '#ff7ad9', 600),
   shadowball: (c) => bola(c, 'shadowball', 70), darkpulse: (c) => ondas(c, '#3a2a4a'), sludgebomb: (c) => bola(c, 'poisonwisp', 70), sludgewave: (c) => jato(c, 'poisonwisp', 12, 52, 60), toxic: (c) => nuvem(c, 'poisonwisp'),
   rockslide: (c) => chuva(c, 'rock1', 6), stoneedge: (c) => chuva(c, 'rock2', 4, 54), rockthrow: (c) => chuva(c, 'rock1', 3), rocktomb: (c) => chuva(c, 'rock3', 5), stealthrock: (c) => chuva(c, 'rock2', 4, 30),
   dracometeor: (c) => chuva(c, 'flareball', 5, 60), dragonpulse: (c) => bola(c, 'flareball', 70), outrage: (c) => aura(c, c.atacante, '#ff5050').then(() => contato(c, 'impacto')), dragondance: (c) => aura(c, c.atacante, '#7a5cff'),

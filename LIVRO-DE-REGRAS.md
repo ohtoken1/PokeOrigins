@@ -197,9 +197,9 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 - **Golpes do adversário:** passar o mouse no Pokémon adversário mostra os **golpes que ele já usou** nesta batalha (os outros ficam escondidos) e o **PP que sobra** de cada um, sempre contando o **PP Max** (o máximo possível, +60%; ex.: Bubble Beam 20 → 32). Fica vermelho quando sobra 1/4 ou menos.
 - **Animações:** os golpes têm animação inspirada nos jogos, com as imagens de efeito do Pokémon Showdown: jatos (Flamethrower, Surf, Ice Beam), raio caindo do céu (Thunderbolt), terremoto com a arena tremendo, pedras caindo (Rock Slide), folhas, bolas de energia (Shadow Ball, Sludge Bomb), mordida, soco, chute, garras, cortes, ondas de som, escudo (Protect), cura, nuvens (Smokescreen, Spore) e outros. Golpes sem animação própria usam a do tipo e da categoria. **Mega Evolução**, **Primal Reversion** (Ω vermelho do Groudon, α azul do Kyogre) e outras **mudanças de forma** têm uma esfera de luz que envolve o Pokémon e estoura em raios.
 - **Informações:** passar o mouse num golpe mostra poder, precisão, PP, categoria, prioridade e descrição. Passar o mouse no selvagem mostra o resumo dele, com a **Speed mínima e máxima** no nível em que ele apareceu (IV 0 a 31, já com a Nature); a habilidade só aparece depois de ser revelada na luta.
-- **Registro e turnos:** à direita da janela de batalha fica o **Registro da batalha**, com tudo o que aconteceu em cada turno (ex.: "Deoxys usou Zen Headbutt e causou 150 de dano (53,4% da vida)"); à esquerda, o **contador de turnos**. Em telas estreitas o registro vai para baixo da janela.
+- **Registro e turnos:** à direita da janela de batalha fica o **Registro da batalha** (com barra de rolagem: não estica a janela), com tudo o que aconteceu em cada turno (ex.: "Deoxys usou Zen Headbutt e causou 150 de dano (53,4% da vida)"); à esquerda, o **contador de turnos**. Em telas estreitas o registro vai para baixo da janela.
 - **Dano:** depois de cada golpe, a mensagem da batalha diz quanto HP o alvo perdeu e quanto isso é da vida máxima.
-- **Ficha do seu Pokémon:** passar o mouse no seu Pokémon (ou na caixa de HP dele) mostra HP máximo, Attack, Defense, Sp. Atk, Sp. Def, Speed, Nature, Ability, item, amizade, Tera Type e golpes.
+- **Ficha do seu Pokémon:** passar o mouse no seu Pokémon (ou na caixa de HP dele) mostra HP máximo, Attack, Defense, Sp. Atk, Sp. Def, Speed **como estão agora na batalha** (com os estágios: Bulk Up +1 Attack mostra o Attack ×1,5 e o "+1" do lado; Mega já com os atributos da Mega), Nature, Ability, item, amizade, Tera Type e golpes.
 - **Itens segurados (held items):** o item que o Pokémon segura funciona na batalha como nos jogos (Leftovers, Focus Sash, Choice Scarf, frutas…), e a batalha avisa quando ele age. Itens gastos voltam no fim da batalha; **frutas comidas somem**.
 - **Mega Evolução:** quem entra na batalha segurando a **Mega Stone** dele (ex.: Charizard com Charizardite X) ganha o botão **Mega Evolução** (com o símbolo da Mega) no menu de golpes. Ligado, ele megaevolui antes de atacar: o símbolo aparece sobre ele, brilha e vira a Mega, com tipos, atributos e Ability da Mega. **Uma vez por batalha**; no fim da batalha volta ao normal. O Rayquaza também precisa de pedra: a **Rayquazite** (pedra criada para o jogo; saber Dragon Ascent não basta). Inclui as Megas novas de Legends: Z-A (Mega Clefable, Mega Dragonite, Mega Garchomp Z…). Quem segura Mega Stone não terastaliza (regra do Showdown).
 - **Z-Moves:** quem segura um **Z-Crystal** ganha o botão **Z-Move** no menu de golpes. Ligado, os golpes viram Z-Moves (ex.: Thunder Shock → Gigavolt Havoc, poder 100). **Uma vez por batalha.**
@@ -317,7 +317,7 @@ O inicial (IV 20 em tudo, soma 120) é sempre **A**.
 
 ### 10.1 Time
 - **Tamanho:** até **6 Pokémon**.
-- **Ordem:** arraste para mudar. O **primeiro** entra na batalha e anda atrás de você.
+- **Ordem:** arraste para mudar (no PC e na tela de **Início**). O **primeiro** entra na batalha e anda atrás de você.
 - **Informações:** clicar abre a **ficha completa** (atributos, IVs, EVs, natureza, habilidade, item, amizade, Tera Type e golpes). Passar o mouse mostra um resumo.
 - **Item segurado:** aparece como um ícone pequeno no canto do cartão do Pokémon. Para dar um item, use **Equipar** na Bolsa; para tirar, use o PC.
 
@@ -575,6 +575,8 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
 - Ícone da Pokédex no cabeçalho, ao lado do nome, com o progresso da Pokédex; barra do passe com 0 / 100 XP por nível.
+- **Início:** arraste os Pokémon do time para trocar a ordem (clicar continua abrindo a ficha).
+- Batalha: registro com rolagem; ficha do seu Pokémon com os atributos atuais (estágios); resumo do adversário atualiza na hora a cada golpe e troca; Psyshock sai do Pokémon.
 - **ID único** de cada Pokémon (ordem de captura) e **trancar** no PC.
 - Correção: depois que o Pokémon do treinador desmaiava, o próximo mostrava os golpes do anterior (o simulador reordena o time do adversário a cada troca).
 - Batalha: time do treinador como Pokébolas até cada Pokémon entrar; resumo do adversário com os golpes já usados e o PP restante (contando PP Max).

@@ -6,18 +6,19 @@ import { itemDaLoja } from '../../../shared/loja';
 import { nomeItemEquipado } from '../../../shared/usoItens';
 import { abrirJanela } from '../ui/janela';
 import { pokemonPorId } from '../dados';
-import { TAMANHO_MAXIMO_TIME, carregarSave, type PokemonDoJogador } from '../estado';
+import { TAMANHO_MAXIMO_TIME, carregarSave, salvar, type PokemonDoJogador } from '../estado';
+import { tornarArrastavel } from '../ui/arrastar';
 import { abrirDetalhes } from '../ui/detalhes';
 import { el, seloGenero, selosTipos, spritePokemon } from '../ui/dom';
 import { iconeItem } from '../ui/iconeItem';
 import { barraHp } from '../ui/time';
 
-function pedestal(p: PokemonDoJogador): HTMLElement {
+function pedestal(p: PokemonDoJogador, posicao: number): HTMLElement {
   const dados = pokemonPorId(p.especieId);
   const max = hpMaximo(p);
   return el(
     'button',
-    { class: `pedestal ${p.shiny ? 'shiny' : ''} ${p.hp <= 0 ? 'desmaiado' : ''}`, title: 'Ver a ficha', onclick: () => abrirDetalhes(p) },
+    { class: `pedestal ${p.shiny ? 'shiny' : ''} ${p.hp <= 0 ? 'desmaiado' : ''}`, title: 'Clique para ver a ficha · arraste para trocar a ordem', 'data-alvo': 'time', 'data-i': posicao },
     el('div', { class: 'pedestal-palco' }, spritePokemon(dados, { shiny: p.shiny, palco: true })),
     el('strong', {}, dados.nome, p.shiny ? ' ✨' : '', seloGenero(p.genero)),
     el('small', {}, `Nv. ${p.nivel}`),
@@ -83,15 +84,35 @@ export const telaInicio: Tela = (raiz, navegar) => {
     return;
   }
   const nome = save.aparencia?.nome || 'Treinador';
+  // arrastar um Pokémon para outra posição troca a ordem (o primeiro é quem entra na batalha e segue no mapa)
+  const fila = el('div', { class: 'fila-time' });
+  const desenharFila = () =>
+    fila.replaceChildren(
+      ...Array.from({ length: TAMANHO_MAXIMO_TIME }, (_, i) => {
+        const p = save.time[i];
+        if (!p) return el('div', { class: 'pedestal vazio', 'data-alvo': 'time', 'data-i': i }, el('small', {}, 'Vaga livre'));
+        const caixa = pedestal(p, i);
+        tornarArrastavel(caixa, {
+          aoClicar: () => abrirDetalhes(p),
+          aoSoltar: (alvo) => {
+            if (!alvo) return;
+            const destino = Math.min(Number(alvo.dataset.i), save.time.length - 1);
+            if (Number.isNaN(destino) || destino === i) return;
+            // troca de lugar com quem está no destino (vaga livre = vai para o fim do time)
+            [save.time[i], save.time[destino]] = [save.time[destino], save.time[i]];
+            salvar(save);
+            desenharFila();
+          },
+        });
+        return caixa;
+      }),
+    );
+  desenharFila();
   tela.append(
     el('h1', {}, 'Início'),
     el('p', { class: 'sub' }, `Olá, ${nome}!`),
-    el('h2', { class: 'titulo-time' }, 'Seu time'),
-    el(
-      'div',
-      { class: 'fila-time' },
-      ...Array.from({ length: TAMANHO_MAXIMO_TIME }, (_, i) => (save.time[i] ? pedestal(save.time[i]) : el('div', { class: 'pedestal vazio' }, el('small', {}, 'Vaga livre')))),
-    ),
+    el('h2', { class: 'titulo-time' }, 'Seu time', el('small', { class: 'meta' }, ' · arraste para trocar a ordem')),
+    fila,
     passeDeBatalha(),
   );
 };

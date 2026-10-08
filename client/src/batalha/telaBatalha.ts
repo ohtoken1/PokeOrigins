@@ -229,27 +229,38 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         // a ficha do seu Pokémon é maior que a arena: flutua por cima da janela (fora do corte da arena)
         const r = arena.getBoundingClientRect();
         if (!resumoFixo.isConnected) fundo.append(resumoFixo);
-        resumoFixo.replaceChildren(...resumoPokemon(p, { abilityConhecida: true, completo: true }));
+        resumoFixo.replaceChildren(...resumoPokemon(p, { abilityConhecida: true, completo: true, emBatalha: batalha.atributosEmCampo() }));
         Object.assign(resumoFixo.style, { left: `${r.left + r.width * 0.36}px`, top: `${r.top + 8}px`, maxHeight: `${window.innerHeight - r.top - 16}px` });
         resumoFixo.hidden = false;
         return;
       }
-      resumo.className = `resumo-pokemon ${lado}`;
-      // golpes que o adversário já usou, com o PP que sobra (contando PP Max); os outros ficam escondidos
-      const usados = batalha.golpesUsadosAdversario();
-      resumo.replaceChildren(
-        ...resumoPokemon(p, { abilityConhecida: batalha.habilidadeSelvagemRevelada }),
-        el('div', { class: 'resumo-golpes' },
-          el('h5', {}, 'Golpes já usados'),
-          ...(usados.length
-            ? usados.map((g) =>
-                el('div', { class: `resumo-golpe ${g.restantes <= g.ppMax / 4 ? 'pouco-pp' : ''}` }, seloTipo(g.tipo), el('span', {}, g.nome), el('small', { title: `Gastou ${g.gastos} PP` }, `PP ${g.restantes}/${g.ppMax}`)))
-            : [el('small', { class: 'meta' }, 'Ainda não usou nenhum golpe.')])),
-      );
+      resumoAdversario = p;
+      desenharResumoAdversario();
       resumo.hidden = false;
     });
-    lugar.addEventListener('mouseleave', () => (resumo.hidden = resumoFixo.hidden = true));
+    lugar.addEventListener('mouseleave', () => {
+      resumo.hidden = resumoFixo.hidden = true;
+      resumoAdversario = null;
+    });
   };
+  /** Quem está no resumo do adversário (null = fechado): ele é redesenhado quando o adversário troca. */
+  let resumoAdversario: PokemonIndividual | null = null;
+  function desenharResumoAdversario() {
+    const p = resumoAdversario;
+    if (!p) return;
+    resumo.className = 'resumo-pokemon selvagem';
+    // golpes que o adversário em campo NA TELA já usou, com o PP que sobra (contando PP Max); os outros ficam escondidos
+    const usados = batalha.golpesUsadosAdversario(treinador ? adversarioNaTela : 0);
+    resumo.replaceChildren(
+      ...resumoPokemon(p, { abilityConhecida: batalha.habilidadeSelvagemRevelada }),
+      el('div', { class: 'resumo-golpes' },
+        el('h5', {}, 'Golpes já usados'),
+        ...(usados.length
+          ? usados.map((g) =>
+              el('div', { class: `resumo-golpe ${g.restantes <= g.ppMax / 4 ? 'pouco-pp' : ''}` }, seloTipo(g.tipo), el('span', {}, g.nome), el('small', { title: `Gastou ${g.gastos} PP` }, `PP ${g.restantes}/${g.ppMax}`)))
+          : [el('small', { class: 'meta' }, 'Ainda não usou nenhum golpe.')])),
+    );
+  }
   mostrarResumo(lugarSelvagem, 'selvagem', () => selvagem);
   // o seu Pokémon: ficha completa (HP máximo, atributos, ability, item, golpes) ao passar o mouse
   mostrarResumo(lugarJogador, 'jogador', () => save.time[batalha.ativo]);
@@ -333,6 +344,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       await tocarEventos(eventos);
     } finally {
       tocandoEventos = false;
+      // golpes novos do adversário / troca: atualiza o resumo se estiver aberto
+      desenharResumoAdversario();
     }
   }
 
@@ -355,6 +368,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           marcarTera(ev.lado, null);
           sprite(ev.lado).classList.remove('megaevoluido');
           if (ev.lado === 'selvagem' && treinador) revelarNoTime((adversarioNaTela = ev.indice));
+          // resumo aberto em cima do adversário: passa a mostrar quem entrou
+          if (ev.lado === 'selvagem' && resumoAdversario && treinador?.equipe[ev.indice]) resumoAdversario = treinador.equipe[ev.indice];
           if (ev.lado === 'selvagem' && treinador && treinador.equipe[ev.indice] && treinador.equipe[ev.indice] !== selvagem) {
             // o treinador mandou outro Pokémon: troca a imagem e a caixa de HP
             selvagem = treinador.equipe[ev.indice];
@@ -381,6 +396,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           break;
         case 'golpe':
           mensagem.textContent = ev.texto;
+          // o golpe do adversário aparece na hora no resumo aberto
+          if (ev.lado === 'selvagem') desenharResumoAdversario();
           await esperar(350);
           await animarGolpeOriginal(arena, sprite(ev.lado), ev.alvo && ev.alvo !== ev.lado ? sprite(ev.alvo) : null, ev.golpe, ev.tipoGolpe, ev.categoria);
           break;

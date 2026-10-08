@@ -11,7 +11,11 @@ const NOMES_ATRIBUTOS: Record<string, string> = { hp: 'HP', atk: 'Attack', def: 
 
 const linha = (rotulo: string, ...valor: (Node | string)[]) => el('div', { class: 'resumo-linha' }, el('span', {}, rotulo), el('strong', {}, ...valor));
 
-export function resumoPokemon(p: PokemonIndividual, opcoes: { abilityConhecida: boolean; completo?: boolean }): HTMLElement[] {
+/** `emBatalha`: atributos atuais na batalha (com estágios), no lugar dos calculados fora dela. */
+export function resumoPokemon(
+  p: PokemonIndividual,
+  opcoes: { abilityConhecida: boolean; completo?: boolean; emBatalha?: Record<'atk' | 'def' | 'spa' | 'spd' | 'spe', { valor: number; estagio: number }> | null },
+): HTMLElement[] {
   const dados = pokemonPorId(p.especieId);
   const natureza = Dex.natures.get(p.natureza);
   const efeito = natureza.plus && natureza.minus ? `+${NOMES_ATRIBUTOS[natureza.plus]} −${NOMES_ATRIBUTOS[natureza.minus]}` : 'neutra';
@@ -28,7 +32,9 @@ export function resumoPokemon(p: PokemonIndividual, opcoes: { abilityConhecida: 
   ];
   // selvagem na batalha: nada que dependa dos IVs (pedido do dono); a Speed aparece como faixa (IV 0 a 31)
   if (!opcoes.completo) return [...linhas, linha('Speed', `${min}–${max}`, el('small', {}, ' (mín.–máx.)'))];
-  const valores = atributos(p);
+  const base = atributos(p);
+  const valores = (a: 'atk' | 'def' | 'spa' | 'spd' | 'spe') => opcoes.emBatalha?.[a].valor ?? base[a];
+  const estagio = (a: 'atk' | 'def' | 'spa' | 'spd' | 'spe') => opcoes.emBatalha?.[a].estagio ?? 0;
   linhas.push(
     linha('HP', `${p.hp}/${hpMaximo(p)}`),
     linha('Item', p.item ? nomeItemEquipado(p.item) : '—'),
@@ -40,12 +46,14 @@ export function resumoPokemon(p: PokemonIndividual, opcoes: { abilityConhecida: 
       { class: 'resumo-atributos' },
       ...(['atk', 'def', 'spa', 'spd', 'spe'] as const).map((a) => {
         const marca = natureza.plus === a ? 'sobe' : natureza.minus === a ? 'desce' : '';
+        const e = estagio(a);
         return el(
           'div',
           { class: `resumo-atributo ${marca}` },
           el('span', {}, NOMES_ATRIBUTOS[a], marca === 'sobe' ? ' ▲' : marca === 'desce' ? ' ▼' : ''),
-          el('span', { class: 'resumo-barra' }, el('span', { style: { width: `${Math.min(100, (valores[a] / Math.max(60, p.nivel * 3)) * 100)}%` } })),
-          el('strong', {}, String(valores[a])),
+          el('span', { class: 'resumo-barra' }, el('span', { style: { width: `${Math.min(100, (valores(a) / Math.max(60, p.nivel * 3)) * 100)}%` } })),
+          // na batalha, o valor já vem com o estágio (+1 Attack = ×1,5) e o estágio aparece do lado
+          el('strong', { class: e > 0 ? 'estagio-sobe' : e < 0 ? 'estagio-desce' : '' }, String(valores(a)), e ? el('small', {}, ` ${e > 0 ? '+' : ''}${e}`) : null),
         );
       }),
     ),

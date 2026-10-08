@@ -161,8 +161,7 @@ export class BatalhaSelvagem {
    * Golpes que o adversário em campo já mostrou, com quantos PP gastou. `ppMax` = PP com PP Max (pedido do dono:
    * mostrar sempre o máximo possível); `restantes` = ppMax − gastos. Os que ele ainda não usou ficam escondidos.
    */
-  golpesUsadosAdversario(): { id: string; nome: string; tipo: string; gastos: number; ppMax: number; restantes: number }[] {
-    const indice = this.adversarioAtivo;
+  golpesUsadosAdversario(indice = this.adversarioAtivo): { id: string; nome: string; tipo: string; gastos: number; ppMax: number; restantes: number }[] {
     const sim = this.objetosAdv[indice];
     return (this.golpesVistos.get(indice) ?? []).map((id) => {
       const g = Dex.moves.get(id);
@@ -171,6 +170,17 @@ export class BatalhaSelvagem {
       const ppMax = ppComPPMax(id);
       return { id, nome: g.name, tipo: g.type, gastos, ppMax, restantes: Math.max(0, ppMax - gastos) };
     });
+  }
+
+  /**
+   * Atributos do seu Pokémon em campo como estão AGORA na batalha: com os estágios (+1 Attack do Bulk Up…) e a forma
+   * atual (Mega), sem efeitos de item/ability. `estagio` = −6 a +6.
+   */
+  atributosEmCampo(): Record<'atk' | 'def' | 'spa' | 'spd' | 'spe', { valor: number; estagio: number }> | null {
+    const sim = this.batalha.p1.active[0];
+    if (!sim || sim.fainted) return null;
+    const ler = (a: 'atk' | 'def' | 'spa' | 'spd' | 'spe') => ({ valor: sim.getStat(a, false, true), estagio: sim.boosts[a] ?? 0 });
+    return { atk: ler('atk'), def: ler('def'), spa: ler('spa'), spd: ler('spd'), spe: ler('spe') };
   }
 
   /** Posição (no time do adversário) de quem está em campo do outro lado. */
