@@ -1,4 +1,4 @@
-// Barra no topo do site: ícone da Pokédex (atalho), Jogar (Mapas, Cidade, Continentes, Duelos com treinadores, Ginásios), Golpes,
+// Barra no topo do site: ícone da Pokédex (atalho), Início (o time lado a lado), Jogar (Mapas, Cidade, Continentes, Duelos com treinadores, Ginásios), Golpes,
 // Informações (Opções, Ranking, Database) e Comunidade (Amigos, Clã). Menus com setinha abrem ao clicar.
 import type { Destino, Navegar } from '../main';
 import { carregarSave } from '../estado';
@@ -9,6 +9,7 @@ type Item = { nome: string; destino: () => Destino; emBreve?: boolean };
 type Aba = { nome: string; telas: string[]; itens: Item[]; menu?: boolean };
 
 const ABAS: Aba[] = [
+  { nome: 'Início', telas: ['inicio'], itens: [{ nome: 'Início', destino: () => (carregarSave() ? { tela: 'inicio' } : { tela: 'inicial' }) }] },
   {
     nome: 'Jogar',
     menu: true,

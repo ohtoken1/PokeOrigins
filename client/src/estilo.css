@@ -1111,3 +1111,30 @@ button.vaga:hover { border-color: var(--borda); }
   height: 92px; background: var(--fundo-bioma) center 70% / cover no-repeat, linear-gradient(160deg, var(--cor-chao), var(--cor-bioma));
 }
 .cartao-bioma .faixa .sprite { filter: drop-shadow(0 3px 2px rgb(0 0 0 / 0.45)); }
+
+/* Tela de Início: o time lado a lado em pedestais */
+.tela-inicio { max-width: 1240px; margin: 0 auto; }
+.tela-inicio .titulo-time { margin: 18px 0 10px; font-size: 1.1rem; }
+.fila-time { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 900px) { .fila-time { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.pedestal {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 8px 12px; min-height: 250px; border-radius: 16px; cursor: pointer;
+  color: var(--texto); font: inherit; text-align: center;
+  background: rgb(27 47 74 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 2px solid var(--borda);
+  transition: transform 0.15s, border-color 0.15s;
+}
+.pedestal:hover { transform: translateY(-4px); border-color: var(--destaque); }
+.pedestal.shiny { border-color: #e8c34a; box-shadow: 0 0 14px rgb(232 195 74 / 0.35); }
+.pedestal.desmaiado .pedestal-palco { filter: grayscale(1) opacity(0.6); }
+.pedestal.vazio { cursor: default; justify-content: center; border-style: dashed; color: var(--texto-2); background: rgb(27 47 74 / 0.2); }
+.pedestal.vazio:hover { transform: none; border-color: var(--borda); }
+.pedestal-palco {
+  position: relative; width: 100%; height: 150px; display: grid; place-items: end center; overflow: hidden;
+  background: radial-gradient(ellipse 60% 18% at 50% 88%, rgb(0 0 0 / 0.35), transparent 70%);
+}
+.pedestal-palco .sprite { max-width: 100%; }
+.pedestal strong { font-size: 0.95rem; display: inline-flex; align-items: center; gap: 4px; }
+.pedestal .barra-hp { width: 100%; }
+.pedestal-hp { color: var(--texto-2); font-size: 0.72rem; }
+.pedestal-item { display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; color: var(--texto-2); }
+.inicio-botoes { display: flex; justify-content: center; margin-top: 18px; }

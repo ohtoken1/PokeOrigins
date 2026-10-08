@@ -451,6 +451,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 
 A barra do topo tem:
 - **ícone da Pokédex** (canto esquerdo): atalho direto para a Pokédex;
+- **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (cada Pokémon grande, com nível, tipos, HP e item; clique para ver a ficha) e um botão para ir aos Mapas;
 - **Jogar**: Mapas (regiões e biomas), **Cidade**, **Continentes**, **Duelos com treinadores** e **Ginásios** (os quatro últimos "em breve");
 - **Golpes**: Move Reminder e Move Tutor;
 - **Informações**: Opções, Ranking e Database;
@@ -516,6 +517,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
+- Tela de Início com o time lado a lado (aba Início na barra do topo).
 - Cartões dos biomas com o cenário de batalha do bioma em cima e a parte do texto transparente.
 - Barra do topo reorganizada: ícone da Pokédex, Jogar (Mapas, Duelos, Ginásios), Informações (Opções, Ranking, Database).
 - Roletas de ovos: Ultra Beast com fundo vermelho e mítico com fundo roxo.
