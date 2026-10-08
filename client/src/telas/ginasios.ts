@@ -10,18 +10,15 @@ import { pokemonPorId } from '../dados';
 import { carregarSave, salvar } from '../estado';
 import { corTipo, el, seloTipo, spritePokemon } from '../ui/dom';
 import { imagemTreinador } from './duelos';
-import { itemDaLoja } from '../../../shared/loja';
-import { iconeItem } from '../ui/iconeItem';
 
-/** Alola não tem insígnias: os Kahunas dão o Z-Crystal do tipo deles. */
-const Z_DOS_KAHUNAS: Record<string, string> = { hala: 'fightiniumz', olivia: 'rockiumz', nanu: 'darkiniumz', hapu: 'groundiumz' };
-
-/** Desenho de verdade da insígnia (client/public/insignias); apagado se ainda não foi conquistada. */
+/**
+ * Desenho da insígnia (client/public/insignias/<líder>.png); apagado se ainda não foi conquistada.
+ * A insígnia NÃO é item (fica em save.insignias). Em Alola, os selos usam o mesmo desenho dos cristais Z
+ * do tipo, mas são imagens próprias, sem ligação com os itens Z.
+ */
 export function insigniaVisual(lider: LiderGinasio, ganha: boolean): HTMLElement {
-  const titulo = `${lider.insignia}${ganha ? '' : ' (ainda não conquistada)'}`;
-  const z = Z_DOS_KAHUNAS[lider.id];
-  const imagem = z ? iconeItem(itemDaLoja(z) ?? { id: z, categoria: 'zcristais' }) : el('img', { src: `insignias/${lider.id}.png`, alt: lider.insignia, loading: 'lazy' });
-  return el('span', { class: `insignia-img ${ganha ? 'ganha' : 'nao-ganha'}`, title: titulo }, imagem);
+  return el('span', { class: `insignia-img ${ganha ? 'ganha' : 'nao-ganha'}`, title: `${lider.insignia}${ganha ? '' : ' (ainda não conquistada)'}` },
+    el('img', { src: `insignias/${lider.id}.png`, alt: lider.insignia, loading: 'lazy' }));
 }
 
 let regiaoAberta: string | null = null;

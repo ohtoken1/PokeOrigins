@@ -222,7 +222,7 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 - Na batalha, o **retrato do treinador** fica no canto de cima, à direita.
 
 ### 6.2 Ginásios (Jogar → Ginásios)
-- Abas por região, com os **8 líderes de cada região** e os times deles nos jogos (Brock, Misty, Lt. Surge… até Grusha, de Paldea). **Alola** tem os **4 Kahunas** (Hala, Olivia, Nanu, Hapu), que valem selos.
+- Abas por região, com os **8 líderes de cada região** e os times deles nos jogos (Brock, Misty, Lt. Surge… até Grusha, de Paldea). **Alola** não tem ginásios nos jogos: são **8 desafios do Island Challenge**, na ordem das ilhas: Capitão Ilima, Kahuna Hala, Capitã Lana, Capitão Kiawe, Capitã Mallow, Kahuna Olivia, Kahuna Nanu e Kahuna Hapu. Cada um dá um **selo**.
 - Mesmas regras dos duelos: nível = média do seu time, formas do nível certo, sem EVs. Os IVs e a recompensa crescem com a ordem do ginásio:
 
 | Ginásio | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
@@ -230,7 +230,7 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 | IVs | 5 | 5 | 6 | 6 | 8 | 8 | 9 | 10 |
 | Silver | 200 | 300 | 400 | 500 | 600 | 700 | 850 | 1.000 |
 
-- **Vencer** dá a **insígnia** (uma vez) e o silver (toda vez; depois de ganhar, o botão vira **Revanche**). As insígnias aparecem com o **desenho de verdade** de cada uma (apagadas até você conquistar) na tela dos Ginásios e no **cabeçalho** (as da região atual; clicar abre os Ginásios). Em Alola, que não tem insígnias, os Kahunas dão o **Z-Crystal** do tipo deles.
+- **Vencer** dá a **insígnia** (uma vez) e o silver (toda vez; depois de ganhar, o botão vira **Revanche**). As insígnias aparecem com o **desenho de verdade** de cada uma (apagadas até você conquistar) na tela dos Ginásios e no **cabeçalho** (as da região atual; clicar abre os Ginásios). Os selos de Alola têm o desenho do cristal Z do tipo, mas **não são itens** (nenhuma insígnia é item).
 
 ## 7. Captura
 
@@ -567,7 +567,8 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
 - Ícone da Pokédex no cabeçalho, ao lado do nome, com o progresso da Pokédex; barra do passe com 0 / 100 XP por nível.
-- Insígnias com o desenho oficial de cada ginásio (Z-Crystals em Alola), no cabeçalho e na tela dos Ginásios.
+- Alola com 8 desafios (Capitães e Kahunas) e selos próprios (não são itens).
+- Insígnias com o desenho oficial de cada ginásio, no cabeçalho e na tela dos Ginásios.
 - Ginásios das 9 regiões (8 líderes; 4 Kahunas em Alola) com insígnias no cabeçalho; imagens dos treinadores nos duelos, ginásios e batalhas.
 - Duelos com treinadores: 50 treinadores dos jogos e do anime, nível da média do seu time, recompensa em silver por dificuldade; registro da batalha com os avisos no fim da frase do golpe.
 - Aba Minha conta (Meu perfil, Achievements, Minhas skins, Opções); chances de aparição, de lendário e de shiny na Pokédex.

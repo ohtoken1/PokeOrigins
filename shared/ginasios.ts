@@ -1,4 +1,5 @@
-// Ginásios (Jogar → Ginásios): os líderes de cada região com os times dos jogos (Alola tem os 4 Kahunas).
+// Ginásios (Jogar → Ginásios): os líderes de cada região com os times dos jogos. Alola não tem ginásios: são
+// 8 desafios do Island Challenge (Capitães e Kahunas), cada um com um selo próprio.
 // Mesmas regras dos duelos: nível = média do time do jogador, sem EVs, IVs baixos pela ordem do ginásio.
 // Vencer dá a insígnia (uma vez) e silver (sempre).
 import type { Dificuldade, TreinadorNpc } from './treinadoresNpc';
@@ -18,13 +19,13 @@ const DIFICULDADE_POR_ORDEM: Dificuldade[] = [1, 1, 2, 2, 3, 3, 4, 5];
 /** Silver por vencer cada ginásio, pela ordem (provisório). */
 export const RECOMPENSA_GINASIO = [200, 300, 400, 500, 600, 700, 850, 1000];
 
-type Linha = [id: string, nome: string, tipo: string, insignia: string, time: number[]];
+/** O último campo (opcional) troca o título (ex.: "Capitão de Alola"). */
+type Linha = [id: string, nome: string, tipo: string, insignia: string, time: number[], titulo?: string];
 
-const regiao = (id: string, nomeRegiao: string, lideres: Linha[], titulo = 'Líder de Ginásio'): LiderGinasio[] =>
-  lideres.map(([idL, nome, tipo, insignia, time], i) => {
-    // Alola tem 4 Kahunas: valem como os ginásios 2, 4, 6 e 8
-    const ordem = lideres.length === 4 ? (i + 1) * 2 : i + 1;
-    return { id: idL, nome, titulo: `${titulo} de ${nomeRegiao}`, dificuldade: DIFICULDADE_POR_ORDEM[ordem - 1], time, regiao: id, ordem, tipo, insignia };
+const regiao = (id: string, nomeRegiao: string, lideres: Linha[]): LiderGinasio[] =>
+  lideres.map(([idL, nome, tipo, insignia, time, titulo], i) => {
+    const ordem = i + 1;
+    return { id: idL, nome, titulo: titulo ?? `Líder de Ginásio de ${nomeRegiao}`, dificuldade: DIFICULDADE_POR_ORDEM[ordem - 1], time, regiao: id, ordem, tipo, insignia };
   });
 
 export const LIDERES: LiderGinasio[] = [
@@ -89,11 +90,15 @@ export const LIDERES: LiderGinasio[] = [
     ['wulfric', 'Wulfric', 'Ice', 'Iceberg Badge', [459, 615, 713]],
   ]),
   ...regiao('alola', 'Alola', [
-    ['hala', 'Hala', 'Fighting', 'Selo de Melemele', [56, 296, 739]],
-    ['olivia', 'Olivia', 'Rock', 'Selo de Akala', [299, 525, 745]],
-    ['nanu', 'Nanu', 'Dark', 'Selo de Ula\'ula', [302, 552, 53]],
-    ['hapu', 'Hapu', 'Ground', 'Selo de Poni', [51, 423, 330, 750]],
-  ], 'Kahuna'),
+    ['ilima', 'Ilima', 'Normal', 'Selo da Prova de Ilima', [734, 235], 'Capitão de Alola'],
+    ['hala', 'Hala', 'Fighting', 'Selo de Melemele', [56, 296, 739], 'Kahuna de Alola'],
+    ['lana', 'Lana', 'Water', 'Selo da Prova de Lana', [746, 771, 752], 'Capitã de Alola'],
+    ['kiawe', 'Kiawe', 'Fire', 'Selo da Prova de Kiawe', [59, 663, 105], 'Capitão de Alola'],
+    ['mallow', 'Mallow', 'Grass', 'Selo da Prova de Mallow', [756, 709, 763], 'Capitã de Alola'],
+    ['olivia', 'Olivia', 'Rock', 'Selo de Akala', [299, 525, 745], 'Kahuna de Alola'],
+    ['nanu', 'Nanu', 'Dark', "Selo de Ula'ula", [302, 552, 53], 'Kahuna de Alola'],
+    ['hapu', 'Hapu', 'Ground', 'Selo de Poni', [51, 423, 330, 750], 'Kahuna de Alola'],
+  ]),
   ...regiao('galar', 'Galar', [
     ['milo', 'Milo', 'Grass', 'Grass Badge', [829, 830]],
     ['nessa', 'Nessa', 'Water', 'Water Badge', [118, 846, 834]],
