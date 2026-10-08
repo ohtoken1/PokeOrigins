@@ -2,6 +2,8 @@
 // Tudo é desenhado por código até termos um tileset de verdade.
 import type { Paleta } from './paletas';
 import { corComFiltro, imagemComFiltro } from './filtroCor';
+import type { Aparencia } from '../personagem/lpc';
+import { sombraProjetada } from './cidadeDesenhos';
 
 export const TAM = 16;
 export const LARGURA = 77;
@@ -9,7 +11,27 @@ export const ALTURA = 58;
 /** Quantas vezes o mapa é maior que o original de 48×36 (quantidade de lagos, bosques, mato…). */
 const ESCALA = (LARGURA * ALTURA) / (48 * 36);
 
-export type Terreno = 'chao' | 'mato' | 'caminho' | 'liquido';
+/** pedra/pedraEscura = calçamento da cidade; jardim = canteiro de flores com meio-fio; trilho = linha do trem (bloqueia) */
+export type Terreno = 'chao' | 'mato' | 'caminho' | 'liquido' | 'pedra' | 'pedraEscura' | 'jardim' | 'trilho';
+
+/** Objeto em pé (prédio, fonte, banco…); `peca` é o nome em PECAS (jogo/cidade.ts). */
+export interface ObjetoMapa {
+  peca: string;
+  /** borda esquerda da imagem, em tiles (pode ser fracionária para centralizar) */
+  x: number;
+  /** linha logo abaixo do objeto (a imagem encosta embaixo nela) */
+  base: number;
+  /** nome mostrado em cima (senão, o da peça) */
+  rotulo?: string;
+}
+
+/** Personagem parado no mapa (por enquanto só visual). */
+export interface NpcMapa {
+  x: number;
+  y: number;
+  nome: string;
+  aparencia: Aparencia;
+}
 
 export interface Mapa {
   /** tamanho em tiles (biomas: LARGURA × ALTURA; a cidade é maior) */
@@ -23,6 +45,13 @@ export interface Mapa {
   /** dx/dy só servem para variar qual flor do tileset aparece */
   flores: { x: number; y: number; dx: number; dy: number }[];
   inicio: { x: number; y: number };
+  /** prédios e decoração em pé (cidade) */
+  objetos?: ObjetoMapa[];
+  npcs?: NpcMapa[];
+  /** árvores com sombra projetada no chão (cidade) */
+  sombras?: boolean;
+  /** trilhas de terra estreitas (em pixels), da largura da porta de cada casa até a calçada */
+  trilhas?: { x: number; y: number; w: number; h: number }[];
 }
 
 /** Gerador aleatório com semente: o mesmo bioma gera sempre o mesmo mapa. */
@@ -146,35 +175,6 @@ export function gerarMapa(semente: string, paleta: Paleta): Mapa {
   return { largura: LARGURA, altura: ALTURA, terreno, bloqueado, grandes, pedrinhas, flores, inicio };
 }
 
-/** Tamanho da cidade em tiles: bem espaçosa para caber os prédios que virão (depois pode diminuir). */
-export const LARGURA_CIDADE = 140;
-export const ALTURA_CIDADE = 100;
-
-/**
- * Cidade inicial: por enquanto só o chão (pedido do dono). Grama, uma praça grande no centro e avenidas largas
- * saindo dela até as bordas, para os prédios (Centro Pokémon, Pokémarket, lojas…) serem colocados depois.
- */
-export function gerarMapaCidade(): Mapa {
-  const [largura, altura] = [LARGURA_CIDADE, ALTURA_CIDADE];
-  const terreno: Terreno[][] = Array.from({ length: altura }, () => Array<Terreno>(largura).fill('chao'));
-  const bloqueado: boolean[][] = Array.from({ length: altura }, () => Array<boolean>(largura).fill(false));
-  const pintar = (x0: number, y0: number, w: number, h: number) => {
-    for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) if (terreno[y]?.[x]) terreno[y][x] = 'caminho';
-  };
-  const [cx, cy] = [Math.floor(largura / 2), Math.floor(altura / 2)];
-  // praça central (30 × 22)
-  pintar(cx - 15, cy - 11, 30, 22);
-  // avenidas de 4 tiles: uma em cruz pela praça e um anel em volta do centro
-  pintar(0, cy - 2, largura, 4);
-  pintar(cx - 2, 0, 4, altura);
-  const [ax, ay] = [Math.floor(largura * 0.2), Math.floor(altura * 0.18)];
-  pintar(ax, ay, largura - 2 * ax, 4);
-  pintar(ax, altura - ay - 4, largura - 2 * ax, 4);
-  pintar(ax, ay, 4, altura - 2 * ay);
-  pintar(largura - ax - 4, ay, 4, altura - 2 * ay);
-  return { largura, altura, terreno, bloqueado, grandes: [], pedrinhas: [], flores: [], inicio: { x: cx, y: cy } };
-}
-
 // ---------- desenho ----------
 
 type Ctx = CanvasRenderingContext2D;
@@ -200,6 +200,8 @@ export interface Tilesets {
   natureza: CanvasImageSource;
   /** core_outdoor_water do Tuxemon (CC-BY-SA 4.0): água e margens */
   agua: CanvasImageSource;
+  /** core_city_and_country do Tuxemon (CC-BY-SA 4.0): calçamento de pedra da cidade */
+  cidade?: CanvasImageSource;
 }
 
 // posições (coluna, linha) dos tiles no tileset do Buch
@@ -262,6 +264,40 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
         continue;
       }
 
+      if ((tipo === 'pedra' || tipo === 'pedraEscura') && tilesets.cidade) {
+        const calcada = (v: Terreno | null) => v === 'pedra' || v === 'pedraEscura' || v === 'jardim';
+        desenharPedra(ctx, tilesets.cidade, px, py, calcada, t(x, y - 1), t(x, y + 1), t(x - 1, y), t(x + 1, y));
+        if (tipo === 'pedraEscura') {
+          ctx.fillStyle = 'rgba(70,60,90,0.28)';
+          ctx.fillRect(px, py, TAM, TAM);
+        }
+        continue;
+      }
+      if (tipo === 'jardim') {
+        tile(buch, GRAMAS[(x * 3 + y * 5) % 4], px, py);
+        tile(buch, FLORES[(x * 7 + y * 3) % FLORES.length], px, py);
+        // meio-fio de pedra onde o canteiro acaba
+        const fora = (v: Terreno | null) => v !== 'jardim';
+        const lados: [boolean, number, number, number, number][] = [
+          [fora(t(x, y - 1)), px, py, TAM, 3],
+          [fora(t(x, y + 1)), px, py + TAM - 3, TAM, 3],
+          [fora(t(x - 1, y)), px, py, 3, TAM],
+          [fora(t(x + 1, y)), px + TAM - 3, py, 3, TAM],
+        ];
+        for (const [ativo, bx, by, bw, bh] of lados) {
+          if (!ativo) continue;
+          ctx.fillStyle = '#6c6f78';
+          ctx.fillRect(bx, by, bw, bh);
+          ctx.fillStyle = '#d4d8e0';
+          ctx.fillRect(bx + (bw === 3 ? 1 : 0), by + (bh === 3 ? 1 : 0), bw === 3 ? 1 : bw, bh === 3 ? 1 : bh);
+        }
+        continue;
+      }
+      if (tipo === 'trilho') {
+        desenharTrilho(ctx, px, py, t(x, y - 1) === 'trilho');
+        continue;
+      }
+
       // grama do tileset é a base do resto
       tile(buch, GRAMAS[Math.floor(r() * GRAMAS.length)], px, py);
 
@@ -282,12 +318,45 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
       }
     }
 
+  // trilhas de terra das portas (areia do tileset, com borda dos lados)
+  if (mapa.trilhas?.length) {
+    const areia = document.createElement('canvas');
+    [areia.width, areia.height] = [TAM, TAM];
+    areia.getContext('2d')!.drawImage(buch, AREIA[0] * TAM, AREIA[1] * TAM, TAM, TAM, 0, 0, TAM, TAM);
+    const padrao = ctx.createPattern(areia, 'repeat')!;
+    for (const tr of mapa.trilhas) {
+      // linha a linha: bordas um pouco tortas, cantos de cima arredondados e abrindo em curva onde encontra a rua
+      const ra = aleatorioComSemente(`trilha:${tr.x},${tr.y}`);
+      let [esq, dir] = [0, 0];
+      for (let yy = 0; yy < tr.h; yy++) {
+        if (yy % 3 === 0) {
+          esq = Math.max(-1, Math.min(1, esq + Math.round(ra() * 2 - 1)));
+          dir = Math.max(-1, Math.min(1, dir + Math.round(ra() * 2 - 1)));
+        }
+        const fim = tr.h - yy;
+        // abre em curva nos últimos 16 px (calçada) e alarga um pouco junto à porta
+        const abertura = fim <= 16 ? Math.round(((16 - fim) * (16 - fim)) / 40) : 0;
+        const topo = yy < 5 ? -Math.round(((5 - yy) * (5 - yy)) / 10) : 0;
+        const x0 = tr.x - esq - abertura + topo;
+        const x1 = tr.x + tr.w + dir + abertura - topo;
+        ctx.fillStyle = padrao;
+        ctx.fillRect(x0, tr.y + yy, x1 - x0, 1);
+        ctx.fillStyle = corBorda;
+        ctx.fillRect(x0, tr.y + yy, 1, 1);
+        ctx.fillRect(x1 - 1, tr.y + yy, 1, 1);
+      }
+    }
+  }
+
   for (const f of mapa.flores) {
     if (paleta.submerso) desenharConcha(ctx, f.x * TAM, f.y * TAM, f.dx + f.dy);
     else tile(buch, FLORES[(f.dx + f.dy) % FLORES.length], f.x * TAM, f.y * TAM);
   }
   for (const p of mapa.pedrinhas) tile(natureza, paleta.pedrinhas[(p.x + p.y) % paleta.pedrinhas.length], p.x * TAM, p.y * TAM);
 
+  // sombras primeiro (embaixo de todas as árvores)
+  if (mapa.sombras && paleta.obstaculo === 'arvore' && paleta.arvores)
+    for (const g of mapa.grandes) desenharSombraArvore(ctx, natureza, paleta.arvores[(g.x * 7 + g.y * 3) % paleta.arvores.length], g.x * TAM, (g.y + 2) * TAM);
   // grandes em ordem de cima para baixo, para os de baixo cobrirem os de cima
   for (const g of [...mapa.grandes].sort((a, b) => a.y - b.y)) {
     const escolher = (lista: [number, number][]) => lista[(g.x * 7 + g.y * 3) % lista.length];
@@ -370,6 +439,63 @@ function desenharGrande(ctx: Ctx, ox: number, oy: number, paleta: Paleta) {
       break;
     }
   }
+}
+
+// ---------- cidade ----------
+
+/** Sombra de cada tipo de árvore (calculada uma vez). */
+const sombrasArvore = new Map<string, HTMLCanvasElement>();
+/** Sombra projetada da árvore (2×3 tiles) com a base em (x, base). */
+function desenharSombraArvore(ctx: Ctx, img: CanvasImageSource, [tx, ty]: [number, number], x: number, base: number) {
+  const chave = `${tx},${ty}`;
+  let sombra = sombrasArvore.get(chave);
+  if (!sombra) {
+    const c = document.createElement('canvas');
+    [c.width, c.height] = [2 * TAM, 3 * TAM];
+    c.getContext('2d')!.drawImage(img, tx * TAM, ty * TAM, 2 * TAM, 3 * TAM, 0, 0, 2 * TAM, 3 * TAM);
+    sombra = sombraProjetada(c, c.width, c.height).canvas;
+    sombrasArvore.set(chave, sombra);
+  }
+  ctx.globalAlpha = 0.26;
+  ctx.drawImage(sombra, x, base - sombra.height + 2);
+  ctx.globalAlpha = 1;
+}
+
+/** Pedra do calçamento no core_city_and_country (pixels). */
+const PEDRA_CIDADE: [number, number] = [368, 16];
+
+/** Calçamento de pedra com uma borda escura onde encosta em outro chão. */
+function desenharPedra(
+  ctx: Ctx, img: CanvasImageSource, px: number, py: number, ehPedra: (v: Terreno | null) => boolean,
+  cima: Terreno | null, baixo: Terreno | null, esq: Terreno | null, dir: Terreno | null,
+) {
+  ctx.drawImage(img, PEDRA_CIDADE[0], PEDRA_CIDADE[1], TAM, TAM, px, py, TAM, TAM);
+  ctx.fillStyle = '#6c6f78';
+  if (!ehPedra(cima)) ctx.fillRect(px, py, TAM, 2);
+  if (!ehPedra(baixo)) ctx.fillRect(px, py + TAM - 2, TAM, 2);
+  if (!ehPedra(esq)) ctx.fillRect(px, py, 2, TAM);
+  if (!ehPedra(dir)) ctx.fillRect(px + TAM - 2, py, 2, TAM);
+}
+
+/** Linha do trem horizontal de 2 tiles: brita, dormentes de madeira e os dois trilhos. */
+function desenharTrilho(ctx: Ctx, px: number, py: number, metadeDeBaixo: boolean) {
+  ctx.fillStyle = '#8c8377';
+  ctx.fillRect(px, py, TAM, TAM);
+  ctx.fillStyle = '#a49a8c';
+  for (let i = 0; i < 6; i++) ctx.fillRect(px + ((i * 7 + (metadeDeBaixo ? 3 : 0)) % 15), py + ((i * 5) % 15), 1, 1);
+  // dormentes (a cada 8 px, atravessando as duas metades)
+  for (const dx of [1, 9]) {
+    ctx.fillStyle = '#5a3a22';
+    ctx.fillRect(px + dx, metadeDeBaixo ? py : py + 3, 5, metadeDeBaixo ? 13 : 13);
+    ctx.fillStyle = '#7a5232';
+    ctx.fillRect(px + dx, metadeDeBaixo ? py : py + 3, 5, 1);
+  }
+  // trilho de aço
+  const y = metadeDeBaixo ? py + 9 : py + 6;
+  ctx.fillStyle = '#3c4048';
+  ctx.fillRect(px, y, TAM, 3);
+  ctx.fillStyle = '#c8ccd4';
+  ctx.fillRect(px, y, TAM, 1);
 }
 
 // ---------- fundo do mar (desenhado por código) ----------

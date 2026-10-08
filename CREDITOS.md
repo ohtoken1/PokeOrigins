@@ -6,6 +6,12 @@
 - **Core Outdoor Nature / Core Outdoor Water / Core Outdoor** do projeto Tuxemon — rubberduck, George_, Buch, luke83, Past the Future, Midi, ZaPaper, ArMM1998, Isaiah658, Drummyfish — CC-BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
   https://github.com/Tuxemon/Tuxemon (ver ATTRIBUTIONS.md) — `client/public/tiles/core_outdoor*.png` (árvores, pedras, água)
 
+- **Core Buildings** do projeto Tuxemon — baseado em "Fancy House" e "Buildings and Features"/"Doors" de Kelvin Shadewing (adaptado por Mircea Kitsune; hospital adaptado por Sanglorian) e "Superpowers Assets Ninja Tilesheet" (domínio público) — CC-BY-SA 4.0 / XYG Open Source License v1.1 / CC BY 3.0
+  https://github.com/Tuxemon/Tuxemon (ver ATTRIBUTIONS.md) — `client/public/tiles/core_buildings.png` (prédios da cidade: Centro Pokémon, Pokémarket, banco, estação, arena, casas)
+- **Core City and Country** do projeto Tuxemon — "Outdoor Tiles – City and Country" de ArMM1998 — CC-BY-SA 4.0
+  https://github.com/Tuxemon/Tuxemon (ver ATTRIBUTIONS.md) — `client/public/tiles/core_city_and_country.png` (fonte, mural, barraca, placa, calçamento)
+- Bancos, floreiras e máquinas de bebida da cidade: "Outdoor odds and ends" de Isaiah658, dentro do `core_outdoor.png` do Tuxemon (acima). Fonte, arena, postes e trilhos: desenho próprio (código em `client/src/jogo/cidadeDesenhos.ts` e `jogo/mapa.ts`); o Pokémarket é o prédio verde do Core Buildings recolorido de azul, com símbolo próprio. A estátua da fonte é o sprite do Mew (5ª geração, PokéAPI) transformado em pedra por código.
+
 As cores dos tiles são alteradas por filtro em cada bioma. Versões modificadas desses tiles seguem as mesmas licenças.
 
 ## Personagem do jogador

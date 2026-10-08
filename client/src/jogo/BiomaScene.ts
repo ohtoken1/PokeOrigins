@@ -1,10 +1,13 @@
 import Phaser from 'phaser';
 import type { Bioma } from '../../../shared/biomas';
-import { TAM, desenharMapa, gerarMapa, gerarMapaCidade, type Mapa } from './mapa';
+import { TAM, desenharMapa, gerarMapa, type Mapa } from './mapa';
+import { FOLHAS_CIDADE, PECAS, URL_ESTATUA, gerarMapaCidade, type ImagensCidade, type Peca } from './cidade';
+import { sombraProjetada } from './cidadeDesenhos';
 import { PALETAS } from './paletas';
 import { pokemonPorId } from '../dados';
+import { PAUSA_MINIMA_ENCONTRO_MS } from '../../../shared/encontros';
 import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
-import type { FolhasPersonagem } from '../personagem/lpc';
+import { montarPersonagem, type FolhasPersonagem } from '../personagem/lpc';
 import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
 
 /** Tamanho da tela do jogo em pixels (a câmera mostra 40×27 tiles ampliados 1,5×). */
@@ -76,6 +79,8 @@ export interface OpcoesBioma {
   aoPronto?(): void;
   /** Chamado ao terminar cada passo. */
   aoPisar(): void;
+  /** Chamado quando o jogador para: PAUSA_MINIMA_ENCONTRO_MS depois do último passo, sem ter andado de novo (anti-macro). */
+  aoParar?(): void;
   /** Personagem LPC montado (chega depois; até lá aparece o desenho antigo). `chave` identifica a aparência. */
   personagem?: { chave: string; folhas: Promise<FolhasPersonagem> };
   /** Nome de treinador, mostrado em cima do personagem. */
@@ -158,6 +163,14 @@ export class BiomaScene extends Phaser.Scene {
     if (!this.textures.exists('buch')) this.load.image('buch', 'tiles/tuxemon-buch.png');
     if (!this.textures.exists('natureza')) this.load.image('natureza', 'tiles/core_outdoor_nature.png');
     if (!this.textures.exists('agua')) this.load.image('agua', 'tiles/core_outdoor_water.png');
+    // cidade: prédios e decoração
+    if (this.opcoes.cidade)
+      for (const [chave, arquivo] of Object.entries(FOLHAS_CIDADE)) if (!this.textures.exists(chave)) this.load.image(chave, arquivo);
+    // estátua da fonte: sprite da PokéAPI (CORS liberado para virar pedra); sem internet a fonte fica sem estátua
+    if (this.opcoes.cidade && !this.textures.exists('estatua')) {
+      this.load.setCORS('anonymous');
+      this.load.image('estatua', URL_ESTATUA);
+    }
   }
 
   create() {
@@ -177,13 +190,24 @@ export class BiomaScene extends Phaser.Scene {
     const imagem = (chave: string) => this.textures.get(chave).getSourceImage() as HTMLImageElement;
     const chaveMapa = `mapa-${idMapa}`;
     if (!this.textures.exists(chaveMapa))
-      this.textures.addCanvas(chaveMapa, desenharMapa(this.mapa, paleta, idMapa, { buch: imagem('buch'), natureza: imagem('natureza'), agua: imagem('agua') }));
+      this.textures.addCanvas(
+        chaveMapa,
+        desenharMapa(this.mapa, paleta, idMapa, {
+          buch: imagem('buch'),
+          natureza: imagem('natureza'),
+          agua: imagem('agua'),
+          cidade: this.opcoes.cidade ? imagem('cidade') : undefined,
+        }),
+      );
     for (const direcao of ['baixo', 'cima', 'lado'] as Direcao[])
       for (const quadro of [0, 1, 2] as Quadro[]) {
         const chave = `jogador-${direcao}-${quadro}`;
         if (!this.textures.exists(chave)) this.textures.addCanvas(chave, desenharPersonagem(direcao, quadro));
       }
     this.add.image(0, 0, chaveMapa).setOrigin(0);
+    this.montarObjetos();
+    this.montarNpcs();
+    if (this.opcoes.cidade) this.soltarBorboletas();
 
     const [sx, sy] = this.pesDoTile(this.posSeguidor.x, this.posSeguidor.y);
     this.imgSeguidor = this.add.sprite(0, 0, '__DEFAULT').setOrigin(0.5, 0.9).setScale(ESCALA_DETALHE);
@@ -226,6 +250,128 @@ export class BiomaScene extends Phaser.Scene {
     teclado.on('keydown', aoTeclar);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => teclado.off('keydown', aoTeclar));
     this.opcoes.aoPronto?.();
+  }
+
+  /** Textura (e quadro) de uma peça da cidade; peças com vários quadros ganham a animação `anim-<peça>`. */
+  private quadroDaPeca(nome: string, p: Peca): { chave: string; quadro: string | undefined; animada: boolean } {
+    if (p.desenhar) {
+      const chave = (i: number) => `peca-${nome}-${i}`;
+      if (!this.textures.exists(chave(0))) {
+        const imgs = Object.fromEntries(
+          [...Object.keys(FOLHAS_CIDADE), 'estatua'].filter((k) => this.textures.exists(k)).map((k) => [k, this.textures.get(k).getSourceImage()]),
+        ) as ImagensCidade;
+        p.desenhar(imgs).forEach((c, i) => this.textures.addCanvas(chave(i), c));
+      }
+      let quadros = 0;
+      while (this.textures.exists(chave(quadros))) quadros++;
+      if (quadros > 1 && !this.anims.exists(`anim-${nome}`))
+        this.anims.create({ key: `anim-${nome}`, frames: Array.from({ length: quadros }, (_, i) => ({ key: chave(i) })), frameRate: 7, repeat: -1 });
+      return { chave: chave(0), quadro: undefined, animada: quadros > 1 };
+    }
+    const textura = this.textures.get(p.folha!);
+    if (!textura.has(nome)) textura.add(nome, 0, p.x!, p.y!, p.w, p.h);
+    return { chave: p.folha!, quadro: nome, animada: false };
+  }
+
+  /** Nome em cima de um prédio ou NPC (mesmo estilo do nome do jogador, um pouco menor). */
+  private rotulo(texto: string, x: number, y: number, cor = '#ffffff') {
+    const t = this.add
+      .text(x, y, texto, { fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: cor, stroke: '#16243a', strokeThickness: 5 })
+      .setOrigin(0.5, 1)
+      .setDepth(99990)
+      .setScale(11 / (FONTE_NOME * zoomEscolhido));
+    t.texture.setFilter(Phaser.Textures.FilterMode.LINEAR);
+  }
+
+  /** Prédios e decoração em pé: ficam na frente do jogador quando ele passa por trás (profundidade pela base). */
+  private montarObjetos() {
+    for (const o of this.mapa.objetos ?? []) {
+      const p: Peca | undefined = PECAS[o.peca];
+      if (!p) continue;
+      const { chave, quadro, animada } = this.quadroDaPeca(o.peca, p);
+      const x = Math.round(o.x * TAM);
+      const base = o.base * TAM;
+      const img = animada ? this.add.sprite(x, base, chave, quadro).play(`anim-${o.peca}`) : this.add.image(x, base, chave, quadro);
+      img.setOrigin(0, 1).setDepth(base - 0.5);
+      // sombra projetada no chão (embaixo de tudo que está em pé)
+      this.add.image(x, base - p.h, this.sombraDaPeca(o.peca, p, chave, quadro)).setOrigin(0).setDepth(1).setAlpha(0.28);
+      const rotulo = o.rotulo ?? p.rotulo;
+      if (rotulo) this.rotulo(rotulo, x + p.w / 2, base - p.h - 2, '#ffe680');
+    }
+  }
+
+  /** Textura da sombra de uma peça (feita uma vez a partir do primeiro quadro). */
+  private sombraDaPeca(nome: string, p: Peca, chave: string, quadro: string | undefined): string {
+    const chaveSombra = `sombra-${nome}`;
+    if (!this.textures.exists(chaveSombra)) {
+      const c = document.createElement('canvas');
+      [c.width, c.height] = [p.w, p.h];
+      const fr = this.textures.getFrame(chave, quadro);
+      c.getContext('2d')!.drawImage(fr.source.image as CanvasImageSource, fr.cutX, fr.cutY, p.w, p.h, 0, 0, p.w, p.h);
+      this.textures.addCanvas(chaveSombra, sombraProjetada(c, p.w, p.h).canvas);
+    }
+    return chaveSombra;
+  }
+
+  /** Borboletas voando em volta dos canteiros de flores (a cidade com mais vida). */
+  private soltarBorboletas() {
+    if (!this.textures.exists('borboleta-0')) {
+      for (const [i, asas] of [[0, 3], [1, 1]] as [number, number][]) {
+        const c = document.createElement('canvas');
+        [c.width, c.height] = [7, 5];
+        const ctx = c.getContext('2d')!;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(3 - asas, 1, asas, 3);
+        ctx.fillRect(4, 1, asas, 3);
+        ctx.fillStyle = '#2a2a2a';
+        ctx.fillRect(3, 0, 1, 5);
+        this.textures.addCanvas(`borboleta-${i}`, c);
+      }
+      this.anims.create({ key: 'anim-borboleta', frames: [{ key: 'borboleta-0' }, { key: 'borboleta-1' }], frameRate: 8, repeat: -1 });
+    }
+    const jardins: [number, number][] = [];
+    this.mapa.terreno.forEach((linha, y) => linha.forEach((t, x) => t === 'jardim' && jardins.push([x, y])));
+    if (!jardins.length) return;
+    const cores = [0xffe066, 0xff9ecb, 0x9fd8ff, 0xffffff, 0xffb347];
+    for (let i = 0; i < 10; i++) {
+      const [tx, ty] = jardins[Math.floor(Math.random() * jardins.length)];
+      const [casaX, casaY] = [tx * TAM + 8, ty * TAM + 4];
+      const b = this.add.sprite(casaX, casaY, 'borboleta-0').setTint(cores[i % cores.length]).setDepth(99000).play('anim-borboleta');
+      const voar = () => {
+        if (!b.active) return;
+        this.tweens.add({
+          targets: b,
+          x: casaX + Phaser.Math.Between(-28, 28),
+          y: casaY + Phaser.Math.Between(-20, 16),
+          duration: Phaser.Math.Between(900, 2200),
+          ease: 'Sine.easeInOut',
+          onComplete: voar,
+        });
+      };
+      voar();
+    }
+  }
+
+  /** Personagens parados (LPC, olhando para baixo, respirando), por enquanto só visuais. */
+  private montarNpcs() {
+    const mapa = this.mapa;
+    for (const n of mapa.npcs ?? []) {
+      const [nx, ny] = this.pesDoTile(n.x, n.y);
+      this.add.ellipse(nx, ny - 1, 16, 5, 0x000000, 0.28).setDepth(ny - 0.5);
+      this.rotulo(n.nome, nx, ny - 25, '#9fe0ff');
+      montarPersonagem(n.aparencia).then((f) => {
+        if (this.mapa !== mapa || !this.sys.isActive()) return;
+        const chave = `npc-${n.nome}`;
+        if (!this.textures.exists(chave)) {
+          const t = this.textures.addCanvas(chave, f.idle)!;
+          t.add('parado-0', 0, 0, 128, 64, 64);
+          t.add('parado-1', 0, 64, 128, 64, 64);
+        }
+        if (!this.anims.exists(`anim-${chave}`))
+          this.anims.create({ key: `anim-${chave}`, frames: [{ key: chave, frame: 'parado-0' }, { key: chave, frame: 'parado-1' }], frameRate: 2, repeat: -1 });
+        this.add.sprite(nx, ny, chave, 'parado-0').setOrigin(0.5, 61 / 64).setScale(ESCALA_LPC).setDepth(ny).play(`anim-${chave}`);
+      });
+    }
   }
 
   /** Fundo do mar: feixes de luz balançando, bolhas subindo e o personagem azulado. */
@@ -463,6 +609,12 @@ export class BiomaScene extends Phaser.Scene {
         } else this.jogador.setTexture(`jogador-${this.direcao}-0`);
         this.atualizarProfundidade();
         this.opcoes.aoPisar();
+        // anti-macro: o encontro só sai quando o jogador para (segurando a tecla ou andando sem parar, nada aparece)
+        const passo = this.passos;
+        const opcoes = this.opcoes;
+        this.time.delayedCall(PAUSA_MINIMA_ENCONTRO_MS, () => {
+          if (this.passos === passo && this.opcoes === opcoes && !this.movendo) opcoes.aoParar?.();
+        });
       },
     });
     // balanço do passo (o LPC já balança na própria animação)

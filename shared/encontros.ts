@@ -12,6 +12,11 @@ export const CHANCE_SHINY = 1 / 1500;
 /** Chance de aparecer um Pokémon a cada passo (1 = todo passo). */
 export const CHANCE_ENCONTRO_POR_PASSO = 1;
 /**
+ * Anti-macro (pedido do dono): segurando a tecla de andar não aparece Pokémon. O encontro só pode sair num passo
+ * sorteado quando o jogador para: este tempo (ms) depois do último passo, se ele não andou de novo.
+ */
+export const PAUSA_MINIMA_ENCONTRO_MS = 300;
+/**
  * Peso de cada LINHA EVOLUTIVA no sorteio (pedido do dono: chances parecidas entre si, a raridade original
  * pesa pouco). Peso = PESO_BASE_LINHA + taxa de captura da forma base × PESO_POR_TAXA
  * (taxa 3 → ~101, taxa 255 → ~178: o mais comum sai no máximo ~1,8× mais que o mais raro).

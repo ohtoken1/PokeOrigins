@@ -177,12 +177,14 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       fugirDoEncontro();
       save.passos++;
       atualizarContador();
+      salvar(save);
+    },
+    // anti-macro: o encontro do passo só aparece quando o jogador para (0,3 s parado); andando sem parar, nada aparece
+    aoParar: () => {
+      if (emBatalha || janelaAberta || fecharEncontro) return;
       // bônus da administração (shiny e lendário) por cima dos ajustes do Admin
       const ajustes = comBonificacao(ajustesAdmin());
-      if (tabela.length === 0 || Math.random() >= ajustes.chancePorPasso) {
-        salvar(save);
-        return;
-      }
+      if (tabela.length === 0 || Math.random() >= ajustes.chancePorPasso) return;
 
       const encontro =
         ajustes.especie !== null ? encontroForcado(pokemonPorId(ajustes.especie), faixaAtual(), ajustes) : sortearEncontro(tabela, faixaAtual(), Math.random, ajustes);

@@ -1,5 +1,5 @@
 // Jogar → Cidade: a cidade inicial, onde os jogadores ficam quando não estão caçando nos mapas nem competindo.
-// Por enquanto só o chão (pedido do dono); Centro Pokémon, Pokémarket, lojas de shards etc. entram depois.
+// Mapa e prédios em jogo/cidade.ts (por enquanto só visuais: portas e NPCs ainda não fazem nada).
 // Usa o mesmo jogo (Phaser) dos biomas, com o mapa da cidade e sem encontros.
 import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
@@ -39,7 +39,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
         ...botoesMenus(save, () => atualizarTime(), true),
       ),
       el('div', { class: 'layout-bioma' },
-        el('section', {}, areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. Aqui não aparecem Pokémon selvagens. Os prédios da cidade (Centro Pokémon, Pokémarket, lojas…) chegam em breve.')),
+        el('section', {}, areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. Aqui não aparecem Pokémon selvagens. Os prédios ainda são só visuais (em breve dá para entrar).')),
         el('aside', {}, caixaTime),
       ),
     ),
