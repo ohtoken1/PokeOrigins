@@ -29,3 +29,6 @@ As cores dos tiles são alteradas por filtro em cada bioma. Versões modificadas
 
 ## Imagens dos treinadores
 - Sprites dos personagens (líderes de ginásio, Elite Four, campeões, rivais e outros) do Pokémon Showdown (play.pokemonshowdown.com/sprites/trainers; arte dos jogos oficiais © Nintendo/Game Freak/The Pokémon Company e artistas da comunidade do Showdown) — `client/public/treinadores/`.
+
+## Imagens das insígnias
+- Insígnias dos ginásios (© Nintendo/Game Freak/The Pokémon Company): PokéAPI sprites (github.com/PokeAPI/sprites, sprites/badges) e, as de Galar, WikiDex (wikidex.net) — `client/public/insignias/`.

@@ -102,7 +102,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - Motor: `BatalhaSelvagem(..., treinador)` aceita o time do NPC (p2 com vários; `adversarios`, `adversarioAtivo`), troca sozinho quando o dele desmaia (`trocarAdversario` em `lerEventos`), IA escolhe o golpe mais forte 75% das vezes, sem fuga. Tela: `abrirBatalha({ treinador })` troca sprite/caixa no `entrar` do adversário, esconde Pokébolas, XP/EVs de todos os derrotados, recompensa da dificuldade.
 
 ## Ginásios (`shared/ginasios.ts`, `client/src/telas/ginasios.ts`)
-- `LIDERES` (estende `TreinadorNpc`): 8 por região (Alola: 4 Kahunas = ordens 2,4,6,8), com `tipo`, `insignia`, `ordem`; dificuldade (IVs) e `RECOMPENSA_GINASIO` pela ordem; mesmo `montarTimeNpc`. `save.insignias` (ids dos líderes) → cabeçalho (região atual, `insigniaVisual`) e tela. Batalha: `treinador.mensagemVitoria` (insígnia) e `treinador.imagem`.
+- `LIDERES` (estende `TreinadorNpc`): 8 por região (Alola: 4 Kahunas = ordens 2,4,6,8), com `tipo`, `insignia`, `ordem`; dificuldade (IVs) e `RECOMPENSA_GINASIO` pela ordem; mesmo `montarTimeNpc`. `save.insignias` (ids dos líderes) → cabeçalho (região atual, `insigniaVisual`) e tela; imagens em `client/public/insignias/<idLider>.png` (PokéAPI sprites/badges; Galar do WikiDex), Alola = ícone do Z-Crystal (`Z_DOS_KAHUNAS`). Batalha: `treinador.mensagemVitoria` (insígnia) e `treinador.imagem`.
 - Imagens dos treinadores: `client/public/treinadores/<id>.png` (sprites do Showdown; `imagemTreinador` em `telas/duelos.ts`), 118 (50 NPCs + 68 líderes); crédito em CREDITOS.md.
 
 ## Professores de golpes (`shared/professores.ts`, `client/src/telas/golpes.ts`)

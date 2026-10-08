@@ -1389,3 +1389,14 @@ button.vaga:hover { border-color: var(--borda); }
 .ginasio-insignia { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; }
 .cartao-ginasio .mini-time .sprite { width: 40px; height: 40px; }
 .lista-treinadores h3 { margin: 0 0 4px; font-size: 1rem; }
+
+/* Insígnias com o desenho de verdade (apagadas até conquistar) */
+.insignia-img { display: inline-grid; place-items: center; width: 22px; height: 22px; flex: none; }
+.insignia-img img { width: 100%; height: 100%; object-fit: contain; }
+.insignia-img .icone-sd, .insignia-img .icone-caixa { transform: scale(0.9); }
+.insignia-img.nao-ganha { filter: grayscale(1) brightness(0.7); opacity: 0.35; }
+.insignia-img.ganha { filter: drop-shadow(0 0 3px rgb(255 255 255 / 0.45)); }
+.ginasios-resumo .insignia-img { width: 34px; height: 34px; }
+.ginasio-insignia .insignia-img { width: 40px; height: 40px; }
+.cab-insignias-lista { align-items: center; }
+.cab-insignias .insignia-img { width: 26px; height: 26px; }

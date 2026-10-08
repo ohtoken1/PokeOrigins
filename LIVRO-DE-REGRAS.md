@@ -230,7 +230,7 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 | IVs | 5 | 5 | 6 | 6 | 8 | 8 | 9 | 10 |
 | Silver | 200 | 300 | 400 | 500 | 600 | 700 | 850 | 1.000 |
 
-- **Vencer** dá a **insígnia** (uma vez) e o silver (toda vez; depois de ganhar, o botão vira **Revanche**). As insígnias aparecem na tela dos Ginásios e no **cabeçalho**, na cor do tipo do ginásio (as da região atual; clicar abre os Ginásios).
+- **Vencer** dá a **insígnia** (uma vez) e o silver (toda vez; depois de ganhar, o botão vira **Revanche**). As insígnias aparecem com o **desenho de verdade** de cada uma (apagadas até você conquistar) na tela dos Ginásios e no **cabeçalho** (as da região atual; clicar abre os Ginásios). Em Alola, que não tem insígnias, os Kahunas dão o **Z-Crystal** do tipo deles.
 
 ## 7. Captura
 
@@ -567,6 +567,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
 - Ícone da Pokédex no cabeçalho, ao lado do nome, com o progresso da Pokédex; barra do passe com 0 / 100 XP por nível.
+- Insígnias com o desenho oficial de cada ginásio (Z-Crystals em Alola), no cabeçalho e na tela dos Ginásios.
 - Ginásios das 9 regiões (8 líderes; 4 Kahunas em Alola) com insígnias no cabeçalho; imagens dos treinadores nos duelos, ginásios e batalhas.
 - Duelos com treinadores: 50 treinadores dos jogos e do anime, nível da média do seu time, recompensa em silver por dificuldade; registro da batalha com os avisos no fim da frase do golpe.
 - Aba Minha conta (Meu perfil, Achievements, Minhas skins, Opções); chances de aparição, de lendário e de shiny na Pokédex.
