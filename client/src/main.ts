@@ -14,13 +14,14 @@ import { telaInicio } from './telas/inicio';
 import { telaAdministracao, type SecaoAdministracao } from './telas/administracao';
 import { telaJogadores } from './telas/jogadores';
 import { telaConta, type SecaoConta } from './telas/conta';
+import { telaDuelos } from './telas/duelos';
 import { telaComunidade, type SecaoComunidade } from './telas/comunidade';
 import { montarPainelAdmin } from './ui/admin';
 import { montarBarraTopo } from './ui/barraTopo';
 import { montarCabecalho } from './ui/cabecalho';
 import { definirNavegacao } from './ui/navegacao';
 
-export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes' } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta };
+export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes' } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' };
 export type Navegar = (destino: Destino) => void;
 /** Cada tela desenha dentro de `raiz` e pode devolver uma função de limpeza. */
 export type Tela = (raiz: HTMLElement, navegar: Navegar) => (() => void) | void;
@@ -51,6 +52,7 @@ const navegar: Navegar = (destino) => {
   else if (destino.tela === 'administracao') limparTelaAtual = telaAdministracao(destino.secao)(raiz, navegar);
   else if (destino.tela === 'jogadores') limparTelaAtual = telaJogadores(raiz, navegar);
   else if (destino.tela === 'conta') limparTelaAtual = telaConta(destino.secao)(raiz, navegar);
+  else if (destino.tela === 'duelos') limparTelaAtual = telaDuelos(raiz, navegar);
   else limparTelaAtual = telaBioma(destino.biomaId)(raiz, navegar);
 };
 

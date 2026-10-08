@@ -1334,3 +1334,26 @@ button.vaga:hover { border-color: var(--borda); }
 /* barra de XP do passe com o texto por cima */
 .barra-exp.barra-passe { position: relative; height: 18px; border-radius: 9px; }
 .barra-passe > span { position: absolute; inset: 0; display: grid; place-items: center; font-size: 0.72rem; font-weight: 800; color: var(--texto); text-shadow: 0 1px 2px #000; }
+
+/* Duelos com treinadores */
+.tela-duelos { max-width: 900px; margin: 0 auto; }
+.cartao-duelo { padding: 16px 18px; border-radius: 16px; background: rgb(27 47 74 / 0.5); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); display: flex; flex-direction: column; gap: 12px; }
+.duelo-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.duelo-topo h2 { margin: 2px 0 0; font-size: 1.6rem; }
+.duelo-dificuldade { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.duelo-dificuldade small { color: var(--texto-2); font-weight: 700; }
+.estrelas { color: #ffd34d; letter-spacing: 1px; font-size: 1rem; }
+.estrelas .apagadas { color: rgb(255 255 255 / 0.18); }
+.duelo-time { display: flex; flex-wrap: wrap; gap: 8px; }
+.duelo-pokemon { display: flex; flex-direction: column; align-items: center; width: 110px; padding: 6px; border-radius: 12px; background: var(--painel-2); border: 1px solid var(--borda); }
+.duelo-pokemon small { font-size: 0.72rem; text-align: center; }
+.duelo-info { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--texto-2); font-size: 0.88rem; }
+.duelo-info strong { color: var(--destaque); }
+.duelo-botoes { display: flex; gap: 8px; flex-wrap: wrap; }
+.lista-treinadores { margin-top: 16px; padding: 10px 14px; border-radius: 14px; background: rgb(27 47 74 / 0.35); border: 1px solid var(--borda); }
+.lista-treinadores summary { cursor: pointer; font-weight: 800; }
+.grupo-treinadores h4 { margin: 12px 0 6px; display: flex; align-items: center; gap: 6px; }
+.linha-treinador-npc { display: grid; grid-template-columns: 130px 220px 1fr; align-items: center; gap: 8px; padding: 2px 0; border-bottom: 1px solid rgb(255 255 255 / 0.05); }
+.linha-treinador-npc small { color: var(--texto-2); }
+.mini-time { display: flex; flex-wrap: wrap; }
+.mini-time .sprite { width: 32px; height: 32px; }

@@ -203,6 +203,23 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 
 ---
 
+### 6.1 Duelos com treinadores (Jogar → Duelos com treinadores)
+- Um treinador é **sorteado entre 50 personagens** dos jogos e do anime (sem líderes de ginásio): rivais (Silver, Wally, Barry, Hop…), Elite Four (Lorelei, Bruno, Agatha, Will, Koga, Karen…), chefes de equipes vilãs (Maxie, Archie, Cyrus, Lysandre, N, Ghetsis…), campeões (Lance, Blue, Red, Steven, Wallace, Cynthia, Leon…) e Ash. Os times seguem os dos jogos/anime. O botão **Sortear outro** troca o treinador; embaixo há a lista de todos.
+- **Nível:** a **média dos níveis do seu time**. As formas voltam para a evolução certa daquele nível (ex.: Garchomp no Nv. 20 vira Gible).
+- **Tamanho do time dele:** o mesmo número de Pokémon do seu time (+1 nos muito difíceis e lendários), usando os mais fortes do time dele.
+- **Sem EVs.** IVs baixos e iguais em todos os atributos, pela força do treinador:
+
+| Dificuldade | Estrelas | IVs | Recompensa (provisória) |
+|---|---|---|---|
+| Fácil | ★ | 5 | 100 silver |
+| Normal | ★★ | 6 | 200 silver |
+| Difícil | ★★★ | 8 | 400 silver |
+| Muito difícil (Elite Four, chefes) | ★★★★ | 9 | 700 silver |
+| Lendário (campeões, Ghetsis, Ash) | ★★★★★ | 10 | 1.000 silver |
+
+- **Regras do duelo:** não dá para fugir nem jogar Pokébola. O treinador manda o próximo Pokémon quando um desmaia. Na maioria das vezes ele escolhe o golpe que mais machuca (tipo, STAB e poder).
+- **Vitória:** silver da dificuldade (com bônus de VIP e da administração), XP e EVs de **todos** os Pokémon dele para quem lutou, XP de treinador e amizade +5. **Derrota:** o time é curado, sem recompensa.
+
 ## 7. Captura
 
 ### 7.1 Fórmula
@@ -455,7 +472,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 
 A barra do topo tem:
 - **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (com nível, tipos, HP e item; clique para ver a ficha) e, embaixo, o **Passe de batalha** (Temporada 1, 30 níveis com trilha grátis e premium; cada nível pede **100 XP do passe** (barra 0 / 100 XP); botão **Missões** com as missões diárias, semanais e da temporada que vão dar XP do passe; mecânica, missões e recompensas **em breve**);
-- **Jogar**: Mapas (regiões e biomas), **Cidade**, **Continentes**, **Duelos com treinadores** e **Ginásios** (os quatro últimos "em breve");
+- **Jogar**: Mapas (regiões e biomas), **Duelos com treinadores**, **Cidade**, **Continentes** e **Ginásios** (os três últimos "em breve");
 - **Golpes**: Move Reminder e Move Tutor;
 - **Informações**: Ranking e Database;
 - **Minha conta**: **Meu perfil** (nível, Pokédex, capturas e time; botão para editar o personagem), **Achievements** (10 conquistas com progresso: capturas, shiny, lendário, Pokédex, time completo, nível de treinador, silver; recompensas em breve), **Minhas skins** (as skins que você ganha vão para cá, não para a Bolsa) e **Opções**;
@@ -538,6 +555,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
 - Ícone da Pokédex no cabeçalho, ao lado do nome, com o progresso da Pokédex; barra do passe com 0 / 100 XP por nível.
+- Duelos com treinadores: 50 treinadores dos jogos e do anime, nível da média do seu time, recompensa em silver por dificuldade; registro da batalha com os avisos no fim da frase do golpe.
 - Aba Minha conta (Meu perfil, Achievements, Minhas skins, Opções); chances de aparição, de lendário e de shiny na Pokédex.
 - Cabeçalho maior com selos dos bônus ativos e atalhos estilo Pokébola; passe de batalha com 30 níveis e botão Missões.
 - Cabeçalho fixo com informações do treinador e atalhos; Passe de batalha (vitrine) na tela de Início; Log na Administração (em breve).

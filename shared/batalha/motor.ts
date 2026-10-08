@@ -141,6 +141,14 @@ export class BatalhaSelvagem {
   readonly indices: number[];
   /** Posições no time de quem chegou a lutar (ganham experiência completa). */
   readonly participantes = new Set<number>();
+  /** Pokémon do outro lado: o selvagem, ou o time do treinador NPC. */
+  readonly adversarios: PokemonIndividual[];
+
+  /** Posição (no time do adversário) de quem está em campo do outro lado. */
+  get adversarioAtivo(): number {
+    const ativo = this.batalha.p2.active[0];
+    return ativo ? Math.max(0, this.batalha.p2.pokemon.indexOf(ativo)) : 0;
+  }
   private tentativasFuga = 0;
   private ignorarRecarga = false;
 
@@ -152,16 +160,19 @@ export class BatalhaSelvagem {
     /** Taxa de captura oficial da espécie (3 = lendário difícil, 255 = muito fácil). */
     private taxaCaptura: number,
     private aleatorio: () => number = Math.random,
+    /** Duelo contra treinador NPC: o time dele (o `selvagem` é o primeiro) e os nomes. Sem captura nem fuga. */
+    readonly treinador: { nome: string; equipe: PokemonIndividual[]; nomesEquipe: string[] } | null = null,
   ) {
     this.indices = time.map((_, i) => i).filter((i) => time[i].hp > 0);
     if (this.indices.length === 0) throw new Error('Nenhum Pokémon em condições de lutar');
 
     this.batalha = new Battle({ formatid: 'gen9customgame' as never });
     this.batalha.setPlayer('p1', { name: 'Jogador', team: this.indices.map((i) => conjuntoShowdown(time[i], `P${i}`)) as never });
-    this.batalha.setPlayer('p2', { name: 'Selvagem', team: [conjuntoShowdown(selvagem, 'S0')] as never });
+    this.adversarios = treinador ? treinador.equipe : [selvagem];
+    this.batalha.setPlayer('p2', { name: treinador ? treinador.nome : 'Selvagem', team: this.adversarios.map((p, k) => conjuntoShowdown(p, `S${k}`)) as never });
     this.objetos = this.batalha.p1.pokemon.slice();
     this.objetos.forEach((sim, k) => aplicarEstado(sim, time[this.indices[k]]));
-    aplicarEstado(this.batalha.p2.pokemon[0], selvagem);
+    this.batalha.p2.pokemon.forEach((sim, k) => aplicarEstado(sim, this.adversarios[k]));
   }
 
   /** Começa a batalha (sai da tela de "prévia de time") e devolve a entrada dos Pokémon. */
@@ -206,7 +217,8 @@ export class BatalhaSelvagem {
     const preso = !!(ativo.trapped || ativo.maybeTrapped);
     const zGolpes = Array.isArray(ativo.canZMove) ? (ativo.canZMove as ({ move: string } | null)[]).map((z) => z?.move ?? null) : null;
     const tera = typeof ativo.canTerastallize === 'string' ? (ativo.canTerastallize as string) : null;
-    return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso, zGolpes, tera };
+    // contra treinador não dá para fugir
+    return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso && !this.treinador, zGolpes, tera };
   }
 
   /** Posições no time dos Pokémon que podem entrar no lugar do atual. */
@@ -332,7 +344,7 @@ export class BatalhaSelvagem {
       }
     };
     this.objetos.forEach((sim, k) => copiar(sim, this.time[this.indices[k]]));
-    copiar(this.batalha.p2.pokemon[0], this.selvagem);
+    this.batalha.p2.pokemon.forEach((sim, k) => copiar(sim, this.adversarios[k]));
   }
 
   // ---------- interno ----------
@@ -352,18 +364,46 @@ export class BatalhaSelvagem {
 
   private escolherSelvagem() {
     const lado = this.batalha.p2;
+    if (lado.requestState === 'switch') return this.trocarAdversario();
     if (lado.requestState !== 'move') return;
     const golpes = ((lado.activeRequest as any).active[0].moves as any[])
       .map((m, i) => ({ m, i }))
       .filter(({ m }) => !m.disabled && (m.pp === undefined || m.pp > 0));
-    const escolhido = golpes.length ? golpes[Math.floor(this.aleatorio() * golpes.length)].i + 1 : 1;
+    let escolhido = golpes.length ? golpes[Math.floor(this.aleatorio() * golpes.length)].i + 1 : 1;
+    // treinador NPC: na maioria das vezes usa o golpe que mais machuca (tipo, STAB e poder)
+    if (this.treinador && golpes.length && this.aleatorio() < 0.75) {
+      const atacante = lado.active[0];
+      const alvo = this.batalha.p1.active[0];
+      const forca = (id: string) => {
+        const g = Dex.moves.get(id);
+        if (g.category === 'Status' || !alvo) return 15;
+        if (!Dex.getImmunity(g.type, alvo.getTypes())) return 0;
+        return (g.basePower || 50) * (atacante.hasType(g.type) ? 1.5 : 1) * 2 ** Dex.getEffectiveness(g.type, alvo.getTypes());
+      };
+      escolhido = golpes.reduce((a, b) => (forca(b.m.id) > forca(a.m.id) ? b : a)).i + 1;
+    }
     this.batalha.choose('p2', `move ${escolhido}`);
+  }
+
+  /** O treinador NPC manda o próximo Pokémon (na ordem do time) quando o atual desmaia. */
+  private trocarAdversario() {
+    const lado = this.batalha.p2;
+    const proximo = lado.pokemon.findIndex((p) => !p.fainted && !p.isActive);
+    if (proximo >= 0) this.batalha.choose('p2', `switch ${proximo + 1}`);
   }
 
   private lerEventos(): EventoBatalha[] {
     const linhas = this.batalha.log.slice(this.lidas);
     this.lidas = this.batalha.log.length;
     const eventos = this.interpretar(linhas);
+    // só o treinador precisa trocar (o Pokémon dele desmaiou): ele troca sozinho e a batalha segue
+    while (!this.batalha.ended && this.batalha.p2.requestState === 'switch' && this.batalha.p1.requestState !== 'switch') {
+      this.trocarAdversario();
+      const mais = this.batalha.log.slice(this.lidas);
+      this.lidas = this.batalha.log.length;
+      if (!mais.length) break;
+      eventos.push(...this.interpretar(mais));
+    }
     const ativo = this.batalha.p1.active[0];
     if (ativo && !ativo.fainted) this.participantes.add(this.ativo);
     return eventos;
@@ -376,7 +416,7 @@ export class BatalhaSelvagem {
   private nome(ident: string): string {
     if (!ident) return '';
     const apelido = ident.split(': ')[1] ?? '';
-    if (ident.startsWith('p2')) return `${this.nomeSelvagem} selvagem`;
+    if (ident.startsWith('p2')) return this.treinador ? `${this.treinador.nomesEquipe[Number(apelido.slice(1))] ?? apelido} de ${this.treinador.nome}` : `${this.nomeSelvagem} selvagem`;
     return this.nomes[Number(apelido.slice(1))] ?? apelido;
   }
 
@@ -398,7 +438,14 @@ export class BatalhaSelvagem {
   /** HP de cada lado (para calcular o dano de cada golpe). */
   private hpLado: Record<Lado, { hp: number; max: number }> = { jogador: { hp: 0, max: 1 }, selvagem: { hp: 0, max: 1 } };
   /** Último golpe usado (para juntar "usou X" com o dano no chat lateral). */
-  private ultimoGolpe: { quem: string; golpe: string; evento: EventoBatalha; acertos: number } | null = null;
+  private ultimoGolpe: { quem: string; golpe: string; evento: EventoBatalha; acertos: number; avisos: string[] } | null = null;
+
+  /** Guarda o aviso para o fim da frase do golpe (registro lateral); sem golpe em andamento, registra sozinho. */
+  private avisoDoGolpe(aviso: string): string | null | undefined {
+    if (!this.ultimoGolpe) return undefined;
+    this.ultimoGolpe.avisos.push(aviso);
+    return null;
+  }
 
   private interpretar(linhas: string[]): EventoBatalha[] {
     const eventos: EventoBatalha[] = [];
@@ -421,12 +468,13 @@ export class BatalhaSelvagem {
         case 'drag': {
           const lado = this.lado(args[0]);
           const [hp, hpMax] = args[2].split(' ')[0].split('/').map(Number);
-          const indice = lado === 'jogador' ? Number(args[0].split(': ')[1].slice(1)) : 0;
+          const indice = Number(args[0].split(': ')[1].slice(1)) || 0;
           this.hpLado[lado] = { hp, max: hpMax ?? hp };
           eventos.push({
             tipo: 'entrar', lado, indice, hp, hpMax: hpMax ?? hp, forma: args[1].split(',')[0],
-            texto: lado === 'jogador' ? `Vai, ${quem}!` : undefined,
-            registro: lado === 'jogador' ? `Vai, ${quem}!` : null,
+            texto: lado === 'jogador' ? `Vai, ${quem}!` : this.treinador ? `${this.treinador.nome} enviou ${this.treinador.nomesEquipe[indice]}!` : undefined,
+            // o primeiro do treinador já é anunciado pela tela ("X enviou Y!"); só as trocas vão para o registro
+            registro: lado === 'jogador' ? `Vai, ${quem}!` : this.treinador && indice > 0 ? `${this.treinador.nome} enviou ${this.treinador.nomesEquipe[indice]}!` : null,
           });
           break;
         }
@@ -478,7 +526,7 @@ export class BatalhaSelvagem {
             texto: `${quem} usou ${golpe.name}!`,
           };
           eventos.push(evento);
-          this.ultimoGolpe = { quem, golpe: golpe.name, evento, acertos: 0 };
+          this.ultimoGolpe = { quem, golpe: golpe.name, evento, acertos: 0, avisos: [] };
           break;
         }
         case '-damage':
@@ -514,10 +562,11 @@ export class BatalhaSelvagem {
             const g = this.ultimoGolpe;
             if (g) {
               g.acertos++;
+              const avisos = g.avisos.length ? ` — ${g.avisos.splice(0).join(', ')}` : '';
               if (g.acertos === 1) {
                 g.evento.registro = null;
-                registro = `${g.quem} usou ${g.golpe} e causou ${dano} de dano (${parte} da vida)`;
-              } else registro = `${g.golpe} acertou de novo: ${dano} de dano (${parte} da vida)`;
+                registro = `${g.quem} usou ${g.golpe} e causou ${dano} de dano (${parte} da vida)${avisos}`;
+              } else registro = `${g.golpe} acertou de novo: ${dano} de dano (${parte} da vida)${avisos}`;
             }
           }
           if (texto && comando === '-damage' && !registro && antes.hp > (hp || 0)) {
@@ -530,17 +579,18 @@ export class BatalhaSelvagem {
         case 'faint':
           eventos.push({ tipo: 'desmaio', lado: this.lado(args[0]), texto: `${quem} desmaiou!` });
           break;
+        // no registro lateral, "super efetivo"/"não é muito efetivo"/"crítico" vão no fim da frase do golpe
         case '-supereffective':
-          eventos.push({ tipo: 'impacto', forte: true, texto: 'É super efetivo!' });
+          eventos.push({ tipo: 'impacto', forte: true, texto: 'É super efetivo!', registro: this.avisoDoGolpe('super efetivo') });
           break;
         case '-resisted':
-          eventos.push({ tipo: 'mensagem', texto: 'Não é muito efetivo...' });
+          eventos.push({ tipo: 'mensagem', texto: 'Não é muito efetivo...', registro: this.avisoDoGolpe('não é muito efetivo') });
           break;
         case '-immune':
           eventos.push({ tipo: 'mensagem', texto: `Não afeta ${quem}...` });
           break;
         case '-crit':
-          eventos.push({ tipo: 'impacto', forte: true, texto: 'Um golpe crítico!' });
+          eventos.push({ tipo: 'impacto', forte: true, texto: 'Um golpe crítico!', registro: this.avisoDoGolpe('crítico') });
           break;
         case '-miss':
           eventos.push({ tipo: 'mensagem', texto: `${quem} errou o ataque!` });

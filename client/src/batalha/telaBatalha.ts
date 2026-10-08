@@ -26,8 +26,11 @@ export type ResultadoBatalha = 'vitoria' | 'derrota' | 'captura' | 'fuga';
 
 export interface OpcoesBatalha {
   save: Save;
+  /** O selvagem; num duelo, o primeiro Pokémon do treinador. */
   selvagem: PokemonIndividual;
   bioma: Bioma;
+  /** Duelo contra treinador NPC (sem captura nem fuga; recompensa em silver ao vencer). */
+  treinador?: { nome: string; titulo: string; equipe: PokemonIndividual[]; recompensa: number };
   aoTerminar(resultado: ResultadoBatalha): void;
 }
 
@@ -133,8 +136,10 @@ function sortearFundo(biomaId: string): string | null {
   return lista ? `batalha/${lista[Math.floor(Math.random() * lista.length)]}` : null;
 }
 
-export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalha): void {
-  const dadosSelvagem = pokemonPorId(selvagem.especieId);
+export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTerminar }: OpcoesBatalha): void {
+  /** Quem está em campo do outro lado (num duelo, muda quando o treinador troca). */
+  let selvagem = primeiro;
+  let dadosSelvagem = pokemonPorId(selvagem.especieId);
   const imagemFundo = sortearFundo(bioma.id);
   const batalha = new BatalhaSelvagem(
     save.time,
@@ -142,6 +147,8 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     selvagem,
     dadosSelvagem.nome,
     dadosSelvagem.taxaCaptura,
+    Math.random,
+    treinador ? { nome: treinador.nome, equipe: treinador.equipe, nomesEquipe: treinador.equipe.map((p) => nomeDe(p.especieId)) } : null,
   );
 
   // ---------- montagem da tela ----------
@@ -156,7 +163,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     img.src = urlSprite3D(especieId, { shiny, costas });
     return img;
   };
-  const spriteSelvagem = spriteBatalha(selvagem.especieId, selvagem.shiny, false);
+  let spriteSelvagem = spriteBatalha(selvagem.especieId, selvagem.shiny, false);
   spriteSelvagem.classList.add('sprite-selvagem');
   let spriteJogador = el('img', { class: 'sprite sprite-jogador', alt: '' });
   const lugarJogador = el('div', { class: 'lugar lugar-jogador' }, spriteJogador);
@@ -311,6 +318,20 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
           // quem entra em campo começa sem estágios de atributo (e sem Terastal)
           info(ev.lado).zerarBoosts();
           marcarTera(ev.lado, null);
+          if (ev.lado === 'selvagem' && treinador && treinador.equipe[ev.indice] && treinador.equipe[ev.indice] !== selvagem) {
+            // o treinador mandou outro Pokémon: troca a imagem e a caixa de HP
+            selvagem = treinador.equipe[ev.indice];
+            dadosSelvagem = pokemonPorId(selvagem.especieId);
+            const novo = spriteBatalha(selvagem.especieId, selvagem.shiny, false);
+            novo.classList.add('sprite-selvagem');
+            spriteSelvagem.replaceWith(novo);
+            spriteSelvagem = novo;
+            infoSelvagem.definir(selvagem);
+            infoSelvagem.hp(ev.hp, ev.hpMax);
+            if (ev.texto) mensagem.textContent = ev.texto;
+            await animarEntrada(spriteSelvagem);
+            await esperar(300);
+          }
           if (ev.lado === 'jogador') {
             colocarJogador(ev.indice);
             // forma que depende do item (Giratina-Origin, Arceus-Fire…)
@@ -449,7 +470,8 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     acoes.replaceChildren(
       // só o que o jogador tem; Sacred Ash é só fora da batalha
       ...(Object.keys(ITENS) as ItemId[])
-        .filter((id) => (save.itens[id] ?? 0) > 0 && !ITENS[id].reviverTime)
+        // contra treinador não dá para jogar Pokébola no Pokémon dele
+        .filter((id) => (save.itens[id] ?? 0) > 0 && !ITENS[id].reviverTime && !(treinador && ITENS[id].categoria === 'bola'))
         .map((id) =>
           botao([iconeItem({ id, categoria: ITENS[id].categoria === 'bola' ? 'bolas' : 'remedios' }), el('span', {}, ITENS[id].nome), el('small', {}, `×${save.itens[id]}`)] as never, () => (ITENS[id].categoria === 'bola' ? arremessar(id) : menuAlvoRemedio(id)), {
             class: `botao item ${ITENS[id].categoria}`,
@@ -606,10 +628,15 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     for (const golpe of r.golpesPendentes) await perguntarGolpe(p, golpe);
   }
 
+  /** Derrotados que dão XP/EVs: o selvagem, ou todo o time do treinador NPC. */
+  const derrotados = () => (treinador ? treinador.equipe : [selvagem]);
+  /** XP que um Pokémon de nível `nivel` ganha pelos derrotados. */
+  const xpPelosDerrotados = (nivel: number) => derrotados().reduce((s, d) => s + expGanha(pokemonPorId(d.especieId).experienciaBase ?? 50, d.nivel, nivel, true), 0);
+
   /** O treinador ganha o mesmo XP que o Pokémon derrotado/capturado dá ao Pokémon em campo. */
   async function darXpTreinador() {
     const nivelAtivo = save.time[batalha.ativo]?.nivel ?? 1;
-    const xp = Math.round(expGanha(dadosSelvagem.experienciaBase ?? 50, selvagem.nivel, nivelAtivo, true) * bonusVip(save, 'xpTreinador') * bonificacao().xp);
+    const xp = Math.round(xpPelosDerrotados(nivelAtivo) * bonusVip(save, 'xpTreinador') * bonificacao().xp);
     const antes = nivelTreinador(save.xpTreinador);
     save.xpTreinador += xp;
     await dizer(`Você ganhou ${xp} XP de treinador!`);
@@ -634,10 +661,12 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
         const p = save.time[pos];
         // XP e EVs só para quem entrou em campo nesta batalha (pedido do dono: sem Exp. Share)
         if (p.hp <= 0 || !batalha.participantes.has(pos)) continue;
-        const ev = dadosSelvagem.evsDados;
-        ganharEvs(p, { hp: ev.hp, atk: ev.ataque, def: ev.defesa, spa: ev.ataqueEspecial, spd: ev.defesaEspecial, spe: ev.velocidade });
+        for (const d of derrotados()) {
+          const ev = pokemonPorId(d.especieId).evsDados;
+          ganharEvs(p, { hp: ev.hp, atk: ev.ataque, def: ev.defesa, spa: ev.ataqueEspecial, spd: ev.defesaEspecial, spe: ev.velocidade });
+        }
         // bônus de XP da administração (1x a 3x)
-        const exp = Math.round(expGanha(dadosSelvagem.experienciaBase ?? 50, selvagem.nivel, p.nivel, true) * bonificacao().xp);
+        const exp = Math.round(xpPelosDerrotados(p.nivel) * bonificacao().xp);
         const r = ganharExperiencia(p, exp, nomeDe, crescimentoDe);
         await mostrarProgresso(pos, r);
         if (r.evolucao) evolucoes.push({ pos, para: r.evolucao.para });
@@ -671,10 +700,12 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
     };
 
     if (resultado === 'vitoria') {
+      if (treinador) await dizer(`Você venceu ${treinador.titulo} ${treinador.nome}!`);
       await darXpTreinador();
-      const silver = Math.round(SILVER_POR_VITORIA * bonusVip(save, 'silver') * bonificacao().silver);
+      // duelo: recompensa da dificuldade do treinador; selvagem: o silver normal por vitória
+      const silver = Math.round((treinador ? treinador.recompensa : SILVER_POR_VITORIA) * bonusVip(save, 'silver') * bonificacao().silver);
       save.silver += silver;
-      await dizer(`Você ganhou ${silver} ${MOEDA}!`);
+      await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${MOEDA}!`);
       await darXpTime();
     } else if (resultado === 'captura') {
       await darXpTreinador();
@@ -710,8 +741,9 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
 
   // ---------- início ----------
   (async () => {
+    if (treinador) await dizer(`${treinador.titulo} ${treinador.nome} quer batalhar!`);
     await animarEntrada(spriteSelvagem);
-    await dizer(`Um ${dadosSelvagem.nome} selvagem apareceu!`);
+    await dizer(treinador ? `${treinador.nome} enviou ${dadosSelvagem.nome}!` : `Um ${dadosSelvagem.nome} selvagem apareceu!`);
     await reproduzir(batalha.iniciar());
     menuPrincipal();
   })();
