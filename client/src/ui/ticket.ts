@@ -31,7 +31,9 @@ function entregar(save: Save, r: ResultadoTicket): string[] {
   return r.pacote.map((premio, i) => {
     if (premio.tipo === 'item') {
       save.itens[premio.id] = (save.itens[premio.id] ?? 0) + premio.quantidade;
-      return `${itemDaLoja(premio.id)?.nome ?? premio.id} ×${premio.quantidade} foi para a bolsa.`;
+      const item = itemDaLoja(premio.id);
+      // skins vão para Minha conta → Minhas skins
+      return `${item?.nome ?? premio.id} ×${premio.quantidade} foi para ${item?.categoria === 'skins' ? 'Minhas skins' : 'a bolsa'}.`;
     }
     if (premio.tipo === 'silver') {
       save.silver += premio.quantidade;

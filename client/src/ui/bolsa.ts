@@ -200,7 +200,8 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
       .filter(([, qtd]) => qtd > 0)
       .map(([id, qtd]) => ({ item: itemDaLoja(id), qtd }))
       .filter((x): x is { item: ItemLoja; qtd: number } => !!x.item);
-    const comItens = CATEGORIAS.filter((c) => meus.some((m) => m.item.categoria === c.id));
+    // skins ficam em Minha conta → Minhas skins, não na bolsa
+    const comItens = CATEGORIAS.filter((c) => c.id !== 'skins' && meus.some((m) => m.item.categoria === c.id));
     if (!comItens.some((c) => c.id === aba) && comItens.length) aba = comItens[0].id;
 
     return el(

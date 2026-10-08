@@ -3,7 +3,10 @@
 import { Dex } from '@pkmn/sim';
 import type { Tela } from '../main';
 import { BIOMAS } from '../../../shared/biomas';
-import { NIVEL_LENDARIO, biomaDoPokemon, montarTabela, type EntradaTabela } from '../../../shared/encontros';
+import { NIVEL_LENDARIO, ajustarTabela, biomaDoPokemon, ehLendario, faixaDosEncontros, montarTabela, probabilidades, type EntradaTabela } from '../../../shared/encontros';
+import { nivelTreinador } from '../../../shared/treinador';
+import { comBonificacao } from '../bonificacao';
+import { ajustesAdmin } from '../ui/admin';
 import { comoEvolui } from '../../../shared/evolucoes';
 import { especie, golpesPorNivel } from '../../../shared/batalha/pokemon';
 import maquinas from '../../../shared/data/maquinas.json';
@@ -24,13 +27,20 @@ const ATRIBUTOS: [keyof PokemonBase['stats'], string][] = [
 ];
 
 /** Onde cada espécie aparece solta (bioma + faixa de nível). */
-function mapaDeEncontros(todos: PokemonBase[]): Map<number, { bioma: string; entrada: EntradaTabela }> {
-  const mapa = new Map<number, { bioma: string; entrada: EntradaTabela }>();
+type Encontro = { bioma: string; entrada: EntradaTabela; tabela: EntradaTabela[]; biomaObj: (typeof BIOMAS)[number] };
+function mapaDeEncontros(todos: PokemonBase[]): Map<number, Encontro> {
+  const mapa = new Map<number, Encontro>();
   for (const r of REGIOES.filter((x) => x.disponivel))
-    for (const b of BIOMAS)
-      for (const entrada of montarTabela(b, pokemonsDaRegiao(r.id), [], todos)) mapa.set(entrada.pokemon.id, { bioma: `${r.nome} · ${b.nome}`, entrada });
+    for (const b of BIOMAS) {
+      const tabela = montarTabela(b, pokemonsDaRegiao(r.id), [], todos);
+      for (const entrada of tabela) mapa.set(entrada.pokemon.id, { bioma: `${r.nome} · ${b.nome}`, entrada, tabela, biomaObj: b });
+    }
   return mapa;
 }
+
+/** "0,25%" (com mais casas quando a chance é muito pequena) e "1 em 400". */
+const porcentagem = (c: number) => `${(c * 100).toLocaleString('pt-BR', { maximumFractionDigits: c * 100 < 0.01 ? 4 : c * 100 < 1 ? 3 : 2 })}%`;
+const umEm = (c: number) => `1 em ${Math.round(1 / c).toLocaleString('pt-BR')}`;
 
 /** Região de origem pelo número da Pokédex nacional. */
 export const regiaoDoNumero = (numero: number) => REGIOES.find((r) => numero >= r.pokedex[0] && numero <= r.pokedex[1]);
@@ -168,6 +178,18 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
   const comoAparece = onde
     ? `Solto · Nv. ${p.lendario || p.mitico ? `${Math.max(NIVEL_LENDARIO, onde.entrada.nivelMin)}+ (raro)` : `${onde.entrada.nivelMin}–${onde.entrada.nivelMax}`}`
     : `Só evoluindo · ${comoEvolui(p)}`;
+  // chances com o nível de treinador atual (e os bônus/ajustes que valem no jogo agora)
+  const saveAtual = carregarSave();
+  const ajustes = comBonificacao(ajustesAdmin());
+  let textoChance = 'Não aparece solto';
+  if (onde) {
+    const faixa = faixaDosEncontros(onde.biomaObj, nivelTreinador(saveAtual?.xpTreinador ?? 0), saveAtual?.nivelEncontro ?? null);
+    const tabela = ajustarTabela(onde.tabela, ajustes);
+    const i = tabela.findIndex((e) => e.pokemon.id === p.id);
+    const c = i >= 0 ? probabilidades(tabela, faixa)[i] : 0;
+    textoChance = c > 0 ? `${porcentagem(c)} (${umEm(c)}) por encontro` : `0% na sua faixa atual (Nv. ${faixa[0]}–${faixa[1]})`;
+  }
+  const textoShiny = `${porcentagem(ajustes.chanceShiny)} (${umEm(ajustes.chanceShiny)})`;
   const textoOnde = el('span', { class: 'dex-onde' },
     el('span', { class: 'dex-chip' }, regiaoP?.nome ?? '—'),
     el('span', { class: 'dex-chip' }, biomaP?.nome ?? '—'),
@@ -261,6 +283,8 @@ ${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) }
         // nomes de ability e egg group ficam em inglês (regra do dono)
         linha('Egg Groups', s.eggGroups.join(', ')),
         linha('Onde encontrar', textoOnde),
+        linha(ehLendario(p) ? 'Chance do lendário' : 'Chance de aparição', textoChance),
+        linha('Chance de shiny', textoShiny),
         linha('Captura base', `${capturaBase(p.taxaCaptura)} (Poké Ball, HP cheio)`),
       ),
     ),

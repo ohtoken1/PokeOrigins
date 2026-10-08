@@ -1304,3 +1304,21 @@ button.vaga:hover { border-color: var(--borda); }
 .missao-texto { flex: 1; display: flex; flex-direction: column; }
 .missao-texto small { color: var(--texto-2); font-size: 0.72rem; }
 .missao-xp { color: var(--destaque); white-space: nowrap; }
+
+/* Minha conta */
+.tela-conta { max-width: 900px; margin: 0 auto; }
+.conta-botoes { margin-top: 12px; }
+.lista-achievements { display: flex; flex-direction: column; gap: 8px; }
+.achievement { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: rgb(27 47 74 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); }
+.achievement.feito { border-color: #8a6a1c; background: rgb(255 201 60 / 0.1); }
+.achievement-selo { width: 30px; height: 30px; flex: none; border-radius: 50%; display: grid; place-items: center; font-size: 1rem; color: #2a1d00; border: 2px dashed var(--borda); }
+.achievement.feito .achievement-selo { border: 0; background: linear-gradient(135deg, #fff1a8, #ffc93c); }
+.achievement-texto { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.achievement-texto small { color: var(--texto-2); }
+.achievement-texto .barra-exp { margin-top: 4px; }
+.achievement-progresso { font-weight: 800; font-size: 0.85rem; white-space: nowrap; color: var(--texto-2); }
+.achievement.feito .achievement-progresso { color: var(--destaque); }
+.grade-skins { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.cartao-skin { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px; border-radius: 12px; background: rgb(27 47 74 / 0.45); border: 1px solid var(--borda); text-align: center; }
+.cartao-skin .icone-skin { width: 56px; height: 56px; }
+.cartao-skin .icone-skin .sprite { width: 72px; height: 72px; }

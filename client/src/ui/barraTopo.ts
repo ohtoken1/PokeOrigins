@@ -28,11 +28,21 @@ const ABAS: Aba[] = [
   {
     nome: 'Informações',
     menu: true,
-    telas: ['opcoes', 'ranking', 'database'],
+    telas: ['ranking', 'database'],
     itens: [
-      { nome: 'Opções', destino: () => ({ tela: 'opcoes' }) },
       { nome: 'Ranking', destino: () => ({ tela: 'ranking' }) },
       { nome: 'Database', destino: () => ({ tela: 'database' }) },
+    ],
+  },
+  {
+    nome: 'Minha conta',
+    menu: true,
+    telas: ['conta-perfil', 'conta-achievements', 'conta-skins', 'opcoes'],
+    itens: [
+      { nome: 'Meu perfil', destino: () => ({ tela: 'conta', secao: 'perfil' }) },
+      { nome: 'Achievements', destino: () => ({ tela: 'conta', secao: 'achievements' }) },
+      { nome: 'Minhas skins', destino: () => ({ tela: 'conta', secao: 'skins' }) },
+      { nome: 'Opções', destino: () => ({ tela: 'opcoes' }) },
     ],
   },
   {
@@ -121,7 +131,7 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
   );
   return (destino) => {
     // telas "em breve" usam a tela de comunidade com uma seção: a seção diz de qual grupo ela é
-    const tela = destino.tela === 'comunidade' ? destino.secao : destino.tela === 'administracao' ? `admin-${destino.secao}` : destino.tela;
+    const tela = destino.tela === 'comunidade' ? destino.secao : destino.tela === 'administracao' ? `admin-${destino.secao}` : destino.tela === 'conta' ? `conta-${destino.secao}` : destino.tela;
     botoes.forEach((b, i) => b.botao.classList.toggle('ativa', abas[i].telas.includes(tela)));
     atalhoPokedex.classList.toggle('ativa', tela === 'pokedex');
   };

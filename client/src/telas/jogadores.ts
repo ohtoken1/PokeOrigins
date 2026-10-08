@@ -7,7 +7,7 @@ import { carregarSave, type Save } from '../estado';
 import { abrirDetalhes } from '../ui/detalhes';
 import { el, spritePokemon } from '../ui/dom';
 
-function perfil(save: Save): HTMLElement {
+export function perfilJogador(save: Save): HTMLElement {
   const e = save.estatisticas;
   const dado = (rotulo: string, valor: string) => el('div', { class: 'perfil-dado' }, el('small', {}, rotulo), el('strong', {}, valor));
   return el(
@@ -46,7 +46,7 @@ export const telaJogadores: Tela = (raiz) => {
       !termo
         ? el('p', { class: 'meta' }, 'Digite o nome de um treinador para ver o perfil dele.')
         : achados.length
-          ? el('div', {}, ...achados.map(perfil))
+          ? el('div', {}, ...achados.map(perfilJogador))
           : el('p', { class: 'meta' }, `Nenhum treinador encontrado com "${campo.value.trim()}".`),
     );
   };
