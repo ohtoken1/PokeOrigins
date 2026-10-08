@@ -148,7 +148,7 @@ Algumas categorias ficam fora desse sorteio por peso. Cada uma tem uma **chance 
 
 | Categoria | Chance total por encontro | Nível |
 |---|---|---|
-| **Iniciais** (e evoluções) | 1 em 10.000 | faixa normal |
+| **Iniciais** (e evoluções) | 1 em 12.000 | faixa normal |
 | **Lendários** | 1 em 20.000 | 50 ou mais |
 | **Míticos** | 1 em 20.000 | 50 ou mais |
 | **Ultra Beasts** | 1 em 20.000 | 50 ou mais |
@@ -632,7 +632,14 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Duelos com treinadores:** "Sortear outro" gira uma roleta (~2,6 s) e o adversário sorteado fica guardado (sair e voltar não sorteia de novo).
 - Carteira do topo atualiza na hora ao gastar ou ganhar silver/gold.
 - Correção: os IVs ocultos não podiam ser revelados pela tela de Início.
-- Novo fundo do jogo com os lendários.
+- Novo fundo do jogo (arte dos campeões dos 25 anos).
+- **Formas regionais** de Alola (18), Galar (19) e Paldea (4) nos mapas da região delas (Hisui ainda não); Alolan Raichu e Alolan Exeggutor aparecem soltos como primeira forma. Os **Paradox** (passado/futuro) saíram dos mapas, mas continuam no jogo.
+- Evoluções por nível de **dia/noite** agora acontecem pelo relógio (Alolan Raticate, Lycanroc, Tyrantrum…).
+- **Sons:** gritos oficiais dos Pokémon ao entrar e ao desmaiar; música de batalha (5 temas) só nas batalhas; volume e mudo no canto da barra do topo e na aba Opções.
+- Resumo do adversário na batalha mostra os **EVs que ele dá** ao ser derrotado.
+- **VIP:** 20% de desconto nas compras em silver, +20% de XP (treinador e Pokémon), +20% de chance de shiny, +10% de chance de lendário, mítico, Ultra Beast e inicial, +5% na captura (sempre em cima da chance normal). Selos na Pokédex mostram o que está mudando as chances.
+- Chance do inicial solto: 1 em 12 mil.
+- Missões antigas do passe são sorteadas de novo quando o formato muda.
 
 ---
 

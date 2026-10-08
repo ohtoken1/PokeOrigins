@@ -2,6 +2,7 @@
 // TMs/TRs (ensinar golpe) e itens equipáveis (segurar para a batalha).
 import { Dex } from '@pkmn/sim';
 import { especie, type PokemonIndividual } from './batalha/pokemon';
+import { idDaEvolucao } from './formasRegionais';
 import { CABO_DE_LIGACAO, ITENS_DE_SEGURAR_NOSSOS, PEDRAS_EVOLUCAO } from './loja';
 
 /**
@@ -11,12 +12,13 @@ import { CABO_DE_LIGACAO, ITENS_DE_SEGURAR_NOSSOS, PEDRAS_EVOLUCAO } from './loj
 export function evolucaoPorItem(p: PokemonIndividual, itemId: string, existe: (numero: number) => boolean): number | null {
   for (const nome of especie(p.especieId).evos ?? []) {
     const evo = Dex.species.get(nome);
-    if (evo.forme || !existe(evo.num)) continue;
+    const id = idDaEvolucao(p.especieId, evo);
+    if (id === null || !existe(id)) continue;
     // pedras e itens de evoluir (maçãs, bules, armaduras, Dragon Scale…): usar o item já evolui
-    if (itemId !== CABO_DE_LIGACAO && evo.evoItem && Dex.items.get(evo.evoItem).id === itemId) return evo.num;
+    if (itemId !== CABO_DE_LIGACAO && evo.evoItem && Dex.items.get(evo.evoItem).id === itemId) return id;
     if (itemId === CABO_DE_LIGACAO && evo.evoType === 'trade') {
       // troca com item (ex.: Onix + Metal Coat = Steelix): o item precisa estar equipado
-      if (!evo.evoItem || Dex.items.get(evo.evoItem).id === p.item) return evo.num;
+      if (!evo.evoItem || Dex.items.get(evo.evoItem).id === p.item) return id;
     }
   }
   return null;

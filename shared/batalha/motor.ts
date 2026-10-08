@@ -334,13 +334,14 @@ export class BatalhaSelvagem {
    * Se falhar, o selvagem ataca de graça.
    */
   /** `chance` = probabilidade (0 a 1) de capturar com esse arremesso (as 4 checagens de tremida). */
-  arremessarBola(bola: EfeitoBola): { capturou: boolean; tremidas: number; chance: number; eventos: EventoBatalha[] } {
+  /** `bonusExtra` multiplica a chance (VIP: 1,05 = +5% em cima da chance normal). */
+  arremessarBola(bola: EfeitoBola, bonusExtra = 1): { capturou: boolean; tremidas: number; chance: number; eventos: EventoBatalha[] } {
     if (bola.garantida) return { capturou: true, tremidas: 3, chance: 1, eventos: [] };
     const alvo = this.batalha.p2.active[0];
     const bonusBola = bola.bonus;
     const taxa = Math.max(1, Math.min(255, this.taxaCaptura + bola.ajusteTaxa));
     const bonusStatus = alvo.status === 'slp' || alvo.status === 'frz' ? 2.5 : alvo.status ? 1.5 : 1;
-    const a = Math.floor((((3 * alvo.maxhp - 2 * alvo.hp) * taxa * bonusBola) / (3 * alvo.maxhp)) * bonusStatus);
+    const a = Math.floor((((3 * alvo.maxhp - 2 * alvo.hp) * taxa * bonusBola) / (3 * alvo.maxhp)) * bonusStatus * bonusExtra);
 
     let tremidas = 0;
     let chance = 1;

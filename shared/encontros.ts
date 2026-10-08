@@ -1,6 +1,7 @@
 // Sorteio de Pokémon selvagens. Fica em shared/ porque, no MMO, quem vai sortear é o
 // servidor (para ninguém trapacear); por enquanto o cliente usa o mesmo código.
 import { BIOMAS, type Bioma } from './biomas';
+import { ehParadoxo, numeroNaDex } from './formasRegionais';
 import { especie, nivelDeEvolucao } from './batalha/pokemon';
 import { TODOS_INICIAIS } from './regioes';
 import type { PokemonBase } from './tipos';
@@ -17,8 +18,8 @@ export const CHANCE_ENCONTRO_POR_PASSO = 1;
  */
 export const PESO_BASE_LINHA = 100;
 export const PESO_POR_TAXA = 0.3;
-/** Chance FIXA por encontro de aparecer ALGUM inicial do bioma (pedido do dono: 1 em 10 mil); dentro dela, sorteia qual. */
-export const CHANCE_INICIAL = 1 / 10000;
+/** Chance FIXA por encontro de aparecer ALGUM inicial do bioma (pedido do dono: 1 em 12 mil); dentro dela, sorteia qual. */
+export const CHANCE_INICIAL = 1 / 12000;
 /** Chance FIXA por encontro de aparecer algum lendário (e, separadamente, algum mítico / alguma Ultra Beast): 1 em 20 mil. */
 export const CHANCE_LENDARIO = 1 / 20000;
 /** Categorias raras: cada uma tem a sua chance total, dividida igualmente entre as linhas dela no bioma. */
@@ -46,6 +47,8 @@ export interface AjustesEncontro {
   soLendarios: boolean;
   /** chance de encontro a cada passo (0 a 1) */
   chancePorPasso: number;
+  /** multiplica a chance dos iniciais soltos (VIP) */
+  multInicial?: number;
   /** número da Pokédex que sempre aparece (de qualquer bioma), ou null */
   especie: number | null;
   /** nível fixo dos encontros, ou null */
@@ -120,7 +123,8 @@ function baseDaLinha(p: PokemonBase, porSlug: Map<string, PokemonBase>): Pokemon
 
 function anteriorDe(p: PokemonBase, porSlug: Map<string, PokemonBase>): PokemonBase | undefined {
   const anterior = p.evoluiDe ? porSlug.get(p.evoluiDe) : undefined;
-  return anterior && anterior.id < p.id ? anterior : undefined;
+  // compara pelo número da Pokédex (formas regionais têm número próprio alto: Galarian Linoone → Obstagoon)
+  return anterior && numeroNaDex(anterior) < numeroNaDex(p) ? anterior : undefined;
 }
 
 /**
@@ -165,7 +169,8 @@ export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: num
   const faixas = faixasDeNivel(todos);
   const porSlug = new Map(todos.map((p) => [p.slug, p]));
   return pokemons
-    .filter((p) => !excluir.includes(p.id) && !evoluiSemNivel(p, porSlug))
+    // Paradox (passado/futuro) existem no jogo mas não aparecem nos mapas (pedido do dono)
+    .filter((p) => !excluir.includes(p.id) && !evoluiSemNivel(p, porSlug) && !ehParadoxo(especie(p.id).name))
     .filter((p) => biomaDoPokemon(p) === bioma.id)
     .map((p) => {
       const [nivelMin, nivelMax] = faixas.get(p.id)!;
@@ -193,6 +198,7 @@ export function faixaDosEncontros(_bioma: Bioma, nivelTreinador: number, tetoEsc
 export function ajustarTabela(tabela: EntradaTabela[], ajustes: AjustesEncontro): EntradaTabela[] {
   let nova = tabela
     .map((e) => (ehLendario(e.pokemon) ? { ...e, chanceFixa: (e.chanceFixa ?? 0) * ajustes.multLendario } : e))
+    .map((e) => (e.grupo === 'inicial' ? { ...e, chanceFixa: (e.chanceFixa ?? 0) * (ajustes.multInicial ?? 1) } : e))
     .filter((e) => e.chanceFixa !== 0);
   if (ajustes.soLendarios && nova.some((e) => ehLendario(e.pokemon))) nova = nova.filter((e) => ehLendario(e.pokemon));
   return nova;
@@ -231,7 +237,7 @@ function linhasNaFaixa(tabela: EntradaTabela[], [min, max]: Faixa): Linha[] {
 
 /**
  * Chance (0 a 1) de cada linha sair. Cada categoria rara presente tem uma chance TOTAL fixa
- * (algum inicial 1/10 mil; algum lendário 1/20 mil; mítico e Ultra Beast idem), dividida igualmente
+ * (algum inicial 1/12 mil; algum lendário 1/20 mil; mítico e Ultra Beast idem), dividida igualmente
  * entre as linhas dela (Regice e Kyogre no mesmo bioma: 1/20 mil para "lendário", e aí 50% cada).
  * As comuns dividem o resto pelo peso. Sem comuns (admin "só lendários"), as raras dividem tudo.
  */

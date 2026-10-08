@@ -1,4 +1,5 @@
 import { adicionarVip, tempoRestanteVip, vipAtivo } from '../../../shared/vip';
+import { numeroNaDex } from '../../../shared/formasRegionais';
 import { TODOS_OS_ITENS } from '../../../shared/loja';
 import { TICKETS } from '../../../shared/tickets';
 import { OVOS } from '../../../shared/ovos';
@@ -98,7 +99,7 @@ function conteudo(): HTMLElement[] {
     'select',
     {},
     el('option', { value: '' }, '— sorteio normal —'),
-    ...todosOsPokemons().map((p) => el('option', { value: p.id, selected: p.id === a.especie }, `#${p.id} ${p.nome}${p.lendario || p.mitico ? ' ★' : ''}`)),
+    ...todosOsPokemons().map((p) => el('option', { value: p.id, selected: p.id === a.especie }, `#${numeroNaDex(p)} ${p.nome}${p.lendario || p.mitico ? ' ★' : ''}`)),
   ) as HTMLSelectElement;
   especie.addEventListener('change', () => mudar({ especie: especie.value ? Number(especie.value) : null }));
 

@@ -24,12 +24,17 @@ export interface Missao {
   feito: number;
 }
 
+/** Muda quando o formato das missões muda: saves com outra versão sorteiam as missões de hoje de novo. */
+export const VERSAO_MISSOES = 2;
+
 export interface EstadoPasse {
   /** XP total do passe (o nível sai de nivelPasse). */
   xp: number;
   /** Dia das missões atuais (AAAA-MM-DD, horário do jogador; no MMO o servidor decide). */
   dia: string;
   missoes: Missao[];
+  /** VERSAO_MISSOES de quando as missões foram sorteadas. */
+  versao?: number;
 }
 
 export const missaoCompleta = (m: Missao) => m.feito >= m.alvo;

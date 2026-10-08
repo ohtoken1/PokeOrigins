@@ -1,7 +1,7 @@
 // Missões diárias do passe de batalha no save do jogador (regras em shared/passe.ts).
 import { BIOMAS } from '../../shared/biomas';
 import { biomaDoPokemon, faixaDosEncontros, montarTabela } from '../../shared/encontros';
-import { diaDeHoje, registrarNaMissao, sortearMissoes, type EstadoPasse, type Missao, type TipoMissao } from '../../shared/passe';
+import { VERSAO_MISSOES, diaDeHoje, registrarNaMissao, sortearMissoes, type EstadoPasse, type Missao, type TipoMissao } from '../../shared/passe';
 import { nivelTreinador } from '../../shared/treinador';
 import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons } from './dados';
 import type { Save } from './estado';
@@ -24,8 +24,10 @@ function especiesDasMissoes(save: Save): number[] {
 export function passeDeHoje(save: Save): EstadoPasse {
   const hoje = diaDeHoje();
   save.passe ??= { xp: 0, dia: '', missoes: [] };
-  if (save.passe.dia !== hoje) {
+  // dia novo, ou missões sorteadas com o formato antigo (ex.: antes da missão de shiny): sorteia de novo
+  if (save.passe.dia !== hoje || save.passe.versao !== VERSAO_MISSOES) {
     save.passe.dia = hoje;
+    save.passe.versao = VERSAO_MISSOES;
     save.passe.missoes = sortearMissoes(hoje, especiesDasMissoes(save));
   }
   return save.passe;

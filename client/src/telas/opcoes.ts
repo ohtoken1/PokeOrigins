@@ -4,6 +4,7 @@ import { carregarSave, salvar } from '../estado';
 import { APARENCIA_PADRAO } from '../personagem/lpc';
 import { nivelMaximoEncontro, nivelTreinador } from '../../../shared/treinador';
 import { PRECO_TROCAR_NOME_GOLD } from '../../../shared/loja';
+import { aoMudarAjustesSom, ajustesSom, mudarAjustesSom } from '../sons';
 import { el } from '../ui/dom';
 
 export const telaOpcoes: Tela = (raiz, navegar) => {
@@ -82,6 +83,20 @@ export const telaOpcoes: Tela = (raiz, navegar) => {
   auto.addEventListener('change', aplicar);
   mostrarValor();
 
+  // ---------- som ----------
+  const controleVolume = (chave: 'geral' | 'volume' | 'volumeMusica') => {
+    const barra = el('input', { type: 'range', min: 0, max: 100, step: 5, value: Math.round(ajustesSom()[chave] * 100) }) as HTMLInputElement;
+    const texto = el('strong', {}, `${barra.value}%`);
+    barra.addEventListener('input', () => {
+      texto.textContent = `${barra.value}%`;
+      mudarAjustesSom({ [chave]: Number(barra.value) / 100 });
+    });
+    return el('div', { class: 'opcoes-linha' }, barra, texto);
+  };
+  const semSom = el('input', { type: 'checkbox', checked: ajustesSom().mudo }) as HTMLInputElement;
+  semSom.addEventListener('change', () => mudarAjustesSom({ mudo: semSom.checked }));
+  aoMudarAjustesSom((a) => (semSom.checked = a.mudo));
+
   tela.append(
     el('p', { class: 'sub' }, 'As mudanças são salvas sozinhas.', salvo),
     secao(
@@ -100,6 +115,13 @@ export const telaOpcoes: Tela = (raiz, navegar) => {
         el('label', { class: 'opcoes-check' }, auto, ' Automático (sempre o máximo do seu nível de treinador)'),
         el('small', {}, 'Só dá para escolher um nível menor que o seu máximo, nunca maior. Os encontros vão de 4 níveis abaixo até o nível escolhido.'),
       ),
+    ),
+    secao(
+      'Som',
+      el('div', { class: 'opcoes-campo' }, el('span', {}, 'Música de fundo'), controleVolume('volumeMusica')),
+      el('div', { class: 'opcoes-campo' }, el('span', {}, 'Gritos dos Pokémon'), controleVolume('volume')),
+      el('div', { class: 'opcoes-campo' }, el('span', {}, 'Volume geral'), controleVolume('geral'), el('small', {}, 'O mesmo controle do canto da barra do topo.')),
+      el('label', { class: 'opcoes-check' }, semSom, ' Silenciar o jogo (o mesmo botão do canto da barra do topo)'),
     ),
   );
   return () => clearTimeout(relogio);

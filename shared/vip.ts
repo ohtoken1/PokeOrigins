@@ -1,15 +1,25 @@
 // VIP: um "buff" na conta que dura um tempo (1 dia, 7 dias…) e dá bônus enquanto estiver ativo.
-// PRÉ-SISTEMA (pedido do dono): os bônus ainda vão ser definidos (BONUS_VIP, hoje tudo 1 = sem efeito)
-// e, quando houver contas/servidor, o prazo fica guardado na conta, não no navegador.
+// Os bônus são MULTIPLICADORES em cima do valor normal (pedido do dono): 20% a mais de chance de shiny com
+// chance 1/1500 vira 1,2/1500, não 20 pontos percentuais. Quando houver contas/servidor, o prazo fica na conta.
 
 export const DIA_MS = 24 * 60 * 60 * 1000;
 
-/** Multiplicadores do VIP (a definir pelo dono). 1 = sem efeito. */
+/** Multiplicadores do VIP. 1 = sem efeito. */
 export const BONUS_VIP = {
-  /** silver ganho por vitória */
+  /** silver ganho por vitória (sem bônus por enquanto) */
   silver: 1,
-  /** XP de treinador */
-  xpTreinador: 1,
+  /** XP de treinador: +20% */
+  xpTreinador: 1.2,
+  /** XP dos Pokémon: +20% */
+  xpPokemon: 1.2,
+  /** chance de shiny nos encontros: +20% */
+  shiny: 1.2,
+  /** chance de lendário, mítico, Ultra Beast e inicial nos encontros: +10% */
+  raros: 1.1,
+  /** chance de captura: +5% */
+  captura: 1.05,
+  /** preço das compras em silver na loja: 20% de desconto */
+  precoLoja: 0.8,
 };
 export type BonusVip = keyof typeof BONUS_VIP;
 

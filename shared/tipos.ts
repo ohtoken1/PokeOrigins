@@ -1,6 +1,8 @@
 // Formato dos dados gerados por scripts/baixar-pokeapi.mjs (shared/data/pokemon-<regiao>.json).
 export interface PokemonBase {
   id: number;
+  /** Só nas formas regionais (shared/formasRegionais.ts): número da espécie na Pokédex nacional (Alolan Rattata → 19). */
+  numeroDex?: number;
   nome: string;
   slug: string;
   tipos: string[];

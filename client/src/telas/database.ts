@@ -1,6 +1,7 @@
 // Database: informações gerais do jogo em tabelas (Pokémon, itens, habilidades e golpes),
 // com busca e ordenação por coluna. Textos em português (descrições traduzidas).
 import { Dex } from '@pkmn/sim';
+import { numeroNaDex } from '../../../shared/formasRegionais';
 import type { Tela } from '../main';
 import { CATEGORIAS_BOLSA, TODOS_OS_ITENS, nomeCategoriaItem, textoPreco } from '../../../shared/loja';
 import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
@@ -163,7 +164,7 @@ export const telaDatabase: Tela = (raiz, navegar) => {
         { todos: 'Categorias', opcoes: [...CATEGORIAS_POKEMON, ['mega', `Megas (${MEGAS.length})`]], valores: (p: LinhaPokemon) => (p.mega ? ['mega'] : categoriasDoPokemon(p)) },
       ],
       colunas: [
-        { titulo: '#', celula: (p) => String(p.id).padStart(3, '0'), ordem: (p) => p.id, classe: 'num' },
+        { titulo: '#', celula: (p) => String(numeroNaDex(p)).padStart(3, '0'), ordem: (p) => numeroNaDex(p) + (p.numeroDex ? 0.5 : 0), classe: 'num' },
         { titulo: '', celula: (p) => spritePokemon(p, { animado: false }), classe: 'db-sprite' },
         { titulo: 'Nome', celula: (p) => (p.mega ? el('span', { class: 'db-nome-mega' }, el('img', { src: 'batalha/mega-evolucao.svg', alt: '' }), p.nome) : p.nome), ordem: (p) => p.nome },
         { titulo: 'Tipos', celula: (p) => selosTipos(p), ordem: (p) => p.tipos.join() },

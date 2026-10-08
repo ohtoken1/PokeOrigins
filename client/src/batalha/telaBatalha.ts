@@ -2,6 +2,8 @@ import { bonificacao } from '../bonificacao';
 import { bonusVip } from '../../../shared/vip';
 import { AMIZADE_POR_BATALHA, ganharAmizade } from '../../../shared/amizade';
 import { trocarSpriteForma } from '../ui/formas';
+import { tocarGrito, tocarMusica } from '../sons';
+import { arquivoSpriteForma } from '../../../shared/formas';
 import { megaPorForma } from '../../../shared/megas';
 import type { Bioma } from '../../../shared/biomas';
 import { BatalhaSelvagem, type EventoBatalha, type Lado } from '../../../shared/batalha/motor';
@@ -145,6 +147,8 @@ function sortearFundo(biomaId: string): string | null {
 }
 
 export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTerminar }: OpcoesBatalha): void {
+  // tema de batalha (selvagem ou treinador); volta para a música de fundo no fim
+  tocarMusica('batalha');
   /** Quem está em campo do outro lado (num duelo, muda quando o treinador troca). */
   let selvagem = primeiro;
   let dadosSelvagem = pokemonPorId(selvagem.especieId);
@@ -238,6 +242,10 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       }
       resumoAdversario = p;
       desenharResumoAdversario();
+      // também flutua fora da arena (com EVs e golpes usados ele não cabe no corte da arena)
+      const r = arena.getBoundingClientRect();
+      if (resumo.parentElement !== fundo) fundo.append(resumo);
+      Object.assign(resumo.style, { left: `${r.left + r.width * 0.36}px`, top: `${r.top + 8}px`, maxHeight: `${window.innerHeight - r.top - 16}px` });
       resumo.hidden = false;
     });
     lugar.addEventListener('mouseleave', () => {
@@ -247,14 +255,19 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
   };
   /** Quem está no resumo do adversário (null = fechado): ele é redesenhado quando o adversário troca. */
   let resumoAdversario: PokemonIndividual | null = null;
+  const NOME_EV: Record<string, string> = { hp: 'HP', ataque: 'Attack', defesa: 'Defense', ataqueEspecial: 'Sp. Atk', defesaEspecial: 'Sp. Def', velocidade: 'Speed' };
   function desenharResumoAdversario() {
     const p = resumoAdversario;
     if (!p) return;
-    resumo.className = 'resumo-pokemon selvagem';
+    resumo.className = 'resumo-pokemon resumo-fixo';
     // golpes que o adversário em campo NA TELA já usou, com o PP que sobra (contando PP Max); os outros ficam escondidos
     const usados = batalha.golpesUsadosAdversario(treinador ? adversarioNaTela : 0);
     resumo.replaceChildren(
       ...resumoPokemon(p, { abilityConhecida: batalha.habilidadeSelvagemRevelada }),
+      // EVs que ele dá ao ser derrotado (selvagem ou do treinador)
+      el('div', { class: 'resumo-evs' },
+        el('h5', {}, 'EVs ao derrotar'),
+        el('div', {}, ...Object.entries(pokemonPorId(p.especieId).evsDados).map(([a, v]) => el('span', { class: 'resumo-ev' }, `+${v} ${NOME_EV[a] ?? a}`)))),
       el('div', { class: 'resumo-golpes' },
         el('h5', {}, 'Golpes já usados'),
         ...(usados.length
@@ -413,6 +426,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
             infoSelvagem.definir(selvagem);
             infoSelvagem.hp(ev.hp, ev.hpMax);
             if (ev.texto) mensagem.textContent = ev.texto;
+            void tocarGrito(selvagem.especieId);
             await animarEntrada(spriteSelvagem);
             await esperar(300);
           }
@@ -422,6 +436,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
             trocarSpriteForma(spriteJogador as HTMLImageElement, ev.forma, { shiny: save.time[ev.indice].shiny, costas: true });
             infoJogador.hp(ev.hp, ev.hpMax);
             if (ev.texto) mensagem.textContent = ev.texto;
+            void tocarGrito(save.time[ev.indice].especieId);
             await animarEntrada(spriteJogador);
             await esperar(400);
           }
@@ -473,6 +488,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           break;
         case 'desmaio':
           if (ev.lado === 'selvagem' && treinador) marcarDesmaioNoTime(adversarioNaTela);
+          // grito mais grave ao desmaiar, como nos jogos
+          void tocarGrito(ev.lado === 'jogador' ? save.time[batalha.ativo].especieId : selvagem.especieId, true);
           await animarDesmaio(sprite(ev.lado));
           await dizer(ev.texto);
           break;
@@ -490,6 +507,9 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
             simbolo: el('img', { class: 'simbolo-transf', src: 'batalha/mega-evolucao.svg', alt: '' }),
           });
           alvo.classList.add('megaevoluido');
+          // grito da Mega (a PokéAPI tem o som de cada Mega pelo mesmo número do sprite)
+          const arquivoMega = arquivoSpriteForma(ev.forma);
+          if (arquivoMega && /^\d+$/.test(arquivoMega)) void tocarGrito(Number(arquivoMega));
           info(ev.lado).renomear(megaPorForma(ev.forma)?.nome ?? ev.forma);
           await dizer(ev.texto);
           break;
@@ -698,7 +718,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       bioma: bioma.id,
       jaPossui: [...save.time, ...save.caixa].some((p) => p.especieId === selvagem.especieId),
     });
-    const { capturou, tremidas, chance, eventos } = batalha.arremessarBola(efeito);
+    // VIP: +5% de chance de captura
+    const { capturou, tremidas, chance, eventos } = batalha.arremessarBola(efeito, bonusVip(save, 'captura'));
     const porcentagem = chance >= 1 ? '100' : chance < 0.001 ? '<0,1' : (chance * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
     mensagem.textContent = `Você arremessou uma ${ITENS[bola].nome}! Chance de captura: ${porcentagem}%`;
     if (capturou && bola === 'healball') curarAoCapturar = true;
@@ -798,7 +819,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           ganharEvs(p, { hp: ev.hp, atk: ev.ataque, def: ev.defesa, spa: ev.ataqueEspecial, spd: ev.defesaEspecial, spe: ev.velocidade });
         }
         // bônus de XP da administração (1x a 3x)
-        const exp = Math.round(xpPelosDerrotados(p.nivel) * bonificacao().xp);
+        const exp = Math.round(xpPelosDerrotados(p.nivel) * bonusVip(save, 'xpPokemon') * bonificacao().xp);
         const r = ganharExperiencia(p, exp, nomeDe, crescimentoDe);
         await mostrarProgresso(pos, r);
         if (r.evolucao) evolucoes.push({ pos, para: r.evolucao.para });
@@ -874,12 +895,14 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
 
     salvar(save);
     fundo.remove();
+    tocarMusica('fundo');
     aoTerminar(resultado);
   }
 
   // ---------- início ----------
   (async () => {
     if (treinador) await dizer(`${treinador.nome}, ${treinador.titulo}, quer batalhar!`);
+    void tocarGrito(selvagem.especieId);
     await animarEntrada(spriteSelvagem);
     await dizer(treinador ? `${treinador.nome} enviou ${dadosSelvagem.nome}!` : `Um ${dadosSelvagem.nome} selvagem apareceu!`);
     await reproduzir(batalha.iniciar());

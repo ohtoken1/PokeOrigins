@@ -1,6 +1,7 @@
 // Barra no topo do site: ícone da Pokédex (atalho), Início (o time lado a lado), Jogar (Mapas, Cidade, Continentes, Duelos com treinadores, Ginásios), Golpes,
 // Informações (Opções, Ranking, Database) e Comunidade (Amigos, Clã). Menus com setinha abrem ao clicar.
 import { ehAdministrador } from '../bonificacao';
+import { aoMudarAjustesSom, ajustesSom, mudarAjustesSom } from '../sons';
 import { SECOES_ADMINISTRACAO } from '../telas/administracao';
 import type { Destino, Navegar } from '../main';
 import { carregarSave } from '../estado';
@@ -86,6 +87,34 @@ export function iconePokedex(): HTMLElement {
 }
 
 /** Cria a barra e devolve a função que marca a aba da tela atual. */
+/** Canto direito da barra: volume geral (música e gritos) e botão de mudo. */
+function controlesSom(): HTMLElement {
+  const barra = el('input', { type: 'range', class: 'volume-topo', min: 0, max: 100, step: 5, value: Math.round(ajustesSom().geral * 100), title: 'Volume', 'aria-label': 'Volume' }) as HTMLInputElement;
+  barra.addEventListener('input', () => mudarAjustesSom({ geral: Number(barra.value) / 100, mudo: false }));
+  aoMudarAjustesSom((a) => (barra.value = String(Math.round(a.geral * 100))));
+  return el('div', { class: 'som-topo' }, barra, botaoMudo());
+}
+
+/** Botão de mudo: liga/desliga música e gritos de uma vez. */
+function botaoMudo(): HTMLElement {
+  const botao = el('button', { class: 'botao-mudo' });
+  const desenhar = (mudo: boolean) => {
+    botao.innerHTML = mudo
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+    botao.title = mudo ? 'Ligar o som' : 'Silenciar o jogo';
+    botao.setAttribute('aria-label', botao.title);
+    botao.classList.toggle('mudo', mudo);
+  };
+  botao.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mudarAjustesSom({ mudo: !ajustesSom().mudo });
+  });
+  aoMudarAjustesSom((a) => desenhar(a.mudo));
+  desenhar(ajustesSom().mudo);
+  return botao;
+}
+
 export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
   const menus: { menu: HTMLElement; botao: HTMLElement }[] = [];
   const fecharTodos = () =>
@@ -124,6 +153,7 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
         { class: 'barra-topo-conteudo' },
         el('strong', { class: 'marca' }, 'Jogo Claude'),
         el('div', { class: 'abas-topo' }, ...botoes.map((b) => b.raiz)),
+        controlesSom(),
       ),
     ),
   );

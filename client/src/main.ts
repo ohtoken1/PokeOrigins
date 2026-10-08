@@ -1,6 +1,7 @@
 import './estilo.css';
 import './estilo-pokedex.css';
 import { carregarSave } from './estado';
+import { iniciarMusica } from './sons';
 import { telaEscolhaInicial } from './telas/escolhaInicial';
 import { telaRegiao } from './telas/regiao';
 import { telaBioma } from './telas/bioma';
@@ -62,6 +63,8 @@ const navegar: Navegar = (destino) => {
 
 montarPainelAdmin(() => navegar(destinoAtual));
 marcarAba = montarBarraTopo(navegar);
+// música de fundo começa no primeiro clique/tecla
+iniciarMusica();
 atualizarCabecalho = montarCabecalho(navegar);
 definirNavegacao(navegar);
 // com save, o jogo abre na tela de Início (o time lado a lado)

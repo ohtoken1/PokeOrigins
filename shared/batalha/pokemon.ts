@@ -1,6 +1,7 @@
 // Regras de um Pokémon "individual" (o que o jogador possui): golpes por nível, IVs,
 // natureza, atributos, experiência e evolução. Os dados oficiais vêm do Pokémon Showdown.
 import { Dex } from '@pkmn/sim';
+import { especieRegional, idDaEvolucao } from '../formasRegionais';
 
 export type Atributo = 'hp' | 'atk' | 'def' | 'spa' | 'spd' | 'spe';
 export type Atributos = Record<Atributo, number>;
@@ -79,6 +80,9 @@ const especiePorNumero = new Map<number, ReturnType<typeof Dex.species.get>>();
 for (const s of Dex.species.all()) if (!s.forme && s.num > 0 && !especiePorNumero.has(s.num)) especiePorNumero.set(s.num, s);
 
 export function especie(numero: number) {
+  // formas regionais (Alolan Rattata = 10091…) usam a forma do Showdown
+  const regional = especieRegional(numero);
+  if (regional) return regional;
   const s = especiePorNumero.get(numero);
   if (!s) throw new Error(`Espécie ${numero} não existe no Showdown`);
   return s;
@@ -208,12 +212,23 @@ export function expGanha(expBaseDerrotado: number, nivelDerrotado: number, nivel
 
 // ---------- evolução ----------
 
-/** Número da espécie para a qual evolui ao atingir o nível, ou null. Só evoluções por nível. */
-export function evolucaoPorNivel(numero: number, nivel: number): number | null {
+/** Evoluções por nível que dependem só da hora ("de dia"/"à noite": Alolan Raticate, Obstagoon, Lycanroc…). */
+const CONDICOES_DE_HORA = ['during the day', 'at night'];
+
+/**
+ * Número da espécie para a qual evolui ao atingir o nível, ou null. Só evoluções por nível; as de dia/noite
+ * seguem o relógio do computador (dia = 6h às 18h, como na amizade).
+ */
+export function evolucaoPorNivel(numero: number, nivel: number, hora = new Date().getHours()): number | null {
+  const dia = hora >= 6 && hora < 18;
   for (const nome of especie(numero).evos ?? []) {
     const evo = Dex.species.get(nome);
-    if (evo.evoType || evo.evoCondition || evo.evoItem || evo.forme) continue;
-    if (evo.evoLevel && nivel >= evo.evoLevel) return evo.num;
+    if (evo.evoType || evo.evoItem) continue;
+    if (evo.evoCondition && !CONDICOES_DE_HORA.includes(evo.evoCondition)) continue;
+    if (evo.evoCondition === 'during the day' && !dia) continue;
+    if (evo.evoCondition === 'at night' && dia) continue;
+    const id = idDaEvolucao(numero, evo);
+    if (id !== null && evo.evoLevel && nivel >= evo.evoLevel) return id;
   }
   return null;
 }
@@ -273,5 +288,7 @@ export function nomeGolpe(id: string): string {
 /** Nível em que a espécie surge evoluindo por nível (Charmeleon = 16), ou null se evolui de outro jeito. */
 export function nivelDeEvolucao(numero: number): number | null {
   const s = especie(numero);
-  return !s.evoType && !s.evoCondition && !s.evoItem && s.evoLevel ? s.evoLevel : null;
+  // nos mapas a hora não importa: Alolan Raticate (à noite) aparece a partir do 20 como o Raticate normal
+  const condicaoOk = !s.evoCondition || CONDICOES_DE_HORA.includes(s.evoCondition);
+  return !s.evoType && condicaoOk && !s.evoItem && s.evoLevel ? s.evoLevel : null;
 }

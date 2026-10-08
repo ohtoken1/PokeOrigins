@@ -1,11 +1,12 @@
 // Pokédex: lista de todos os Pokémon da região com busca/filtro e a ficha completa da espécie
 // (dados da PokéAPI + Pokémon Showdown: atributos, habilidades, fraquezas, evolução, golpes, onde achar).
 import { Dex } from '@pkmn/sim';
+import { formaRegional, numeroNaDex } from '../../../shared/formasRegionais';
 import type { Tela } from '../main';
 import { BIOMAS } from '../../../shared/biomas';
 import { NIVEL_LENDARIO, ajustarTabela, biomaDoPokemon, ehLendario, faixaDosEncontros, montarTabela, probabilidades, type EntradaTabela } from '../../../shared/encontros';
 import { nivelTreinador } from '../../../shared/treinador';
-import { comBonificacao } from '../bonificacao';
+import { comBonificacao, fontesDeBonus, textoMult, type AlvoChance } from '../bonificacao';
 import { ajustesAdmin } from '../ui/admin';
 import { comoEvolui } from '../../../shared/evolucoes';
 import { especie, golpesPorNivel } from '../../../shared/batalha/pokemon';
@@ -48,6 +49,11 @@ const umEm = (c: number) => `1 em ${Math.round(1 / c).toLocaleString('pt-BR')}`;
 
 /** Região de origem pelo número da Pokédex nacional. */
 export const regiaoDoNumero = (numero: number) => REGIOES.find((r) => numero >= r.pokedex[0] && numero <= r.pokedex[1]);
+/** Região do Pokémon: a da forma regional (Alolan Rattata → Alola) ou a do número da Pokédex. */
+const regiaoDoPokemon = (p: PokemonBase) => {
+  const forma = formaRegional(p.id);
+  return forma ? REGIOES.find((r) => r.id === forma.regiao) : regiaoDoNumero(p.id);
+};
 
 /** Multiplicador de dano de cada tipo atacante contra a espécie. */
 function fraquezas(tipos: string[]): Map<number, string[]> {
@@ -89,7 +95,7 @@ function fichaOculta(p: PokemonBase): HTMLElement {
     el('div', { class: 'dex-topo dex-oculto' },
       el('div', { class: 'dex-palco' }, spritePokemon(p, { animado: false, palco: true, chao: 0.88 })),
       el('div', { class: 'dex-resumo' },
-        el('div', { class: 'dex-titulo' }, el('span', { class: 'dex-numero' }, `#${String(p.id).padStart(4, '0')}`), el('h2', {}, '???')),
+        el('div', { class: 'dex-titulo' }, el('span', { class: 'dex-numero' }, `#${String(numeroNaDex(p)).padStart(4, '0')}`), el('h2', {}, '???')),
         el('p', { class: 'dica' }, 'Você ainda não viu este Pokémon. Encontre-o em algum bioma para liberar as informações.'),
       ),
     ),
@@ -195,7 +201,7 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
   // onde encontrar
   // onde encontrar: região + bioma (pelo tipo) e como aparece
   const onde = encontros.get(p.id);
-  const regiaoP = regiaoDoNumero(p.id);
+  const regiaoP = regiaoDoPokemon(p);
   const biomaP = BIOMAS.find((b) => b.id === biomaDoPokemon(p));
   const comoAparece = onde
     ? `Solto · Nv. ${p.lendario || p.mitico ? `${Math.max(NIVEL_LENDARIO, onde.entrada.nivelMin)}+ (raro)` : `${onde.entrada.nivelMin}–${onde.entrada.nivelMax}`}`
@@ -212,6 +218,17 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
     textoChance = c > 0 ? `${porcentagem(c)} (${umEm(c)}) por encontro` : `0% na sua faixa atual (Nv. ${faixa[0]}–${faixa[1]})`;
   }
   const textoShiny = `${porcentagem(ajustes.chanceShiny)} (${umEm(ajustes.chanceShiny)})`;
+  // selos de quem está mudando a chance (VIP, Bonificação, futuramente skins…)
+  const grupo = onde?.entrada.grupo ?? null;
+  const alvoAparicao: AlvoChance | null = grupo === 'inicial' ? 'inicial' : grupo ? 'lendario' : null;
+  const fontes = fontesDeBonus();
+  const comSelos = (texto: string, alvo: AlvoChance | null) => {
+    const daqui = alvo ? fontes.filter((f) => f.alvo === alvo) : [];
+    return daqui.length
+      ? el('span', { class: 'dex-chance' }, texto, el('span', { class: 'dex-selos-bonus' },
+          ...daqui.map((f) => el('span', { class: `selo-fonte fonte-${f.id}`, title: `${f.nome}: ${textoMult(f.mult)} na chance (já incluído no valor ao lado)` }, f.nome))))
+      : texto;
+  };
   const textoOnde = el('span', { class: 'dex-onde' },
     el('span', { class: 'dex-chip' }, regiaoP?.nome ?? '—'),
     el('span', { class: 'dex-chip' }, biomaP?.nome ?? '—'),
@@ -280,7 +297,7 @@ ${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) }
   };
 
   const titulo = el('div', { class: 'dex-titulo' },
-    el('span', { class: 'dex-numero' }, `#${String(p.id).padStart(4, '0')}`),
+    el('span', { class: 'dex-numero' }, `#${String(numeroNaDex(p)).padStart(4, '0')}`),
     el('h2', {}, p.nome),
     p.lendario ? el('span', { class: 'dex-selo lendario' }, 'Lendário') : null,
     p.mitico ? el('span', { class: 'dex-selo lendario' }, 'Mítico') : null,
@@ -305,8 +322,8 @@ ${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) }
         // nomes de ability e egg group ficam em inglês (regra do dono)
         linha('Egg Groups', s.eggGroups.join(', ')),
         linha('Onde encontrar', textoOnde),
-        linha(ehLendario(p) ? 'Chance do lendário' : 'Chance de aparição', textoChance),
-        linha('Chance de shiny', textoShiny),
+        linha(ehLendario(p) ? 'Chance do lendário' : 'Chance de aparição', comSelos(textoChance, alvoAparicao)),
+        linha('Chance de shiny', comSelos(textoShiny, 'shiny')),
         linha('Captura base', `${capturaBase(p.taxaCaptura)} (Poké Ball, HP cheio)`),
       ),
     ),
@@ -371,7 +388,7 @@ function fichaMega(m: Mega, base: PokemonBase, abrir: Abrir): HTMLElement {
       el('div', {}, palco, el('div', { class: 'dex-botoes' }, alternar('shiny', '✨ Shiny'), alternar('costas', 'Costas'))),
       el('div', { class: 'dex-resumo' },
         el('div', { class: 'dex-titulo' },
-          el('span', { class: 'dex-numero' }, `#${String(base.id).padStart(4, '0')}`),
+          el('span', { class: 'dex-numero' }, `#${String(numeroNaDex(base)).padStart(4, '0')}`),
           el('h2', {}, m.nome),
           el('span', { class: 'dex-selo mega' }, el('img', { src: 'batalha/mega-evolucao.svg', alt: '' }), 'Mega'),
           m.nova ? el('span', { class: 'dex-selo' }, 'Legends: Z-A') : null,
@@ -454,14 +471,14 @@ export const telaPokedex = (inicial?: number, megaInicial?: string): Tela => (ra
         // nome, tipagem e categoria só filtram quem já foi visto (senão a busca entregaria quem é)
         (!termo || (visto(p.id) && p.nome.toLowerCase().includes(termo)) || String(p.id) === termo.replace('#', '')) &&
         (!filtroTipo.value || (visto(p.id) && p.tipos.includes(filtroTipo.value))) &&
-        (!filtroRegiao.value || regiaoDoNumero(p.id)?.id === filtroRegiao.value) &&
+        (!filtroRegiao.value || regiaoDoPokemon(p)?.id === filtroRegiao.value) &&
         (!filtroCategoria.value || (visto(p.id) && categoriasDoPokemon(p).includes(filtroCategoria.value))),
     );
     lista.replaceChildren(
       ...filtrados.map((p) =>
         el('li', { 'data-id': p.id, class: `${p.id === selecionado ? 'ativo' : ''} ${visto(p.id) ? '' : 'oculto'}`, onclick: () => abrir(p.id) },
           spritePokemon(p, { animado: false }),
-          el('span', { class: 'dex-num' }, `#${String(p.id).padStart(3, '0')}`),
+          el('span', { class: 'dex-num' }, `#${String(numeroNaDex(p)).padStart(3, '0')}`),
           el('span', { class: 'dex-nome' }, visto(p.id) ? p.nome : '???'),
           capturados.has(p.id) ? pokebolinha() : vistos.has(p.id) ? el('span', { class: 'dex-marca', title: 'Visto' }, '○') : null,
         ),

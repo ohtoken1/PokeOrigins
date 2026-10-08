@@ -1,4 +1,5 @@
 import { comBonificacao } from '../bonificacao';
+import { numeroNaDex } from '../../../shared/formasRegionais';
 import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
 import { regiaoPorId } from '../../../shared/regioes';
@@ -88,7 +89,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         el(
           'div',
           {},
-          el('strong', {}, `#${p.id} ${p.nome}`),
+          el('strong', {}, `#${numeroNaDex(p)} ${p.nome}`),
           selosTipos(p),
           el('small', {}, chance > 0 ? `Aparição agora: ${info}` : solto ? `Aparece em outra faixa: ${info}` : `Não aparece solto: ${info}`),
           el('small', { class: capturado ? 'capturado' : visto ? 'visto' : 'nunca' }, capturado ? '● Já capturado' : visto ? '○ Já visto (não capturado)' : '— Nunca visto'),

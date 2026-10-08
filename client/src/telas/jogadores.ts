@@ -59,7 +59,7 @@ function painelInsignias(save: Save): HTMLElement {
 export function perfilJogador(save: Save): HTMLElement {
   const e = save.estatisticas;
   const online = estaOnline(save);
-  const totalDex = todosOsPokemons().length;
+  const totalDex = todosOsPokemons().filter((p) => !p.numeroDex).length;
   const parteDex = Math.round((save.capturados.length / totalDex) * 1000) / 10;
   const desde = save.criadoEm ? new Date(save.criadoEm).toLocaleDateString('pt-BR') : '—';
   const [ouro, prata, bronze] = [e?.medalhasOuro ?? 0, e?.medalhasPrata ?? 0, e?.medalhasBronze ?? 0];

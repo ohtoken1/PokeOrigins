@@ -2,6 +2,7 @@
 // (pedido do dono: +5 por batalha contra selvagem ou treinador NPC). Com amizade alta, quem evolui por amizade
 // (Golbat → Crobat, Eevee → Espeon/Umbreon…) evolui ao subir de nível.
 import { Dex } from '@pkmn/sim';
+import { idDaEvolucao } from './formasRegionais';
 import { AMIZADE_INICIAL, especie, type PokemonIndividual } from './batalha/pokemon';
 
 export { AMIZADE_INICIAL };
@@ -33,12 +34,13 @@ export function evolucaoPorAmizade(p: PokemonIndividual, hora = new Date().getHo
   const dia = hora >= 6 && hora < 18;
   for (const nome of especie(p.especieId).evos ?? []) {
     const evo = Dex.species.get(nome);
-    if (evo.evoType !== 'levelFriendship' || evo.evoItem || evo.forme || evo.num <= 0) continue;
+    const id = idDaEvolucao(p.especieId, evo);
+    if (evo.evoType !== 'levelFriendship' || evo.evoItem || id === null || id <= 0) continue;
     const condicao = evo.evoCondition ?? '';
     if (condicao === 'during the day' && !dia) continue;
     if (condicao === 'at night' && dia) continue;
     if (condicao && condicao !== 'during the day' && condicao !== 'at night') continue;
-    return evo.num;
+    return id;
   }
   return null;
 }

@@ -15,7 +15,7 @@
 
 * { box-sizing: border-box; }
 /* wallpaper calmo: anoitecer num vale com lua de Pokébola (client/public/fundo.svg) */
-body { margin: 0; min-height: 100vh; background: linear-gradient(rgb(8 14 30 / 0.55), rgb(8 14 30 / 0.55)) fixed, url('/fundo-lendarios.webp') center / cover no-repeat fixed, var(--fundo); }
+body { margin: 0; min-height: 100vh; background: linear-gradient(rgb(8 14 30 / 0.45), rgb(8 14 30 / 0.45)) fixed, url('/fundo-campeoes.webp') center / cover no-repeat fixed, var(--fundo); }
 /* wallpaper de cada bioma (cores que contrastam com o mapa) */
 body[data-fundo='grama'] { background-image: url('/fundo-grama.svg'); }
 body[data-fundo='agua'] { background-image: url('/fundo-agua.svg'); }
@@ -450,6 +450,13 @@ button.vaga:hover { border-color: var(--borda); }
 .barra-topo-conteudo { max-width: 1340px; margin: 0 auto; padding: 0 16px; height: 48px; display: flex; align-items: center; gap: 24px; }
 .barra-topo .marca { font-size: 1.05rem; letter-spacing: 0.02em; }
 .abas-topo { display: flex; gap: 4px; }
+.som-topo { margin-left: auto; flex: none; display: flex; align-items: center; gap: 8px; }
+.volume-topo { width: 90px; accent-color: var(--destaque); cursor: pointer; }
+.botao-mudo { flex: none; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--borda); background: rgb(255 255 255 / 0.06); color: var(--texto); cursor: pointer; }
+.botao-mudo:hover { border-color: var(--destaque); }
+.botao-mudo svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.botao-mudo svg path:first-child { fill: currentColor; }
+.botao-mudo.mudo { color: #ef4444; }
 .aba-topo { background: none; border: 0; padding: 8px 12px; border-radius: 8px; color: var(--texto-2); cursor: pointer; font-weight: 600; white-space: nowrap; }
 .aba-topo:hover:not(:disabled) { background: var(--painel-2); color: var(--texto); }
 .aba-topo.ativa { color: var(--texto); box-shadow: inset 0 -2px 0 var(--destaque); border-radius: 8px 8px 0 0; }
@@ -504,6 +511,10 @@ button.vaga:hover { border-color: var(--borda); }
 .resumo-barra { height: 5px; border-radius: 3px; background: rgb(255 255 255 / 0.08); overflow: hidden; }
 .resumo-barra > span { display: block; height: 100%; border-radius: 3px; background: #5ab8ff; }
 .resumo-golpes { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; padding-top: 6px; border-top: 1px solid rgb(255 255 255 / 0.08); }
+.resumo-evs { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; padding-top: 6px; border-top: 1px solid rgb(255 255 255 / 0.08); }
+.resumo-evs h5 { margin: 0; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--texto-2); }
+.resumo-evs > div { display: flex; flex-wrap: wrap; gap: 4px; }
+.resumo-ev { padding: 2px 8px; border-radius: 999px; background: rgb(74 168 255 / 0.18); color: #9fd0ff; font-size: 0.72rem; font-weight: 800; }
 .resumo-golpes h5 { margin: 0; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--texto-2); }
 .resumo-golpe { display: grid; grid-template-columns: 62px 1fr auto; align-items: center; gap: 8px; }
 .resumo-golpe .tipo { font-size: 0.62rem; padding: 2px 0; text-align: center; }
