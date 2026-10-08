@@ -22,7 +22,7 @@ import { resumoPokemon } from '../ui/resumo';
 import { dicaGolpe } from '../ui/dicaGolpe';
 import { nomeCategoria, traduzir } from '../../../shared/traducao';
 import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarRetorno, animarTransformacao, tremerArena } from './animacoes';
-import { animarGolpeOriginal } from './efeitosGolpes';
+import { HAZARDS, animarGolpeOriginal } from './efeitosGolpes';
 
 export type ResultadoBatalha = 'vitoria' | 'derrota' | 'captura' | 'fuga';
 
@@ -319,6 +319,36 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     );
   };
 
+  /** Hazards em cada lado: camadas (Spikes até 3, Toxic Spikes até 2) e as peças desenhadas (ficam no `lugar`). */
+  const camadasHazard: Record<Lado, Record<string, number>> = { jogador: {}, selvagem: {} };
+  const pecasHazard: Record<Lado, Record<string, HTMLElement[]>> = { jogador: {}, selvagem: {} };
+  const colocarHazard = (lado: Lado, id: string) => {
+    const h = HAZARDS[id];
+    if (!h) return;
+    const camadas = (camadasHazard[lado][id] = (camadasHazard[lado][id] ?? 0) + 1);
+    const pecas = (pecasHazard[lado][id] ??= []);
+    // Stealth Rock e Sticky Web: todas as peças de uma vez; Spikes/Toxic Spikes: uma por camada
+    const total = h.porCamada ? Math.min(camadas, h.pecas.length) : h.pecas.length;
+    const espelhar = lado === 'jogador';
+    for (let k = pecas.length; k < total; k++) {
+      const [dx, altura] = h.pecas[k];
+      const peca = el('img', {
+        class: `peca-hazard hazard-${id}`,
+        src: `https://play.pokemonshowdown.com/fx/${h.fx[k % h.fx.length]}.png`,
+        alt: '',
+        referrerpolicy: 'no-referrer',
+        style: { width: `${h.tamanho}px`, height: `${h.tamanho}px`, left: `calc(50% + ${espelhar ? -dx : dx}px - ${h.tamanho / 2}px)`, bottom: `${altura - h.tamanho / 2}px`, opacity: String(h.opacidade) },
+      });
+      lugar(lado).append(peca);
+      pecas.push(peca);
+    }
+  };
+  const tirarHazard = (lado: Lado, id: string) => {
+    for (const p of pecasHazard[lado][id] ?? []) p.remove();
+    delete pecasHazard[lado][id];
+    delete camadasHazard[lado][id];
+  };
+
   /** Aba do Terastal ao lado direito do Pokémon (some quando ele sai de campo). */
   const marcarTera = (lado: Lado, tipo: string | null) => {
     const l = lugar(lado);
@@ -399,7 +429,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           // o golpe do adversário aparece na hora no resumo aberto
           if (ev.lado === 'selvagem') desenharResumoAdversario();
           await esperar(350);
-          await animarGolpeOriginal(arena, sprite(ev.lado), ev.alvo && ev.alvo !== ev.lado ? sprite(ev.alvo) : null, ev.golpe, ev.tipoGolpe, ev.categoria);
+          await animarGolpeOriginal(arena, sprite(ev.lado), ev.alvo && ev.alvo !== ev.lado ? sprite(ev.alvo) : null, ev.golpe, ev.tipoGolpe, ev.categoria, sprite(ev.lado === 'jogador' ? 'selvagem' : 'jogador'));
           break;
         case 'hp': {
           info(ev.lado).hp(ev.hp, ev.hpMax);
@@ -472,6 +502,20 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
             ? { cores: [groudon ? '#ff4a1c' : '#2f8cff'], simbolo: el('span', { class: `simbolo-primal ${groudon ? 'omega' : 'alpha'}` }, groudon ? 'Ω' : 'α') }
             : { cores: [corTipo(Dex.species.get(ev.forma).types[0] ?? 'Normal')], rapida: true });
           if (ev.texto) await dizer(ev.texto);
+          break;
+        }
+        case 'condicaoLado':
+          // hazards ficam desenhados no chão em volta do Pokémon do lado (pedras, espinhos, teia)
+          if (ev.ativa) colocarHazard(ev.lado, ev.condicao);
+          else tirarHazard(ev.lado, ev.condicao);
+          await dizer(ev.texto);
+          break;
+        case 'trocarCondicoes': {
+          const antes = { jogador: { ...camadasHazard.jogador }, selvagem: { ...camadasHazard.selvagem } };
+          for (const l of ['jogador', 'selvagem'] as Lado[]) for (const id of Object.keys(HAZARDS)) tirarHazard(l, id);
+          for (const [l, outro] of [['jogador', 'selvagem'], ['selvagem', 'jogador']] as [Lado, Lado][])
+            for (const [id, n] of Object.entries(antes[l])) for (let k = 0; k < n; k++) colocarHazard(outro, id);
+          await dizer(ev.texto);
           break;
         }
         case 'fim':

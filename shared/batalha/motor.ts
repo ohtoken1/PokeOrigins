@@ -38,6 +38,13 @@ export type EventoBatalha = (
   | { tipo: 'terreno'; terreno: string | null; texto?: string }
   /** Começou um turno novo (contador ao lado da janela). */
   | { tipo: 'turno'; numero: number }
+  /**
+   * Condição num lado do campo (id do Showdown: stealthrock, spikes, toxicspikes, stickyweb, reflect, tailwind…).
+   * `ativa` false = acabou (Rapid Spin, Defog, fim dos turnos). Os hazards ficam desenhados no campo.
+   */
+  | { tipo: 'condicaoLado'; lado: Lado; condicao: string; ativa: boolean; texto: string }
+  /** Court Change: os lados trocam as condições. */
+  | { tipo: 'trocarCondicoes'; texto: string }
 ) & { registro?: string | null };
 
 export interface OpcaoGolpe {
@@ -105,6 +112,30 @@ const CLIMAS: Record<string, string> = {
   DeltaStream: 'Um vento misterioso protege os Pokémon voadores!',
   none: 'O clima voltou ao normal.',
 };
+
+/** Frase da condição de lado (hazards, Reflect, Tailwind…) começando ou acabando. */
+function textoCondicaoLado(id: string, nome: string, lado: Lado, ativa: boolean): string {
+  const onde = lado === 'jogador' ? 'do seu lado' : 'do lado adversário';
+  const comeco: Record<string, string> = {
+    stealthrock: `Pedras pontiagudas flutuam ${onde}!`,
+    spikes: `Espinhos se espalharam no chão ${onde}!`,
+    toxicspikes: `Espinhos venenosos se espalharam no chão ${onde}!`,
+    stickyweb: `Uma teia pegajosa se espalhou no chão ${onde}!`,
+    reflect: `Reflect protege ${onde} contra golpes físicos!`,
+    lightscreen: `Light Screen protege ${onde} contra golpes especiais!`,
+    auroraveil: `Aurora Veil protege ${onde}!`,
+    tailwind: `O Tailwind soprou ${onde}!`,
+    safeguard: `Safeguard protege ${onde} contra problemas de status!`,
+    mist: `Mist protege ${onde} contra a perda de atributos!`,
+  };
+  const fim: Record<string, string> = {
+    stealthrock: `As pedras pontiagudas sumiram ${onde}!`,
+    spikes: `Os espinhos sumiram ${onde}!`,
+    toxicspikes: `Os espinhos venenosos sumiram ${onde}!`,
+    stickyweb: `A teia pegajosa sumiu ${onde}!`,
+  };
+  return (ativa ? comeco[id] : fim[id]) ?? (ativa ? `${nome} começou ${onde}!` : `${nome} acabou ${onde}.`);
+}
 
 function conjuntoShowdown(p: PokemonIndividual, nome: string) {
   return {
@@ -526,6 +557,18 @@ export class BatalhaSelvagem {
           });
           break;
         }
+        case '-sidestart':
+        case '-sideend': {
+          const nomeCondicao = args[1].replace(/^move: /, '');
+          const condicao = Dex.toID(nomeCondicao);
+          const ladoC = this.lado(args[0]);
+          const ativa = comando === '-sidestart';
+          eventos.push({ tipo: 'condicaoLado', lado: ladoC, condicao, ativa, texto: textoCondicaoLado(condicao, nomeCondicao, ladoC, ativa) });
+          break;
+        }
+        case '-swapsideconditions':
+          eventos.push({ tipo: 'trocarCondicoes', texto: 'Os efeitos dos dois lados do campo trocaram de lugar!' });
+          break;
         case 'turn':
           this.ultimoGolpe = null;
           eventos.push({ tipo: 'turno', numero: Number(args[0]), registro: null });

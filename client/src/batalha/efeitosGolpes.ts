@@ -8,7 +8,41 @@ import { corTipo, el } from '../ui/dom';
 const FX = 'https://play.pokemonshowdown.com/fx/';
 
 type Ponto = { x: number; y: number };
-type Contexto = { arena: HTMLElement; atacante: HTMLElement; alvo: HTMLElement | null; tipo: string; cor: string; golpe: string };
+/** `oposto` = Pokémon do outro lado (golpes que miram o lado do adversário, como os hazards, vêm sem alvo). */
+type Contexto = { arena: HTMLElement; atacante: HTMLElement; alvo: HTMLElement | null; oposto: HTMLElement | null; tipo: string; cor: string; golpe: string };
+
+/**
+ * Hazards (como no Pokémon Showdown): cada peça é arremessada em arco do atacante até o chão em volta do adversário e
+ * FICA lá enquanto o hazard existir. `pecas[i]` = [dx, altura acima do chão] em px a partir dos pés do Pokémon
+ * (o lado do jogador espelha o dx). Spikes/Toxic Spikes: uma peça por camada.
+ */
+export const HAZARDS: Record<string, { fx: string[]; tamanho: number; opacidade: number; pecas: [number, number][]; porCamada?: boolean }> = {
+  // posições do Showdown abertas 1,5× (os nossos sprites são maiores que os de lá)
+  stealthrock: { fx: ['rock1', 'rock2', 'rock1', 'rock2'], tamanho: 28, opacidade: 0.75, pecas: [[-60, 12], [-30, 52], [45, 26], [15, 40]] },
+  spikes: { fx: ['caltrop'], tamanho: 28, opacidade: 1, pecas: [[-38, 0], [75, 0], [45, -6]], porCamada: true },
+  toxicspikes: { fx: ['poisoncaltrop'], tamanho: 28, opacidade: 1, pecas: [[8, -2], [-22, 6]], porCamada: true },
+  stickyweb: { fx: ['web'], tamanho: 96, opacidade: 0.45, pecas: [[15, -4]] },
+};
+
+/** Ponto (na arena) de uma peça de hazard em volta de quem está no `lugar` (pés do Pokémon = base do lugar). */
+export function pontoHazard(arena: HTMLElement, lugar: HTMLElement, [dx, altura]: [number, number], espelhar: boolean): Ponto {
+  const r = lugar.getBoundingClientRect();
+  const a = arena.getBoundingClientRect();
+  return { x: r.left - a.left + r.width / 2 + (espelhar ? -dx : dx), y: r.bottom - a.top - altura };
+}
+
+/** Arremessa as peças do hazard em arco até o lado adversário (só a animação; quem deixa as peças lá é a tela). */
+async function arremessarHazard(ctx: Contexto, id: string) {
+  const h = HAZARDS[id];
+  const lugar = ctx.oposto?.parentElement;
+  if (!h || !lugar) return;
+  const de = centro(ctx.atacante, ctx.arena);
+  const espelhar = lugar.classList.contains('lugar-jogador');
+  // Spikes/Toxic Spikes jogam todas as peças da animação (o Showdown também), mas só ficam as das camadas
+  await Promise.all(
+    h.pecas.map((p, i) => voar(ctx, h.fx[i % h.fx.length], de, pontoHazard(ctx.arena, lugar, p, espelhar), { tamanho: h.tamanho, duracao: 520, atraso: i * (id === 'stealthrock' ? 75 : 125), arco: 70 })),
+  );
+}
 
 const pausa = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 /** Espera a animação (com limite de tempo: com a aba em segundo plano o navegador congela animações). */
@@ -274,13 +308,14 @@ const ROTEIROS: Record<string, (ctx: Contexto) => Promise<void>> = {
   solarbeam: (c) => jato(c, 'energyball', 12, 44), energyball: (c) => bola(c, 'energyball', 70),
   psychic: (c) => tingir(c, '#ff7ad9', 500).then(() => ondas(c, '#ff7ad9')), psybeam: (c) => jato(c, 'mistball', 9, 34), confusion: (c) => ondas(c, '#ff7ad9'), psyshock: (c) => jato(c, 'mistball', 7, 40, 30), futuresight: (c) => tingir(c, '#ff7ad9', 600),
   shadowball: (c) => bola(c, 'shadowball', 70), darkpulse: (c) => ondas(c, '#3a2a4a'), sludgebomb: (c) => bola(c, 'poisonwisp', 70), sludgewave: (c) => jato(c, 'poisonwisp', 12, 52, 60), toxic: (c) => nuvem(c, 'poisonwisp'),
-  rockslide: (c) => chuva(c, 'rock1', 6), stoneedge: (c) => chuva(c, 'rock2', 4, 54), rockthrow: (c) => chuva(c, 'rock1', 3), rocktomb: (c) => chuva(c, 'rock3', 5), stealthrock: (c) => chuva(c, 'rock2', 4, 30),
+  rockslide: (c) => chuva(c, 'rock1', 6), stoneedge: (c) => chuva(c, 'rock2', 4, 54), rockthrow: (c) => chuva(c, 'rock1', 3), rocktomb: (c) => chuva(c, 'rock3', 5),
+  stealthrock: (c) => arremessarHazard(c, 'stealthrock'), spikes: (c) => arremessarHazard(c, 'spikes'), toxicspikes: (c) => arremessarHazard(c, 'toxicspikes'), stickyweb: (c) => arremessarHazard(c, 'stickyweb'),
   dracometeor: (c) => chuva(c, 'flareball', 5, 60), dragonpulse: (c) => bola(c, 'flareball', 70), outrage: (c) => aura(c, c.atacante, '#ff5050').then(() => contato(c, 'impacto')), dragondance: (c) => aura(c, c.atacante, '#7a5cff'),
   hyperbeam: (c) => jato(c, null, 14, 46), gigaimpact: (c) => contato(c, 'impacto'), bodyslam: (c) => contato(c, 'impacto'), tackle: (c) => contato(c, 'impacto'), quickattack: (c) => contato(c, 'impacto'),
   swordsdance: espadas, protect: (c) => escudo(c, '#7fff9a'), detect: (c) => escudo(c, '#ffe066'), reflect: (c) => escudo(c, '#ffb0e0'), lightscreen: (c) => escudo(c, '#ffe9a0'), substitute: (c) => escudo(c, '#ffffff'),
   recover: cura, roost: cura, synthesis: cura, moonlight: cura, morningsun: cura, rest: cura, softboiled: cura, slackoff: cura, wish: cura, healpulse: cura,
   smokescreen: (c) => nuvem(c, 'blackwisp'), poisongas: (c) => nuvem(c, 'poisonwisp'), spore: (c) => nuvem(c, 'energyball'), sleeppowder: (c) => nuvem(c, 'energyball'), stunspore: (c) => nuvem(c, 'electroball'), poisonpowder: (c) => nuvem(c, 'poisonwisp'),
-  stringshot: (c) => (c.alvo ? estourar(c, 'web', centro(c.alvo, c.arena), { tamanho: 110, duracao: 600, de: 0.4, ate: 1.1 }) : Promise.resolve()), stickyweb: (c) => nuvem(c, 'web'),
+  stringshot: (c) => (c.alvo ? estourar(c, 'web', centro(c.alvo, c.arena), { tamanho: 110, duracao: 600, de: 0.4, ate: 1.1 }) : Promise.resolve()),
   moonblast: (c) => bola(c, 'moon', 70), dazzlinggleam: (c) => tingir(c, '#ffd6f0', 450, 0.6), playrough: (c) => contato(c, 'impacto'), charm: (c) => nuvem(c, 'heart'), sweetkiss: (c) => nuvem(c, 'heart'), attract: (c) => nuvem(c, 'heart'),
   bravebird: (c) => contato(c, 'impacto'), airslash: (c) => jato(c, 'feather', 6, 34), hurricane: (c) => jato(c, 'feather', 12, 36, 60), gust: (c) => jato(c, 'feather', 5, 30, 40), featherdance: (c) => nuvem(c, 'feather'),
   flashcannon: (c) => jato(c, 'shine', 9, 40), irondefense: (c) => aura(c, c.atacante, '#c0c8d8', 'shine'), bulletpunch: (c) => contato(c, 'soco'), meteormash: (c) => contato(c, 'soco'),
@@ -314,8 +349,8 @@ function roteiro(golpeId: string, categoria: string, tipo: string): (ctx: Contex
 }
 
 /** Anima o golpe na arena. `alvo` null = golpe em si mesmo (ou sem alvo). */
-export async function animarGolpeOriginal(arena: HTMLElement, atacante: HTMLElement, alvo: HTMLElement | null, golpeId: string, tipo: string, categoria: string) {
-  const ctx: Contexto = { arena, atacante, alvo, tipo, cor: corTipo(tipo), golpe: golpeId };
+export async function animarGolpeOriginal(arena: HTMLElement, atacante: HTMLElement, alvo: HTMLElement | null, golpeId: string, tipo: string, categoria: string, oposto: HTMLElement | null = null) {
+  const ctx: Contexto = { arena, atacante, alvo, oposto, tipo, cor: corTipo(tipo), golpe: golpeId };
   try {
     await roteiro(golpeId, categoria, tipo)(ctx);
   } finally {

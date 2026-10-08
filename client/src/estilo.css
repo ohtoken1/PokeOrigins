@@ -1469,3 +1469,9 @@ button.vaga:hover { border-color: var(--borda); }
 .fila-time .pedestal.arrastavel { touch-action: none; }
 .fila-time .pedestal.arrastando { z-index: 5; opacity: 0.85; pointer-events: none; }
 .fila-time .pedestal.alvo { border-color: var(--destaque); box-shadow: 0 0 0 2px var(--destaque); }
+
+/* Hazards no campo (Stealth Rock, Spikes, Toxic Spikes, Sticky Web): peças do Showdown em volta dos pés do Pokémon */
+.peca-hazard { position: absolute; z-index: 3; pointer-events: none; object-fit: contain; }
+.peca-hazard.hazard-stealthrock { animation: pedra-flutua 2.4s ease-in-out infinite alternate; }
+.peca-hazard.hazard-stickyweb { z-index: 1; }
+@keyframes pedra-flutua { from { translate: 0 0; } to { translate: 0 -4px; } }
