@@ -12,7 +12,7 @@ import { pokemonPorId } from '../dados';
 import { ITENS, type ItemId } from '../../../shared/itens';
 import { efeitoBola } from '../../../shared/bolas';
 import { nivelTreinador } from '../../../shared/treinador';
-import { MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
+import { EXP_SHARE, MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
 import { sortearTicketDaBatalha } from '../../../shared/tickets';
 import { curarTime, guardarNoPC, registrarCapturaNoRanking, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
@@ -690,8 +690,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       const evolucoes: { pos: number; para: number }[] = [];
       for (const pos of batalha.indices) {
         const p = save.time[pos];
-        // XP e EVs só para quem entrou em campo nesta batalha (pedido do dono: sem Exp. Share)
-        if (p.hp <= 0 || !batalha.participantes.has(pos)) continue;
+        // XP e EVs só para quem entrou em campo nesta batalha, ou quem segura a Exp. Share (mesmo sem entrar)
+        if (p.hp <= 0 || (!batalha.participantes.has(pos) && p.item !== EXP_SHARE)) continue;
         for (const d of derrotados()) {
           const ev = pokemonPorId(d.especieId).evsDados;
           ganharEvs(p, { hp: ev.hp, atk: ev.ataque, def: ev.defesa, spa: ev.ataqueEspecial, spd: ev.defesaEspecial, spe: ev.velocidade });

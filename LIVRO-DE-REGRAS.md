@@ -198,7 +198,7 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 - **Dano:** depois de cada golpe, a mensagem da batalha diz quanto HP o alvo perdeu e quanto isso é da vida máxima.
 - **Ficha do seu Pokémon:** passar o mouse no seu Pokémon (ou na caixa de HP dele) mostra HP máximo, Attack, Defense, Sp. Atk, Sp. Def, Speed, Nature, Ability, item, amizade, Tera Type e golpes.
 - **Itens segurados (held items):** o item que o Pokémon segura funciona na batalha como nos jogos (Leftovers, Focus Sash, Choice Scarf, frutas…), e a batalha avisa quando ele age. Itens gastos voltam no fim da batalha; **frutas comidas somem**.
-- **Mega Evolução:** quem entra na batalha segurando a **Mega Stone** dele (ex.: Charizard com Charizardite X) ganha o botão **Mega Evolução** (com o símbolo da Mega) no menu de golpes. Ligado, ele megaevolui antes de atacar: o símbolo aparece sobre ele, brilha e vira a Mega, com tipos, atributos e Ability da Mega. **Uma vez por batalha**; no fim da batalha volta ao normal. Rayquaza megaevolui sabendo **Dragon Ascent** (sem pedra). Inclui as Megas novas de Legends: Z-A (Mega Clefable, Mega Dragonite, Mega Garchomp Z…). Quem segura Mega Stone não terastaliza (regra do Showdown).
+- **Mega Evolução:** quem entra na batalha segurando a **Mega Stone** dele (ex.: Charizard com Charizardite X) ganha o botão **Mega Evolução** (com o símbolo da Mega) no menu de golpes. Ligado, ele megaevolui antes de atacar: o símbolo aparece sobre ele, brilha e vira a Mega, com tipos, atributos e Ability da Mega. **Uma vez por batalha**; no fim da batalha volta ao normal. O Rayquaza também precisa de pedra: a **Rayquazite** (pedra criada para o jogo; saber Dragon Ascent não basta). Inclui as Megas novas de Legends: Z-A (Mega Clefable, Mega Dragonite, Mega Garchomp Z…). Quem segura Mega Stone não terastaliza (regra do Showdown).
 - **Z-Moves:** quem segura um **Z-Crystal** ganha o botão **Z-Move** no menu de golpes. Ligado, os golpes viram Z-Moves (ex.: Thunder Shock → Gigavolt Havoc, poder 100). **Uma vez por batalha.**
 - **Formas por item:** Giratina com Griseous Core entra na Origin Forme; Dialga/Palkia com Adamant Crystal/Lustrous Globe também; Arceus muda de tipo com Plates ou Z-Crystals de tipo; Silvally com Memories; Genesect com Drives; Ogerpon com as máscaras. Kyogre e Groudon fazem a **Primal Reversion** com Blue/Red Orb, e Zacian/Zamazenta viram Crowned com Rusted Sword/Shield. A imagem na batalha muda junto.
 
@@ -265,7 +265,7 @@ Level, Love, Moon, Heavy, Fast, Repeat e Dream Ball funcionam como nos jogos.
 
 ## 8. Experiência, níveis e evolução
 
-- **Sem Exp. Share:** XP e EVs vão **só para quem entrou em campo** naquela batalha.
+- **Exp. Share:** XP e EVs vão para quem entrou em campo naquela batalha **e para quem segura a Exp. Share** (item da loja, em Itens de batalha), mesmo sem entrar. Cada um ganha o XP inteiro, sem dividir.
 - **Fórmula de XP:** da 7ª geração em diante.
 - **Vários níveis de uma vez** aparecem como **uma mensagem só**, com o nível final.
 - **Golpes novos:** com menos de 4 golpes, o Pokémon aprende sozinho. Com 4, você escolhe qual esquecer (ou desiste). O golpe novo aparece colorido, e passar o mouse mostra o que ele faz.
@@ -363,7 +363,7 @@ As duas aparecem **separadas na carteira**, acima do painel do treinador.
 | **Remédios** | Potions, Revives, curas de status, Ethers/Elixirs, Sacred Ash… |
 | **Evolução** | pedras, Linking Cord, maçãs, armaduras, Dragon Scale e outros itens de evoluir |
 | **Itens de batalha** | itens de batalha de todas as gerações (incensos, Thick Club, Leek…), sem os que ficam fora da loja |
-| **Mega Stones** | as 88 Mega Stones (inclusive as de Legends: Z-A), **1 gold cada** |
+| **Mega Stones** | as 89 Mega Stones (inclusive as de Legends: Z-A e a **Rayquazite**), **1 gold cada** |
 | **TMs** | as de Scarlet/Violet |
 | **TRs** | as de Sword/Shield |
 
@@ -570,6 +570,9 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
 - Ícone da Pokédex no cabeçalho, ao lado do nome, com o progresso da Pokédex; barra do passe com 0 / 100 XP por nível.
+- **Exp. Share:** item para segurar; quem segura ganha XP e EVs da vitória/captura mesmo sem entrar em campo.
+- **Rayquazite:** o Rayquaza agora megaevolui com pedra, como os outros.
+- Itens-chave novos: **Dynamax Band** e **Terastallizer Band** (uso em breve).
 - **Mega Evolução:** 89 Megas (com as de Legends: Z-A), botão com o símbolo da Mega na batalha, Mega Stones na loja por 1 gold, Megas na Database (linhas próprias) e na Pokédex (estágio da evolução e ficha própria).
 - Alola com 8 desafios (Capitães e Kahunas) e selos próprios (não são itens).
 - Insígnias com o desenho oficial de cada ginásio, no cabeçalho e na tela dos Ginásios.
@@ -639,7 +642,6 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Rever as licenças antes de qualquer cobrança: os sprites do Pokémon que te segue são **não comerciais**.
 
 ### 🎮 Jogabilidade
-- **Exp. Share**, como item ou opção.
 - Insígnias e desafios.
 - Sprites que faltam para o Pokémon que te segue (64 espécies), quando o SpriteCollab lançar.
 - Ajustes finos de bioma, chances e níveis conforme os testes.

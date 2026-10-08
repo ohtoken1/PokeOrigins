@@ -2,7 +2,7 @@
 // TMs/TRs (ensinar golpe) e itens equipáveis (segurar para a batalha).
 import { Dex } from '@pkmn/sim';
 import { especie, type PokemonIndividual } from './batalha/pokemon';
-import { CABO_DE_LIGACAO, PEDRAS_EVOLUCAO } from './loja';
+import { CABO_DE_LIGACAO, EXP_SHARE, PEDRAS_EVOLUCAO } from './loja';
 
 /**
  * Para qual espécie o Pokémon evolui usando o item, ou null.
@@ -30,10 +30,12 @@ export function podeAprenderPorMaquina(p: PokemonIndividual, golpeId: string): b
 
 /** Item que um Pokémon pode segurar na batalha (itens do Showdown). */
 export function ehEquipavel(itemId: string): boolean {
+  if (itemId === EXP_SHARE) return true;
   const i = Dex.items.get(itemId);
   return i.exists && !i.isPokeball && !PEDRAS_EVOLUCAO.includes(i.id);
 }
 
 export function nomeItemEquipado(itemId: string): string {
+  if (itemId === EXP_SHARE) return 'Exp. Share';
   return Dex.items.get(itemId).name || itemId;
 }

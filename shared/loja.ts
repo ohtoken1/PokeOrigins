@@ -8,7 +8,7 @@ import { ITENS, type ItemId } from './itens';
 import { TICKETS } from './tickets';
 import { TIPOS_TERA } from './tera';
 import { ITENS_CUSTOM } from './itensCustom';
-import { MEGA_STONES, PRECO_MEGA_STONE_GOLD, megaDaPedra } from './megas';
+import { MEGA_STONES, PRECO_MEGA_STONE_GOLD, RAYQUAZITE, megaDaPedra } from './megas';
 
 export { TIPOS_TERA };
 import { OVOS } from './ovos';
@@ -90,6 +90,8 @@ export const faixaDoIv = (iv: number): [number, number] => FAIXAS_IV.find(([a, b
 
 /** Pedras que fazem Pokémon evoluir ao serem usadas. */
 export const PEDRAS_EVOLUCAO = ['firestone', 'waterstone', 'thunderstone', 'leafstone', 'moonstone', 'sunstone', 'shinystone', 'duskstone', 'dawnstone', 'icestone'];
+/** Item nosso (não existe no Showdown): quem segura ganha XP e EVs da batalha mesmo sem entrar em campo. */
+export const EXP_SHARE = 'expshare';
 /** Item nosso (não existe no Showdown): faz evoluir quem evolui por troca, como o Linking Cord do Legends: Arceus. */
 export const CABO_DE_LIGACAO = 'linkingcord';
 
@@ -148,14 +150,18 @@ function montarCatalogo(): ItemLoja[] {
   }
   add({ id: CABO_DE_LIGACAO, nome: 'Linking Cord', categoria: 'evolucao', descricao: 'Faz evoluir Pokémon que evoluem por troca (se precisar de item, ele deve estar equipado).' });
 
+  add({ id: EXP_SHARE, nome: 'Exp. Share', categoria: 'batalha', sprite: 'exp-share', descricao: 'Segurando, o Pokémon ganha XP e EVs de toda vitória ou captura, mesmo sem entrar em campo.' });
+
   // todos os itens do Showdown que têm uso no jogo (inclusive os de gerações passadas: incensos, Z-Crystals, gems…)
-  for (const i of Dex.items.all()) {
+  // a Rayquazite (pedra nossa) entra pelos dados do Showdown; garante que ela venha mesmo se a lista já estava pronta
+  const doShowdown = Dex.items.all();
+  for (const i of doShowdown.some((x) => x.id === RAYQUAZITE) ? doShowdown : [...doShowdown, Dex.items.get(RAYQUAZITE)]) {
     if (!i.exists || PEDRAS_EVOLUCAO.includes(i.id)) continue;
     const categoria = classificarItem(i);
     if (!categoria) continue;
     const mega = categoria === 'megapedras' ? megaDaPedra(i.id) : undefined;
     const descricao = mega ? `Segurando, ${mega.nome.replace(/^Mega /, '')} pode megaevoluir em ${mega.nome} na batalha (uma vez por batalha).` : traduzir(i.shortDesc || i.desc);
-    add({ id: i.id, nome: i.name, categoria, descricao });
+    add({ id: i.id, nome: i.name, categoria, descricao, imagem: i.id === RAYQUAZITE ? 'itens/rayquazite.png' : undefined });
   }
 
   for (const tipo of TIPOS_TERA)

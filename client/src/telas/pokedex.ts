@@ -325,11 +325,8 @@ ${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) }
   );
 }
 
-/** Como a Mega acontece ("Segurando Charizardite X" / "Sabendo Dragon Ascent"). */
-function textoRequisitoMega(m: Mega): string {
-  if (m.pedra) return `Segurando ${itemDaLoja(m.pedra)?.nome ?? Dex.items.get(m.pedra).name}`;
-  return `Sabendo ${Dex.moves.get(m.golpe ?? '').name}`;
-}
+/** Como a Mega acontece ("Segurando Charizardite X"). */
+const textoRequisitoMega = (m: Mega) => `Segurando ${itemDaLoja(m.pedra)?.nome ?? Dex.items.get(m.pedra).name}`;
 
 /** Ficha da Mega: tipos, atributos (com a diferença para a forma normal), ability, tier, fraquezas e a Mega Stone. */
 function fichaMega(m: Mega, base: PokemonBase, abrir: Abrir): HTMLElement {
@@ -367,7 +364,7 @@ function fichaMega(m: Mega, base: PokemonBase, abrir: Abrir): HTMLElement {
       el('div', { class: 'dex-ef-linha' }, el('span', { class: 'dex-ef-mult' }, rotulo), el('div', { class: 'tipos' }, grupos.get(mult)!.map((t) => seloTipo(t)))),
     ),
   );
-  const pedra = m.pedra ? itemDaLoja(m.pedra) : undefined;
+  const pedra = itemDaLoja(m.pedra);
   const outras = megasDaEspecie(base.id).filter((x) => x.forma !== m.forma);
   return el('article', { class: 'dex-ficha dex-ficha-mega' },
     el('div', { class: 'dex-topo' },

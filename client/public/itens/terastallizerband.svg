@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <!-- Terastallizer Band: pulseira com um cristal Tera (desenho próprio) -->
+  <defs>
+    <linearGradient id="t" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe46b"/><stop offset=".35" stop-color="#7ff0ff"/><stop offset=".7" stop-color="#b78cff"/><stop offset="1" stop-color="#ff7ad9"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="24" cy="31" rx="19" ry="10" fill="#2e3a55" stroke="#121826" stroke-width="2"/>
+  <ellipse cx="24" cy="29" rx="19" ry="10" fill="#4a7bd6" stroke="#121826" stroke-width="2"/>
+  <ellipse cx="24" cy="29" rx="13" ry="5.5" fill="#1d2433" stroke="#121826" stroke-width="1.5"/>
+  <path d="M8 27c3 3 9 5 16 5s13-2 16-5" fill="none" stroke="#9cc2ff" stroke-width="2" stroke-linecap="round" opacity=".8"/>
+  <path d="M24 3l9 7-2 10-7 5-7-5-2-10z" fill="url(#t)" stroke="#121826" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M24 3v22M15 10l9 5 9-5M17 20l7-5 7 5" fill="none" stroke="#fff" stroke-width="1" opacity=".75"/>
+  <path d="M19.5 8.5l3-2" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+</svg>

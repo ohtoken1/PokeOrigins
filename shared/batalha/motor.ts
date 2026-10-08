@@ -118,7 +118,8 @@ function conjuntoShowdown(p: PokemonIndividual, nome: string) {
     nature: p.natureza,
     gender: p.genero === 'N' ? '' : p.genero,
     shiny: p.shiny,
-    item: p.item ?? '',
+    // itens nossos sem efeito no simulador (Exp. Share) não vão para ele
+    item: p.item && Dex.items.get(p.item).exists ? p.item : '',
     ivs: p.ivs,
     evs: p.evs,
   };
@@ -221,7 +222,8 @@ export class BatalhaSelvagem {
     const zGolpes = Array.isArray(ativo.canZMove) ? (ativo.canZMove as ({ move: string } | null)[]).map((z) => z?.move ?? null) : null;
     const tera = typeof ativo.canTerastallize === 'string' ? (ativo.canTerastallize as string) : null;
     // contra treinador não dá para fugir
-    const mega = !!ativo.canMegaEvo;
+    // Mega só com Mega Stone (sem o atalho do Rayquaza por Dragon Ascent: pedido do dono)
+    const mega = !!ativo.canMegaEvo && !!this.batalha.p1.active[0]?.getItem().megaStone;
     return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso && !this.treinador, zGolpes, tera, mega };
   }
 
