@@ -1,5 +1,6 @@
-// Animações básicas da batalha (Web Animations API). Fáceis de trocar por efeitos melhores depois.
-import { corTipo, el } from '../ui/dom';
+// Animações da batalha (Web Animations API): entrada, dano, desmaio, Pokébola, evolução e transformações.
+// As dos golpes ficam em efeitosGolpes.ts.
+import { el } from '../ui/dom';
 import { Dex } from '@pkmn/sim';
 
 /** Espera a animação acabar; com a aba em segundo plano o navegador congela animações, então há um limite de tempo. */
@@ -65,66 +66,6 @@ export function tremerArena(arena: HTMLElement) {
       { duration: 280 },
     ),
   );
-}
-
-/**
- * Golpe: físico = o atacante avança; especial = um projétil da cor do tipo voa até o alvo;
- * status = um anel da cor do tipo pulsa no alvo.
- */
-export async function animarGolpe(arena: HTMLElement, atacante: HTMLElement, alvo: HTMLElement | null, tipo: string, categoria: string) {
-  const cor = corTipo(tipo);
-  const destino = alvo ?? atacante;
-
-  if (categoria === 'Physical' && alvo) {
-    const de = centro(atacante, arena);
-    const para = centro(alvo, arena);
-    const dx = (para.x - de.x) * 0.35;
-    const dy = (para.y - de.y) * 0.35;
-    await esperarAnimacao(
-      atacante.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${dx}px,${dy}px)` }, { transform: 'translate(0,0)' }], {
-        duration: 320,
-        easing: 'ease-in-out',
-      }),
-    );
-    explosao(arena, centro(alvo, arena), cor);
-    await animarDano(alvo);
-    return;
-  }
-
-  if (categoria === 'Special' && alvo) {
-    const de = centro(atacante, arena);
-    const para = centro(alvo, arena);
-    const bola = el('div', { class: 'projetil', style: { background: cor, boxShadow: `0 0 18px 6px ${cor}` } });
-    arena.append(bola);
-    await esperarAnimacao(
-      bola.animate(
-        [
-          { transform: `translate(${de.x}px,${de.y}px) scale(0.6)` },
-          { transform: `translate(${para.x}px,${para.y}px) scale(1.2)` },
-        ],
-        { duration: 380, easing: 'ease-in' },
-      ),
-    );
-    bola.remove();
-    explosao(arena, para, cor);
-    await animarDano(alvo);
-    return;
-  }
-
-  // golpe de status (ou sem alvo): anel pulsando
-  const ponto = centro(destino, arena);
-  const anel = el('div', { class: 'anel', style: { borderColor: cor, left: `${ponto.x}px`, top: `${ponto.y}px` } });
-  arena.append(anel);
-  await Promise.all([
-    esperarAnimacao(
-      anel.animate([{ transform: 'translate(-50%,-50%) scale(0.2)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1.6)', opacity: 0 }], {
-        duration: 600,
-        easing: 'ease-out',
-      }),
-    ),
-    esperarAnimacao(atacante.animate([{ filter: 'brightness(1)' }, { filter: 'brightness(1.8)' }, { filter: 'brightness(1)' }], { duration: 600 })),
-  ]);
-  anel.remove();
 }
 
 function explosao(arena: HTMLElement, ponto: { x: number; y: number }, cor: string) {
@@ -193,4 +134,69 @@ export async function animarEvolucao(sprite: HTMLImageElement, srcNovo: string) 
   }
   sprite.src = srcNovo;
   await esperarAnimacao(sprite.animate([{ filter: 'brightness(6)', transform: 'scale(1.2)' }, { filter: 'brightness(1)', transform: 'scale(1)' }], { duration: 600 }));
+}
+
+/**
+ * Transformação na batalha (Mega Evolução, Primal Reversion, outras formas): uma esfera de luz envolve o Pokémon,
+ * ele fica branco, troca de forma no auge e a esfera explode em raios. `simbolo`: aparece por cima (Mega, Ω/α).
+ */
+export async function animarTransformacao(
+  lugar: HTMLElement,
+  sprite: HTMLImageElement,
+  trocar: () => void,
+  { cores, simbolo, rapida = false }: { cores: string[]; simbolo?: HTMLElement; rapida?: boolean },
+) {
+  const fundo = cores.length > 1 ? `conic-gradient(from 0deg, ${[...cores, cores[0]].join(', ')})` : `radial-gradient(circle, #fff 0 20%, ${cores[0]} 55%, transparent 72%)`;
+  const esfera = el('div', { class: 'transf-esfera', style: { background: fundo } });
+  const raios = el('div', { class: 'transf-raios' }, ...Array.from({ length: 10 }, (_, i) => el('span', { style: { transform: `rotate(${i * 36}deg)`, background: cores[i % cores.length] } })));
+  lugar.append(esfera, raios);
+  if (simbolo) lugar.append(simbolo);
+  const t = rapida ? 0.55 : 1;
+
+  // 1) a luz cresce girando em volta e o Pokémon vai ficando branco
+  await Promise.all([
+    esperarAnimacao(esfera.animate([{ transform: 'scale(0) rotate(0deg)', opacity: 0.2 }, { transform: 'scale(1.25) rotate(540deg)', opacity: 0.85 }], { duration: 1100 * t, easing: 'ease-in', fill: 'forwards' })),
+    esperarAnimacao(sprite.animate([{ filter: 'brightness(1)' }, { filter: 'brightness(8) saturate(0)' }], { duration: 1100 * t, fill: 'forwards' })),
+    simbolo ? esperarAnimacao(simbolo.animate([{ opacity: 0, transform: 'scale(0.2)' }, { opacity: 1, transform: 'scale(1.1)' }], { duration: 700 * t, delay: 300 * t, fill: 'forwards' })) : Promise.resolve(),
+  ]);
+  // 2) no auge, troca a forma
+  trocar();
+  await new Promise((r) => setTimeout(r, 120));
+  // 3) a esfera estoura em raios e o Pokémon aparece com a cor de volta
+  await Promise.all([
+    esperarAnimacao(esfera.animate([{ transform: 'scale(1.25)', opacity: 0.85 }, { transform: 'scale(2.4)', opacity: 0 }], { duration: 500 * t, easing: 'ease-out', fill: 'forwards' })),
+    esperarAnimacao(raios.animate([{ transform: 'scale(0.3)', opacity: 1 }, { transform: 'scale(1.8)', opacity: 0 }], { duration: 600 * t, easing: 'ease-out', fill: 'forwards' })),
+    esperarAnimacao(sprite.animate([{ filter: 'brightness(8) saturate(0)' }, { filter: 'brightness(1)' }], { duration: 700 * t, fill: 'forwards' })),
+    simbolo ? esperarAnimacao(simbolo.animate([{ opacity: 1, transform: 'scale(1.1)' }, { opacity: 0, transform: 'scale(1.8)' }], { duration: 600 * t, fill: 'forwards' })) : Promise.resolve(),
+  ]);
+  esfera.remove();
+  raios.remove();
+  simbolo?.remove();
+  // tira o filtro preso pelo "fill: forwards" (o brilho da Mega vem da classe)
+  sprite.getAnimations().forEach((a) => a.cancel());
+}
+
+/**
+ * Evolução fora da batalha (pedra, Linking Cord…): janela por cima de tudo com o Pokémon piscando entre a forma
+ * antiga e a nova, como na evolução por nível. Resolve quando o jogador fecha.
+ */
+export function animarEvolucaoNaTela(antes: { nome: string; src: string }, depois: { nome: string; src: string }): Promise<void> {
+  const img = el('img', { class: 'sprite evolucao-sprite', src: antes.src, alt: '' }) as HTMLImageElement;
+  const texto = el('p', { class: 'evolucao-texto' }, `O quê? ${antes.nome} está evoluindo!`);
+  const ok = el('button', { class: 'botao', hidden: true }, 'OK');
+  const fundo = el('div', { class: 'evolucao-tela' }, el('div', { class: 'evolucao-caixa' }, el('div', { class: 'evolucao-palco' }, el('div', { class: 'evolucao-luz' }), img), texto, ok));
+  document.body.append(fundo);
+  return new Promise((resolver) => {
+    void (async () => {
+      await new Promise((r) => setTimeout(r, 700));
+      await animarEvolucao(img, depois.src);
+      texto.textContent = `Parabéns! ${antes.nome} evoluiu para ${depois.nome}!`;
+      ok.hidden = false;
+      ok.focus();
+    })();
+    ok.addEventListener('click', () => {
+      fundo.remove();
+      resolver();
+    });
+  });
 }

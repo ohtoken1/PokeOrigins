@@ -13,6 +13,7 @@ import { iconeItem } from './iconeItem';
 import { cartaoPokemon } from './time';
 import { abrirJanelaTicket } from './ticket';
 import { abrirJanelaOvo } from './ovo';
+import { animarEvolucaoNaTela } from '../batalha/animacoes';
 
 const ACAO: Partial<Record<CategoriaLoja, string>> = {
   remedios: 'Usar',
@@ -84,6 +85,10 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
         gastar(item.id);
         // troca com item (ex.: Metal Coat): o item equipado é gasto na evolução
         if (item.id === CABO_DE_LIGACAO && especie(para).evoItem) p.item = null;
+        // mesma animação da evolução por nível, numa janela por cima da bolsa
+        const [de, novo] = [pokemonPorId(p.especieId), pokemonPorId(para)];
+        const imagem = (d: typeof de) => (p.shiny ? d.sprites.gifShiny ?? d.sprites.frenteShiny : d.sprites.gif ?? d.sprites.frente) ?? '';
+        void animarEvolucaoNaTela({ nome: quem, src: imagem(de) }, { nome: novo.nome, src: imagem(novo) });
         const r = evoluir(p, para, (n) => pokemonPorId(n).nome);
         registrarCapturado(save, para);
         for (const golpe of r.golpesPendentes) aprender(p, golpe, () => {}, () => {});

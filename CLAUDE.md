@@ -44,7 +44,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - PP: sem PP Ups (máximo = PP base). HP/status/PP persistem entre batalhas; Centro Pokémon cura. Derrota = cura e volta ao menu da região.
 - Fundo de batalha: sorteado a cada batalha entre os do bioma (`FUNDOS_BATALHA` em `telaBatalha.ts`, imagens dos jogos oficiais em `client/public/batalha/`, via Showdown).
 - Registro lateral: cada `EventoBatalha` tem `registro` opcional (frase do chat; null = não registra; senão usa `texto`); o motor junta "usou X" + dano (`hpLado`, `ultimoGolpe`) e emite `turno` (contador à esquerda). `dizer` fora dos eventos também registra. Ficha do seu Pokémon ao passar o mouse: `resumoFixo` (position fixed, fora do corte da arena).
-- Interface e animações: `client/src/batalha/` (físico = avanço, especial = projétil da cor do tipo, status = anel; Pokébola com tremidas; evolução piscando).
+- Interface e animações: `client/src/batalha/`. Golpes em `efeitosGolpes.ts` (`animarGolpeOriginal`): imagens de efeito do Showdown carregadas de `play.pokemonshowdown.com/fx/` (como a folha de ícones de itens); `ROTEIROS` por golpe famoso, depois marcas (bite/punch/slicing/sound, nome com kick/claw), depois categoria/tipo (`FX_DO_TIPO`). Transformações: `animarTransformacao` em `animacoes.ts` (Mega com símbolo e arco-íris, Primal com Ω/α, outras formas rápida na cor do tipo). Evolução fora da batalha (pedra, Linking Cord): `animarEvolucaoNaTela` (janela por cima, chamada em `ui/bolsa.ts`). Pokébola com tremidas; evolução por nível piscando.
 
 ## Próximas etapas (ordem combinada)
 1. ~~Base: dados, biomas, encontros~~

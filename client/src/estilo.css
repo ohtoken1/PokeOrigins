@@ -1083,24 +1083,8 @@ button.vaga:hover { border-color: var(--borda); }
 .botao-mega.ligado .mega-simbolo { filter: brightness(0) invert(1) drop-shadow(0 0 3px #fff); animation: mega-gira 2.4s linear infinite; }
 .golpe-mega { box-shadow: 0 0 0 2px #e74291aa, 0 0 10px #00b9ef88; }
 @keyframes mega-gira { to { transform: rotate(360deg); } }
-.mega-simbolo-anim {
-  position: absolute; left: 50%; top: 40%; width: 96px; height: 96px; margin: -48px 0 0 -48px; z-index: 5; pointer-events: none;
-  filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 18px #00b9ef);
-  animation: mega-simbolo 1.4s ease-out forwards;
-}
-@keyframes mega-simbolo {
-  0% { opacity: 0; transform: scale(0.2) rotate(-90deg); }
-  35% { opacity: 1; transform: scale(1.15) rotate(0deg); }
-  70% { opacity: 1; transform: scale(1) rotate(20deg); }
-  100% { opacity: 0; transform: scale(1.8) rotate(40deg); }
-}
-.sprite.megaevoluindo { animation: mega-brilho 1.4s ease-in-out; }
-@keyframes mega-brilho {
-  0%, 100% { filter: none; }
-  30% { filter: brightness(3) drop-shadow(0 0 12px #e74291); }
-  55% { filter: brightness(4) drop-shadow(0 0 16px #00b9ef); }
-  75% { filter: brightness(2.5) drop-shadow(0 0 12px #aacf52); }
-}
+/* símbolo da Mega por cima da esfera de luz na transformação */
+.simbolo-transf { position: absolute; left: 50%; bottom: calc(22% + 27px); width: 96px; height: 96px; margin-left: -48px; z-index: 5; pointer-events: none; filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 18px #00b9ef); }
 .sprite.megaevoluido { filter: drop-shadow(0 0 4px #e7429188) drop-shadow(0 0 2px #00b9ef88); }
 .botao-tera.ligado { background: linear-gradient(135deg, #ffffff, var(--cor-tipo)); color: #10202e; border-color: transparent; font-weight: 800; }
 .botao.golpe.golpe-tera { box-shadow: 0 0 0 2px #bff3ff, 0 0 14px #7fd3ff99; }
@@ -1430,3 +1414,27 @@ button.vaga:hover { border-color: var(--borda); }
 /* Database: nome das Megas com o símbolo */
 .db-nome-mega { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; }
 .db-nome-mega img { width: 16px; height: 16px; object-fit: contain; }
+
+/* Animações dos golpes (imagens de efeito do Showdown) */
+.fx-golpe { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 6; object-fit: contain; image-rendering: auto; }
+.fx-luz { border-radius: 50%; }
+.fx-anel { width: 90px; height: 90px; border: 5px solid; border-radius: 50%; }
+.fx-escudo { width: 130px; height: 130px; border: 3px solid; border-radius: 50%; background: radial-gradient(circle, transparent 55%, rgba(255,255,255,0.25)); }
+.fx-tela { position: absolute; inset: 0; pointer-events: none; z-index: 5; mix-blend-mode: screen; }
+
+/* Transformações na batalha (Mega, Primal, formas) */
+.transf-esfera { position: absolute; left: 50%; bottom: 22%; width: 150px; height: 150px; margin-left: -75px; border-radius: 50%; z-index: 4; pointer-events: none; filter: blur(2px); mix-blend-mode: screen; }
+.transf-raios { position: absolute; left: 50%; bottom: calc(22% + 75px); width: 0; height: 0; z-index: 4; pointer-events: none; }
+.transf-raios span { position: absolute; left: -3px; top: -120px; width: 6px; height: 120px; border-radius: 3px; transform-origin: 50% 120px; box-shadow: 0 0 10px #fff; }
+.simbolo-primal { position: absolute; left: 50%; bottom: 35%; margin-left: -40px; width: 80px; text-align: center; font: 900 72px/1 Georgia, serif; z-index: 5; pointer-events: none; }
+.simbolo-primal.omega { color: #ff5a3a; text-shadow: 0 0 12px #ff2000, 0 0 30px #ff8a00; }
+.simbolo-primal.alpha { color: #4db8ff; text-shadow: 0 0 12px #0070ff, 0 0 30px #00d0ff; }
+
+/* Evolução fora da batalha (pedra, Linking Cord) */
+.evolucao-tela { position: fixed; inset: 0; z-index: 200000; display: grid; place-items: center; background: rgba(5, 10, 20, 0.75); }
+.evolucao-caixa { background: var(--painel); border: 2px solid var(--borda); border-radius: 16px; padding: 20px 28px; display: grid; justify-items: center; gap: 12px; min-width: 320px; }
+.evolucao-palco { position: relative; width: 220px; height: 180px; display: grid; place-items: center; border-radius: 12px; background: radial-gradient(circle at 50% 60%, #2b4a7a, #0f1a2e 70%); overflow: hidden; }
+.evolucao-luz { position: absolute; inset: -40%; background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.25), transparent 30%, rgba(255,255,255,0.2), transparent 60%); animation: evolucao-gira 3s linear infinite; }
+@keyframes evolucao-gira { to { transform: rotate(360deg); } }
+.evolucao-sprite { position: relative; width: 140px; height: 140px; object-fit: contain; image-rendering: pixelated; }
+.evolucao-texto { margin: 0; font-weight: 700; text-align: center; }

@@ -21,7 +21,8 @@ import { iconeItem } from '../ui/iconeItem';
 import { resumoPokemon } from '../ui/resumo';
 import { dicaGolpe } from '../ui/dicaGolpe';
 import { nomeCategoria, traduzir } from '../../../shared/traducao';
-import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarGolpe, animarRetorno, tremerArena } from './animacoes';
+import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarRetorno, animarTransformacao, tremerArena } from './animacoes';
+import { animarGolpeOriginal } from './efeitosGolpes';
 
 export type ResultadoBatalha = 'vitoria' | 'derrota' | 'captura' | 'fuga';
 
@@ -353,7 +354,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         case 'golpe':
           mensagem.textContent = ev.texto;
           await esperar(350);
-          await animarGolpe(arena, sprite(ev.lado), ev.alvo && ev.alvo !== ev.lado ? sprite(ev.alvo) : null, ev.tipoGolpe, ev.categoria);
+          await animarGolpeOriginal(arena, sprite(ev.lado), ev.alvo && ev.alvo !== ev.lado ? sprite(ev.alvo) : null, ev.golpe, ev.tipoGolpe, ev.categoria);
           break;
         case 'hp': {
           info(ev.lado).hp(ev.hp, ev.hpMax);
@@ -403,26 +404,30 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           await dizer(ev.texto);
           break;
         case 'mega': {
-          // Mega Evolução: o símbolo aparece sobre o Pokémon, brilho de arco-íris e troca do sprite
+          // Mega Evolução: esfera de arco-íris envolve o Pokémon, o símbolo da Mega aparece, ele troca e a luz estoura
           const alvo = sprite(ev.lado) as HTMLImageElement;
-          const simbolo = el('img', { class: 'mega-simbolo-anim', src: 'batalha/mega-evolucao.svg', alt: '' });
-          lugar(ev.lado).append(simbolo);
-          alvo.classList.add('megaevoluindo');
-          await esperar(900);
-          trocarSpriteForma(alvo, ev.forma, { shiny: ev.lado === 'jogador' ? save.time[batalha.ativo].shiny : selvagem.shiny, costas: ev.lado === 'jogador' });
-          await esperar(500);
-          alvo.classList.remove('megaevoluindo');
+          mensagem.textContent = `${ev.lado === 'jogador' ? nomeDe(save.time[batalha.ativo].especieId) : nomeDe(selvagem.especieId)} está reagindo à Mega Stone!`;
+          await animarTransformacao(lugar(ev.lado), alvo, () => trocarSpriteForma(alvo, ev.forma, { shiny: ev.lado === 'jogador' ? save.time[batalha.ativo].shiny : selvagem.shiny, costas: ev.lado === 'jogador' }), {
+            cores: ['#f08300', '#aacf52', '#00b9ef', '#e74291'],
+            simbolo: el('img', { class: 'simbolo-transf', src: 'batalha/mega-evolucao.svg', alt: '' }),
+          });
           alvo.classList.add('megaevoluido');
           info(ev.lado).renomear(megaPorForma(ev.forma)?.nome ?? ev.forma);
-          simbolo.remove();
           await dizer(ev.texto);
           break;
         }
-        case 'forma':
-          // Primal Reversion e outras mudanças de forma no meio da batalha
-          trocarSpriteForma(sprite(ev.lado) as HTMLImageElement, ev.forma, { shiny: ev.lado === 'jogador' ? save.time[batalha.ativo].shiny : selvagem.shiny, costas: ev.lado === 'jogador' });
+        case 'forma': {
+          // Primal Reversion (Ω vermelho do Groudon, α azul do Kyogre) e outras mudanças de forma no meio da batalha
+          const alvo = sprite(ev.lado) as HTMLImageElement;
+          const trocar = () => trocarSpriteForma(alvo, ev.forma, { shiny: ev.lado === 'jogador' ? save.time[batalha.ativo].shiny : selvagem.shiny, costas: ev.lado === 'jogador' });
+          const primal = /-Primal$/.test(ev.forma);
+          const groudon = ev.forma.startsWith('Groudon');
+          await animarTransformacao(lugar(ev.lado), alvo, trocar, primal
+            ? { cores: [groudon ? '#ff4a1c' : '#2f8cff'], simbolo: el('span', { class: `simbolo-primal ${groudon ? 'omega' : 'alpha'}` }, groudon ? 'Ω' : 'α') }
+            : { cores: [corTipo(Dex.species.get(ev.forma).types[0] ?? 'Normal')], rapida: true });
           if (ev.texto) await dizer(ev.texto);
           break;
+        }
         case 'fim':
           break;
       }
