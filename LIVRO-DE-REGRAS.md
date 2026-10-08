@@ -454,8 +454,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 ## 15. Comunidade
 
 A barra do topo tem:
-- **ícone da Pokédex** (canto esquerdo): atalho direto para a Pokédex;
-- **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (com nível, tipos, HP e item; clique para ver a ficha) e, embaixo, o **Passe de batalha** (Temporada 1, 30 níveis com trilha grátis e premium; botão **Missões** com as missões diárias, semanais e da temporada que vão dar XP do passe; mecânica, missões e recompensas **em breve**);
+- **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (com nível, tipos, HP e item; clique para ver a ficha) e, embaixo, o **Passe de batalha** (Temporada 1, 30 níveis com trilha grátis e premium; cada nível pede **100 XP do passe** (barra 0 / 100 XP); botão **Missões** com as missões diárias, semanais e da temporada que vão dar XP do passe; mecânica, missões e recompensas **em breve**);
 - **Jogar**: Mapas (regiões e biomas), **Cidade**, **Continentes**, **Duelos com treinadores** e **Ginásios** (os quatro últimos "em breve");
 - **Golpes**: Move Reminder e Move Tutor;
 - **Informações**: Ranking e Database;
@@ -464,7 +463,7 @@ A barra do topo tem:
 - **Administração** (só para contas de administrador; enquanto não há contas, aparece para todos): **Bonificação** e, em breve, **Log** (tudo o que entra e sai no jogo, para achar abuso de bug), Jogadores, Eventos e Anúncios.
 
 ### Cabeçalho fixo
-Embaixo da barra do topo fica um **cabeçalho** que acompanha todas as telas, inclusive o mapa do bioma (só some na criação do personagem e na roleta do inicial): nome do treinador, **VIP** ou não, nível e barra de XP de treinador, **região** atual, **Pokédex da região** (capturados e %), **insígnias** (0/8 até os ginásios existirem), os **selos dos bônus ativos** (ex.: "Silver 1,5x", "XP 2x", "Shiny 2x"; só informam), **silver** e **gold**, e, logo abaixo dele à direita, os atalhos em **botões redondos estilo Pokébola** (pretos, com borda e faixa brancas e o desenho do destino no centro; o nome aparece ao passar o mouse) : **Centro Pokémon** (cura o time), **Pokémarket**, **Bolsa**, **PC** e **Mapas**.
+Embaixo da barra do topo fica um **cabeçalho** que acompanha todas as telas, inclusive o mapa do bioma (só some na criação do personagem e na roleta do inicial): o **ícone da Pokédex** (atalho) com quanto você já capturou da Pokédex da região (ex.: 1/151 · 0,7%), nome do treinador, **VIP** ou não, nível e barra de XP de treinador, **região** atual, **insígnias** (0/8 até os ginásios existirem), os **selos dos bônus ativos** (ex.: "Silver 1,5x", "XP 2x", "Shiny 2x"; só informam), **silver** e **gold**, e, logo abaixo dele à direita, os atalhos em **botões redondos estilo Pokébola** (pretos, com borda e faixa brancas e o desenho do destino no centro; o nome aparece ao passar o mouse) : **Centro Pokémon** (cura o time), **Pokémarket**, **Bolsa**, **PC** e **Mapas**.
 
 ### Bonificação
 A administração pode multiplicar, para todos os jogadores, de **1x até 3x** (1x, 1,5x, 2x, 2,5x, 3x):
@@ -538,6 +537,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
+- Ícone da Pokédex no cabeçalho, ao lado do nome, com o progresso da Pokédex; barra do passe com 0 / 100 XP por nível.
 - Aba Minha conta (Meu perfil, Achievements, Minhas skins, Opções); chances de aparição, de lendário e de shiny na Pokédex.
 - Cabeçalho maior com selos dos bônus ativos e atalhos estilo Pokébola; passe de batalha com 30 níveis e botão Missões.
 - Cabeçalho fixo com informações do treinador e atalhos; Passe de batalha (vitrine) na tela de Início; Log na Administração (em breve).

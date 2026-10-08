@@ -52,6 +52,8 @@ function abrirMissoes(): void {
 
 /** Passe de batalha: por enquanto só a vitrine (a mecânica e as recompensas ainda vão ser definidas). */
 const NIVEIS_PASSE = 30;
+/** XP do passe para subir cada nível. */
+const XP_POR_NIVEL_PASSE = 100;
 function passeDeBatalha(): HTMLElement {
   const casa = (nivel: number, premium: boolean) =>
     el('div', { class: `passe-casa ${premium ? 'premium' : 'gratis'}`, title: 'Recompensa a definir' }, el('span', { class: 'passe-cadeado' }, '?'));
@@ -61,7 +63,10 @@ function passeDeBatalha(): HTMLElement {
     el('div', { class: 'passe-topo' },
       el('div', {}, el('h2', {}, 'Passe de batalha'), el('small', { class: 'meta' }, 'Temporada 1 · recompensas e mecânica em breve')),
       el('div', { class: 'passe-acoes' }, el('button', { class: 'botao secundario', onclick: abrirMissoes }, 'Missões'), el('span', { class: 'selo-em-breve' }, 'Em breve'))),
-    el('div', { class: 'passe-progresso' }, el('small', {}, `Nível 0 de ${NIVEIS_PASSE}`), el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: '0%' } }))),
+    // XP do passe: cada nível pede XP_POR_NIVEL_PASSE (0 a 100)
+    el('div', { class: 'passe-progresso' },
+      el('small', {}, `Nível 0 de ${NIVEIS_PASSE}`),
+      el('div', { class: 'barra-exp barra-passe' }, el('div', { class: 'preenchido', style: { width: '0%' } }), el('span', {}, `0 / ${XP_POR_NIVEL_PASSE} XP`))),
     el('div', { class: 'passe-trilha' },
       el('div', { class: 'passe-rotulos' }, el('small', {}, 'Grátis'), el('small', {}, 'Premium')),
       ...Array.from({ length: NIVEIS_PASSE }, (_, i) =>

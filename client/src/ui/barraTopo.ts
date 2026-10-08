@@ -65,7 +65,7 @@ const ABAS: Aba[] = [
 ];
 
 /** Pokédex vermelha clássica (Kanto): lente azul grande, três luzinhas, dobradiça e telinha. */
-function iconePokedex(): HTMLElement {
+export function iconePokedex(): HTMLElement {
   const caixa = el('span', { class: 'icone-pokedex' });
   caixa.innerHTML = `<svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
     <rect x="3" y="2" width="22" height="28" rx="3" fill="#d8262c" stroke="#5a0b0e" stroke-width="1.4"/>
@@ -116,14 +116,12 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
   });
   document.addEventListener('click', fecharTodos);
 
-  const atalhoPokedex = el('button', { class: 'atalho-pokedex', title: 'Pokédex', 'aria-label': 'Abrir a Pokédex', onclick: () => navegar({ tela: 'pokedex' }) }, iconePokedex());
 
   document.body.prepend(
     el('nav', { class: 'barra-topo' },
       el(
         'div',
         { class: 'barra-topo-conteudo' },
-        atalhoPokedex,
         el('strong', { class: 'marca' }, 'Jogo Claude'),
         el('div', { class: 'abas-topo' }, ...botoes.map((b) => b.raiz)),
       ),
@@ -133,6 +131,5 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
     // telas "em breve" usam a tela de comunidade com uma seção: a seção diz de qual grupo ela é
     const tela = destino.tela === 'comunidade' ? destino.secao : destino.tela === 'administracao' ? `admin-${destino.secao}` : destino.tela === 'conta' ? `conta-${destino.secao}` : destino.tela;
     botoes.forEach((b, i) => b.botao.classList.toggle('ativa', abas[i].telas.includes(tela)));
-    atalhoPokedex.classList.toggle('ativa', tela === 'pokedex');
   };
 }

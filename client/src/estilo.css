@@ -1322,3 +1322,15 @@ button.vaga:hover { border-color: var(--borda); }
 .cartao-skin { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px; border-radius: 12px; background: rgb(27 47 74 / 0.45); border: 1px solid var(--borda); text-align: center; }
 .cartao-skin .icone-skin { width: 56px; height: 56px; }
 .cartao-skin .icone-skin .sprite { width: 72px; height: 72px; }
+
+/* Pokédex no cabeçalho, perto do nome */
+.cab-pokedex { display: flex; align-items: center; gap: 8px; padding: 3px 10px 3px 4px; border-radius: 12px; border: 1px solid var(--borda); background: rgb(255 255 255 / 0.04); color: var(--texto); font: inherit; cursor: pointer; }
+.cab-pokedex:hover, .cab-pokedex.ativa { border-color: var(--destaque); }
+.cab-pokedex .icone-pokedex svg { width: 34px; height: 34px; }
+.cab-pokedex-texto { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 70px; }
+.cab-pokedex-texto strong { font-size: 0.95rem; line-height: 1; }
+.cab-pokedex-texto small { font-size: 0.72rem; color: var(--texto-2); line-height: 1; }
+.cab-pokedex .cab-dex-barra { width: 100%; height: 5px; }
+/* barra de XP do passe com o texto por cima */
+.barra-exp.barra-passe { position: relative; height: 18px; border-radius: 9px; }
+.barra-passe > span { position: absolute; inset: 0; display: grid; place-items: center; font-size: 0.72rem; font-weight: 800; color: var(--texto); text-shadow: 0 1px 2px #000; }

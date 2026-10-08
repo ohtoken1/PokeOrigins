@@ -9,6 +9,7 @@ import { tempoRestanteVip, vipAtivo } from '../../../shared/vip';
 import { carregarSave, curarTime } from '../estado';
 import { abrirBolsa } from './bolsa';
 import { el } from './dom';
+import { iconePokedex } from './barraTopo';
 import { icone, type NomeIcone } from './icones';
 import { abrirLoja } from './loja';
 import { abrirPC } from './pc';
@@ -54,6 +55,13 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
       el(
         'div',
         { class: 'cabecalho-conteudo' },
+        // Pokédex (atalho) com o quanto já foi capturado da região, perto do nome
+        el('button', { class: `cab-pokedex ${atual.tela === 'pokedex' ? 'ativa' : ''}`, title: `Pokédex de ${regiao?.nome ?? ''}: ${capturadosDex} de ${totalDex} capturados`, onclick: () => navegar({ tela: 'pokedex' }) },
+          iconePokedex(),
+          el('span', { class: 'cab-pokedex-texto' },
+            el('strong', {}, `${capturadosDex}/${totalDex}`),
+            el('small', {}, `${parteDex.toLocaleString('pt-BR')}%`),
+            el('span', { class: 'cab-dex-barra' }, el('span', { style: { width: `${parteDex}%` } })))),
         el('div', { class: 'cab-grupo cab-treinador' },
           el('div', { class: 'cab-nome' },
             el('strong', {}, save.aparencia?.nome || 'Treinador'),
@@ -61,12 +69,9 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
           el('div', { class: 'cab-xp', title: t.necessario ? `${t.atual.toLocaleString('pt-BR')} / ${t.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo' },
             el('small', {}, `Treinador Nv. ${t.nivel}`),
             el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${t.necessario ? (t.atual / t.necessario) * 100 : 100}%` } })))),
-        el('div', { class: 'cab-grupo cab-regiao', title: `Pokédex de ${regiao?.nome ?? ''}: ${capturadosDex} de ${totalDex} capturados` },
+        el('div', { class: 'cab-grupo cab-regiao' },
           el('small', {}, 'Região'),
-          el('strong', {}, regiao?.nome ?? save.regiao),
-          el('button', { class: 'cab-dex', onclick: () => navegar({ tela: 'pokedex' }) },
-            el('span', {}, `Pokédex ${capturadosDex}/${totalDex} (${parteDex.toLocaleString('pt-BR')}%)`),
-            el('span', { class: 'cab-dex-barra' }, el('span', { style: { width: `${parteDex}%` } })))),
+          el('strong', {}, regiao?.nome ?? save.regiao)),
         el('div', { class: 'cab-grupo cab-insignias', title: 'Insígnias: chegam com os Ginásios (em breve)' },
           el('small', {}, `Insígnias 0/${TOTAL_INSIGNIAS}`),
           el('div', { class: 'cab-insignias-lista' }, ...Array.from({ length: TOTAL_INSIGNIAS }, () => el('span', { class: 'insignia vazia' })))),
