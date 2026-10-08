@@ -6,7 +6,9 @@ import { itemDaLoja } from '../../../shared/loja';
 import { nomeItemEquipado } from '../../../shared/usoItens';
 import { abrirJanela } from '../ui/janela';
 import { pokemonPorId } from '../dados';
-import { TAMANHO_MAXIMO_TIME, carregarSave, salvar, type PokemonDoJogador } from '../estado';
+import { TAMANHO_MAXIMO_TIME, carregarSave, salvar, type PokemonDoJogador, type Save } from '../estado';
+import { NIVEIS_PASSE, XP_POR_MISSAO, XP_POR_NIVEL_PASSE, missaoCompleta, nivelPasse } from '../../../shared/passe';
+import { ondeMissao, passeDeHoje, textoMissao } from '../passe';
 import { tornarArrastavel } from '../ui/arrastar';
 import { abrirDetalhes } from '../ui/detalhes';
 import { el, seloGenero, selosTipos, spritePokemon } from '../ui/dom';
@@ -29,45 +31,46 @@ function pedestal(p: PokemonDoJogador, posicao: number): HTMLElement {
   );
 }
 
-/** Missões que dão XP do passe de batalha (exemplos; ainda não valem: a mecânica vem depois). */
-const MISSOES: { tipo: string; lista: [string, number][] }[] = [
-  { tipo: 'Diárias', lista: [['Vencer 10 batalhas', 100], ['Capturar 5 Pokémon', 100], ['Andar 500 passos nos mapas', 50]] },
-  { tipo: 'Semanais', lista: [['Capturar 30 Pokémon', 400], ['Vencer 50 batalhas', 400], ['Evoluir 3 Pokémon', 300]] },
-  { tipo: 'Da temporada', lista: [['Capturar um shiny', 1000], ['Chegar ao treinador Nv. 10', 1000]] },
-];
-function abrirMissoes(): void {
-  abrirJanela('Missões do passe', () =>
+/** Janela das missões de hoje (renovam à meia-noite). */
+function abrirMissoes(save: Save): void {
+  const passe = passeDeHoje(save);
+  salvar(save);
+  abrirJanela('Missões diárias', () =>
     el('div', { class: 'missoes' },
-      el('p', { class: 'meta' }, 'Cumpra missões para ganhar XP do passe de batalha. As missões ainda não estão valendo: são exemplos até a mecânica ser definida.'),
-      ...MISSOES.map((g) =>
-        el('section', { class: 'missoes-grupo' },
-          el('h4', {}, g.tipo),
-          ...g.lista.map(([texto, xp]) =>
-            el('div', { class: 'missao' },
-              el('span', { class: 'missao-check' }),
-              el('span', { class: 'missao-texto' }, texto, el('small', {}, '0 / —')),
-              el('strong', { class: 'missao-xp' }, `+${xp} XP`),
-              el('span', { class: 'selo-em-breve' }, 'Em breve'))))),
+      el('p', { class: 'meta' }, `${passe.missoes.length} missões por dia, renovam à meia-noite (as quantidades são as mesmas para todos os jogadores no dia). Cada uma vale ${XP_POR_MISSAO} XP do passe (até 2 níveis por dia). Derrotar e capturar: só Pokémon selvagens.`),
+      el('section', { class: 'missoes-grupo' },
+        ...passe.missoes.map((m) => {
+          const dados = m.especieId ? pokemonPorId(m.especieId) : null;
+          const completa = missaoCompleta(m);
+          return el('div', { class: `missao ${completa ? 'completa' : ''}` },
+            el('span', { class: 'missao-check' }, completa ? '✓' : ''),
+            el('span', { class: `missao-sprite missao-${m.tipo}` }, dados ? spritePokemon(dados, { animado: false }) : m.tipo === 'shiny' ? '✨' : '⚔'),
+            el('span', { class: 'missao-texto' }, textoMissao(m),
+              el('small', {}, `${Math.min(m.feito, m.alvo)} / ${m.alvo} · ${ondeMissao(m)}`),
+              el('span', { class: 'barra-exp barra-missao' }, el('span', { class: 'preenchido', style: { width: `${(Math.min(m.feito, m.alvo) / m.alvo) * 100}%` } }))),
+            el('strong', { class: 'missao-xp' }, `+${XP_POR_MISSAO} XP`));
+        }),
+        ),
     ), { classe: 'janela-missoes' });
 }
 
-/** Passe de batalha: por enquanto só a vitrine (a mecânica e as recompensas ainda vão ser definidas). */
-const NIVEIS_PASSE = 30;
-/** XP do passe para subir cada nível. */
-const XP_POR_NIVEL_PASSE = 100;
-function passeDeBatalha(): HTMLElement {
-  const casa = (nivel: number, premium: boolean) =>
-    el('div', { class: `passe-casa ${premium ? 'premium' : 'gratis'}`, title: 'Recompensa a definir' }, el('span', { class: 'passe-cadeado' }, '?'));
+/** Passe de batalha: XP só das missões diárias; recompensas ainda vão ser definidas. */
+function passeDeBatalha(save: Save): HTMLElement {
+  const passe = passeDeHoje(save);
+  const nivel = nivelPasse(passe.xp);
+  const noNivel = nivel >= NIVEIS_PASSE ? XP_POR_NIVEL_PASSE : passe.xp - nivel * XP_POR_NIVEL_PASSE;
+  const feitasHoje = passe.missoes.filter(missaoCompleta).length;
+  const casa = (n: number, premium: boolean) =>
+    el('div', { class: `passe-casa ${premium ? 'premium' : 'gratis'} ${n <= nivel ? 'alcancada' : ''}`, title: 'Recompensa a definir' }, el('span', { class: 'passe-cadeado' }, '?'));
   return el(
     'section',
     { class: 'passe-batalha' },
     el('div', { class: 'passe-topo' },
-      el('div', {}, el('h2', {}, 'Passe de batalha'), el('small', { class: 'meta' }, 'Temporada 1 · recompensas e mecânica em breve')),
-      el('div', { class: 'passe-acoes' }, el('button', { class: 'botao secundario', onclick: abrirMissoes }, 'Missões'), el('span', { class: 'selo-em-breve' }, 'Em breve'))),
-    // XP do passe: cada nível pede XP_POR_NIVEL_PASSE (0 a 100)
+      el('div', {}, el('h2', {}, 'Passe de batalha'), el('small', { class: 'meta' }, 'Temporada 1 · recompensas em breve')),
+      el('div', { class: 'passe-acoes' }, el('button', { class: 'botao secundario', onclick: () => abrirMissoes(save) }, `Missões ${feitasHoje}/${passe.missoes.length}`))),
     el('div', { class: 'passe-progresso' },
-      el('small', {}, `Nível 0 de ${NIVEIS_PASSE}`),
-      el('div', { class: 'barra-exp barra-passe' }, el('div', { class: 'preenchido', style: { width: '0%' } }), el('span', {}, `0 / ${XP_POR_NIVEL_PASSE} XP`))),
+      el('small', {}, `Nível ${nivel} de ${NIVEIS_PASSE}`),
+      el('div', { class: 'barra-exp barra-passe' }, el('div', { class: 'preenchido', style: { width: `${(noNivel / XP_POR_NIVEL_PASSE) * 100}%` } }), el('span', {}, nivel >= NIVEIS_PASSE ? 'Completo!' : `${noNivel} / ${XP_POR_NIVEL_PASSE} XP`))),
     el('div', { class: 'passe-trilha' },
       el('div', { class: 'passe-rotulos' }, el('small', {}, 'Grátis'), el('small', {}, 'Premium')),
       ...Array.from({ length: NIVEIS_PASSE }, (_, i) =>
@@ -113,6 +116,6 @@ export const telaInicio: Tela = (raiz, navegar) => {
     el('p', { class: 'sub' }, `Olá, ${nome}!`),
     el('h2', { class: 'titulo-time' }, 'Seu time', el('small', { class: 'meta' }, ' · arraste para trocar a ordem')),
     fila,
-    passeDeBatalha(),
+    passeDeBatalha(save),
   );
 };

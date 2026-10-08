@@ -6,6 +6,7 @@ import { SILVER_INICIAL } from '../../shared/loja';
 import { ehLendario } from '../../shared/encontros';
 import { pokemonPorId } from './dados';
 import type { Aparencia } from './personagem/lpc';
+import type { EstadoPasse } from '../../shared/passe';
 
 export type PokemonDoJogador = PokemonIndividual & {
   /** Box do PC onde está guardado (0 a NUMERO_BOXES − 1); só vale para quem está no PC. */
@@ -45,6 +46,10 @@ export interface Save {
   estatisticas?: Estatisticas;
   /** Próximo ID de Pokémon (em ordem de captura). */
   proximoIdPokemon?: number;
+  /** Passe de batalha: XP e missões do dia (client/src/passe.ts). */
+  passe?: EstadoPasse;
+  /** Quando virou treinador (ms). No MMO = data do cadastro da conta. */
+  criadoEm?: number;
 }
 
 export interface Estatisticas {
@@ -52,7 +57,11 @@ export interface Estatisticas {
   capturasShiny: number;
   /** Lendários, míticos e Ultra Beasts. */
   capturasLendarios: number;
+  /** Total de medalhas de torneio (soma de ouro, prata e bronze). */
   medalhas: number;
+  medalhasOuro?: number;
+  medalhasPrata?: number;
+  medalhasBronze?: number;
 }
 
 /** Conta uma captura feita em batalha (para os rankings). */
@@ -125,6 +134,7 @@ export function novoSave(regiao: string, inicial: number, aparencia?: Aparencia)
     nivelEncontro: null,
     vistos: [inicial],
     capturados: [inicial],
+    criadoEm: Date.now(),
   };
 }
 
@@ -180,6 +190,8 @@ function normalizar(save: Save): Save {
   save.silver ??= SILVER_INICIAL;
   save.gold ??= 0;
   save.xpTreinador ??= 0;
+  // saves de antes da data de cadastro: conta a partir de quando abriu o jogo com esta versão
+  save.criadoEm ??= Date.now();
   save.nivelEncontro ??= null;
   // saves antigos: começa o histórico com quem está no time e no PC
   save.capturados ??= [...new Set([...save.time, ...save.caixa].map((p) => p.especieId))];
@@ -221,7 +233,15 @@ export function usarSave(save: Save): void {
 }
 /** O save em uso, se este Pokémon for dele (time ou PC). */
 export function saveDoPokemon(p: PokemonDoJogador): Save | null {
-  return saveEmUso && (saveEmUso.time.includes(p) || saveEmUso.caixa.includes(p)) ? saveEmUso : null;
+  // o save único em memória vale em qualquer tela (antes só região/bioma registravam o save: no Início os botões ficavam travados)
+  const save = carregarSave() ?? saveEmUso;
+  return save && (save.time.includes(p) || save.caixa.includes(p)) ? save : null;
+}
+
+// avisados a cada salvar (ex.: carteira do cabeçalho mostra silver/gold na hora)
+const aoSalvarFns: ((save: Save) => void)[] = [];
+export function aoSalvar(fn: (save: Save) => void): void {
+  aoSalvarFns.push(fn);
 }
 
 export function salvar(save: Save): void {
@@ -233,6 +253,7 @@ export function salvar(save: Save): void {
   } catch {
     // sem armazenamento disponível: o jogo continua, só não guarda o progresso
   }
+  for (const fn of aoSalvarFns) fn(save);
 }
 
 export function apagarSave(): void {

@@ -8,7 +8,7 @@ import type { Destino, Navegar } from '../main';
 import { regiaoPorId } from '../../../shared/regioes';
 import { progressoTreinador } from '../../../shared/treinador';
 import { tempoRestanteVip, vipAtivo } from '../../../shared/vip';
-import { carregarSave, curarTime } from '../estado';
+import { aoSalvar, carregarSave, curarTime } from '../estado';
 import { abrirBolsa } from './bolsa';
 import { el } from './dom';
 import { iconePokedex } from './barraTopo';
@@ -80,8 +80,8 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
         // bônus da administração (Shiny 2x, XP 2x…), só informativo
         selosBonus(),
         el('div', { class: 'cab-grupo cab-moedas' },
-          el('span', { class: 'cab-moeda', title: 'Silver' }, el('span', { class: 'icone-moeda moeda-silver' }), save.silver.toLocaleString('pt-BR')),
-          el('span', { class: 'cab-moeda', title: 'Gold' }, el('span', { class: 'icone-moeda moeda-gold' }), save.gold.toLocaleString('pt-BR'))),
+          el('span', { class: 'cab-moeda', title: 'Silver' }, el('span', { class: 'icone-moeda moeda-silver' }), el('span', { class: 'cab-valor-silver' }, save.silver.toLocaleString('pt-BR'))),
+          el('span', { class: 'cab-moeda', title: 'Gold' }, el('span', { class: 'icone-moeda moeda-gold' }), el('span', { class: 'cab-valor-gold' }, save.gold.toLocaleString('pt-BR')))),
         // ícone só (o nome aparece ao passar o mouse)
       ),
       // atalhos fora da barra: botões hexagonais soltos, um do lado do outro
@@ -98,6 +98,14 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
           aviso),
     );
   }
+
+  // gastou ou ganhou silver/gold (ficha, loja, bolsa, admin…): a carteira muda na hora, sem esperar trocar de tela
+  aoSalvar((save) => {
+    const silver = raiz.querySelector('.cab-valor-silver');
+    const gold = raiz.querySelector('.cab-valor-gold');
+    if (silver) silver.textContent = save.silver.toLocaleString('pt-BR');
+    if (gold) gold.textContent = save.gold.toLocaleString('pt-BR');
+  });
 
   return (destino) => {
     atual = destino;

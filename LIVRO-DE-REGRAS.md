@@ -492,7 +492,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 ## 15. Comunidade
 
 A barra do topo tem:
-- **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (com nível, tipos, HP e item; clique para ver a ficha) e, embaixo, o **Passe de batalha** (Temporada 1, 30 níveis com trilha grátis e premium; cada nível pede **100 XP do passe** (barra 0 / 100 XP); botão **Missões** com as missões diárias, semanais e da temporada que vão dar XP do passe; mecânica, missões e recompensas **em breve**);
+- **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (com nível, tipos, HP e item; clique para ver a ficha) e, embaixo, o **Passe de batalha** (Temporada 1, 30 níveis com trilha grátis e premium; cada nível pede **100 XP do passe**; o XP vem só das **missões diárias**: 5 por dia, renovam à meia-noite — capturar 1 shiny, derrotar 2 espécies sorteadas (10 a 20 cada), capturar 1 espécie (10 a 15) e vencer 5 a 10 Duelos com treinadores; as quantidades são as **mesmas para todos** no dia e as espécies são comuns da sua região e faixa de nível (sem iniciais, lendários, míticos e Ultra Beasts); cada missão vale **40 XP** = no máximo **2 níveis por dia**; recompensas **em breve**);
 - **Jogar**: Mapas (regiões e biomas), **Cidade** (a cidade inicial, onde os jogadores ficam quando não estão caçando nem competindo; por enquanto só o chão, bem espaçosa, sem Pokémon selvagens; Centro Pokémon, Pokémarket, lojas de shards e outros prédios entram aos poucos), **Duelos com treinadores**, **Ginásios** e **Continentes** ("em breve");
 - **Golpes**: Move Reminder e Move Tutor;
 - **Informações**: Ranking e Database;
@@ -624,6 +624,15 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Aba Comunidade (Amigos e Clã em breve) e aba Opções (nome de treinador, nome real, nome no mapa, teto dos encontros).
 - Câmera do mapa com zoom fixo.
 - Painel Admin para testes: chances, Pokémon forçado, moedas, tickets e Pokédex revelada.
+
+### v0.2 — 8 de outubro de 2026
+- **Missões diárias do passe de batalha** (5 por dia, 40 XP cada, até 2 níveis por dia).
+- **Perfil do treinador** novo: coluna com retrato, nome, Online/Offline, nível, região, data de "Treinador desde" e PvP ranqueado (em breve); números (Vistos, Capturados, Shiny, Dex completa), pódio de medalhas de torneio (ouro, prata, bronze), insígnias com escolha de região e o time em cápsulas de Pokébola.
+- Trocar o **nome de treinador** custa 1 gold e mudar a **aparência** custa 1 gold (provisório; criar é grátis).
+- **Duelos com treinadores:** "Sortear outro" gira uma roleta (~2,6 s) e o adversário sorteado fica guardado (sair e voltar não sorteia de novo).
+- Carteira do topo atualiza na hora ao gastar ou ganhar silver/gold.
+- Correção: os IVs ocultos não podiam ser revelados pela tela de Início.
+- Novo fundo do jogo com os lendários.
 
 ---
 

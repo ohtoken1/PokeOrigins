@@ -2,6 +2,7 @@
 // Camadas do LPC + detalhes Pokémon (boné, estampa, Pokébolas no cinto) em lpc.ts.
 import type { Tela } from '../main';
 import { carregarSave, salvar } from '../estado';
+import { PRECO_TROCAR_APARENCIA_GOLD, PRECO_TROCAR_NOME_GOLD } from '../../../shared/loja';
 import {
   APARENCIA_PADRAO, CABELOS, CORES_CABELO, CORES_ROUPA, ESTAMPAS, PELES, carregarPaletas, montarPersonagem,
   type Aparencia, type FolhasPersonagem,
@@ -31,6 +32,15 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
   const save = carregarSave();
   const a: Aparencia = { ...APARENCIA_PADRAO, ...(save?.aparencia ?? aparenciaNova() ?? {}) };
   a.bone = 'nenhum';
+  // como estava ao abrir: editar depois de criado custa gold (nome e aparência cobrados separados)
+  const original: Aparencia = { ...a };
+  const visual = (x: Aparencia) => JSON.stringify({ ...x, nome: '' });
+  const custo = () => {
+    if (!save) return { nome: false, aparencia: false, total: 0 };
+    const nome = (campoNome.value.trim().replace(/\s+/g, ' ') || original.nome) !== original.nome;
+    const aparencia = visual(a) !== visual(original);
+    return { nome, aparencia, total: (nome ? PRECO_TROCAR_NOME_GOLD : 0) + (aparencia ? PRECO_TROCAR_APARENCIA_GOLD : 0) };
+  };
   let direcao = 2;
   let folhas: FolhasPersonagem | null = null;
   let versao = 0;
@@ -60,6 +70,7 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
         caixa.querySelectorAll('button').forEach((x) => x.classList.remove('ativo'));
         b.classList.add('ativo');
         remontar();
+        atualizarCusto();
       });
       caixa.append(b);
     }
@@ -107,7 +118,18 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
   campoNome.addEventListener('input', () => {
     avisoNome.textContent = '';
     nomeSobre.textContent = campoNome.value.trim();
+    atualizarCusto();
   });
+  // preço da edição (só com save): aparece embaixo do botão Salvar
+  const textoCusto = el('small', { class: 'custo-personagem' }, '');
+  const botaoSalvar = el('button', { class: 'botao grande', onclick: () => concluir() }, save ? 'Salvar' : 'Continuar →');
+  const atualizarCusto = () => {
+    if (!save) return;
+    const c = custo();
+    botaoSalvar.textContent = c.total ? `Salvar · ${c.total} gold` : 'Salvar';
+    textoCusto.textContent = `Trocar o nome: ${PRECO_TROCAR_NOME_GOLD} gold · mudar a aparência: ${PRECO_TROCAR_APARENCIA_GOLD} gold · você tem ${save.gold} gold`;
+  };
+  atualizarCusto();
   const concluir = () => {
     const nome = campoNome.value.trim().replace(/\s+/g, ' ');
     if (nome.length < 3) {
@@ -117,6 +139,12 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
     }
     a.nome = nome;
     if (save) {
+      const c = custo();
+      if (save.gold < c.total) {
+        avisoNome.textContent = `Gold insuficiente: precisa de ${c.total}, você tem ${save.gold}.`;
+        return;
+      }
+      save.gold -= c.total;
       save.aparencia = { ...a };
       salvar(save);
       navegar({ tela: 'regiao' });
@@ -135,14 +163,14 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
       'main',
       { class: 'tela tela-personagem' },
       el('h1', {}, save ? 'Editar personagem' : 'Crie seu treinador'),
-      el('p', { class: 'sub' }, 'Escolha o visual do seu personagem. Dá para mudar depois pelo menu da região.'),
+      el('p', { class: 'sub' }, save ? 'Mude o visual ou o nome do seu treinador (cada mudança custa gold).' : 'Escolha o visual do seu personagem. Dá para mudar depois (com gold).'),
       el(
         'div',
         { class: 'layout-personagem' },
         el('section', { class: 'palco-personagem' },
           el('label', { class: 'grupo-nome' }, el('span', {}, 'Nome de treinador'), campoNome, avisoNome),
           el('div', { class: 'chao-personagem' }, nomeSobre, canvas), direcoes,
-          el('button', { class: 'botao grande', onclick: concluir }, save ? 'Salvar' : 'Continuar →')),
+          botaoSalvar, save ? textoCusto : null),
         painel,
       ),
       el('small', { class: 'creditos-lpc' }, 'Personagem: Universal LPC Spritesheet Character Generator — artistas em lpc/CREDITOS-LPC.csv (CC-BY-SA 3.0 / GPL 3.0 / OGA-BY 3.0). Boné, estampas e Pokébolas: desenho próprio.'),

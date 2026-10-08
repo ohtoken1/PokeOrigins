@@ -12,6 +12,8 @@ import { pokemonPorId } from '../dados';
 import { ITENS, type ItemId } from '../../../shared/itens';
 import { efeitoBola } from '../../../shared/bolas';
 import { nivelTreinador } from '../../../shared/treinador';
+import { XP_POR_MISSAO, type Missao } from '../../../shared/passe';
+import { contarNasMissoes, textoMissao } from '../passe';
 import { EXP_SHARE, MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
 import { sortearTicketDaBatalha } from '../../../shared/tickets';
 import { curarTime, guardarNoPC, registrarCapturaNoRanking, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
@@ -32,7 +34,7 @@ export interface OpcoesBatalha {
   selvagem: PokemonIndividual;
   bioma: Bioma;
   /** Duelo contra treinador NPC (sem captura nem fuga; recompensa em silver ao vencer). */
-  treinador?: { nome: string; titulo: string; equipe: PokemonIndividual[]; recompensa: number; imagem?: string; mensagemVitoria?: string };
+  treinador?: { nome: string; titulo: string; equipe: PokemonIndividual[]; recompensa: number; imagem?: string; mensagemVitoria?: string; duelo?: boolean };
   aoTerminar(resultado: ResultadoBatalha): void;
 }
 
@@ -754,6 +756,10 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     for (const golpe of r.golpesPendentes) await perguntarGolpe(p, golpe);
   }
 
+  const avisarMissoes = async (concluidas: Missao[]) => {
+    for (const m of concluidas) await dizer(`Missão concluída: ${textoMissao(m)}! +${XP_POR_MISSAO} XP do passe de batalha.`);
+  };
+
   /** Derrotados que dão XP/EVs: o selvagem, ou todo o time do treinador NPC. */
   const derrotados = () => (treinador ? treinador.equipe : [selvagem]);
   /** XP que um Pokémon de nível `nivel` ganha pelos derrotados. */
@@ -834,6 +840,9 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       save.silver += silver;
       await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${MOEDA}!`);
       await darXpTime();
+      // missões diárias do passe: derrotar conta só selvagens; vitória em Duelos com treinadores conta duelo
+      if (!treinador) await avisarMissoes(contarNasMissoes(save, 'derrotar', selvagem.especieId));
+      else if (treinador.duelo) await avisarMissoes(contarNasMissoes(save, 'duelo'));
     } else if (resultado === 'captura') {
       await darXpTreinador();
       await darXpTime();
@@ -841,6 +850,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       if (curarAoCapturar) curar(selvagem);
       registrarCapturado(save, selvagem.especieId);
       registrarCapturaNoRanking(save, selvagem);
+      await avisarMissoes(contarNasMissoes(save, 'capturar', selvagem.especieId));
+      if (selvagem.shiny) await avisarMissoes(contarNasMissoes(save, 'shiny'));
       if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(selvagem);
       else {
         const box = guardarNoPC(save, selvagem);

@@ -15,7 +15,7 @@
 
 * { box-sizing: border-box; }
 /* wallpaper calmo: anoitecer num vale com lua de Pokébola (client/public/fundo.svg) */
-body { margin: 0; min-height: 100vh; background: url('/fundo.svg') center bottom / cover no-repeat fixed, var(--fundo); }
+body { margin: 0; min-height: 100vh; background: linear-gradient(rgb(8 14 30 / 0.55), rgb(8 14 30 / 0.55)) fixed, url('/fundo-lendarios.webp') center / cover no-repeat fixed, var(--fundo); }
 /* wallpaper de cada bioma (cores que contrastam com o mapa) */
 body[data-fundo='grama'] { background-image: url('/fundo-grama.svg'); }
 body[data-fundo='agua'] { background-image: url('/fundo-agua.svg'); }
@@ -1194,18 +1194,66 @@ button.vaga:hover { border-color: var(--borda); }
 }
 .aviso-bonus strong { color: var(--destaque); }
 /* Buscar jogadores */
-.tela-jogadores { max-width: 860px; margin: 0 auto; }
+.tela-jogadores { max-width: 1100px; margin: 0 auto; }
 .jogadores-busca .db-busca { width: 100%; max-width: 420px; }
 .jogadores-resultado { margin-top: 14px; }
-.perfil-jogador { padding: 14px 16px; border-radius: 14px; background: rgb(27 47 74 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); }
-.perfil-topo { display: flex; align-items: baseline; gap: 12px; }
-.perfil-topo h2 { margin: 0; }
-.perfil-dados { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin: 12px 0; }
-.perfil-dado { display: flex; flex-direction: column; padding: 8px 10px; border-radius: 10px; background: var(--painel-2); }
-.perfil-dado small { color: var(--texto-2); font-size: 0.72rem; }
-.perfil-time { display: flex; flex-wrap: wrap; gap: 8px; }
-.perfil-pokemon { display: flex; flex-direction: column; align-items: center; width: 100px; padding: 6px; border-radius: 10px; border: 1px solid var(--borda); background: var(--painel); color: var(--texto); cursor: pointer; font: inherit; }
-.perfil-pokemon small { font-size: 0.68rem; text-align: center; }
+.custo-personagem { display: block; margin-top: 6px; color: var(--texto-2); font-size: 0.75rem; text-align: center; }
+.perfil-jogador { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 14px; }
+@media (max-width: 760px) { .perfil-jogador { grid-template-columns: minmax(0, 1fr); } }
+.perfil-painel, .perfil-lado { padding: 14px 16px; border-radius: 18px; background: rgb(20 28 44 / 0.85); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); }
+.perfil-painel h3 { margin: 0 0 10px; font-size: 1rem; }
+.perfil-lado { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
+.perfil-lado h2 { margin: 4px 0 0; font-size: 1.4rem; }
+.perfil-retrato { width: 140px; height: 140px; border-radius: 18px; background: repeating-linear-gradient(45deg, #2a4466 0 10px, #2f4c74 10px 20px); border: 2px solid var(--borda); display: grid; place-items: center; overflow: hidden; }
+.perfil-retrato-canvas { width: 160px; height: 160px; flex: none; image-rendering: pixelated; transform: translateY(-14px); }
+.perfil-status { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.85rem; }
+.perfil-bolinha { width: 8px; height: 8px; border-radius: 50%; background: #8a93a6; }
+.perfil-status.online { color: #4ade80; }
+.perfil-status.online .perfil-bolinha { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+.perfil-status.offline { color: var(--texto-2); }
+.perfil-nivel { width: 100%; }
+.perfil-nivel small { color: var(--texto-2); }
+.perfil-barra { display: block; height: 8px; margin-top: 4px; }
+.perfil-barra .preenchido { display: block; }
+.perfil-info { width: 100%; text-align: left; font-size: 0.85rem; border-top: 1px solid var(--borda); padding-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.perfil-info div { display: flex; align-items: center; gap: 6px; }
+.perfil-info span { color: var(--texto-2); }
+.perfil-info svg { width: 16px; height: 16px; flex: none; color: var(--destaque); }
+.perfil-pvp { width: 100%; margin-top: auto; border-radius: 12px; background: linear-gradient(135deg, #3a2a66, #24345a); border: 1px solid #6a58b0; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.perfil-pvp small { color: #c8bdf0; }
+.perfil-direita { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.perfil-numeros { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 760px) { .perfil-numeros { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.perfil-numero { border-radius: 14px; background: rgb(20 28 44 / 0.85); border: 1px solid var(--borda); border-left: 5px solid var(--destaque); padding: 12px; display: flex; flex-direction: column; }
+.perfil-numero small { color: var(--texto-2); }
+.perfil-numero strong { font-size: 1.4rem; }
+.perfil-numero.n-capturados { border-left-color: #ef4444; }
+.perfil-numero.n-shiny { border-left-color: #f5c542; }
+.perfil-numero.n-dex { border-left-color: #3fd46b; }
+.perfil-shiny { color: #f5c542; }
+.perfil-meio { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+@media (max-width: 760px) { .perfil-meio { grid-template-columns: minmax(0, 1fr); } }
+.perfil-podio { display: flex; align-items: flex-end; justify-content: center; gap: 8px; height: 140px; }
+.podio-degrau { width: 72px; border-radius: 10px 10px 0 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding-top: 8px; color: #1b2f4a; font-weight: 900; }
+.podio-degrau strong { font-size: 1.3rem; }
+.podio-ouro { height: 136px; background: #f2c230; }
+.podio-prata { height: 112px; background: #c9ced6; }
+.podio-bronze { height: 94px; background: #cd7f32; }
+.medalha-icone { position: relative; width: 18px; height: 22px; flex: none; }
+.medalha-fita { position: absolute; top: 0; left: 3px; width: 12px; height: 10px; background: linear-gradient(90deg, #d94141 50%, #3b6fd9 50%); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 70%, 0 100%); }
+.medalha-disco { position: absolute; bottom: 0; left: 0; width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgb(0 0 0 / 0.45); box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.2), inset 0 1px 0 rgb(255 255 255 / 0.5); }
+.podio-ouro .medalha-disco { background: radial-gradient(circle at 35% 30%, #fff3b0, #f2c230 45%, #b8860b); }
+.podio-prata .medalha-disco { background: radial-gradient(circle at 35% 30%, #ffffff, #c9ced6 45%, #858c96); }
+.podio-bronze .medalha-disco { background: radial-gradient(circle at 35% 30%, #ffd9b0, #cd7f32 45%, #8a4f1c); }
+.perfil-seletor-regiao { width: 100%; margin-bottom: 10px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto); font: inherit; font-weight: 700; cursor: pointer; }
+.perfil-insignias { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; justify-items: center; }
+.perfil-insignias .insignia-img { width: 44px; height: 44px; padding: 6px; border-radius: 10px; background: rgb(35 58 88 / 0.6); }
+.perfil-time { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 760px) { .perfil-time { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.perfil-capsula { min-width: 0; border-radius: 999px 999px 14px 14px; background: linear-gradient(180deg, #d94141 0 50%, #e8eef6 50% 100%); padding: 6px 6px 8px; text-align: center; color: #1b2f4a; font: inherit; font-size: 0.75rem; font-weight: 800; border: 2px solid #0e1a2c; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+.perfil-capsula:hover { border-color: var(--destaque); }
+.perfil-capsula .sprite { width: 64px; height: 64px; margin-bottom: -4px; }
+.perfil-capsula.vazia { background: rgb(35 58 88 / 0.6); color: var(--texto-2); border: 2px dashed var(--borda); cursor: default; justify-content: center; min-height: 90px; }
 
 /* Cabeçalho fixo (embaixo da barra do topo) */
 .cabecalho-jogo { position: sticky; top: 48px; z-index: 790; background: rgb(16 30 50 / 0.82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-bottom: 1px solid var(--borda); }
@@ -1315,9 +1363,18 @@ button.vaga:hover { border-color: var(--borda); }
 .missao-texto { flex: 1; display: flex; flex-direction: column; }
 .missao-texto small { color: var(--texto-2); font-size: 0.72rem; }
 .missao-xp { color: var(--destaque); white-space: nowrap; }
+.missao.completa { opacity: 1; border-color: #3fae5a; }
+.missao.completa .missao-check { border-color: #3fae5a; background: #3fae5a; color: #fff; display: grid; place-items: center; font-size: 0.7rem; font-weight: 900; }
+.missao-sprite { width: 48px; height: 48px; flex: none; display: grid; place-items: center; }
+.missao-sprite .sprite, .missao-sprite img { max-width: 48px; max-height: 48px; }
+.missao-shiny, .missao-duelo { font-size: 1.6rem; border-radius: 10px; background: rgb(255 255 255 / 0.06); }
+.barra-missao { display: block; height: 6px; margin-top: 4px; }
+.barra-missao .preenchido { display: block; }
+.missao.completa .barra-missao .preenchido { background: #3fae5a; }
+.passe-casa.alcancada { border-color: var(--destaque); box-shadow: 0 0 0 1px var(--destaque) inset; }
 
 /* Minha conta */
-.tela-conta { max-width: 900px; margin: 0 auto; }
+.tela-conta { max-width: 1100px; margin: 0 auto; }
 .conta-botoes { margin-top: 12px; }
 .lista-achievements { display: flex; flex-direction: column; gap: 8px; }
 .achievement { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: rgb(27 47 74 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); }
@@ -1373,6 +1430,11 @@ button.vaga:hover { border-color: var(--borda); }
 .retrato-npc { width: 80px; height: 80px; object-fit: contain; image-rendering: pixelated; flex: none; filter: drop-shadow(0 3px 3px rgb(0 0 0 / 0.45)); }
 .duelo-topo { align-items: center; }
 .duelo-nome { flex: 1; }
+.duelo-roleta .retrato-npc { filter: brightness(0.75) drop-shadow(0 3px 3px rgb(0 0 0 / 0.45)); }
+.duelo-sorteando { margin: 0; font-weight: 700; animation: piscar-sorteio 0.6s ease-in-out infinite alternate; }
+@keyframes piscar-sorteio { from { opacity: 0.45; } to { opacity: 1; } }
+.cartao-duelo.duelo-revelado { animation: revelar-duelo 0.45s ease-out; }
+@keyframes revelar-duelo { from { transform: scale(0.97); box-shadow: 0 0 0 3px var(--destaque); } to { transform: none; box-shadow: none; } }
 .mini-retrato { display: inline-flex; align-items: center; gap: 6px; }
 .mini-retrato img { width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; }
 .linha-treinador-npc { grid-template-columns: 170px 210px 1fr; }

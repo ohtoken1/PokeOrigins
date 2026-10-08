@@ -3,6 +3,7 @@ import type { Tela } from '../main';
 import { carregarSave, salvar } from '../estado';
 import { APARENCIA_PADRAO } from '../personagem/lpc';
 import { nivelMaximoEncontro, nivelTreinador } from '../../../shared/treinador';
+import { PRECO_TROCAR_NOME_GOLD } from '../../../shared/loja';
 import { el } from '../ui/dom';
 
 export const telaOpcoes: Tela = (raiz, navegar) => {
@@ -39,7 +40,15 @@ export const telaOpcoes: Tela = (raiz, navegar) => {
       nomeTreinador.value = save.aparencia?.nome ?? '';
       return;
     }
+    if (nome === save.aparencia?.nome) return;
+    // trocar o nome custa gold
+    if (save.gold < PRECO_TROCAR_NOME_GOLD) {
+      erroNome.textContent = `Gold insuficiente: trocar o nome custa ${PRECO_TROCAR_NOME_GOLD} gold (você tem ${save.gold}).`;
+      nomeTreinador.value = save.aparencia?.nome ?? '';
+      return;
+    }
     erroNome.textContent = '';
+    save.gold -= PRECO_TROCAR_NOME_GOLD;
     save.aparencia = { ...APARENCIA_PADRAO, ...save.aparencia, nome };
     avisarSalvo('Nome de treinador salvo');
   });
@@ -77,7 +86,7 @@ export const telaOpcoes: Tela = (raiz, navegar) => {
     el('p', { class: 'sub' }, 'As mudanças são salvas sozinhas.', salvo),
     secao(
       'Perfil',
-      campo('Nome de treinador', nomeTreinador, 'Aparece em cima do seu personagem no mapa (3 a 16 letras).'),
+      campo('Nome de treinador', nomeTreinador, `Aparece em cima do seu personagem no mapa (3 a 16 letras). Trocar custa ${PRECO_TROCAR_NOME_GOLD} gold.`),
       erroNome,
       campo('Nome real', nomeReal, 'Opcional. Só você vê, por enquanto.'),
       el('label', { class: 'opcoes-check' }, mostrarNome, ' Mostrar meu nome em cima do personagem'),
