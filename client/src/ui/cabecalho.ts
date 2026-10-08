@@ -47,7 +47,7 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
     const parteDex = Math.round((capturadosDex / totalDex) * 1000) / 10;
     const vip = vipAtivo(save);
     const atalho = (nome: NomeIcone, texto: string, acao: () => void) =>
-      el('button', { class: 'atalho-cabecalho', title: texto, 'aria-label': texto, onclick: acao }, icone(nome), el('span', {}, texto));
+      el('button', { class: 'atalho-hex', title: texto, 'aria-label': texto, onclick: acao }, icone(nome));
 
     raiz.replaceChildren(
       el(
@@ -72,7 +72,10 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
         el('div', { class: 'cab-grupo cab-moedas' },
           el('span', { class: 'cab-moeda', title: 'Silver' }, el('span', { class: 'icone-moeda moeda-silver' }), save.silver.toLocaleString('pt-BR')),
           el('span', { class: 'cab-moeda', title: 'Gold' }, el('span', { class: 'icone-moeda moeda-gold' }), save.gold.toLocaleString('pt-BR'))),
-        el('div', { class: 'cab-grupo cab-atalhos' },
+        // ícone só (o nome aparece ao passar o mouse)
+      ),
+      // atalhos fora da barra: botões hexagonais soltos, um do lado do outro
+      el('div', { class: 'cab-atalhos-fora' },
           atalho('coracao', 'Centro Pokémon', () => {
             curarTime(save);
             avisar('Time curado!');
@@ -83,7 +86,6 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
           atalho('computador', 'PC', () => abrirPC(save, aoMudar)),
           atalho('mapa', 'Mapas', () => navegar({ tela: 'regiao' })),
           aviso),
-      ),
     );
   }
 

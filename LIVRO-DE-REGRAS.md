@@ -462,7 +462,7 @@ A barra do topo tem:
 - **Administração** (só para contas de administrador; enquanto não há contas, aparece para todos): **Bonificação** e, em breve, **Log** (tudo o que entra e sai no jogo, para achar abuso de bug), Jogadores, Eventos e Anúncios.
 
 ### Cabeçalho fixo
-Embaixo da barra do topo fica um **cabeçalho** que acompanha todas as telas (menos a criação do personagem, a roleta do inicial e o mapa do bioma, que precisam do espaço): nome do treinador, **VIP** ou não, nível e barra de XP de treinador, **região** atual, **Pokédex da região** (capturados e %), **insígnias** (0/8 até os ginásios existirem), **silver** e **gold**, e atalhos para **Centro Pokémon** (cura o time), **Pokémarket**, **Bolsa**, **PC** e **Mapas**.
+Embaixo da barra do topo fica um **cabeçalho** que acompanha todas as telas (menos a criação do personagem, a roleta do inicial e o mapa do bioma, que precisam do espaço): nome do treinador, **VIP** ou não, nível e barra de XP de treinador, **região** atual, **Pokédex da região** (capturados e %), **insígnias** (0/8 até os ginásios existirem), **silver** e **gold**, e, logo abaixo dele à direita, os atalhos em **botões hexagonais só com ícone** (o nome aparece ao passar o mouse): **Centro Pokémon** (cura o time), **Pokémarket**, **Bolsa**, **PC** e **Mapas**.
 
 ### Bonificação
 A administração pode multiplicar, para todos os jogadores, de **1x até 3x** (1x, 1,5x, 2x, 2,5x, 3x):

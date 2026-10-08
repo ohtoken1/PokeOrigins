@@ -18,7 +18,7 @@ function pedestal(p: PokemonDoJogador): HTMLElement {
   return el(
     'button',
     { class: `pedestal ${p.shiny ? 'shiny' : ''} ${p.hp <= 0 ? 'desmaiado' : ''}`, title: 'Ver a ficha', onclick: () => abrirDetalhes(p) },
-    el('div', { class: 'pedestal-palco' }, spritePokemon(dados, { shiny: p.shiny, palco: true, escala: 2 })),
+    el('div', { class: 'pedestal-palco' }, spritePokemon(dados, { shiny: p.shiny, palco: true })),
     el('strong', {}, dados.nome, p.shiny ? ' ✨' : '', seloGenero(p.genero)),
     el('small', {}, `Nv. ${p.nivel}`),
     selosTipos(dados),
