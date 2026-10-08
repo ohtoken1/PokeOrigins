@@ -493,7 +493,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 
 A barra do topo tem:
 - **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (com nível, tipos, HP e item; clique para ver a ficha) e, embaixo, o **Passe de batalha** (Temporada 1, 30 níveis com trilha grátis e premium; cada nível pede **100 XP do passe**; o XP vem só das **missões diárias**: 5 por dia, renovam à meia-noite — capturar 1 shiny, derrotar 2 espécies sorteadas (10 a 20 cada), capturar 1 espécie (10 a 15) e vencer 5 a 10 Duelos com treinadores; as quantidades são as **mesmas para todos** no dia e as espécies são comuns da sua região e faixa de nível (sem iniciais, lendários, míticos e Ultra Beasts); cada missão vale **40 XP** = no máximo **2 níveis por dia**; recompensas **em breve**);
-- **Jogar**: Mapas (regiões e biomas), **Cidade** (a cidade inicial, onde os jogadores ficam quando não estão caçando nem competindo; por enquanto só o chão, bem espaçosa, sem Pokémon selvagens; Centro Pokémon, Pokémarket, lojas de shards e outros prédios entram aos poucos), **Duelos com treinadores**, **Ginásios** e **Continentes** ("em breve");
+- **Jogar**: Mapas (regiões e biomas), **Cidade** (a cidade inicial, onde os jogadores ficam quando não estão caçando nem competindo; sem Pokémon selvagens; por enquanto só visual: os prédios ainda não abrem), **Duelos com treinadores**, **Ginásios** e **Continentes** ("em breve");
 - **Golpes**: Move Reminder e Move Tutor;
 - **Informações**: Ranking e Database;
 - **Minha conta**: **Meu perfil** (nível, Pokédex, capturas e time; botão para editar o personagem), **Achievements** (10 conquistas com progresso: capturas, shiny, lendário, Pokédex, time completo, nível de treinador, silver; recompensas em breve), **Minhas skins** (as skins que você ganha vão para cá, não para a Bolsa) e **Opções**;
@@ -640,6 +640,9 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **VIP:** 20% de desconto nas compras em silver, +20% de XP (treinador e Pokémon), +20% de chance de shiny, +10% de chance de lendário, mítico, Ultra Beast e inicial, +5% na captura (sempre em cima da chance normal). Selos na Pokédex mostram o que está mudando as chances.
 - Chance do inicial solto: 1 em 12 mil.
 - Missões antigas do passe são sorteadas de novo quando o formato muda.
+- **Cidade** com tudo no lugar: praça com fonte e estátua do Mew, Centro Pokémon, Pokémarket, Banco, Arena, estação de trem, Professor de Golpes, casas com quintal, parques com lago, hortas, feiras nas entradas, floresta, lago grande e campo de flores. Moradores e Pokémon passeando, pássaros, nuvens, trem passando e **dia/noite pelo relógio** (janelas e postes acesos à noite).
+- **Anti-macro:** o Pokémon selvagem só aparece quando você para de andar (segurar a tecla direto não sorteia encontro).
+- Mapas mais nítidos (sem o serrilhado do pixel art).
 
 ---
 

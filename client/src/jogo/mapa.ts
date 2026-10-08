@@ -4,6 +4,8 @@ import type { Paleta } from './paletas';
 import { corComFiltro, imagemComFiltro } from './filtroCor';
 import type { Aparencia } from '../personagem/lpc';
 import { sombraProjetada } from './cidadeDesenhos';
+import { desenharChaoCidade, plantarFlores } from './cidadeChao';
+import type { FormaLago } from './ruido';
 
 export const TAM = 16;
 export const LARGURA = 77;
@@ -11,8 +13,29 @@ export const ALTURA = 58;
 /** Quantas vezes o mapa é maior que o original de 48×36 (quantidade de lagos, bosques, mato…). */
 const ESCALA = (LARGURA * ALTURA) / (48 * 36);
 
-/** pedra/pedraEscura = calçamento da cidade; jardim = canteiro de flores com meio-fio; trilho = linha do trem (bloqueia) */
-export type Terreno = 'chao' | 'mato' | 'caminho' | 'liquido' | 'pedra' | 'pedraEscura' | 'jardim' | 'trilho';
+/**
+ * Cidade: pedra = calçada de lajotas; praca = pedras da praça; pedraEscura = faixas de tijolo; jardim = canteiro de
+ * flores com meio-fio; trilho = linha do trem (bloqueia); lago = água dos lagos orgânicos (bloqueia).
+ */
+export type Terreno = 'chao' | 'mato' | 'caminho' | 'liquido' | 'pedra' | 'praca' | 'pedraEscura' | 'jardim' | 'trilho' | 'lago' | 'horta';
+
+/** Formas da cidade desenhadas em pixels (não em tiles). */
+export interface InfoCidade {
+  /** pedras da praça em anéis em volta deste ponto (px); `achatamento` < 1 deixa os anéis ovais como a fonte */
+  aneis?: { x: number; y: number; raio: number; achatamento: number };
+  /** lagos com borda orgânica (px) */
+  lagos: FormaLago[];
+  /** trilhas curvas de terra nos parques: pontos (px) e largura */
+  caminhos: { pontos: [number, number][]; largura: number }[];
+  /** enfeites desenhados no chão (px): vitórias-régias na água, juncos na margem */
+  enfeites: { tipo: 'vitoria' | 'junco'; x: number; y: number; v: number }[];
+  /** moradores que passeiam (tile de casa e quantos tiles podem se afastar) */
+  moradores: { x: number; y: number; raio: number }[];
+  /** Pokémon soltos pela cidade (espécie, tile de casa, raio; raio 0 = parado) */
+  pokemons: { especie: number; x: number; y: number; raio: number }[];
+  /** postes (pixels do topo da lanterna) para a luz à noite */
+  luzes: { x: number; y: number }[];
+}
 
 /** Objeto em pé (prédio, fonte, banco…); `peca` é o nome em PECAS (jogo/cidade.ts). */
 export interface ObjetoMapa {
@@ -39,8 +62,9 @@ export interface Mapa {
   altura: number;
   terreno: Terreno[][];
   bloqueado: boolean[][];
-  /** obstáculos 2×2 (árvores, pedras grandes…) com canto superior esquerdo em x,y */
-  grandes: { x: number; y: number }[];
+  /** obstáculos 2×2 (árvores, pedras grandes…) com canto superior esquerdo em x,y; na cidade a árvore (tile da
+   * folha de natureza) pode vir escolhida, e `rocha` desenha uma pedra grande no lugar */
+  grandes: { x: number; y: number; arvore?: [number, number]; rocha?: boolean }[];
   pedrinhas: { x: number; y: number }[];
   /** dx/dy só servem para variar qual flor do tileset aparece */
   flores: { x: number; y: number; dx: number; dy: number }[];
@@ -52,6 +76,8 @@ export interface Mapa {
   sombras?: boolean;
   /** trilhas de terra estreitas (em pixels), da largura da porta de cada casa até a calçada */
   trilhas?: { x: number; y: number; w: number; h: number }[];
+  /** cidade: chão desenhado pixel a pixel (jogo/cidadeChao.ts) */
+  cidade?: InfoCidade;
 }
 
 /** Gerador aleatório com semente: o mesmo bioma gera sempre o mesmo mapa. */
@@ -209,6 +235,8 @@ const GRAMAS: [number, number][] = [[2, 1], [3, 1], [5, 5], [6, 5], [2, 1], [3, 
 const MATO_ALTO: [number, number] = [1, 5];
 const FLORES: [number, number][] = [[7, 0], [7, 1], [7, 3], [7, 4], [7, 6], [7, 7]];
 const AREIA: [number, number] = [4, 5];
+/** pedra grande cinza (2×2) do core_outdoor_nature */
+const ROCHA_GRANDE: [number, number] = [42, 6];
 // no core_outdoor_water: textura da água (bloco 6×6) e moldura da margem (3×3, meio transparente)
 const AGUA: [number, number] = [9, 0];
 const MARGEM: [number, number] = [6, 1];
@@ -243,7 +271,14 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
   const tile = (src: CanvasImageSource, [tx, ty]: [number, number], px: number, py: number, w = 1, h = 1) =>
     ctx.drawImage(src, tx * TAM, ty * TAM, w * TAM, h * TAM, px, py, w * TAM, h * TAM);
 
-  for (let y = 0; y < mapa.altura; y++)
+  if (mapa.cidade) {
+    // cidade: chão pixel a pixel, trilhos por cima e flores sem o quadrado de grama
+    desenharChaoCidade(ctx, mapa);
+    for (let y = 0; y < mapa.altura; y++)
+      for (let x = 0; x < mapa.largura; x++) if (terreno[y][x] === 'trilho') desenharTrilho(ctx, x * TAM, y * TAM, t(x, y - 1) === 'trilho');
+    plantarFlores(ctx, mapa, buch, tilesets.cidade);
+  }
+  for (let y = 0; y < mapa.altura && !mapa.cidade; y++)
     for (let x = 0; x < mapa.largura; x++) {
       const px = x * TAM;
       const py = y * TAM;
@@ -318,8 +353,8 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
       }
     }
 
-  // trilhas de terra das portas (areia do tileset, com borda dos lados)
-  if (mapa.trilhas?.length) {
+  // trilhas de terra das portas (areia do tileset, com borda dos lados); na cidade já vêm no chão
+  if (mapa.trilhas?.length && !mapa.cidade) {
     const areia = document.createElement('canvas');
     [areia.width, areia.height] = [TAM, TAM];
     areia.getContext('2d')!.drawImage(buch, AREIA[0] * TAM, AREIA[1] * TAM, TAM, TAM, 0, 0, TAM, TAM);
@@ -347,7 +382,7 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
     }
   }
 
-  for (const f of mapa.flores) {
+  for (const f of mapa.cidade ? [] : mapa.flores) {
     if (paleta.submerso) desenharConcha(ctx, f.x * TAM, f.y * TAM, f.dx + f.dy);
     else tile(buch, FLORES[(f.dx + f.dy) % FLORES.length], f.x * TAM, f.y * TAM);
   }
@@ -355,13 +390,15 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
 
   // sombras primeiro (embaixo de todas as árvores)
   if (mapa.sombras && paleta.obstaculo === 'arvore' && paleta.arvores)
-    for (const g of mapa.grandes) desenharSombraArvore(ctx, natureza, paleta.arvores[(g.x * 7 + g.y * 3) % paleta.arvores.length], g.x * TAM, (g.y + 2) * TAM);
+    for (const g of mapa.grandes)
+      if (!g.rocha) desenharSombraArvore(ctx, natureza, g.arvore ?? paleta.arvores[(g.x * 7 + g.y * 3) % paleta.arvores.length], g.x * TAM, (g.y + 2) * TAM);
   // grandes em ordem de cima para baixo, para os de baixo cobrirem os de cima
   for (const g of [...mapa.grandes].sort((a, b) => a.y - b.y)) {
     const escolher = (lista: [number, number][]) => lista[(g.x * 7 + g.y * 3) % lista.length];
-    if (paleta.obstaculo === 'arvore' && paleta.arvores) {
+    if (g.rocha) tile(natureza, ROCHA_GRANDE, g.x * TAM, g.y * TAM, 2, 2);
+    else if (paleta.obstaculo === 'arvore' && paleta.arvores) {
       // árvore de 2×3 tiles: a copa passa 1 tile acima do espaço 2×2 que ela bloqueia
-      tile(natureza, escolher(paleta.arvores), g.x * TAM, (g.y - 1) * TAM, 2, 3);
+      tile(natureza, g.arvore ?? escolher(paleta.arvores), g.x * TAM, (g.y - 1) * TAM, 2, 3);
     } else if (paleta.obstaculo === 'coral') {
       // fundo do mar: maioria corais, algumas rochas
       if (paleta.rochas && (g.x * 5 + g.y * 3) % 7 === 0) tile(natureza, escolher(paleta.rochas), g.x * TAM, g.y * TAM, 2, 2);

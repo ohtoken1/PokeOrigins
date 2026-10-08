@@ -68,6 +68,11 @@ function medir(img: HTMLImageElement, a: Anim): { origemY: number; largura: numb
 }
 
 const carregando = new Map<string, Promise<InfoPmd | null>>();
+/**
+ * Uma carga de cada vez no loader do Phaser: várias ao mesmo tempo (a cidade carrega vários Pokémon juntos)
+ * deixavam arquivos presos na fila sem nunca terminar.
+ */
+let filaDoLoader: Promise<void> = Promise.resolve();
 
 /** Carrega as folhas de andar/parado e cria as animações (uma vez por espécie). */
 export function carregarPmd(cena: Phaser.Scene, especie: number, shiny = false): Promise<InfoPmd | null> {
@@ -80,13 +85,19 @@ export function carregarPmd(cena: Phaser.Scene, especie: number, shiny = false):
   const promessa = (async () => {
     const dados = await lerAnimData(numero);
     if (!dados) return null;
-    await new Promise<void>((ok) => {
-      for (const nome of ['Walk', 'Idle'] as const)
-        if (!cena.textures.exists(`${prefixo}-${nome}`))
-          cena.load.spritesheet(`${prefixo}-${nome}`, `${pasta}/${nome}-Anim.png`, { frameWidth: dados[nome].largura, frameHeight: dados[nome].altura });
-      cena.load.once(Phaser.Loader.Events.COMPLETE, () => ok());
-      cena.load.start();
-    });
+    const carga = filaDoLoader.then(
+      () =>
+        new Promise<void>((ok) => {
+          const faltam = (['Walk', 'Idle'] as const).filter((nome) => !cena.textures.exists(`${prefixo}-${nome}`));
+          if (!faltam.length || !cena.sys.isActive()) return ok();
+          for (const nome of faltam)
+            cena.load.spritesheet(`${prefixo}-${nome}`, `${pasta}/${nome}-Anim.png`, { frameWidth: dados[nome].largura, frameHeight: dados[nome].altura });
+          cena.load.once(Phaser.Loader.Events.COMPLETE, () => ok());
+          cena.load.start();
+        }),
+    );
+    filaDoLoader = carga;
+    await carga;
     if (!cena.textures.exists(`${prefixo}-Walk`)) return null;
     // sem folha "parado" (alguns Pokémon): parado usa o 1º quadro de andar
     const temIdle = cena.textures.exists(`${prefixo}-Idle`);

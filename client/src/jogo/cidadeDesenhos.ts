@@ -3,19 +3,19 @@
 // azul) e a sombra projetada de qualquer objeto.
 type Ctx = CanvasRenderingContext2D;
 
-function novoCanvas(w: number, h: number): [HTMLCanvasElement, Ctx] {
+export function novoCanvas(w: number, h: number): [HTMLCanvasElement, Ctx] {
   const c = document.createElement('canvas');
   [c.width, c.height] = [Math.ceil(w), Math.ceil(h)];
   const ctx = c.getContext('2d', { willReadFrequently: true })!;
   ctx.imageSmoothingEnabled = false;
   return [c, ctx];
 }
-const ret = (ctx: Ctx, cor: string, x: number, y: number, w: number, h: number) => {
+export const ret = (ctx: Ctx, cor: string, x: number, y: number, w: number, h: number) => {
   ctx.fillStyle = cor;
   ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
 };
 /** Elipse cheia, linha por linha, sempre em pixels inteiros (bordas nítidas e simétricas). */
-function elipse(ctx: Ctx, cx: number, cy: number, rx: number, ry: number, cor: string) {
+export function elipse(ctx: Ctx, cx: number, cy: number, rx: number, ry: number, cor: string) {
   [cx, cy, rx, ry] = [Math.round(cx), Math.round(cy), Math.round(rx), Math.round(ry)];
   if (rx <= 0 || ry <= 0) return;
   ctx.fillStyle = cor;
@@ -42,7 +42,7 @@ function anel(ctx: Ctx, cx: number, cy: number, rx: number, ry: number, cor: str
 /** Borda de baixo da elipse no ponto x (onde começa a parede da frente). */
 const baseDaElipse = (x: number, cx: number, cy: number, rx: number, ry: number) => Math.round(cy + ry * Math.sqrt(Math.max(0, 1 - ((x - cx) / rx) ** 2)));
 /** Pokébola pequena (emblemas). */
-function pokebola(ctx: Ctx, cx: number, cy: number, r: number, cima: string, contorno: string) {
+export function pokebola(ctx: Ctx, cx: number, cy: number, r: number, cima: string, contorno: string) {
   elipse(ctx, cx, cy, r + 1, r + 1, contorno);
   elipse(ctx, cx, cy, r, r, '#f4f4ee');
   ctx.fillStyle = cima;

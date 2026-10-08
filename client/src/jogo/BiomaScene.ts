@@ -3,6 +3,7 @@ import type { Bioma } from '../../../shared/biomas';
 import { TAM, desenharMapa, gerarMapa, type Mapa } from './mapa';
 import { FOLHAS_CIDADE, PECAS, URL_ESTATUA, gerarMapaCidade, type ImagensCidade, type Peca } from './cidade';
 import { sombraProjetada } from './cidadeDesenhos';
+import { montarVidaDaCidade, type VidaDaCidade } from './cidadeVida';
 import { PALETAS } from './paletas';
 import { pokemonPorId } from '../dados';
 import { PAUSA_MINIMA_ENCONTRO_MS } from '../../../shared/encontros';
@@ -13,6 +14,11 @@ import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
 /** Tamanho da tela do jogo em pixels (a câmera mostra 40×27 tiles ampliados 1,5×). */
 export const LARGURA_TELA = 960;
 export const ALTURA_TELA = 640;
+/**
+ * O canvas é desenhado com o dobro de pixels e reduzido suavemente na página: cada pixel do mundo vira 3 pixels
+ * exatos (zoom 1,5 × 2) em vez de 1 ou 2 alternados, que deixava o pixel art irregular/serrilhado.
+ */
+export const RESOLUCAO = 2;
 /** Zoom da câmera, fixo (pedido do dono: 1,5; o jogador não muda). */
 const ZOOM = 1.5;
 const zoomEscolhido = ZOOM;
@@ -132,6 +138,8 @@ export class BiomaScene extends Phaser.Scene {
   private setas!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<'W' | 'A' | 'S' | 'D', Phaser.Input.Keyboard.Key>;
   private opcoes!: OpcoesBioma;
+  /** cidade: moradores e Pokémon passeando (ocupam tiles) */
+  private vida: VidaDaCidade | null = null;
 
   constructor() {
     super('bioma');
@@ -156,6 +164,7 @@ export class BiomaScene extends Phaser.Scene {
     this.linhaLpc = 2;
     this.pmd = null;
     this.linhaPmd = 0;
+    this.vida = null;
   }
 
   preload() {
@@ -207,7 +216,10 @@ export class BiomaScene extends Phaser.Scene {
     this.add.image(0, 0, chaveMapa).setOrigin(0);
     this.montarObjetos();
     this.montarNpcs();
-    if (this.opcoes.cidade) this.soltarBorboletas();
+    if (this.opcoes.cidade) {
+      this.soltarBorboletas();
+      this.vida = montarVidaDaCidade(this, this.mapa, () => ({ x: this.pos.x, y: this.pos.y, seguidor: this.posSeguidor }));
+    }
 
     const [sx, sy] = this.pesDoTile(this.posSeguidor.x, this.posSeguidor.y);
     this.imgSeguidor = this.add.sprite(0, 0, '__DEFAULT').setOrigin(0.5, 0.9).setScale(ESCALA_DETALHE);
@@ -235,7 +247,7 @@ export class BiomaScene extends Phaser.Scene {
     if (paleta.submerso) this.efeitosSubmersos();
 
     const camera = this.cameras.main;
-    camera.setZoom(zoomEscolhido).setBounds(0, 0, this.mapa.largura * TAM, this.mapa.altura * TAM).setRoundPixels(true);
+    camera.setZoom(zoomEscolhido * RESOLUCAO).setBounds(0, 0, this.mapa.largura * TAM, this.mapa.altura * TAM).setRoundPixels(true);
     camera.startFollow(this.jogador, true);
 
     const teclado = this.input.keyboard!;
@@ -292,9 +304,10 @@ export class BiomaScene extends Phaser.Scene {
       const x = Math.round(o.x * TAM);
       const base = o.base * TAM;
       const img = animada ? this.add.sprite(x, base, chave, quadro).play(`anim-${o.peca}`) : this.add.image(x, base, chave, quadro);
-      img.setOrigin(0, 1).setDepth(base - 0.5);
+      // bandeirolas e outras peças no alto ficam sempre por cima de quem passa embaixo
+      img.setOrigin(0, 1).setDepth(p.alto ? 99500 : base - 0.5);
       // sombra projetada no chão (embaixo de tudo que está em pé)
-      this.add.image(x, base - p.h, this.sombraDaPeca(o.peca, p, chave, quadro)).setOrigin(0).setDepth(1).setAlpha(0.28);
+      if (!p.semSombra) this.add.image(x, base - p.h, this.sombraDaPeca(o.peca, p, chave, quadro)).setOrigin(0).setDepth(1).setAlpha(0.28);
       const rotulo = o.rotulo ?? p.rotulo;
       if (rotulo) this.rotulo(rotulo, x + p.w / 2, base - p.h - 2, '#ffe680');
     }
@@ -573,7 +586,7 @@ export class BiomaScene extends Phaser.Scene {
 
     const x = this.pos.x + dx;
     const y = this.pos.y + dy;
-    if (x < 0 || y < 0 || x >= this.mapa.largura || y >= this.mapa.altura || this.mapa.bloqueado[y][x]) return;
+    if (x < 0 || y < 0 || x >= this.mapa.largura || y >= this.mapa.altura || this.mapa.bloqueado[y][x] || this.vida?.ocupa(x, y)) return;
 
     // o seguidor vai para onde o jogador estava
     const anterior = this.pos;

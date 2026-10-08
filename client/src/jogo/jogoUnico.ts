@@ -2,7 +2,7 @@
 // criava um jogo novo (com um contexto WebGL novo): trocando várias vezes, o navegador ficava
 // sem memória de vídeo e a tela travava/ficava preta por dezenas de segundos.
 import Phaser from 'phaser';
-import { ALTURA_TELA, BiomaScene, LARGURA_TELA, type OpcoesBioma } from './BiomaScene';
+import { ALTURA_TELA, BiomaScene, LARGURA_TELA, RESOLUCAO, type OpcoesBioma } from './BiomaScene';
 
 let jogo: Phaser.Game | null = null;
 
@@ -12,8 +12,9 @@ export function mostrarJogo(area: HTMLElement, opcoes: OpcoesBioma): { cena: () 
     jogo = new Phaser.Game({
       type: Phaser.AUTO,
       parent: area,
-      width: LARGURA_TELA,
-      height: ALTURA_TELA,
+      // resolução dobrada (ver RESOLUCAO): a página mostra o canvas no mesmo tamanho, reduzido suavemente
+      width: LARGURA_TELA * RESOLUCAO,
+      height: ALTURA_TELA * RESOLUCAO,
       pixelArt: true,
       backgroundColor: '#15263c',
       scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_HORIZONTALLY },
