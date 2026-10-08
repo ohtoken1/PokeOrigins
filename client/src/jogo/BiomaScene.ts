@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import type { Bioma } from '../../../shared/biomas';
-import { ALTURA, LARGURA, TAM, desenharMapa, gerarMapa, type Mapa } from './mapa';
+import { TAM, desenharMapa, gerarMapa, gerarMapaCidade, type Mapa } from './mapa';
 import { PALETAS } from './paletas';
 import { pokemonPorId } from '../dados';
 import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
@@ -66,7 +66,10 @@ export interface Seguidor {
 }
 
 export interface OpcoesBioma {
+  /** Bioma do mapa (na cidade, só define o visual do chão: grama). */
   bioma: Bioma;
+  /** Mapa da cidade (sem encontros) no lugar do mapa do bioma. */
+  cidade?: boolean;
   /** Primeiro Pokémon do time, que anda atrás do jogador. */
   seguidor: Seguidor | null;
   /** Chamado quando o mapa terminou de ser montado. */
@@ -160,20 +163,21 @@ export class BiomaScene extends Phaser.Scene {
   create() {
     const { bioma } = this.opcoes;
     const paleta = PALETAS[bioma.id] ?? PALETAS.grama;
-    // mapa de cada bioma é gerado e desenhado só na primeira visita; depois vem da memória
-    let mapa = mapasGerados.get(bioma.id);
+    // mapa de cada bioma (e da cidade) é gerado e desenhado só na primeira visita; depois vem da memória
+    const idMapa = this.opcoes.cidade ? 'cidade' : bioma.id;
+    let mapa = mapasGerados.get(idMapa);
     if (!mapa) {
-      mapa = gerarMapa(bioma.id, paleta);
-      mapasGerados.set(bioma.id, mapa);
+      mapa = this.opcoes.cidade ? gerarMapaCidade() : gerarMapa(bioma.id, paleta);
+      mapasGerados.set(idMapa, mapa);
     }
     this.mapa = mapa;
     this.pos = { ...this.mapa.inicio };
     this.posSeguidor = { ...this.mapa.inicio };
 
     const imagem = (chave: string) => this.textures.get(chave).getSourceImage() as HTMLImageElement;
-    const chaveMapa = `mapa-${bioma.id}`;
+    const chaveMapa = `mapa-${idMapa}`;
     if (!this.textures.exists(chaveMapa))
-      this.textures.addCanvas(chaveMapa, desenharMapa(this.mapa, paleta, bioma.id, { buch: imagem('buch'), natureza: imagem('natureza'), agua: imagem('agua') }));
+      this.textures.addCanvas(chaveMapa, desenharMapa(this.mapa, paleta, idMapa, { buch: imagem('buch'), natureza: imagem('natureza'), agua: imagem('agua') }));
     for (const direcao of ['baixo', 'cima', 'lado'] as Direcao[])
       for (const quadro of [0, 1, 2] as Quadro[]) {
         const chave = `jogador-${direcao}-${quadro}`;
@@ -207,7 +211,7 @@ export class BiomaScene extends Phaser.Scene {
     if (paleta.submerso) this.efeitosSubmersos();
 
     const camera = this.cameras.main;
-    camera.setZoom(zoomEscolhido).setBounds(0, 0, LARGURA * TAM, ALTURA * TAM).setRoundPixels(true);
+    camera.setZoom(zoomEscolhido).setBounds(0, 0, this.mapa.largura * TAM, this.mapa.altura * TAM).setRoundPixels(true);
     camera.startFollow(this.jogador, true);
 
     const teclado = this.input.keyboard!;
@@ -226,7 +230,7 @@ export class BiomaScene extends Phaser.Scene {
 
   /** Fundo do mar: feixes de luz balançando, bolhas subindo e o personagem azulado. */
   private efeitosSubmersos() {
-    const [w, h] = [LARGURA * TAM, ALTURA * TAM];
+    const [w, h] = [this.mapa.largura * TAM, this.mapa.altura * TAM];
     this.jogador.setTint(0xc8e4ff);
     this.imgSeguidor.setTint(0xc8e4ff);
 
@@ -423,7 +427,7 @@ export class BiomaScene extends Phaser.Scene {
 
     const x = this.pos.x + dx;
     const y = this.pos.y + dy;
-    if (x < 0 || y < 0 || x >= LARGURA || y >= ALTURA || this.mapa.bloqueado[y][x]) return;
+    if (x < 0 || y < 0 || x >= this.mapa.largura || y >= this.mapa.altura || this.mapa.bloqueado[y][x]) return;
 
     // o seguidor vai para onde o jogador estava
     const anterior = this.pos;

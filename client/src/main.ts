@@ -4,6 +4,7 @@ import { carregarSave } from './estado';
 import { telaEscolhaInicial } from './telas/escolhaInicial';
 import { telaRegiao } from './telas/regiao';
 import { telaBioma } from './telas/bioma';
+import { telaCidade } from './telas/cidade';
 import { telaPokedex } from './telas/pokedex';
 import { telaDatabase } from './telas/database';
 import { telaPersonagem } from './telas/personagem';
@@ -22,7 +23,7 @@ import { montarBarraTopo } from './ui/barraTopo';
 import { montarCabecalho } from './ui/cabecalho';
 import { definirNavegacao } from './ui/navegacao';
 
-export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes' } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' };
+export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes' } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' } | { tela: 'cidade' };
 export type Navegar = (destino: Destino) => void;
 /** Cada tela desenha dentro de `raiz` e pode devolver uma função de limpeza. */
 export type Tela = (raiz: HTMLElement, navegar: Navegar) => (() => void) | void;
@@ -55,6 +56,7 @@ const navegar: Navegar = (destino) => {
   else if (destino.tela === 'conta') limparTelaAtual = telaConta(destino.secao)(raiz, navegar);
   else if (destino.tela === 'duelos') limparTelaAtual = telaDuelos(raiz, navegar);
   else if (destino.tela === 'ginasios') limparTelaAtual = telaGinasios(raiz, navegar);
+  else if (destino.tela === 'cidade') limparTelaAtual = telaCidade(raiz, navegar);
   else limparTelaAtual = telaBioma(destino.biomaId)(raiz, navegar);
 };
 

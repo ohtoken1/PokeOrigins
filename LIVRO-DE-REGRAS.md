@@ -487,7 +487,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 
 A barra do topo tem:
 - **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (com nível, tipos, HP e item; clique para ver a ficha) e, embaixo, o **Passe de batalha** (Temporada 1, 30 níveis com trilha grátis e premium; cada nível pede **100 XP do passe** (barra 0 / 100 XP); botão **Missões** com as missões diárias, semanais e da temporada que vão dar XP do passe; mecânica, missões e recompensas **em breve**);
-- **Jogar**: Mapas (regiões e biomas), **Duelos com treinadores**, **Ginásios**, **Cidade** e **Continentes** (os dois últimos "em breve");
+- **Jogar**: Mapas (regiões e biomas), **Cidade** (a cidade inicial, onde os jogadores ficam quando não estão caçando nem competindo; por enquanto só o chão, bem espaçosa, sem Pokémon selvagens; Centro Pokémon, Pokémarket, lojas de shards e outros prédios entram aos poucos), **Duelos com treinadores**, **Ginásios** e **Continentes** ("em breve");
 - **Golpes**: Move Reminder e Move Tutor;
 - **Informações**: Ranking e Database;
 - **Minha conta**: **Meu perfil** (nível, Pokédex, capturas e time; botão para editar o personagem), **Achievements** (10 conquistas com progresso: capturas, shiny, lendário, Pokédex, time completo, nível de treinador, silver; recompensas em breve), **Minhas skins** (as skins que você ganha vão para cá, não para a Bolsa) e **Opções**;
@@ -570,6 +570,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
 - Ícone da Pokédex no cabeçalho, ao lado do nome, com o progresso da Pokédex; barra do passe com 0 / 100 XP por nível.
+- **Cidade** (Jogar → Cidade): mapa da cidade inicial, só com o chão por enquanto (140 × 100 quadrados, praça central e avenidas).
 - **Exp. Share:** item para segurar; quem segura ganha XP e EVs da vitória/captura mesmo sem entrar em campo.
 - **Rayquazite:** o Rayquaza agora megaevolui com pedra, como os outros.
 - **Terastallizer Band** (item de batalha): obrigatória para terastalizar. **Dynamax Band** (item de batalha; o Dynamax ainda não existe).

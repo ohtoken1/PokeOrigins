@@ -3,7 +3,7 @@
 import type { Tela } from '../main';
 import { el } from '../ui/dom';
 
-export type SecaoComunidade = 'amigos' | 'cla' | 'cidade' | 'continentes' | 'duelos' | 'ginasios';
+export type SecaoComunidade = 'amigos' | 'cla' | 'continentes' | 'duelos' | 'ginasios';
 
 const SECOES: Record<SecaoComunidade, { titulo: string; icone: string; texto: string; itens: string[] }> = {
   amigos: {
@@ -17,12 +17,6 @@ const SECOES: Record<SecaoComunidade, { titulo: string; icone: string; texto: st
     icone: '🛡️',
     texto: 'Crie ou entre num clã para jogar em grupo.',
     itens: ['Criar um clã com nome e emblema', 'Membros, cargos e chat do clã', 'Torneios e ranking entre clãs'],
-  },
-  cidade: {
-    titulo: 'Cidade',
-    icone: '',
-    texto: 'A cidade do jogo: lugar para encontrar outros treinadores e serviços.',
-    itens: ['Centro Pokémon, loja e professores', 'Encontrar outros jogadores', 'Eventos'],
   },
   continentes: {
     titulo: 'Continentes',

@@ -18,7 +18,7 @@ const ABAS: Aba[] = [
     telas: ['inicial', 'regiao', 'bioma', 'personagem', 'cidade', 'continentes', 'duelos', 'ginasios'],
     itens: [
       { nome: 'Mapas', destino: () => (carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' }) },
-      { nome: 'Cidade', destino: () => ({ tela: 'comunidade', secao: 'cidade' }), emBreve: true },
+      { nome: 'Cidade', destino: () => (carregarSave() ? { tela: 'cidade' } : { tela: 'inicial' }) },
       { nome: 'Continentes', destino: () => ({ tela: 'comunidade', secao: 'continentes' }), emBreve: true },
       { nome: 'Duelos com treinadores', destino: () => ({ tela: 'duelos' }) },
       { nome: 'Ginásios', destino: () => ({ tela: 'ginasios' }) },

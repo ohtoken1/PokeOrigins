@@ -12,6 +12,9 @@ const ESCALA = (LARGURA * ALTURA) / (48 * 36);
 export type Terreno = 'chao' | 'mato' | 'caminho' | 'liquido';
 
 export interface Mapa {
+  /** tamanho em tiles (biomas: LARGURA × ALTURA; a cidade é maior) */
+  largura: number;
+  altura: number;
   terreno: Terreno[][];
   bloqueado: boolean[][];
   /** obstáculos 2×2 (árvores, pedras grandes…) com canto superior esquerdo em x,y */
@@ -140,7 +143,36 @@ export function gerarMapa(semente: string, paleta: Paleta): Mapa {
         inicio = { x: ix, y: iy };
       }
     }
-  return { terreno, bloqueado, grandes, pedrinhas, flores, inicio };
+  return { largura: LARGURA, altura: ALTURA, terreno, bloqueado, grandes, pedrinhas, flores, inicio };
+}
+
+/** Tamanho da cidade em tiles: bem espaçosa para caber os prédios que virão (depois pode diminuir). */
+export const LARGURA_CIDADE = 140;
+export const ALTURA_CIDADE = 100;
+
+/**
+ * Cidade inicial: por enquanto só o chão (pedido do dono). Grama, uma praça grande no centro e avenidas largas
+ * saindo dela até as bordas, para os prédios (Centro Pokémon, Pokémarket, lojas…) serem colocados depois.
+ */
+export function gerarMapaCidade(): Mapa {
+  const [largura, altura] = [LARGURA_CIDADE, ALTURA_CIDADE];
+  const terreno: Terreno[][] = Array.from({ length: altura }, () => Array<Terreno>(largura).fill('chao'));
+  const bloqueado: boolean[][] = Array.from({ length: altura }, () => Array<boolean>(largura).fill(false));
+  const pintar = (x0: number, y0: number, w: number, h: number) => {
+    for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) if (terreno[y]?.[x]) terreno[y][x] = 'caminho';
+  };
+  const [cx, cy] = [Math.floor(largura / 2), Math.floor(altura / 2)];
+  // praça central (30 × 22)
+  pintar(cx - 15, cy - 11, 30, 22);
+  // avenidas de 4 tiles: uma em cruz pela praça e um anel em volta do centro
+  pintar(0, cy - 2, largura, 4);
+  pintar(cx - 2, 0, 4, altura);
+  const [ax, ay] = [Math.floor(largura * 0.2), Math.floor(altura * 0.18)];
+  pintar(ax, ay, largura - 2 * ax, 4);
+  pintar(ax, altura - ay - 4, largura - 2 * ax, 4);
+  pintar(ax, ay, 4, altura - 2 * ay);
+  pintar(largura - ax - 4, ay, 4, altura - 2 * ay);
+  return { largura, altura, terreno, bloqueado, grandes: [], pedrinhas: [], flores: [], inicio: { x: cx, y: cy } };
 }
 
 // ---------- desenho ----------
@@ -192,8 +224,8 @@ function comFiltro(img: CanvasImageSource, filtro: string): CanvasImageSource {
 
 export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilesets: Tilesets): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
-  canvas.width = LARGURA * TAM;
-  canvas.height = ALTURA * TAM;
+  canvas.width = mapa.largura * TAM;
+  canvas.height = mapa.altura * TAM;
   // canvas na memória comum (não na placa de vídeo): milhares de desenhos pequenos ficam bem mais rápidos
   const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
   ctx.imageSmoothingEnabled = false;
@@ -209,8 +241,8 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
   const tile = (src: CanvasImageSource, [tx, ty]: [number, number], px: number, py: number, w = 1, h = 1) =>
     ctx.drawImage(src, tx * TAM, ty * TAM, w * TAM, h * TAM, px, py, w * TAM, h * TAM);
 
-  for (let y = 0; y < ALTURA; y++)
-    for (let x = 0; x < LARGURA; x++) {
+  for (let y = 0; y < mapa.altura; y++)
+    for (let x = 0; x < mapa.largura; x++) {
       const px = x * TAM;
       const py = y * TAM;
       const tipo = terreno[y][x];
