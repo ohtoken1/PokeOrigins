@@ -1438,3 +1438,17 @@ button.vaga:hover { border-color: var(--borda); }
 @keyframes evolucao-gira { to { transform: rotate(360deg); } }
 .evolucao-sprite { position: relative; width: 140px; height: 140px; object-fit: contain; image-rendering: pixelated; }
 .evolucao-texto { margin: 0; font-weight: 700; text-align: center; }
+
+/* Time do adversário na batalha: Pokébolas até cada Pokémon entrar em campo */
+.time-adversario { position: absolute; top: 104px; right: 10px; z-index: 2; display: flex; gap: 4px; pointer-events: auto; }
+.bola-time {
+  width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #1f2937; position: relative; overflow: hidden;
+  background: linear-gradient(#ef4444 0 46%, #1f2937 46% 54%, #f8fafc 54%); box-shadow: 0 1px 3px #0008;
+}
+.bola-time::after { content: ''; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #f8fafc; border: 1.5px solid #1f2937; }
+.bola-time.revelado { width: 30px; height: 30px; border-radius: 8px; background: rgb(15 26 46 / 0.75); border-color: #ffffff55; }
+.bola-time.revelado::after { display: none; }
+.bola-time.revelado .sprite { width: 30px; height: 30px; object-fit: contain; image-rendering: pixelated; }
+.bola-time.desmaiado { filter: grayscale(1) brightness(0.6); }
+/* golpe do adversário com pouco PP (1/4 ou menos) */
+.resumo-golpe.pouco-pp small { color: #ff6b6b; font-weight: 800; }

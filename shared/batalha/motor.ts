@@ -5,7 +5,7 @@ import { especieComItem } from '../formas';
 import { megaPorForma } from '../megas';
 import { TERASTALLIZER_BAND } from '../loja';
 import { Battle, Dex } from '@pkmn/sim';
-import { AMIZADE_INICIAL, especie, ppMaximo, type PokemonIndividual } from './pokemon';
+import { AMIZADE_INICIAL, especie, ppComPPMax, ppMaximo, type PokemonIndividual } from './pokemon';
 import { aplicarRemedio, usarRemedio, type Item } from '../itens';
 import type { EfeitoBola } from '../bolas';
 
@@ -148,6 +148,25 @@ export class BatalhaSelvagem {
   readonly participantes = new Set<number>();
   /** Pokémon do outro lado: o selvagem, ou o time do treinador NPC. */
   readonly adversarios: PokemonIndividual[];
+
+  /** Golpes que cada Pokémon do adversário (posição no time dele) já usou nesta batalha, na ordem em que apareceram. */
+  private golpesVistos = new Map<number, string[]>();
+
+  /**
+   * Golpes que o adversário em campo já mostrou, com quantos PP gastou. `ppMax` = PP com PP Max (pedido do dono:
+   * mostrar sempre o máximo possível); `restantes` = ppMax − gastos. Os que ele ainda não usou ficam escondidos.
+   */
+  golpesUsadosAdversario(): { id: string; nome: string; tipo: string; gastos: number; ppMax: number; restantes: number }[] {
+    const indice = this.adversarioAtivo;
+    const sim = this.batalha.p2.pokemon[indice];
+    return (this.golpesVistos.get(indice) ?? []).map((id) => {
+      const g = Dex.moves.get(id);
+      const slot = sim?.moveSlots.find((s) => s.id === id);
+      const gastos = slot ? Math.max(0, slot.maxpp - slot.pp) : 0;
+      const ppMax = ppComPPMax(id);
+      return { id, nome: g.name, tipo: g.type, gastos, ppMax, restantes: Math.max(0, ppMax - gastos) };
+    });
+  }
 
   /** Posição (no time do adversário) de quem está em campo do outro lado. */
   get adversarioAtivo(): number {
@@ -545,6 +564,11 @@ export class BatalhaSelvagem {
           };
           eventos.push(evento);
           this.ultimoGolpe = { quem, golpe: golpe.name, evento, acertos: 0, avisos: [] };
+          // golpe do adversário fica "conhecido" (Struggle não conta: não é golpe dele)
+          if (evento.lado === 'selvagem' && golpe.id !== 'struggle') {
+            const vistos = this.golpesVistos.get(this.adversarioAtivo) ?? [];
+            if (!vistos.includes(golpe.id)) this.golpesVistos.set(this.adversarioAtivo, [...vistos, golpe.id]);
+          }
           break;
         }
         case '-damage':

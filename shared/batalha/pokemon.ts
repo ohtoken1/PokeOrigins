@@ -106,6 +106,15 @@ export function ppMaximo(golpeId: string): number {
   return Dex.moves.get(golpeId).pp;
 }
 
+/**
+ * PP do golpe com PP Max (3 PP Ups: +60%, como nos jogos; golpes de 1 PP não sobem). O PP Max ainda não existe no
+ * jogo, mas o PP do adversário já é mostrado assim (pedido do dono), para ficar certo quando ele chegar.
+ */
+export function ppComPPMax(golpeId: string): number {
+  const g = Dex.moves.get(golpeId);
+  return g.noPPBoosts ? g.pp : Math.floor((g.pp * 8) / 5);
+}
+
 /** Como nos jogos: os 4 últimos golpes aprendidos até o nível atual. */
 export function golpesIniciais(numero: number, nivel: number): GolpeAprendido[] {
   const ids: string[] = [];

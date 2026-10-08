@@ -181,6 +181,21 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
 
   // canto esquerdo de cima: caixa do selvagem e, embaixo dela, clima/terreno com os turnos que faltam
   const painelCampo = el('div', { class: 'painel-campo' });
+  // time do adversário (duelos): Pokébolas fechadas até cada Pokémon entrar em campo
+  const bolasTime = (treinador?.equipe ?? []).map(() => el('span', { class: 'bola-time', title: 'Ainda não apareceu' }));
+  const timeAdversario = el('div', { class: 'time-adversario' }, ...bolasTime);
+  const revelarNoTime = (indice: number) => {
+    const bola = bolasTime[indice];
+    const p = treinador?.equipe[indice];
+    if (!bola || !p || bola.classList.contains('revelado')) return;
+    bola.classList.add('revelado');
+    bola.title = nomeDe(p.especieId);
+    bola.replaceChildren(spritePokemon(pokemonPorId(p.especieId), { shiny: p.shiny, animado: false }));
+  };
+  const marcarDesmaioNoTime = (indice: number) => bolasTime[indice]?.classList.add('desmaiado');
+  /** Posição de quem está em campo do adversário NA TELA (o simulador já pode estar à frente da animação). */
+  let adversarioNaTela = 0;
+
   const arena = el(
     'div',
     {
@@ -190,6 +205,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     el('div', { class: 'canto-esquerdo' }, infoSelvagem.raiz, painelCampo),
     // retrato do treinador (duelos e ginásios), no canto de cima à direita
     treinador?.imagem ? el('img', { class: 'retrato-batalha', src: treinador.imagem, alt: treinador.nome }) : '',
+    // time do treinador como Pokébolas: cada uma só mostra o Pokémon depois que ele entra em campo
+    treinador ? timeAdversario : '',
     lugarSelvagem,
     lugarJogador,
     infoJogador.raiz,
@@ -218,7 +235,17 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         return;
       }
       resumo.className = `resumo-pokemon ${lado}`;
-      resumo.replaceChildren(...resumoPokemon(p, { abilityConhecida: batalha.habilidadeSelvagemRevelada }));
+      // golpes que o adversário já usou, com o PP que sobra (contando PP Max); os outros ficam escondidos
+      const usados = batalha.golpesUsadosAdversario();
+      resumo.replaceChildren(
+        ...resumoPokemon(p, { abilityConhecida: batalha.habilidadeSelvagemRevelada }),
+        el('div', { class: 'resumo-golpes' },
+          el('h5', {}, 'Golpes já usados'),
+          ...(usados.length
+            ? usados.map((g) =>
+                el('div', { class: `resumo-golpe ${g.restantes <= g.ppMax / 4 ? 'pouco-pp' : ''}` }, seloTipo(g.tipo), el('span', {}, g.nome), el('small', { title: `Gastou ${g.gastos} PP` }, `PP ${g.restantes}/${g.ppMax}`)))
+            : [el('small', { class: 'meta' }, 'Ainda não usou nenhum golpe.')])),
+      );
       resumo.hidden = false;
     });
     lugar.addEventListener('mouseleave', () => (resumo.hidden = resumoFixo.hidden = true));
@@ -327,6 +354,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           info(ev.lado).zerarBoosts();
           marcarTera(ev.lado, null);
           sprite(ev.lado).classList.remove('megaevoluido');
+          if (ev.lado === 'selvagem' && treinador) revelarNoTime((adversarioNaTela = ev.indice));
           if (ev.lado === 'selvagem' && treinador && treinador.equipe[ev.indice] && treinador.equipe[ev.indice] !== selvagem) {
             // o treinador mandou outro Pokémon: troca a imagem e a caixa de HP
             selvagem = treinador.equipe[ev.indice];
@@ -395,6 +423,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           await dizer(ev.texto);
           break;
         case 'desmaio':
+          if (ev.lado === 'selvagem' && treinador) marcarDesmaioNoTime(adversarioNaTela);
           await animarDesmaio(sprite(ev.lado));
           await dizer(ev.texto);
           break;
