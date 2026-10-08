@@ -458,7 +458,20 @@ A barra do topo tem:
 - **Jogar**: Mapas (regiões e biomas), **Cidade**, **Continentes**, **Duelos com treinadores** e **Ginásios** (os quatro últimos "em breve");
 - **Golpes**: Move Reminder e Move Tutor;
 - **Informações**: Opções, Ranking e Database;
-- **Comunidade**: **Amigos** e **Clã**, os dois **"em breve"**, porque dependem de contas e do servidor online.
+- **Comunidade**: **Buscar jogadores** (digite o nome de um treinador para ver o perfil: nível, Pokédex, capturas e time; sem servidor, só encontra você mesmo), **Amigos** e **Clã** (os dois **"em breve"**, porque dependem de contas e do servidor online);
+- **Administração** (só para contas de administrador; enquanto não há contas, aparece para todos): **Bonificação** e, em breve, Jogadores, Eventos e Anúncios.
+
+### Bonificação
+A administração pode multiplicar, para todos os jogadores, de **1x até 3x** (1x, 1,5x, 2x, 2,5x, 3x):
+
+| Bônus | O que muda |
+|---|---|
+| **Silver** | silver ganho por vitória |
+| **XP** | experiência dos Pokémon e do treinador |
+| **Aparição de shiny** | chance de um selvagem ser shiny (ex.: 3x → 1 em 500) |
+| **Aparição de lendário** | chance de lendários, míticos e Ultra Beasts |
+
+Com algum bônus ligado, aparece um aviso **"Bônus ativo"** no menu da região. Ele soma com o VIP (multiplica junto). Por enquanto fica guardado só no navegador; com o servidor, vale para todo mundo.
 
 ### Ranking
 A aba **Ranking**, na barra do topo, tem 8 rankings. **Por enquanto só você aparece**: a lista com todos os jogadores precisa do servidor online.
@@ -520,6 +533,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Loja completa (bolas, remédios, evolução, itens de batalha, TMs, TRs) e bolsa com usar, equipar e ensinar.
 - Sistema de Tickets com roleta de raridades; primeiro ticket: Kyogre.
 - Ovos Misteriosos S e A: qualquer Pokémon com IVs garantidos e 5% de shiny.
+- Aba Administração com Bonificação (silver, XP, shiny e lendário de 1x a 3x); Buscar jogadores na Comunidade.
 - Batalha: registro dos turnos com o dano de cada golpe, contador de turnos e ficha do seu Pokémon ao passar o mouse.
 - Tela de Início com o time lado a lado (aba Início na barra do topo).
 - Cartões dos biomas com o cenário de batalha do bioma em cima e a parte do texto transparente.

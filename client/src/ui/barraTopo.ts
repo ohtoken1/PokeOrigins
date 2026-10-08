@@ -1,12 +1,14 @@
 // Barra no topo do site: ícone da Pokédex (atalho), Início (o time lado a lado), Jogar (Mapas, Cidade, Continentes, Duelos com treinadores, Ginásios), Golpes,
 // Informações (Opções, Ranking, Database) e Comunidade (Amigos, Clã). Menus com setinha abrem ao clicar.
+import { ehAdministrador } from '../bonificacao';
+import { SECOES_ADMINISTRACAO } from '../telas/administracao';
 import type { Destino, Navegar } from '../main';
 import { carregarSave } from '../estado';
 import { el } from './dom';
 
 type Item = { nome: string; destino: () => Destino; emBreve?: boolean };
 /** Aba simples (`itens` com 1 item, sem menu) ou grupo com menu. `telas` = telas em que a aba fica marcada. */
-type Aba = { nome: string; telas: string[]; itens: Item[]; menu?: boolean };
+type Aba = { nome: string; telas: string[]; itens: Item[]; menu?: boolean; soAdmin?: boolean };
 
 const ABAS: Aba[] = [
   { nome: 'Início', telas: ['inicio'], itens: [{ nome: 'Início', destino: () => (carregarSave() ? { tela: 'inicio' } : { tela: 'inicial' }) }] },
@@ -36,11 +38,19 @@ const ABAS: Aba[] = [
   {
     nome: 'Comunidade',
     menu: true,
-    telas: ['amigos', 'cla'],
+    telas: ['amigos', 'cla', 'jogadores'],
     itens: [
+      { nome: 'Buscar jogadores', destino: () => ({ tela: 'jogadores' }) },
       { nome: '👥 Amigos', destino: () => ({ tela: 'comunidade', secao: 'amigos' }), emBreve: true },
       { nome: '🛡️ Clã', destino: () => ({ tela: 'comunidade', secao: 'cla' }), emBreve: true },
     ],
+  },
+  {
+    nome: 'Administração',
+    menu: true,
+    soAdmin: true,
+    telas: SECOES_ADMINISTRACAO.map((x) => `admin-${x.id}`),
+    itens: SECOES_ADMINISTRACAO.map((x) => ({ nome: x.nome, destino: () => ({ tela: 'administracao', secao: x.id }), emBreve: !!x.emBreve })),
   },
 ];
 
@@ -74,7 +84,9 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
       botao.classList.remove('aberta');
     });
 
-  const botoes = ABAS.map((aba) => {
+  // Administração só aparece para contas de administrador
+  const abas = ABAS.filter((a) => !a.soAdmin || ehAdministrador());
+  const botoes = abas.map((aba) => {
     if (!aba.menu) {
       const b = el('button', { class: 'aba-topo', onclick: () => navegar(aba.itens[0].destino()) }, aba.nome);
       return { botao: b, raiz: b };
@@ -109,8 +121,8 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
   );
   return (destino) => {
     // telas "em breve" usam a tela de comunidade com uma seção: a seção diz de qual grupo ela é
-    const tela = destino.tela === 'comunidade' ? destino.secao : destino.tela;
-    botoes.forEach((b, i) => b.botao.classList.toggle('ativa', ABAS[i].telas.includes(tela)));
+    const tela = destino.tela === 'comunidade' ? destino.secao : destino.tela === 'administracao' ? `admin-${destino.secao}` : destino.tela;
+    botoes.forEach((b, i) => b.botao.classList.toggle('ativa', abas[i].telas.includes(tela)));
     atalhoPokedex.classList.toggle('ativa', tela === 'pokedex');
   };
 }

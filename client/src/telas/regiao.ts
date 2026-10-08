@@ -1,3 +1,5 @@
+import { bonificacao } from '../bonificacao';
+import { NOMES_BONUS, textoBonus, type ChaveBonus } from '../../../shared/bonificacao';
 import { FUNDOS_BATALHA } from '../batalha/telaBatalha';
 import { tempoRestanteVip, vipAtivo } from '../../../shared/vip';
 import type { Tela } from '../main';
@@ -79,6 +81,12 @@ export const telaRegiao: Tela = (raiz, navegar) => {
           {},
           el('h1', {}, `Região de ${regiao.nome}`),
           el('p', { class: 'sub' }, `Pokédex: ${save.vistos.filter((n) => n >= regiao.pokedex[0] && n <= regiao.pokedex[1]).length} de ${regiao.pokedex[1] - regiao.pokedex[0] + 1} vistos · ${save.passos} passos`),
+          (() => {
+            // aviso dos bônus ligados pela administração
+            const b = bonificacao();
+            const ativos = (Object.keys(b) as ChaveBonus[]).filter((k) => b[k] > 1);
+            return ativos.length ? el('div', { class: 'aviso-bonus' }, el('strong', {}, 'Bônus ativo:'), ...ativos.map((k) => el('span', {}, `${NOMES_BONUS[k].nome} ${textoBonus(b[k])}`))) : null;
+          })(),
           el('div', { class: 'grade-biomas' }, cartoesBiomas),
         ),
         el(

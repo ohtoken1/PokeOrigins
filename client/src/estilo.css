@@ -1164,3 +1164,34 @@ button.vaga:hover { border-color: var(--borda); }
 
 /* ficha do seu Pokémon na batalha (passar o mouse): flutua por cima da janela */
 .resumo-pokemon.resumo-fixo { position: fixed; z-index: 1001; width: 250px; overflow-y: auto; background: rgb(16 30 50 / 0.94); }
+
+/* Administração */
+.tela-administracao { max-width: 860px; margin: 0 auto; }
+.admin-corpo { display: flex; flex-direction: column; gap: 14px; }
+.admin-abas { display: flex; gap: 6px; flex-wrap: wrap; }
+.bonus-secao { display: flex; flex-direction: column; gap: 10px; }
+.bonus-linha {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border-radius: 12px;
+  background: rgb(27 47 74 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
+}
+.bonus-linha > div:first-child { display: flex; flex-direction: column; gap: 2px; }
+.bonus-linha small { color: var(--texto-2); }
+.bonus-valores { display: flex; gap: 4px; }
+.aviso-bonus {
+  display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin-bottom: 10px; padding: 8px 12px; border-radius: 10px;
+  background: rgb(255 203 5 / 0.12); border: 1px solid #8a6a1c; font-size: 0.85rem;
+}
+.aviso-bonus strong { color: var(--destaque); }
+/* Buscar jogadores */
+.tela-jogadores { max-width: 860px; margin: 0 auto; }
+.jogadores-busca .db-busca { width: 100%; max-width: 420px; }
+.jogadores-resultado { margin-top: 14px; }
+.perfil-jogador { padding: 14px 16px; border-radius: 14px; background: rgb(27 47 74 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); }
+.perfil-topo { display: flex; align-items: baseline; gap: 12px; }
+.perfil-topo h2 { margin: 0; }
+.perfil-dados { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin: 12px 0; }
+.perfil-dado { display: flex; flex-direction: column; padding: 8px 10px; border-radius: 10px; background: var(--painel-2); }
+.perfil-dado small { color: var(--texto-2); font-size: 0.72rem; }
+.perfil-time { display: flex; flex-wrap: wrap; gap: 8px; }
+.perfil-pokemon { display: flex; flex-direction: column; align-items: center; width: 100px; padding: 6px; border-radius: 10px; border: 1px solid var(--borda); background: var(--painel); color: var(--texto); cursor: pointer; font: inherit; }
+.perfil-pokemon small { font-size: 0.68rem; text-align: center; }

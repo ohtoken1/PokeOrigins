@@ -1,3 +1,4 @@
+import { comBonificacao } from '../bonificacao';
 import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
 import { regiaoPorId } from '../../../shared/regioes';
@@ -28,7 +29,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   const regiao = regiaoPorId(save.regiao);
   const tabelaNormal = montarTabela(bioma, pokemonsDaRegiao(regiao.id), [], todosOsPokemons());
   // tabela com os ajustes do painel de administrador (lendários mais/menos comuns…)
-  let tabela = ajustarTabela(tabelaNormal, ajustesAdmin());
+  let tabela = ajustarTabela(tabelaNormal, comBonificacao(ajustesAdmin()));
   const nivelDoTreinador = nivelTreinador(save.xpTreinador);
   const faixaNatural = faixaDosEncontros(bioma, nivelDoTreinador);
   const faixaAtual = () => faixaDosEncontros(bioma, nivelDoTreinador, save.nivelEncontro);
@@ -175,7 +176,8 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       fugirDoEncontro();
       save.passos++;
       atualizarContador();
-      const ajustes = ajustesAdmin();
+      // bônus da administração (shiny e lendário) por cima dos ajustes do Admin
+      const ajustes = comBonificacao(ajustesAdmin());
       if (tabela.length === 0 || Math.random() >= ajustes.chancePorPasso) {
         salvar(save);
         return;
@@ -235,7 +237,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   });
 
   const pararDeOuvirAdmin = aoMudarAdmin(() => {
-    tabela = ajustarTabela(tabelaNormal, ajustesAdmin());
+    tabela = ajustarTabela(tabelaNormal, comBonificacao(ajustesAdmin()));
     atualizarChances();
     atualizarTitulo();
   });

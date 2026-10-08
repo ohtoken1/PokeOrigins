@@ -1,3 +1,4 @@
+import { bonificacao } from '../bonificacao';
 import { bonusVip } from '../../../shared/vip';
 import { AMIZADE_POR_BATALHA, ganharAmizade } from '../../../shared/amizade';
 import { trocarSpriteForma } from '../ui/formas';
@@ -608,7 +609,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
   /** O treinador ganha o mesmo XP que o Pokémon derrotado/capturado dá ao Pokémon em campo. */
   async function darXpTreinador() {
     const nivelAtivo = save.time[batalha.ativo]?.nivel ?? 1;
-    const xp = Math.round(expGanha(dadosSelvagem.experienciaBase ?? 50, selvagem.nivel, nivelAtivo, true) * bonusVip(save, 'xpTreinador'));
+    const xp = Math.round(expGanha(dadosSelvagem.experienciaBase ?? 50, selvagem.nivel, nivelAtivo, true) * bonusVip(save, 'xpTreinador') * bonificacao().xp);
     const antes = nivelTreinador(save.xpTreinador);
     save.xpTreinador += xp;
     await dizer(`Você ganhou ${xp} XP de treinador!`);
@@ -635,7 +636,8 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
         if (p.hp <= 0 || !batalha.participantes.has(pos)) continue;
         const ev = dadosSelvagem.evsDados;
         ganharEvs(p, { hp: ev.hp, atk: ev.ataque, def: ev.defesa, spa: ev.ataqueEspecial, spd: ev.defesaEspecial, spe: ev.velocidade });
-        const exp = expGanha(dadosSelvagem.experienciaBase ?? 50, selvagem.nivel, p.nivel, true);
+        // bônus de XP da administração (1x a 3x)
+        const exp = Math.round(expGanha(dadosSelvagem.experienciaBase ?? 50, selvagem.nivel, p.nivel, true) * bonificacao().xp);
         const r = ganharExperiencia(p, exp, nomeDe, crescimentoDe);
         await mostrarProgresso(pos, r);
         if (r.evolucao) evolucoes.push({ pos, para: r.evolucao.para });
@@ -670,7 +672,7 @@ export function abrirBatalha({ save, selvagem, bioma, aoTerminar }: OpcoesBatalh
 
     if (resultado === 'vitoria') {
       await darXpTreinador();
-      const silver = Math.round(SILVER_POR_VITORIA * bonusVip(save, 'silver'));
+      const silver = Math.round(SILVER_POR_VITORIA * bonusVip(save, 'silver') * bonificacao().silver);
       save.silver += silver;
       await dizer(`Você ganhou ${silver} ${MOEDA}!`);
       await darXpTime();
