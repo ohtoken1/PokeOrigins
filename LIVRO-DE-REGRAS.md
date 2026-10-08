@@ -454,7 +454,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 
 A barra do topo tem:
 - **ícone da Pokédex** (canto esquerdo): atalho direto para a Pokédex;
-- **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (cada Pokémon grande, com nível, tipos, HP e item; clique para ver a ficha), um botão para ir aos Mapas e, embaixo, o **Passe de batalha** (Temporada 1, 30 níveis com trilha grátis e premium; mecânica e recompensas **em breve**);
+- **Início**: a primeira tela ao abrir o jogo, com o seu **time lado a lado** (com nível, tipos, HP e item; clique para ver a ficha) e, embaixo, o **Passe de batalha** (Temporada 1, 30 níveis com trilha grátis e premium; botão **Missões** com as missões diárias, semanais e da temporada que vão dar XP do passe; mecânica, missões e recompensas **em breve**);
 - **Jogar**: Mapas (regiões e biomas), **Cidade**, **Continentes**, **Duelos com treinadores** e **Ginásios** (os quatro últimos "em breve");
 - **Golpes**: Move Reminder e Move Tutor;
 - **Informações**: Opções, Ranking e Database;
