@@ -6,11 +6,12 @@ import { trocarGolpe } from '../../../shared/batalha/progresso';
 import { PRECO_RELEMBRAR, PRECO_TUTOR, golpesDoTutor, golpesParaRelembrar } from '../../../shared/professores';
 import { nomeCategoria } from '../../../shared/traducao';
 import { pokemonPorId } from '../dados';
-import { carregarSave, salvar } from '../estado';
+import { carregarSave, salvar, type Save } from '../estado';
+import { abrirJanela } from '../ui/janela';
 import { dicaGolpe } from '../ui/dicaGolpe';
 import { corTipo, el, seloTipo, spritePokemon } from '../ui/dom';
 
-type Professor = 'relembrar' | 'tutor';
+export type Professor = 'relembrar' | 'tutor';
 const PROFESSORES: Record<Professor, { nome: string; fala: string; preco: number; lista: (p: PokemonIndividual) => string[] }> = {
   relembrar: {
     nome: 'Move Reminder',
@@ -26,16 +27,28 @@ const PROFESSORES: Record<Professor, { nome: string; fala: string; preco: number
   },
 };
 
-export const telaGolpes: Tela = (raiz, navegar) => {
+/** `inicial`: professor já escolhido; `daCidade` mostra o botão de voltar para a cidade. */
+export const telaGolpes = (inicial: Professor = 'relembrar', daCidade = false): Tela => (raiz, navegar) => {
   const save = carregarSave();
-  const tela = el('main', { class: 'tela tela-golpes' }, el('h1', {}, 'Golpes'));
+  const tela = el('main', { class: 'tela tela-golpes' },
+    daCidade ? el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'cidade' }) }, '← Voltar para a cidade') : null,
+    el('h1', {}, 'Golpes'));
   raiz.append(tela);
   if (!save) {
     tela.append(el('p', { class: 'sub' }, 'Comece um jogo para usar os professores de golpes.'), el('button', { class: 'botao', onclick: () => navegar({ tela: 'inicial' }) }, 'Começar'));
     return;
   }
+  tela.append(corpoProfessores(save, inicial));
+};
 
-  let professor: Professor = 'relembrar';
+/** Move Reminder / Move Tutor numa janela por cima do jogo (clique nos NPCs da cidade). */
+export function abrirProfessores(save: Save, inicial: Professor, aoMudar: () => void): void {
+  abrirJanela('Professores de golpes', () => corpoProfessores(save, inicial, aoMudar), { classe: 'janela-professores', aoFechar: aoMudar });
+}
+
+/** Conteúdo dos professores (abas, time, golpes atuais e oferecidos). */
+function corpoProfessores(save: Save, inicial: Professor, aoMudar?: () => void): HTMLElement {
+  let professor: Professor = inicial;
   let indice = 0;
   /** golpe escolhido esperando o jogador dizer qual esquecer (Pokémon com 4 golpes) */
   let aprendendo: string | null = null;
@@ -60,6 +73,7 @@ export const telaGolpes: Tela = (raiz, navegar) => {
     }
     aprendendo = null;
     salvar(save);
+    aoMudar?.();
     desenhar();
   };
 
@@ -127,5 +141,5 @@ export const telaGolpes: Tela = (raiz, navegar) => {
     );
   }
   desenhar();
-  tela.append(corpo);
-};
+  return corpo;
+}

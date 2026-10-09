@@ -102,6 +102,8 @@ export function montarVidaDaCidade(
   cena: Phaser.Scene,
   mapa: Mapa,
   jogador: () => { x: number; y: number; seguidor: { x: number; y: number } },
+  /** modo desempenho: sem moradores, Pokémon, pássaros, nuvens, folhas nem vaga-lumes */
+  leve = false,
 ): VidaDaCidade {
   const info = mapa.cidade!;
   const [W, H] = [mapa.largura * TAM, mapa.altura * TAM];
@@ -171,7 +173,7 @@ export function montarVidaDaCidade(
   // ---------- moradores (personagens LPC com roupas sorteadas) ----------
   const sorte = aleatorioComSemente('moradores');
   const escolher = <T,>(lista: readonly T[]) => lista[Math.floor(sorte() * lista.length)];
-  info.moradores.forEach((casa, i) => {
+  (leve ? [] : info.moradores).forEach((casa, i) => {
     const corpo: Aparencia['corpo'] = sorte() < 0.5 ? 'masc' : 'fem';
     const aparencia: Aparencia = {
       corpo, pele: escolher(PELES), cabelo: escolher(Object.keys(CABELOS)), corCabelo: escolher(CORES_CABELO.slice(0, 9)),
@@ -205,7 +207,7 @@ export function montarVidaDaCidade(
   });
 
   // ---------- Pokémon soltos (sprites de mapa do PMD) ----------
-  for (const p of info.pokemons) {
+  for (const p of leve ? [] : info.pokemons) {
     if (!temSpritePmd(p.especie, false)) continue;
     const a: Andante = { x: p.x, y: p.y, alvo: null };
     andantes.push(a);
@@ -229,7 +231,7 @@ export function montarVidaDaCidade(
 
   // ---------- bandos de Pidgey cruzando o céu (com sombra no chão) ----------
   const camera = cena.cameras.main;
-  carregarPmd(cena, 16).then((pmd) => {
+  if (!leve) carregarPmd(cena, 16).then((pmd) => {
     if (!pmd || !ativa()) return;
     const bando = () => {
       if (!ativa()) return;
@@ -255,7 +257,7 @@ export function montarVidaDaCidade(
 
   // ---------- sombras de nuvens passando devagar ----------
   texturaSuave(cena, 'nuvem-sombra', 120, 'rgba(10,20,40,0.55)', [[0, 0, 0.75], [-0.35, 0.1, 0.6], [0.38, -0.05, 0.62], [0.1, 0.3, 0.5], [-0.1, -0.3, 0.5]]);
-  for (let k = 0; k < 6; k++) {
+  for (let k = 0; k < (leve ? 0 : 6); k++) {
     const nuvem = cena.add.image(Math.random() * W, Math.random() * H, 'nuvem-sombra').setDepth(PROF_NUVENS).setAlpha(0.2).setScale(1.4 + Math.random() * 1.2, 1 + Math.random() * 0.6);
     const andar = () => {
       if (!ativa()) return;
@@ -337,6 +339,7 @@ export function montarVidaDaCidade(
   cena.time.addEvent({
     delay: 700, loop: true,
     callback: () => {
+      if (leve) return;
       const vista = camera.worldView;
       const perto = mapa.grandes.filter((g) => !g.rocha && g.x * TAM > vista.x - 32 && g.x * TAM < vista.right && g.y * TAM > vista.y && g.y * TAM < vista.bottom + 32);
       if (!perto.length) return;
@@ -425,7 +428,7 @@ export function montarVidaDaCidade(
   cena.time.addEvent({
     delay: 260, loop: true,
     callback: () => {
-      if (noite < 0.5) return;
+      if (noite < 0.5 || leve) return;
       const vista = camera.worldView;
       const [x, y] = [vista.x + Math.random() * vista.width, vista.y + Math.random() * vista.height];
       const tx = Math.floor(x / TAM);

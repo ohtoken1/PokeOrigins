@@ -25,7 +25,7 @@ const ABAS: Aba[] = [
       { nome: 'Ginásios', destino: () => ({ tela: 'ginasios' }) },
     ],
   },
-  { nome: 'Golpes', telas: ['golpes'], itens: [{ nome: 'Golpes', destino: () => ({ tela: 'golpes' }) }] },
+  // Golpes saiu da barra (pedido do dono): os professores ficam na cidade (Move Reminder / Move Tutor)
   {
     nome: 'Informações',
     menu: true,

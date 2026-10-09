@@ -4,6 +4,7 @@ import { TAM, desenharMapa, gerarMapa, type Mapa } from './mapa';
 import { FOLHAS_CIDADE, PECAS, URL_ESTATUA, gerarMapaCidade, type ImagensCidade, type Peca } from './cidade';
 import { sombraProjetada } from './cidadeDesenhos';
 import { montarVidaDaCidade, type VidaDaCidade } from './cidadeVida';
+import { modoDesempenho } from '../desempenho';
 import { PALETAS } from './paletas';
 import { pokemonPorId } from '../dados';
 import { PAUSA_MINIMA_ENCONTRO_MS } from '../../../shared/encontros';
@@ -19,6 +20,8 @@ export const ALTURA_TELA = 640;
  * exatos (zoom 1,5 × 2) em vez de 1 ou 2 alternados, que deixava o pixel art irregular/serrilhado.
  */
 export const RESOLUCAO = 2;
+/** Resolução usada agora: 1 no modo desempenho (Opções). */
+export const resolucao = () => (modoDesempenho() ? 1 : RESOLUCAO);
 /** Zoom da câmera, fixo (pedido do dono: 1,5; o jogador não muda). */
 const ZOOM = 1.5;
 const zoomEscolhido = ZOOM;
@@ -91,6 +94,8 @@ export interface OpcoesBioma {
   personagem?: { chave: string; folhas: Promise<FolhasPersonagem> };
   /** Nome de treinador, mostrado em cima do personagem. */
   nomeJogador?: string;
+  /** Cidade: clicou no nome de um lugar/NPC (ação da peça: 'centro', 'loja', 'reminder'…). */
+  aoClicarLocal?(acao: string): void;
 }
 
 const DIRECOES_POR_TECLA: Record<string, [number, number]> = {
@@ -217,8 +222,8 @@ export class BiomaScene extends Phaser.Scene {
     this.montarObjetos();
     this.montarNpcs();
     if (this.opcoes.cidade) {
-      this.soltarBorboletas();
-      this.vida = montarVidaDaCidade(this, this.mapa, () => ({ x: this.pos.x, y: this.pos.y, seguidor: this.posSeguidor }));
+      if (!modoDesempenho()) this.soltarBorboletas();
+      this.vida = montarVidaDaCidade(this, this.mapa, () => ({ x: this.pos.x, y: this.pos.y, seguidor: this.posSeguidor }), modoDesempenho());
     }
 
     const [sx, sy] = this.pesDoTile(this.posSeguidor.x, this.posSeguidor.y);
@@ -247,7 +252,7 @@ export class BiomaScene extends Phaser.Scene {
     if (paleta.submerso) this.efeitosSubmersos();
 
     const camera = this.cameras.main;
-    camera.setZoom(zoomEscolhido * RESOLUCAO).setBounds(0, 0, this.mapa.largura * TAM, this.mapa.altura * TAM).setRoundPixels(true);
+    camera.setZoom(zoomEscolhido * (Number(this.game.config.width) / LARGURA_TELA)).setBounds(0, 0, this.mapa.largura * TAM, this.mapa.altura * TAM).setRoundPixels(true);
     camera.startFollow(this.jogador, true);
 
     const teclado = this.input.keyboard!;
@@ -285,14 +290,32 @@ export class BiomaScene extends Phaser.Scene {
     return { chave: p.folha!, quadro: nome, animada: false };
   }
 
-  /** Nome em cima de um prédio ou NPC (mesmo estilo do nome do jogador, um pouco menor). */
-  private rotulo(texto: string, x: number, y: number, cor = '#ffffff') {
+  /**
+   * Nome em cima de um prédio ou NPC: plaquinha escura com letra clara (legível em qualquer chão). Com `acao`,
+   * vira botão: o cursor vira mãozinha, acende ao passar o mouse e o clique chama `aoClicarLocal`.
+   */
+  private rotulo(texto: string, x: number, y: number, cor = '#ffffff', acao?: string) {
     const t = this.add
-      .text(x, y, texto, { fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: cor, stroke: '#16243a', strokeThickness: 5 })
+      .text(x, y, acao ? `${texto} ›` : texto, {
+        fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: cor,
+        backgroundColor: acao ? 'rgba(14,24,42,0.86)' : 'rgba(14,24,42,0.6)', padding: { x: 14, y: 6 },
+      })
       .setOrigin(0.5, 1)
       .setDepth(99990)
-      .setScale(11 / (FONTE_NOME * zoomEscolhido));
+      .setScale(13 / (FONTE_NOME * zoomEscolhido));
     t.texture.setFilter(Phaser.Textures.FilterMode.LINEAR);
+    if (!acao) return;
+    t.setInteractive({ useHandCursor: true });
+    t.on('pointerover', () => t.setBackgroundColor('rgba(40,90,170,0.95)').setColor('#ffffff'));
+    t.on('pointerout', () => t.setBackgroundColor('rgba(14,24,42,0.86)').setColor(cor));
+    t.on('pointerdown', () => this.opcoes.aoClicarLocal?.(acao));
+  }
+
+  /** Para o minimapa da cidade: o mapa, o desenho do chão e onde o jogador está. */
+  infoMinimapa(): { mapa: Mapa; chao: HTMLCanvasElement; jogador: { x: number; y: number } } | null {
+    const chave = `mapa-${this.opcoes.cidade ? 'cidade' : this.opcoes.bioma.id}`;
+    if (!this.mapa || !this.textures.exists(chave)) return null;
+    return { mapa: this.mapa, chao: this.textures.get(chave).getSourceImage() as HTMLCanvasElement, jogador: this.pos };
   }
 
   /** Prédios e decoração em pé: ficam na frente do jogador quando ele passa por trás (profundidade pela base). */
@@ -309,7 +332,7 @@ export class BiomaScene extends Phaser.Scene {
       // sombra projetada no chão (embaixo de tudo que está em pé)
       if (!p.semSombra) this.add.image(x, base - p.h, this.sombraDaPeca(o.peca, p, chave, quadro)).setOrigin(0).setDepth(1).setAlpha(0.28);
       const rotulo = o.rotulo ?? p.rotulo;
-      if (rotulo) this.rotulo(rotulo, x + p.w / 2, base - p.h - 2, '#ffe680');
+      if (rotulo) this.rotulo(rotulo, x + p.w / 2, base - p.h - 2, '#ffe680', o.acao ?? p.acao);
     }
   }
 
@@ -371,7 +394,7 @@ export class BiomaScene extends Phaser.Scene {
     for (const n of mapa.npcs ?? []) {
       const [nx, ny] = this.pesDoTile(n.x, n.y);
       this.add.ellipse(nx, ny - 1, 16, 5, 0x000000, 0.28).setDepth(ny - 0.5);
-      this.rotulo(n.nome, nx, ny - 25, '#9fe0ff');
+      this.rotulo(n.nome, nx, ny - 25, '#9fe0ff', n.acao);
       montarPersonagem(n.aparencia).then((f) => {
         if (this.mapa !== mapa || !this.sys.isActive()) return;
         const chave = `npc-${n.nome}`;

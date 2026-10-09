@@ -15,7 +15,7 @@ export const CHANCE_ENCONTRO_POR_PASSO = 1;
  * Anti-macro (pedido do dono): segurando a tecla de andar não aparece Pokémon. O encontro só pode sair num passo
  * sorteado quando o jogador para: este tempo (ms) depois do último passo, se ele não andou de novo.
  */
-export const PAUSA_MINIMA_ENCONTRO_MS = 300;
+export const PAUSA_MINIMA_ENCONTRO_MS = 150;
 /**
  * Peso de cada LINHA EVOLUTIVA no sorteio (pedido do dono: chances parecidas entre si, a raridade original
  * pesa pouco). Peso = PESO_BASE_LINHA + taxa de captura da forma base × PESO_POR_TAXA

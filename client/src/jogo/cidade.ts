@@ -38,6 +38,8 @@ export interface Peca {
   solidas?: number;
   /** nome mostrado em cima do objeto */
   rotulo?: string;
+  /** clicar no nome faz algo (telas/cidade.ts): 'centro', 'loja', 'banco', 'estacao', 'arena'… */
+  acao?: string;
   /** fica no alto (bandeirolas): sempre por cima do jogador */
   alto?: boolean;
   /** sem sombra projetada */
@@ -50,11 +52,11 @@ const ARBUSTOS: [number, number][] = [
 ];
 
 export const PECAS: Record<string, Peca> = {
-  centroPokemon: { folha: 'predios', x: 0, y: 416, w: 112, h: 128, porta: { x: 64, w: 16, largo: true }, rotulo: 'Centro Pokémon' },
-  pokemarket: { w: RECORTE_MART.w, h: RECORTE_MART.h, desenhar: (f) => [desenharMart(f.predios)], porta: { x: 64, w: 16, largo: true }, rotulo: 'Pokémarket' },
-  banco: { folha: 'predios', x: 112, y: 0, w: 112, h: 80, porta: { x: 47, w: 18 }, rotulo: 'Banco' },
-  estacao: { folha: 'predios', x: 0, y: 0, w: 112, h: 80, porta: { x: 47, w: 18 }, rotulo: 'Estação de trem' },
-  arena: { ...TAM_ARENA, desenhar: () => Array.from({ length: QUADROS_ARENA }, (_, i) => desenharArena(i)), solidas: 10, porta: { x: 112, w: 32 }, rotulo: 'Arena' },
+  centroPokemon: { folha: 'predios', x: 0, y: 416, w: 112, h: 128, porta: { x: 64, w: 16, largo: true }, rotulo: 'Centro Pokémon', acao: 'centro' },
+  pokemarket: { w: RECORTE_MART.w, h: RECORTE_MART.h, desenhar: (f) => [desenharMart(f.predios)], porta: { x: 64, w: 16, largo: true }, rotulo: 'Pokémarket', acao: 'loja' },
+  banco: { folha: 'predios', x: 112, y: 0, w: 112, h: 80, porta: { x: 47, w: 18 }, rotulo: 'Banco', acao: 'banco' },
+  estacao: { folha: 'predios', x: 0, y: 0, w: 112, h: 80, porta: { x: 47, w: 18 }, rotulo: 'Estação de trem', acao: 'estacao' },
+  arena: { ...TAM_ARENA, desenhar: () => Array.from({ length: QUADROS_ARENA }, (_, i) => desenharArena(i)), solidas: 10, porta: { x: 112, w: 32 }, rotulo: 'Arena', acao: 'arena' },
   fonte: {
     ...TAM_FONTE,
     desenhar: (f) => {
@@ -116,6 +118,8 @@ export const ALTURA_CIDADE = 109;
 
 /** Aparência do NPC dos golpes (Move Reminder / Move Tutor). */
 const APARENCIA_PROFESSOR = { ...APARENCIA_PADRAO, pele: 'bronze', cabelo: 'messy1', corCabelo: 'white', camiseta: 'purple', calca: 'black', tenis: 'brown', estampa: 'nenhuma' as const, cinto: false };
+/** Move Tutor: o "espelho" do Move Reminder, com as cores trocadas. */
+const APARENCIA_TUTOR = { ...APARENCIA_PROFESSOR, corpo: 'fem' as const, pele: 'light', cabelo: 'ponytail', corCabelo: 'dark_brown', camiseta: 'teal', calca: 'navy' };
 
 /** Árvores do core_outdoor_nature (tile do canto de cima, 2 × 3): redondas, pinheiros, outono. */
 const ARVORE_REDONDA: [number, number][] = [[48, 0], [50, 0]];
@@ -293,7 +297,7 @@ export function gerarMapaCidade(): Mapa {
     for (let yy = linha; yy < y; yy++) for (let xx = c0; xx <= c1; xx++) ocupado[yy][xx] = true;
   };
   /** Coloca a peça centrada em `centro` (tiles, contínuo) com a base na linha `base` (a linha logo abaixo dela). */
-  const colocar = (peca: string, centro: number, base: number, rotulo?: string) => {
+  const colocar = (peca: string, centro: number, base: number, rotulo?: string, acao?: string) => {
     garantirPeca(peca);
     const p = PECAS[peca];
     const x = centro - p.w / TAM / 2;
@@ -307,7 +311,7 @@ export function gerarMapaCidade(): Mapa {
         ocupado[yy][xx] = true;
         if (yy >= b - solidas) bloqueado[yy][xx] = true;
       }
-    objetos.push({ peca, x, base, rotulo });
+    objetos.push({ peca, x, base, rotulo, acao });
     ultimaPorta = null;
     if (p.porta) caminhoDaPorta(Math.round(x * TAM) + p.porta.x, p.porta.w, base, !!p.porta.largo);
     return { c0, c1 };
@@ -357,8 +361,8 @@ export function gerarMapaCidade(): Mapa {
     colocar('bancoFrente', x, cy - 7);
     colocar('bancoCostas', x, cy + 11);
   }
-  colocar('mural', cx - 13, cy - 2, 'Mural de anúncios');
-  colocar('mural', espelho(cx - 13), cy - 2, 'Quadro de torneios');
+  colocar('mural', cx - 13, cy - 2, 'Mural de anúncios', 'mural');
+  colocar('mural', espelho(cx - 13), cy - 2, 'Quadro de torneios', 'torneios');
   for (const x of [eixo - 4, espelho(eixo - 4)]) {
     poste(x, praca.y0 + 1);
     poste(x, praca.y0 + praca.h);
@@ -438,7 +442,11 @@ export function gerarMapaCidade(): Mapa {
     poste(espelho(x), cy - 3);
   }
 
-  const npcs: NpcMapa[] = [{ x: Math.floor(oeste), y: 38, nome: 'Professor de Golpes', aparencia: APARENCIA_PROFESSOR }];
+  // professores de golpes na frente da barraca, um de cada lado (roupas espelhadas)
+  const npcs: NpcMapa[] = [
+    { x: Math.floor(oeste) - 3, y: 38, nome: 'Move Reminder', aparencia: APARENCIA_PROFESSOR, acao: 'reminder' },
+    { x: Math.floor(oeste) + 3, y: 38, nome: 'Move Tutor', aparencia: APARENCIA_TUTOR, acao: 'tutor' },
+  ];
   for (const n of npcs) {
     bloqueado[n.y][n.x] = true;
     ocupado[n.y][n.x] = true;

@@ -24,7 +24,7 @@ import { montarBarraTopo } from './ui/barraTopo';
 import { montarCabecalho } from './ui/cabecalho';
 import { definirNavegacao } from './ui/navegacao';
 
-export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes' } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' } | { tela: 'cidade' };
+export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes'; professor?: 'relembrar' | 'tutor'; daCidade?: boolean } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' } | { tela: 'cidade' };
 export type Navegar = (destino: Destino) => void;
 /** Cada tela desenha dentro de `raiz` e pode devolver uma função de limpeza. */
 export type Tela = (raiz: HTMLElement, navegar: Navegar) => (() => void) | void;
@@ -49,7 +49,7 @@ const navegar: Navegar = (destino) => {
   else if (destino.tela === 'database') limparTelaAtual = telaDatabase(raiz, navegar);
   else if (destino.tela === 'personagem') limparTelaAtual = telaPersonagem(raiz, navegar);
   else if (destino.tela === 'opcoes') limparTelaAtual = telaOpcoes(raiz, navegar);
-  else if (destino.tela === 'golpes') limparTelaAtual = telaGolpes(raiz, navegar);
+  else if (destino.tela === 'golpes') limparTelaAtual = telaGolpes(destino.professor, destino.daCidade)(raiz, navegar);
   else if (destino.tela === 'ranking') limparTelaAtual = telaRanking(raiz, navegar);
   else if (destino.tela === 'comunidade') limparTelaAtual = telaComunidade(destino.secao)(raiz, navegar);
   else if (destino.tela === 'administracao') limparTelaAtual = telaAdministracao(destino.secao)(raiz, navegar);

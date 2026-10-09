@@ -6,6 +6,7 @@ import { nivelMaximoEncontro, nivelTreinador } from '../../../shared/treinador';
 import { PRECO_TROCAR_NOME_GOLD } from '../../../shared/loja';
 import { aoMudarAjustesSom, ajustesSom, mudarAjustesSom } from '../sons';
 import { el } from '../ui/dom';
+import { modoDesempenho, mudarModoDesempenho } from '../desempenho';
 
 export const telaOpcoes: Tela = (raiz, navegar) => {
   const save = carregarSave();
@@ -83,6 +84,21 @@ export const telaOpcoes: Tela = (raiz, navegar) => {
   auto.addEventListener('change', aplicar);
   mostrarValor();
 
+  // ---------- desempenho ----------
+  const botaoDesempenho = el('button', { class: 'botao botao-alternar', 'aria-pressed': 'false' }) as HTMLButtonElement;
+  const mostrarDesempenho = () => {
+    const ligado = modoDesempenho();
+    botaoDesempenho.textContent = ligado ? 'Ativado (clique para desativar)' : 'Desativado (clique para ativar)';
+    botaoDesempenho.classList.toggle('ligado', ligado);
+    botaoDesempenho.setAttribute('aria-pressed', String(ligado));
+  };
+  botaoDesempenho.addEventListener('click', () => {
+    mudarModoDesempenho(!modoDesempenho());
+    mostrarDesempenho();
+    salvo.textContent = '✓ Salvo';
+  });
+  mostrarDesempenho();
+
   // ---------- som ----------
   const controleVolume = (chave: 'geral' | 'volume' | 'volumeMusica') => {
     const barra = el('input', { type: 'range', min: 0, max: 100, step: 5, value: Math.round(ajustesSom()[chave] * 100) }) as HTMLInputElement;
@@ -122,6 +138,14 @@ export const telaOpcoes: Tela = (raiz, navegar) => {
       el('div', { class: 'opcoes-campo' }, el('span', {}, 'Gritos dos Pokémon'), controleVolume('volume')),
       el('div', { class: 'opcoes-campo' }, el('span', {}, 'Volume geral'), controleVolume('geral'), el('small', {}, 'O mesmo controle do canto da barra do topo.')),
       el('label', { class: 'opcoes-check' }, semSom, ' Silenciar o jogo (o mesmo botão do canto da barra do topo)'),
+    ),
+    secao(
+      'Desempenho',
+      el('div', { class: 'opcoes-campo' },
+        el('span', {}, 'Modo desempenho'),
+        botaoDesempenho,
+        el('small', {}, 'Para computadores e celulares mais fracos: desliga nuvens, folhas, pássaros, vaga-lumes, borboletas, moradores e Pokémon passeando na cidade, e desenha o jogo na resolução normal (o pixel art fica um pouco serrilhado). Vale a partir do próximo mapa que você abrir.'),
+      ),
     ),
   );
   return () => clearTimeout(relogio);

@@ -46,6 +46,8 @@ export interface ObjetoMapa {
   base: number;
   /** nome mostrado em cima (senão, o da peça) */
   rotulo?: string;
+  /** o que acontece ao clicar no nome (senão, o da peça): 'centro', 'loja', 'reminder'… */
+  acao?: string;
 }
 
 /** Personagem parado no mapa (por enquanto só visual). */
@@ -54,6 +56,8 @@ export interface NpcMapa {
   y: number;
   nome: string;
   aparencia: Aparencia;
+  /** o que acontece ao clicar no nome */
+  acao?: string;
 }
 
 export interface Mapa {

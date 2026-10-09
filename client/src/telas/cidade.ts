@@ -1,11 +1,15 @@
 // Jogar → Cidade: a cidade inicial, onde os jogadores ficam quando não estão caçando nos mapas nem competindo.
-// Mapa e prédios em jogo/cidade.ts (por enquanto só visuais: portas e NPCs ainda não fazem nada).
-// Usa o mesmo jogo (Phaser) dos biomas, com o mapa da cidade e sem encontros.
+// Mapa e prédios em jogo/cidade.ts. Os nomes dos lugares são botões (Centro Pokémon cura, Pokémarket abre a loja,
+// Move Reminder/Move Tutor abrem os professores, estação vai para os mapas, Arena para os ginásios) e o minimapa
+// no canto mostra onde fica cada um. Usa o mesmo jogo (Phaser) dos biomas, com o mapa da cidade e sem encontros.
 import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
 import type { BiomaScene, OpcoesBioma } from '../jogo/BiomaScene';
 import { mostrarJogo } from '../jogo/jogoUnico';
-import { carregarSave, usarSave, salvar } from '../estado';
+import { carregarSave, curarTime, usarSave, salvar } from '../estado';
+import { abrirLoja } from '../ui/loja';
+import { abrirProfessores } from './golpes';
+import { montarMinimapa } from '../ui/minimapa';
 import { el } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
 import { botoesMenus } from '../ui/menus';
@@ -39,7 +43,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
         ...botoesMenus(save, () => atualizarTime(), true),
       ),
       el('div', { class: 'layout-bioma' },
-        el('section', {}, areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. Aqui não aparecem Pokémon selvagens. Os prédios ainda são só visuais (em breve dá para entrar).')),
+        el('section', {}, areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. Aqui não aparecem Pokémon selvagens. Clique no nome de um lugar (ou no minimapa) para usar: Centro Pokémon, Pokémarket, Move Reminder, Move Tutor…')),
         el('aside', {}, caixaTime),
       ),
     ),
@@ -59,15 +63,44 @@ export const telaCidade: Tela = (raiz, navegar) => {
     aoPisar: () => {},
     personagem: { chave: JSON.stringify(aparencia), folhas: montarPersonagem(aparencia) },
     nomeJogador: save.mostrarNome === false ? undefined : save.aparencia?.nome,
+    aoClicarLocal: (acao) => usarLocal(acao),
   };
   const jogo = mostrarJogo(areaJogo, opcoes);
   cena = jogo.cena;
+
+  // aviso curto em cima do jogo ("Seus Pokémon foram curados!")
+  const aviso = el('div', { class: 'cidade-aviso', role: 'status' });
+  areaJogo.append(aviso);
+  let relogioAviso = 0;
+  const avisar = (texto: string) => {
+    aviso.textContent = texto;
+    aviso.classList.add('visivel');
+    clearTimeout(relogioAviso);
+    relogioAviso = window.setTimeout(() => aviso.classList.remove('visivel'), 2200);
+  };
+  /** O que cada lugar faz ao clicar no nome (ou no minimapa). */
+  function usarLocal(acao: string) {
+    if (acao === 'centro') {
+      // futuramente: animação da enfermeira/máquina de cura
+      curarTime(save!);
+      atualizarTime();
+      avisar('Seus Pokémon foram curados!');
+    } else if (acao === 'loja') abrirLoja(save!, () => atualizarTime());
+    else if (acao === 'reminder') abrirProfessores(save!, 'relembrar', () => atualizarTime());
+    else if (acao === 'tutor') abrirProfessores(save!, 'tutor', () => atualizarTime());
+    else if (acao === 'estacao') navegar({ tela: 'regiao' });
+    else if (acao === 'arena') navegar({ tela: 'ginasios' });
+    else avisar(acao === 'banco' ? 'Banco: em breve.' : acao === 'torneios' ? 'Quadro de torneios: em breve.' : 'Mural de anúncios: em breve.');
+  }
+  const minimapa = montarMinimapa(areaJogo, () => cena(), usarLocal);
 
   // o mapa para com PC/Bolsa/ficha abertos
   const pararDeOuvirJanelas = aoMudarJanelas((aberta) => cena()?.pausar(aberta));
 
   return () => {
     pararDeOuvirJanelas();
+    minimapa.parar();
+    clearTimeout(relogioAviso);
     jogo.tirar();
   };
 };

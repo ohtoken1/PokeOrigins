@@ -73,7 +73,7 @@ Temporário: save no `localStorage`, botão "Curar time" no bioma (facilidade de
 - Regras de jogo (probabilidades, níveis, chance de shiny) ficam em `shared/` como constantes fáceis de ajustar.
 - Bioma = lista de tipos; cada Pokémon mora em UM bioma só: o do seu tipo principal (ex.: Gastly Fantasma/Veneno → Torre). Pedido do dono. Exceções por linha evolutiva em `BIOMA_FIXO` (`shared/encontros.ts`): Porygon → Torre, Zubat → Caverna, Grimer e Koffing → Vulcão, Dratini → Mar Profundo. Iniciais aparecem soltos normalmente (como qualquer outro).
 - `CHANCE_ENCONTRO_POR_PASSO = 1` (pedido do dono: todo passo tem Pokémon, não precisa ser no mato).
-- Anti-macro: o encontro só é sorteado quando o jogador **para** (`PAUSA_MINIMA_ENCONTRO_MS` = 300 depois do último passo, `aoParar` da `BiomaScene`); andando sem parar (tecla segurada) não aparece Pokémon.
+- Anti-macro: o encontro só é sorteado quando o jogador **para** (`PAUSA_MINIMA_ENCONTRO_MS` = 150 depois do último passo, `aoParar` da `BiomaScene`); andando sem parar (tecla segurada) não aparece Pokémon.
 - Sorteio por **linha evolutiva** (pedido do dono): sai a linha (peso = `PESO_BASE_LINHA` + taxa de captura da forma base × `PESO_POR_TAXA`, chances parecidas entre si), depois o nível dentro da faixa, e o nível decide a forma (Caterpie/Metapod/Butterfree dividem a mesma chance).
 - Windows/PowerShell: depois de instalar algo, o PATH pode precisar ser recarregado no shell.
 
