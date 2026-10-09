@@ -11,6 +11,8 @@ import { PAUSA_MINIMA_ENCONTRO_MS } from '../../../shared/encontros';
 import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
 import { montarPersonagem, type FolhasPersonagem } from '../personagem/lpc';
 import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
+import { garantirTexturaLpc, OutrosJogadores } from './outrosJogadores';
+import { entrarNaSala, moverOnline, sairDaSalaOnline, visualOnline, type DirecaoOnline, type JogadorOnline, type VisualOnline } from '../online';
 
 /** Tamanho da tela do jogo em pixels (a câmera mostra 40×27 tiles ampliados 1,5×). */
 export const LARGURA_TELA = 960;
@@ -23,22 +25,22 @@ export const RESOLUCAO = 2;
 /** Resolução usada agora: 1 no modo desempenho (Opções). */
 export const resolucao = () => (modoDesempenho() ? 1 : RESOLUCAO);
 /** Zoom da câmera, fixo (pedido do dono: 1,5; o jogador não muda). */
-const ZOOM = 1.5;
+export const ZOOM = 1.5;
 const zoomEscolhido = ZOOM;
 /** Nome de treinador: fonte desenhada grande e reduzida para ficar nítida; tamanho final na tela (px). */
-const FONTE_NOME = 32;
-const TAMANHO_NOME_TELA = 13;
+export const FONTE_NOME = 32;
+export const TAMANHO_NOME_TELA = 13;
 /** Tamanho do personagem/seguidor no mundo (fixo: com zoom 1,6 cada pixel do desenho virava 1 pixel da tela). */
 const ESCALA_DETALHE = 1 / 1.6;
 /** Quanto o personagem/seguidor são maiores no mundo que o tamanho original (zoom 2 → 1,6). */
 const COMPENSA_ZOOM = 2 / 1.6;
 /** Escala do personagem LPC (quadro 64×64) no mundo: 20% menor que a do desenho antigo (pedido do dono). */
-const ESCALA_LPC = 0.5;
+export const ESCALA_LPC = 0.5;
 /** Escala dos sprites de mapa do PMD (Pokémon que segue). */
-const ESCALA_PMD = 0.75;
-const DURACAO_PASSO = 160;
+export const ESCALA_PMD = 0.75;
+export const DURACAO_PASSO = 160;
 /** Quadros da animação de andar do LPC por quadradinho (o ciclo tem 8). */
-const QUADROS_POR_PASSO = 3;
+export const QUADROS_POR_PASSO = 3;
 
 /** Sprites da 5ª geração (Black/White): frente e costas, normal e shiny, já no tamanho relativo certo. */
 const SPRITES_BW = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white';
@@ -96,6 +98,10 @@ export interface OpcoesBioma {
   nomeJogador?: string;
   /** Cidade: clicou no nome de um lugar/NPC (ação da peça: 'centro', 'loja', 'reminder'…). */
   aoClicarLocal?(acao: string): void;
+  /** Sala online deste mapa ("cidade", "kanto:grama"…): quem está nela se vê andando. Sem sala = sozinho. */
+  sala?: string;
+  /** Clicou no boneco de outro jogador. */
+  aoClicarJogador?(jogador: JogadorOnline, evento: MouseEvent): void;
 }
 
 const DIRECOES_POR_TECLA: Record<string, [number, number]> = {
@@ -145,6 +151,8 @@ export class BiomaScene extends Phaser.Scene {
   private opcoes!: OpcoesBioma;
   /** cidade: moradores e Pokémon passeando (ocupam tiles) */
   private vida: VidaDaCidade | null = null;
+  /** outros jogadores na mesma sala online */
+  private outros: OutrosJogadores | null = null;
 
   constructor() {
     super('bioma');
@@ -170,6 +178,7 @@ export class BiomaScene extends Phaser.Scene {
     this.pmd = null;
     this.linhaPmd = 0;
     this.vida = null;
+    this.outros = null;
   }
 
   preload() {
@@ -266,6 +275,7 @@ export class BiomaScene extends Phaser.Scene {
     };
     teclado.on('keydown', aoTeclar);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => teclado.off('keydown', aoTeclar));
+    this.entrarOnline();
     this.opcoes.aoPronto?.();
   }
 
@@ -456,6 +466,29 @@ export class BiomaScene extends Phaser.Scene {
     });
   }
 
+  /** Entra na sala online do mapa: os outros jogadores aparecem e os nossos passos são avisados. */
+  private entrarOnline() {
+    const { sala, aoClicarJogador } = this.opcoes;
+    if (!sala) return;
+    const outros = new OutrosJogadores(this, (j, e) => aoClicarJogador?.(j, e));
+    this.outros = outros;
+    entrarNaSala(sala, this.pos.x, this.pos.y, this.linhaLpc as DirecaoOnline, this.visualOnline(), outros);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      sairDaSalaOnline(outros);
+      outros.destruir();
+    });
+  }
+
+  private visualOnline(): VisualOnline {
+    let aparencia: VisualOnline['aparencia'] = null;
+    try {
+      aparencia = this.opcoes.personagem ? JSON.parse(this.opcoes.personagem.chave) : null;
+    } catch {
+      // chave antiga: sem aparência (os outros veem o visual padrão)
+    }
+    return { aparencia, seguidor: this.dadosSeguidor };
+  }
+
   pausar(pausado: boolean) {
     this.pausado = pausado;
   }
@@ -465,6 +498,7 @@ export class BiomaScene extends Phaser.Scene {
     if (novo?.especie === this.dadosSeguidor?.especie && novo?.shiny === this.dadosSeguidor?.shiny) return;
     this.dadosSeguidor = novo;
     if (this.seguidor) this.carregarSeguidor();
+    if (this.outros) visualOnline(this.visualOnline());
   }
 
   update() {
@@ -562,11 +596,7 @@ export class BiomaScene extends Phaser.Scene {
   /** Troca o desenho antigo pelo personagem LPC (cada quadro 64×64 vira um frame "linha-coluna"). */
   private usarPersonagemLpc(chave: string, folhas: FolhasPersonagem) {
     if (!this.jogador?.active) return;
-    const nome = `jogador-lpc-${chave}`;
-    if (!this.textures.exists(nome)) {
-      const t = this.textures.addCanvas(nome, folhas.walk)!;
-      for (let linha = 0; linha < 4; linha++) for (let col = 0; col < 9; col++) t.add(`${linha}-${col}`, 0, col * 64, linha * 64, 64, 64);
-    }
+    const nome = garantirTexturaLpc(this, chave, folhas);
     this.lpc = nome;
     this.jogador.setTexture(nome, `${this.linhaLpc}-0`).setOrigin(0.5, 61 / 64).setFlipX(false).setScale(ESCALA_LPC);
     this.sombraJogador.setSize(16, 5);
@@ -615,6 +645,7 @@ export class BiomaScene extends Phaser.Scene {
     const anterior = this.pos;
     this.pos = { x, y };
     this.movendo = true;
+    moverOnline(x, y, (dy < 0 ? 0 : dy > 0 ? 2 : dx < 0 ? 1 : 3) as DirecaoOnline);
 
     this.passos++;
     if (!this.lpc) this.jogador.setTexture(`jogador-${direcao}-${this.passos % 2 ? 1 : 2}`);

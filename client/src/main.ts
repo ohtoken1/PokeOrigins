@@ -26,6 +26,8 @@ import { definirNavegacao } from './ui/navegacao';
 import { montarAvisoSincronia } from './ui/sincronia';
 import { ativarDeslizantes } from './ui/deslizante';
 import { garantirConta } from './telas/entrada';
+import { vigiarTrocas } from './ui/troca';
+import { conectarOnline } from './online';
 
 export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes'; professor?: 'relembrar' | 'tutor'; daCidade?: boolean } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' } | { tela: 'cidade' };
 export type Navegar = (destino: Destino) => void;
@@ -74,6 +76,9 @@ void garantirConta(raiz).then((conta) => {
   atualizarCabecalho = montarCabecalho(navegar);
   definirNavegacao(navegar);
   montarAvisoSincronia();
+  // mundo compartilhado (ver os outros jogadores no mapa) e convites de troca
+  conectarOnline();
+  vigiarTrocas();
   // com save, o jogo abre na tela de Início (o time lado a lado)
   navegar(carregarSave() ? { tela: 'inicio' } : { tela: 'inicial' });
 });

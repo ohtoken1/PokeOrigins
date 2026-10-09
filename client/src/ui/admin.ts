@@ -11,6 +11,8 @@ import { todosOsPokemons } from '../dados';
 import { carregarSave, salvar } from '../estado';
 import { el } from './dom';
 import { ehAdministrador } from '../bonificacao';
+import { convidarParaTroca } from '../trocas';
+import { abrirTroca } from './troca';
 
 const CHAVE = 'jogo-claude:admin';
 const CHAVE_POKEDEX = 'jogo-claude:admin-pokedex';
@@ -239,6 +241,21 @@ function conteudo(): HTMLElement[] {
         aoMudarSave?.();
       });
       return el('label', { class: 'admin-check' }, caixa, ' Habilitar todos os Pokémon da Pokédex');
+    })(),
+    el('h4', {}, 'Trocas (teste)'),
+    (() => {
+      // o sistema está desligado para os jogadores (TROCAS_LIBERADAS em trocas.ts); aqui dá para testar
+      const usuario = el('input', { type: 'text', placeholder: 'usuário do outro jogador', maxlength: 16 }) as HTMLInputElement;
+      const aviso = el('small', { class: 'admin-nota' });
+      const convidar = async () => {
+        aviso.textContent = '';
+        try {
+          abrirTroca(await convidarParaTroca(usuario.value.trim()));
+        } catch (e) {
+          aviso.textContent = e instanceof Error ? e.message : 'Não foi possível convidar.';
+        }
+      };
+      return el('div', { class: 'admin-campo' }, usuario, el('button', { class: 'botao secundario', onclick: convidar }, 'Convidar para troca'), aviso);
     })(),
     el('h4', {}, 'Encontros'),
     campo('Chance de shiny', seletor(OPCOES_SHINY, a.chanceShiny, (v) => mudar({ chanceShiny: v }))),

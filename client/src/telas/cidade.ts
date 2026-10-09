@@ -10,6 +10,7 @@ import { carregarSave, curarTime, usarSave, salvar } from '../estado';
 import { abrirLoja } from '../ui/loja';
 import { abrirProfessores } from './golpes';
 import { montarMinimapa } from '../ui/minimapa';
+import { abrirMenuJogador } from '../ui/menuJogador';
 import { el } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
 import { botoesMenus } from '../ui/menus';
@@ -64,6 +65,9 @@ export const telaCidade: Tela = (raiz, navegar) => {
     personagem: { chave: JSON.stringify(aparencia), folhas: montarPersonagem(aparencia) },
     nomeJogador: save.aparencia?.nome,
     aoClicarLocal: (acao) => usarLocal(acao),
+    // todos os jogadores na mesma cidade
+    sala: 'cidade',
+    aoClicarJogador: abrirMenuJogador,
   };
   const jogo = mostrarJogo(areaJogo, opcoes);
   cena = jogo.cena;

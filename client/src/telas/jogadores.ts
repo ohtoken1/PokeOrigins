@@ -1,6 +1,6 @@
-// Comunidade → Buscar jogadores: procura um treinador pelo nome e mostra o perfil (identificação, PvP ranqueado,
-// números da jornada com medalhas de torneio, insígnias e time). Também é o "Meu perfil" da Minha conta.
-// Sem servidor ainda, a busca só encontra o próprio jogador deste navegador.
+// Comunidade → Buscar jogadores: procura um treinador (usuário ou nome) no servidor e mostra o perfil (identificação,
+// PvP ranqueado, números da jornada com medalhas de torneio, insígnias e time). Também é o "Meu perfil" da Minha
+// conta e o "Ver perfil" ao clicar em outro jogador no mapa (`abrirPerfilDe`).
 import type { Tela } from '../main';
 import { progressoTreinador } from '../../../shared/treinador';
 import { lideresDaRegiao } from '../../../shared/ginasios';
@@ -11,11 +11,34 @@ import { pokemonPorId, todosOsPokemons } from '../dados';
 import { carregarSave, type PokemonDoJogador, type Save } from '../estado';
 import { abrirDetalhes } from '../ui/detalhes';
 import { el, spritePokemon } from '../ui/dom';
+import { abrirJanela } from '../ui/janela';
+import { api, ErroApi } from '../conta';
 import { icone } from '../ui/icones';
 
-/** Sem servidor, o único perfil que existe é o de quem está jogando agora: sempre online. */
-function estaOnline(save: Save): boolean {
-  return save === carregarSave();
+/** Perfil de outro jogador como o servidor manda (server/src/index.ts → perfilPublico): só o que é público. */
+export interface PerfilPublico {
+  usuario: string;
+  online: boolean;
+  perfil: Pick<Save, 'aparencia' | 'regiao' | 'xpTreinador' | 'criadoEm' | 'insignias' | 'vistos' | 'capturados' | 'estatisticas'> & {
+    mostrarTime: boolean;
+    time: { especieId: number; nivel: number; shiny: boolean }[];
+  };
+}
+
+/** Abre o perfil de outro jogador numa janela (clicar no boneco no mapa → Ver perfil). */
+export async function abrirPerfilDe(usuario: string): Promise<void> {
+  try {
+    const r = await api<PerfilPublico>('GET', `/jogadores/${encodeURIComponent(usuario)}`);
+    abrirJanela(`Perfil de ${r.perfil.aparencia?.nome || r.usuario}`, () => perfilRemoto(r), { classe: 'janela-perfil' });
+  } catch (e) {
+    alert(e instanceof ErroApi ? e.message : 'Não foi possível abrir o perfil.');
+  }
+}
+
+/** Perfil de outro jogador: o mesmo desenho, com o time só para ver (sem abrir a ficha) e escondido se ele quiser. */
+function perfilRemoto(r: PerfilPublico): HTMLElement {
+  const save = { ...r.perfil, time: r.perfil.time } as unknown as Save;
+  return perfilJogador(save, { online: r.online, remoto: true, timeEscondido: !r.perfil.mostrarTime });
 }
 
 /** Medalha de torneio desenhada por código (fita + disco) com a quantidade do lado. */
@@ -26,7 +49,7 @@ const medalha = (cor: 'ouro' | 'prata' | 'bronze', nome: string, quantidade: num
 /** Retrato do personagem (LPC, parado olhando para a frente). */
 function retratoTreinador(save: Save): HTMLElement {
   const canvas = el('canvas', { width: 64, height: 64, class: 'perfil-retrato-canvas' }) as HTMLCanvasElement;
-  montarPersonagem({ ...APARENCIA_PADRAO, ...save.aparencia }).then((f) => {
+  montarPersonagem({ ...APARENCIA_PADRAO, ...save.aparencia }).catch(() => montarPersonagem(APARENCIA_PADRAO)).then((f) => {
     const ctx = canvas.getContext('2d')!;
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(f.walk, 0, LINHA_DIRECAO.baixo * 64, 64, 64, 0, 0, 64, 64);
@@ -34,10 +57,10 @@ function retratoTreinador(save: Save): HTMLElement {
   return el('div', { class: 'perfil-retrato' }, canvas);
 }
 
-/** Cápsula de Pokébola com o Pokémon do time (clicar abre a ficha). */
-function capsulaTime(p: PokemonDoJogador): HTMLElement {
+/** Cápsula de Pokébola com o Pokémon do time (clicar abre a ficha; de outro jogador, só mostra). */
+function capsulaTime(p: PokemonDoJogador, remoto = false): HTMLElement {
   const d = pokemonPorId(p.especieId);
-  return el('button', { class: 'perfil-capsula', title: 'Ver a ficha', onclick: () => abrirDetalhes(p) },
+  return el(remoto ? 'div' : 'button', remoto ? { class: 'perfil-capsula' } : { class: 'perfil-capsula', title: 'Ver a ficha', onclick: () => abrirDetalhes(p) },
     spritePokemon(d, { shiny: p.shiny, animado: false }),
     el('span', {}, d.nome, p.shiny ? el('span', { class: 'perfil-shiny' }, ' ★') : '', ` · ${p.nivel}`));
 }
@@ -56,9 +79,10 @@ function painelInsignias(save: Save): HTMLElement {
   return el('div', {}, seletor, lista);
 }
 
-export function perfilJogador(save: Save): HTMLElement {
+export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: boolean; timeEscondido?: boolean } = {}): HTMLElement {
   const e = save.estatisticas;
-  const online = estaOnline(save);
+  // o próprio perfil está sempre online (é quem está jogando)
+  const online = opcoes.online ?? save === carregarSave();
   const totalDex = todosOsPokemons().filter((p) => !p.numeroDex).length;
   const parteDex = Math.round((save.capturados.length / totalDex) * 1000) / 10;
   const desde = save.criadoEm ? new Date(save.criadoEm).toLocaleDateString('pt-BR') : '—';
@@ -98,8 +122,10 @@ export function perfilJogador(save: Save): HTMLElement {
         caixa('Medalhas de torneio',
           el('div', { class: 'perfil-podio' }, degrau('prata', '2º', 'Prata', prata), degrau('ouro', '1º', 'Ouro', ouro), degrau('bronze', '3º', 'Bronze', bronze))),
         caixa('Insígnias', painelInsignias(save))),
-      caixa('Time', el('div', { class: 'perfil-time' }, ...save.time.map(capsulaTime),
-        ...Array.from({ length: Math.max(0, 6 - save.time.length) }, () => el('div', { class: 'perfil-capsula vazia' }, 'vaga'))))),
+      caixa('Time', opcoes.timeEscondido
+        ? el('p', { class: 'meta' }, 'Este treinador escolheu não mostrar a equipe.')
+        : el('div', { class: 'perfil-time' }, ...save.time.map((p) => capsulaTime(p, opcoes.remoto)),
+          ...Array.from({ length: Math.max(0, 6 - save.time.length) }, () => el('div', { class: 'perfil-capsula vazia' }, 'vaga'))))),
   );
 }
 
@@ -108,25 +134,33 @@ export const telaJogadores: Tela = (raiz) => {
   raiz.append(tela);
   const campo = el('input', { type: 'search', class: 'db-busca', placeholder: 'Nome do treinador…' }) as HTMLInputElement;
   const resultado = el('div', { class: 'jogadores-resultado' });
+  // busca no servidor (usuário ou nome de treinador), esperando a pessoa parar de digitar
+  let relogio = 0;
+  let pedido = 0;
   const buscar = () => {
-    const termo = campo.value.trim().toLowerCase();
-    const save = carregarSave();
-    // sem servidor: a "lista de jogadores" tem só quem joga neste navegador
-    const jogadores = save ? [save] : [];
-    const achados = termo ? jogadores.filter((s) => (s.aparencia?.nome ?? '').toLowerCase().includes(termo)) : [];
-    resultado.replaceChildren(
-      !termo
-        ? el('p', { class: 'meta' }, 'Digite o nome de um treinador para ver o perfil dele.')
-        : achados.length
-          ? el('div', {}, ...achados.map(perfilJogador))
-          : el('p', { class: 'meta' }, `Nenhum treinador encontrado com "${campo.value.trim()}".`),
-    );
+    const termo = campo.value.trim();
+    clearTimeout(relogio);
+    if (!termo) return void resultado.replaceChildren(el('p', { class: 'meta' }, 'Digite o nome de um treinador para ver o perfil dele.'));
+    relogio = window.setTimeout(async () => {
+      const este = ++pedido;
+      try {
+        const achados = await api<{ usuario: string; nome: string | null; online: boolean }[]>('GET', `/jogadores?busca=${encodeURIComponent(termo)}`);
+        if (este !== pedido) return;
+        resultado.replaceChildren(
+          achados.length
+            ? el('div', { class: 'jogadores-lista' }, ...achados.map((j) =>
+                el('button', { class: 'jogador-achado', onclick: () => abrirPerfilDe(j.usuario) },
+                  el('span', { class: `perfil-bolinha ${j.online ? 'online' : 'offline'}`, title: j.online ? 'Online' : 'Offline' }),
+                  el('strong', {}, j.nome || j.usuario), el('small', {}, `@${j.usuario}`))))
+            : el('p', { class: 'meta' }, `Nenhum treinador encontrado com "${termo}".`),
+        );
+      } catch (e) {
+        if (este === pedido) resultado.replaceChildren(el('p', { class: 'meta' }, e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.'));
+      }
+    }, 250);
   };
   campo.addEventListener('input', buscar);
-  tela.append(
-    el('div', { class: 'jogadores-busca' }, campo),
-    el('small', { class: 'meta' }, 'Por enquanto só dá para encontrar você mesmo: a busca com todos os jogadores precisa do servidor online.'),
-    resultado,
-  );
+  tela.append(el('div', { class: 'jogadores-busca' }, campo), resultado);
   buscar();
+  return () => clearTimeout(relogio);
 };

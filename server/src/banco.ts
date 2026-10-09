@@ -45,6 +45,9 @@ export interface Conta {
 const sql = {
   contaPorLogin: db.prepare('SELECT * FROM contas WHERE usuario = ? OR email = ?'),
   contaPorId: db.prepare('SELECT * FROM contas WHERE id = ?'),
+  contaPorUsuario: db.prepare('SELECT * FROM contas WHERE usuario = ?'),
+  buscar: db.prepare(`SELECT c.id, c.usuario, json_extract(s.dados, '$.aparencia.nome') AS nome FROM contas c JOIN saves s ON s.conta_id = c.id
+    WHERE c.usuario LIKE ? ESCAPE '!' OR json_extract(s.dados, '$.aparencia.nome') LIKE ? ESCAPE '!' ORDER BY c.usuario LIMIT 20`),
   existe: db.prepare('SELECT usuario, email FROM contas WHERE usuario = ? OR email = ?'),
   quantas: db.prepare('SELECT COUNT(*) AS n FROM contas'),
   criarConta: db.prepare('INSERT INTO contas (usuario, email, senha, admin, criada_em) VALUES (?, ?, ?, ?, ?)'),
@@ -57,10 +60,20 @@ const sql = {
   inserirSave: db.prepare('INSERT INTO saves (conta_id, dados, versao, atualizado_em) VALUES (?, ?, 1, ?)'),
   atualizarSave: db.prepare('UPDATE saves SET dados = ?, versao = versao + 1, atualizado_em = ? WHERE conta_id = ? AND versao = ?'),
   apagarSave: db.prepare('DELETE FROM saves WHERE conta_id = ?'),
+  regravarSave: db.prepare('UPDATE saves SET dados = ?, versao = versao + 1, atualizado_em = ? WHERE conta_id = ?'),
 };
 
 export const contaPorLogin = (login: string) => sql.contaPorLogin.get(login, login) as Conta | undefined;
 export const contaPorId = (id: number) => sql.contaPorId.get(id) as Conta | undefined;
+/** Jogadores (com save) cujo usuário ou nome de treinador contém o termo. */
+export function buscarJogadores(termo: string): { id: number; usuario: string; nome: string | null }[] {
+  const t = termo.trim().slice(0, 30);
+  if (!t) return [];
+  // ! é o caractere de escape do LIKE (para % e _ digitados valerem como texto)
+  const padrao = `%${t.replace(/[!%_]/g, (c) => `!${c}`)}%`;
+  return sql.buscar.all(padrao, padrao) as { id: number; usuario: string; nome: string | null }[];
+}
+export const contaPorUsuario = (usuario: string) => sql.contaPorUsuario.get(usuario) as Conta | undefined;
 export const loginEmUso = (usuario: string, email: string) => sql.existe.all(usuario, email) as { usuario: string; email: string }[];
 export const totalDeContas = () => (sql.quantas.get() as { n: number }).n;
 
@@ -91,3 +104,26 @@ export function gravarSave(contaId: number, dados: string, versaoLida: number): 
   return sql.atualizarSave.run(dados, Date.now(), contaId, versaoLida).changes > 0 ? versaoLida + 1 : null;
 }
 export const apagarSave = (contaId: number) => void sql.apagarSave.run(contaId);
+
+/**
+ * Mudança feita pelo SERVIDOR em vários saves de uma vez (ex.: troca entre jogadores): tudo ou nada.
+ * `mudar` recebe os saves já lidos (objetos) e altera no lugar; devolve a versão nova de cada um.
+ */
+export function mudarSaves(contaIds: number[], mudar: (saves: Record<string, unknown>[]) => void): number[] {
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    const lidos = contaIds.map((id) => {
+      const s = lerSave(id);
+      if (!s) throw new Error(`Conta ${id} sem save.`);
+      return { id, dados: JSON.parse(s.dados) as Record<string, unknown>, versao: s.versao };
+    });
+    mudar(lidos.map((l) => l.dados));
+    const agora = Date.now();
+    for (const l of lidos) sql.regravarSave.run(JSON.stringify(l.dados), agora, l.id);
+    db.exec('COMMIT');
+    return lidos.map((l) => l.versao + 1);
+  } catch (e) {
+    db.exec('ROLLBACK');
+    throw e;
+  }
+}

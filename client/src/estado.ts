@@ -337,6 +337,32 @@ window.addEventListener('pagehide', () => {
   if (JSON.stringify(corpo).length < 60_000) void api('PUT', '/save', corpo, { keepalive: true }).catch(() => {});
 });
 
+/** Manda agora o que estiver pendente e espera chegar (antes de ações que o servidor confere no save, como trocas). */
+export async function salvarAgora(): Promise<void> {
+  clearTimeout(envio);
+  for (let i = 0; i < 50 && enviando; i++) await new Promise((ok) => setTimeout(ok, 100));
+  if (pendente) await enviar();
+  if (pendente) throw new ErroApi('Não foi possível salvar seu progresso agora. Tente de novo.', 0);
+}
+
+/**
+ * O servidor mudou o save (ex.: troca feita): troca o conteúdo do objeto único em memória pelo do servidor,
+ * mantendo o MESMO objeto (as telas abertas seguram a referência) e avisa quem escuta `aoSalvar`.
+ */
+export function adotarSaveDoServidor(doServidor: Save, versaoServidor: number): void {
+  clearTimeout(envio);
+  pendente = false;
+  versao = versaoServidor;
+  const novo = normalizar(doServidor);
+  if (emMemoria) {
+    for (const chave of Object.keys(emMemoria)) delete (emMemoria as unknown as Record<string, unknown>)[chave];
+    Object.assign(emMemoria, novo);
+  } else emMemoria = novo;
+  guardarCopia();
+  avisar('salvo');
+  for (const fn of aoSalvarFns) fn(emMemoria);
+}
+
 // save da tela de jogo aberta (região/bioma): quem dono dos Pokémon mostrados nas fichas
 let saveEmUso: Save | null = null;
 export function usarSave(save: Save): void {

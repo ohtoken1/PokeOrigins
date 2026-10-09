@@ -1664,3 +1664,115 @@ input[type='checkbox']:focus-visible { outline: 2px solid var(--destaque); outli
 input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .opcoes-nome { font-size: 1.1rem; color: var(--destaque); }
+
+/* Troca entre jogadores (ui/troca.ts): você | centro | o outro */
+.janela.janela-troca { width: min(1040px, 100%); }
+.janela-troca .janela-corpo { overflow-y: auto; }
+.troca { position: relative; display: flex; flex-direction: column; gap: 12px; }
+.troca-cancelar { align-self: flex-end; border-color: color-mix(in srgb, var(--perigo) 60%, var(--borda)); color: #ffb4b4; }
+.troca-cancelar:hover { background: color-mix(in srgb, var(--perigo) 25%, var(--painel-2)); }
+.troca-colunas { display: grid; grid-template-columns: 1fr minmax(170px, 210px) 1fr; gap: 14px; align-items: stretch; }
+.troca-coluna {
+  display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 14px; border-radius: 14px;
+  background: rgb(20 34 56 / 0.7); border: 2px solid var(--borda); transition: border-color 0.2s, box-shadow 0.2s;
+}
+.troca-coluna.confirmada { border-color: #4fd36a; box-shadow: 0 0 14px rgb(79 211 106 / 0.25); }
+.troca-coluna header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.troca-coluna h3 { margin: 0; font-size: 1.05rem; overflow: hidden; text-overflow: ellipsis; }
+.troca-selo { flex: none; padding: 3px 9px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; background: var(--painel-2); color: var(--texto-2); }
+.troca-selo.ok { background: rgb(79 211 106 / 0.18); color: #7fe596; }
+.troca-selo.trocar { background: rgb(255 203 5 / 0.2); color: var(--destaque); }
+.troca-oferta { display: flex; flex-direction: column; gap: 6px; min-height: 120px; }
+.troca-vazio { margin: auto 0; text-align: center; color: var(--texto-2); font-size: 0.88rem; }
+.troca-pokemon, .troca-item, .troca-moeda {
+  display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 10px; background: var(--painel-2); border: 1px solid var(--borda);
+}
+.troca-pokemon .sprite { width: 48px; height: 48px; object-fit: contain; image-rendering: pixelated; flex: none; }
+.troca-pokemon.shiny { border-color: #e7c64a; }
+.troca-pokemon-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.troca-pokemon-info small { color: var(--texto-2); }
+.troca-shiny { color: var(--destaque); }
+.troca-item span:not([class]) { flex: 1; min-width: 0; }
+.troca-moeda { font-weight: 700; }
+.troca-moeda .icone-moeda, .troca-moeda-campo .icone-moeda { width: 20px; height: 20px; flex: none; }
+.troca-tirar { margin-left: auto; flex: none; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--borda); background: transparent; color: var(--texto-2); cursor: pointer; }
+.troca-tirar:hover { border-color: var(--perigo); color: #ff9a9a; }
+.troca-controles { display: flex; flex-direction: column; gap: 10px; padding-top: 10px; border-top: 1px dashed var(--borda); }
+.troca-adicionar { display: flex; gap: 8px; }
+.troca-adicionar .botao { flex: 1; }
+.troca-adicionar .botao.ativo { border-color: var(--destaque); color: var(--destaque); }
+.troca-seletor { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; max-height: 220px; overflow-y: auto; padding: 4px; }
+.troca-seletor.itens { grid-template-columns: 1fr; }
+.troca-opcao {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; border-radius: 10px; cursor: pointer;
+  background: var(--painel-2); border: 1px solid var(--borda); color: var(--texto); font: inherit;
+}
+.troca-opcao:hover:not(:disabled) { border-color: var(--destaque); }
+.troca-opcao:disabled { opacity: 0.45; cursor: not-allowed; }
+.troca-opcao .sprite { width: 48px; height: 48px; object-fit: contain; image-rendering: pixelated; }
+.troca-opcao small { font-size: 0.74rem; text-align: center; }
+.troca-opcao em { font-size: 0.68rem; color: var(--texto-2); font-style: normal; text-align: center; }
+.troca-opcao-item { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 10px; background: var(--painel-2); }
+.troca-opcao-item > span:not([class]) { flex: 1; min-width: 0; font-size: 0.88rem; }
+.troca-opcao-item small { color: var(--texto-2); }
+.troca-opcao-item .botao { padding: 5px 10px; }
+.troca-qtd, .troca-campo-moeda { width: 72px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--borda); background: var(--painel); color: var(--texto); font: inherit; }
+.troca-moedas { display: flex; gap: 10px; flex-wrap: wrap; }
+.troca-moeda-campo { display: flex; align-items: center; gap: 6px; }
+.troca-campo-moeda { width: 96px; }
+.troca-moeda-campo small { color: var(--texto-2); font-size: 0.75rem; }
+.troca-confirmar { margin-top: auto; padding: 10px; }
+.troca-centro { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; color: var(--texto-2); font-size: 0.9rem; }
+.troca-centro p { margin: 0; }
+.troca-trocar {
+  padding: 16px 22px; font-size: 1.15rem; border-radius: 14px;
+  box-shadow: 0 0 0 4px rgb(255 203 5 / 0.18), 0 6px 18px rgb(0 0 0 / 0.4); animation: troca-pulsar 1.4s ease-in-out infinite;
+}
+@keyframes troca-pulsar { 50% { box-shadow: 0 0 0 9px rgb(255 203 5 / 0.08), 0 6px 18px rgb(0 0 0 / 0.4); } }
+.troca-fim { font-size: 1.2rem; font-weight: 800; color: var(--texto); }
+.troca-centro.feita .troca-fim { color: #7fe596; }
+.troca-mensagem { margin: 0; min-height: 1.2em; text-align: center; color: #ff9a9a; font-size: 0.9rem; }
+.troca-mensagem:empty { min-height: 0; }
+@media (max-width: 760px) {
+  .troca-colunas { grid-template-columns: 1fr; }
+  .troca-centro { order: 3; padding: 8px 0; }
+}
+
+/* Convite de troca recebido */
+.aviso-convite {
+  position: fixed; right: 18px; bottom: 18px; z-index: 2100; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0;
+  max-width: min(340px, calc(100vw - 32px)); padding: 14px 16px; border-radius: 14px;
+  background: rgb(20 34 56 / 0.96); border: 1px solid var(--borda); border-left: 4px solid var(--destaque); box-shadow: 0 10px 28px rgb(0 0 0 / 0.45);
+}
+.aviso-convite[hidden] { display: none; }
+.aviso-convite-botoes { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
+.aviso-convite-botoes .botao { flex: 1; }
+
+/* Menu ao clicar em outro jogador no mapa (ui/menuJogador.ts) */
+.menu-jogador {
+  position: fixed; z-index: 2200; min-width: 200px; display: flex; flex-direction: column; gap: 4px; padding: 8px;
+  border-radius: 14px; background: rgb(20 34 56 / 0.97); border: 1px solid var(--borda); box-shadow: 0 12px 30px rgb(0 0 0 / 0.5);
+}
+.menu-jogador header { display: flex; flex-direction: column; padding: 4px 8px 8px; border-bottom: 1px solid var(--borda); margin-bottom: 2px; }
+.menu-jogador header small { color: var(--texto-2); }
+.menu-jogador-opcao {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 10px; border: 0; border-radius: 9px;
+  background: transparent; color: var(--texto); font: inherit; font-weight: 600; text-align: left; cursor: pointer;
+}
+.menu-jogador-opcao:hover:not(:disabled) { background: var(--painel-2); color: var(--destaque); }
+.menu-jogador-opcao:disabled { color: var(--texto-2); cursor: not-allowed; }
+.menu-jogador-opcao small { font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: var(--painel-2); }
+.menu-jogador-aviso { padding: 0 8px; color: #ff9a9a; }
+.menu-jogador-aviso:empty { display: none; }
+
+/* Buscar jogadores (servidor) */
+.jogadores-lista { display: flex; flex-direction: column; gap: 6px; max-width: 520px; }
+.jogador-achado {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; cursor: pointer; text-align: left;
+  background: rgb(27 47 74 / 0.75); border: 1px solid var(--borda); color: var(--texto); font: inherit;
+}
+.jogador-achado:hover { border-color: var(--destaque); }
+.jogador-achado small { color: var(--texto-2); }
+.jogador-achado .perfil-bolinha { width: 10px; height: 10px; border-radius: 50%; background: #6b7689; flex: none; }
+.jogador-achado .perfil-bolinha.online { background: #4fd36a; box-shadow: 0 0 6px #4fd36a; }
+.janela.janela-perfil { width: min(980px, 100%); }

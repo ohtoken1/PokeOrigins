@@ -12,6 +12,7 @@ import { abrirBatalha } from '../batalha/telaBatalha';
 import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons } from '../dados';
 import { ajustesAdmin, aoMudarAdmin } from '../ui/admin';
 import { carregarSave, usarSave, curarTime, novoPokemon, salvar } from '../estado';
+import { abrirMenuJogador } from '../ui/menuJogador';
 import { el, selosTipos, spritePokemon } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
 import { botaoIcone, botoesMenus } from '../ui/menus';
@@ -170,6 +171,9 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
 
   const opcoesCena: OpcoesBioma = {
     bioma,
+    // todos os jogadores no mesmo bioma da mesma região
+    sala: `${regiao.id}:${bioma.id}`,
+    aoClicarJogador: abrirMenuJogador,
     aoPronto: () => carregando.remove(),
     seguidor: save.time[0] ? { especie: save.time[0].especieId, shiny: save.time[0].shiny } : null,
     aoPisar: () => {

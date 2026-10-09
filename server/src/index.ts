@@ -6,6 +6,8 @@ import { extname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as banco from './banco.ts';
 import { cadastrar, contaDoToken, entrar, ErroConta, publica, sair } from './contas.ts';
+import * as trocas from './trocas.ts';
+import { estaOnline, ligarMundo } from './mundo.ts';
 
 const PORTA = Number(process.env.PORT ?? 3001);
 const SITE = resolve(fileURLToPath(new URL('../../client/dist', import.meta.url)));
@@ -102,7 +104,61 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     banco.apagarSave(conta.id);
     return responder(res, 200, { versao: 0 });
   }
+
+  // ---- trocas entre jogadores (server/src/trocas.ts) ----
+  if (caminho === '/api/trocas/atual' && metodo === 'GET') return responder(res, 200, trocas.atual(exigirConta(req)));
+  if (caminho === '/api/trocas' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 201, trocas.convidar(conta, (await lerCorpo(req)).usuario));
+  }
+  const rotaTroca = caminho.match(/^\/api\/trocas\/([A-Za-z0-9_-]{1,40})\/(aceitar|recusar|oferta|confirmar|trocar|cancelar)$/);
+  if (rotaTroca && (metodo === 'POST' || metodo === 'PUT')) {
+    const conta = exigirConta(req);
+    const [, id, acao] = rotaTroca;
+    const corpo = await lerCorpo(req);
+    if (acao === 'aceitar' || acao === 'recusar') return responder(res, 200, trocas.responderConvite(conta, id, acao === 'aceitar'));
+    if (acao === 'oferta') return responder(res, 200, trocas.mudarOferta(conta, id, corpo));
+    if (acao === 'confirmar') return responder(res, 200, trocas.confirmar(conta, id, corpo.confirmado !== false));
+    if (acao === 'trocar') return responder(res, 200, trocas.trocar(conta, id));
+    return responder(res, 200, trocas.cancelar(conta, id));
+  }
+
+  // ---- outros jogadores: busca e perfil público ----
+  if (caminho === '/api/jogadores' && metodo === 'GET') {
+    exigirConta(req);
+    const busca = new URL(req.url ?? '/', 'http://x').searchParams.get('busca') ?? '';
+    return responder(res, 200, banco.buscarJogadores(busca).map((j) => ({ ...j, online: estaOnline(j.id) })));
+  }
+  const rotaPerfil = caminho.match(/^\/api\/jogadores\/([A-Za-z0-9_]{3,16})$/);
+  if (rotaPerfil && metodo === 'GET') {
+    exigirConta(req);
+    const conta = banco.contaPorUsuario(rotaPerfil[1]);
+    const save = conta && banco.lerSave(conta.id);
+    if (!conta || !save) throw new ErroConta('Jogador não encontrado.', 404);
+    return responder(res, 200, { usuario: conta.usuario, online: estaOnline(conta.id), perfil: perfilPublico(JSON.parse(save.dados)) });
+  }
   throw new ErroConta('Não encontrado.', 404);
+}
+
+/**
+ * O que os outros podem ver de um save: o necessário para o perfil. Nada de IVs, EVs, bolsa, moedas ou PC;
+ * o time só com espécie, nível e shiny, e só se o dono deixou "Mostrar minha equipe" ligado.
+ */
+function perfilPublico(save: Record<string, unknown>) {
+  const time = Array.isArray(save.time) ? (save.time as Record<string, unknown>[]) : [];
+  const mostrarTime = save.mostrarTime !== false;
+  return {
+    aparencia: save.aparencia ?? null,
+    regiao: save.regiao,
+    xpTreinador: save.xpTreinador ?? 0,
+    criadoEm: save.criadoEm ?? null,
+    insignias: save.insignias ?? [],
+    vistos: save.vistos ?? [],
+    capturados: save.capturados ?? [],
+    estatisticas: save.estatisticas ?? null,
+    mostrarTime,
+    time: mostrarTime ? time.map((p) => ({ especieId: p.especieId, nivel: p.nivel, shiny: !!p.shiny })) : [],
+  };
 }
 
 // ---- site (só em produção, depois de `npm run build`) ----
@@ -125,7 +181,7 @@ function entregarSite(res: ServerResponse, caminho: string): void {
   createReadStream(arquivo).pipe(res);
 }
 
-createServer(async (req, res) => {
+const servidor = createServer(async (req, res) => {
   const caminho = new URL(req.url ?? '/', 'http://x').pathname;
   try {
     if (caminho.startsWith('/api/')) await api(req, res, caminho);
@@ -138,4 +194,6 @@ createServer(async (req, res) => {
       if (!res.headersSent) responder(res, 500, { erro: 'Erro no servidor.' });
     }
   }
-}).listen(PORTA, () => console.log(`Servidor do PokeOrigins em http://localhost:${PORTA}`));
+});
+ligarMundo(servidor);
+servidor.listen(PORTA, () => console.log(`Servidor do PokeOrigins em http://localhost:${PORTA}`));

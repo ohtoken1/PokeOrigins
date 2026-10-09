@@ -662,6 +662,11 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Move Reminder e Move Tutor** viraram NPCs na cidade, com janela própria por cima do jogo; a aba Golpes saiu da barra do topo.
 - **Modo desempenho** em Opções: menos efeitos e resolução menor para computadores mais fracos.
 - O Pokémon selvagem aparece 0,15 s depois de parar de andar (antes 0,3 s).
+- **Mundo online:** todos os jogadores no mesmo mapa (a cidade, ou o mesmo bioma da mesma região) se veem andando, com nome e o Pokémon que segue.
+- **Clicar em outro jogador** abre um menu: Ver perfil, Trocar e Desafiar para duelo (em breve).
+- **Trocas entre jogadores** liberadas (Pokémon, itens, silver e gold; os dois confirmam e depois os dois clicam em Trocar).
+- **Buscar jogadores** procura de verdade (usuário ou nome de treinador) e mostra quem está online.
+- Opções: **Mostrar minha equipe**, **Aceitar pedidos de troca** e **Aceitar desafios de duelo**.
 
 ---
 
@@ -673,7 +678,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Servidor:** sorteios e batalhas rodando no servidor, para ninguém trapacear.
 - **Lista de amigos:** ver quem está online e em qual bioma, convidar para batalhas e trocas.
 - **Clãs:** nome, emblema, cargos, chat e ranking entre clãs.
-- **Trocas entre jogadores**, respeitando o selo **NT** (o inicial nunca pode ser trocado).
+- **Trocas entre jogadores**: cada um coloca Pokémon, itens, silver e gold, os dois confirmam e depois os dois clicam em **Trocar**. O inicial (**NT**) e Pokémon **trancados** não podem ser trocados; depois de confirmar não dá mais para mudar a oferta (só trocar ou cancelar), e se o outro mudar a dele antes de confirmar, a sua confirmação cai.
 
 ### 🏆 Torneios — o foco principal
 - Torneios online simultâneos, cada jogador com o seu time.

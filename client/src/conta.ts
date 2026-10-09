@@ -42,6 +42,8 @@ function guardarToken(token: string | null, manter = false): void {
 }
 let tokenEmMemoria = lerToken();
 export const temSessao = () => !!tokenEmMemoria;
+/** Token da sessão (para a conexão em tempo real, que manda o token na primeira mensagem). */
+export const tokenAtual = () => tokenEmMemoria;
 
 /** Chamada à API do servidor; erros viram ErroApi com a mensagem em português que o servidor mandou. */
 export async function api<T>(metodo: string, caminho: string, corpo?: unknown, opcoes: { keepalive?: boolean } = {}): Promise<T> {
