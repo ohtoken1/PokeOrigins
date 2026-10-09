@@ -12,6 +12,7 @@ import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
 import { montarPersonagem, type FolhasPersonagem } from '../personagem/lpc';
 import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
 import { garantirTexturaLpc, OutrosJogadores } from './outrosJogadores';
+import { digitando } from '../ui/digitando';
 import { entrarNaSala, moverOnline, sairDaSalaOnline, visualOnline, type DirecaoOnline, type JogadorOnline, type VisualOnline } from '../online';
 
 /** Tamanho da tela do jogo em pixels (a câmera mostra 40×27 tiles ampliados 1,5×). */
@@ -270,11 +271,22 @@ export class BiomaScene extends Phaser.Scene {
     this.wasd = teclado.addKeys('W,A,S,D', false) as typeof this.wasd;
     // guarda toques rápidos (apertar e soltar entre dois quadros), que isDown não pega
     const aoTeclar = (e: KeyboardEvent) => {
+      if (digitando()) return;
       const direcao = DIRECOES_POR_TECLA[e.key.toLowerCase()];
       if (direcao) this.direcaoPendente = direcao;
     };
     teclado.on('keydown', aoTeclar);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => teclado.off('keydown', aoTeclar));
+    // escrevendo num campo (chat): o Phaser para de "segurar" setas e espaço, senão não dá para usar no texto
+    const aoFocar = () => (digitando() ? teclado.disableGlobalCapture() : teclado.enableGlobalCapture());
+    const aoDesfocar = () => setTimeout(aoFocar);
+    document.addEventListener('focusin', aoFocar);
+    document.addEventListener('focusout', aoDesfocar);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      teclado.off('keydown', aoTeclar);
+      document.removeEventListener('focusin', aoFocar);
+      document.removeEventListener('focusout', aoDesfocar);
+      teclado.enableGlobalCapture();
+    });
     this.entrarOnline();
     this.opcoes.aoPronto?.();
   }
@@ -504,7 +516,7 @@ export class BiomaScene extends Phaser.Scene {
   update() {
     this.atualizarSombras();
     if (this.movendo) return;
-    if (this.pausado) {
+    if (this.pausado || digitando()) {
       this.direcaoPendente = undefined;
       return;
     }

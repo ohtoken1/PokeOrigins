@@ -27,6 +27,30 @@ export interface OuvinteSala {
   visual(id: number, visual: VisualOnline): void;
 }
 
+export type CanalChat = 'local' | 'global' | 'cla';
+export interface MensagemChat {
+  canal: CanalChat;
+  id: number;
+  usuario: string;
+  nome: string;
+  texto: string;
+  em: number;
+}
+/** O que o chat ouve: mensagem nova, histórico ao entrar (global ao conectar, local ao entrar num mapa) e avisos. */
+export interface OuvinteChat {
+  mensagem(m: MensagemChat): void;
+  historico(canal: CanalChat, lista: MensagemChat[]): void;
+  erro(canal: CanalChat, texto: string): void;
+}
+const ouvintesChat = new Set<OuvinteChat>();
+export function aoChat(o: OuvinteChat): () => void {
+  ouvintesChat.add(o);
+  return () => ouvintesChat.delete(o);
+}
+/** Manda no chat; false = sem conexão agora. */
+export const enviarChat = (canal: CanalChat, texto: string): boolean => mandar({ t: 'chat', canal, texto });
+export const onlineConectado = () => pronto;
+
 let ws: WebSocket | null = null;
 let pronto = false;
 let espera = 1000;
@@ -35,7 +59,12 @@ let minhaId = 0;
 let salaAtual: { sala: string; x: number; y: number; dir: DirecaoOnline; visual: VisualOnline; ouvinte: OuvinteSala } | null = null;
 
 export const meuIdOnline = () => minhaId;
-const mandar = (msg: unknown) => pronto && ws?.readyState === WebSocket.OPEN && ws.send(JSON.stringify(msg));
+/** Manda se estiver conectado; devolve se mandou. */
+function mandar(msg: unknown): boolean {
+  if (!pronto || ws?.readyState !== WebSocket.OPEN) return false;
+  ws.send(JSON.stringify(msg));
+  return true;
+}
 
 function entrarDeNovo(): void {
   if (!salaAtual) return;
@@ -63,6 +92,9 @@ export function conectarOnline(): void {
       minhaId = msg.id as number;
       return entrarDeNovo();
     }
+    if (msg.t === 'chat') return ouvintesChat.forEach((o) => o.mensagem(msg as unknown as MensagemChat));
+    if (msg.t === 'chat-historico') return ouvintesChat.forEach((o) => o.historico(msg.canal as CanalChat, msg.lista as MensagemChat[]));
+    if (msg.t === 'chat-erro') return ouvintesChat.forEach((o) => o.erro(msg.canal as CanalChat, msg.texto as string));
     const ouvinte = salaAtual?.ouvinte;
     if (!ouvinte) return;
     if (msg.t === 'jogadores' && msg.sala === salaAtual!.sala) ouvinte.todos(msg.lista as JogadorOnline[]);

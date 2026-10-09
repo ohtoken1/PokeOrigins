@@ -11,6 +11,12 @@ const COORD_MAX = 1000;
 /** Mensagens por segundo que um jogador pode mandar (andar rápido manda ~7). */
 const LIMITE_POR_SEGUNDO = 30;
 const VISUAL_MAX = 2000;
+/** Chat: tamanho da mensagem, anti-spam (no máximo 3 a cada 5 s) e quantas ficam guardadas para quem chega. */
+const CHAT_MAX = 200;
+const CHAT_RAJADA = 3;
+const CHAT_JANELA_MS = 5000;
+const HISTORICO_GLOBAL = 50;
+const HISTORICO_LOCAL = 30;
 
 /** 0 cima, 1 esquerda, 2 baixo, 3 direita (mesmas linhas da folha do personagem LPC). */
 type Direcao = 0 | 1 | 2 | 3;
@@ -29,7 +35,25 @@ interface Conexao {
   visual: Visual;
   mensagens: number;
   vivo: boolean;
+  /** horários das últimas mensagens de chat (anti-spam) */
+  chats: number[];
 }
+type Canal = 'local' | 'global' | 'cla';
+interface MensagemChat {
+  t: 'chat';
+  canal: Canal;
+  id: number;
+  usuario: string;
+  nome: string;
+  texto: string;
+  em: number;
+}
+const historicoGlobal: MensagemChat[] = [];
+const historicoLocal = new Map<string, MensagemChat[]>();
+const guardar = (lista: MensagemChat[], m: MensagemChat, max: number) => {
+  lista.push(m);
+  if (lista.length > max) lista.splice(0, lista.length - max);
+};
 
 const salas = new Map<string, Set<Conexao>>();
 const porConta = new Map<number, Conexao>();
@@ -99,7 +123,8 @@ function receber(c: Conexao, texto: string): void {
     c.conta = conta;
     c.nome = nomeDe(conta);
     porConta.set(conta.id, c);
-    return void enviar(c, { t: 'ok', id: conta.id });
+    enviar(c, { t: 'ok', id: conta.id });
+    return void enviar(c, { t: 'chat-historico', canal: 'global', lista: historicoGlobal });
   }
   if (++c.mensagens > LIMITE_POR_SEGUNDO) return;
 
@@ -116,6 +141,7 @@ function receber(c: Conexao, texto: string): void {
     enviar(c, { t: 'jogadores', sala, lista: [...lista].map(publico) });
     lista.add(c);
     paraSala(sala, { t: 'entrou', jogador: publico(c) }, c);
+    enviar(c, { t: 'chat-historico', canal: 'local', lista: historicoLocal.get(sala) ?? [] });
   } else if (msg.t === 'sair') {
     sairDaSala(c);
   } else if (msg.t === 'pos' && c.sala) {
@@ -124,9 +150,37 @@ function receber(c: Conexao, texto: string): void {
     if (x === null || y === null) return;
     Object.assign(c, { x, y, dir: direcao(msg.dir) });
     paraSala(c.sala, { t: 'moveu', id: c.conta.id, x, y, dir: c.dir }, c);
+  } else if (msg.t === 'chat') {
+    falar(c, msg.canal, msg.texto);
   } else if (msg.t === 'visual' && c.sala) {
     c.visual = lerVisual(msg.visual);
     paraSala(c.sala, { t: 'visual', id: c.conta.id, visual: c.visual }, c);
+  }
+}
+
+/** Mensagem de chat: local (quem está no mesmo mapa), global (todos online) ou clã (quando existir). */
+function falar(c: Conexao, canal: unknown, bruto: unknown): void {
+  if (canal !== 'local' && canal !== 'global' && canal !== 'cla') return;
+  const erro = (texto: string) => void enviar(c, { t: 'chat-erro', canal, texto });
+  // sem caracteres de controle e espaços repetidos; vazio não vai
+  const texto = typeof bruto === 'string' ? bruto.replace(/\p{Cc}|\p{Cf}/gu, '').replace(/\s+/g, ' ').trim().slice(0, CHAT_MAX) : '';
+  if (!texto) return;
+  if (canal === 'cla') return erro('Você ainda não está em um clã.');
+  if (canal === 'local' && !c.sala) return erro('Entre num mapa para falar no chat local.');
+  const agora = Date.now();
+  c.chats = c.chats.filter((t) => agora - t < CHAT_JANELA_MS);
+  if (c.chats.length >= CHAT_RAJADA) return erro('Calma! Espere um pouco para mandar outra mensagem.');
+  c.chats.push(agora);
+  const m: MensagemChat = { t: 'chat', canal, id: c.conta!.id, usuario: c.conta!.usuario, nome: c.nome, texto, em: agora };
+  if (canal === 'global') {
+    guardar(historicoGlobal, m, HISTORICO_GLOBAL);
+    const json = JSON.stringify(m);
+    for (const outra of porConta.values()) if (outra.ws.readyState === WebSocket.OPEN) outra.ws.send(json);
+  } else {
+    const lista = historicoLocal.get(c.sala!) ?? [];
+    historicoLocal.set(c.sala!, lista);
+    guardar(lista, m, HISTORICO_LOCAL);
+    paraSala(c.sala!, m);
   }
 }
 
@@ -137,7 +191,7 @@ export function ligarMundo(servidor: Server): void {
     wss.handleUpgrade(req, socket, cabeca, (ws) => wss.emit('connection', ws, req));
   });
   wss.on('connection', (ws: WebSocket) => {
-    const c: Conexao = { ws, conta: null, nome: '', sala: null, x: 0, y: 0, dir: 2, visual: { aparencia: null, seguidor: null }, mensagens: 0, vivo: true };
+    const c: Conexao = { ws, conta: null, nome: '', sala: null, x: 0, y: 0, dir: 2, visual: { aparencia: null, seguidor: null }, mensagens: 0, vivo: true, chats: [] };
     // sem se identificar em 10 s: fecha
     const prazo = setTimeout(() => !c.conta && ws.close(4001, 'Sem sessão'), 10_000);
     ws.on('message', (dados) => receber(c, String(dados)));

@@ -667,6 +667,8 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Trocas entre jogadores** liberadas (Pokémon, itens, silver e gold; os dois confirmam e depois os dois clicam em Trocar).
 - **Buscar jogadores** procura de verdade (usuário ou nome de treinador) e mostra quem está online.
 - Opções: **Mostrar minha equipe**, **Aceitar pedidos de troca** e **Aceitar desafios de duelo**.
+- **Chat** ao lado do mapa, com abas **Local** (quem está no mesmo mapa), **Global** (todos online) e **Clã** (quando os clãs existirem). Mensagens de até 200 letras, no máximo 3 a cada 5 segundos; clicar no nome abre o perfil.
+- A lista **Pokémon deste bioma** agora abre pelo botão **%** no canto do mapa.
 
 ---
 

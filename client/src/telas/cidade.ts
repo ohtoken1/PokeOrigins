@@ -11,6 +11,7 @@ import { abrirLoja } from '../ui/loja';
 import { abrirProfessores } from './golpes';
 import { montarMinimapa } from '../ui/minimapa';
 import { abrirMenuJogador } from '../ui/menuJogador';
+import { montarChat } from '../ui/chat';
 import { el } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
 import { botoesMenus } from '../ui/menus';
@@ -36,6 +37,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
   atualizarTime();
 
   const areaJogo = el('div', { class: 'area-jogo' });
+  const chat = montarChat();
   raiz.append(
     el('main', { class: 'tela tela-bioma tela-cidade' },
       el('header', { class: 'barra' },
@@ -45,7 +47,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
       ),
       el('div', { class: 'layout-bioma' },
         el('section', {}, areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. Aqui não aparecem Pokémon selvagens. Clique no nome de um lugar (ou no minimapa) para usar: Centro Pokémon, Pokémarket, Move Reminder, Move Tutor…')),
-        el('aside', {}, caixaTime),
+        el('aside', {}, caixaTime, chat.elemento),
       ),
     ),
   );
@@ -104,6 +106,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
   return () => {
     pararDeOuvirJanelas();
     minimapa.parar();
+    chat.parar();
     clearTimeout(relogioAviso);
     jogo.tirar();
   };

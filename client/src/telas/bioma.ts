@@ -13,6 +13,7 @@ import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons } from '../dados';
 import { ajustesAdmin, aoMudarAdmin } from '../ui/admin';
 import { carregarSave, usarSave, curarTime, novoPokemon, salvar } from '../estado';
 import { abrirMenuJogador } from '../ui/menuJogador';
+import { montarChat } from '../ui/chat';
 import { el, selosTipos, spritePokemon } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
 import { botaoIcone, botoesMenus } from '../ui/menus';
@@ -133,6 +134,18 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   atualizarTitulo();
 
   const areaJogo = el('div', { class: 'area-jogo' });
+  // "Pokémon deste bioma" virou um botão % no canto do mapa (pedido do dono: o lugar ao lado é do chat)
+  const painelChances = el('div', { class: 'painel-chances', hidden: true, role: 'dialog', 'aria-label': 'Pokémon deste bioma' }, tituloChances, listaChances, fichaMorador);
+  const botaoChances = el('button', {
+    class: 'botao-chances', title: 'Pokémon deste bioma e as chances', 'aria-label': 'Pokémon deste bioma', 'aria-expanded': 'false',
+    onclick: () => {
+      painelChances.hidden = !painelChances.hidden;
+      botaoChances.classList.toggle('aberto', !painelChances.hidden);
+      botaoChances.setAttribute('aria-expanded', String(!painelChances.hidden));
+    },
+  }, '%');
+  areaJogo.append(botaoChances, painelChances);
+  const chat = montarChat();
   // o teto dos encontros agora é escolhido na aba Opções (barra do topo)
   raiz.append(
     el(
@@ -154,7 +167,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         'div',
         { class: 'layout-bioma' },
         el('section', {}, atalhosBiomas(bioma.id, (id) => navegar({ tela: 'bioma', biomaId: id })), areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. A cada passo aparece um Pokémon: Enter para lutar, ou continue andando para fugir.')),
-        el('aside', {}, caixaTime, tituloChances, listaChances, fichaMorador),
+        el('aside', {}, caixaTime, chat.elemento),
       ),
     ),
   );
@@ -253,6 +266,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     delete document.body.dataset.fundo;
     pararDeOuvirAdmin();
     pararDeOuvirJanelas();
+    chat.parar();
     fugirDoEncontro();
     jogo.tirar();
   };

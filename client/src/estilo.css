@@ -1776,3 +1776,48 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .jogador-achado .perfil-bolinha { width: 10px; height: 10px; border-radius: 50%; background: #6b7689; flex: none; }
 .jogador-achado .perfil-bolinha.online { background: #4fd36a; box-shadow: 0 0 6px #4fd36a; }
 .janela.janela-perfil { width: min(980px, 100%); }
+
+/* Botão % no canto do mapa: abre "Pokémon deste bioma" por cima do jogo (o lado do mapa ficou para o chat) */
+.area-jogo { position: relative; }
+.botao-chances {
+  position: absolute; top: 10px; right: 10px; z-index: 30; width: 42px; height: 42px; border-radius: 50%;
+  display: grid; place-items: center; font: 800 1.15rem/1 system-ui, sans-serif; cursor: pointer; color: #1a1a1a;
+  background: radial-gradient(circle at 35% 30%, #fff3b0, var(--destaque) 60%, #d79a00); border: 2px solid #fff7d1;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.45); transition: transform 0.12s;
+}
+.botao-chances:hover { transform: scale(1.08); }
+.botao-chances.aberto { background: var(--painel-2); color: var(--destaque); border-color: var(--destaque); }
+.painel-chances {
+  position: absolute; top: 60px; right: 10px; z-index: 29; width: min(360px, calc(100% - 20px)); max-height: calc(100% - 72px);
+  overflow-y: auto; padding: 12px; border-radius: 14px; line-height: normal;
+  background: rgb(18 30 50 / 0.9); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1px solid var(--borda);
+  box-shadow: 0 10px 28px rgb(0 0 0 / 0.45);
+}
+.painel-chances[hidden] { display: none; }
+.painel-chances h2 { margin: 0 0 8px; font-size: 0.95rem; }
+
+/* Chat (Local, Global, Clã) ao lado do mapa */
+.chat { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+.chat h2 { margin: 0; font-size: 1.05rem; }
+.chat-abas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: 12px; background: rgb(20 34 56 / 0.85); border: 1px solid var(--borda); }
+.chat-aba { position: relative; padding: 7px 4px; border: 0; border-radius: 9px; background: transparent; color: var(--texto-2); font: inherit; font-weight: 700; font-size: 0.88rem; cursor: pointer; }
+.chat-aba:hover { color: var(--texto); }
+.chat-aba.ativa { background: var(--destaque); color: #1a1a1a; }
+.chat-nao-lidas { position: absolute; top: -4px; right: 2px; min-width: 18px; padding: 1px 5px; border-radius: 99px; background: var(--perigo); color: #fff; font-size: 0.68rem; line-height: 1.3; }
+.chat-lista {
+  height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding: 10px; border-radius: 12px;
+  background: rgb(20 34 56 / 0.85); border: 1px solid var(--borda); font-size: 0.86rem; overflow-wrap: anywhere;
+}
+.chat-msg { margin: 0; line-height: 1.35; }
+.chat-msg time { color: var(--texto-2); font-size: 0.72rem; margin-right: 6px; font-variant-numeric: tabular-nums; }
+.chat-nome { padding: 0; border: 0; background: none; font: inherit; font-weight: 800; color: #8fc8ff; cursor: pointer; margin-right: 4px; }
+.chat-nome::after { content: ':'; }
+.chat-nome:hover { text-decoration: underline; }
+.chat-msg.minha .chat-nome { color: var(--destaque); }
+.chat-aviso { margin: 0; color: #ffb4b4; font-size: 0.8rem; font-style: italic; }
+.chat-vazio { margin: auto; color: var(--texto-2); text-align: center; font-size: 0.85rem; }
+.chat-formulario { display: flex; gap: 6px; }
+.chat-campo { flex: 1; min-width: 0; padding: 9px 11px; border-radius: 10px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto); font: inherit; }
+.chat-campo:focus { outline: 2px solid var(--destaque); outline-offset: 1px; }
+.chat-campo:disabled { opacity: 0.55; }
+.chat-enviar { flex: none; width: 42px; padding: 0; font-size: 1rem; }
