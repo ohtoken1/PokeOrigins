@@ -28,6 +28,8 @@ import { ativarDeslizantes } from './ui/deslizante';
 import { garantirConta } from './telas/entrada';
 import { vigiarTrocas } from './ui/troca';
 import { conectarOnline } from './online';
+// o chat ouve o servidor desde a conexão (guarda as mensagens mesmo fora do mapa)
+import './ui/chat';
 
 export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes'; professor?: 'relembrar' | 'tutor'; daCidade?: boolean } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' } | { tela: 'cidade' };
 export type Navegar = (destino: Destino) => void;

@@ -1,3 +1,4 @@
+import { digitando } from './digitando';
 import type { Encontro } from '../../../shared/encontros';
 import { el, seloGenero, selosTipos, spritePokemon } from './dom';
 
@@ -17,7 +18,7 @@ export function mostrarEncontro(raiz: HTMLElement, encontro: Encontro, acoes: Ac
   const lendario = pokemon.lendario || pokemon.mitico;
 
   const aoTeclar = (e: KeyboardEvent) => {
-    if (e.key !== 'Enter' || acoes.bloqueio) return;
+    if (e.key !== 'Enter' || acoes.bloqueio || digitando()) return;
     e.preventDefault();
     acoes.lutar();
   };
