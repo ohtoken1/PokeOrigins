@@ -5,9 +5,12 @@ import { aoMudarAjustesSom, ajustesSom, mudarAjustesSom } from '../sons';
 import { SECOES_ADMINISTRACAO } from '../telas/administracao';
 import type { Destino, Navegar } from '../main';
 import { carregarSave } from '../estado';
+import { sairDaConta } from '../conta';
 import { el } from './dom';
+import { pintarDeslizante } from './deslizante';
 
-type Item = { nome: string; destino: () => Destino; emBreve?: boolean };
+/** `acao`: em vez de navegar, faz outra coisa (ex.: sair da conta). */
+type Item = { nome: string; destino: () => Destino; emBreve?: boolean; acao?: () => void };
 /** Aba simples (`itens` com 1 item, sem menu) ou grupo com menu. `telas` = telas em que a aba fica marcada. */
 type Aba = { nome: string; telas: string[]; itens: Item[]; menu?: boolean; soAdmin?: boolean };
 
@@ -44,6 +47,7 @@ const ABAS: Aba[] = [
       { nome: 'Achievements', destino: () => ({ tela: 'conta', secao: 'achievements' }) },
       { nome: 'Minhas skins', destino: () => ({ tela: 'conta', secao: 'skins' }) },
       { nome: 'Opções', destino: () => ({ tela: 'opcoes' }) },
+      { nome: 'Sair da conta', destino: () => ({ tela: 'inicio' }), acao: () => void sairDaConta() },
     ],
   },
   {
@@ -91,7 +95,10 @@ export function iconePokedex(): HTMLElement {
 function controlesSom(): HTMLElement {
   const barra = el('input', { type: 'range', class: 'volume-topo', min: 0, max: 100, step: 5, value: Math.round(ajustesSom().geral * 100), title: 'Volume', 'aria-label': 'Volume' }) as HTMLInputElement;
   barra.addEventListener('input', () => mudarAjustesSom({ geral: Number(barra.value) / 100, mudo: false }));
-  aoMudarAjustesSom((a) => (barra.value = String(Math.round(a.geral * 100))));
+  aoMudarAjustesSom((a) => {
+    barra.value = String(Math.round(a.geral * 100));
+    pintarDeslizante(barra);
+  });
   return el('div', { class: 'som-topo' }, barra, botaoMudo());
 }
 
@@ -131,7 +138,7 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
       return { botao: b, raiz: b };
     }
     const menu = el('div', { class: 'menu-topo', hidden: true },
-      ...aba.itens.map((item) => el('button', { onclick: () => (fecharTodos(), navegar(item.destino())) }, item.nome, item.emBreve ? el('small', {}, 'em breve') : null)));
+      ...aba.itens.map((item) => el('button', { onclick: () => (fecharTodos(), item.acao ? item.acao() : navegar(item.destino())) }, item.nome, item.emBreve ? el('small', {}, 'em breve') : null)));
     const botao = el('button', { class: 'aba-topo aba-menu', 'aria-haspopup': 'true' }, aba.nome, el('span', { class: 'setinha' }, '▾'));
     botao.addEventListener('click', (e) => {
       e.stopPropagation();

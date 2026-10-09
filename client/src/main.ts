@@ -23,6 +23,9 @@ import { montarPainelAdmin } from './ui/admin';
 import { montarBarraTopo } from './ui/barraTopo';
 import { montarCabecalho } from './ui/cabecalho';
 import { definirNavegacao } from './ui/navegacao';
+import { montarAvisoSincronia } from './ui/sincronia';
+import { ativarDeslizantes } from './ui/deslizante';
+import { garantirConta } from './telas/entrada';
 
 export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes'; professor?: 'relembrar' | 'tutor'; daCidade?: boolean } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' } | { tela: 'cidade' };
 export type Navegar = (destino: Destino) => void;
@@ -61,11 +64,16 @@ const navegar: Navegar = (destino) => {
   else limparTelaAtual = telaBioma(destino.biomaId)(raiz, navegar);
 };
 
-montarPainelAdmin(() => navegar(destinoAtual));
-marcarAba = montarBarraTopo(navegar);
-// música de fundo começa no primeiro clique/tecla
-iniciarMusica();
-atualizarCabecalho = montarCabecalho(navegar);
-definirNavegacao(navegar);
-// com save, o jogo abre na tela de Início (o time lado a lado)
-navegar(carregarSave() ? { tela: 'inicio' } : { tela: 'inicial' });
+ativarDeslizantes();
+// primeiro a conta (tela de entrada); só depois o jogo monta barra, cabeçalho e painel
+void garantirConta(raiz).then((conta) => {
+  if (conta.admin) montarPainelAdmin(() => navegar(destinoAtual));
+  marcarAba = montarBarraTopo(navegar);
+  // música de fundo começa no primeiro clique/tecla
+  iniciarMusica();
+  atualizarCabecalho = montarCabecalho(navegar);
+  definirNavegacao(navegar);
+  montarAvisoSincronia();
+  // com save, o jogo abre na tela de Início (o time lado a lado)
+  navegar(carregarSave() ? { tela: 'inicio' } : { tela: 'inicial' });
+});

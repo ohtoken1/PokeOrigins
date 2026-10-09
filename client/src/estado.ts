@@ -1,4 +1,4 @@
-// Save local no navegador. TEMPORÁRIO: quando o servidor existir, o save fica na conta do jogador.
+// Save do jogador: fica na conta (servidor), com o objeto único em memória e uma cópia no navegador até chegar lá.
 import { atributosZerados, curar, gerarIndividuo, hpMaximo, type PokemonIndividual } from '../../shared/batalha/pokemon';
 import { IV_INICIAL } from '../../shared/regioes';
 import { ITENS_INICIAIS } from '../../shared/itens';
@@ -7,6 +7,7 @@ import { ehLendario } from '../../shared/encontros';
 import { pokemonPorId } from './dados';
 import type { Aparencia } from './personagem/lpc';
 import type { EstadoPasse } from '../../shared/passe';
+import { api, ErroApi } from './conta';
 
 export type PokemonDoJogador = PokemonIndividual & {
   /** Box do PC onde está guardado (0 a NUMERO_BOXES − 1); só vale para quem está no PC. */
@@ -34,10 +35,16 @@ export interface Save {
   capturados: number[];
   /** Visual do personagem (camadas LPC + detalhes Pokémon); sem isso, usa APARENCIA_PADRAO. */
   aparencia?: Aparencia;
-  /** Nome real (opcional, aba Opções). */
+  /** ANTIGO (opção removida da aba Opções). */
   nomeReal?: string;
-  /** Mostrar o nome de treinador em cima do personagem (padrão: sim). */
+  /** ANTIGO (opção removida: o nome aparece sempre). */
   mostrarNome?: boolean;
+  /** Outros jogadores veem o time no perfil (padrão: sim). */
+  mostrarTime?: boolean;
+  /** Aceitar pedidos de troca de outros jogadores (padrão: sim; desligado recusa sozinho). */
+  aceitarTrocas?: boolean;
+  /** Aceitar desafios de duelo de outros jogadores (padrão: sim; desligado recusa sozinho). */
+  aceitarDuelos?: boolean;
   /** Insígnias conquistadas (ids dos líderes de ginásio, shared/ginasios.ts). */
   insignias?: string[];
   /** VIP: data/hora (ms) em que acaba (shared/vip.ts). PRÉ-SISTEMA: no MMO fica na conta. */
@@ -212,19 +219,123 @@ function normalizar(save: Save): Save {
  * O save fica num objeto só, compartilhado por todas as telas e menus (cabeçalho, PC, Bolsa, Admin, batalha).
  * Antes cada um lia uma cópia do localStorage: um Pokémon capturado no bioma não aparecia na Bolsa/PC abertos
  * pelo cabeçalho até apertar F5 (e uma cópia velha podia apagar o que a outra salvou).
+ *
+ * O save mora na CONTA (servidor). `salvar` muda a memória na hora e manda para o servidor logo depois (juntando
+ * vários salvamentos seguidos num envio só). Enquanto não chega, uma cópia fica no navegador (`pendente`): se a
+ * página fechar antes, ela sobe no próximo login. `versao` evita que duas abas/computadores apaguem um ao outro.
  */
 let emMemoria: Save | null = null;
 
 export function carregarSave(): Save | null {
-  if (emMemoria) return emMemoria;
+  return emMemoria;
+}
+
+/** Save que ficou no navegador antes das contas (para levar para a conta no primeiro login). */
+export function saveAntigoDoNavegador(): Save | null {
   try {
     const texto = localStorage.getItem(CHAVE);
-    emMemoria = texto ? normalizar(JSON.parse(texto) as Save) : null;
-    return emMemoria;
+    return texto ? normalizar(JSON.parse(texto) as Save) : null;
   } catch {
     return null;
   }
 }
+/** Depois de levar o save antigo para a conta: guarda uma cópia de segurança e tira da chave antiga. */
+export function arquivarSaveAntigo(): void {
+  try {
+    const texto = localStorage.getItem(CHAVE);
+    if (texto) localStorage.setItem(`${CHAVE}-backup`, texto);
+    localStorage.removeItem(CHAVE);
+  } catch {
+    // sem armazenamento
+  }
+}
+
+// ---- sincronização com o servidor ----
+type Copia = { save: Save; versao: number; pendente: boolean };
+let contaId = 0;
+let versao = 0;
+let envio: ReturnType<typeof setTimeout> | undefined;
+let enviando = false;
+let pendente = false;
+/** Recomeçar apaga no servidor; o próximo envio espera o apagar terminar (senão a versão não bate). */
+let apagando: Promise<unknown> | null = null;
+const ESPERA_ENVIO_MS = 1000;
+const ESPERA_SEM_CONEXAO_MS = 5000;
+const chaveCopia = () => `${CHAVE}-conta-${contaId}`;
+
+export type EstadoSincronia = 'salvo' | 'salvando' | 'sem-conexao' | 'conflito' | 'sessao';
+const aoMudarSincroniaFns: ((estado: EstadoSincronia, mensagem?: string) => void)[] = [];
+export const aoMudarSincronia = (fn: (estado: EstadoSincronia, mensagem?: string) => void) => void aoMudarSincroniaFns.push(fn);
+const avisar = (estado: EstadoSincronia, mensagem?: string) => aoMudarSincroniaFns.forEach((fn) => fn(estado, mensagem));
+
+function guardarCopia(): void {
+  if (!emMemoria || !contaId) return;
+  try {
+    localStorage.setItem(chaveCopia(), JSON.stringify({ save: emMemoria, versao, pendente } satisfies Copia));
+  } catch {
+    // sem espaço: o servidor continua sendo a fonte
+  }
+}
+
+/**
+ * Começa a sessão de jogo com o save que veio do servidor. Se ficou no navegador uma cópia ainda não enviada
+ * da MESMA versão (a página fechou antes de mandar), ela é mais nova: entra no lugar e sobe agora.
+ */
+export function iniciarSaveDaConta(id: number, doServidor: Save | null, versaoServidor: number): void {
+  contaId = id;
+  versao = versaoServidor;
+  emMemoria = doServidor ? normalizar(doServidor) : null;
+  try {
+    const copia = JSON.parse(localStorage.getItem(chaveCopia()) ?? 'null') as Copia | null;
+    if (copia?.pendente && copia.versao === versaoServidor) {
+      emMemoria = normalizar(copia.save);
+      agendarEnvio(0);
+    } else localStorage.removeItem(chaveCopia());
+  } catch {
+    // cópia estragada: vale a do servidor
+  }
+}
+
+function agendarEnvio(espera = ESPERA_ENVIO_MS): void {
+  pendente = true;
+  avisar('salvando');
+  clearTimeout(envio);
+  envio = setTimeout(enviar, espera);
+}
+
+async function enviar(): Promise<void> {
+  if (enviando) return agendarEnvio();
+  if (!emMemoria || !pendente) return;
+  enviando = true;
+  pendente = false;
+  try {
+    if (apagando) await apagando;
+    const r = await api<{ versao: number }>('PUT', '/save', { save: emMemoria, versao });
+    versao = r.versao;
+    guardarCopia();
+    if (!pendente) avisar('salvo');
+  } catch (e) {
+    pendente = true;
+    guardarCopia();
+    const status = e instanceof ErroApi ? e.status : 0;
+    if (status === 409) avisar('conflito', (e as Error).message);
+    else if (status === 401) avisar('sessao', (e as Error).message);
+    else {
+      avisar('sem-conexao', status ? (e as Error).message : undefined);
+      envio = setTimeout(enviar, ESPERA_SEM_CONEXAO_MS);
+    }
+  } finally {
+    enviando = false;
+  }
+}
+
+// fechando a página com algo por enviar: tenta mandar (a cópia local cobre se não der)
+window.addEventListener('pagehide', () => {
+  if (!pendente || !emMemoria || enviando) return;
+  const corpo = { save: emMemoria, versao };
+  // keepalive só aceita pedidos pequenos
+  if (JSON.stringify(corpo).length < 60_000) void api('PUT', '/save', corpo, { keepalive: true }).catch(() => {});
+});
 
 // save da tela de jogo aberta (região/bioma): quem dono dos Pokémon mostrados nas fichas
 let saveEmUso: Save | null = null;
@@ -248,19 +359,23 @@ export function salvar(save: Save): void {
   emMemoria = save;
   // quem entrou no time/PC desde o último save (captura, ovo, ticket…) ganha o ID único aqui
   garantirIds(save);
-  try {
-    localStorage.setItem(CHAVE, JSON.stringify(save));
-  } catch {
-    // sem armazenamento disponível: o jogo continua, só não guarda o progresso
-  }
+  pendente = true;
+  guardarCopia();
+  agendarEnvio();
   for (const fn of aoSalvarFns) fn(save);
 }
 
 export function apagarSave(): void {
   emMemoria = null;
+  pendente = false;
+  clearTimeout(envio);
   try {
-    localStorage.removeItem(CHAVE);
+    localStorage.removeItem(chaveCopia());
   } catch {
     // idem
   }
+  apagando = api<{ versao: number }>('DELETE', '/save')
+    .then((r) => (versao = r.versao))
+    .catch(() => avisar('sem-conexao'))
+    .finally(() => (apagando = null));
 }

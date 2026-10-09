@@ -10,6 +10,10 @@ let jogo: Phaser.Game | null = null;
 export function mostrarJogo(area: HTMLElement, opcoes: OpcoesBioma): { cena: () => BiomaScene | null; tirar: () => void } {
   // o modo desempenho muda a resolução: o jogo é criado de novo com o tamanho certo
   if (jogo && jogo.config.width !== LARGURA_TELA * resolucao()) {
+    // o destroy do Phaser só acontece no próximo quadro: com o jogo dormindo (fora do mapa) nunca acontecia,
+    // e o teclado do jogo velho continuava "segurando" as setas (o novo ignorava as teclas já tratadas)
+    jogo.input.keyboard?.stopListeners();
+    jogo.loop.wake();
     jogo.destroy(true);
     jogo = null;
   }

@@ -32,6 +32,15 @@
 
 ## 1. Começando
 
+### 1.0 Sua conta
+Para jogar é preciso uma **conta** (aba **Criar conta** na tela de entrada): nome de usuário (3 a 16 letras, números ou _), e-mail e senha (pelo menos 6 caracteres).
+
+- O progresso fica **salvo na conta**, no servidor: dá para entrar de qualquer computador.
+- **Manter conectado** deixa a conta aberta neste computador por 30 dias; sem ele, ela fecha quando o navegador fecha.
+- Sair: **Minha conta → Sair da conta**.
+- Se o jogo for aberto em duas abas ou dois computadores ao mesmo tempo, só um salva: o outro avisa para recarregar a página (assim um não apaga o progresso do outro).
+- Quem já jogava antes das contas: no primeiro login aparece a opção de **levar o progresso** do navegador para a conta.
+
 ### 1.1 Criação do treinador
 O primeiro passo é montar o seu personagem:
 
@@ -337,8 +346,8 @@ O inicial (IV 20 em tudo, soma 120) é sempre **A**.
 - **Pokémon grandes** ficam 2 passos atrás, para não "entrar" no treinador.
 - 961 das 1025 espécies têm animação. As que não têm aparecem com a imagem de batalha, balançando.
 
-### 10.4 Professores de golpes (aba Golpes)
-Na barra do topo, a aba **Golpes** tem dois professores. Escolha o Pokémon do time e o golpe; se ele já souber 4, você escolhe qual esquecer.
+### 10.4 Professores de golpes (na Cidade)
+Na **Cidade**, clique no nome do **Move Reminder** ou do **Move Tutor** (lado a lado, no oeste) para abrir a janela dos professores. Escolha o Pokémon do time e o golpe; se ele já souber 4, você escolhe qual esquecer.
 
 | Professor | O que ensina | Preço (provisório) |
 |---|---|---|
@@ -644,6 +653,16 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Anti-macro:** o Pokémon selvagem só aparece quando você para de andar (segurar a tecla direto não sorteia encontro).
 - Mapas mais nítidos (sem o serrilhado do pixel art).
 
+### v0.3 — 9 de outubro de 2026
+- O jogo agora se chama **PokeOrigins**.
+- **Contas:** cadastro e login antes de tudo, progresso salvo na conta (servidor), "Manter conectado", sair da conta e aviso quando outra aba ou computador salvou. O progresso antigo do navegador pode ser levado para a conta.
+- O painel e a aba de **Administração** só aparecem para contas de administrador.
+- **Cidade funcional:** nomes dos lugares maiores e clicáveis; o Centro Pokémon cura o time, o Pokémarket abre a loja, a estação leva aos mapas e a Arena aos ginásios.
+- **Minimapa** da cidade no canto de cima, com um botão para cada lugar.
+- **Move Reminder e Move Tutor** viraram NPCs na cidade, com janela própria por cima do jogo; a aba Golpes saiu da barra do topo.
+- **Modo desempenho** em Opções: menos efeitos e resolução menor para computadores mais fracos.
+- O Pokémon selvagem aparece 0,15 s depois de parar de andar (antes 0,3 s).
+
 ---
 
 ## 18. Ideias para o futuro
@@ -651,8 +670,6 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 > Ideias que já conversamos. Nada aqui é promessa de data; é o nosso mapa.
 
 ### 🌐 Online
-- **Contas e login** antes da criação do personagem.
-- **Save na nuvem.**
 - **Servidor:** sorteios e batalhas rodando no servidor, para ninguém trapacear.
 - **Lista de amigos:** ver quem está online e em qual bioma, convidar para batalhas e trocas.
 - **Clãs:** nome, emblema, cargos, chat e ranking entre clãs.

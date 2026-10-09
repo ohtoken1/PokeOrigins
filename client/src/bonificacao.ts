@@ -3,6 +3,7 @@ import { BONIFICACAO_PADRAO, valorBonus, type Bonificacao, type ChaveBonus } fro
 import type { AjustesEncontro } from '../../shared/encontros';
 import { bonusVip, vipAtivo } from '../../shared/vip';
 import { carregarSave } from './estado';
+import { conta } from './conta';
 
 const CHAVE = 'jogo-claude:bonificacao';
 
@@ -73,8 +74,5 @@ export function comBonificacao(a: AjustesEncontro): AjustesEncontro {
   };
 }
 
-/**
- * A conta é de administrador? Sem sistema de contas ainda, todo mundo é (pedido do dono, para testar).
- * Quando houver contas, isto vem do servidor.
- */
-export const ehAdministrador = (): boolean => true;
+/** A conta logada é de administrador? Vem do servidor (a primeira conta criada é; outras pelo `npm run admin`). */
+export const ehAdministrador = (): boolean => !!conta()?.admin;

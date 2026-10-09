@@ -1,0 +1,14 @@
+{
+  "name": "server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --disable-warning=ExperimentalWarning src/index.ts",
+    "start": "node --disable-warning=ExperimentalWarning src/index.ts",
+    "admin": "node --disable-warning=ExperimentalWarning src/admin.ts",
+    "checar": "tsc --noEmit -p ."
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.1"
+  }
+}

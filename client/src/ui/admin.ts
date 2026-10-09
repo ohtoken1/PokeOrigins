@@ -10,12 +10,14 @@ import { NIVEL_MAX_TREINADOR, nivelTreinador, xpTotalParaNivel } from '../../../
 import { todosOsPokemons } from '../dados';
 import { carregarSave, salvar } from '../estado';
 import { el } from './dom';
+import { ehAdministrador } from '../bonificacao';
 
 const CHAVE = 'jogo-claude:admin';
 const CHAVE_POKEDEX = 'jogo-claude:admin-pokedex';
 
 /** Teste: mostra a Pokédex inteira, mesmo os Pokémon ainda não vistos. */
 export function pokedexRevelada(): boolean {
+  if (!ehAdministrador()) return false;
   try {
     return localStorage.getItem(CHAVE_POKEDEX) === 'sim';
   } catch {
@@ -40,7 +42,8 @@ function carregar(): AjustesEncontro {
 }
 
 export function ajustesAdmin(): AjustesEncontro {
-  return ajustes;
+  // ajustes de teste só valem para administradores (um jogador não liga shiny 1/2 pelo localStorage)
+  return ehAdministrador() ? ajustes : AJUSTES_PADRAO;
 }
 
 /** Avisa quando um ajuste muda; devolve a função para parar de ouvir. */

@@ -1,12 +1,15 @@
 {
-  "name": "jogo-claude",
+  "name": "pokeorigins",
   "private": true,
   "workspaces": [
-    "client"
+    "client",
+    "server"
   ],
   "scripts": {
-    "dev": "npm run dev -w client",
+    "dev": "node scripts/dev.mjs",
     "build": "npm run build -w client",
+    "start": "npm run start -w server",
+    "admin": "npm run admin -w server --",
     "dados": "node scripts/baixar-pokeapi.mjs",
     "maquinas": "node scripts/baixar-maquinas.mjs"
   }

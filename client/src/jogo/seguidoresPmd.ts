@@ -67,25 +67,31 @@ function medir(img: HTMLImageElement, a: Anim): { origemY: number; largura: numb
   return { origemY: (base + 1) / a.altura, largura: Math.max(4, dir - esq + 1) };
 }
 
-const carregando = new Map<string, Promise<InfoPmd | null>>();
 /**
- * Uma carga de cada vez no loader do Phaser: várias ao mesmo tempo (a cidade carrega vários Pokémon juntos)
- * deixavam arquivos presos na fila sem nunca terminar.
+ * Por jogo (Phaser.Game): o modo desempenho cria um jogo novo, sem as texturas e animações do anterior.
+ * `fila`: uma carga de cada vez no loader do Phaser: várias ao mesmo tempo (a cidade carrega vários Pokémon
+ * juntos) deixavam arquivos presos na fila sem nunca terminar.
  */
-let filaDoLoader: Promise<void> = Promise.resolve();
+const porJogo = new WeakMap<Phaser.Game, { carregando: Map<string, Promise<InfoPmd | null>>; fila: Promise<void> }>();
+function doJogo(jogo: Phaser.Game) {
+  let estado = porJogo.get(jogo);
+  if (!estado) porJogo.set(jogo, (estado = { carregando: new Map(), fila: Promise.resolve() }));
+  return estado;
+}
 
 /** Carrega as folhas de andar/parado e cria as animações (uma vez por espécie). */
 export function carregarPmd(cena: Phaser.Scene, especie: number, shiny = false): Promise<InfoPmd | null> {
   if (!temSpritePmd(especie, shiny)) return Promise.resolve(null);
   const numero = String(especie).padStart(4, '0');
   const prefixo = `pmd-${numero}${shiny ? '-s' : ''}`;
-  const salvo = carregando.get(prefixo);
+  const estado = doJogo(cena.game);
+  const salvo = estado.carregando.get(prefixo);
   if (salvo) return salvo;
   const pasta = `seguidores/${numero}${shiny ? '/shiny' : ''}`;
   const promessa = (async () => {
     const dados = await lerAnimData(numero);
     if (!dados) return null;
-    const carga = filaDoLoader.then(
+    const carga = estado.fila.then(
       () =>
         new Promise<void>((ok) => {
           const faltam = (['Walk', 'Idle'] as const).filter((nome) => !cena.textures.exists(`${prefixo}-${nome}`));
@@ -96,7 +102,7 @@ export function carregarPmd(cena: Phaser.Scene, especie: number, shiny = false):
           cena.load.start();
         }),
     );
-    filaDoLoader = carga;
+    estado.fila = carga;
     await carga;
     if (!cena.textures.exists(`${prefixo}-Walk`)) return null;
     // sem folha "parado" (alguns Pokémon): parado usa o 1º quadro de andar
@@ -129,6 +135,6 @@ export function carregarPmd(cena: Phaser.Scene, especie: number, shiny = false):
     const idle = temIdle ? medir(img('Idle'), dados.Idle) : walk;
     return { especie, prefixo, origemWalk: walk.origemY, origemIdle: idle.origemY, largura: walk.largura };
   })();
-  carregando.set(prefixo, promessa);
+  estado.carregando.set(prefixo, promessa);
   return promessa;
 }

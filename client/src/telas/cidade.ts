@@ -62,7 +62,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
     // na cidade não há encontros
     aoPisar: () => {},
     personagem: { chave: JSON.stringify(aparencia), folhas: montarPersonagem(aparencia) },
-    nomeJogador: save.mostrarNome === false ? undefined : save.aparencia?.nome,
+    nomeJogador: save.aparencia?.nome,
     aoClicarLocal: (acao) => usarLocal(acao),
   };
   const jogo = mostrarJogo(areaJogo, opcoes);

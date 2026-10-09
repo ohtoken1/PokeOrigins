@@ -70,12 +70,11 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
           el('div', { class: 'cab-xp', title: t.necessario ? `${t.atual.toLocaleString('pt-BR')} / ${t.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo' },
             el('small', {}, `Treinador Nv. ${t.nivel}`),
             el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${t.necessario ? (t.atual / t.necessario) * 100 : 100}%` } })))),
-        el('div', { class: 'cab-grupo cab-regiao' },
-          el('small', {}, 'Região'),
+        el('div', { class: 'cab-grupo cab-regiao', title: 'Região atual' },
           el('strong', {}, regiao?.nome ?? save.regiao)),
         // insígnias da região atual (clicar abre os Ginásios)
-        el('button', { class: 'cab-grupo cab-insignias', title: 'Insígnias: vença os Ginásios', onclick: () => navegar({ tela: 'ginasios' }) },
-          el('small', {}, `Insígnias ${lideres.filter((l) => (save.insignias ?? []).includes(l.id)).length}/${lideres.length}`),
+        // sem texto: as conquistadas acendem, as outras ficam apagadas
+        el('button', { class: 'cab-grupo cab-insignias', title: `Insígnias ${lideres.filter((l) => (save.insignias ?? []).includes(l.id)).length}/${lideres.length}: vença os Ginásios`, onclick: () => navegar({ tela: 'ginasios' }) },
           el('div', { class: 'cab-insignias-lista' }, ...lideres.map((l) => insigniaVisual(l, (save.insignias ?? []).includes(l.id))))),
         // bônus da administração (Shiny 2x, XP 2x…), só informativo
         selosBonus(),
