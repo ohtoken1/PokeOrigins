@@ -1,4 +1,4 @@
-# Jogo Claude — MMO de Pokémon no navegador
+# PokeOrigins — MMO de Pokémon no navegador
 
 O dono do projeto não é programador: explique decisões em português simples e teste no navegador antes de dizer que algo funciona.
 Respostas **curtas** (o dono pediu para economizar limite). Prioridade atual: **lapidar o jogo local**; servidor/contas/anti-trapaça só depois, quando o dono pedir.

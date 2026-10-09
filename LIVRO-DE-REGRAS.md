@@ -1,4 +1,4 @@
-# 📖 Livro de Regras — Jogo Claude
+# 📖 Livro de Regras — PokeOrigins
 
 > Como o **nosso** jogo funciona. Não explica Pokémon em geral (tipos, golpes, natureza…). Isso qualquer um encontra por aí. Aqui ficam só as regras e os sistemas **deste** jogo.
 >

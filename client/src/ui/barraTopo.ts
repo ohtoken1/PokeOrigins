@@ -151,7 +151,7 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
       el(
         'div',
         { class: 'barra-topo-conteudo' },
-        el('strong', { class: 'marca' }, 'Jogo Claude'),
+        el('strong', { class: 'marca' }, 'PokeOrigins'),
         el('div', { class: 'abas-topo' }, ...botoes.map((b) => b.raiz)),
         controlesSom(),
       ),
