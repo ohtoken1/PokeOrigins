@@ -1,12 +1,12 @@
 // Tickets: itens raros que, ao abrir, sorteiam UM prêmio. Cada prêmio tem a sua chance (do total) e uma
-// raridade (comum, raro, épico, lendário), que dá a cor na roleta. Conteúdo e porcentagens: planilha do dono
+// raridade (comum, raro, épico, lendário, mítico), que dá a cor na roleta. Conteúdo e porcentagens: planilha do dono
 // (Tickets.xlsx). Fica em shared/ porque, no MMO, quem sorteia é o servidor.
 import { Dex } from '@pkmn/sim';
 import { ITENS } from './itens';
 import { TIPOS_TERA } from './tera';
 import { idSkin } from './itensCustom';
 
-export type Raridade = 'comum' | 'raro' | 'epico' | 'lendario';
+export type Raridade = 'comum' | 'raro' | 'epico' | 'lendario' | 'mitico';
 
 /** Nomes e ordem das raridades (as chances vêm de cada ticket). */
 export const RARIDADES: { id: Raridade; nome: string }[] = [
@@ -14,6 +14,7 @@ export const RARIDADES: { id: Raridade; nome: string }[] = [
   { id: 'raro', nome: 'Raro' },
   { id: 'epico', nome: 'Épico' },
   { id: 'lendario', nome: 'Lendário' },
+  { id: 'mitico', nome: 'Mítico' },
 ];
 
 /** Chance de ganhar um ticket (sorteado entre os existentes) ao vencer ou capturar um selvagem. */
@@ -72,19 +73,28 @@ const EPICO: LinhaPremio[] = [
   linha('epico', 0.01, { tipo: 'silver', quantidade: 1_000_000 }),
   linha('epico', 0.01, item('ovo-misterioso-a')),
 ];
-/** Lendário: os prêmios dividem 1% por igual (4 → 0,25% cada; 5 → 0,2% cada). */
-const lendarios = (...premios: Premio[]): LinhaPremio[] => premios.map((p) => linha('lendario', 0.01 / premios.length, p));
+/** Lendário: os prêmios dividem o total por igual (1% sem mítico: 5 → 0,2% cada; 0,9% com mítico: 3 → 0,3% cada). */
+const lendarios = (premios: Premio[], total = 0.01): LinhaPremio[] => premios.map((p) => linha('lendario', total / premios.length, p));
+/** Mítico (pedido do dono): a skin shiny, 0,1%; o lendário do ticket fica com 0,9%. */
+const CHANCE_MITICO = 0.001;
 /** Ticket padrão da planilha: comum + raro + épico iguais em todos; muda só o lendário. */
 const padrao = (id: string, nome: string, descricao: string, ...lendario: Premio[]): Ticket => ({
   id,
   nome,
   descricao,
-  premios: [...COMUM, ...RARO, ...EPICO, ...lendarios(...lendario)],
+  premios: [...COMUM, ...RARO, ...EPICO, ...lendarios(lendario)],
 });
-/** Ticket do lendário com o próprio Pokémon, o item dele e as duas skins. */
-const deLendario = (nome: string, especie: number, itemId: string) =>
-  padrao(`ticket-${nome.toLowerCase()}`, `Ticket de ${nome}`, `Abra para sortear um prêmio. No lendário: ${nome} (IVs 15+, 5% de chance de shiny), o item dele ou uma skin.`,
-    pokemon(especie), item(itemId), item(idSkin(nome)), item(idSkin(nome, true)));
+/** Ticket do lendário: no lendário (0,9%) o próprio Pokémon, o item dele e a skin; no mítico (0,1%) a skin shiny. */
+const deLendario = (nome: string, especie: number, itemId: string): Ticket => ({
+  id: `ticket-${nome.toLowerCase()}`,
+  nome: `Ticket de ${nome}`,
+  descricao: `Abra para sortear um prêmio. No lendário: ${nome} (IVs 15+, 5% de chance de shiny), o item dele ou a skin. No mítico: a skin shiny.`,
+  premios: [
+    ...COMUM, ...RARO, ...EPICO,
+    ...lendarios([pokemon(especie), item(itemId), item(idSkin(nome))], 0.01 - CHANCE_MITICO),
+    linha('mitico', CHANCE_MITICO, item(idSkin(nome, true))),
+  ],
+});
 
 export const TICKETS: Ticket[] = [
   deLendario('Kyogre', 382, 'blueorb'),

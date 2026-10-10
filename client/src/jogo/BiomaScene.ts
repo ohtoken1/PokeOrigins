@@ -147,6 +147,8 @@ export class BiomaScene extends Phaser.Scene {
   private passos = 0;
   private pausado = false;
   private direcaoPendente: [number, number] | undefined;
+  /** Andando sozinho até um lugar (clicou no nome ou no minimapa): os passos que faltam e o que fazer ao chegar. */
+  private destino: { alvo: { x: number; y: number }; rota: [number, number][]; aoChegar: () => void; desvios: number } | undefined;
   private setas!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<'W' | 'A' | 'S' | 'D', Phaser.Input.Keyboard.Key>;
   private opcoes!: OpcoesBioma;
@@ -174,6 +176,7 @@ export class BiomaScene extends Phaser.Scene {
     this.passos = 0;
     this.pausado = false;
     this.direcaoPendente = undefined;
+    this.destino = undefined;
     this.lpc = null;
     this.linhaLpc = 2;
     this.pmd = null;
@@ -356,6 +359,8 @@ export class BiomaScene extends Phaser.Scene {
       const rotulo = o.rotulo ?? p.rotulo;
       if (rotulo) this.rotulo(rotulo, x + p.w / 2, base - p.h - 2, '#ffe680', o.acao ?? p.acao);
     }
+    const saida = this.mapa.saida;
+    if (saida) this.rotulo('Saída para os mapas', (saida.x + 0.5) * TAM, (saida.y - 2) * TAM, '#b8f0a0', 'mapas');
   }
 
   /** Textura da sombra de uma peça (feita uma vez a partir do primeiro quadro). */
@@ -526,9 +531,96 @@ export class BiomaScene extends Phaser.Scene {
     else if (setas.right.isDown || wasd.D.isDown) direcao = [1, 0];
     else if (setas.up.isDown || wasd.W.isDown) direcao = [0, -1];
     else if (setas.down.isDown || wasd.S.isDown) direcao = [0, 1];
+    // andar com as teclas cancela a caminhada automática
+    if (direcao) this.destino = undefined;
+    else if (this.destino) return this.seguirRota();
     direcao ??= this.direcaoPendente;
     this.direcaoPendente = undefined;
     if (direcao) this.tentarMover(...direcao);
+  }
+
+  /**
+   * Faz o personagem andar sozinho até o lugar com essa `acao` (prédio, placa ou NPC do mapa) e chama `aoChegar`
+   * quando ele parar na frente. Devolve false se o lugar não existe ou não dá para chegar perto.
+   */
+  irAte(acao: string, aoChegar: () => void): boolean {
+    const alvo = this.alvoDoLugar(acao);
+    const rota = alvo && this.calcularRota(alvo);
+    if (!alvo || !rota) return false;
+    this.destino = { alvo, rota, aoChegar, desvios: 0 };
+    return true;
+  }
+
+  /** Tile na frente do lugar: embaixo da porta do prédio (no meio da largura) ou embaixo do NPC. */
+  private alvoDoLugar(acao: string): { x: number; y: number } | null {
+    if (acao === 'mapas') return this.mapa.saida ?? null;
+    for (const o of this.mapa.objetos ?? []) {
+      const p: Peca | undefined = PECAS[o.peca];
+      if (p && (o.acao ?? p.acao) === acao) return { x: Math.floor(o.x + p.w / TAM / 2), y: o.base };
+    }
+    const npc = (this.mapa.npcs ?? []).find((n) => n.acao === acao);
+    return npc ? { x: npc.x, y: npc.y + 1 } : null;
+  }
+
+  /** Caminho mais curto (passo a passo) até o tile livre mais perto do alvo; null se não há como chegar perto. */
+  private calcularRota(alvo: { x: number; y: number }): [number, number][] | null {
+    const { largura, altura, bloqueado } = this.mapa;
+    const livre = (x: number, y: number) => x >= 0 && y >= 0 && x < largura && y < altura && !bloqueado[y][x] && !this.vida?.ocupa(x, y);
+    const inicio = this.pos.y * largura + this.pos.x;
+    const veioDe = new Int32Array(largura * altura).fill(-1);
+    veioDe[inicio] = inicio;
+    const fila = [inicio];
+    let melhor = inicio;
+    let melhorDistancia = Infinity;
+    for (let i = 0; i < fila.length; i++) {
+      const atual = fila[i];
+      const x = atual % largura;
+      const y = (atual - x) / largura;
+      // o primeiro que aparece com a menor distância é também o de menos passos
+      const distancia = Math.abs(x - alvo.x) + Math.abs(y - alvo.y);
+      if (distancia < melhorDistancia) {
+        melhor = atual;
+        melhorDistancia = distancia;
+        if (!distancia) break;
+      }
+      for (const [dx, dy] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
+        const proximo = (y + dy) * largura + x + dx;
+        if (livre(x + dx, y + dy) && veioDe[proximo] < 0) {
+          veioDe[proximo] = atual;
+          fila.push(proximo);
+        }
+      }
+    }
+    // longe demais do lugar (cercado, por exemplo): não vale a caminhada
+    if (melhorDistancia > 3) return null;
+    const rota: [number, number][] = [];
+    for (let atual = melhor; atual !== inicio; atual = veioDe[atual]) {
+      const anterior = veioDe[atual];
+      rota.unshift([(atual % largura) - (anterior % largura), Math.floor(atual / largura) - Math.floor(anterior / largura)]);
+    }
+    return rota;
+  }
+
+  /** Um passo da caminhada automática (chamado quando o personagem está parado). */
+  private seguirRota() {
+    const destino = this.destino!;
+    const passo = destino.rota.shift();
+    if (!passo) {
+      this.destino = undefined;
+      // vira para o lugar (o tile do prédio é bloqueado: só muda a direção)
+      const dx = destino.alvo.x - this.pos.x;
+      const dy = destino.alvo.y - 1 - this.pos.y;
+      const virar: [number, number] = Math.abs(dx) > Math.abs(dy) ? [Math.sign(dx), 0] : [0, Math.sign(dy) || -1];
+      if (this.mapa.bloqueado[this.pos.y + virar[1]]?.[this.pos.x + virar[0]]) this.tentarMover(...virar);
+      return destino.aoChegar();
+    }
+    const antes = this.pos;
+    this.tentarMover(...passo);
+    if (this.pos !== antes) return;
+    // alguém entrou na frente (morador, Pokémon): procura outro caminho, algumas vezes
+    const outra = ++destino.desvios <= 8 ? this.calcularRota(destino.alvo) : null;
+    if (outra) destino.rota = outra;
+    else this.destino = undefined;
   }
 
   /** Ponto onde ficam os pés de quem está no tile (um pouco abaixo do centro). */

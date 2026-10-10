@@ -14,11 +14,14 @@ import { el, spritePokemon } from '../ui/dom';
 import { abrirJanela } from '../ui/janela';
 import { api, ErroApi } from '../conta';
 import { icone } from '../ui/icones';
+import { desenharBandeira } from '../ui/bandeira';
+import { meuCla, NOME_CARGO, type Cargo, type ResumoCla } from '../cla';
 
 /** Perfil de outro jogador como o servidor manda (server/src/index.ts → perfilPublico): só o que é público. */
 export interface PerfilPublico {
   usuario: string;
   online: boolean;
+  cla: (ResumoCla & { cargo: Cargo }) | null;
   perfil: Pick<Save, 'aparencia' | 'regiao' | 'xpTreinador' | 'criadoEm' | 'insignias' | 'vistos' | 'capturados' | 'estatisticas'> & {
     mostrarTime: boolean;
     time: { especieId: number; nivel: number; shiny: boolean }[];
@@ -38,7 +41,7 @@ export async function abrirPerfilDe(usuario: string): Promise<void> {
 /** Perfil de outro jogador: o mesmo desenho, com o time só para ver (sem abrir a ficha) e escondido se ele quiser. */
 function perfilRemoto(r: PerfilPublico): HTMLElement {
   const save = { ...r.perfil, time: r.perfil.time } as unknown as Save;
-  return perfilJogador(save, { online: r.online, remoto: true, timeEscondido: !r.perfil.mostrarTime });
+  return perfilJogador(save, { online: r.online, remoto: true, timeEscondido: !r.perfil.mostrarTime, cla: r.cla });
 }
 
 /** Medalha de torneio desenhada por código (fita + disco) com a quantidade do lado. */
@@ -79,10 +82,13 @@ function painelInsignias(save: Save): HTMLElement {
   return el('div', {}, seletor, lista);
 }
 
-export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: boolean; timeEscondido?: boolean } = {}): HTMLElement {
+export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: boolean; timeEscondido?: boolean; cla?: PerfilPublico['cla'] } = {}): HTMLElement {
   const e = save.estatisticas;
   // o próprio perfil está sempre online (é quem está jogando)
   const online = opcoes.online ?? save === carregarSave();
+  // clã: o do servidor (perfil de outro) ou o meu
+  const meu = meuCla();
+  const cla = opcoes.remoto ? opcoes.cla : meu && { ...meu, cargo: meu.meuCargo ?? 'membro' };
   const totalDex = todosOsPokemons().filter((p) => !p.numeroDex).length;
   const parteDex = Math.round((save.capturados.length / totalDex) * 1000) / 10;
   const desde = save.criadoEm ? new Date(save.criadoEm).toLocaleDateString('pt-BR') : '—';
@@ -103,6 +109,8 @@ export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: b
       retratoTreinador(save),
       el('h2', {}, save.aparencia?.nome || 'Treinador'),
       el('span', { class: `perfil-status ${online ? 'online' : 'offline'}` }, el('span', { class: 'perfil-bolinha' }), online ? 'Online agora' : 'Offline'),
+      cla ? el('div', { class: 'perfil-cla', title: `Clã ${cla.nome} · nível ${cla.nivel}` }, desenharBandeira(cla.bandeira, 30),
+        el('span', {}, el('strong', {}, cla.nome), el('small', {}, `${NOME_CARGO[cla.cargo]} · Nv. ${cla.nivel}`))) : null,
       el('div', { class: 'perfil-nivel', title: t.necessario ? `${t.atual.toLocaleString('pt-BR')} / ${t.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo' },
         el('small', {}, `Treinador Nv. ${t.nivel}`),
         el('span', { class: 'barra-exp perfil-barra' }, el('span', { class: 'preenchido', style: { width: `${t.necessario ? (t.atual / t.necessario) * 100 : 100}%` } }))),

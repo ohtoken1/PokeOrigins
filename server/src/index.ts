@@ -7,6 +7,11 @@ import { fileURLToPath } from 'node:url';
 import * as banco from './banco.ts';
 import { cadastrar, contaDoToken, entrar, ErroConta, publica, sair } from './contas.ts';
 import * as trocas from './trocas.ts';
+import * as amigos from './amigos.ts';
+import * as cla from './cla.ts';
+import * as cambio from './cambio.ts';
+import * as anuncios from './anuncios.ts';
+import * as viagem from './viagem.ts';
 import { estaOnline, ligarMundo } from './mundo.ts';
 
 const PORTA = Number(process.env.PORT ?? 3001);
@@ -29,6 +34,8 @@ setInterval(() => {
   const agora = Date.now();
   for (const [ip, t] of tentativas) if (agora - t.desde > JANELA_TENTATIVAS) tentativas.delete(ip);
   banco.limparSessoesVencidas();
+  amigos.limpar();
+  cla.consertar();
 }, 60 * 1000).unref();
 
 // ---- utilidades de HTTP ----
@@ -38,12 +45,15 @@ function responder(res: ServerResponse, status: number, corpo: unknown): void {
   res.end(texto);
 }
 
-async function lerCorpo(req: IncomingMessage): Promise<Record<string, unknown>> {
+/** Pedidos que não levam o save (login, amigos, clã, trocas…) são pequenos: acima disso é erro ou abuso. */
+const TAMANHO_MAX_PEDIDO_PEQUENO = 16 * 1024;
+
+async function lerCorpo(req: IncomingMessage, limite = TAMANHO_MAX_PEDIDO_PEQUENO): Promise<Record<string, unknown>> {
   const partes: Buffer[] = [];
   let tamanho = 0;
   for await (const parte of req) {
     tamanho += (parte as Buffer).length;
-    if (tamanho > TAMANHO_MAX_PEDIDO) throw new ErroConta('Pedido grande demais.', 413);
+    if (tamanho > limite) throw new ErroConta('Pedido grande demais.', 413);
     partes.push(parte as Buffer);
   }
   if (!tamanho) return {};
@@ -91,8 +101,10 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   }
   if (metodo === 'PUT' && caminho === '/api/save') {
     const conta = exigirConta(req);
-    const c = await lerCorpo(req);
+    const c = await lerCorpo(req, TAMANHO_MAX_PEDIDO);
     if (!c.save || typeof c.save !== 'object' || typeof c.versao !== 'number') throw new ErroConta('Save inválido.');
+    // conta comum: região e viagem só mudam pelo trem (server/src/viagem.ts)
+    viagem.protegerRegiao(conta, c.save as Record<string, unknown>);
     const texto = JSON.stringify(c.save);
     if (texto.length > TAMANHO_MAX_SAVE) throw new ErroConta('Save grande demais.', 413);
     const versao = banco.gravarSave(conta.id, texto, c.versao);
@@ -123,6 +135,86 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     return responder(res, 200, trocas.cancelar(conta, id));
   }
 
+  // ---- amigos e mensagens privadas (server/src/amigos.ts) ----
+  if (caminho === '/api/amigos' && metodo === 'GET') return responder(res, 200, amigos.lista(exigirConta(req)));
+  if (caminho === '/api/amigos' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 201, amigos.convidar(conta, (await lerCorpo(req)).usuario));
+  }
+  const rotaAmigo = caminho.match(/^\/api\/amigos\/([A-Za-z0-9_]{3,16})\/(aceitar|recusar|remover|mensagens)$/);
+  if (rotaAmigo) {
+    const conta = exigirConta(req);
+    const [, usuario, acao] = rotaAmigo;
+    if (acao === 'mensagens' && metodo === 'GET') return responder(res, 200, amigos.conversa(conta, usuario));
+    if (metodo === 'POST') {
+      if (acao === 'mensagens') return responder(res, 201, amigos.mandar(conta, usuario, (await lerCorpo(req)).texto));
+      if (acao === 'remover') return responder(res, 200, amigos.remover(conta, usuario));
+      return responder(res, 200, amigos.responder(conta, usuario, acao === 'aceitar'));
+    }
+  }
+
+  // ---- clãs (server/src/cla.ts) ----
+  if (caminho === '/api/cla' && metodo === 'GET') return responder(res, 200, cla.meu(exigirConta(req)));
+  if (caminho === '/api/clas' && metodo === 'GET') {
+    exigirConta(req);
+    return responder(res, 200, cla.listar(new URL(req.url ?? '/', 'http://x').searchParams.get('busca') ?? ''));
+  }
+  const rotaClas = caminho.match(/^\/api\/clas\/(\d{1,9})(?:\/(entrar|cancelar))?$/);
+  if (rotaClas) {
+    const conta = exigirConta(req);
+    const id = Number(rotaClas[1]);
+    if (!rotaClas[2] && metodo === 'GET') return responder(res, 200, cla.ver(conta, id));
+    if (rotaClas[2] && metodo === 'POST') return responder(res, 200, rotaClas[2] === 'entrar' ? cla.entrar(conta, id) : cla.cancelarPedido(conta, id));
+  }
+  if (metodo === 'POST' && caminho.startsWith('/api/cla')) {
+    const rotaCla = caminho.match(/^\/api\/cla(?:\/(sair|editar|xp)|\/(pedidos|membros)\/([A-Za-z0-9_]{3,16})\/(aceitar|recusar|expulsar|cargo))?$/);
+    if (rotaCla) {
+      const conta = exigirConta(req);
+      const corpo = await lerCorpo(req);
+      const [, simples, grupo, usuario, acao] = rotaCla;
+      if (!simples && !grupo) return responder(res, 201, cla.criar(conta, corpo));
+      if (simples === 'sair') return responder(res, 200, cla.sair(conta));
+      if (simples === 'editar') return responder(res, 200, cla.editar(conta, corpo));
+      if (simples === 'xp') return responder(res, 200, cla.darXp(conta, corpo.xp));
+      if (grupo === 'pedidos' && (acao === 'aceitar' || acao === 'recusar')) return responder(res, 200, cla.responderPedido(conta, usuario, acao === 'aceitar'));
+      if (grupo === 'membros' && acao === 'expulsar') return responder(res, 200, cla.expulsar(conta, usuario));
+      if (grupo === 'membros' && acao === 'cargo') return responder(res, 200, cla.mudarCargo(conta, usuario, corpo.cargo));
+    }
+  }
+
+  // ---- banco da cidade: silver ↔ gold (server/src/cambio.ts) ----
+  if (caminho === '/api/cambio' && metodo === 'GET') {
+    exigirConta(req);
+    return responder(res, 200, { cofre: cambio.cofre() });
+  }
+  if (caminho === '/api/cambio' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, cambio.trocar(conta, await lerCorpo(req)));
+  }
+
+  // ---- trem entre as regiões (server/src/viagem.ts) ----
+  if (caminho === '/api/viagem' && metodo === 'GET') {
+    exigirConta(req);
+    return responder(res, 200, viagem.agora());
+  }
+  if (caminho === '/api/viagem' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, viagem.comprar(conta, await lerCorpo(req)));
+  }
+  if (caminho === '/api/viagem/chegar' && metodo === 'POST') return responder(res, 200, viagem.chegar(exigirConta(req)));
+
+  // ---- anúncios da staff, lidos no mural da cidade (server/src/anuncios.ts) ----
+  if (caminho === '/api/anuncios' && metodo === 'GET') {
+    exigirConta(req);
+    return responder(res, 200, anuncios.listar());
+  }
+  if (caminho === '/api/anuncios' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 201, anuncios.publicar(conta, await lerCorpo(req)));
+  }
+  const rotaAnuncio = caminho.match(/^\/api\/anuncios\/(\d{1,9})$/);
+  if (rotaAnuncio && metodo === 'DELETE') return responder(res, 200, anuncios.apagar(exigirConta(req), Number(rotaAnuncio[1])));
+
   // ---- outros jogadores: busca e perfil público ----
   if (caminho === '/api/jogadores' && metodo === 'GET') {
     exigirConta(req);
@@ -135,7 +227,7 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     const conta = banco.contaPorUsuario(rotaPerfil[1]);
     const save = conta && banco.lerSave(conta.id);
     if (!conta || !save) throw new ErroConta('Jogador não encontrado.', 404);
-    return responder(res, 200, { usuario: conta.usuario, online: estaOnline(conta.id), perfil: perfilPublico(JSON.parse(save.dados)) });
+    return responder(res, 200, { usuario: conta.usuario, online: estaOnline(conta.id), perfil: perfilPublico(JSON.parse(save.dados)), cla: cla.resumoDaConta(conta.id) });
   }
   throw new ErroConta('Não encontrado.', 404);
 }
@@ -195,5 +287,6 @@ const servidor = createServer(async (req, res) => {
     }
   }
 });
+cla.consertar();
 ligarMundo(servidor);
 servidor.listen(PORTA, () => console.log(`Servidor do PokeOrigins em http://localhost:${PORTA}`));

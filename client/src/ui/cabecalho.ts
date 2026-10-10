@@ -1,6 +1,7 @@
 // Cabeçalho fixo embaixo da barra do topo, em todas as telas (menos as que precisam do espaço: criação do
 // personagem e roleta do inicial; no mapa do bioma ele aparece, pedido do dono). Mostra nome, VIP, XP de treinador, região, Pokédex da região,
 // insígnias, silver/gold e atalhos (Centro Pokémon, Pokémarket, Bolsa, PC, Mapas).
+import { ehAdministrador } from '../bonificacao';
 import { lideresDaRegiao } from '../../../shared/ginasios';
 import { insigniaVisual } from '../telas/ginasios';
 import { selosBonus } from './selosBonus';
@@ -90,10 +91,12 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
             avisar('Time curado!');
             aoMudar();
           }),
-          atalho('loja', 'Pokémarket', () => abrirLoja(save, aoMudar)),
+          // Pokémarket: jogadores vão até ele na cidade; o atalho fica só para administradores (pedido do dono)
+          ehAdministrador() ? atalho('loja', 'Pokémarket', () => abrirLoja(save, aoMudar)) : null,
           atalho('mochila', 'Bolsa', () => abrirBolsa(save, aoMudar)),
           atalho('computador', 'PC', () => abrirPC(save, aoMudar)),
-          atalho('mapa', 'Mapas', () => navegar({ tela: 'regiao' })),
+          // Mapas: jogadores saem pela saída do sul da cidade; para eles o atalho leva à cidade
+          ehAdministrador() ? atalho('mapa', 'Mapas', () => navegar({ tela: 'regiao' })) : atalho('mapa', 'Cidade', () => navegar({ tela: 'cidade' })),
           aviso),
     );
   }

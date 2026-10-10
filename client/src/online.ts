@@ -50,6 +50,12 @@ export function aoChat(o: OuvinteChat): () => void {
 /** Manda no chat; false = sem conexão agora. */
 export const enviarChat = (canal: CanalChat, texto: string): boolean => mandar({ t: 'chat', canal, texto });
 export const onlineConectado = () => pronto;
+/** Avisos do servidor fora dos mapas e do chat: lista de amigos mudou ('amigos'), mensagem privada ('privado'), clã mudou ('cla'), mural de anúncios mudou ('anuncios'). */
+const ouvintesAviso = new Set<(msg: Record<string, unknown>) => void>();
+export function aoAvisoDoServidor(f: (msg: Record<string, unknown>) => void): () => void {
+  ouvintesAviso.add(f);
+  return () => ouvintesAviso.delete(f);
+}
 
 let ws: WebSocket | null = null;
 let pronto = false;
@@ -95,6 +101,7 @@ export function conectarOnline(): void {
     if (msg.t === 'chat') return ouvintesChat.forEach((o) => o.mensagem(msg as unknown as MensagemChat));
     if (msg.t === 'chat-historico') return ouvintesChat.forEach((o) => o.historico(msg.canal as CanalChat, msg.lista as MensagemChat[]));
     if (msg.t === 'chat-erro') return ouvintesChat.forEach((o) => o.erro(msg.canal as CanalChat, msg.texto as string));
+    if (msg.t === 'amigos' || msg.t === 'privado' || msg.t === 'cla' || msg.t === 'anuncios' || msg.t === 'cofre') return ouvintesAviso.forEach((f) => f(msg));
     const ouvinte = salaAtual?.ouvinte;
     if (!ouvinte) return;
     if (msg.t === 'jogadores' && msg.sala === salaAtual!.sala) ouvinte.todos(msg.lista as JogadorOnline[]);

@@ -2,6 +2,8 @@
 // Ainda sem funcionar; por enquanto as telas mostram o que vai existir.
 import type { Tela } from '../main';
 import { el } from '../ui/dom';
+import { telaAmigos } from './amigos';
+import { telaCla } from './cla';
 
 export type SecaoComunidade = 'amigos' | 'cla' | 'continentes' | 'duelos' | 'ginasios';
 
@@ -38,7 +40,7 @@ const SECOES: Record<SecaoComunidade, { titulo: string; icone: string; texto: st
   },
 };
 
-export const telaComunidade = (secao: SecaoComunidade): Tela => (raiz) => {
+export const telaComunidade = (secao: SecaoComunidade): Tela => secao === 'amigos' ? telaAmigos : secao === 'cla' ? telaCla : (raiz) => {
   const s = SECOES[secao];
   raiz.append(
     el(
@@ -51,7 +53,7 @@ export const telaComunidade = (secao: SecaoComunidade): Tela => (raiz) => {
         el('span', { class: 'selo-em-breve' }, 'Em breve'),
         el('p', {}, s.texto),
         el('ul', {}, ...s.itens.map((i) => el('li', {}, i))),
-        el('small', {}, secao === 'amigos' || secao === 'cla' ? 'Esta parte precisa de contas e do servidor online, que ainda vão ser feitos.' : 'Esta parte ainda vai ser feita.'),
+        el('small', {}, 'Esta parte ainda vai ser feita.'),
       ),
     ),
   );

@@ -362,7 +362,7 @@ export function gerarMapaCidade(): Mapa {
     colocar('bancoCostas', x, cy + 11);
   }
   colocar('mural', cx - 13, cy - 2, 'Mural de anúncios', 'mural');
-  colocar('mural', espelho(cx - 13), cy - 2, 'Quadro de torneios', 'torneios');
+  colocar('mural', espelho(cx - 13), cy - 2, 'Quadro de missões', 'missoes');
   for (const x of [eixo - 4, espelho(eixo - 4)]) {
     poste(x, praca.y0 + 1);
     poste(x, praca.y0 + praca.h);
@@ -548,5 +548,5 @@ export function gerarMapaCidade(): Mapa {
 
   // pedras em anéis em volta da fonte (centro da bacia), ovais como ela
   info.aneis = { x: eixo * TAM, y: fonteBase * TAM - 48, raio: 124, achatamento: 0.72 };
-  return { largura, altura, terreno, bloqueado, grandes, pedrinhas: [], flores, inicio: { x: cx, y: cy + 11 }, objetos, npcs, trilhas, sombras: true, cidade: info };
+  return { largura, altura, terreno, bloqueado, grandes, pedrinhas: [], flores, inicio: { x: cx, y: cy + 11 }, saida: { x: cx, y: altura - 2 }, objetos, npcs, trilhas, sombras: true, cidade: info };
 }

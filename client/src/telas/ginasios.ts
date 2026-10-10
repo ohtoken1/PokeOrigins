@@ -10,6 +10,8 @@ import { pokemonPorId } from '../dados';
 import { carregarSave, salvar } from '../estado';
 import { corTipo, el, seloTipo, spritePokemon } from '../ui/dom';
 import { imagemTreinador } from './duelos';
+import { ehAdministrador } from '../bonificacao';
+import { aoMudarViagem, viagemAtual } from '../viagem';
 
 /**
  * Desenho da insígnia (client/public/insignias/<líder>.png); apagado se ainda não foi conquistada.
@@ -32,11 +34,23 @@ export const telaGinasios: Tela = (raiz, navegar) => {
     return;
   }
   save.insignias ??= [];
-  let regiao = regiaoAberta ?? save.regiao;
+  // jogador comum só desafia os ginásios da região onde está, e nenhum enquanto viaja de trem (pedido do dono);
+  // as outras abas ficam só para olhar. Administradores desafiam qualquer um.
+  const admin = ehAdministrador();
+  let regiao = admin ? regiaoAberta ?? save.regiao : save.regiao;
+  const nomeDe = (id: string) => REGIOES.find((r) => r.id === id)?.nome ?? id;
+  /** Por que não dá para desafiar os ginásios desta aba ('' = dá). */
+  const bloqueio = (): string => {
+    if (admin) return '';
+    const viagem = viagemAtual();
+    if (viagem) return `Você está viajando para ${nomeDe(viagem.para)}. Os ginásios abrem quando o trem chegar.`;
+    return regiao === save.regiao ? '' : `Você está em ${nomeDe(save.regiao)}. Para desafiar os ginásios de ${nomeDe(regiao)}, viaje de trem até lá.`;
+  };
   const crescimentoDe = (n: number) => pokemonPorId(n).crescimento;
   const corpo = el('div', { class: 'ginasios-corpo' });
 
   const desafiar = (lider: LiderGinasio) => {
+    if (bloqueio()) return desenhar();
     const equipe = montarTimeNpc(lider, save.time, crescimentoDe);
     const jaTinha = save.insignias!.includes(lider.id);
     abrirBatalha({
@@ -63,10 +77,12 @@ export const telaGinasios: Tela = (raiz, navegar) => {
     regiaoAberta = regiao;
     const lideres = lideresDaRegiao(regiao);
     const ganhas = lideres.filter((l) => save!.insignias!.includes(l.id)).length;
-    const podeLutar = save!.time.some((p) => p.hp > 0);
+    const fechado = bloqueio();
+    const podeLutar = !fechado && save!.time.some((p) => p.hp > 0);
     corpo.replaceChildren(
       el('nav', { class: 'abas abas-regioes-ginasio' },
         ...REGIOES.filter((r) => r.disponivel).map((r) => el('button', { class: `aba ${r.id === regiao ? 'ativa' : ''}`, onclick: () => ((regiao = r.id), desenhar()) }, r.nome))),
+      fechado ? el('p', { class: 'aviso-mapas-viagem' }, fechado) : '',
       el('div', { class: 'ginasios-resumo' },
         el('strong', {}, `Insígnias de ${REGIOES.find((r) => r.id === regiao)?.nome}: ${ganhas}/${lideres.length}`),
         el('div', { class: 'cab-insignias-lista' }, ...lideres.map((l) => insigniaVisual(l, save!.insignias!.includes(l.id))))),
@@ -82,10 +98,12 @@ export const telaGinasios: Tela = (raiz, navegar) => {
               el('div', { class: 'ginasio-insignia' }, insigniaVisual(l, ganha), el('span', {}, ganha ? `${l.insignia} conquistada` : l.insignia)),
               el('div', { class: 'mini-time' }, ...equipe.map((p) => spritePokemon(pokemonPorId(p.especieId), { animado: false }))),
               el('small', { class: 'meta' }, `${NOMES_DIFICULDADE[l.dificuldade]} · ${RECOMPENSA_GINASIO[l.ordem - 1].toLocaleString('pt-BR')} silver`)),
-            el('button', { class: `botao ${ganha ? 'secundario' : ''}`, disabled: !podeLutar, onclick: () => desafiar(l) }, ganha ? 'Revanche' : 'Desafiar'));
+            el('button', { class: `botao ${ganha ? 'secundario' : ''}`, disabled: !podeLutar, title: fechado, onclick: () => desafiar(l) }, ganha ? 'Revanche' : 'Desafiar'));
         })),
     );
   }
   desenhar();
   tela.append(el('p', { class: 'sub' }, 'Vença os líderes para ganhar as insígnias.'), corpo);
+  // o trem partiu ou chegou com a tela aberta
+  return aoMudarViagem(desenhar);
 };

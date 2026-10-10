@@ -28,6 +28,10 @@ import { ativarDeslizantes } from './ui/deslizante';
 import { garantirConta } from './telas/entrada';
 import { vigiarTrocas } from './ui/troca';
 import { conectarOnline } from './online';
+import { vigiarAmigos } from './amigos';
+import { vigiarCla } from './cla';
+import { vigiarAnuncios } from './anuncios';
+import { aoMudarViagem, vigiarViagem } from './viagem';
 // o chat ouve o servidor desde a conexão (guarda as mensagens mesmo fora do mapa)
 import './ui/chat';
 
@@ -81,6 +85,12 @@ void garantirConta(raiz).then((conta) => {
   // mundo compartilhado (ver os outros jogadores no mapa) e convites de troca
   conectarOnline();
   vigiarTrocas();
+  vigiarAmigos();
+  vigiarCla();
+  vigiarAnuncios();
+  // trem: contagem no canto e, ao partir/chegar, o cabeçalho (região) e a tela dos mapas se atualizam
+  vigiarViagem();
+  aoMudarViagem(() => (destinoAtual.tela === 'regiao' ? navegar(destinoAtual) : atualizarCabecalho?.(destinoAtual)));
   // com save, o jogo abre na tela de Início (o time lado a lado)
   navegar(carregarSave() ? { tela: 'inicio' } : { tela: 'inicial' });
 });

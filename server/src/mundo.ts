@@ -50,6 +50,7 @@ interface MensagemChat {
 }
 const historicoGlobal: MensagemChat[] = [];
 const historicoLocal = new Map<string, MensagemChat[]>();
+const historicoCla = new Map<number, MensagemChat[]>();
 const guardar = (lista: MensagemChat[], m: MensagemChat, max: number) => {
   lista.push(m);
   if (lista.length > max) lista.splice(0, lista.length - max);
@@ -60,6 +61,29 @@ const porConta = new Map<number, Conexao>();
 
 /** O jogador está com o jogo aberto agora? (perfil mostra "Online agora") */
 export const estaOnline = (contaId: number) => porConta.has(contaId);
+/** Manda uma mensagem para o jogo de uma conta, se estiver aberto (pedido de amizade, mensagem privada…). */
+export function avisar(contaId: number, msg: unknown): void {
+  const c = porConta.get(contaId);
+  if (c) enviar(c, msg);
+}
+/** Manda uma mensagem para todos que estão com o jogo aberto (anúncio novo no mural…). */
+export function avisarTodos(msg: unknown): void {
+  const texto = JSON.stringify(msg);
+  for (const c of porConta.values()) if (c.ws.readyState === WebSocket.OPEN) c.ws.send(texto);
+}
+/** Texto de chat limpo: sem caracteres de controle e espaços repetidos, no tamanho máximo. */
+export const limparTexto = (bruto: unknown) => (typeof bruto === 'string' ? bruto.replace(/\p{Cc}|\p{Cf}/gu, '').replace(/\s+/g, ' ').trim().slice(0, CHAT_MAX) : '');
+/** Manda o histórico do chat do clã da conta (vazio se saiu do clã): ao conectar e ao entrar/sair de um clã. */
+export function mandarHistoricoDoCla(contaId: number): void {
+  const cla = banco.claDaConta(contaId);
+  avisar(contaId, { t: 'chat-historico', canal: 'cla', lista: cla ? (historicoCla.get(cla.id) ?? []) : [] });
+}
+/** O clã acabou: o histórico do chat dele não precisa mais ficar na memória. */
+export const esquecerChatDoCla = (claId: number) => void historicoCla.delete(claId);
+const ouvintesPresenca = new Set<(contaId: number) => void>();
+/** Chamado quando uma conta entra ou sai do jogo (os amigos atualizam o "online"). */
+export const aoMudarPresenca = (f: (contaId: number) => void) => void ouvintesPresenca.add(f);
+const presencaMudou = (contaId: number) => ouvintesPresenca.forEach((f) => f(contaId));
 
 const enviar = (c: Conexao, msg: unknown) => c.ws.readyState === WebSocket.OPEN && c.ws.send(JSON.stringify(msg));
 const publico = (c: Conexao) => ({ id: c.conta!.id, usuario: c.conta!.usuario, nome: c.nome, x: c.x, y: c.y, dir: c.dir, visual: c.visual });
@@ -123,8 +147,10 @@ function receber(c: Conexao, texto: string): void {
     c.conta = conta;
     c.nome = nomeDe(conta);
     porConta.set(conta.id, c);
+    if (!antiga) presencaMudou(conta.id);
     enviar(c, { t: 'ok', id: conta.id });
-    return void enviar(c, { t: 'chat-historico', canal: 'global', lista: historicoGlobal });
+    enviar(c, { t: 'chat-historico', canal: 'global', lista: historicoGlobal });
+    return mandarHistoricoDoCla(conta.id);
   }
   if (++c.mensagens > LIMITE_POR_SEGUNDO) return;
 
@@ -162,17 +188,22 @@ function receber(c: Conexao, texto: string): void {
 function falar(c: Conexao, canal: unknown, bruto: unknown): void {
   if (canal !== 'local' && canal !== 'global' && canal !== 'cla') return;
   const erro = (texto: string) => void enviar(c, { t: 'chat-erro', canal, texto });
-  // sem caracteres de controle e espaços repetidos; vazio não vai
-  const texto = typeof bruto === 'string' ? bruto.replace(/\p{Cc}|\p{Cf}/gu, '').replace(/\s+/g, ' ').trim().slice(0, CHAT_MAX) : '';
+  const texto = limparTexto(bruto);
   if (!texto) return;
-  if (canal === 'cla') return erro('Você ainda não está em um clã.');
+  const cla = canal === 'cla' ? banco.claDaConta(c.conta!.id) : undefined;
+  if (canal === 'cla' && !cla) return erro('Você ainda não está em um clã.');
   if (canal === 'local' && !c.sala) return erro('Entre num mapa para falar no chat local.');
   const agora = Date.now();
   c.chats = c.chats.filter((t) => agora - t < CHAT_JANELA_MS);
   if (c.chats.length >= CHAT_RAJADA) return erro('Calma! Espere um pouco para mandar outra mensagem.');
   c.chats.push(agora);
   const m: MensagemChat = { t: 'chat', canal, id: c.conta!.id, usuario: c.conta!.usuario, nome: c.nome, texto, em: agora };
-  if (canal === 'global') {
+  if (cla) {
+    const lista = historicoCla.get(cla.id) ?? [];
+    historicoCla.set(cla.id, lista);
+    guardar(lista, m, HISTORICO_LOCAL);
+    for (const membro of banco.membrosDoCla(cla.id)) avisar(membro.id, m);
+  } else if (canal === 'global') {
     guardar(historicoGlobal, m, HISTORICO_GLOBAL);
     const json = JSON.stringify(m);
     for (const outra of porConta.values()) if (outra.ws.readyState === WebSocket.OPEN) outra.ws.send(json);
@@ -199,7 +230,10 @@ export function ligarMundo(servidor: Server): void {
     ws.on('close', () => {
       clearTimeout(prazo);
       sairDaSala(c);
-      if (c.conta && porConta.get(c.conta.id) === c) porConta.delete(c.conta.id);
+      if (c.conta && porConta.get(c.conta.id) === c) {
+        porConta.delete(c.conta.id);
+        presencaMudou(c.conta.id);
+      }
     });
     (ws as WebSocket & { conexao?: Conexao }).conexao = c;
   });

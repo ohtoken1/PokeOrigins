@@ -360,7 +360,7 @@ Na **Cidade**, clique no nome do **Move Reminder** ou do **Move Tutor** (lado a 
 
 | Moeda | Como ganha | Para que serve |
 |---|---|---|
-| 🪙 **Silver** | começa com 1.000 · +10 por vitória (provisório) | loja, revelar faixas de IV |
+| 🪙 **Silver** | começa com 1.000 · só ao vencer treinadores (Duelos) e ginásios; Pokémon selvagem não dá | loja, revelar faixas de IV |
 | 🟡 **Gold** | moeda **paga** (no futuro); hoje só pelo Admin | revelar IVs exatos e, no futuro, mais coisas |
 
 As duas aparecem **separadas na carteira**, acima do painel do treinador.
@@ -506,7 +506,7 @@ A barra do topo tem:
 - **Golpes**: Move Reminder e Move Tutor;
 - **Informações**: Ranking e Database;
 - **Minha conta**: **Meu perfil** (nível, Pokédex, capturas e time; botão para editar o personagem), **Achievements** (10 conquistas com progresso: capturas, shiny, lendário, Pokédex, time completo, nível de treinador, silver; recompensas em breve), **Minhas skins** (as skins que você ganha vão para cá, não para a Bolsa) e **Opções**;
-- **Comunidade**: **Buscar jogadores** (digite o nome de um treinador para ver o perfil: nível, Pokédex, capturas e time; sem servidor, só encontra você mesmo), **Amigos** e **Clã** (os dois **"em breve"**, porque dependem de contas e do servidor online);
+- **Comunidade**: **Buscar jogadores** (digite o nome de um treinador para ver o perfil: nível, Pokédex, capturas e time; busca por usuário ou nome de treinador), **Amigos** (pedidos de amizade, lista com quem está online, perfil e mensagem privada) e **Clã** (criar com bandeira própria, 5 vagas, cargos e nível de 1 a 10);
 - **Administração** (só para contas de administrador; enquanto não há contas, aparece para todos): **Bonificação** e, em breve, **Log** (tudo o que entra e sai no jogo, para achar abuso de bug), Jogadores, Eventos e Anúncios.
 
 ### Cabeçalho fixo
@@ -669,6 +669,25 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - Opções: **Mostrar minha equipe**, **Aceitar pedidos de troca** e **Aceitar desafios de duelo**.
 - **Chat** ao lado do mapa, com abas **Local** (quem está no mesmo mapa), **Global** (todos online) e **Clã** (quando os clãs existirem). Mensagens de até 200 letras, no máximo 3 a cada 5 segundos; clicar no nome abre o perfil.
 - A lista **Pokémon deste bioma** agora abre pelo botão **%** no canto do mapa.
+- **Amigos** (Comunidade → Amigos): busque um treinador pelo nome e envie um pedido; quando ele aceitar, aparece na sua lista com o aviso de online. Dali dá para ver o perfil, mandar **mensagem privada** (fica guardada: o amigo lê quando entrar) e desfazer a amizade (apaga a conversa). Limite de 100 amigos e de 10 pedidos novos a cada 10 minutos; cada conversa guarda as 200 últimas mensagens. Também dá para adicionar clicando no jogador no mapa.
+- O chat do mapa ganhou a aba **Amigos**: pedidos recebidos, lista de amigos e a conversa privada ali mesmo.
+- **Clãs** (Comunidade → Clã): criar custa **1 gold**; você monta a **bandeira** (formato, padrão, duas cores e um símbolo com tema Pokémon) e escolhe o nome (3 a 16 letras ou números; nomes iguais não valem, mesmo mudando acento ou maiúsculas). Cada clã tem **5 vagas**. A entrada pode ser livre ou por pedido.
+- **Cargos do clã:** Líder (edita o clã, muda cargos, passa a liderança, expulsa), Vice-líder (aceita pedidos e expulsa membros comuns) e Membro. O cargo aparece ao lado de cada nome e no perfil.
+- **Nível do clã (1 a 10):** o XP que os Pokémon dos membros ganham em batalha também vai para o clã, e todos enchem a mesma barra. Para sair do nível N é preciso o XP de 10 × N Pokémon indo do nível 1 ao 100. O jogo mostra só a **porcentagem**. Cada nível também terá **missões do clã** (ainda a definir), feitas em conjunto por todos os membros.
+- A aba **Clã** do chat agora funciona para quem está em um clã.
+- **Silver** agora só vem de batalhas contra treinadores (Duelos) e ginásios; vencer Pokémon selvagem não dá mais silver.
+- **Skins dão bônus:** em Minha conta → Minhas skins você escolhe uma skin para o **visual** e uma para o **bônus** (podem ser diferentes; o visual nos Pokémon vem depois). Só vale o bônus da skin escolhida. Skin normal: +1% de captura, +2% de shiny, +2% de lendário/mítico/Ultra Beast/inicial e +2% de silver em batalhas. Skin shiny: +3%, +5%, +5% e +5% (valores provisórios).
+- **Banco da cidade:** troca silver por gold e gold por silver. Por enquanto 1 para 1 nos dois sentidos (provisório). O banco tem um **cofre próprio** e não cria moeda: começou com 1.000 silver e nenhum gold, só entrega o que tem guardado e fica com o que os jogadores pagam (quem vende 100 gold recebe 100 silver do cofre, que passa a ter 100 gold a mais). Sem a moeda no cofre, a troca não acontece. O cofre aparece na janela do banco.
+- **Mural de anúncios da cidade:** mostra os avisos publicados pela staff; quem está com o jogo aberto recebe um aviso quando sai um anúncio novo.
+- **Cidade:** clicar num lugar do **minimapa** faz o personagem andar sozinho até lá e a função abre quando ele chega (andar com as teclas cancela). Clicar no **nome do lugar no próprio mapa** (ele já está na sua tela) abre a função na hora.
+- **Trem entre as regiões:** para mudar de região, vá até a **Estação de trem** da cidade, escolha a região e pague o ticket (1 silver ou 1 gold, provisório). A viagem leva **30 segundos por região de distância** na ordem Kanto, Johto, Hoenn, Sinnoh, Unova, Kalos, Alola, Galar, Paldea (Kanto → Johto 30 s; Kanto → Paldea 4 min; provisório, vai diminuir com Fly e Surf). **VIP:** metade do tempo e metade do preço em silver (em gold o preço é o mesmo). Enquanto viaja, aparece "Viajando para…" com o tempo que falta no canto de cima à esquerda e você pode usar a cidade normalmente; os mapas e os ginásios só abrem quando o trem chegar. Não dá para cancelar a viagem nem comprar outra antes de chegar.
+- **Mapas pela saída do sul:** o botão "Mapas" saiu do menu Jogar e do topo. Para caçar, ande até a **saída do sul da cidade** (marcador verde "S" no minimapa): ao chegar, a tela dos mapas da sua região abre sozinha. As abas de região saíram dessa tela.
+- **Arena da cidade:** tudo de duelos fica lá. Clicando na Arena você escolhe entre **Ginásios**, **Duelos com treinadores**, **Torneio** e **Liga Pokémon** (os dois últimos em breve). Duelos e Ginásios saíram do menu Jogar.
+- **Ginásios por região:** você só desafia os ginásios da região onde está (as outras abas ficam para consulta). Para enfrentar os de outra região, viaje de trem até lá.
+- O **Pokémarket** agora só abre na cidade: o atalho do topo saiu para os jogadores.
+- O Quadro de torneios virou **Quadro de missões** (as missões chegam em breve).
+- **Formas de Hisui** (16) agora aparecem em **Kalos**: Hisuian Growlithe, Voltorb, Qwilfish, Sneasel, Zorua, Zoroark e Lilligant soltos; Typhlosion, Samurott e Decidueye (raros como iniciais), Braviary, Sliggoo e Avalugg já no nível em que evoluiriam; Hisuian Arcanine e Electrode só evoluindo com pedra; Hisuian Goodra evoluindo o Hisuian Sliggoo.
+- **Tickets:** nova raridade **Mítico** (0,1%) com a skin shiny; o Lendário passou para 0,9% (0,3% para o Pokémon, 0,3% para o item e 0,3% para a skin). A seção "Chances" saiu da janela; as porcentagens continuam em "Prêmios possíveis".
 
 ---
 

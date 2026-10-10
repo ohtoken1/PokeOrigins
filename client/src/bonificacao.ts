@@ -2,6 +2,7 @@
 import { BONIFICACAO_PADRAO, valorBonus, type Bonificacao, type ChaveBonus } from '../../shared/bonificacao';
 import type { AjustesEncontro } from '../../shared/encontros';
 import { bonusVip, vipAtivo } from '../../shared/vip';
+import { bonusAtivoDaSkin } from '../../shared/skins';
 import { carregarSave } from './estado';
 import { conta } from './conta';
 
@@ -53,7 +54,13 @@ export function fontesDeBonus(): FonteBonus[] {
     fontes.push({ id: 'vip', nome: 'VIP', alvo: 'lendario', mult: bonusVip(save, 'raros') });
     fontes.push({ id: 'vip', nome: 'VIP', alvo: 'inicial', mult: bonusVip(save, 'raros') });
   }
-  // futuro: skins equipadas (id 'skin') entram aqui
+  // skin escolhida como bônus
+  if (save) {
+    const skins = bonusAtivoDaSkin(save);
+    fontes.push({ id: 'skin', nome: 'Skin', alvo: 'shiny', mult: 1 + skins.shiny });
+    fontes.push({ id: 'skin', nome: 'Skin', alvo: 'lendario', mult: 1 + skins.raros });
+    fontes.push({ id: 'skin', nome: 'Skin', alvo: 'inicial', mult: 1 + skins.raros });
+  }
   return fontes.filter((f) => f.mult !== 1);
 }
 

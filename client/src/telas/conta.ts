@@ -1,8 +1,9 @@
 // Aba "Minha conta": Meu perfil, Achievements e Minhas skins (Opções fica no mesmo menu, tela própria).
+import { bonusAtivoDaSkin, bonusDaSkin, temSkin, textoBonusSkin } from '../../../shared/skins';
 import type { Tela } from '../main';
 import { TODOS_OS_ITENS } from '../../../shared/loja';
 import { nivelTreinador } from '../../../shared/treinador';
-import { carregarSave, type Save } from '../estado';
+import { carregarSave, salvar, type Save } from '../estado';
 import { el } from '../ui/dom';
 import { iconeItem } from '../ui/iconeItem';
 import { perfilJogador } from './jogadores';
@@ -44,18 +45,43 @@ function achievements(save: Save): HTMLElement {
   );
 }
 
-/** Minhas skins: as skins que o jogador tem (os tickets mandam as skins para cá, não para a bolsa). */
+/**
+ * Minhas skins: as skins que o jogador tem (os tickets mandam as skins para cá, não para a bolsa). Duas escolhas
+ * separadas: qual skin usar no visual e de qual skin vem o bônus (dá para usar o visual de uma e o bônus de outra).
+ */
 function skins(save: Save): HTMLElement {
+  const secao = el('section', { class: 'conta-secao' });
+  const desenhar = () => secao.replaceChildren(...conteudoSkins(save, desenhar));
+  desenhar();
+  return secao;
+}
+
+function conteudoSkins(save: Save, redesenhar: () => void): HTMLElement[] {
   const minhas = TODOS_OS_ITENS.filter((i) => i.categoria === 'skins' && (save.itens[i.id] ?? 0) > 0);
-  return el(
-    'section',
-    { class: 'conta-secao' },
-    el('p', { class: 'sub' }, 'Visuais especiais dos seus Pokémon. Usar as skins vem em breve.'),
+  const total = bonusAtivoDaSkin(save);
+  const visual = temSkin(save, save.skinVisual) ? save.skinVisual : null;
+  const bonus = temSkin(save, save.skinBonus) ? save.skinBonus : null;
+  const nomeDe = (id: string | null) => minhas.find((i) => i.id === id)?.nome ?? 'nenhuma';
+  const escolher = (campo: 'skinVisual' | 'skinBonus', id: string) => {
+    // clicar de novo na que está em uso tira
+    save[campo] = save[campo] === id ? null : id;
+    salvar(save);
+    redesenhar();
+  };
+  return [
+    el('p', { class: 'sub' }, 'Escolha uma skin para o visual e uma para o bônus: podem ser skins diferentes. Só vale o bônus da skin escolhida. O visual nos Pokémon vem em breve.'),
+    el('div', { class: 'skins-total' }, el('span', {}, 'Visual: ', el('strong', {}, nomeDe(visual))), el('span', {}, 'Bônus de: ', el('strong', {}, nomeDe(bonus)))),
+    el('div', { class: 'skins-total' }, ...([['captura', 'Captura'], ['shiny', 'Shiny'], ['raros', 'Lendário, mítico, Ultra Beast e inicial'], ['silver', 'Silver em batalhas']] as const).map(([k, nome]) =>
+      el('span', {}, `${nome}: `, el('strong', {}, `+${(Math.round(total[k] * 1000) / 10).toLocaleString('pt-BR')}%`)))),
     minhas.length
       ? el('div', { class: 'grade-skins' },
-          ...minhas.map((i) => el('div', { class: 'cartao-skin' }, iconeItem(i), el('strong', {}, i.nome), el('small', {}, `×${save.itens[i.id]}`))))
-      : el('p', { class: 'meta' }, 'Você ainda não tem nenhuma skin. Elas saem no lendário dos tickets.'),
-  );
+          ...minhas.map((i) => el('div', { class: `cartao-skin${i.id === visual || i.id === bonus ? ' em-uso' : ''}` },
+            iconeItem(i), el('strong', {}, i.nome), el('small', {}, `×${save.itens[i.id]}`), el('small', { class: 'skin-bonus' }, textoBonusSkin(bonusDaSkin(i.id))),
+            el('div', { class: 'skin-botoes' },
+              el('button', { class: `botao ${i.id === visual ? '' : 'secundario'}`, 'aria-pressed': String(i.id === visual), onclick: () => escolher('skinVisual', i.id) }, i.id === visual ? '✓ Visual' : 'Usar visual'),
+              el('button', { class: `botao ${i.id === bonus ? '' : 'secundario'}`, 'aria-pressed': String(i.id === bonus), onclick: () => escolher('skinBonus', i.id) }, i.id === bonus ? '✓ Bônus' : 'Usar bônus')))))
+      : el('p', { class: 'meta' }, 'Você ainda não tem nenhuma skin. Elas saem no lendário e no mítico dos tickets.'),
+  ];
 }
 
 export const telaConta = (secao: SecaoConta): Tela => (raiz, navegar) => {

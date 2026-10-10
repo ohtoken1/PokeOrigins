@@ -76,9 +76,8 @@ export const textoPreco = (i: Pick<ItemLoja, 'preco' | 'moeda'>, quantidade = 1)
 export const PRECO_PADRAO = 1;
 /** Preços específicos (id do item → preço). Vazio por enquanto: tudo custa PRECO_PADRAO. */
 export const PRECOS: Record<string, number> = {};
-/** Silver inicial e recompensa por vitória: provisórios até o dono definir a economia. */
+/** Silver inicial (provisório). Silver só se ganha vencendo treinadores e ginásios; selvagens não dão (pedido do dono). */
 export const SILVER_INICIAL = 1000;
-export const SILVER_POR_VITORIA = 10;
 /**
  * Preço para revelar os IVs de um Pokémon capturado (provisório): silver mostra só a FAIXA de cada IV,
  * gold mostra o valor exato. Gold ainda não existe no jogo: preparado para depois.

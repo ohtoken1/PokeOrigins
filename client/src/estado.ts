@@ -7,6 +7,7 @@ import { ehLendario } from '../../shared/encontros';
 import { pokemonPorId } from './dados';
 import type { Aparencia } from './personagem/lpc';
 import type { EstadoPasse } from '../../shared/passe';
+import type { Viagem } from '../../shared/viagem';
 import { api, ErroApi } from './conta';
 
 export type PokemonDoJogador = PokemonIndividual & {
@@ -45,6 +46,11 @@ export interface Save {
   aceitarTrocas?: boolean;
   /** Aceitar desafios de duelo de outros jogadores (padrão: sim; desligado recusa sozinho). */
   aceitarDuelos?: boolean;
+  /** Skins (shared/skins.ts): a do visual e a do bônus são escolhas separadas. */
+  skinVisual?: string | null;
+  skinBonus?: string | null;
+  /** Viagem de trem em andamento (shared/viagem.ts); quem cria e encerra é o servidor. */
+  viagem?: Viagem | null;
   /** Insígnias conquistadas (ids dos líderes de ginásio, shared/ginasios.ts). */
   insignias?: string[];
   /** VIP: data/hora (ms) em que acaba (shared/vip.ts). PRÉ-SISTEMA: no MMO fica na conta. */
