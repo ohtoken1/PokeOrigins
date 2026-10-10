@@ -8,6 +8,8 @@ import { progressoTreinador } from '../../../shared/treinador';
 import { pokemonsDaRegiao, todosOsPokemons } from '../dados';
 import { apagarSave, carregarSave, curarTime, salvar, usarSave } from '../estado';
 import { icone } from '../ui/icones';
+import { ehAdministrador } from '../bonificacao';
+import { viagemAtual } from '../viagem';
 import { botoesMenus } from '../ui/menus';
 import { el, spritePokemon } from '../ui/dom';
 import { painelTime } from '../ui/time';
@@ -22,7 +24,10 @@ export const telaRegiao: Tela = (raiz, navegar) => {
   const pokemons = pokemonsDaRegiao(regiao.id);
   const treinador = progressoTreinador(save.xpTreinador);
 
-  const abas = REGIOES.map((r) =>
+  // trocar de região pelas abas é só para administradores: jogadores viajam de trem (estação da cidade)
+  const admin = ehAdministrador();
+  const viagem = admin ? null : viagemAtual();
+  const abas = !admin ? [] : REGIOES.map((r) =>
     el(
       'button',
       {
@@ -70,7 +75,7 @@ export const telaRegiao: Tela = (raiz, navegar) => {
     el(
       'main',
       { class: 'tela tela-regiao' },
-      el('nav', { class: 'abas' }, abas),
+      admin ? el('nav', { class: 'abas' }, abas) : null,
       el(
         'div',
         { class: 'layout-regiao' },
@@ -79,7 +84,10 @@ export const telaRegiao: Tela = (raiz, navegar) => {
           {},
           el('h1', {}, `Região de ${regiao.nome}`),
           el('p', { class: 'sub' }, `Pokédex: ${save.vistos.filter((n) => n >= regiao.pokedex[0] && n <= regiao.pokedex[1]).length} de ${regiao.pokedex[1] - regiao.pokedex[0] + 1} vistos · ${save.passos} passos`),
-          el('div', { class: 'grade-biomas' }, cartoesBiomas),
+          viagem
+            ? el('p', { class: 'aviso-mapas-viagem' }, `Você está viajando para ${regiaoPorId(viagem.para).nome}. Os mapas abrem quando o trem chegar; enquanto isso, aproveite a cidade.`)
+            : el('div', { class: 'grade-biomas' }, cartoesBiomas),
+          admin ? null : el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'cidade' }) }, '← Voltar para a cidade'),
         ),
         el(
           'aside',

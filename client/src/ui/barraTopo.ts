@@ -10,7 +10,7 @@ import { el } from './dom';
 import { pintarDeslizante } from './deslizante';
 
 /** `acao`: em vez de navegar, faz outra coisa (ex.: sair da conta). */
-type Item = { nome: string; destino: () => Destino; emBreve?: boolean; acao?: () => void };
+type Item = { nome: string; destino: () => Destino; emBreve?: boolean; acao?: () => void; soAdmin?: boolean };
 /** Aba simples (`itens` com 1 item, sem menu) ou grupo com menu. `telas` = telas em que a aba fica marcada. */
 type Aba = { nome: string; telas: string[]; itens: Item[]; menu?: boolean; soAdmin?: boolean };
 
@@ -21,11 +21,13 @@ const ABAS: Aba[] = [
     menu: true,
     telas: ['inicial', 'regiao', 'bioma', 'personagem', 'cidade', 'continentes', 'duelos', 'ginasios'],
     itens: [
-      { nome: 'Mapas', destino: () => (carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' }) },
+      // jogadores chegam aos mapas pela saída do sul da cidade (pedido do dono); o atalho fica só para administradores
+      { nome: 'Mapas', soAdmin: true, destino: () => (carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' }) },
       { nome: 'Cidade', destino: () => (carregarSave() ? { tela: 'cidade' } : { tela: 'inicial' }) },
       { nome: 'Continentes', destino: () => ({ tela: 'comunidade', secao: 'continentes' }), emBreve: true },
-      { nome: 'Duelos com treinadores', destino: () => ({ tela: 'duelos' }) },
-      { nome: 'Ginásios', destino: () => ({ tela: 'ginasios' }) },
+      // tudo de duelos fica na Arena da cidade (pedido do dono); os atalhos ficam só para administradores
+      { nome: 'Duelos com treinadores', soAdmin: true, destino: () => ({ tela: 'duelos' }) },
+      { nome: 'Ginásios', soAdmin: true, destino: () => ({ tela: 'ginasios' }) },
     ],
   },
   // Golpes saiu da barra (pedido do dono): os professores ficam na cidade (Move Reminder / Move Tutor)
@@ -56,8 +58,8 @@ const ABAS: Aba[] = [
     telas: ['amigos', 'cla', 'jogadores'],
     itens: [
       { nome: 'Buscar jogadores', destino: () => ({ tela: 'jogadores' }) },
-      { nome: '👥 Amigos', destino: () => ({ tela: 'comunidade', secao: 'amigos' }), emBreve: true },
-      { nome: '🛡️ Clã', destino: () => ({ tela: 'comunidade', secao: 'cla' }), emBreve: true },
+      { nome: '👥 Amigos', destino: () => ({ tela: 'comunidade', secao: 'amigos' }) },
+      { nome: '🛡️ Clã', destino: () => ({ tela: 'comunidade', secao: 'cla' }) },
     ],
   },
   {
@@ -138,7 +140,7 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
       return { botao: b, raiz: b };
     }
     const menu = el('div', { class: 'menu-topo', hidden: true },
-      ...aba.itens.map((item) => el('button', { onclick: () => (fecharTodos(), item.acao ? item.acao() : navegar(item.destino())) }, item.nome, item.emBreve ? el('small', {}, 'em breve') : null)));
+      ...aba.itens.filter((item) => !item.soAdmin || ehAdministrador()).map((item) => el('button', { onclick: () => (fecharTodos(), item.acao ? item.acao() : navegar(item.destino())) }, item.nome, item.emBreve ? el('small', {}, 'em breve') : null)));
     const botao = el('button', { class: 'aba-topo aba-menu', 'aria-haspopup': 'true' }, aba.nome, el('span', { class: 'setinha' }, '▾'));
     botao.addEventListener('click', (e) => {
       e.stopPropagation();

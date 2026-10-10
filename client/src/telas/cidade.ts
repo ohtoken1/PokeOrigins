@@ -1,13 +1,20 @@
 // Jogar → Cidade: a cidade inicial, onde os jogadores ficam quando não estão caçando nos mapas nem competindo.
 // Mapa e prédios em jogo/cidade.ts. Os nomes dos lugares são botões (Centro Pokémon cura, Pokémarket abre a loja,
-// Move Reminder/Move Tutor abrem os professores, estação vai para os mapas, Arena para os ginásios) e o minimapa
-// no canto mostra onde fica cada um. Usa o mesmo jogo (Phaser) dos biomas, com o mapa da cidade e sem encontros.
+// Move Reminder/Move Tutor abrem os professores, estação = trem entre as regiões, Arena para os ginásios, Banco, Mural)
+// e o minimapa no canto mostra onde fica cada um. Clicar no nome abre direto; clicar no minimapa faz o personagem andar
+// sozinho até o lugar (a função abre quando ele chega); a saída do sul abre os mapas da região; andar com as teclas no meio do caminho cancela. Usa o mesmo jogo (Phaser) dos biomas, com o mapa da cidade e sem encontros.
 import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
 import type { BiomaScene, OpcoesBioma } from '../jogo/BiomaScene';
 import { mostrarJogo } from '../jogo/jogoUnico';
 import { carregarSave, curarTime, usarSave, salvar } from '../estado';
 import { abrirLoja } from '../ui/loja';
+import { abrirBanco } from '../ui/banco';
+import { abrirMural } from '../ui/mural';
+import { abrirEstacao } from '../ui/trem';
+import { abrirArena } from '../ui/arena';
+import { viagemAtual } from '../viagem';
+import { REGIOES } from '../../../shared/regioes';
 import { abrirProfessores } from './golpes';
 import { montarMinimapa } from '../ui/minimapa';
 import { abrirMenuJogador } from '../ui/menuJogador';
@@ -46,7 +53,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
         ...botoesMenus(save, () => atualizarTime(), true),
       ),
       el('div', { class: 'layout-bioma' },
-        el('section', {}, areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. Aqui não aparecem Pokémon selvagens. Clique no nome de um lugar (ou no minimapa) para usar: Centro Pokémon, Pokémarket, Move Reminder, Move Tutor…')),
+        el('section', {}, areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. Aqui não aparecem Pokémon selvagens. Clique no nome de um lugar que está na tela para usar na hora, ou no minimapa para o seu personagem andar até lá: Centro Pokémon, Pokémarket, Banco, Mural de anúncios, Move Reminder, Move Tutor… Na estação de trem você viaja para outra região; a saída do sul leva aos mapas.')),
         el('aside', {}, caixaTime, chat.elemento),
       ),
     ),
@@ -63,10 +70,16 @@ export const telaCidade: Tela = (raiz, navegar) => {
     aoPronto: () => carregando.remove(),
     seguidor: save.time[0] ? { especie: save.time[0].especieId, shiny: save.time[0].shiny } : null,
     // na cidade não há encontros
-    aoPisar: () => {},
+    aoPisar: () => {
+      // saída do sul: chegou nela, abre os mapas da região (pedido do dono)
+      const info = cena()?.infoMinimapa();
+      if (info?.mapa.saida && info.jogador.y >= info.mapa.saida.y) usarLocal('mapas');
+    },
     personagem: { chave: JSON.stringify(aparencia), folhas: montarPersonagem(aparencia) },
     nomeJogador: save.aparencia?.nome,
-    aoClicarLocal: (acao) => usarLocal(acao),
+    // o nome clicado no mapa já está na tela do jogador: abre direto (pedido do dono); o minimapa faz andar até lá
+    // (a saída para os mapas não é função de lugar: tem de andar até ela)
+    aoClicarLocal: (acao) => (acao === 'mapas' ? irAoLocal(acao) : usarLocal(acao)),
     // todos os jogadores na mesma cidade
     sala: 'cidade',
     aoClicarJogador: abrirMenuJogador,
@@ -84,7 +97,14 @@ export const telaCidade: Tela = (raiz, navegar) => {
     clearTimeout(relogioAviso);
     relogioAviso = window.setTimeout(() => aviso.classList.remove('visivel'), 2200);
   };
-  /** O que cada lugar faz ao clicar no nome (ou no minimapa). */
+  /** Clicou num lugar do minimapa: o personagem anda até lá e a função abre na chegada. */
+  function irAoLocal(acao: string) {
+    // a saída abre sozinha ao pisar nela (aoPisar)
+    if (cena()?.irAte(acao, () => void (acao !== 'mapas' && usarLocal(acao)))) avisar('Indo até lá… (ande com as teclas para cancelar)');
+    else avisar('Não dá para chegar lá agora.');
+  }
+  let saindo = false;
+  /** O que cada lugar faz quando o personagem chega. */
   function usarLocal(acao: string) {
     if (acao === 'centro') {
       // futuramente: animação da enfermeira/máquina de cura
@@ -94,11 +114,20 @@ export const telaCidade: Tela = (raiz, navegar) => {
     } else if (acao === 'loja') abrirLoja(save!, () => atualizarTime());
     else if (acao === 'reminder') abrirProfessores(save!, 'relembrar', () => atualizarTime());
     else if (acao === 'tutor') abrirProfessores(save!, 'tutor', () => atualizarTime());
-    else if (acao === 'estacao') navegar({ tela: 'regiao' });
-    else if (acao === 'arena') navegar({ tela: 'ginasios' });
-    else avisar(acao === 'banco' ? 'Banco: em breve.' : acao === 'torneios' ? 'Quadro de torneios: em breve.' : 'Mural de anúncios: em breve.');
+    else if (acao === 'estacao') abrirEstacao(save!, () => atualizarTime());
+    else if (acao === 'mapas') {
+      const viagem = viagemAtual();
+      if (viagem) return avisar(`Você está viajando para ${REGIOES.find((r) => r.id === viagem.para)?.nome ?? viagem.para}. Os mapas abrem quando o trem chegar.`);
+      if (saindo) return;
+      saindo = true;
+      navegar({ tela: 'regiao' });
+    }
+    else if (acao === 'arena') abrirArena(navegar);
+    else if (acao === 'banco') abrirBanco(save!, () => atualizarTime());
+    else if (acao === 'mural') abrirMural();
+    else avisar('Quadro de missões: em breve.');
   }
-  const minimapa = montarMinimapa(areaJogo, () => cena(), usarLocal);
+  const minimapa = montarMinimapa(areaJogo, () => cena(), irAoLocal);
 
   // o mapa para com PC/Bolsa/ficha abertos
   const pararDeOuvirJanelas = aoMudarJanelas((aberta) => cena()?.pausar(aberta));

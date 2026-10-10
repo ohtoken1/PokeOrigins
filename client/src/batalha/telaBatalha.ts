@@ -16,9 +16,11 @@ import { efeitoBola } from '../../../shared/bolas';
 import { nivelTreinador } from '../../../shared/treinador';
 import { XP_POR_MISSAO, type Missao } from '../../../shared/passe';
 import { contarNasMissoes, textoMissao } from '../passe';
-import { EXP_SHARE, MOEDA, SILVER_POR_VITORIA } from '../../../shared/loja';
+import { EXP_SHARE, MOEDA } from '../../../shared/loja';
+import { multSkins } from '../../../shared/skins';
 import { sortearTicketDaBatalha } from '../../../shared/tickets';
 import { curarTime, guardarNoPC, registrarCapturaNoRanking, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
+import { darXpAoCla } from '../cla';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { iconeItem } from '../ui/iconeItem';
@@ -719,7 +721,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       jaPossui: [...save.time, ...save.caixa].some((p) => p.especieId === selvagem.especieId),
     });
     // VIP: +5% de chance de captura
-    const { capturou, tremidas, chance, eventos } = batalha.arremessarBola(efeito, bonusVip(save, 'captura'));
+    const { capturou, tremidas, chance, eventos } = batalha.arremessarBola(efeito, bonusVip(save, 'captura') * multSkins(save, 'captura'));
     const porcentagem = chance >= 1 ? '100' : chance < 0.001 ? '<0,1' : (chance * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
     mensagem.textContent = `Você arremessou uma ${ITENS[bola].nome}! Chance de captura: ${porcentagem}%`;
     if (capturou && bola === 'healball') curarAoCapturar = true;
@@ -792,6 +794,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     const xp = Math.round(xpPelosDerrotados(nivelAtivo) * bonusVip(save, 'xpTreinador') * bonificacao().xp);
     const antes = nivelTreinador(save.xpTreinador);
     save.xpTreinador += xp;
+    // o clã ganha o mesmo XP (todos os membros enchem a mesma barra)
+    darXpAoCla(xp);
     await dizer(`Você ganhou ${xp} XP de treinador!`);
     const depois = nivelTreinador(save.xpTreinador);
     if (depois > antes) await dizer(`Seu nível de treinador subiu para ${depois}! Os Pokémon selvagens ficaram mais fortes.`);
@@ -856,10 +860,12 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       if (treinador) await dizer(`Você venceu ${treinador.nome}!`);
       if (treinador?.mensagemVitoria) await dizer(treinador.mensagemVitoria);
       await darXpTreinador();
-      // duelo: recompensa da dificuldade do treinador; selvagem: o silver normal por vitória
-      const silver = Math.round((treinador ? treinador.recompensa : SILVER_POR_VITORIA) * bonusVip(save, 'silver') * bonificacao().silver);
-      save.silver += silver;
-      await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${MOEDA}!`);
+      // silver só em batalhas contra treinadores e ginásios (pedido do dono): selvagem não dá
+      if (treinador) {
+        const silver = Math.round(treinador.recompensa * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver'));
+        save.silver += silver;
+        await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${MOEDA}!`);
+      }
       await darXpTime();
       // missões diárias do passe: derrotar conta só selvagens; vitória em Duelos com treinadores conta duelo
       if (!treinador) await avisarMissoes(contarNasMissoes(save, 'derrotar', selvagem.especieId));

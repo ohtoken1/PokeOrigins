@@ -17,7 +17,8 @@ const MARCADORES: Record<string, { cor: string; letra: string }> = {
   arena: { cor: '#d8902a', letra: 'A' },
   banco: { cor: '#c8a640', letra: 'B' },
   mural: { cor: '#8a6a4a', letra: 'M' },
-  torneios: { cor: '#8a6a4a', letra: 'Q' },
+  missoes: { cor: '#8a6a4a', letra: 'Q' },
+  mapas: { cor: '#3f9a4a', letra: 'S' },
 };
 
 export function montarMinimapa(area: HTMLElement, cena: () => BiomaScene | null, aoClicar: (acao: string) => void): { parar(): void } {
@@ -57,6 +58,7 @@ export function montarMinimapa(area: HTMLElement, cena: () => BiomaScene | null,
       if (p && acao) lugares.push({ acao, nome: o.rotulo ?? p.rotulo ?? acao, x: o.x * TAM + p.w / 2, y: o.base * TAM - p.h / 2 });
     }
     for (const n of mapa.npcs ?? []) if (n.acao) lugares.push({ acao: n.acao, nome: n.nome, x: n.x * TAM + 8, y: n.y * TAM });
+    if (mapa.saida) lugares.push({ acao: 'mapas', nome: 'Saída para os mapas', x: (mapa.saida.x + 0.5) * TAM, y: (mapa.saida.y - 1) * TAM });
     marcadores.replaceChildren(
       ...lugares.map((l) => {
         const m = MARCADORES[l.acao] ?? { cor: '#888', letra: '?' };

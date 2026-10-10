@@ -1,4 +1,5 @@
 // Menu que abre ao clicar no boneco de outro jogador no mapa: Ver perfil, Trocar e Desafiar para duelo.
+import { amigos, pedirAmizade, responderPedido } from '../amigos';
 import { ErroApi } from '../conta';
 import type { JogadorOnline } from '../online';
 import { abrirPerfilDe } from '../telas/jogadores';
@@ -32,9 +33,21 @@ export function abrirMenuJogador(j: JogadorOnline, evento: MouseEvent): void {
       aviso.textContent = e instanceof ErroApi ? e.message : 'Não foi possível convidar.';
     }
   };
+  // amizade: adicionar, aceitar o pedido dele, ou só mostrar como está
+  const { amigos: meus, enviados, recebidos } = amigos();
+  const tem = (lista: { usuario: string }[]) => lista.some((a) => a.usuario === j.usuario);
+  const amizade = (acao: Promise<unknown>, feito: string) => {
+    aviso.textContent = '';
+    acao.then(() => void (aviso.textContent = feito), (e) => void (aviso.textContent = e instanceof ErroApi ? e.message : 'Não foi possível.'));
+  };
+  const opcaoAmigo = tem(meus) ? opcao('Amigo', null, 'Já é seu amigo')
+    : tem(enviados) ? opcao('Adicionar amigo', null, 'Pedido enviado')
+    : tem(recebidos) ? opcao('Aceitar pedido de amizade', () => amizade(responderPedido(j.usuario, true), 'Agora vocês são amigos.'))
+    : opcao('Adicionar amigo', () => amizade(pedirAmizade(j.usuario), 'Pedido de amizade enviado.'));
   const menu = el('div', { class: 'menu-jogador', role: 'menu' },
     el('header', {}, el('strong', {}, j.nome), el('small', {}, `@${j.usuario}`)),
     opcao('Ver perfil', () => (fechar(), void abrirPerfilDe(j.usuario))),
+    opcaoAmigo,
     opcao('Trocar', trocasDisponiveis() ? () => void trocar() : null, 'Em breve'),
     opcao('Desafiar para duelo', null, 'Em breve'),
     aviso);

@@ -76,6 +76,8 @@ export interface Mapa {
   /** prédios e decoração em pé (cidade) */
   objetos?: ObjetoMapa[];
   npcs?: NpcMapa[];
+  /** cidade: tile da saída do sul (pisar da linha dele para baixo abre os mapas da região) */
+  saida?: { x: number; y: number };
   /** árvores com sombra projetada no chão (cidade) */
   sombras?: boolean;
   /** trilhas de terra estreitas (em pixels), da largura da porta de cada casa até a calçada */

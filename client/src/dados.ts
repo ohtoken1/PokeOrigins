@@ -27,7 +27,7 @@ const POKEMONS_POR_REGIAO: Record<string, PokemonBase[]> = {
 const porId = new Map<number, PokemonBase>();
 for (const lista of Object.values(POKEMONS_POR_REGIAO)) for (const p of lista) porId.set(p.id, p);
 
-// Formas regionais (Alola, Galar, Paldea; Hisui ainda não): entram na lista da região delas, com número próprio
+// Formas regionais (Alola, Galar, Paldea e Hisui — estas em Kalos): entram na lista da região delas, com número próprio
 for (const lista of Object.keys(POKEMONS_POR_REGIAO)) POKEMONS_POR_REGIAO[lista] = [...POKEMONS_POR_REGIAO[lista]];
 for (const forma of FORMAS_REGIONAIS) {
   const normal = porId.get(Dex.species.get(forma.showdown).num);

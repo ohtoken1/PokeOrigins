@@ -21,7 +21,7 @@ import { iconeItem } from './iconeItem';
 import { areaRoletas, botoesQuantidade } from './abrirVarios';
 
 /** Ordem para escolher em qual prêmio a roleta para quando abre vários (o mais raro). */
-const PESO_RARIDADE: Record<Raridade, number> = { comum: 0, raro: 1, epico: 2, lendario: 3 };
+const PESO_RARIDADE: Record<Raridade, number> = { comum: 0, raro: 1, epico: 2, lendario: 3, mitico: 4 };
 
 const numero = (n: number) => n.toLocaleString('pt-BR');
 const porcentagem = (c: number) => `${numero(Math.round(c * 10000) / 100)}%`;
@@ -99,7 +99,8 @@ const ENFEITE: [Raridade, number][] = [
   ['comum', 0.5],
   ['raro', 0.28],
   ['epico', 0.15],
-  ['lendario', 0.07],
+  ['lendario', 0.05],
+  ['mitico', 0.02],
 ];
 
 export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => void): void {
@@ -128,13 +129,6 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
       const qtd = save.itens[ticketId] ?? 0;
       const raridades = chancesDasRaridades(ticket);
       const bolinha = (r: Raridade) => el('span', { class: `bolinha fundo-${r}` });
-      // chances: fechado; a setinha abre a lista
-      const chances = el(
-        'details',
-        { class: 'ticket-secao' },
-        el('summary', {}, 'Chances'),
-        ...raridades.map((r) => el('div', { class: 'ticket-chance' }, el('span', {}, bolinha(r.id), r.nome), el('span', {}, porcentagem(r.chance)))),
-      );
       // uma roleta por ticket aberto (uma em cima da outra)
       const roletas = areaRoletas(() => casaRoleta(...enfeite()));
       const resultado = el('div', { class: 'ticket-resultado' });
@@ -185,7 +179,7 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
         ),
       );
 
-      return el('div', { class: 'ticket' }, el('p', { class: 'meta' }, ticket.descricao), chances, roletas.raiz, areaBotoes, resultado, lista);
+      return el('div', { class: 'ticket' }, el('p', { class: 'meta' }, ticket.descricao), roletas.raiz, areaBotoes, resultado, lista);
     },
     { classe: 'janela-ticket' },
   );

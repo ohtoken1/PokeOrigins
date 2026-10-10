@@ -1,5 +1,7 @@
 // Itens nossos (não existem no Showdown): skins de lendários e itens-chave de forma (Prison Bottle, DNA Splicers,
-// Reveal Glass, Teal Mask). Por enquanto só existem e saem dos tickets; a utilidade vem depois (pedido do dono).
+// Reveal Glass, Teal Mask). Saem dos tickets. A skin escolhida como "bônus" dá bônus (shared/skins.ts);
+// os itens-chave ainda não têm uso (pedido do dono).
+import { BONUS_SKIN, BONUS_SKIN_SHINY, textoBonusSkin } from './skins';
 
 export type CategoriaCustom = 'skins' | 'chave';
 
@@ -33,8 +35,8 @@ export const idSkin = (nome: string, shiny = false) => `skin-${nome.toLowerCase(
 
 export const ITENS_CUSTOM: ItemCustom[] = [
   ...COM_SKIN.flatMap(([especie, nome]): ItemCustom[] => [
-    { id: idSkin(nome), nome: `Skin ${nome}`, categoria: 'skins', skin: { especie, shiny: false }, descricao: `Visual especial para o ${nome}. Uso em breve.` },
-    { id: idSkin(nome, true), nome: `Skin ${nome} Shiny`, categoria: 'skins', skin: { especie, shiny: true }, descricao: `Visual especial para o ${nome} shiny. Uso em breve.` },
+    { id: idSkin(nome), nome: `Skin ${nome}`, categoria: 'skins', skin: { especie, shiny: false }, descricao: `Visual especial para o ${nome}. Bônus ao escolher como skin de bônus: ${textoBonusSkin(BONUS_SKIN)}.` },
+    { id: idSkin(nome, true), nome: `Skin ${nome} Shiny`, categoria: 'skins', skin: { especie, shiny: true }, descricao: `Visual especial para o ${nome} shiny. Bônus ao escolher como skin de bônus: ${textoBonusSkin(BONUS_SKIN_SHINY)}.` },
   ]),
   { id: 'prisonbottle', nome: 'Prison Bottle', categoria: 'chave', sprite: 'prison-bottle', descricao: 'Garrafa que liberta o Hoopa Unbound. Uso em breve.' },
   { id: 'dnasplicers', nome: 'DNA Splicers', categoria: 'chave', sprite: 'dna-splicers', descricao: 'Junta o Kyurem com Reshiram ou Zekrom (White/Black Kyurem). Uso em breve.' },

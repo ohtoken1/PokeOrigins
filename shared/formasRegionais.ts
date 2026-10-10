@@ -1,4 +1,5 @@
-// Formas regionais (Alola, Galar e Paldea; Hisui ainda não, pedido do dono). Cada uma vira um "Pokémon" próprio
+// Formas regionais (Alola, Galar, Paldea e Hisui — as de Hisui moram em Kalos, que tem poucos Pokémon: pedido do
+// dono). Cada uma vira um "Pokémon" próprio
 // no jogo com o número da PokéAPI (10091 = Alolan Rattata…), dados de batalha do Showdown e sprites da PokéAPI.
 // Aparecem nos mapas da região delas; a espécie normal continua na região original.
 import { Dex } from '@pkmn/sim';
@@ -11,7 +12,7 @@ export interface FormaRegional {
   showdown: string;
   /** Nome na PokéAPI (slug). */
   slug: string;
-  regiao: 'alola' | 'galar' | 'paldea';
+  regiao: 'alola' | 'galar' | 'paldea' | 'kalos';
   nome: string;
   /** Dados da PokéAPI que o Showdown não tem. */
   experienciaBase: number;
@@ -65,6 +66,23 @@ export const FORMAS_REGIONAIS: FormaRegional[] = [
   f(10251, 'Tauros-Paldea-Blaze', 'tauros-paldea-blaze-breed', 'paldea', 'Paldean Tauros (Blaze Breed)', 172, 14, 850, { ataque: 2 }),
   f(10252, 'Tauros-Paldea-Aqua', 'tauros-paldea-aqua-breed', 'paldea', 'Paldean Tauros (Aqua Breed)', 172, 14, 1100, { ataque: 2 }),
   f(10253, 'Wooper-Paldea', 'wooper-paldea', 'paldea', 'Paldean Wooper', 42, 4, 110, { hp: 1 }),
+  // Hisui (aparecem em Kalos)
+  f(10229, 'Growlithe-Hisui', 'growlithe-hisui', 'kalos', 'Hisuian Growlithe', 70, 8, 227, { ataque: 1 }),
+  f(10230, 'Arcanine-Hisui', 'arcanine-hisui', 'kalos', 'Hisuian Arcanine', 194, 20, 1680, { ataque: 2 }),
+  f(10231, 'Voltorb-Hisui', 'voltorb-hisui', 'kalos', 'Hisuian Voltorb', 66, 5, 130, { velocidade: 1 }),
+  f(10232, 'Electrode-Hisui', 'electrode-hisui', 'kalos', 'Hisuian Electrode', 172, 12, 710, { velocidade: 2 }),
+  f(10233, 'Typhlosion-Hisui', 'typhlosion-hisui', 'kalos', 'Hisuian Typhlosion', 240, 16, 698, { ataqueEspecial: 3 }),
+  f(10234, 'Qwilfish-Hisui', 'qwilfish-hisui', 'kalos', 'Hisuian Qwilfish', 88, 5, 39, { ataque: 1 }),
+  f(10235, 'Sneasel-Hisui', 'sneasel-hisui', 'kalos', 'Hisuian Sneasel', 86, 9, 270, { velocidade: 1 }),
+  f(10236, 'Samurott-Hisui', 'samurott-hisui', 'kalos', 'Hisuian Samurott', 238, 15, 582, { ataqueEspecial: 3 }),
+  f(10237, 'Lilligant-Hisui', 'lilligant-hisui', 'kalos', 'Hisuian Lilligant', 168, 12, 192, { ataqueEspecial: 2 }),
+  f(10238, 'Zorua-Hisui', 'zorua-hisui', 'kalos', 'Hisuian Zorua', 66, 7, 125, { ataqueEspecial: 1 }),
+  f(10239, 'Zoroark-Hisui', 'zoroark-hisui', 'kalos', 'Hisuian Zoroark', 179, 16, 730, { ataqueEspecial: 2 }),
+  f(10240, 'Braviary-Hisui', 'braviary-hisui', 'kalos', 'Hisuian Braviary', 179, 17, 434, { ataque: 2 }),
+  f(10241, 'Sliggoo-Hisui', 'sliggoo-hisui', 'kalos', 'Hisuian Sliggoo', 158, 7, 685, { defesaEspecial: 2 }),
+  f(10242, 'Goodra-Hisui', 'goodra-hisui', 'kalos', 'Hisuian Goodra', 270, 17, 3341, { defesaEspecial: 3 }),
+  f(10243, 'Avalugg-Hisui', 'avalugg-hisui', 'kalos', 'Hisuian Avalugg', 180, 14, 2624, { defesa: 2 }),
+  f(10244, 'Decidueye-Hisui', 'decidueye-hisui', 'kalos', 'Hisuian Decidueye', 239, 16, 370, { ataque: 3 }),
 ];
 
 const PORID = new Map(FORMAS_REGIONAIS.map((x) => [x.id, x]));
@@ -102,8 +120,10 @@ export function idDaEvolucao(origem: number, evo: { forme?: string; name: string
 /**
  * Formas que nos jogos só nascem evoluindo a espécie normal NA região (Pikachu → Alolan Raichu, Exeggcute → Alolan
  * Exeggutor). Aqui não dá para saber a região da evolução, então valem como Pokémon sem pré-evolução (pedido do dono).
+ * Hisuian Lilligant entra aqui (viria do Petilil normal com pedra); as de Hisui que evoluem por nível de uma espécie
+ * normal (Typhlosion, Samurott, Decidueye, Braviary, Sliggoo, Avalugg) aparecem em Kalos já no nível da evolução.
  */
-export const SEM_PRE_EVOLUCAO = [10100, 10114];
+export const SEM_PRE_EVOLUCAO = [10100, 10114, 10237];
 
 /** "Poison Point" → "poison-point" (formato das habilidades na PokéAPI). */
 const slugHabilidade = (nome: string) => nome.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, '-');
