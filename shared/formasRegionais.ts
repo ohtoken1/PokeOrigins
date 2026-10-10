@@ -173,5 +173,6 @@ export function montarFormaRegional(forma: FormaRegional, normal: PokemonBase, s
  */
 export function ehParadoxo(nomeShowdown: string): boolean {
   const s = Dex.species.get(nomeShowdown);
-  return Object.values(s.abilities).some((a) => a === 'Protosynthesis' || a === 'Quark Drive');
+  // Koraidon e Miraidon entram no mesmo sistema (cubos da Chave Temporal), pedido do dono
+  return s.name === 'Koraidon' || s.name === 'Miraidon' || Object.values(s.abilities).some((a) => a === 'Protosynthesis' || a === 'Quark Drive');
 }

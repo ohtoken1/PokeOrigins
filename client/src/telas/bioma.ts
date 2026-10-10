@@ -1,10 +1,11 @@
 import { comBonificacao } from '../bonificacao';
 import { numeroNaDex } from '../../../shared/formasRegionais';
 import type { Tela } from '../main';
+import { aplicarLiderNoSelvagem, sortearEncontroComLider } from '../../../shared/campo';
 import { biomaPorId } from '../../../shared/biomas';
 import { regiaoPorId } from '../../../shared/regioes';
 import { nivelTreinador } from '../../../shared/treinador';
-import { NIVEL_LENDARIO, ajustarTabela, biomaDoPokemon, encontroForcado, faixaDosEncontros, montarTabela, probabilidades, sortearEncontro } from '../../../shared/encontros';
+import { NIVEL_LENDARIO, ajustarTabela, biomaDoPokemon, encontroForcado, faixaDosEncontros, montarTabela, probabilidades } from '../../../shared/encontros';
 import { comoEvolui } from '../../../shared/evolucoes';
 import type { BiomaScene, OpcoesBioma } from '../jogo/BiomaScene';
 import { mostrarJogo } from '../jogo/jogoUnico';
@@ -203,14 +204,20 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       const ajustes = comBonificacao(ajustesAdmin());
       if (tabela.length === 0 || Math.random() >= ajustes.chancePorPasso) return;
 
+      // a habilidade do primeiro do time muda o sorteio (Static, Pressure, Intimidate…; shared/campo.ts)
+      const lider = save.time[0];
       const encontro =
-        ajustes.especie !== null ? encontroForcado(pokemonPorId(ajustes.especie), faixaAtual(), ajustes) : sortearEncontro(tabela, faixaAtual(), Math.random, ajustes);
+        ajustes.especie !== null ? encontroForcado(pokemonPorId(ajustes.especie), faixaAtual(), ajustes) : sortearEncontroComLider(tabela, faixaAtual(), lider, ajustes);
+      // Intimidate / Keen Eye afastaram um selvagem fraco: neste passo não aparece nada
+      if (!encontro) return;
       if (!save.vistos.includes(encontro.pokemon.id)) save.vistos.push(encontro.pokemon.id);
       salvar(save);
       atualizarContador();
 
       // o indivíduo já nasce aqui para o cartão mostrar o gênero
       const selvagem = novoPokemon(encontro.pokemon.id, encontro.nivel, encontro.shiny);
+      // Synchronize (Nature) e Cute Charm (gênero)
+      aplicarLiderNoSelvagem(selvagem, lider);
       const temQuemLute = save.time.some((p) => p.hp > 0);
       fecharEncontro = mostrarEncontro(areaJogo, encontro, {
         bloqueio: temQuemLute ? null : 'Seu time está desmaiado. Cure no Centro Pokémon.',

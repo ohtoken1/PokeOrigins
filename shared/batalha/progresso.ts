@@ -67,7 +67,8 @@ export function ganharExperiencia(
   if (p.nivel >= NIVEL_MAXIMO) p.exp = expParaNivel(crescimento, NIVEL_MAXIMO);
 
   // por nível; ou, se subiu de nível com amizade alta, por amizade (Golbat → Crobat, Eevee → Espeon/Umbreon…)
-  const para = evolucaoPorNivel(p.especieId, p.nivel) ?? (p.nivel > nivelAntes ? evolucaoPorAmizade(p) : null);
+  // Everstone: quem segura não evolui (nome fixo aqui para não importar shared/campo.ts, que importa encontros)
+  const para = p.item === 'everstone' ? null : (evolucaoPorNivel(p.especieId, p.nivel) ?? (p.nivel > nivelAntes ? evolucaoPorAmizade(p) : null));
   if (para && especie(para)) r.evolucao = { de: p.especieId, para };
   return r;
 }

@@ -16,7 +16,7 @@ import { abrirJanela } from '../ui/janela';
 import { abrirPerfilDe } from './jogadores';
 
 const mensagemDe = (e: unknown) => (e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.');
-const seloNivel = (nivel: number) => el('span', { class: 'cla-nivel', title: `Clã nível ${nivel}` }, `Nv. ${nivel}`);
+const seloNivel = (nivel: number) => el('span', { class: 'cla-nivel', title: `Guilda nível ${nivel}` }, `Nv. ${nivel}`);
 const seloCargo = (cargo: MembroCla['cargo']) => el('span', { class: `cla-cargo cargo-${cargo}` }, NOME_CARGO[cargo]);
 
 /** Cartão de um clã (bandeira, nível, barra, descrição e membros com o cargo); `acoes` monta os botões de cada membro. */
@@ -35,18 +35,18 @@ function cartaoDoCla(c: DetalheCla, acoes: (m: MembroCla) => (HTMLElement | null
     noMaximo ? null : el('section', { class: 'cla-missoes' },
       el('h3', {}, `Para o nível ${c.nivel + 1}`),
       el('ul', {},
-        el('li', { class: c.progresso >= 99.9 ? 'feita' : '' }, `Experiência do clã: ${c.progresso.toLocaleString('pt-BR')}%`),
+        el('li', { class: c.progresso >= 99.9 ? 'feita' : '' }, `Experiência da guilda: ${c.progresso.toLocaleString('pt-BR')}%`),
         ...(c.missoes.length
           ? c.missoes.map((m) => el('li', { class: m.feita ? 'feita' : '' }, m.texto))
-          : [el('li', { class: 'em-definicao' }, 'Missões do clã ', el('span', { class: 'selo-em-breve' }, 'Em breve'))])),
-      el('small', {}, 'A experiência e as missões são do clã inteiro: o que cada membro faz soma para todos.')),
+          : [el('li', { class: 'em-definicao' }, 'Missões da guilda ', el('span', { class: 'selo-em-breve' }, 'Em breve'))])),
+      el('small', {}, 'A experiência e as missões são da guilda inteira: o que cada membro faz soma para todos.')),
     el('section', { class: 'cla-membros' },
       el('h3', {}, 'Membros'),
       ...c.membros.map((m) => el('div', { class: `cla-membro${m.usuario === conta()?.usuario ? ' eu' : ''}` },
         c.meuCargo ? el('span', { class: `perfil-bolinha ${m.online ? 'online' : 'offline'}`, title: m.online ? 'Online' : 'Offline' }) : null,
         el('span', { class: 'amigo-quem' }, el('strong', {}, m.nome), el('small', {}, `@${m.usuario}`)),
         seloCargo(m.cargo),
-        el('span', { class: 'cla-parte', title: 'Parte da experiência do clã que veio deste membro' }, `${m.parte}%`),
+        el('span', { class: 'cla-parte', title: 'Parte da experiência da guilda que veio deste membro' }, `${m.parte}%`),
         el('span', { class: 'amigo-botoes' }, el('button', { class: 'botao secundario', onclick: () => void abrirPerfilDe(m.usuario) }, 'Perfil'), ...acoes(m)))),
       ...Array.from({ length: Math.max(0, c.vagas - c.membros.length) }, () => el('div', { class: 'cla-membro vaga' }, 'Vaga livre'))));
 }
@@ -70,16 +70,16 @@ export const telaCla: Tela = (raiz) => {
       return [
         lider && m.cargo === 'membro' ? botao('Tornar vice-líder', () => void fazer(mudarCargoNoCla(m.usuario, 'vice'))) : null,
         lider && m.cargo === 'vice' ? botao('Tornar membro', () => void fazer(mudarCargoNoCla(m.usuario, 'membro'))) : null,
-        lider ? botao('Passar liderança', () => confirm(`Passar a liderança do clã para ${m.nome}? Você vira vice-líder.`) && void fazer(mudarCargoNoCla(m.usuario, 'lider'))) : null,
-        gestor && (lider || m.cargo === 'membro') ? botao('Expulsar', () => confirm(`Expulsar ${m.nome} do clã?`) && void fazer(expulsarDoCla(m.usuario)), 'perigo') : null,
+        lider ? botao('Passar liderança', () => confirm(`Passar a liderança da guilda para ${m.nome}? Você vira vice-líder.`) && void fazer(mudarCargoNoCla(m.usuario, 'lider'))) : null,
+        gestor && (lider || m.cargo === 'membro') ? botao('Expulsar', () => confirm(`Expulsar ${m.nome} da guilda?`) && void fazer(expulsarDoCla(m.usuario)), 'perigo') : null,
       ];
     };
     const editar = () => {
       const bandeira: Bandeira = { ...(c.bandeira ?? BANDEIRA_PADRAO) };
-      const descricao = el('input', { type: 'text', class: 'db-busca', maxlength: DESCRICAO_CLA_MAX, value: c.descricao, placeholder: 'Descrição do clã' }) as HTMLInputElement;
+      const descricao = el('input', { type: 'text', class: 'db-busca', maxlength: DESCRICAO_CLA_MAX, value: c.descricao, placeholder: 'Descrição da guilda' }) as HTMLInputElement;
       const aberto = el('input', { type: 'checkbox', checked: c.aberto }) as HTMLInputElement;
       const erro = el('p', { class: 'amigos-aviso' });
-      const janela = abrirJanela('Editar clã', () => el('div', { class: 'cla-formulario' },
+      const janela = abrirJanela('Editar guilda', () => el('div', { class: 'cla-formulario' },
         editorDeBandeira(bandeira),
         el('label', { class: 'cla-campo' }, 'Descrição', descricao),
         el('label', { class: 'cla-campo linha' }, aberto, 'Entrada livre (desligado: só entra quem o líder ou vice-líder aceitar)'),
@@ -88,7 +88,7 @@ export const telaCla: Tela = (raiz) => {
         { classe: 'janela-cla' });
     };
     tela.replaceChildren(el('div', {},
-      el('h1', {}, 'Meu clã'),
+      el('h1', {}, 'Minha guilda'),
       cartaoDoCla(c, acoes),
       gestor && c.pedidos.length ? el('section', { class: 'amigos-secao' }, el('h2', {}, `Pedidos de entrada (${c.pedidos.length})`),
         el('div', { class: 'amigos-lista' }, ...c.pedidos.map((p) => el('div', { class: 'amigo-linha' },
@@ -100,20 +100,20 @@ export const telaCla: Tela = (raiz) => {
       aviso,
       el('div', { class: 'cla-rodape' },
         lider ? botao('Editar bandeira e descrição', editar) : null,
-        botao('Sair do clã', () => {
+        botao('Sair da guilda', () => {
           const sozinho = c.membros.length === 1;
-          const texto = sozinho ? 'Você é o único membro: ao sair, o clã é apagado. Sair mesmo assim?'
-            : lider ? 'Ao sair, a liderança passa para o vice-líder (ou o membro mais antigo). Sair do clã?' : 'Sair do clã?';
+          const texto = sozinho ? 'Você é o único membro: ao sair, a guilda é apagada. Sair mesmo assim?'
+            : lider ? 'Ao sair, a liderança passa para o vice-líder (ou o membro mais antigo). Sair da guilda?' : 'Sair da guilda?';
           if (confirm(texto)) void fazer(sairDoCla());
         }, 'perigo'))));
   };
 
   // ---- sem clã: criar ou entrar ----
   const bandeiraNova: Bandeira = { ...BANDEIRA_PADRAO };
-  const nome = el('input', { type: 'text', class: 'db-busca', maxlength: NOME_CLA_MAX, placeholder: 'Nome do clã', 'aria-label': 'Nome do clã' }) as HTMLInputElement;
-  const descricao = el('input', { type: 'text', class: 'db-busca', maxlength: DESCRICAO_CLA_MAX, placeholder: 'Descrição (opcional)', 'aria-label': 'Descrição do clã' }) as HTMLInputElement;
+  const nome = el('input', { type: 'text', class: 'db-busca', maxlength: NOME_CLA_MAX, placeholder: 'Nome da guilda', 'aria-label': 'Nome da guilda' }) as HTMLInputElement;
+  const descricao = el('input', { type: 'text', class: 'db-busca', maxlength: DESCRICAO_CLA_MAX, placeholder: 'Descrição (opcional)', 'aria-label': 'Descrição da guilda' }) as HTMLInputElement;
   const aberto = el('input', { type: 'checkbox', checked: true }) as HTMLInputElement;
-  const busca = el('input', { type: 'search', class: 'db-busca', placeholder: 'Buscar clã pelo nome…', 'aria-label': 'Buscar clã' }) as HTMLInputElement;
+  const busca = el('input', { type: 'search', class: 'db-busca', placeholder: 'Buscar guilda pelo nome…', 'aria-label': 'Buscar guilda' }) as HTMLInputElement;
   const lista = el('div', { class: 'amigos-lista' });
   let clas: ResumoCla[] = [];
   let relogio = 0;
@@ -123,9 +123,9 @@ export const telaCla: Tela = (raiz) => {
   const criar = async () => {
     if (criando) return;
     const n = limparNomeCla(nome.value);
-    if (!NOME_CLA_VALIDO.test(n)) return void (aviso.textContent = 'Nome do clã: de 3 a 16 letras ou números.');
-    if ((carregarSave()?.gold ?? 0) < PRECO_CRIAR_CLA_GOLD) return void (aviso.textContent = `Criar um clã custa ${PRECO_CRIAR_CLA_GOLD} gold.`);
-    if (!confirm(`Criar o clã "${n}" por ${PRECO_CRIAR_CLA_GOLD} gold?`)) return;
+    if (!NOME_CLA_VALIDO.test(n)) return void (aviso.textContent = 'Nome da guilda: de 3 a 16 letras ou números.');
+    if ((carregarSave()?.gold ?? 0) < PRECO_CRIAR_CLA_GOLD) return void (aviso.textContent = `Criar uma guilda custa ${PRECO_CRIAR_CLA_GOLD} gold.`);
+    if (!confirm(`Criar a guilda "${n}" por ${PRECO_CRIAR_CLA_GOLD} gold?`)) return;
     criando = true;
     await fazer((async () => {
       // o servidor cobra o gold no save guardado: salva antes e pega o save de volta depois
@@ -152,7 +152,7 @@ export const telaCla: Tela = (raiz) => {
               el('button', { class: 'botao secundario', onclick: () => void verCla(c.id).then((d) => abrirJanela(d.nome, () => cartaoDoCla(d), { classe: 'janela-cla' }), (e) => void (aviso.textContent = mensagemDe(e))) }, 'Ver'),
               acao));
         })
-      : [el('p', { class: 'meta' }, busca.value.trim() ? `Nenhum clã encontrado com "${busca.value.trim()}".` : 'Ainda não existe nenhum clã. Crie o primeiro!')]));
+      : [el('p', { class: 'meta' }, busca.value.trim() ? `Nenhuma guilda encontrada com "${busca.value.trim()}".` : 'Ainda não existe nenhuma guilda. Crie a primeira!')]));
   };
   const buscar = (espera = 250) => {
     clearTimeout(relogio);
@@ -170,15 +170,15 @@ export const telaCla: Tela = (raiz) => {
   };
   busca.addEventListener('input', () => buscar());
   const criacao = el('section', { class: 'cla-cartao cla-criar' },
-    el('h2', {}, 'Criar um clã'),
+    el('h2', {}, 'Criar sua guilda'),
     el('p', { class: 'meta' }, `Monte a bandeira, escolha o nome e chame até ${VAGAS_CLA - 1} amigos (${VAGAS_CLA} vagas com você).`),
     editorDeBandeira(bandeiraNova),
     el('div', { class: 'cla-formulario' },
       el('label', { class: 'cla-campo' }, 'Nome', nome),
       el('label', { class: 'cla-campo' }, 'Descrição', descricao),
       el('label', { class: 'cla-campo linha' }, aberto, 'Entrada livre (desligado: só entra quem você aceitar)'),
-      el('button', { class: 'botao botao-gold cla-botao-criar', onclick: () => void criar() }, `Criar clã · ${PRECO_CRIAR_CLA_GOLD} gold`)));
-  const procura = el('section', { class: 'amigos-secao' }, el('h2', {}, 'Entrar num clã'), el('div', { class: 'jogadores-busca' }, busca), lista);
+      el('button', { class: 'botao botao-gold cla-botao-criar', onclick: () => void criar() }, `Criar guilda · ${PRECO_CRIAR_CLA_GOLD} gold`)));
+  const procura = el('section', { class: 'amigos-secao' }, el('h2', {}, 'Entrar em uma guilda'), el('div', { class: 'jogadores-busca' }, busca), lista);
 
   let tinhaCla: boolean | null = null;
   const desenhar = () => {
@@ -186,7 +186,7 @@ export const telaCla: Tela = (raiz) => {
     if (c) meuClaNaTela(c);
     else {
       // o formulário de criar fica montado (não perde o que a pessoa já escolheu)
-      if (tinhaCla !== false) tela.replaceChildren(el('h1', {}, 'Clã'), aviso, criacao, procura);
+      if (tinhaCla !== false) tela.replaceChildren(el('h1', {}, 'Guildas'), aviso, procura, criacao);
       if (tinhaCla !== false) buscar(0);
       else mostrarLista();
     }

@@ -109,26 +109,26 @@ export const listar = (busca: string) => banco.listarClas(chaveDoNomeCla(busca))
 
 export function ver(conta: banco.Conta, id: number) {
   const cla = banco.claPorId(id);
-  if (!cla) throw new ErroConta('Clã não encontrado.', 404);
+  if (!cla) throw new ErroConta('Guilda não encontrada.', 404);
   return detalhe(cla, conta);
 }
 
 const lerDescricao = (d: unknown) => limparTexto(d).slice(0, DESCRICAO_CLA_MAX);
 
 export function criar(conta: banco.Conta, dados: Record<string, unknown>) {
-  if (banco.claDaConta(conta.id)) throw new ErroConta('Você já está em um clã.');
+  if (banco.claDaConta(conta.id)) throw new ErroConta('Você já está em uma guilda.');
   const nome = typeof dados.nome === 'string' ? limparNomeCla(dados.nome) : '';
-  if (!NOME_CLA_VALIDO.test(nome)) throw new ErroConta('Nome do clã: de 3 a 16 letras ou números.');
+  if (!NOME_CLA_VALIDO.test(nome)) throw new ErroConta('Nome da guilda: de 3 a 16 letras ou números.');
   const bandeira = lerBandeira(dados.bandeira);
   if (!bandeira) throw new ErroConta('Bandeira inválida.');
   const chave = chaveDoNomeCla(nome);
-  if (banco.claPorChave(chave)) throw new ErroConta('Já existe um clã com este nome.', 409);
-  if (!banco.lerSave(conta.id)) throw new ErroConta('Comece sua jornada antes de criar um clã.');
+  if (banco.claPorChave(chave)) throw new ErroConta('Já existe uma guilda com este nome.', 409);
+  if (!banco.lerSave(conta.id)) throw new ErroConta('Comece sua jornada antes de criar uma guilda.');
   // cobra o gold no save guardado (o jogo salva antes de pedir) e cria o clã na mesma mudança:
   // ou as duas coisas acontecem, ou nenhuma
   banco.mudarSaves([conta.id], ([save]) => {
     const gold = typeof save.gold === 'number' && Number.isFinite(save.gold) ? save.gold : 0;
-    if (gold < PRECO_CRIAR_CLA_GOLD) throw new ErroConta(`Criar um clã custa ${PRECO_CRIAR_CLA_GOLD} gold.`);
+    if (gold < PRECO_CRIAR_CLA_GOLD) throw new ErroConta(`Criar uma guilda custa ${PRECO_CRIAR_CLA_GOLD} gold.`);
     save.gold = gold - PRECO_CRIAR_CLA_GOLD;
     banco.criarCla(nome, chave, JSON.stringify(bandeira), lerDescricao(dados.descricao), dados.aberto !== false, conta.id);
   });
@@ -138,10 +138,10 @@ export function criar(conta: banco.Conta, dados: Record<string, unknown>) {
 
 /** Clã aberto: entra na hora. Fechado: fica um pedido para o líder ou vice-líder aceitar. */
 export function entrar(conta: banco.Conta, id: number) {
-  if (banco.claDaConta(conta.id)) throw new ErroConta('Você já está em um clã.');
+  if (banco.claDaConta(conta.id)) throw new ErroConta('Você já está em uma guilda.');
   const cla = banco.claPorId(id);
-  if (!cla) throw new ErroConta('Clã não encontrado.', 404);
-  if (banco.membrosDoCla(id).length >= VAGAS_CLA) throw new ErroConta('Este clã está cheio.');
+  if (!cla) throw new ErroConta('Guilda não encontrada.', 404);
+  if (banco.membrosDoCla(id).length >= VAGAS_CLA) throw new ErroConta('Esta guilda está cheia.');
   if (cla.aberto) {
     banco.transacao(() => banco.entrarNoCla(conta.id, id));
     mandarHistoricoDoCla(conta.id);
@@ -163,7 +163,7 @@ export function cancelarPedido(conta: banco.Conta, id: number) {
 /** O clã da conta, exigindo o cargo (líder, ou líder/vice). */
 function meuClaComo(conta: banco.Conta, ...cargos: Cargo[]) {
   const cla = banco.claDaConta(conta.id);
-  if (!cla) throw new ErroConta('Você não está em um clã.');
+  if (!cla) throw new ErroConta('Você não está em uma guilda.');
   const membros = banco.membrosDoCla(cla.id);
   const eu = membros.find((m) => m.id === conta.id);
   const cargo = eu ? cargoDe(cla, eu) : 'membro';
@@ -172,7 +172,7 @@ function meuClaComo(conta: banco.Conta, ...cargos: Cargo[]) {
 }
 function membroAlvo(cla: banco.Cla, membros: banco.MembroCla[], conta: banco.Conta, usuario: string) {
   const alvo = membros.find((m) => m.usuario.toLowerCase() === usuario.toLowerCase());
-  if (!alvo) throw new ErroConta('Este jogador não está no clã.', 404);
+  if (!alvo) throw new ErroConta('Este jogador não está na guilda.', 404);
   if (alvo.id === conta.id) throw new ErroConta('Este é você.');
   return { alvo, cargo: cargoDe(cla, alvo) };
 }
@@ -182,10 +182,10 @@ export function responderPedido(conta: banco.Conta, usuario: string, aceitar: bo
   const pedido = banco.pedidosDoCla(cla.id).find((p) => p.usuario.toLowerCase() === usuario.toLowerCase());
   if (!pedido) throw new ErroConta('Este pedido não existe mais.', 404);
   if (aceitar) {
-    if (membros.length >= VAGAS_CLA) throw new ErroConta('O clã está cheio.');
+    if (membros.length >= VAGAS_CLA) throw new ErroConta('A guilda está cheia.');
     if (banco.claDaConta(pedido.id)) {
       banco.tirarPedidoDoCla(cla.id, pedido.id);
-      throw new ErroConta('Este jogador já entrou em outro clã.', 409);
+      throw new ErroConta('Este jogador já entrou em outra guilda.', 409);
     }
     banco.transacao(() => banco.entrarNoCla(pedido.id, cla.id));
     mandarHistoricoDoCla(pedido.id);
@@ -236,7 +236,7 @@ export function editar(conta: banco.Conta, dados: Record<string, unknown>) {
 /** Sair: se o líder sai, a liderança vai para o vice-líder mais antigo (ou o membro mais antigo); sozinho, o clã acaba. */
 export function sair(conta: banco.Conta) {
   const cla = banco.claDaConta(conta.id);
-  if (!cla) throw new ErroConta('Você não está em um clã.');
+  if (!cla) throw new ErroConta('Você não está em uma guilda.');
   const outros = banco.membrosDoCla(cla.id).filter((m) => m.id !== conta.id);
   const pedidos = banco.pedidosDoCla(cla.id).map((p) => p.id);
   banco.transacao(() => {

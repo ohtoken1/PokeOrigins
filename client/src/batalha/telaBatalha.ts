@@ -18,6 +18,7 @@ import { XP_POR_MISSAO, type Missao } from '../../../shared/passe';
 import { contarNasMissoes, textoMissao } from '../passe';
 import { EXP_SHARE, MOEDA } from '../../../shared/loja';
 import { multSkins } from '../../../shared/skins';
+import { evsComItem, multSilverDoTime, multXpDoItem } from '../../../shared/campo';
 import { sortearTicketDaBatalha } from '../../../shared/tickets';
 import { curarTime, guardarNoPC, registrarCapturaNoRanking, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
 import { darXpAoCla } from '../cla';
@@ -820,10 +821,12 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         if (p.hp <= 0 || (!batalha.participantes.has(pos) && p.item !== EXP_SHARE)) continue;
         for (const d of derrotados()) {
           const ev = pokemonPorId(d.especieId).evsDados;
-          ganharEvs(p, { hp: ev.hp, atk: ev.ataque, def: ev.defesa, spa: ev.ataqueEspecial, spd: ev.defesaEspecial, spe: ev.velocidade });
+          // Macho Brace dobra os EVs; Power Item soma 8 no atributo dele
+          ganharEvs(p, evsComItem(p, { hp: ev.hp, atk: ev.ataque, def: ev.defesa, spa: ev.ataqueEspecial, spd: ev.defesaEspecial, spe: ev.velocidade }));
         }
         // bônus de XP da administração (1x a 3x)
-        const exp = Math.round(xpPelosDerrotados(p.nivel) * bonusVip(save, 'xpPokemon') * bonificacao().xp);
+        // Lucky Egg: +50% para quem segura
+        const exp = Math.round(xpPelosDerrotados(p.nivel) * bonusVip(save, 'xpPokemon') * bonificacao().xp * multXpDoItem(p));
         const r = ganharExperiencia(p, exp, nomeDe, crescimentoDe);
         await mostrarProgresso(pos, r);
         if (r.evolucao) evolucoes.push({ pos, para: r.evolucao.para });
@@ -862,7 +865,9 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       await darXpTreinador();
       // silver só em batalhas contra treinadores e ginásios (pedido do dono): selvagem não dá
       if (treinador) {
-        const silver = Math.round(treinador.recompensa * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver'));
+        // Amulet Coin / Luck Incense: +20% se quem segura entrou em campo
+        const amuleto = multSilverDoTime([...batalha.participantes].map((pos) => save.time[pos]));
+        const silver = Math.round(treinador.recompensa * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver') * amuleto);
         save.silver += silver;
         await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${MOEDA}!`);
       }

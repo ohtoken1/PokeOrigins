@@ -9,6 +9,7 @@ import { nivelTreinador } from '../../../shared/treinador';
 import { comBonificacao, fontesDeBonus, textoMult, type AlvoChance } from '../bonificacao';
 import { ajustesAdmin } from '../ui/admin';
 import { comoEvolui } from '../../../shared/evolucoes';
+import { cuboDaEspecie, cubosDaOrigem } from '../../../shared/itensCustom';
 import { especie, golpesPorNivel } from '../../../shared/batalha/pokemon';
 import maquinas from '../../../shared/data/maquinas.json';
 import { golpesDeTutorDaEspecie } from '../../../shared/professores';
@@ -158,11 +159,19 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
   );
 
   // linha evolutiva (só espécies da região)
-  const cadeia = todos.filter((q) => q.cadeiaEvolucao === p.cadeiaEvolucao);
+  // os Pokémon do passado e do futuro entram na linha de quem usa o cubo (Volcarona → Slither Wing / Iron Moth)
+  const origensDoCubo = cuboDaEspecie(p.id)?.origens.map((n) => todos.find((q) => q.id === n)).filter((q): q is PokemonBase => !!q) ?? [];
+  const linhas = new Set((origensDoCubo.length ? origensDoCubo : [p]).map((q) => q.cadeiaEvolucao));
+  const normais = todos.filter((q) => linhas.has(q.cadeiaEvolucao));
+  const cadeia = [...normais, ...todos.filter((q) => !normais.includes(q) && cuboDaEspecie(q.id)?.origens.some((n) => normais.some((c) => c.id === n)))];
   const estagio = (q: PokemonBase): number => {
-    const anterior = q.evoluiDe ? cadeia.find((c) => c.slug === q.evoluiDe) : undefined;
+    const cubo = normais.includes(q) ? undefined : cuboDaEspecie(q.id);
+    if (cubo) return Math.max(...cubo.origens.map((n) => normais.find((c) => c.id === n)).filter((c): c is PokemonBase => !!c).map(estagio)) + 1;
+    const anterior = q.evoluiDe ? normais.find((c) => c.slug === q.evoluiDe) : undefined;
     return anterior ? estagio(anterior) + 1 : 0;
   };
+  /** Como se chega nesta forma (texto embaixo do nome na linha evolutiva). */
+  const comoChega = (q: PokemonBase) => (normais.includes(q) ? comoEvolui(q) : `Usar ${cuboDaEspecie(q.id)!.nome}`);
   const porEstagio: PokemonBase[][] = [];
   for (const q of cadeia) (porEstagio[estagio(q)] ??= []).push(q);
   // Megas da linha: entram como o último estágio (Charizard → Mega Charizard X / Y)
@@ -177,7 +186,7 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
           el('button', { class: `dex-evo ${q.id === p.id ? 'atual' : ''} ${visto(q.id) ? '' : 'oculto'}`, onclick: () => abrir(q.id) },
             spritePokemon(q, { animado: false }),
             el('span', {}, visto(q.id) ? q.nome : '???'),
-            i > 0 ? el('small', {}, comoEvolui(q)) : null,
+            i > 0 ? el('small', {}, comoChega(q)) : null,
           ),
         ),
       ),
@@ -205,7 +214,9 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
   const biomaP = BIOMAS.find((b) => b.id === biomaDoPokemon(p));
   const comoAparece = onde
     ? `Solto · Nv. ${p.lendario || p.mitico ? `${Math.max(NIVEL_LENDARIO, onde.entrada.nivelMin)}+ (raro)` : `${onde.entrada.nivelMin}–${onde.entrada.nivelMax}`}`
-    : `Só evoluindo · ${comoEvolui(p)}`;
+    : cuboDaEspecie(p.id)
+      ? `Só com o ${cuboDaEspecie(p.id)!.nome}, usado em ${cuboDaEspecie(p.id)!.origens.map((n) => todos.find((q) => q.id === n)?.nome ?? n).join(' ou ')}`
+      : `Só evoluindo · ${comoEvolui(p)}`;
   // chances com o nível de treinador atual (e os bônus/ajustes que valem no jogo agora)
   const saveAtual = carregarSave();
   const ajustes = comBonificacao(ajustesAdmin());
@@ -330,7 +341,8 @@ ${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) }
     el('section', {}, el('h3', {}, 'Atributos base'), atributos),
     el('section', {}, el('h3', {}, 'Abilities'), habilidades),
     el('section', {}, el('h3', {}, 'Dano recebido por tipo'), efetividade),
-    el('section', {}, el('h3', {}, 'Evolução'), cadeia.length > 1 || megas.length ? evolucao : el('p', { class: 'dica' }, 'Não evolui.')),
+    el('section', {}, el('h3', {}, 'Evolução'), cadeia.length > 1 || megas.length ? evolucao : el('p', { class: 'dica' }, 'Não evolui.'),
+      cubosDaOrigem(p.id).length ? el('p', { class: 'dica' }, `Com um cubo, ${p.nome} vira ${cubosDaOrigem(p.id).map((c) => c.nome.replace('Cubo de ', '')).join(' ou ')}. Os cubos saem da Chave Temporal e da loja do Viajante do tempo, na cidade.`) : null),
     el('section', {}, el('h3', {}, 'Golpes por nível'), golpes),
     el(
       'section',

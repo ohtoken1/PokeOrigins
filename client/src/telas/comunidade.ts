@@ -15,10 +15,10 @@ const SECOES: Record<SecaoComunidade, { titulo: string; icone: string; texto: st
     itens: ['Adicionar amigos pelo nome de treinador', 'Ver quem está online e em qual bioma', 'Convidar para batalhas e trocas'],
   },
   cla: {
-    titulo: 'Clã',
+    titulo: 'Guilda',
     icone: '🛡️',
-    texto: 'Crie ou entre num clã para jogar em grupo.',
-    itens: ['Criar um clã com nome e emblema', 'Membros, cargos e chat do clã', 'Torneios e ranking entre clãs'],
+    texto: 'Crie ou entre numa guilda para jogar em grupo.',
+    itens: ['Criar uma guilda com nome e emblema', 'Membros, cargos e chat da guilda', 'Torneios e ranking entre guildas'],
   },
   continentes: {
     titulo: 'Continentes',

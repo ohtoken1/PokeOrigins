@@ -109,7 +109,7 @@ export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: b
       retratoTreinador(save),
       el('h2', {}, save.aparencia?.nome || 'Treinador'),
       el('span', { class: `perfil-status ${online ? 'online' : 'offline'}` }, el('span', { class: 'perfil-bolinha' }), online ? 'Online agora' : 'Offline'),
-      cla ? el('div', { class: 'perfil-cla', title: `Clã ${cla.nome} · nível ${cla.nivel}` }, desenharBandeira(cla.bandeira, 30),
+      cla ? el('div', { class: 'perfil-cla', title: `Guilda ${cla.nome} · nível ${cla.nivel}` }, desenharBandeira(cla.bandeira, 30),
         el('span', {}, el('strong', {}, cla.nome), el('small', {}, `${NOME_CARGO[cla.cargo]} · Nv. ${cla.nivel}`))) : null,
       el('div', { class: 'perfil-nivel', title: t.necessario ? `${t.atual.toLocaleString('pt-BR')} / ${t.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo' },
         el('small', {}, `Treinador Nv. ${t.nivel}`),

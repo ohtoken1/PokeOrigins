@@ -5,7 +5,7 @@
 import { Dex } from '@pkmn/sim';
 import maquinas from './data/maquinas.json';
 import { ITENS, type ItemId } from './itens';
-import { TICKETS } from './tickets';
+import { CHAVE_TEMPORAL, TICKETS } from './tickets';
 import { TIPOS_TERA } from './tera';
 import { ITENS_CUSTOM } from './itensCustom';
 import { MEGA_STONES, PRECO_MEGA_STONE_GOLD, RAYQUAZITE, megaDaPedra } from './megas';
@@ -16,7 +16,7 @@ import { nomeCategoria, nomeTipo, traduzir } from './traducao';
 
 export type CategoriaLoja =
   | 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'megapedras' | 'frutas' | 'gems' | 'placas' | 'memorias' | 'zcristais' | 'lendarios'
-  | 'terashards' | 'chave' | 'skins' | 'tm' | 'tr' | 'tickets' | 'ovos';
+  | 'terashards' | 'chave' | 'skins' | 'cubos' | 'tm' | 'tr' | 'tickets' | 'ovos';
 
 /** Abas da loja. */
 export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
@@ -39,6 +39,7 @@ export const CATEGORIAS_FORA_DA_LOJA: { id: CategoriaLoja; nome: string }[] = [
   { id: 'terashards', nome: 'Tera Shards' },
   { id: 'chave', nome: 'Itens-chave' },
   { id: 'skins', nome: 'Skins' },
+  { id: 'cubos', nome: 'Cubos' },
   { id: 'tickets', nome: 'Tickets' },
   { id: 'ovos', nome: 'Ovos' },
 ];
@@ -67,6 +68,8 @@ export interface ItemLoja {
   teraTipo?: string;
   /** skins: de qual Pokémon */
   skin?: { especie: number; shiny: boolean };
+  /** cubos: de qual Pokémon e de que era (shared/itensCustom.ts) */
+  cubo?: { especie: number; era: 'passado' | 'futuro' | 'lendario' };
 }
 
 /** Moeda do jogo. */
@@ -99,7 +102,17 @@ export const TERASTALLIZER_BAND = 'terastallizerband';
 /** Dynamax Band: item de segurar; o Dynamax ainda não existe (o simulador da 9ª geração não tem). */
 export const DYNAMAX_BAND = 'dynamaxband';
 /** Nomes dos itens de segurar que não existem no Showdown (não vão para o simulador). */
-export const ITENS_DE_SEGURAR_NOSSOS: Record<string, string> = { [EXP_SHARE]: 'Exp. Share', [TERASTALLIZER_BAND]: 'Terastallizer Band', [DYNAMAX_BAND]: 'Dynamax Band' };
+export const ITENS_DE_SEGURAR_NOSSOS: Record<string, string> = { [EXP_SHARE]: 'Exp. Share', [TERASTALLIZER_BAND]: 'Terastallizer Band', [DYNAMAX_BAND]: 'Dynamax Band', luckyegg: 'Lucky Egg', everstone: 'Everstone', amuletcoin: 'Amulet Coin', luckincense: 'Luck Incense' };
+/** Descrições nossas para itens do Showdown cujo efeito no jogo é fora da batalha (EVs). */
+const DESCRICAO_DE_CAMPO: Record<string, string> = {
+  machobrace: 'Segurando, o Pokémon ganha o dobro de EVs de cada Pokémon derrotado. Na batalha, a Speed cai pela metade.',
+  powerweight: 'Segurando, o Pokémon ganha +8 EVs de HP por Pokémon derrotado. Na batalha, a Speed cai pela metade.',
+  powerbracer: 'Segurando, o Pokémon ganha +8 EVs de Attack por Pokémon derrotado. Na batalha, a Speed cai pela metade.',
+  powerbelt: 'Segurando, o Pokémon ganha +8 EVs de Defense por Pokémon derrotado. Na batalha, a Speed cai pela metade.',
+  powerlens: 'Segurando, o Pokémon ganha +8 EVs de Sp. Atk por Pokémon derrotado. Na batalha, a Speed cai pela metade.',
+  powerband: 'Segurando, o Pokémon ganha +8 EVs de Sp. Def por Pokémon derrotado. Na batalha, a Speed cai pela metade.',
+  poweranklet: 'Segurando, o Pokémon ganha +8 EVs de Speed por Pokémon derrotado. Na batalha, a Speed cai pela metade.',
+};
 /** Item nosso (não existe no Showdown): faz evoluir quem evolui por troca, como o Linking Cord do Legends: Arceus. */
 export const CABO_DE_LIGACAO = 'linkingcord';
 
@@ -125,7 +138,6 @@ function classificarItem(i: ReturnType<typeof Dex.items.get>): CategoriaLoja | n
   if (i.isNonstandard && i.isNonstandard !== 'Past') return null;
   if (i.isPokeball || /^tr\d\d$/.test(i.id)) return null;
   if (/^\(Gen \d\)|No competitive use|Though this feather|big nugget|Hyper Training|Can be revived|Can revive|Cannot be given/i.test(desc)) return null;
-  if (i.id === 'machobrace') return null;
   if (i.isBerry) return i.isNonstandard ? null : 'frutas';
   if (i.isGem) return 'gems';
   // Z-Crystals de tipo também têm onPlate (Arceus muda de tipo com eles): checar antes das Plates
@@ -137,11 +149,13 @@ function classificarItem(i: ReturnType<typeof Dex.items.get>): CategoriaLoja | n
   return 'batalha';
 }
 const NA_LOJA = new Set<CategoriaLoja>(['bolas', 'remedios', 'evolucao', 'batalha', 'megapedras', 'tm', 'tr']);
+/** Itens de categorias vendidas que ficam fora da loja (pedido do dono). */
+const FORA_DA_LOJA = new Set(['amuletcoin', 'luckincense']);
 
 function montarCatalogo(): ItemLoja[] {
   const itens: ItemLoja[] = [];
   const add = (item: Omit<ItemLoja, 'preco' | 'naLoja'>) => {
-    const naLoja = NA_LOJA.has(item.categoria);
+    const naLoja = NA_LOJA.has(item.categoria) && !FORA_DA_LOJA.has(item.id);
     // Mega Stones custam gold (pedido do dono)
     if (item.categoria === 'megapedras') itens.push({ ...item, naLoja, moeda: 'gold', preco: PRECOS[item.id] ?? PRECO_MEGA_STONE_GOLD });
     else itens.push({ ...item, naLoja, preco: naLoja ? preco(item.id) : 0 });
@@ -159,6 +173,11 @@ function montarCatalogo(): ItemLoja[] {
   add({ id: CABO_DE_LIGACAO, nome: 'Linking Cord', categoria: 'evolucao', descricao: 'Faz evoluir Pokémon que evoluem por troca (se precisar de item, ele deve estar equipado).' });
 
   add({ id: EXP_SHARE, nome: 'Exp. Share', categoria: 'batalha', sprite: 'exp-share', descricao: 'Segurando, o Pokémon ganha XP e EVs de toda vitória ou captura, mesmo sem entrar em campo.' });
+  // itens de segurar com efeito fora da batalha (shared/campo.ts); não existem no Showdown
+  add({ id: 'luckyegg', nome: 'Lucky Egg', categoria: 'batalha', sprite: 'lucky-egg', descricao: 'Segurando, o Pokémon ganha 50% a mais de XP.' });
+  add({ id: 'everstone', nome: 'Everstone', categoria: 'batalha', sprite: 'everstone', descricao: 'Segurando, o Pokémon não evolui por nível nem por amizade.' });
+  add({ id: 'amuletcoin', nome: 'Amulet Coin', categoria: 'batalha', sprite: 'amulet-coin', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de silver. Não acumula com o Luck Incense.' });
+  add({ id: 'luckincense', nome: 'Luck Incense', categoria: 'batalha', sprite: 'luck-incense', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de silver. Não acumula com a Amulet Coin.' });
   // ícones desenhados por nós (client/public/itens)
   add({ id: TERASTALLIZER_BAND, nome: 'Terastallizer Band', categoria: 'batalha', imagem: 'itens/terastallizerband.svg', descricao: 'Pulseira com um cristal Tera. O Pokémon só pode terastalizar se estiver segurando ela (uma vez por batalha).' });
   add({ id: DYNAMAX_BAND, nome: 'Dynamax Band', categoria: 'batalha', imagem: 'itens/dynamaxband.svg', descricao: 'Pulseira com uma Wishing Star para Dynamax e Gigantamax. O Dynamax ainda não existe no jogo.' });
@@ -171,7 +190,7 @@ function montarCatalogo(): ItemLoja[] {
     const categoria = classificarItem(i);
     if (!categoria) continue;
     const mega = categoria === 'megapedras' ? megaDaPedra(i.id) : undefined;
-    const descricao = mega ? `Segurando, ${mega.nome.replace(/^Mega /, '')} pode megaevoluir em ${mega.nome} na batalha (uma vez por batalha).` : traduzir(i.shortDesc || i.desc);
+    const descricao = mega ? `Segurando, ${mega.nome.replace(/^Mega /, '')} pode megaevoluir em ${mega.nome} na batalha (uma vez por batalha).` : (DESCRICAO_DE_CAMPO[i.id] ?? traduzir(i.shortDesc || i.desc));
     add({ id: i.id, nome: i.name, categoria, descricao, imagem: i.id === RAYQUAZITE ? 'itens/rayquazite.png' : undefined });
   }
 
@@ -201,6 +220,8 @@ export const TODOS_OS_ITENS: ItemLoja[] = [
   // itens nossos: skins e itens-chave (sem uso por enquanto)
   ...ITENS_CUSTOM.map((i): ItemLoja => ({ ...i, preco: 0, naLoja: false })),
   ...TICKETS.map((t): ItemLoja => ({ id: t.id, nome: t.nome, categoria: 'tickets', descricao: t.descricao, preco: 0, naLoja: false, sprite: 'eon-ticket' })),
+  // Chave Temporal: abre como um ticket (aba Tickets da bolsa)
+  { id: CHAVE_TEMPORAL.id, nome: CHAVE_TEMPORAL.nome, categoria: 'tickets', descricao: CHAVE_TEMPORAL.descricao, preco: 0, naLoja: false, sprite: 'secret-key' },
   ...OVOS.map((o): ItemLoja => ({ id: o.id, nome: o.nome, categoria: 'ovos', descricao: o.descricao, preco: 0, naLoja: false })),
 ];
 /** O que a loja vende. */

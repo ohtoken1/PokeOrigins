@@ -8,6 +8,7 @@ import { pokemonPorId } from './dados';
 import type { Aparencia } from './personagem/lpc';
 import type { EstadoPasse } from '../../shared/passe';
 import type { Viagem } from '../../shared/viagem';
+import type { EstadoQuadro } from '../../shared/missoesQuadro';
 import { api, ErroApi } from './conta';
 
 export type PokemonDoJogador = PokemonIndividual & {
@@ -26,6 +27,8 @@ export interface Save {
   silver: number;
   /** Moeda paga (futuramente comprada; por enquanto o Admin dá). Começa em 0. */
   gold: number;
+  /** Fragmentos Temporais: moeda da loja do Viajante do tempo (por enquanto o Admin dá). */
+  fragmentos?: number;
   passos: number;
   /** XP total do treinador (o nível sai de shared/treinador.ts). */
   xpTreinador: number;
@@ -51,6 +54,10 @@ export interface Save {
   skinBonus?: string | null;
   /** Viagem de trem em andamento (shared/viagem.ts); quem cria e encerra é o servidor. */
   viagem?: Viagem | null;
+  /** Shiny Charm usado: quando o bônus acaba (ms; shared/campo.ts). */
+  shinyCharmAte?: number | null;
+  /** Quadro de missões da cidade: as que já foram feitas (client/src/missoesQuadro.ts). */
+  missoesQuadro?: EstadoQuadro;
   /** Insígnias conquistadas (ids dos líderes de ginásio, shared/ginasios.ts). */
   insignias?: string[];
   /** VIP: data/hora (ms) em que acaba (shared/vip.ts). PRÉ-SISTEMA: no MMO fica na conta. */
@@ -72,6 +79,8 @@ export interface Estatisticas {
   capturasLendarios: number;
   /** Total de medalhas de torneio (soma de ouro, prata e bronze). */
   medalhas: number;
+  /** Missões concluídas no Quadro de missões da cidade. */
+  missoesQuadro?: number;
   medalhasOuro?: number;
   medalhasPrata?: number;
   medalhasBronze?: number;

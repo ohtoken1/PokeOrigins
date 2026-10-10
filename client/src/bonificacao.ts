@@ -3,6 +3,7 @@ import { BONIFICACAO_PADRAO, valorBonus, type Bonificacao, type ChaveBonus } fro
 import type { AjustesEncontro } from '../../shared/encontros';
 import { bonusVip, vipAtivo } from '../../shared/vip';
 import { bonusAtivoDaSkin } from '../../shared/skins';
+import { MULT_SHINY_CHARM, shinyCharmAtivo } from '../../shared/campo';
 import { carregarSave } from './estado';
 import { conta } from './conta';
 
@@ -32,7 +33,7 @@ export type AlvoChance = 'shiny' | 'lendario' | 'inicial';
 /** Uma fonte de bônus nas chances de encontro (aparece como selo na Pokédex). */
 export interface FonteBonus {
   /** classe do selo: bonificacao, vip, skin… */
-  id: 'bonificacao' | 'vip' | 'skin';
+  id: 'bonificacao' | 'vip' | 'skin' | 'charm';
   nome: string;
   alvo: AlvoChance;
   /** multiplicador (1,2 = +20%) */
@@ -61,6 +62,8 @@ export function fontesDeBonus(): FonteBonus[] {
     fontes.push({ id: 'skin', nome: 'Skin', alvo: 'lendario', mult: 1 + skins.raros });
     fontes.push({ id: 'skin', nome: 'Skin', alvo: 'inicial', mult: 1 + skins.raros });
   }
+  // Shiny Charm usado (vale por 1 hora)
+  if (save && shinyCharmAtivo(save)) fontes.push({ id: 'charm', nome: 'Shiny Charm', alvo: 'shiny', mult: MULT_SHINY_CHARM });
   return fontes.filter((f) => f.mult !== 1);
 }
 

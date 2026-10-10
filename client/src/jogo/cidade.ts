@@ -38,6 +38,8 @@ export interface Peca {
   solidas?: number;
   /** nome mostrado em cima do objeto */
   rotulo?: string;
+  /** a placa do nome fica no meio da peça, não em cima (peças altas, como a Arena: em cima ela some da tela) */
+  rotuloNoMeio?: boolean;
   /** clicar no nome faz algo (telas/cidade.ts): 'centro', 'loja', 'banco', 'estacao', 'arena'… */
   acao?: string;
   /** fica no alto (bandeirolas): sempre por cima do jogador */
@@ -56,7 +58,7 @@ export const PECAS: Record<string, Peca> = {
   pokemarket: { w: RECORTE_MART.w, h: RECORTE_MART.h, desenhar: (f) => [desenharMart(f.predios)], porta: { x: 64, w: 16, largo: true }, rotulo: 'Pokémarket', acao: 'loja' },
   banco: { folha: 'predios', x: 112, y: 0, w: 112, h: 80, porta: { x: 47, w: 18 }, rotulo: 'Banco', acao: 'banco' },
   estacao: { folha: 'predios', x: 0, y: 0, w: 112, h: 80, porta: { x: 47, w: 18 }, rotulo: 'Estação de trem', acao: 'estacao' },
-  arena: { ...TAM_ARENA, desenhar: () => Array.from({ length: QUADROS_ARENA }, (_, i) => desenharArena(i)), solidas: 10, porta: { x: 112, w: 32 }, rotulo: 'Arena', acao: 'arena' },
+  arena: { ...TAM_ARENA, desenhar: () => Array.from({ length: QUADROS_ARENA }, (_, i) => desenharArena(i)), solidas: 10, porta: { x: 112, w: 32 }, rotulo: 'Arena', rotuloNoMeio: true, acao: 'arena' },
   fonte: {
     ...TAM_FONTE,
     desenhar: (f) => {
@@ -119,6 +121,14 @@ export const ALTURA_CIDADE = 109;
 /** Aparência do NPC dos golpes (Move Reminder / Move Tutor). */
 const APARENCIA_PROFESSOR = { ...APARENCIA_PADRAO, pele: 'bronze', cabelo: 'messy1', corCabelo: 'white', camiseta: 'purple', calca: 'black', tenis: 'brown', estampa: 'nenhuma' as const, cinto: false };
 /** Move Tutor: o "espelho" do Move Reminder, com as cores trocadas. */
+/** Viajante do tempo: cabelo azul, roupa escura. */
+const APARENCIA_VIAJANTE = { ...APARENCIA_PADRAO, pele: 'light', cabelo: 'messy1', corCabelo: 'blue', camiseta: 'navy', calca: 'black', tenis: 'gray', estampa: 'nenhuma' as const, cinto: false };
+/** Guildas: mestre de guilda, de vermelho. */
+const APARENCIA_GUILDAS = { ...APARENCIA_PADRAO, pele: 'amber', cabelo: 'messy1', corCabelo: 'ginger', camiseta: 'maroon', calca: 'brown', tenis: 'black', estampa: 'nenhuma' as const, cinto: true };
+/** Evento sazonal: roupa festiva, cabelo rosa. */
+const APARENCIA_SAZONAL = { ...APARENCIA_PADRAO, corpo: 'fem' as const, pele: 'light', cabelo: 'ponytail', corCabelo: 'pink', camiseta: 'yellow', calca: 'orange', tenis: 'white', estampa: 'nenhuma' as const, cinto: false };
+/** Mercado negro: todo de preto. */
+const APARENCIA_MERCADO_NEGRO = { ...APARENCIA_PADRAO, pele: 'taupe', cabelo: 'messy1', corCabelo: 'black', camiseta: 'black', calca: 'black', tenis: 'black', estampa: 'nenhuma' as const, cinto: false };
 const APARENCIA_TUTOR = { ...APARENCIA_PROFESSOR, corpo: 'fem' as const, pele: 'light', cabelo: 'ponytail', corCabelo: 'dark_brown', camiseta: 'teal', calca: 'navy' };
 
 /** Árvores do core_outdoor_nature (tile do canto de cima, 2 × 3): redondas, pinheiros, outono. */
@@ -330,13 +340,13 @@ export function gerarMapaCidade(): Mapa {
     const trechos: [number, number][] = aberto ? [[x0, aberto[0] - 1], [aberto[1] + 1, x1]] : [[x0, x1]];
     for (const [a, b] of trechos) if (b >= a) colocar(`cerca${tipo}${b - a + 1}`, (a + b + 1) / 2, linha + 1);
   };
-  /** casa com quintal: cerca branca na frente (portão na trilha), caixa de correio e arbusto florido */
-  const casa = (peca: string, centro: number, base: number) => {
+  /** casa com quintal: cerca branca na frente (portão na trilha), caixa de correio e arbusto florido; devolve as colunas da porta */
+  const casa = (peca: string, centro: number, base: number): [number, number] | null => {
     const { c0, c1 } = colocar(peca, centro, base);
     const porta = ultimaPorta as [number, number] | null;
-    if (!porta) return;
+    if (!porta) return null;
     const linhaCerca = base + 1;
-    if (terreno[linhaCerca]?.[c0] !== 'chao') return;
+    if (terreno[linhaCerca]?.[c0] !== 'chao') return porta;
     // a cerca passa 1 tile do lado de fora (emenda com a da casa vizinha); do outro lado do eixo, tudo espelhado
     const arbusto = `arbusto${Math.floor(hash2(c0, base, 5) * ARBUSTOS.length)}`;
     if (centro < eixo) {
@@ -350,6 +360,7 @@ export function gerarMapaCidade(): Mapa {
       cerca('Branca', porta[1] + 1, c1, linhaCerca);
       colocar(arbusto, porta[1] + 1.5, base + 1);
     }
+    return porta;
   };
 
   // estação no norte, recuada da avenida, com bancos na plataforma
@@ -397,10 +408,12 @@ export function gerarMapaCidade(): Mapa {
     if (terreno[y][x] === 'chao' && !bloqueado[y][x]) colocarPar(`arbusto${k}`, x + 0.5, y + 1);
   // sul da praça: sobrados recuados da avenida do anel
   const baseSul = anel.y1 - RUA - 2;
-  casa('sobradoClaro', eixo - 15, baseSul);
-  casa('sobradoVermelho', eixo - 9, baseSul);
-  casa('sobradoCinza', espelho(eixo - 9), baseSul);
-  casa('sobradoClaro', espelho(eixo - 15), baseSul);
+  // casas dos NPCs (pedido do dono: cada um mora numa casa, que vai ganhar um visual próprio depois)
+  const portaSazonal = casa('sobradoClaro', eixo - 15, baseSul);
+  const portaGuildas = casa('sobradoVermelho', eixo - 9, baseSul);
+  // casa do Viajante do tempo (pedido do dono: o NPC mora numa casa; ela vai ganhar um visual próprio depois)
+  const portaViajante = casa('sobradoCinza', espelho(eixo - 9), baseSul);
+  const portaMercadoNegro = casa('sobradoClaro', espelho(eixo - 15), baseSul);
   // quadras do sul: casas em fileira e café/casas na ruela
   const casasSul: [string, string, number][] = [['casaMadeira', 'casaMadeira', anel.x0 + 9.5], ['casaVermelha', 'casaVermelha', anel.x0 + 15.5], ['casaVinho', 'casaMadeira2', anel.x0 + 21.5]];
   for (const [a, b, x] of casasSul) {
@@ -446,6 +459,12 @@ export function gerarMapaCidade(): Mapa {
   const npcs: NpcMapa[] = [
     { x: Math.floor(oeste) - 3, y: 38, nome: 'Move Reminder', aparencia: APARENCIA_PROFESSOR, acao: 'reminder' },
     { x: Math.floor(oeste) + 3, y: 38, nome: 'Move Tutor', aparencia: APARENCIA_TUTOR, acao: 'tutor' },
+    // Viajante do tempo: no quintal da casa dele, ao lado da porta (loja de cubos, paga em Fragmentos Temporais)
+    { x: (portaViajante?.[0] ?? cx + 10) - 1, y: baseSul, nome: 'Viajante do tempo', aparencia: APARENCIA_VIAJANTE, acao: 'viajante' },
+    // sem função por enquanto ("em breve"). Casas do lado oeste: o NPC fica à direita da porta (o arbusto está à esquerda)
+    { x: (portaGuildas?.[1] ?? cx - 9) + 1, y: baseSul, nome: 'Guildas', aparencia: APARENCIA_GUILDAS, acao: 'guildas' },
+    { x: (portaSazonal?.[1] ?? cx - 15) + 1, y: baseSul, nome: 'Evento sazonal', aparencia: APARENCIA_SAZONAL, acao: 'sazonal' },
+    { x: (portaMercadoNegro?.[0] ?? cx + 16) - 1, y: baseSul, nome: 'Mercado negro', aparencia: APARENCIA_MERCADO_NEGRO, acao: 'mercadonegro' },
   ];
   for (const n of npcs) {
     bloqueado[n.y][n.x] = true;

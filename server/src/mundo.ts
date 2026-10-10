@@ -191,7 +191,7 @@ function falar(c: Conexao, canal: unknown, bruto: unknown): void {
   const texto = limparTexto(bruto);
   if (!texto) return;
   const cla = canal === 'cla' ? banco.claDaConta(c.conta!.id) : undefined;
-  if (canal === 'cla' && !cla) return erro('Você ainda não está em um clã.');
+  if (canal === 'cla' && !cla) return erro('Você ainda não está em uma guilda.');
   if (canal === 'local' && !c.sala) return erro('Entre num mapa para falar no chat local.');
   const agora = Date.now();
   c.chats = c.chats.filter((t) => agora - t < CHAT_JANELA_MS);

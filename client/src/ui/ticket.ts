@@ -2,6 +2,7 @@
 // raridade (branco comum, azul raro, roxo épico, laranja lendário), que para no prêmio sorteado.
 import {
   abrirTicket,
+  CHAVE_TEMPORAL,
   chancesDasRaridades,
   ticketPorId,
   type LinhaPremio,
@@ -21,7 +22,7 @@ import { iconeItem } from './iconeItem';
 import { areaRoletas, botoesQuantidade } from './abrirVarios';
 
 /** Ordem para escolher em qual prêmio a roleta para quando abre vários (o mais raro). */
-const PESO_RARIDADE: Record<Raridade, number> = { comum: 0, raro: 1, epico: 2, lendario: 3, mitico: 4 };
+const PESO_RARIDADE: Record<Raridade, number> = { comum: 0, raro: 1, epico: 2, passado: 2, futuro: 2, lendario: 3, mitico: 4 };
 
 const numero = (n: number) => n.toLocaleString('pt-BR');
 const porcentagem = (c: number) => `${numero(Math.round(c * 10000) / 100)}%`;
@@ -99,6 +100,8 @@ const ENFEITE: [Raridade, number][] = [
   ['comum', 0.5],
   ['raro', 0.28],
   ['epico', 0.15],
+  ['passado', 0.45],
+  ['futuro', 0.45],
   ['lendario', 0.05],
   ['mitico', 0.02],
 ];
@@ -107,6 +110,8 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
   const ticket = ticketPorId(ticketId);
   if (!ticket) return;
   let girando = false;
+  const ehChave = ticketId === CHAVE_TEMPORAL.id;
+  const verbo = ehChave ? 'Usar' : 'Abrir';
   const linhasDe = (r: Raridade) => ticket.premios.filter((l) => l.raridade === r);
   const possiveis = ENFEITE.filter(([r]) => linhasDe(r).length);
   const enfeite = (): [Premio[], Raridade] => {
@@ -151,16 +156,16 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
         roletas.girar(todos.map((x) => casaRoleta(x.pacote, x.raridade)), 5000, () => {
           const nome = raridades.find((x) => x.id === r.raridade)?.nome ?? '';
           resultado.replaceChildren(
-            el('p', { class: 'ticket-raridade' }, bolinha(r.raridade), n > 1 ? `${n} tickets abertos · o melhor: ${nome}!` : `${nome}!`),
+            el('p', { class: 'ticket-raridade' }, bolinha(r.raridade), n > 1 ? `${n} ${ehChave ? 'chaves usadas' : 'tickets abertos'} · o melhor: ${nome}!` : `${nome}!`),
             el('div', { class: 'premios' }, ...todos.flatMap((x) => x.pacote.map((p, k) => cartaoPremio(p, x.shiny[k], x.raridade)))),
             el('div', { class: 'frases-premio' }, ...frases.map((f) => el('small', {}, f))),
           );
           girando = false;
-          botoes = botoesQuantidade('Abrir', save.itens[ticketId] ?? 0, abrirVarios);
+          botoes = botoesQuantidade(verbo, save.itens[ticketId] ?? 0, abrirVarios);
           areaBotoes.replaceChildren(botoes.raiz);
         });
       };
-      let botoes = botoesQuantidade('Abrir', qtd, abrirVarios);
+      let botoes = botoesQuantidade(verbo, qtd, abrirVarios);
       const areaBotoes = el('div', {}, botoes.raiz);
 
       // prêmios possíveis: fechado; dentro, uma setinha por raridade, cada prêmio com a sua chance

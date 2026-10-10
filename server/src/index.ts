@@ -12,6 +12,7 @@ import * as cla from './cla.ts';
 import * as cambio from './cambio.ts';
 import * as anuncios from './anuncios.ts';
 import * as viagem from './viagem.ts';
+import * as ranking from './ranking.ts';
 import { estaOnline, ligarMundo } from './mundo.ts';
 
 const PORTA = Number(process.env.PORT ?? 3001);
@@ -214,6 +215,12 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   }
   const rotaAnuncio = caminho.match(/^\/api\/anuncios\/(\d{1,9})$/);
   if (rotaAnuncio && metodo === 'DELETE') return responder(res, 200, anuncios.apagar(exigirConta(req), Number(rotaAnuncio[1])));
+
+  // ---- ranking com todos os jogadores (server/src/ranking.ts) ----
+  if (caminho === '/api/ranking' && metodo === 'GET') {
+    exigirConta(req);
+    return responder(res, 200, ranking.listar());
+  }
 
   // ---- outros jogadores: busca e perfil público ----
   if (caminho === '/api/jogadores' && metodo === 'GET') {

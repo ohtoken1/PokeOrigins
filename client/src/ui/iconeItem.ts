@@ -40,10 +40,16 @@ export function iconeOvo(tier: string): HTMLElement {
   return caixa;
 }
 
-export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 'sprite' | 'imagem'> & { skin?: ItemLoja['skin'] }): HTMLElement {
+/** Ícone de cubo: o Pokémon dentro de um cubo (âmbar = passado, ciano = futuro, laranja = lendário). */
+export function iconeCubo(especie: number, era: string): HTMLElement {
+  return el('div', { class: `icone-cubo cubo-${era}` }, spritePokemon(pokemonPorId(especie), { animado: false }));
+}
+
+export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 'sprite' | 'imagem'> & { skin?: ItemLoja['skin']; cubo?: ItemLoja['cubo'] }): HTMLElement {
   const reserva = () => el('div', { class: `icone-item ${item.id} cat-${item.categoria}` });
   if (item.categoria === 'ovos') return iconeOvo(ovoPorId(item.id)?.letra ?? 'A');
   if (item.skin) return iconeSkin(item.skin.especie, item.skin.shiny);
+  if (item.cubo) return iconeCubo(item.cubo.especie, item.cubo.era);
   if (item.imagem) {
     const img = el('img', { class: 'icone-png icone-imagem', src: item.imagem, alt: '', loading: 'lazy', referrerpolicy: 'no-referrer' });
     img.addEventListener('error', () => img.replaceWith(reserva()), { once: true });

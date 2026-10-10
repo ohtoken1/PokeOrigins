@@ -1,7 +1,7 @@
 import { adicionarVip, tempoRestanteVip, vipAtivo } from '../../../shared/vip';
 import { numeroNaDex } from '../../../shared/formasRegionais';
 import { TODOS_OS_ITENS } from '../../../shared/loja';
-import { TICKETS } from '../../../shared/tickets';
+import { CHAVE_TEMPORAL, TICKETS } from '../../../shared/tickets';
 import { OVOS } from '../../../shared/ovos';
 // Painel de administrador (aba na esquerda) para testar encontros: shiny, lendários, chance por passo,
 // Pokémon e nível forçados. Provisório: sem login; os ajustes ficam só neste navegador.
@@ -143,6 +143,18 @@ function conteudo(): HTMLElement[] {
       });
       return campo(`${moeda === 'gold' ? 'Gold' : 'Silver'} (tem ${save ? save[moeda].toLocaleString('pt-BR') : 0})`, el('div', { class: 'admin-linha' }, campoQtd, dar));
     }),
+    (() => {
+      const campoQtd = el('input', { type: 'number', min: 1, value: 10, disabled: !save }) as HTMLInputElement;
+      const dar = el('button', { class: 'botao secundario', disabled: !save }, 'Adicionar') as HTMLButtonElement;
+      dar.addEventListener('click', () => {
+        const atual = carregarSave();
+        if (!atual) return;
+        atual.fragmentos = Math.max(0, (atual.fragmentos ?? 0) + Math.round(Number(campoQtd.value) || 0));
+        salvar(atual);
+        aoMudarSave?.();
+      });
+      return campo(`Fragmentos Temporais (tem ${(save?.fragmentos ?? 0).toLocaleString('pt-BR')})`, el('div', { class: 'admin-linha' }, campoQtd, dar));
+    })(),
     el('h4', {}, 'Itens'),
     (() => {
       // qualquer item do jogo (inclusive os de fora da loja: Plates, Z-Crystals, Tera Shards, Berries…)
@@ -195,7 +207,7 @@ function conteudo(): HTMLElement[] {
     ),
     el('small', { class: 'meta' }, save && vipAtivo(save) ? `VIP ativo, acaba em ${tempoRestanteVip(save)}` : 'Sem VIP'),
     el('h4', {}, 'Tickets e ovos'),
-    ...TICKETS.map((t) =>
+    ...[...TICKETS, CHAVE_TEMPORAL].map((t) =>
       el(
         'button',
         {

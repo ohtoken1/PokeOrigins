@@ -13,6 +13,8 @@ import { abrirBanco } from '../ui/banco';
 import { abrirMural } from '../ui/mural';
 import { abrirEstacao } from '../ui/trem';
 import { abrirArena } from '../ui/arena';
+import { abrirQuadroDeMissoes } from '../ui/quadroMissoes';
+import { abrirLojaTemporal } from '../ui/lojaTemporal';
 import { viagemAtual } from '../viagem';
 import { REGIOES } from '../../../shared/regioes';
 import { abrirProfessores } from './golpes';
@@ -21,9 +23,11 @@ import { abrirMenuJogador } from '../ui/menuJogador';
 import { montarChat } from '../ui/chat';
 import { el } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
-import { botoesMenus } from '../ui/menus';
 import { painelTime } from '../ui/time';
 import { APARENCIA_PADRAO, montarPersonagem } from '../personagem/lpc';
+
+/** NPCs que ainda não têm função. */
+const EM_BREVE: Record<string, string> = { sazonal: 'Evento sazonal', mercadonegro: 'Mercado negro' };
 
 export const telaCidade: Tela = (raiz, navegar) => {
   const save = carregarSave();
@@ -49,8 +53,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
     el('main', { class: 'tela tela-bioma tela-cidade' },
       el('header', { class: 'barra' },
         el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'inicio' }) }, '← Voltar'),
-        el('h1', {}, 'Cidade', el('small', {}, ' · cidade inicial')),
-        ...botoesMenus(save, () => atualizarTime(), true),
+        el('h1', {}, 'Cidade'),
       ),
       el('div', { class: 'layout-bioma' },
         el('section', {}, areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. Aqui não aparecem Pokémon selvagens. Clique no nome de um lugar que está na tela para usar na hora, ou no minimapa para o seu personagem andar até lá: Centro Pokémon, Pokémarket, Banco, Mural de anúncios, Move Reminder, Move Tutor… Na estação de trem você viaja para outra região; a saída do sul leva aos mapas.')),
@@ -125,7 +128,10 @@ export const telaCidade: Tela = (raiz, navegar) => {
     else if (acao === 'arena') abrirArena(navegar);
     else if (acao === 'banco') abrirBanco(save!, () => atualizarTime());
     else if (acao === 'mural') abrirMural();
-    else avisar('Quadro de missões: em breve.');
+    else if (acao === 'guildas') navegar({ tela: 'comunidade', secao: 'cla' });
+    else if (acao === 'viajante') abrirLojaTemporal(save!, () => atualizarTime());
+    else if (acao === 'missoes') abrirQuadroDeMissoes(save!, () => atualizarTime());
+    else avisar(`${EM_BREVE[acao] ?? 'Este lugar'}: em breve.`);
   }
   const minimapa = montarMinimapa(areaJogo, () => cena(), irAoLocal);
 
