@@ -4,15 +4,18 @@
 import { Dex } from '@pkmn/sim';
 import { ITENS } from './itens';
 import { TIPOS_TERA } from './tera';
-import { idSkin } from './itensCustom';
+import { cubosDaEra, idSkin } from './itensCustom';
 
-export type Raridade = 'comum' | 'raro' | 'epico' | 'lendario' | 'mitico';
+export type Raridade = 'comum' | 'raro' | 'epico' | 'passado' | 'futuro' | 'lendario' | 'mitico';
 
 /** Nomes e ordem das raridades (as chances vêm de cada ticket). */
 export const RARIDADES: { id: Raridade; nome: string }[] = [
   { id: 'comum', nome: 'Comum' },
   { id: 'raro', nome: 'Raro' },
   { id: 'epico', nome: 'Épico' },
+  // só na Chave Temporal
+  { id: 'passado', nome: 'Passado' },
+  { id: 'futuro', nome: 'Futuro' },
   { id: 'lendario', nome: 'Lendário' },
   { id: 'mitico', nome: 'Mítico' },
 ];
@@ -118,8 +121,25 @@ export const TICKETS: Ticket[] = [
     pokemon(1017), item('tealmask'), item('hearthflamemask'), item('wellspringmask'), item('cornerstonemask')),
 ];
 
+/**
+ * Chave Temporal (pedido do dono): funciona como um ticket, mas só dá cubos (shared/itensCustom.ts). Passado 49,5%,
+ * Futuro 49,5% e Lendário 1% (Koraidon e Miraidon); dentro de cada grupo, todos com a mesma chance.
+ * Fica fora de TICKETS para não cair nas batalhas (sortearTicketDaBatalha).
+ */
+export const CHANCES_CHAVE_TEMPORAL = { passado: 0.495, futuro: 0.495, lendario: 0.01 } as const;
+const cubos = (era: keyof typeof CHANCES_CHAVE_TEMPORAL): LinhaPremio[] => {
+  const ids = cubosDaEra(era);
+  return ids.map((id) => linha(era, CHANCES_CHAVE_TEMPORAL[era] / ids.length, item(id)));
+};
+export const CHAVE_TEMPORAL: Ticket = {
+  id: 'chave-temporal',
+  nome: 'Chave Temporal',
+  descricao: 'Use para abrir uma fenda no tempo e receber o cubo de um Pokémon do passado, do futuro ou, com muita sorte, de Koraidon ou Miraidon.',
+  premios: [...cubos('passado'), ...cubos('futuro'), ...cubos('lendario')],
+};
+
 export function ticketPorId(id: string): Ticket | undefined {
-  return TICKETS.find((t) => t.id === id);
+  return id === CHAVE_TEMPORAL.id ? CHAVE_TEMPORAL : TICKETS.find((t) => t.id === id);
 }
 
 /** Chance total de cada raridade num ticket (soma das linhas). */

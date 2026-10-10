@@ -2025,3 +2025,46 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .arena-opcao:hover:not(:disabled) { border-color: var(--destaque); background: rgb(27 47 74 / 0.9); }
 .arena-opcao:disabled { opacity: 0.55; cursor: not-allowed; }
 @media (max-width: 520px) { .arena-opcoes { grid-template-columns: 1fr; } }
+
+/* Cubos (Pokémon do passado e do futuro) e Chave Temporal */
+.icone-cubo { width: 32px; height: 32px; border-radius: 6px; display: grid; place-items: center; overflow: hidden; background: linear-gradient(135deg, #4a2f10, #8a5a1e); box-shadow: inset 0 0 0 2px #e0a84a, inset 0 0 0 3px rgb(0 0 0 / 0.35); }
+.icone-cubo.cubo-futuro { background: linear-gradient(135deg, #0d3550, #1c7c9c); box-shadow: inset 0 0 0 2px #6fe3ff, inset 0 0 0 3px rgb(0 0 0 / 0.35); }
+.icone-cubo.cubo-lendario { background: linear-gradient(135deg, #5a2a00, #c8641a); box-shadow: inset 0 0 0 2px #ffd27a, inset 0 0 0 3px rgb(0 0 0 / 0.35); }
+.icone-cubo .sprite { width: 40px; height: 40px; max-width: none; }
+.fundo-passado { background: #b9792c; color: #fff; }
+.fundo-futuro { background: #1f9bc0; color: #fff; }
+
+/* Loja do Viajante do tempo (ui/lojaTemporal.ts): moeda = Fragmento Temporal */
+.icone-fragmento { display: inline-block; width: 20px; height: 20px; vertical-align: -4px; flex: none; }
+.loja-temporal .topo-loja { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.loja-temporal .saldo { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.loja-temporal .preco { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.loja-temporal .linha-item.falta-origem .texto p { color: var(--texto-2); }
+.loja-temporal .origem { color: var(--destaque); font-size: 0.8rem; }
+
+/* Quadro de missões da cidade (ui/quadroMissoes.ts) */
+.janela.janela-missoes { width: min(760px, 96vw); }
+.quadro-missoes { display: flex; flex-direction: column; gap: 12px; }
+.quadro-missoes .meta { margin: 0; }
+.grade-missoes { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 10px; }
+.missao-quadro { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 8px; border-radius: 6px; background: #f3e6c4; color: #3a2a12; border: 3px solid #8a6a3a; box-shadow: 0 3px 0 #5a4322, 0 6px 12px rgb(0 0 0 / 0.35); text-align: center; }
+.missao-foto { position: relative; width: 84px; height: 84px; display: grid; place-items: center; border-radius: 4px; background: #fffaf0; border: 2px solid #c9a86a; }
+.missao-foto .sprite { max-width: 80px; max-height: 80px; }
+.missao-foto .selo-tier { position: absolute; right: -8px; top: -8px; }
+.missao-quadro ul { list-style: none; margin: 0; padding: 0; width: 100%; display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem; font-weight: 700; }
+.missao-quadro li { display: flex; justify-content: space-between; gap: 6px; padding: 2px 6px; border-radius: 4px; background: rgb(138 106 58 / 0.14); }
+.missao-quadro li small { font-weight: 600; color: #7a5c2a; }
+.missao-rodape { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.8rem; }
+.missao-rodape small { color: #7a5c2a; font-variant-numeric: tabular-nums; }
+.missao-quadro.feita { filter: saturate(0.5); opacity: 0.8; }
+.missao-feita { color: #1f7a3a; font-weight: 800; }
+
+button.missao-quadro { font: inherit; cursor: pointer; }
+button.missao-quadro:hover:not(:disabled) { border-color: #c98a1a; transform: translateY(-2px); }
+button.missao-quadro:disabled { cursor: default; }
+.missao-tenho { color: #1f7a3a !important; font-weight: 800; }
+.missao-pedido { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin: 0; padding: 10px 14px; border-radius: 12px; background: rgb(27 47 74 / 0.6); border: 1px solid var(--borda); }
+.missao-voltar { align-self: flex-start; }
+.missao-candidatos { max-height: 50vh; overflow-y: auto; }
+
+.selo-bonus.bonus-charm { background: linear-gradient(135deg, #7fe8ff, #2f9fd8); color: #05263a; }

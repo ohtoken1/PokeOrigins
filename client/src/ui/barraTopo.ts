@@ -1,5 +1,6 @@
-// Barra no topo do site: ícone da Pokédex (atalho), Início (o time lado a lado), Jogar (Mapas, Cidade, Continentes, Duelos com treinadores, Ginásios), Golpes,
-// Informações (Opções, Ranking, Database) e Comunidade (Amigos, Clã). Menus com setinha abrem ao clicar.
+// Barra no topo do site: Início (o time lado a lado), Jogar (jogador comum: vai direto para a Cidade; administrador:
+// menu com Mapas, Cidade, Duelos e Ginásios), Minha conta e Comunidade (Buscar jogadores, Amigos, Guilda, Ranking,
+// Database). Cada item tem um iconezinho. Menus com setinha abrem ao clicar.
 import { ehAdministrador } from '../bonificacao';
 import { aoMudarAjustesSom, ajustesSom, mudarAjustesSom } from '../sons';
 import { SECOES_ADMINISTRACAO } from '../telas/administracao';
@@ -19,47 +20,40 @@ const ABAS: Aba[] = [
   {
     nome: 'Jogar',
     menu: true,
-    telas: ['inicial', 'regiao', 'bioma', 'personagem', 'cidade', 'continentes', 'duelos', 'ginasios'],
+    telas: ['inicial', 'regiao', 'bioma', 'personagem', 'cidade', 'duelos', 'ginasios'],
     itens: [
       // jogadores chegam aos mapas pela saída do sul da cidade (pedido do dono); o atalho fica só para administradores
-      { nome: 'Mapas', soAdmin: true, destino: () => (carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' }) },
-      { nome: 'Cidade', destino: () => (carregarSave() ? { tela: 'cidade' } : { tela: 'inicial' }) },
-      { nome: 'Continentes', destino: () => ({ tela: 'comunidade', secao: 'continentes' }), emBreve: true },
+      { nome: '🗺️ Mapas', soAdmin: true, destino: () => (carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' }) },
+      { nome: '🏙️ Cidade', destino: () => (carregarSave() ? { tela: 'cidade' } : { tela: 'inicial' }) },
       // tudo de duelos fica na Arena da cidade (pedido do dono); os atalhos ficam só para administradores
-      { nome: 'Duelos com treinadores', soAdmin: true, destino: () => ({ tela: 'duelos' }) },
-      { nome: 'Ginásios', soAdmin: true, destino: () => ({ tela: 'ginasios' }) },
+      { nome: '⚔️ Duelos com treinadores', soAdmin: true, destino: () => ({ tela: 'duelos' }) },
+      { nome: '🏅 Ginásios', soAdmin: true, destino: () => ({ tela: 'ginasios' }) },
     ],
   },
-  // Golpes saiu da barra (pedido do dono): os professores ficam na cidade (Move Reminder / Move Tutor)
-  {
-    nome: 'Informações',
-    menu: true,
-    telas: ['ranking', 'database'],
-    itens: [
-      { nome: 'Ranking', destino: () => ({ tela: 'ranking' }) },
-      { nome: 'Database', destino: () => ({ tela: 'database' }) },
-    ],
-  },
+  // Golpes saiu da barra (pedido do dono): os professores ficam na cidade (Move Reminder / Move Tutor).
+  // A aba Informações também saiu: Ranking e Database ficam em Comunidade.
   {
     nome: 'Minha conta',
     menu: true,
     telas: ['conta-perfil', 'conta-achievements', 'conta-skins', 'opcoes'],
     itens: [
-      { nome: 'Meu perfil', destino: () => ({ tela: 'conta', secao: 'perfil' }) },
-      { nome: 'Achievements', destino: () => ({ tela: 'conta', secao: 'achievements' }) },
-      { nome: 'Minhas skins', destino: () => ({ tela: 'conta', secao: 'skins' }) },
-      { nome: 'Opções', destino: () => ({ tela: 'opcoes' }) },
-      { nome: 'Sair da conta', destino: () => ({ tela: 'inicio' }), acao: () => void sairDaConta() },
+      { nome: '🧑 Meu perfil', destino: () => ({ tela: 'conta', secao: 'perfil' }) },
+      { nome: '🏆 Achievements', destino: () => ({ tela: 'conta', secao: 'achievements' }) },
+      { nome: '🎨 Minhas skins', destino: () => ({ tela: 'conta', secao: 'skins' }) },
+      { nome: '⚙️ Opções', destino: () => ({ tela: 'opcoes' }) },
+      { nome: '🚪 Sair da conta', destino: () => ({ tela: 'inicio' }), acao: () => void sairDaConta() },
     ],
   },
   {
     nome: 'Comunidade',
     menu: true,
-    telas: ['amigos', 'cla', 'jogadores'],
+    telas: ['amigos', 'cla', 'jogadores', 'ranking', 'database'],
     itens: [
-      { nome: 'Buscar jogadores', destino: () => ({ tela: 'jogadores' }) },
+      { nome: '🔎 Buscar jogadores', destino: () => ({ tela: 'jogadores' }) },
       { nome: '👥 Amigos', destino: () => ({ tela: 'comunidade', secao: 'amigos' }) },
-      { nome: '🛡️ Clã', destino: () => ({ tela: 'comunidade', secao: 'cla' }) },
+      { nome: '🛡️ Guilda', destino: () => ({ tela: 'comunidade', secao: 'cla' }) },
+      { nome: '📊 Ranking', destino: () => ({ tela: 'ranking' }) },
+      { nome: '📚 Database', destino: () => ({ tela: 'database' }) },
     ],
   },
   {
@@ -135,12 +129,14 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
   // Administração só aparece para contas de administrador
   const abas = ABAS.filter((a) => !a.soAdmin || ehAdministrador());
   const botoes = abas.map((aba) => {
-    if (!aba.menu) {
-      const b = el('button', { class: 'aba-topo', onclick: () => navegar(aba.itens[0].destino()) }, aba.nome);
+    const itens = aba.itens.filter((item) => !item.soAdmin || ehAdministrador());
+    // sem menu, ou com um item só (Jogar para o jogador comum = só a Cidade): o botão leva direto
+    if (!aba.menu || itens.length === 1) {
+      const b = el('button', { class: 'aba-topo', onclick: () => (fecharTodos(), itens[0].acao ? itens[0].acao() : navegar(itens[0].destino())) }, aba.nome);
       return { botao: b, raiz: b };
     }
     const menu = el('div', { class: 'menu-topo', hidden: true },
-      ...aba.itens.filter((item) => !item.soAdmin || ehAdministrador()).map((item) => el('button', { onclick: () => (fecharTodos(), item.acao ? item.acao() : navegar(item.destino())) }, item.nome, item.emBreve ? el('small', {}, 'em breve') : null)));
+      ...itens.map((item) => el('button', { onclick: () => (fecharTodos(), item.acao ? item.acao() : navegar(item.destino())) }, item.nome, item.emBreve ? el('small', {}, 'em breve') : null)));
     const botao = el('button', { class: 'aba-topo aba-menu', 'aria-haspopup': 'true' }, aba.nome, el('span', { class: 'setinha' }, '▾'));
     botao.addEventListener('click', (e) => {
       e.stopPropagation();

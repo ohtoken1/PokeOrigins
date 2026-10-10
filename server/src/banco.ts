@@ -121,6 +121,11 @@ const sql = {
   contaPorLogin: db.prepare('SELECT * FROM contas WHERE usuario = ? OR email = ?'),
   contaPorId: db.prepare('SELECT * FROM contas WHERE id = ?'),
   contaPorUsuario: db.prepare('SELECT * FROM contas WHERE usuario = ?'),
+  ranking: db.prepare(`SELECT c.usuario, json_extract(s.dados, '$.aparencia.nome') AS nome, json_extract(s.dados, '$.xpTreinador') AS xp,
+    json_extract(s.dados, '$.estatisticas.capturas') AS capturas, json_extract(s.dados, '$.estatisticas.capturasShiny') AS shiny,
+    json_extract(s.dados, '$.estatisticas.capturasLendarios') AS lendarios, json_extract(s.dados, '$.estatisticas.medalhas') AS medalhas,
+    json_extract(s.dados, '$.estatisticas.missoesQuadro') AS missoes, json_extract(s.dados, '$.silver') AS silver, json_extract(s.dados, '$.gold') AS gold
+    FROM contas c JOIN saves s ON s.conta_id = c.id LIMIT 5000`),
   buscar: db.prepare(`SELECT c.id, c.usuario, json_extract(s.dados, '$.aparencia.nome') AS nome FROM contas c JOIN saves s ON s.conta_id = c.id
     WHERE c.usuario LIKE ? ESCAPE '!' OR json_extract(s.dados, '$.aparencia.nome') LIKE ? ESCAPE '!' ORDER BY c.usuario LIMIT 20`),
   existe: db.prepare('SELECT usuario, email FROM contas WHERE usuario = ? OR email = ?'),
@@ -198,6 +203,8 @@ export function buscarJogadores(termo: string): { id: number; usuario: string; n
   const padrao = `%${t.replace(/[!%_]/g, (c) => `!${c}`)}%`;
   return sql.buscar.all(padrao, padrao) as { id: number; usuario: string; nome: string | null }[];
 }
+/** Os números de cada jogador com save, para o ranking (server/src/ranking.ts). */
+export const linhasDoRanking = () => sql.ranking.all() as Record<'usuario' | 'nome' | 'xp' | 'capturas' | 'shiny' | 'lendarios' | 'medalhas' | 'missoes' | 'silver' | 'gold', unknown>[] as (Record<string, unknown> & { usuario: string })[];
 export const contaPorUsuario = (usuario: string) => sql.contaPorUsuario.get(usuario) as Conta | undefined;
 export const loginEmUso = (usuario: string, email: string) => sql.existe.all(usuario, email) as { usuario: string; email: string }[];
 export const totalDeContas = () => (sql.quantas.get() as { n: number }).n;

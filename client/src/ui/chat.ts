@@ -15,7 +15,7 @@ type Aba = CanalChat | 'amigos';
 const CANAIS: { id: Aba; nome: string }[] = [
   { id: 'local', nome: 'Local' },
   { id: 'global', nome: 'Global' },
-  { id: 'cla', nome: 'Clã' },
+  { id: 'cla', nome: 'Guilda' },
   { id: 'amigos', nome: 'Amigos' },
 ];
 type Linha = MensagemChat | { canal: CanalChat; aviso: string; em: number };
@@ -145,11 +145,11 @@ export function montarChat(): { elemento: HTMLElement; parar: () => void } {
     const linhas = guardadas[canalAberto];
     const semCla = canalAberto === 'cla' && !meuCla();
     lista.replaceChildren(
-      ...(linhas.length ? linhas.map(linha) : [el('p', { class: 'chat-vazio' }, semCla ? 'Você ainda não está em um clã.' : canalAberto === 'cla' ? 'Ninguém do clã falou ainda.' : canalAberto === 'local' ? 'Ninguém falou neste mapa ainda.' : 'Ninguém falou ainda. Diga oi!')]),
+      ...(linhas.length ? linhas.map(linha) : [el('p', { class: 'chat-vazio' }, semCla ? 'Você ainda não está em uma guilda.' : canalAberto === 'cla' ? 'Ninguém da guilda falou ainda.' : canalAberto === 'local' ? 'Ninguém falou neste mapa ainda.' : 'Ninguém falou ainda. Diga oi!')]),
     );
     campo.disabled = semCla;
     enviar.toggleAttribute('disabled', semCla);
-    campo.placeholder = semCla ? 'Entre num clã para usar este chat' : canalAberto === 'cla' ? `Falar com o clã ${meuCla()?.nome ?? ''}…` : canalAberto === 'local' ? 'Falar com quem está neste mapa…' : 'Falar com todos online…';
+    campo.placeholder = semCla ? 'Entre numa guilda para usar este chat' : canalAberto === 'cla' ? `Falar com a guilda ${meuCla()?.nome ?? ''}…` : canalAberto === 'local' ? 'Falar com quem está neste mapa…' : 'Falar com todos online…';
     desenharAbas();
     if (rolarAteOFim || noFim) lista.scrollTop = lista.scrollHeight;
   };

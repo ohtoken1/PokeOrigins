@@ -19,6 +19,10 @@ const MARCADORES: Record<string, { cor: string; letra: string }> = {
   mural: { cor: '#8a6a4a', letra: 'M' },
   missoes: { cor: '#8a6a4a', letra: 'Q' },
   mapas: { cor: '#3f9a4a', letra: 'S' },
+  viajante: { cor: '#2f6fb0', letra: 'V' },
+  guildas: { cor: '#a8323a', letra: 'G' },
+  sazonal: { cor: '#e08a2a', letra: 'E' },
+  mercadonegro: { cor: '#2a2a33', letra: 'N' },
 };
 
 export function montarMinimapa(area: HTMLElement, cena: () => BiomaScene | null, aoClicar: (acao: string) => void): { parar(): void } {

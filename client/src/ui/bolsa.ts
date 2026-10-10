@@ -1,8 +1,11 @@
-import { especie, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { especie, golpesIniciais, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { evoluir, trocarGolpe } from '../../../shared/batalha/progresso';
 import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
-import { ehEquipavel, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
+import { ehEquipavel, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
+import { cuboPorItem } from '../../../shared/itensCustom';
+import { SHINY_CHARM, shinyCharmAtivo, usarShinyCharm } from '../../../shared/campo';
+import { textoDoTempo } from '../../../shared/viagem';
 import { pokemonPorId, todosOsPokemons } from '../dados';
 import { registrarCapturado, salvar, type Save } from '../estado';
 import { abrirJanela } from './janela';
@@ -30,6 +33,7 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
   tm: 'Ensinar',
   tr: 'Ensinar',
   tickets: 'Abrir',
+  cubos: 'Usar',
   ovos: 'Chocar',
 };
 
@@ -79,9 +83,12 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
         if (msg) gastar(item.id);
         return msg ?? 'Não teria efeito.';
       }
+      case 'cubos':
       case 'evolucao': {
-        const para = evolucaoPorItem(p, item.id, existe);
-        if (!para) return `${item.nome} não tem efeito em ${quem}.`;
+        // cubo: transforma o Pokémon de origem na versão do passado/futuro (Volcarona + Cubo de Iron Moth)
+        const cubo = item.categoria === 'cubos' ? cuboPorItem(item.id) : undefined;
+        const para = cubo ? (cubo.origens.includes(p.especieId) && existe(cubo.especie) ? cubo.especie : null) : evolucaoPorItem(p, item.id, existe);
+        if (!para) return cubo ? `${item.nome} só funciona em ${cubo.origens.map((n) => pokemonPorId(n).nome).join(' ou ')}.` : `${item.nome} não tem efeito em ${quem}.`;
         gastar(item.id);
         // troca com item (ex.: Metal Coat): o item equipado é gasto na evolução
         if (item.id === CABO_DE_LIGACAO && especie(para).evoItem) p.item = null;
@@ -89,10 +96,16 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
         const [de, novo] = [pokemonPorId(p.especieId), pokemonPorId(para)];
         const imagem = (d: typeof de) => (p.shiny ? d.sprites.gifShiny ?? d.sprites.frenteShiny : d.sprites.gif ?? d.sprites.frente) ?? '';
         void animarEvolucaoNaTela({ nome: quem, src: imagem(de) }, { nome: novo.nome, src: imagem(novo) });
+        // cubo (pedido do dono): a forma nova esquece os golpes que ela não pode ter (antes de aprender os dela)
+        const esquecidos = cubo ? p.golpes.filter((g) => !especiePodeTerGolpe(para, g.id)).map((g) => nomeGolpe(g.id)) : [];
+        if (cubo) p.golpes = p.golpes.filter((g) => especiePodeTerGolpe(para, g.id));
         const r = evoluir(p, para, (n) => pokemonPorId(n).nome);
+        // nunca fica sem golpe: sem nenhum, recebe os do nível dela
+        if (!p.golpes.length && !r.golpesPendentes.length) p.golpes = golpesIniciais(para, p.nivel);
+        if (esquecidos.length) r.mensagens.unshift(`Esqueceu ${esquecidos.join(', ')} (${pokemonPorId(para).nome} não aprende).`);
         registrarCapturado(save, para);
         for (const golpe of r.golpesPendentes) aprender(p, golpe, () => {}, () => {});
-        return [`${quem} evoluiu para ${pokemonPorId(para).nome}!`, ...r.mensagens].join(' ');
+        return [cubo ? `${quem} atravessou o tempo e virou ${pokemonPorId(para).nome}!` : `${quem} evoluiu para ${pokemonPorId(para).nome}!`, ...r.mensagens].join(' ');
       }
       case 'batalha':
       case 'megapedras':
@@ -233,6 +246,21 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
               iconeItem(item),
               el('div', { class: 'texto' }, el('strong', {}, item.nome), el('p', {}, item.descricao)),
               el('span', { class: 'quantidade' }, `×${qtd}`),
+              // Shiny Charm: usa na conta (como uma poção); travado enquanto o bônus de 1 hora está ativo
+              item.id === SHINY_CHARM &&
+                el('button', {
+                  class: 'botao', disabled: shinyCharmAtivo(save),
+                  title: shinyCharmAtivo(save) ? 'Só um por vez: espere o bônus acabar' : '',
+                  onclick: () => {
+                    const erro = usarShinyCharm(save);
+                    if (!erro) {
+                      salvar(save);
+                      aoMudar();
+                    }
+                    aviso = erro || 'Shiny Charm ativado: +20% de chance de shiny por 1 hora!';
+                    refazer();
+                  },
+                }, shinyCharmAtivo(save) ? `Ativo · ${textoDoTempo((save.shinyCharmAte ?? 0) - Date.now())}` : 'Usar'),
               ACAO[item.categoria] &&
                 el(
                   'button',

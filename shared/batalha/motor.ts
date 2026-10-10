@@ -407,6 +407,8 @@ export class BatalhaSelvagem {
     const A = this.batalha.p1.active[0].getStat('spe');
     const B = this.batalha.p2.active[0].getStat('spe');
     const chance = Math.floor((A * 128) / Math.max(1, B)) + 30 * this.tentativasFuga;
+    // Run Away: fuga garantida (a habilidade do Pokémon em campo)
+    if (this.batalha.p1.active[0].hasAbility('runaway')) return { fugiu: true, eventos: [] };
     if (A >= B || Math.floor(this.aleatorio() * 256) < chance) return { fugiu: true, eventos: [] };
     return { fugiu: false, eventos: this.turnoGratisDoSelvagem() };
   }

@@ -357,7 +357,7 @@ export class BiomaScene extends Phaser.Scene {
       // sombra projetada no chão (embaixo de tudo que está em pé)
       if (!p.semSombra) this.add.image(x, base - p.h, this.sombraDaPeca(o.peca, p, chave, quadro)).setOrigin(0).setDepth(1).setAlpha(0.28);
       const rotulo = o.rotulo ?? p.rotulo;
-      if (rotulo) this.rotulo(rotulo, x + p.w / 2, base - p.h - 2, '#ffe680', o.acao ?? p.acao);
+      if (rotulo) this.rotulo(rotulo, x + p.w / 2, p.rotuloNoMeio ? base - p.h / 2 + 8 : base - p.h - 2, '#ffe680', o.acao ?? p.acao);
     }
     const saida = this.mapa.saida;
     if (saida) this.rotulo('Saída para os mapas', (saida.x + 0.5) * TAM, (saida.y - 2) * TAM, '#b8f0a0', 'mapas');

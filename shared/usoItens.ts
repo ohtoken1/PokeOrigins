@@ -30,6 +30,11 @@ export function podeAprenderPorMaquina(p: PokemonIndividual, golpeId: string): b
   return fontes.some((f) => /^\dM$/.test(f));
 }
 
+/** Se a espécie aprende o golpe de algum jeito (nível, máquina, tutor, ovo…), em qualquer geração. */
+export function especiePodeTerGolpe(especieId: number, golpeId: string): boolean {
+  return !!Dex.species.getLearnsetData(especie(especieId).id).learnset?.[golpeId]?.length;
+}
+
 /** Item que um Pokémon pode segurar na batalha (itens do Showdown). */
 export function ehEquipavel(itemId: string): boolean {
   if (ITENS_DE_SEGURAR_NOSSOS[itemId]) return true;

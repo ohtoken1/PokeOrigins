@@ -1,5 +1,5 @@
-// Rankings (aba "Ranking" da barra do topo). Sem servidor, só o próprio jogador aparece;
-// quando houver contas, o servidor monta a lista com todos usando estas mesmas regras.
+// Rankings (Informações → Ranking). O servidor monta a lista com todos os jogadores (server/src/ranking.ts)
+// e a tela ordena com estas regras. Este arquivo não importa nada (o servidor também usa).
 
 /** Números de um jogador que entram nos rankings. */
 export interface DadosRanking {
@@ -11,6 +11,8 @@ export interface DadosRanking {
   nivel: number;
   xp: number;
   medalhas: number;
+  /** Missões concluídas no Quadro de missões da cidade. */
+  missoes: number;
   silver: number;
   gold: number;
 }
@@ -28,7 +30,7 @@ export function pontosGerais(d: DadosRanking): number {
   );
 }
 
-export type CategoriaRanking = 'geral' | 'capturas' | 'shiny' | 'lendarios' | 'nivel' | 'medalhas' | 'silver' | 'gold';
+export type CategoriaRanking = 'geral' | 'capturas' | 'shiny' | 'lendarios' | 'nivel' | 'missoes' | 'medalhas' | 'silver' | 'gold';
 
 export const CATEGORIAS_RANKING: { id: CategoriaRanking; nome: string; coluna: string; descricao: string; valor: (d: DadosRanking) => number; emBreve?: boolean }[] = [
   {
@@ -42,6 +44,7 @@ export const CATEGORIAS_RANKING: { id: CategoriaRanking; nome: string; coluna: s
   { id: 'shiny', nome: 'Capturas shiny', coluna: 'Shiny', descricao: 'Pokémon shiny capturados em batalha.', valor: (d) => d.capturasShiny },
   { id: 'lendarios', nome: 'Lendários', coluna: 'Lendários', descricao: 'Lendários, míticos e Ultra Beasts capturados em batalha.', valor: (d) => d.capturasLendarios },
   { id: 'nivel', nome: 'Nível', coluna: 'Nível', descricao: 'Nível de treinador (empate: quem tem mais XP).', valor: (d) => d.nivel },
+  { id: 'missoes', nome: 'Missões do quadro', coluna: 'Missões', descricao: 'Missões concluídas no Quadro de missões da cidade.', valor: (d) => d.missoes },
   { id: 'medalhas', nome: 'Medalhas de torneio', coluna: 'Medalhas', descricao: 'Medalhas ganhas nos torneios online.', valor: (d) => d.medalhas, emBreve: true },
   { id: 'silver', nome: 'Silver', coluna: 'Silver', descricao: 'Silver na carteira.', valor: (d) => d.silver },
   { id: 'gold', nome: 'Gold', coluna: 'Gold', descricao: 'Gold na carteira.', valor: (d) => d.gold },
