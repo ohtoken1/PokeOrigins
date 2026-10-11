@@ -5,7 +5,7 @@ import Phaser from 'phaser';
 import { TAM, aleatorioComSemente, type Mapa } from './mapa';
 import { dentroDoLago } from './ruido';
 import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
-import { CABELOS, CORES_CABELO, CORES_ROUPA, PELES, montarPersonagem, type Aparencia } from '../personagem/lpc';
+import { CORES_CABELO, CORES_ROUPA, PELES, cabelosDoSexo, montarPersonagem, type Aparencia } from '../personagem/lpc';
 import { TAM_TREM, desenharTrem } from './cidadePecas';
 import { sombraProjetada } from './cidadeDesenhos';
 import { PECAS } from './cidade';
@@ -176,7 +176,7 @@ export function montarVidaDaCidade(
   (leve ? [] : info.moradores).forEach((casa, i) => {
     const corpo: Aparencia['corpo'] = sorte() < 0.5 ? 'masc' : 'fem';
     const aparencia: Aparencia = {
-      corpo, pele: escolher(PELES), cabelo: escolher(Object.keys(CABELOS)), corCabelo: escolher(CORES_CABELO.slice(0, 9)),
+      corpo, pele: escolher(PELES), cabelo: escolher(cabelosDoSexo(corpo).map(([id]) => id)), corCabelo: escolher(CORES_CABELO.slice(0, 9)),
       camiseta: escolher(CORES_ROUPA), calca: escolher(['black', 'navy', 'brown', 'gray', 'tan', 'blue', 'forest']), tenis: escolher(['black', 'brown', 'white', 'red', 'gray']),
       bone: sorte() < 0.2 ? escolher(['vermelho', 'azul', 'verde', 'amarelo'] as const) : 'nenhum', estampa: 'nenhuma', cinto: false,
     };

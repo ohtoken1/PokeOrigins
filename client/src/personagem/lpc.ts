@@ -3,6 +3,7 @@
 // Pokébolas no cinto. Cada folha tem 4 linhas (cima, esquerda, baixo, direita) de quadros 64×64:
 // "walk" tem 9 quadros (o 0 é parado), "idle" tem 2. Com uma skin de lendário (`aparencia.skin`), o personagem é
 // desenhado por skinsDesenho.ts em cima do corpo, da cabeça e do cabelo dele.
+import { afinarCorpoFem } from './corpoFem';
 import { desenharSkin, temArteDeSkin } from './skinsDesenho';
 
 export type Corpo = 'masc' | 'fem';
@@ -39,16 +40,50 @@ export const APARENCIA_PADRAO: Aparencia = {
   cinto: true,
 };
 
-export const CABELOS: Record<string, string> = {
-  spiked: 'Espetado',
-  bangs: 'Franja',
-  messy1: 'Bagunçado',
-  pixie: 'Pixie',
-  bob: 'Chanel',
-  ponytail: 'Rabo de cavalo',
-  long: 'Longo',
-  curly_short: 'Cacheado',
+/** Cabelos do LPC (pasta `lpc/cabelo/<id>`). Cada um é de um sexo só (pedido do dono); `fundo` = tem a parte que passa por trás do corpo (`fundo-<anim>.png`). */
+export interface Cabelo {
+  nome: string;
+  sexo: Corpo;
+  fundo?: boolean;
+}
+export const CABELOS: Record<string, Cabelo> = {
+  // masculinos
+  spiked: { nome: 'Espetado', sexo: 'masc' },
+  messy1: { nome: 'Bagunçado', sexo: 'masc' },
+  bangs: { nome: 'Franja', sexo: 'masc' },
+  curly_short: { nome: 'Cacheado', sexo: 'masc' },
+  plain: { nome: 'Liso', sexo: 'masc' },
+  parted: { nome: 'Repartido', sexo: 'masc' },
+  curtains: { nome: 'Cortina', sexo: 'masc' },
+  bedhead: { nome: 'Despenteado', sexo: 'masc' },
+  messy2: { nome: 'Rebelde', sexo: 'masc' },
+  cowlick: { nome: 'Redemoinho', sexo: 'masc' },
+  high_and_tight: { nome: 'Militar', sexo: 'masc' },
+  buzzcut: { nome: 'Raspado', sexo: 'masc' },
+  natural: { nome: 'Crespo', sexo: 'masc' },
+  shorthawk: { nome: 'Moicano', sexo: 'masc' },
+  // femininos
+  long: { nome: 'Longo', sexo: 'fem' },
+  ponytail: { nome: 'Rabo de cavalo', sexo: 'fem', fundo: true },
+  bob: { nome: 'Chanel', sexo: 'fem' },
+  pixie: { nome: 'Pixie', sexo: 'fem' },
+  long_straight: { nome: 'Longo liso', sexo: 'fem' },
+  xlong: { nome: 'Muito longo', sexo: 'fem', fundo: true },
+  wavy: { nome: 'Ondulado', sexo: 'fem', fundo: true },
+  curly_long: { nome: 'Cacheado longo', sexo: 'fem' },
+  lob: { nome: 'Médio', sexo: 'fem' },
+  bangslong: { nome: 'Franja longa', sexo: 'fem' },
+  swoop: { nome: 'Franja de lado', sexo: 'fem' },
+  unkempt: { nome: 'Solto', sexo: 'fem' },
+  half_up: { nome: 'Meio preso', sexo: 'fem' },
+  high_ponytail: { nome: 'Rabo alto', sexo: 'fem', fundo: true },
+  bunches: { nome: 'Chiquinhas', sexo: 'fem', fundo: true },
+  pigtails: { nome: 'Maria-chiquinha', sexo: 'fem' },
+  braid: { nome: 'Trança', sexo: 'fem', fundo: true },
+  princess: { nome: 'Princesa', sexo: 'fem', fundo: true },
 };
+/** Os cabelos de um sexo, na ordem da lista: [id, nome]. */
+export const cabelosDoSexo = (sexo: Corpo): [string, string][] => Object.entries(CABELOS).filter(([, c]) => c.sexo === sexo).map(([id, c]) => [id, c.nome]);
 export const PELES = ['light', 'amber', 'olive', 'taupe', 'bronze', 'brown', 'black'];
 export const CORES_CABELO = ['black', 'dark_brown', 'chestnut', 'light_brown', 'blonde', 'ginger', 'red', 'platinum', 'white', 'pink', 'purple', 'blue', 'green'];
 export const CORES_ROUPA = ['white', 'black', 'gray', 'red', 'maroon', 'orange', 'yellow', 'green', 'forest', 'teal', 'sky', 'blue', 'navy', 'purple', 'pink', 'brown', 'tan'];
@@ -72,8 +107,35 @@ export function carregarPaletas(): Promise<Paletas> {
   return paletas;
 }
 
+type Fonte = HTMLImageElement | HTMLCanvasElement;
 const imagens = new Map<string, Promise<HTMLImageElement | null>>();
-function imagem(src: string): Promise<HTMLImageElement | null> {
+const femininas = new Map<string, Promise<Record<string, HTMLCanvasElement> | null>>();
+/** Corpo e camiseta femininos já afinados (corpoFem.ts), uma vez por animação. */
+function camadasFem(anim: string): Promise<Record<string, HTMLCanvasElement> | null> {
+  if (!femininas.has(anim))
+    femininas.set(
+      anim,
+      Promise.all(['corpo', 'camiseta', 'cabeca'].map((c) => arquivo(`${c}/fem/${anim}.png`))).then(([corpo, camiseta, cabeca]) => {
+        if (!corpo || !camiseta || !cabeca) return null;
+        const copia = (img: HTMLImageElement) => {
+          const c = document.createElement('canvas');
+          c.width = img.width;
+          c.height = img.height;
+          c.getContext('2d', { willReadFrequently: true })!.drawImage(img, 0, 0);
+          return c;
+        };
+        const r = { corpo: copia(corpo), camiseta: copia(camiseta) };
+        afinarCorpoFem(r.corpo, cabeca, r.camiseta);
+        return r;
+      }),
+    );
+  return femininas.get(anim)!;
+}
+function imagem(src: string): Promise<Fonte | null> {
+  const fem = /^(corpo|camiseta)\/fem\/(\w+)\.png$/.exec(src);
+  return fem ? camadasFem(fem[2]).then((c) => c?.[fem[1]] ?? null) : arquivo(src);
+}
+function arquivo(src: string): Promise<HTMLImageElement | null> {
   if (!imagens.has(src))
     imagens.set(
       src,
@@ -88,7 +150,7 @@ function imagem(src: string): Promise<HTMLImageElement | null> {
 }
 
 /** Cópia da camada com as cores trocadas: as cores da imagem (do escuro ao claro) viram as da paleta, na mesma ordem. */
-function recolorir(img: HTMLImageElement, paleta: string[] | null): HTMLCanvasElement {
+export function recolorir(img: Fonte, paleta: string[] | null): HTMLCanvasElement {
   const c = document.createElement('canvas');
   c.width = img.width;
   c.height = img.height;
@@ -214,7 +276,7 @@ export async function montarPersonagem(a: Aparencia): Promise<FolhasPersonagem> 
   }
   const montar = async (anim: 'walk' | 'idle') => {
     const lista: [string, string[] | null, string][] = [];
-    if (a.cabelo === 'ponytail') lista.push([`cabelo/ponytail/fundo-${anim}.png`, p.hair[a.corCabelo], 'cabeloFundo']);
+    if (CABELOS[a.cabelo]?.fundo) lista.push([`cabelo/${a.cabelo}/fundo-${anim}.png`, p.hair[a.corCabelo], 'cabeloFundo']);
     lista.push([`corpo/${a.corpo}/${anim}.png`, p.body[a.pele], 'corpo']);
     lista.push([`cabeca/${a.corpo}/${anim}.png`, p.body[a.pele], 'cabeca']);
     lista.push([`olhos/${anim}.png`, null, 'olhos']);
