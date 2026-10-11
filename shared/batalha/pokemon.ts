@@ -44,7 +44,11 @@ export interface PokemonIndividual {
   ivsFaixa?: boolean;
   /** Amizade 0–255 (shared/amizade.ts); sem valor = AMIZADE_INICIAL. */
   amizade?: number;
-  /** Tera Type (troca com Tera Shards); sem valor = o primeiro tipo da espécie. */
+  /**
+   * Tera Type. Selvagem capturado: sorteado na hora da captura, com chance igual entre os 18 tipos (pedido do
+   * dono; só se descobre depois de capturar). Troca com Tera Shards. Sem valor = o primeiro tipo da espécie
+   * (Pokémon antigos, de ovo, de ticket e de treinadores).
+   */
   teraTipo?: string;
 }
 
@@ -53,6 +57,11 @@ export const AMIZADE_INICIAL = 50;
 
 /** IV mínimo de um Pokémon shiny (cada atributo vem entre 15 e 31). */
 export const IV_MIN_SHINY = 15;
+
+/** Os 18 tipos que um Tera Type pode ser. */
+export const TIPOS_TERA = ['Normal', 'Fire', 'Water', 'Electric', 'Grass', 'Ice', 'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug', 'Rock', 'Ghost', 'Dragon', 'Dark', 'Steel', 'Fairy'];
+/** Tera Type de um selvagem recém-capturado: qualquer tipo, todos com a mesma chance. */
+export const sortearTeraTipo = (aleatorio: () => number = Math.random): string => TIPOS_TERA[Math.floor(aleatorio() * TIPOS_TERA.length)];
 
 export const ATRIBUTOS: Atributo[] = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
 export const EV_MAX_ATRIBUTO = 252;

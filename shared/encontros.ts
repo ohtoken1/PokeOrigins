@@ -37,6 +37,8 @@ function grupoRaro(p: PokemonBase, base: PokemonBase): GrupoRaro | null {
   if (TODOS_INICIAIS.includes(base.id)) return 'inicial';
   return null;
 }
+/** Categoria rara de uma espécie (a linha inteira de um inicial conta como inicial), ou null se é comum. */
+export const categoriaRara = (p: PokemonBase, todos: PokemonBase[]): GrupoRaro | null => grupoRaro(p, baseDaLinha(p, new Map(todos.map((x) => [x.slug, x]))));
 /** Lendários e míticos aparecem desde o começo, mas nunca abaixo deste nível. */
 export const NIVEL_LENDARIO = 50;
 

@@ -254,6 +254,7 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 - **Bônus de status:** dormindo ou congelado ×2,5; paralisado, envenenado ou queimado ×1,5.
 - Ao arremessar, o jogo mostra a **chance de captura** daquele arremesso.
 - A Pokédex mostra a **captura base** de cada espécie (Poké Ball, HP cheio).
+- **Tera Type do capturado:** todo Pokémon selvagem ganha um **Tera Type sorteado na hora da captura**, com a mesma chance para os 18 tipos (um Pikachu pode sair com Tera Type Water, por exemplo). Só dá para saber depois de capturar: aparece na ficha do Pokémon. Pokémon capturados antes dessa mudança, de ovo e de ticket continuam com o tipo principal da espécie. Dá para trocar com Tera Shards.
 
 ### 7.2 Pokébolas
 São 25 Pokébolas, com os efeitos dos jogos:
@@ -375,6 +376,17 @@ As duas aparecem **separadas na carteira**, acima do painel do treinador.
 > ⚠️ A economia ainda é provisória. Hoje **todo item da loja custa 1 silver**, só para testes.
 
 ---
+
+### Mercado negro (na Cidade)
+Fale com o NPC **Mercado negro**, na frente de uma casa ao sul da praça (treinador nível 3). Lá os jogadores vendem uns para os outros (na aba Vender dá para buscar o seu Pokémon pelo nome):
+- **O que dá para anunciar:** Pokémon, itens da bolsa e gold. Pokémon **NT** ou **trancado** e itens NT não entram, e sempre precisa ficar 1 Pokémon no seu time.
+- **Preço:** quem anuncia escolhe o valor e a moeda (silver ou gold). **Gold só é vendido por silver.** Itens e gold são vendidos em lote: o comprador leva tudo de uma vez.
+- **Taxa:** o mercado fica com **5%** do preço (arredondado para baixo; preço menor que 20 não paga taxa). Esse valor some do jogo.
+- **Enquanto está anunciado**, o Pokémon, o item ou o gold sai do seu time, PC ou bolsa. Volta se você tirar o anúncio ou se ninguém comprar em **1 dia** (24 horas).
+- **Limite:** 10 anúncios por jogador ao mesmo tempo.
+- **O que o comprador vê de um Pokémon:** espécie, nível, shiny, gênero, Nature, Ability, item que segura e golpes. **Tier e IVs só aparecem se o vendedor já avaliou**; quem é VIP vê o valor exato, os outros veem a faixa.
+- **Quando vende:** o pagamento chega sozinho, com um aviso na tela (na hora, se você está jogando; no próximo login, se não está).
+- Pokémon comprado conta para a Pokédex, mas, como nas trocas, não conta para as conquistas de "consiga um…".
 
 ## 12. Loja e Bolsa
 
@@ -533,6 +545,16 @@ A barra do topo tem:
 
 ### Cabeçalho fixo
 Embaixo da barra do topo fica um **cabeçalho** que acompanha todas as telas, inclusive o mapa do bioma (só some na criação do personagem e na roleta do inicial): o **ícone da Pokédex** (atalho) com quanto você já capturou da Pokédex da região (ex.: 1/151 · 0,7%), nome do treinador, **VIP** ou não, nível e barra de XP de treinador, **região** atual, **insígnias** da região (ganhas nos Ginásios), os **selos dos bônus ativos** (ex.: "Silver 1,5x", "XP 2x", "Shiny 2x"; só informam), **silver** e **gold**, e, logo abaixo dele à direita, os atalhos em **botões redondos estilo Pokébola** (pretos, com borda e faixa brancas e o desenho do destino no centro; o nome aparece ao passar o mouse) : **Centro Pokémon** (cura o time), **Pokémarket**, **Bolsa**, **PC** e **Mapas**.
+
+### Barrinha de avisos
+Embaixo do cabeçalho passa uma barrinha com avisos para **todos os jogadores**, na hora em que acontecem:
+- alguém **capturou um shiny**;
+- alguém capturou um **lendário, mítico, Ultra Beast ou inicial** (a linha inteira do inicial conta);
+- alguém tirou um **prêmio lendário ou mítico** num ticket;
+- **avisos da staff**;
+- banimentos (quando o sistema de banir existir).
+
+Cada aviso fica passando por 30 minutos; os 12 mais novos aparecem em fila. Passar o mouse em cima pausa a barrinha.
 
 ### Bonificação
 A administração pode multiplicar, para todos os jogadores, de **1x até 3x** (1x, 1,5x, 2x, 2,5x, 3x):
@@ -806,6 +828,13 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Pokébolas no cinto:** só aparecem com o personagem de frente.
 - **Personagem feminino mais magro:** cintura mais fina e sem a saliência na frente do tronco. As skins continuam servindo.
 - **Logo e cores novas:** o jogo ganhou a logo "PokeOrigins" dourada (tela de entrada e barra do topo) e trocou o azul-escuro por **preto e dourado**. As barras de XP passaram a ser creme.
+- **Mercado negro:** o NPC da cidade agora funciona. Jogadores anunciam Pokémon, itens e gold por silver ou gold, e outros compram; o mercado fica com 5% (regras na seção 11).
+- **Janelas mais fáceis de ler:** as janelas que abrem por cima do mapa ficaram menos transparentes.
+- **Barrinha de avisos** embaixo do cabeçalho: mostra para todos as capturas de shiny, lendário, mítico, Ultra Beast e inicial, os prêmios lendários e míticos dos tickets e os avisos da staff.
+- **Mercado negro:** anúncios valem 1 dia, e a aba Vender tem busca pelo nome do Pokémon.
+- **Vale Pokémon S:** a staff agora consegue entregar um Pokémon montado para um jogador (é assim que o vale é trocado). O Pokémon chega com um aviso na tela, já com os IVs avaliados.
+- **Botões:** ficam marrons parados e dourados quando selecionados ou com o mouse em cima.
+- **Tera Type aleatório:** Pokémon selvagem capturado agora vem com um Tera Type sorteado entre os 18 tipos, revelado só depois da captura.
 
 ---
 

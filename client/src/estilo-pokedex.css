@@ -21,7 +21,7 @@
 .dex-palco { height: 220px; display: grid; place-items: center; border-radius: 12px; overflow: hidden; background: radial-gradient(ellipse 36% 8% at 50% 88%, rgb(0 0 0 / 0.3) 0 99%, transparent 100%), var(--painel-2); }
 .dex-botoes { display: flex; gap: 6px; margin-top: 8px; }
 .dex-botoes .botao { flex: 1; padding: 6px; }
-.dex-botoes .botao.ligado { background: var(--destaque); color: #000; }
+.dex-botoes .botao.ligado { background: var(--dourado); color: var(--texto-no-dourado); border-color: transparent; }
 .dex-resumo { display: flex; flex-direction: column; gap: 6px; }
 .dex-resumo .tipos { justify-content: flex-start; margin-bottom: 4px; }
 .dex-titulo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -96,7 +96,7 @@
 
 .dex-botoes-extras { display: flex; gap: 8px; flex-wrap: wrap; }
 .dex-botoes-extras .botao { padding: 7px 14px; }
-.dex-botoes-extras .botao.ligado { background: var(--destaque); color: #000; }
+.dex-botoes-extras .botao.ligado { background: var(--dourado); color: var(--texto-no-dourado); border-color: transparent; }
 .dex-extras:not(:empty) { margin-top: 12px; }
 .dex-tm { border-left-width: 3px; }
 

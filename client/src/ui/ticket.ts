@@ -21,6 +21,7 @@ import { el, spritePokemon } from './dom';
 import { iconeItem } from './iconeItem';
 import { areaRoletas, botoesQuantidade } from './abrirVarios';
 import { marcarConquista } from '../conquistas';
+import { avisarPremioRaro } from '../online';
 
 /** Ordem para escolher em qual prêmio a roleta para quando abre vários (o mais raro). */
 const PESO_RARIDADE: Record<Raridade, number> = { comum: 0, raro: 1, epico: 2, passado: 2, futuro: 2, lendario: 3, mitico: 4 };
@@ -169,6 +170,8 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
             el('div', { class: 'frases-premio' }, ...frases.map((f) => el('small', {}, f))),
           );
           girando = false;
+          // letreiro de todos os jogadores: prêmio lendário ou mítico (só depois de a roleta parar)
+          if (r.raridade === 'lendario' || r.raridade === 'mitico') avisarPremioRaro(r.raridade, ticket.nome);
           botoes = botoesQuantidade(verbo, save.itens[ticketId] ?? 0, abrirVarios);
           areaBotoes.replaceChildren(botoes.raiz);
         });

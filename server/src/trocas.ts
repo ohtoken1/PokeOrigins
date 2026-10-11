@@ -51,8 +51,8 @@ const trocas = new Map<string, Troca>();
 const ofertaVazia = (): Oferta => ({ pokemons: [], itens: {}, silver: 0, gold: 0 });
 
 // ---- tipos mínimos do save (o resto do save não interessa aqui) ----
-type PokemonSave = { uid?: number; especieId: number; nivel: number; shiny?: boolean; genero?: string; item?: string | null; inegociavel?: boolean; trancado?: boolean; box?: number; [k: string]: unknown };
-type SaveMin = { time: PokemonSave[]; caixa: PokemonSave[]; itens: Record<string, number>; silver: number; gold: number; proximoIdPokemon?: number; capturados?: number[]; vistos?: number[]; capturadosShiny?: number[]; aceitarTrocas?: boolean };
+export type PokemonSave = { uid?: number; especieId: number; nivel: number; shiny?: boolean; genero?: string; item?: string | null; inegociavel?: boolean; trancado?: boolean; box?: number; [k: string]: unknown };
+export type SaveMin = { time: PokemonSave[]; caixa: PokemonSave[]; itens: Record<string, number>; silver: number; gold: number; proximoIdPokemon?: number; capturados?: number[]; vistos?: number[]; capturadosShiny?: number[]; aceitarTrocas?: boolean };
 
 function saveDe(contaId: number): SaveMin {
   const s = banco.lerSave(contaId);
@@ -262,8 +262,12 @@ function tirar(save: SaveMin, oferta: Oferta, pokemons: PokemonSave[]): void {
   save.gold -= oferta.gold;
 }
 
-function dar(save: SaveMin, oferta: Oferta, pokemons: PokemonSave[]): void {
-  for (const original of pokemons) {
+/**
+ * Põe um Pokémon no save de quem recebe (time se couber, senão a primeira box com espaço) e marca a Pokédex.
+ * Também usado pelo mercado (server/src/mercado.ts); com "deOutroJogador" falso, está voltando para o próprio dono.
+ */
+export function guardarPokemon(save: SaveMin, original: PokemonSave, deOutroJogador = true): void {
+  {
     // cópia: ID novo (do dono novo), sem cadeado e sem box antiga
     const p: PokemonSave = structuredClone(original);
     p.uid = save.proximoIdPokemon = Math.max(save.proximoIdPokemon ?? 1, ...[...save.time, ...save.caixa].map((x) => (x.uid ?? 0) + 1));
@@ -271,11 +275,11 @@ function dar(save: SaveMin, oferta: Oferta, pokemons: PokemonSave[]): void {
     delete p.trancado;
     delete p.box;
     // veio de troca: não serve para as conquistas de "consiga um…" (o mesmo Pokémon não vale para vários jogadores)
-    p.origem = 'troca';
+    if (deOutroJogador) p.origem = 'troca';
     if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(p);
     else {
       const box = Array.from({ length: NUMERO_BOXES }, (_, i) => i).find((i) => save.caixa.filter((x) => (x.box ?? 0) === i).length < TAMANHO_BOX);
-      if (box === undefined) throw new ErroConta('O PC de um dos jogadores está cheio.', 409);
+      if (box === undefined) throw new ErroConta('O PC de quem recebe está cheio.', 409);
       p.box = box;
       save.caixa.push(p);
     }
@@ -289,6 +293,10 @@ function dar(save: SaveMin, oferta: Oferta, pokemons: PokemonSave[]): void {
       if (!l.includes(p.especieId)) l.push(p.especieId);
     }
   }
+}
+
+function dar(save: SaveMin, oferta: Oferta, pokemons: PokemonSave[]): void {
+  for (const original of pokemons) guardarPokemon(save, original);
   for (const [item, qtd] of Object.entries(oferta.itens)) save.itens[item] = (save.itens[item] ?? 0) + qtd;
   save.silver = (save.silver ?? 0) + oferta.silver;
   save.gold = (save.gold ?? 0) + oferta.gold;

@@ -50,6 +50,10 @@ export function aoChat(o: OuvinteChat): () => void {
 /** Manda no chat; false = sem conexão agora. */
 export const enviarChat = (canal: CanalChat, texto: string): boolean => mandar({ t: 'chat', canal, texto });
 export const onlineConectado = () => pronto;
+/** Avisa o servidor de um prêmio lendário ou mítico tirado num ticket (passa no letreiro de todos). */
+export const avisarPremioRaro = (raridade: string, ticket: string): boolean => mandar({ t: 'premio', raridade, ticket });
+/** Avisa o servidor de uma captura que passa no letreiro de todos (shiny, lendário, mítico, Ultra Beast ou inicial). */
+export const avisarCapturaRara = (especieId: number, shiny: boolean, categoria: string | null): boolean => mandar({ t: 'captura', especieId, shiny, categoria });
 /** Avisos do servidor fora dos mapas e do chat: lista de amigos mudou ('amigos'), mensagem privada ('privado'), clã mudou ('cla'), mural de anúncios mudou ('anuncios'). */
 const ouvintesAviso = new Set<(msg: Record<string, unknown>) => void>();
 export function aoAvisoDoServidor(f: (msg: Record<string, unknown>) => void): () => void {
@@ -101,7 +105,7 @@ export function conectarOnline(): void {
     if (msg.t === 'chat') return ouvintesChat.forEach((o) => o.mensagem(msg as unknown as MensagemChat));
     if (msg.t === 'chat-historico') return ouvintesChat.forEach((o) => o.historico(msg.canal as CanalChat, msg.lista as MensagemChat[]));
     if (msg.t === 'chat-erro') return ouvintesChat.forEach((o) => o.erro(msg.canal as CanalChat, msg.texto as string));
-    if (msg.t === 'amigos' || msg.t === 'privado' || msg.t === 'cla' || msg.t === 'anuncios' || msg.t === 'cofre' || msg.t === 'entrega') return ouvintesAviso.forEach((f) => f(msg));
+    if (msg.t === 'amigos' || msg.t === 'privado' || msg.t === 'cla' || msg.t === 'anuncios' || msg.t === 'cofre' || msg.t === 'entrega' || msg.t === 'mercado' || msg.t === 'mercado-acerto' || msg.t === 'letreiro' || msg.t === 'letreiro-historico') return ouvintesAviso.forEach((f) => f(msg));
     const ouvinte = salaAtual?.ouvinte;
     if (!ouvinte) return;
     if (msg.t === 'jogadores' && msg.sala === salaAtual!.sala) ouvinte.todos(msg.lista as JogadorOnline[]);

@@ -7,6 +7,9 @@
   --texto: #f5efe0;
   --texto-2: #b0a58d;
   --destaque: #e9b949;
+  /* dourado da logo (degradê): fundo do que está SELECIONADO ou com o mouse em cima; parado, o botão é marrom (pedido do dono) */
+  --dourado: linear-gradient(180deg, #f6d77a 0%, #e9b949 45%, #c98f24 100%);
+  --texto-no-dourado: #1c1404;
   --perigo: #e64545;
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   color: var(--texto);
@@ -41,12 +44,13 @@ button { font: inherit; color: inherit; }
 }
 
 .botao {
-  padding: 9px 18px; border-radius: 10px; border: 0; cursor: pointer; font-weight: 700;
-  background: var(--destaque); color: #1a1a1a;
+  padding: 9px 18px; border-radius: 10px; border: 1px solid var(--borda); cursor: pointer; font-weight: 700;
+  background: var(--painel-2); color: var(--texto);
 }
-.botao:hover:not(:disabled) { filter: brightness(1.08); }
+/* :where não pesa na conta: botões com cor própria (perigo, gold, batalha) continuam com a deles */
+.botao:where(:hover, :focus-visible, :active):where(:not(:disabled)) { background: var(--dourado); color: var(--texto-no-dourado); border-color: transparent; }
 .botao:disabled { opacity: 0.4; cursor: not-allowed; }
-.botao.secundario { background: var(--painel-2); color: var(--texto); border: 1px solid var(--borda); }
+/* "secundario" ficou igual ao botão comum (todos são marrons parados); a classe continua nas telas */
 
 /* Escolha do inicial */
 .tela-inicial { text-align: center; padding-top: 64px; }
@@ -64,7 +68,7 @@ button { font: inherit; color: inherit; }
 .aba {
   padding: 6px 14px; border-radius: 999px; border: 1px solid var(--borda); background: var(--painel); cursor: pointer;
 }
-.aba.ativa { background: var(--destaque); color: #1a1a1a; border-color: transparent; font-weight: 700; }
+.aba.ativa { background: var(--dourado); color: var(--texto-no-dourado); border-color: transparent; font-weight: 700; }
 .aba:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .layout-regiao, .layout-bioma { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
@@ -248,7 +252,7 @@ kbd { font: 600 0.7rem system-ui; padding: 1px 5px; border-radius: 4px; backgrou
   box-shadow: inset 4px 0 0 var(--cor-tipo, transparent);
 }
 .botao.golpe .detalhes { display: flex; gap: 8px; align-items: center; font-size: 0.78rem; font-weight: 500; color: var(--texto-2); }
-.botao.membro { display: flex; align-items: center; gap: 8px; background: var(--painel-2); color: var(--texto); border: 1px solid var(--borda); }
+.botao.membro { display: flex; align-items: center; gap: 8px; }
 .botao.membro .sprite { width: 48px; height: 48px; margin: -8px 0; }
 .botao.voltar { grid-column: 1 / -1; }
 
@@ -423,7 +427,7 @@ button.vaga:hover { border-color: var(--borda); }
   border-radius: 8px 0 0 8px; font: inherit; font-size: 0.85rem; font-weight: 600;
   transition: left 0.2s;
 }
-.admin-aba.aberto { left: 260px; background: var(--destaque); color: #000; }
+.admin-aba.aberto { left: 260px; background: var(--dourado); color: var(--texto-no-dourado); }
 .admin-painel {
   position: fixed; left: -260px; top: 0; bottom: 0; width: 260px; z-index: 900; overflow-y: auto;
   background: var(--painel); border-right: 1px solid var(--borda); padding: 16px; box-sizing: border-box;
@@ -704,13 +708,13 @@ button.vaga:hover { border-color: var(--borda); }
 .moeda-gold strong { color: #f5c842; }
 .botao.botao-gold { background: #f2c230; color: #2a1d00; }
 
-/* Fundos levemente transparentes (pedido do dono): janelas, ficha e resumo ao passar o mouse deixam ver o que está atrás */
+/* Fundos um pouco transparentes: deixam ver o que está atrás, mas escuros o bastante para ler em cima do verde do mapa (pedido do dono) */
 .janela-fundo { background: rgb(0 0 0 / 0.15); }
 .janela {
-  background: rgb(26 24 21 / 0.45);
-  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-  --painel: rgb(26 24 21 / 0.35);
-  --painel-2: rgb(42 38 32 / 0.4);
+  background: rgb(26 24 21 / 0.8);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  --painel: rgb(26 24 21 / 0.6);
+  --painel-2: rgb(42 38 32 / 0.7);
 }
 .resumo-pokemon {
   background: rgb(12 11 10 / 0.45);
@@ -1610,7 +1614,7 @@ button.vaga:hover { border-color: var(--borda); }
 .entrada-titulo { margin: 8px 0 6px; text-align: center; font-size: 1.15rem; }
 .abas-entrada { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-bottom: 16px; border-radius: 12px; background: var(--painel-2); }
 .aba-entrada { padding: 8px; border: 0; border-radius: 9px; background: transparent; color: var(--texto-2); font: inherit; font-weight: 700; cursor: pointer; }
-.aba-entrada.ativa { background: var(--destaque); color: #1a1a1a; }
+.aba-entrada.ativa { background: var(--dourado); color: var(--texto-no-dourado); }
 .formulario-entrada { display: flex; flex-direction: column; gap: 12px; }
 .rotulo-entrada { display: flex; flex-direction: column; gap: 5px; font-size: 0.9rem; font-weight: 700; }
 .rotulo-entrada[hidden] { display: none; }
@@ -1818,7 +1822,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .chat-abas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; border-radius: 12px; background: rgb(18 17 15 / 0.85); border: 1px solid var(--borda); }
 .chat-aba { position: relative; padding: 7px 2px; border: 0; border-radius: 9px; background: transparent; color: var(--texto-2); font: inherit; font-weight: 700; font-size: 0.88rem; cursor: pointer; }
 .chat-aba:hover { color: var(--texto); }
-.chat-aba.ativa { background: var(--destaque); color: #1a1a1a; }
+.chat-aba.ativa { background: var(--dourado); color: var(--texto-no-dourado); }
 .chat-nao-lidas { position: absolute; top: -4px; right: 2px; min-width: 18px; padding: 1px 5px; border-radius: 99px; background: var(--perigo); color: #fff; font-size: 0.68rem; line-height: 1.3; }
 .chat-lista {
   height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding: 10px; border-radius: 12px;
@@ -2258,3 +2262,82 @@ button.vaga.casa-box:hover { border-color: rgb(18 17 15 / 0.35); background: rgb
 .botao-dynamax { border-color: #c4003a; }
 .botao-dynamax.ligado { background: linear-gradient(120deg, #7a0030, #c4003a 45%, #ff3d6e); color: #fff; text-shadow: 0 1px 2px #0009; border-color: transparent; font-weight: 800; }
 .golpe-dynamax { box-shadow: 0 0 0 2px #ff3d6eaa, 0 0 10px #c4003a88; }
+
+/* Mercado negro (ui/mercado.ts): anúncios de Pokémon, itens e gold entre jogadores */
+.janela.janela-mercado-negro { width: min(720px, 100%); }
+.mercado-negro { display: flex; flex-direction: column; gap: 10px; }
+.mn-abas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.mn-aviso { margin: 0; min-height: 1.2em; font-size: 0.9rem; color: var(--destaque); }
+.mn-aviso:empty { display: none; }
+.mn-corpo { display: flex; flex-direction: column; gap: 10px; }
+.mn-filtros { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.mn-busca { flex: 1 1 160px; min-width: 0; padding: 7px 11px; border-radius: 999px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto); font: inherit; }
+.mn-lista { display: flex; flex-direction: column; gap: 6px; max-height: min(52vh, 460px); overflow-y: auto; padding-right: 2px; }
+.mn-anuncio { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: var(--painel-2); border: 1px solid var(--borda); }
+.mn-anuncio.shiny { border-color: #e7c64a; }
+.mn-anuncio.meu { border-style: dashed; }
+.mn-icone { flex: none; width: 56px; height: 56px; display: grid; place-items: center; }
+.mn-icone .sprite { width: 56px; height: 56px; object-fit: contain; image-rendering: pixelated; }
+.mn-gold { width: 34px; height: 34px; }
+.mn-info { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.mn-info strong { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.mn-info small { color: var(--texto-2); }
+.mn-ver { padding: 0; border: 0; background: none; color: var(--destaque); font: inherit; font-size: 0.82rem; cursor: pointer; text-decoration: underline; }
+.mn-detalhes { width: 100%; margin-top: 4px; padding: 8px; border-radius: 10px; background: rgb(0 0 0 / 0.25); }
+.mn-detalhes .meta { margin: 6px 0 0; font-size: 0.82rem; }
+.mn-ivs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.mn-ivs span { display: flex; flex-direction: column; }
+.mn-ivs small { font-weight: 500; }
+.mn-lado { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.mn-preco { display: inline-flex; align-items: center; gap: 5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mn-preco .icone-moeda { width: 16px; height: 16px; }
+.mn-acao { display: flex; gap: 6px; }
+.mn-acao .botao { padding: 6px 12px; }
+.mn-preco-campo { display: flex; gap: 6px; align-items: center; }
+.mn-preco-campo .mn-moeda { flex: 0 0 110px; }
+.mn-moeda-fixa { color: var(--texto-2); font-weight: 500; }
+.mn-resumo { margin: 0; }
+.mercado-negro .troca-opcao.escolhido { border-color: var(--destaque); box-shadow: 0 0 0 2px var(--destaque); }
+@media (max-width: 560px) { .mn-anuncio { flex-wrap: wrap; } .mn-lado { flex-direction: row; align-items: center; width: 100%; justify-content: space-between; } }
+.mn-abas .aba { border-radius: 10px; padding: 8px 6px; }
+.mn-escolher { display: flex; flex-direction: column; gap: 6px; }
+.mn-escolher .mn-busca { flex: none; }
+
+/* Letreiro (ui/letreiro.ts): avisos de todos os jogadores passando embaixo do cabeçalho */
+.letreiro { display: flex; align-items: center; gap: 8px; height: 26px; padding: 0 16px; max-width: 1340px; margin: 0 auto; border-top: 1px solid rgb(90 74 35 / 0.6); font-size: 0.8rem; }
+.letreiro-rotulo { flex: none; font-size: 0.85rem; }
+.letreiro-trilho { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent); }
+.letreiro-vazio { color: var(--texto-2); }
+.letreiro-faixa { display: inline-flex; gap: 48px; }
+.letreiro-item { color: var(--texto); }
+.letreiro-item.shiny, .letreiro-item.shiny .letreiro-pokemon { color: #ffe27a; }
+.letreiro-item.lendario .letreiro-pokemon { color: #ffb05c; }
+.letreiro-item.mitico .letreiro-pokemon { color: #d9a6ff; }
+.letreiro-item.ultra .letreiro-pokemon { color: #ff8a80; }
+.letreiro-item.inicial .letreiro-pokemon { color: #8fe3a0; }
+.letreiro-item.banido { color: #ff9a9a; }
+@media (prefers-reduced-motion: no-preference) {
+  .letreiro-faixa { padding-left: 100%; animation: letreiro-passar var(--tempo, 20s) linear infinite; }
+  .letreiro-trilho:hover .letreiro-faixa { animation-play-state: paused; }
+}
+@keyframes letreiro-passar { to { transform: translateX(-100%); } }
+.letreiro-item.staff { color: #ffe9b0; }
+.letreiro-item.staff strong { color: var(--destaque); }
+.anuncio-botoes { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Administração → Dar Pokémon (telas/adminPokemon.ts) */
+.adm-pk { display: flex; flex-direction: column; gap: 10px; max-width: 620px; }
+.adm-pk-previa { display: flex; align-items: center; gap: 10px; min-height: 34px; }
+.adm-pk-previa:empty { display: none; }
+.adm-pk-previa .sprite { width: 72px; height: 72px; object-fit: contain; image-rendering: pixelated; }
+.adm-pk-linha { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px; }
+.adm-pk-linha .cla-campo { flex: 0 0 120px; }
+.adm-pk-chave { display: flex; align-items: center; gap: 8px; font-weight: 700; padding-bottom: 8px; cursor: pointer; }
+.adm-pk-titulo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.adm-pk-titulo .aba { padding: 2px 10px; font-size: 0.78rem; }
+.adm-pk-grade { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.adm-pk-grade label { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.adm-pk-grade small { color: var(--texto-2); font-weight: 500; white-space: nowrap; }
+.adm-pk-grade input { width: 100%; min-width: 0; padding-left: 6px; padding-right: 2px; }
+.adm-pk-golpes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+@media (max-width: 560px) { .adm-pk-grade { grid-template-columns: repeat(3, minmax(0, 1fr)); } .adm-pk-golpes { grid-template-columns: 1fr; } }

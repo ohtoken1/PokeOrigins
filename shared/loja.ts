@@ -99,8 +99,8 @@ export const PRECO_REVELAR_IVS = 100;
 export const PRECO_TROCAR_NOME_GOLD = 1;
 export const PRECO_TROCAR_APARENCIA_GOLD = 1;
 /** Faixas de IV mostradas a quem não é VIP (o 31 fica junto com 26+). */
-export const FAIXAS_IV: [number, number][] = [[0, 5], [6, 10], [11, 15], [16, 20], [21, 25], [26, 31]];
-export const faixaDoIv = (iv: number): [number, number] => FAIXAS_IV.find(([a, b]) => iv >= a && iv <= b) ?? [iv, iv];
+// as faixas moram em tierIv.ts (arquivo que o servidor também lê)
+export { FAIXAS_IV, faixaDoIv } from './tierIv';
 
 /** Pedras que fazem Pokémon evoluir ao serem usadas. */
 export const PEDRAS_EVOLUCAO = ['firestone', 'waterstone', 'thunderstone', 'leafstone', 'moonstone', 'sunstone', 'shinystone', 'duskstone', 'dawnstone', 'icestone'];
