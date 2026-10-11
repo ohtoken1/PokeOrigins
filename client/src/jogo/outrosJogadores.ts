@@ -4,18 +4,27 @@ import Phaser from 'phaser';
 import { APARENCIA_PADRAO, montarPersonagem, type FolhasPersonagem } from '../personagem/lpc';
 import type { DirecaoOnline, JogadorOnline, OuvinteSala, VisualOnline } from '../online';
 import { DURACAO_PASSO, ESCALA_LPC, ESCALA_PMD, FONTE_NOME, QUADROS_POR_PASSO, TAMANHO_NOME_TELA, ZOOM } from './BiomaScene';
+import { BrilhoSkin } from './brilhoSkin';
 import { TAM } from './mapa';
 import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
 
-/** Textura do personagem LPC (cada quadro 64×64 vira um frame "linha-coluna"); a mesma para todos com a aparência igual. */
+/**
+ * Textura do personagem LPC (cada quadro 64×64 vira um frame "linha-coluna"); a mesma para todos com a aparência igual.
+ * Skin shiny: a aura vira a textura `<nome>-aura`, com os mesmos quadros (texturaDaAura).
+ */
 export function garantirTexturaLpc(cena: Phaser.Scene, chave: string, folhas: FolhasPersonagem): string {
   const nome = `jogador-lpc-${chave}`;
-  if (!cena.textures.exists(nome)) {
-    const t = cena.textures.addCanvas(nome, folhas.walk)!;
+  const criar = (n: string, folha: HTMLCanvasElement) => {
+    if (cena.textures.exists(n)) return;
+    const t = cena.textures.addCanvas(n, folha)!;
     for (let linha = 0; linha < 4; linha++) for (let col = 0; col < 9; col++) t.add(`${linha}-${col}`, 0, col * 64, linha * 64, 64, 64);
-  }
+  };
+  criar(nome, folhas.walk);
+  if (folhas.aura) criar(`${nome}-aura`, folhas.aura);
   return nome;
 }
+/** Textura da aura da skin shiny desse personagem (null = não tem brilho). */
+export const texturaDaAura = (cena: Phaser.Scene, nome: string): string | null => (cena.textures.exists(`${nome}-aura`) ? `${nome}-aura` : null);
 
 // a mesma aparência não é montada duas vezes (vários jogadores com o visual padrão, por exemplo)
 const folhasPorAparencia = new Map<string, Promise<FolhasPersonagem>>();
@@ -41,6 +50,7 @@ interface Outro {
   linhaPmd: number;
   posSeguidor: { x: number; y: number };
   lpc: string | null;
+  brilho: BrilhoSkin | null;
   ciclo: number;
   movendo: boolean;
   fila: { x: number; y: number; dir: DirecaoOnline }[];
@@ -79,7 +89,7 @@ export class OutrosJogadores implements OuvinteSala {
       .setDepth(99999)
       .setScale(TAMANHO_NOME_TELA / (FONTE_NOME * ZOOM));
     nome.texture.setFilter(Phaser.Textures.FilterMode.LINEAR);
-    const outro: Outro = { dados: j, corpo, sombra, nome, seguidor: null, sombraSeguidor: null, pmd: null, linhaPmd: 0, posSeguidor: { x: j.x, y: j.y }, lpc: null, ciclo: 0, movendo: false, fila: [] };
+    const outro: Outro = { dados: j, corpo, sombra, nome, seguidor: null, sombraSeguidor: null, pmd: null, linhaPmd: 0, posSeguidor: { x: j.x, y: j.y }, lpc: null, brilho: null, ciclo: 0, movendo: false, fila: [] };
     this.outros.set(j.id, outro);
     // clicar no boneco (ou no nome) abre o menu: perfil, trocar, duelo
     for (const alvo of [corpo, nome]) {
@@ -94,6 +104,7 @@ export class OutrosJogadores implements OuvinteSala {
     const o = this.outros.get(id);
     if (!o) return;
     this.cena.tweens.killTweensOf([o.corpo, o.seguidor].filter(Boolean) as Phaser.GameObjects.GameObject[]);
+    o.brilho?.destruir();
     for (const obj of [o.corpo, o.sombra, o.nome, o.seguidor, o.sombraSeguidor]) obj?.destroy();
     this.outros.delete(id);
   }
@@ -123,8 +134,13 @@ export class OutrosJogadores implements OuvinteSala {
     const { chave, folhas } = folhasDe(o.dados.visual.aparencia);
     void folhas.then((f) => {
       if (!o.corpo.active) return;
+      // o visual pode ter mudado de novo enquanto este era montado
+      if (folhasDe(o.dados.visual.aparencia).chave !== chave) return;
       o.lpc = garantirTexturaLpc(this.cena, chave, f);
       o.corpo.setTexture(o.lpc, `${o.dados.dir}-0`).setOrigin(0.5, 61 / 64).setScale(ESCALA_LPC);
+      o.brilho?.destruir();
+      const aura = texturaDaAura(this.cena, o.lpc);
+      o.brilho = aura ? new BrilhoSkin(this.cena, o.corpo, aura) : null;
     });
     o.seguidor?.destroy();
     o.sombraSeguidor?.destroy();

@@ -4,6 +4,8 @@
 // banco roda como uma mudança só (banco.transacao), para nunca ficar pela metade.
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
+import { NIVEL_MINIMO, liberado } from '../../shared/trancas.ts';
+import { nivelTreinador } from '../../shared/treinador.ts';
 import { avisar, esquecerChatDoCla, estaOnline, limparTexto, mandarHistoricoDoCla } from './mundo.ts';
 import {
   chaveDoNomeCla, DESCRICAO_CLA_MAX, lerBandeira, limparNomeCla, MISSOES_CLA, NIVEL_MAX_CLA, NOME_CLA_VALIDO, PRECO_CRIAR_CLA_GOLD,
@@ -115,8 +117,16 @@ export function ver(conta: banco.Conta, id: number) {
 
 const lerDescricao = (d: unknown) => limparTexto(d).slice(0, DESCRICAO_CLA_MAX);
 
+/** Tranca de nível das guildas (shared/trancas.ts): confere o nível de treinador no save guardado. */
+function exigirNivel(conta: banco.Conta): void {
+  const guardado = banco.lerSave(conta.id);
+  const xp = guardado ? (JSON.parse(guardado.dados) as { xpTreinador?: unknown }).xpTreinador : 0;
+  if (!liberado('guilda', nivelTreinador(typeof xp === 'number' && xp > 0 ? xp : 0), !!conta.admin)) throw new ErroConta(`As guildas abrem no nível ${NIVEL_MINIMO.guilda} de treinador.`, 403);
+}
+
 export function criar(conta: banco.Conta, dados: Record<string, unknown>) {
   if (banco.claDaConta(conta.id)) throw new ErroConta('Você já está em uma guilda.');
+  exigirNivel(conta);
   const nome = typeof dados.nome === 'string' ? limparNomeCla(dados.nome) : '';
   if (!NOME_CLA_VALIDO.test(nome)) throw new ErroConta('Nome da guilda: de 3 a 16 letras ou números.');
   const bandeira = lerBandeira(dados.bandeira);
@@ -139,6 +149,7 @@ export function criar(conta: banco.Conta, dados: Record<string, unknown>) {
 /** Clã aberto: entra na hora. Fechado: fica um pedido para o líder ou vice-líder aceitar. */
 export function entrar(conta: banco.Conta, id: number) {
   if (banco.claDaConta(conta.id)) throw new ErroConta('Você já está em uma guilda.');
+  exigirNivel(conta);
   const cla = banco.claPorId(id);
   if (!cla) throw new ErroConta('Guilda não encontrada.', 404);
   if (banco.membrosDoCla(id).length >= VAGAS_CLA) throw new ErroConta('Esta guilda está cheia.');

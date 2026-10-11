@@ -1408,6 +1408,10 @@ button.vaga:hover { border-color: var(--borda); }
 .cartao-skin .icone-skin { width: 56px; height: 56px; }
 .cartao-skin.em-uso { border-color: var(--destaque); }
 .skin-botoes { display: flex; flex-direction: column; gap: 5px; width: 100%; margin-top: 6px; }
+/* provador: o personagem andando com a skin do visual */
+.skins-provador-linha { display: flex; align-items: center; gap: 14px; margin: 0 0 14px; }
+.skin-provador { width: 116px; height: 116px; flex: none; border-radius: 16px; background: #6fb04a; border: 2px solid var(--borda); display: grid; place-items: center; overflow: hidden; }
+.skin-provador-canvas { width: 128px; height: 128px; flex: none; image-rendering: pixelated; transform: translateY(-8px); }
 .skin-botoes .botao { padding: 5px 8px; font-size: 0.8rem; }
 .cartao-skin .skin-bonus { color: var(--destaque); font-size: 0.74rem; line-height: 1.35; }
 .skins-total { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
@@ -2068,3 +2072,38 @@ button.missao-quadro:disabled { cursor: default; }
 .missao-candidatos { max-height: 50vh; overflow-y: auto; }
 
 .selo-bonus.bonus-charm { background: linear-gradient(135deg, #7fe8ff, #2f9fd8); color: #05263a; }
+
+/* Conquistas, títulos e ícones provisórios */
+.grupo-conquistas { margin: 0 0 12px; }
+.grupo-conquistas > summary { cursor: pointer; padding: 8px 4px; font-weight: 800; font-size: 1.05rem; }
+.grupo-conquistas > summary small { color: var(--texto-2); font-weight: 700; }
+.achievement-texto .achievement-recompensa { color: var(--destaque); font-weight: 700; }
+.aviso-conquista {
+  position: fixed; right: 18px; top: 128px; z-index: 2150; display: flex; flex-direction: column; gap: 3px; pointer-events: none;
+  max-width: min(380px, calc(100vw - 32px)); padding: 10px 16px; border-radius: 14px;
+  background: rgb(20 34 56 / 0.96); border: 1px solid #ffc93c; box-shadow: 0 10px 28px rgb(0 0 0 / 0.45);
+}
+.aviso-conquista[hidden] { display: none; }
+.aviso-conquista strong { color: #ffc93c; font-size: 0.85rem; }
+.aviso-conquista span { font-size: 0.9rem; overflow-wrap: anywhere; }
+.aviso-conquista small { color: var(--texto-2); }
+.conta-perfil { display: flex; flex-direction: column; gap: 14px; }
+.lista-titulos { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.titulo-opcao { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 14px; border-radius: 12px; cursor: pointer; color: inherit; font: inherit; background: rgb(27 47 74 / 0.6); border: 1px solid var(--borda); }
+.titulo-opcao small { color: var(--texto-2); font-size: 0.75rem; }
+.titulo-opcao.em-uso { border-color: var(--destaque); background: rgb(255 201 60 / 0.12); }
+.titulo-opcao.em-uso small { color: var(--destaque); }
+.titulo-opcao:disabled { opacity: 0.5; cursor: not-allowed; }
+.perfil-titulo { display: inline-block; padding: 2px 12px; border-radius: 99px; font-size: 0.82rem; font-weight: 800; color: #2a1d00; background: linear-gradient(135deg, #fff1a8, #ffc93c); }
+.icone-simbolo { width: 32px; height: 32px; flex: none; border-radius: 8px; display: grid; place-items: center; font-size: 20px; line-height: 1; background: linear-gradient(135deg, #22344f, #3a5378); box-shadow: inset 0 0 0 2px #7f97bd; }
+.icone-simbolo.cat-skins { background: linear-gradient(135deg, #3a2a00, #6b4d00); box-shadow: inset 0 0 0 2px #e8b931; }
+.cartao-skin .icone-simbolo { width: 56px; height: 56px; font-size: 34px; }
+.icone-ovo.ovo-nt { position: relative; }
+.icone-ovo.ovo-nt::after { content: 'NT'; position: absolute; right: -4px; top: -3px; padding: 0 3px; border-radius: 5px; font-size: 8px; font-weight: 900; line-height: 11px; color: #fff; background: #b91c1c; }
+
+/* Charms: ícone pintado na cor do tipo e selo do bônus ativo */
+.icone-charm { width: 32px; height: 32px; flex: none; display: grid; place-items: center; }
+.icone-charm svg { width: 30px; height: 30px; filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.45)); }
+.selo-bonus.bonus-charm { background: linear-gradient(135deg, #fff, var(--cor-tipo, #2f9fd8)); color: #10192b; box-shadow: 0 0 0 1px var(--cor-tipo, #2f9fd8); }
+.admin-dar-item { display: flex; flex-direction: column; gap: 10px; max-width: 460px; }
+.admin-dar-item .linha-escolhido { display: flex; align-items: center; gap: 10px; min-height: 34px; }

@@ -10,6 +10,8 @@ import {
 import { api, conta, ErroApi } from '../conta';
 import { adotarSaveDoServidor, carregarSave, salvarAgora, type Save } from '../estado';
 import type { Tela } from '../main';
+import { NIVEL_MINIMO, textoTranca } from '../../../shared/trancas';
+import { conteudoLiberado } from '../trancas';
 import { desenharBandeira, editorDeBandeira } from '../ui/bandeira';
 import { el } from '../ui/dom';
 import { abrirJanela } from '../ui/janela';
@@ -184,7 +186,12 @@ export const telaCla: Tela = (raiz) => {
   const desenhar = () => {
     const c = meuCla();
     if (c) meuClaNaTela(c);
-    else {
+    else if (!conteudoLiberado('guilda')) {
+      // tranca de nível: sem guilda e abaixo do nível, não cria nem entra
+      tela.replaceChildren(el('h1', {}, 'Guildas'),
+        el('section', { class: 'em-breve' }, el('span', { class: 'selo-em-breve' }, textoTranca('guilda')),
+          el('p', {}, `As guildas abrem no nível ${NIVEL_MINIMO.guilda} de treinador. Continue batalhando e capturando para subir de nível.`)));
+    } else {
       // o formulário de criar fica montado (não perde o que a pessoa já escolheu)
       if (tinhaCla !== false) tela.replaceChildren(el('h1', {}, 'Guildas'), aviso, procura, criacao);
       if (tinhaCla !== false) buscar(0);

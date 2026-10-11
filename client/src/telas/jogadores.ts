@@ -4,6 +4,7 @@
 import type { Tela } from '../main';
 import { progressoTreinador } from '../../../shared/treinador';
 import { lideresDaRegiao } from '../../../shared/ginasios';
+import { skinVestida } from '../personagem/aparencia';
 import { APARENCIA_PADRAO, LINHA_DIRECAO, montarPersonagem } from '../personagem/lpc';
 import { insigniaVisual } from './ginasios';
 import { REGIOES, regiaoPorId } from '../../../shared/regioes';
@@ -16,15 +17,18 @@ import { api, ErroApi } from '../conta';
 import { icone } from '../ui/icones';
 import { desenharBandeira } from '../ui/bandeira';
 import { meuCla, NOME_CARGO, type Cargo, type ResumoCla } from '../cla';
+import { tituloAtivo } from '../../../shared/conquistas';
 
 /** Perfil de outro jogador como o servidor manda (server/src/index.ts → perfilPublico): só o que é público. */
 export interface PerfilPublico {
   usuario: string;
   online: boolean;
   cla: (ResumoCla & { cargo: Cargo }) | null;
-  perfil: Pick<Save, 'aparencia' | 'regiao' | 'xpTreinador' | 'criadoEm' | 'insignias' | 'vistos' | 'capturados' | 'estatisticas'> & {
+  perfil: Pick<Save, 'aparencia' | 'regiao' | 'xpTreinador' | 'criadoEm' | 'insignias' | 'vistos' | 'capturados' | 'estatisticas' | 'skinVisual'> & {
     mostrarTime: boolean;
     time: { especieId: number; nivel: number; shiny: boolean }[];
+    /** título em uso (o servidor já confere se a conquista foi concluída) */
+    titulo?: string | null;
   };
 }
 
@@ -41,7 +45,7 @@ export async function abrirPerfilDe(usuario: string): Promise<void> {
 /** Perfil de outro jogador: o mesmo desenho, com o time só para ver (sem abrir a ficha) e escondido se ele quiser. */
 function perfilRemoto(r: PerfilPublico): HTMLElement {
   const save = { ...r.perfil, time: r.perfil.time } as unknown as Save;
-  return perfilJogador(save, { online: r.online, remoto: true, timeEscondido: !r.perfil.mostrarTime, cla: r.cla });
+  return perfilJogador(save, { online: r.online, remoto: true, timeEscondido: !r.perfil.mostrarTime, cla: r.cla, titulo: r.perfil.titulo ?? null });
 }
 
 /** Medalha de torneio desenhada por código (fita + disco) com a quantidade do lado. */
@@ -49,12 +53,14 @@ const medalha = (cor: 'ouro' | 'prata' | 'bronze', nome: string, quantidade: num
   el('span', { class: `perfil-medalha medalha-${cor}`, title: `${nome}: ${quantidade}` },
     el('span', { class: 'medalha-icone' }, el('span', { class: 'medalha-fita' }), el('span', { class: 'medalha-disco' })), String(quantidade));
 
-/** Retrato do personagem (LPC, parado olhando para a frente). */
-function retratoTreinador(save: Save): HTMLElement {
+/** Retrato do personagem (LPC, parado olhando para a frente), com a skin que ele veste. De outro jogador, a skin já vem conferida pelo servidor. */
+function retratoTreinador(save: Save, remoto = false): HTMLElement {
   const canvas = el('canvas', { width: 64, height: 64, class: 'perfil-retrato-canvas' }) as HTMLCanvasElement;
-  montarPersonagem({ ...APARENCIA_PADRAO, ...save.aparencia }).catch(() => montarPersonagem(APARENCIA_PADRAO)).then((f) => {
+  const skin = remoto ? save.skinVisual : skinVestida(save);
+  montarPersonagem({ ...APARENCIA_PADRAO, ...save.aparencia, ...(skin ? { skin } : {}) }).catch(() => montarPersonagem(APARENCIA_PADRAO)).then((f) => {
     const ctx = canvas.getContext('2d')!;
     ctx.imageSmoothingEnabled = false;
+    if (f.aura) ctx.drawImage(f.aura, 0, LINHA_DIRECAO.baixo * 64, 64, 64, 0, 0, 64, 64);
     ctx.drawImage(f.walk, 0, LINHA_DIRECAO.baixo * 64, 64, 64, 0, 0, 64, 64);
   });
   return el('div', { class: 'perfil-retrato' }, canvas);
@@ -82,13 +88,15 @@ function painelInsignias(save: Save): HTMLElement {
   return el('div', {}, seletor, lista);
 }
 
-export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: boolean; timeEscondido?: boolean; cla?: PerfilPublico['cla'] } = {}): HTMLElement {
+export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: boolean; timeEscondido?: boolean; cla?: PerfilPublico['cla']; titulo?: string | null } = {}): HTMLElement {
   const e = save.estatisticas;
   // o próprio perfil está sempre online (é quem está jogando)
   const online = opcoes.online ?? save === carregarSave();
   // clã: o do servidor (perfil de outro) ou o meu
   const meu = meuCla();
   const cla = opcoes.remoto ? opcoes.cla : meu && { ...meu, cargo: meu.meuCargo ?? 'membro' };
+  // título: o do servidor (perfil de outro) ou o escolhido no meu save
+  const titulo = opcoes.remoto ? opcoes.titulo : tituloAtivo(save);
   const totalDex = todosOsPokemons().filter((p) => !p.numeroDex).length;
   const parteDex = Math.round((save.capturados.length / totalDex) * 1000) / 10;
   const desde = save.criadoEm ? new Date(save.criadoEm).toLocaleDateString('pt-BR') : '—';
@@ -106,8 +114,9 @@ export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: b
     { class: 'perfil-jogador' },
     // coluna da esquerda: identidade (retrato, nome, status, nível, região, desde quando, PvP)
     el('aside', { class: 'perfil-lado' },
-      retratoTreinador(save),
+      retratoTreinador(save, opcoes.remoto),
       el('h2', {}, save.aparencia?.nome || 'Treinador'),
+      titulo ? el('span', { class: 'perfil-titulo', title: 'Título' }, titulo) : null,
       el('span', { class: `perfil-status ${online ? 'online' : 'offline'}` }, el('span', { class: 'perfil-bolinha' }), online ? 'Online agora' : 'Offline'),
       cla ? el('div', { class: 'perfil-cla', title: `Guilda ${cla.nome} · nível ${cla.nivel}` }, desenharBandeira(cla.bandeira, 30),
         el('span', {}, el('strong', {}, cla.nome), el('small', {}, `${NOME_CARGO[cla.cargo]} · Nv. ${cla.nivel}`))) : null,

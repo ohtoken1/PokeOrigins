@@ -5,6 +5,7 @@ import type { IncomingMessage, Server } from 'node:http';
 import { WebSocket, WebSocketServer } from 'ws';
 import * as banco from './banco.ts';
 import { contaDoToken } from './contas.ts';
+import { temSkin, type ComSkins } from '../../shared/skins.ts';
 
 const SALA_VALIDA = /^[a-z0-9:_-]{1,40}$/;
 const COORD_MAX = 1000;
@@ -111,7 +112,26 @@ function nomeDe(conta: banco.Conta): string {
   }
 }
 
-function lerVisual(v: unknown): Visual {
+/** Skin que a conta veste, pelo save guardado: só vale a escolhida em `skinVisual` e só se o item ainda está na bolsa. */
+function skinDe(conta: banco.Conta): string | null {
+  try {
+    const save = JSON.parse(banco.lerSave(conta.id)?.dados ?? '{}') as Partial<ComSkins>;
+    return save.itens && typeof save.itens === 'object' && temSkin(save as ComSkins, save.skinVisual) ? save.skinVisual : null;
+  } catch {
+    return null;
+  }
+}
+
+/** O visual vem do jogo (aparência + seguidor), menos a skin: essa é sempre a do save guardado (ninguém mostra skin que não tem). */
+function lerVisual(v: unknown, conta: banco.Conta): Visual {
+  const visual = lerVisualDoJogo(v);
+  const skin = skinDe(conta);
+  if (visual.aparencia) delete visual.aparencia.skin;
+  if (skin) visual.aparencia = { ...(visual.aparencia ?? {}), skin };
+  return visual;
+}
+
+function lerVisualDoJogo(v: unknown): Visual {
   const vazio: Visual = { aparencia: null, seguidor: null };
   if (!v || typeof v !== 'object' || JSON.stringify(v).length > VISUAL_MAX) return vazio;
   const { aparencia, seguidor } = v as Record<string, unknown>;
@@ -160,7 +180,7 @@ function receber(c: Conexao, texto: string): void {
     const y = coord(msg.y);
     if (!sala || x === null || y === null) return;
     sairDaSala(c);
-    Object.assign(c, { sala, x, y, dir: direcao(msg.dir), visual: lerVisual(msg.visual), nome: nomeDe(c.conta) });
+    Object.assign(c, { sala, x, y, dir: direcao(msg.dir), visual: lerVisual(msg.visual, c.conta), nome: nomeDe(c.conta) });
     const lista = salas.get(sala) ?? new Set<Conexao>();
     salas.set(sala, lista);
     // quem chega recebe quem já está; quem já está fica sabendo de quem chegou
@@ -179,7 +199,7 @@ function receber(c: Conexao, texto: string): void {
   } else if (msg.t === 'chat') {
     falar(c, msg.canal, msg.texto);
   } else if (msg.t === 'visual' && c.sala) {
-    c.visual = lerVisual(msg.visual);
+    c.visual = lerVisual(msg.visual, c.conta);
     paraSala(c.sala, { t: 'visual', id: c.conta.id, visual: c.visual }, c);
   }
 }

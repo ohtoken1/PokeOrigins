@@ -3,6 +3,7 @@ import { numeroNaDex } from '../../../shared/formasRegionais';
 import { TODOS_OS_ITENS } from '../../../shared/loja';
 import { CHAVE_TEMPORAL, TICKETS } from '../../../shared/tickets';
 import { OVOS } from '../../../shared/ovos';
+import { ehSeloSazonal } from '../../../shared/itensCustom';
 // Painel de administrador (aba na esquerda) para testar encontros: shiny, lendários, chance por passo,
 // Pokémon e nível forçados. Provisório: sem login; os ajustes ficam só neste navegador.
 import { AJUSTES_PADRAO, CHANCE_SHINY, type AjustesEncontro } from '../../../shared/encontros';
@@ -158,7 +159,7 @@ function conteudo(): HTMLElement[] {
     el('h4', {}, 'Itens'),
     (() => {
       // qualquer item do jogo (inclusive os de fora da loja: Plates, Z-Crystals, Tera Shards, Berries…)
-      const lista = el('datalist', { id: 'admin-itens' }, ...TODOS_OS_ITENS.map((i) => el('option', { value: i.nome })));
+      const lista = el('datalist', { id: 'admin-itens' }, ...TODOS_OS_ITENS.filter((i) => !ehSeloSazonal(i.id)).map((i) => el('option', { value: i.nome })));
       const campoItem = el('input', { list: 'admin-itens', placeholder: 'Nome do item', class: 'admin-item' }) as HTMLInputElement;
       const campoQtd = el('input', { type: 'number', min: '1', value: '1', class: 'admin-qtd' }) as HTMLInputElement;
       const aviso = el('small', { class: 'meta' });

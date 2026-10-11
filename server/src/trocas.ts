@@ -9,6 +9,7 @@
 import { randomBytes } from 'node:crypto';
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
+import { itemInegociavel } from '../../shared/naoTrocavel.ts';
 
 /** Mesmo do jogo (client/src/estado.ts). */
 const TAMANHO_MAXIMO_TIME = 6;
@@ -51,7 +52,7 @@ const ofertaVazia = (): Oferta => ({ pokemons: [], itens: {}, silver: 0, gold: 0
 
 // ---- tipos mínimos do save (o resto do save não interessa aqui) ----
 type PokemonSave = { uid?: number; especieId: number; nivel: number; shiny?: boolean; genero?: string; item?: string | null; inegociavel?: boolean; trancado?: boolean; box?: number; [k: string]: unknown };
-type SaveMin = { time: PokemonSave[]; caixa: PokemonSave[]; itens: Record<string, number>; silver: number; gold: number; proximoIdPokemon?: number; capturados?: number[]; vistos?: number[]; aceitarTrocas?: boolean };
+type SaveMin = { time: PokemonSave[]; caixa: PokemonSave[]; itens: Record<string, number>; silver: number; gold: number; proximoIdPokemon?: number; capturados?: number[]; vistos?: number[]; capturadosShiny?: number[]; aceitarTrocas?: boolean };
 
 function saveDe(contaId: number): SaveMin {
   const s = banco.lerSave(contaId);
@@ -92,12 +93,15 @@ function conferirOferta(save: SaveMin, oferta: Oferta, quem: string): PokemonSav
   const pokemons = oferta.pokemons.map((uid) => {
     const p = todos.find((x) => x.uid === uid);
     if (!p) throw new ErroConta(`${quem}: um Pokémon da oferta não está mais com o treinador.`, 409);
-    if (p.inegociavel) throw new ErroConta(`${quem}: o inicial (NT) não pode ser trocado.`, 409);
+    if (p.inegociavel) throw new ErroConta(`${quem}: Pokémon NT não pode ser trocado.`, 409);
     if (p.trancado) throw new ErroConta(`${quem}: Pokémon trancado não pode ser trocado (destranque no PC).`, 409);
     return p;
   });
   if (save.time.filter((p) => !oferta.pokemons.includes(p.uid ?? -1)).length < 1) throw new ErroConta(`${quem}: precisa ficar pelo menos 1 Pokémon no time.`, 409);
-  for (const [item, qtd] of Object.entries(oferta.itens)) if ((save.itens[item] ?? 0) < qtd) throw new ErroConta(`${quem}: não tem itens suficientes.`, 409);
+  for (const [item, qtd] of Object.entries(oferta.itens)) {
+    if (itemInegociavel(item)) throw new ErroConta(`${quem}: item NT não pode ser trocado.`, 409);
+    if ((save.itens[item] ?? 0) < qtd) throw new ErroConta(`${quem}: não tem itens suficientes.`, 409);
+  }
   if ((save.silver ?? 0) < oferta.silver) throw new ErroConta(`${quem}: silver insuficiente.`, 409);
   if ((save.gold ?? 0) < oferta.gold) throw new ErroConta(`${quem}: gold insuficiente.`, 409);
   return pokemons;
@@ -266,6 +270,8 @@ function dar(save: SaveMin, oferta: Oferta, pokemons: PokemonSave[]): void {
     save.proximoIdPokemon = p.uid + 1;
     delete p.trancado;
     delete p.box;
+    // veio de troca: não serve para as conquistas de "consiga um…" (o mesmo Pokémon não vale para vários jogadores)
+    p.origem = 'troca';
     if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(p);
     else {
       const box = Array.from({ length: NUMERO_BOXES }, (_, i) => i).find((i) => save.caixa.filter((x) => (x.box ?? 0) === i).length < TAMANHO_BOX);
@@ -275,6 +281,11 @@ function dar(save: SaveMin, oferta: Oferta, pokemons: PokemonSave[]): void {
     }
     for (const lista of ['capturados', 'vistos'] as const) {
       const l = (save[lista] ??= []);
+      if (!l.includes(p.especieId)) l.push(p.especieId);
+    }
+    // troca conta para a Pokédex, inclusive a marca de shiny
+    if (p.shiny) {
+      const l = (save.capturadosShiny ??= []);
       if (!l.includes(p.especieId)) l.push(p.especieId);
     }
   }

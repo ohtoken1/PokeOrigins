@@ -4,7 +4,7 @@ import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { ehEquipavel, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
 import { cuboPorItem } from '../../../shared/itensCustom';
-import { SHINY_CHARM, shinyCharmAtivo, usarShinyCharm } from '../../../shared/campo';
+import { charmAte, charmAtivo, nomeCharm, tipoDoCharm, usarCharm } from '../../../shared/charms';
 import { textoDoTempo } from '../../../shared/viagem';
 import { pokemonPorId, todosOsPokemons } from '../dados';
 import { registrarCapturado, salvar, type Save } from '../estado';
@@ -16,6 +16,7 @@ import { iconeItem } from './iconeItem';
 import { cartaoPokemon } from './time';
 import { abrirJanelaTicket } from './ticket';
 import { abrirJanelaOvo } from './ovo';
+import { marcarConquista } from '../conquistas';
 import { animarEvolucaoNaTela } from '../batalha/animacoes';
 
 const ACAO: Partial<Record<CategoriaLoja, string>> = {
@@ -103,7 +104,9 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
         // nunca fica sem golpe: sem nenhum, recebe os do nível dela
         if (!p.golpes.length && !r.golpesPendentes.length) p.golpes = golpesIniciais(para, p.nivel);
         if (esquecidos.length) r.mensagens.unshift(`Esqueceu ${esquecidos.join(', ')} (${pokemonPorId(para).nome} não aprende).`);
-        registrarCapturado(save, para);
+        registrarCapturado(save, para, p.shiny);
+        if (cubo?.era === 'passado') marcarConquista(save, 'cuboPassado');
+        else if (cubo?.era === 'futuro') marcarConquista(save, 'cuboFuturo');
         for (const golpe of r.golpesPendentes) aprender(p, golpe, () => {}, () => {});
         return [cubo ? `${quem} atravessou o tempo e virou ${pokemonPorId(para).nome}!` : `${quem} evoluiu para ${pokemonPorId(para).nome}!`, ...r.mensagens].join(' ');
       }
@@ -246,21 +249,26 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
               iconeItem(item),
               el('div', { class: 'texto' }, el('strong', {}, item.nome), el('p', {}, item.descricao)),
               el('span', { class: 'quantidade' }, `×${qtd}`),
-              // Shiny Charm: usa na conta (como uma poção); travado enquanto o bônus de 1 hora está ativo
-              item.id === SHINY_CHARM &&
-                el('button', {
-                  class: 'botao', disabled: shinyCharmAtivo(save),
-                  title: shinyCharmAtivo(save) ? 'Só um por vez: espere o bônus acabar' : '',
+              // charm: usa na conta (como uma poção); travado enquanto o bônus de 30 minutos daquele tipo está ativo
+              (() => {
+                const tipo = tipoDoCharm(item.id);
+                if (!tipo) return null;
+                const ativo = charmAtivo(save, tipo);
+                return el('button', {
+                  class: 'botao', disabled: ativo,
+                  title: ativo ? 'Só um deste tipo por vez: espere o bônus acabar' : '',
                   onclick: () => {
-                    const erro = usarShinyCharm(save);
+                    const erro = usarCharm(save, tipo);
                     if (!erro) {
+                      marcarConquista(save, 'charm');
                       salvar(save);
                       aoMudar();
                     }
-                    aviso = erro || 'Shiny Charm ativado: +20% de chance de shiny por 1 hora!';
+                    aviso = erro || `${nomeCharm(tipo)} ativado: +20% de chance de shiny nos Pokémon desse tipo por 30 minutos!`;
                     refazer();
                   },
-                }, shinyCharmAtivo(save) ? `Ativo · ${textoDoTempo((save.shinyCharmAte ?? 0) - Date.now())}` : 'Usar'),
+                }, ativo ? `Ativo · ${textoDoTempo(charmAte(save, tipo) - Date.now())}` : 'Usar');
+              })(),
               ACAO[item.categoria] &&
                 el(
                   'button',

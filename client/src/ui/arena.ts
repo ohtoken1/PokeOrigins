@@ -5,6 +5,8 @@ import type { Destino, Navegar } from '../main';
 import { ehAdministrador } from '../bonificacao';
 import { carregarSave } from '../estado';
 import { aoMudarViagem, viagemAtual } from '../viagem';
+import { textoTranca } from '../../../shared/trancas';
+import { conteudoLiberado } from '../trancas';
 import { el } from './dom';
 import { abrirJanela } from './janela';
 
@@ -23,8 +25,8 @@ export function abrirArena(navegar: Navegar): void {
         fechado: viagem ? `Fechado até o trem chegar a ${nomeDaRegiao(viagem.para)}` : undefined,
       },
       { nome: 'Duelos com treinadores', descricao: 'Enfrente treinadores e ganhe silver.', destino: { tela: 'duelos' } },
-      { nome: 'Torneio', descricao: 'Torneios entre jogadores.', fechado: 'Em breve' },
-      { nome: 'Liga Pokémon', descricao: 'O desafio final de cada região.', fechado: 'Em breve' },
+      { nome: 'Torneio', descricao: 'Torneios entre jogadores.', fechado: conteudoLiberado('torneio') ? 'Em breve' : textoTranca('torneio') },
+      { nome: 'Liga Pokémon', descricao: 'O desafio final de cada região.', fechado: conteudoLiberado('liga') ? 'Em breve' : textoTranca('liga') },
     ];
     return el('div', { class: 'arena-opcoes' },
       ...opcoes.map((o) =>

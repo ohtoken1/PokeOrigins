@@ -361,6 +361,33 @@ export function criarAnuncio(titulo: string, texto: string, autor: number, autor
 /** Devolve se achou o anúncio. */
 export const apagarAnuncio = (id: number) => sqlAnuncio.apagar.run(id).changes > 0;
 
+// ---- itens dados pela administração, esperando o jogo do jogador buscar (server/src/entregas.ts) ----
+db.exec(`
+  CREATE TABLE IF NOT EXISTS entregas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    conta_id INTEGER NOT NULL REFERENCES contas(id) ON DELETE CASCADE,
+    item TEXT NOT NULL,
+    nome TEXT NOT NULL,
+    quantidade INTEGER NOT NULL CHECK (quantidade > 0),
+    de TEXT NOT NULL,
+    criado_em INTEGER NOT NULL
+  );
+`);
+export interface Entrega {
+  id: number;
+  item: string;
+  nome: string;
+  quantidade: number;
+}
+const sqlEntrega = {
+  criar: db.prepare('INSERT INTO entregas (conta_id, item, nome, quantidade, de, criado_em) VALUES (?, ?, ?, ?, ?, ?)'),
+  daConta: db.prepare('SELECT id, item, nome, quantidade FROM entregas WHERE conta_id = ? ORDER BY id'),
+  apagar: db.prepare('DELETE FROM entregas WHERE id = ?'),
+};
+export const criarEntrega = (contaId: number, item: string, nome: string, quantidade: number, de: string) => void sqlEntrega.criar.run(contaId, item, nome, quantidade, de, Date.now());
+export const entregasDaConta = (contaId: number) => sqlEntrega.daConta.all(contaId) as unknown as Entrega[];
+export const apagarEntrega = (id: number) => void sqlEntrega.apagar.run(id);
+
 // ---- cofre do banco da cidade (server/src/cambio.ts): uma linha só, nunca negativa ----
 db.exec(`
   CREATE TABLE IF NOT EXISTS cofre (

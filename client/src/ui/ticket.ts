@@ -20,6 +20,7 @@ import { abrirJanela } from './janela';
 import { el, spritePokemon } from './dom';
 import { iconeItem } from './iconeItem';
 import { areaRoletas, botoesQuantidade } from './abrirVarios';
+import { marcarConquista } from '../conquistas';
 
 /** Ordem para escolher em qual prêmio a roleta para quando abre vários (o mais raro). */
 const PESO_RARIDADE: Record<Raridade, number> = { comum: 0, raro: 1, epico: 2, passado: 2, futuro: 2, lendario: 3, mitico: 4 };
@@ -52,7 +53,8 @@ function entregar(save: Save, r: ResultadoTicket): string[] {
     // IVs mínimos do ticket (ex.: 15+); shiny continua com 15+ no mínimo
     p.ivs = sortearIvs(0, Math.max(premio.ivMinimo, r.shiny[i] ? IV_MIN_SHINY : 0));
     p.hp = hpMaximo(p);
-    registrarCapturado(save, premio.especie);
+    p.origem = 'ticket';
+    registrarCapturado(save, premio.especie, r.shiny[i]);
     const nome = `${pokemonPorId(premio.especie).nome}${r.shiny[i] ? ' ✨' : ''}`;
     if (save.time.length < TAMANHO_MAXIMO_TIME) {
       save.time.push(p);
@@ -147,6 +149,12 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
         if (save.itens[ticketId] <= 0) delete save.itens[ticketId];
         const todos = Array.from({ length: n }, () => abrirTicket(ticket));
         const frases = todos.flatMap((x) => entregar(save, x));
+        // conquistas dos prêmios raros
+        for (const x of todos) {
+          if (x.raridade === 'epico') marcarConquista(save, 'ticketEpico');
+          else if (x.raridade === 'lendario') marcarConquista(save, 'ticketLendario');
+          else if (x.raridade === 'mitico') marcarConquista(save, 'ticketMitico');
+        }
         salvar(save);
         aoMudar();
         // o título mostra o prêmio mais raro; embaixo aparecem todos

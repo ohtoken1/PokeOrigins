@@ -25,6 +25,11 @@ function concluirSeChegou(save: Record<string, unknown>, agora: number): boolean
   if (agora < viagem.chegaEm) return false;
   if (ORDEM.includes(viagem.para)) save.regiao = viagem.para;
   delete save.viagem;
+  // conquistas do trem: quantas viagens e por quais regiões passou (saída e chegada)
+  const antes = save.trem && typeof save.trem === 'object' ? (save.trem as { viagens?: unknown; regioes?: unknown }) : {};
+  const regioes = new Set(Array.isArray(antes.regioes) ? antes.regioes.filter((r): r is string => ORDEM.includes(r as string)) : []);
+  for (const r of [viagem.de, viagem.para]) if (ORDEM.includes(r)) regioes.add(r);
+  save.trem = { viagens: saldo(antes.viagens) + 1, regioes: [...regioes] };
   return true;
 }
 
@@ -78,4 +83,7 @@ export function protegerRegiao(conta: banco.Conta, save: Record<string, unknown>
   save.regiao = antes.regiao;
   if (antes.viagem) save.viagem = antes.viagem;
   else delete save.viagem;
+  // as viagens feitas também são do servidor
+  if (antes.trem) save.trem = antes.trem;
+  else delete save.trem;
 }
