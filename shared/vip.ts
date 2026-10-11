@@ -28,6 +28,10 @@ export interface ComVip {
   vipAte?: number | null;
 }
 
+/** Tempo da máquina de cura do Centro Pokémon (pedido do dono): 5 s para jogador comum, 2 s para VIP. */
+export const TEMPO_CURA_MS = 5000;
+export const TEMPO_CURA_VIP_MS = 2000;
+
 export const vipAtivo = (c: ComVip, agora = Date.now()): boolean => (c.vipAte ?? 0) > agora;
 
 /** Soma dias de VIP: se já estiver ativo, estende a partir do fim atual. */

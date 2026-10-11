@@ -26,6 +26,8 @@ const CORES_OVO: Record<string, [string, string, string, string]> = {
   L: ['#ff8a3d', '#d4471a', '#ffe0b8', '#5e1600'],
   I: ['#6fdc7a', '#2e9e45', '#e2ffd9', '#0f4a1c'],
   C: ['#c9d3e0', '#8b97a8', '#f4f7fb', '#2f3a4a'],
+  // Ovo Comum
+  N: ['#5cc8e8', '#2a8fb8', '#dff6ff', '#0c3f58'],
 };
 
 export function iconeOvo(letra: string, rotulo = letra, nt = false): HTMLElement {

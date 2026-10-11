@@ -255,7 +255,8 @@ export function gerarIndividuo(
   if (s.gender) genero = s.gender as PokemonIndividual['genero'];
   else genero = aleatorio() < (s.genderRatio?.M ?? 0.5) ? 'M' : 'F';
 
-  const habilidades = [s.abilities['0'], s.abilities['1']].filter(Boolean) as string[];
+  // chance igual entre todas as Abilities da espécie, a Hidden Ability inclusive (pedido do dono)
+  const habilidades = [s.abilities['0'], s.abilities['1'], s.abilities.H].filter(Boolean) as string[];
   const individuo: PokemonIndividual = {
     especieId: numero,
     nivel,

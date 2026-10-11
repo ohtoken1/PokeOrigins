@@ -9,7 +9,8 @@ import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
 import type { BiomaScene, OpcoesBioma } from '../jogo/BiomaScene';
 import { mostrarJogo } from '../jogo/jogoUnico';
-import { carregarSave, curarTime, usarSave, salvar } from '../estado';
+import { carregarSave, usarSave, salvar } from '../estado';
+import { abrirCura } from '../ui/cura';
 import { abrirLoja } from '../ui/loja';
 import { abrirBanco } from '../ui/banco';
 import { abrirMural } from '../ui/mural';
@@ -113,10 +114,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
   /** O que cada lugar faz quando o personagem chega. */
   function usarLocal(acao: string) {
     if (acao === 'centro') {
-      // futuramente: animação da enfermeira/máquina de cura
-      curarTime(save!);
-      atualizarTime();
-      avisar('Seus Pokémon foram curados!');
+      abrirCura(save!, () => atualizarTime());
     } else if (acao === 'loja') abrirLoja(save!, () => atualizarTime());
     else if (acao === 'reminder') abrirProfessores(save!, 'relembrar', () => atualizarTime());
     else if (acao === 'tutor') abrirProfessores(save!, 'tutor', () => atualizarTime());

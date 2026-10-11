@@ -13,8 +13,8 @@ import { itemInegociavel } from '../../shared/naoTrocavel.ts';
 
 /** Mesmo do jogo (client/src/estado.ts). */
 const TAMANHO_MAXIMO_TIME = 6;
-const NUMERO_BOXES = 20;
-const TAMANHO_BOX = 30;
+const NUMERO_BOXES = 30;
+const TAMANHO_BOX = 50;
 const MAX_POKEMONS_POR_OFERTA = 6;
 const MAX_TIPOS_DE_ITEM = 20;
 /** Convite sem resposta e troca parada somem sozinhos. */

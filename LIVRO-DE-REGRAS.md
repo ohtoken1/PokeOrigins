@@ -298,19 +298,19 @@ Level, Love, Moon, Heavy, Fast, Repeat e Dream Ball funcionam como nos jogos.
 
 ## 9. IVs ocultos
 
-Os IVs de um Pokémon capturado **começam escondidos** ("?" na ficha). Há dois jeitos de revelar:
+Os IVs de um Pokémon capturado **começam escondidos** ("?" na ficha). Para revelar, use **Avaliar IVs** na ficha (100 silver, provisório). O que aparece depois depende de você ser VIP:
 
-| Pagamento | O que mostra | Preço (provisório) |
-|---|---|---|
-| **Silver** | a **faixa** de cada IV: 0–5, 6–10, 11–15, 16–20, 21–25 ou 26–31 | 100 silver |
-| **Gold** | o **valor exato** de cada IV | 1 gold |
+| Jogador | O que vê depois de avaliar |
+|---|---|
+| **Sem VIP** | a **faixa** de cada IV: 0–5, 6–10, 11–15, 16–20, 21–25 ou 26–31 |
+| **VIP** | o **valor exato** de cada IV |
 
-- Depois de pagar com silver, ainda dá para pagar com gold para ver o valor exato.
-- A revelação é **permanente**: vale para aquele Pokémon para sempre.
+- Vale o VIP **de agora**: quem vira VIP passa a ver o valor exato de todos os Pokémon já avaliados, sem pagar de novo; quando o VIP acaba, eles voltam a mostrar a faixa.
+- A avaliação é **permanente**: vale para aquele Pokémon para sempre.
 - O inicial já vem com os IVs revelados (IV 20).
 
 ### Tier do Pokémon
-Todo Pokémon ganha um **tier** pela **soma dos 6 IVs** (de 0 a 186). O tier só aparece **depois da avaliação** (silver ou gold), na ficha e no resumo ao passar o mouse:
+Todo Pokémon ganha um **tier** pela **soma dos 6 IVs** (de 0 a 186). O tier só aparece **depois da avaliação**, na ficha e no resumo ao passar o mouse:
 
 | Tier | Soma dos IVs |
 |---|---|
@@ -333,8 +333,14 @@ O inicial (IV 20 em tudo, soma 120) é sempre **A**.
 - **Item segurado:** aparece como um ícone pequeno no canto do cartão do Pokémon. Para dar um item, use **Equipar** na Bolsa; para tirar, use o PC.
 
 ### 10.2 PC
-- **Espaço:** **20 boxes de 30 Pokémon** (600 vagas).
-- **Arrastar:** entre o time, as boxes e as abas das boxes.
+- **Espaço:** **30 boxes de 50 Pokémon** (1.500 vagas).
+- **Casas da box:** cada casa mostra só o Pokémon **andando** (o mesmo desenho do mapa), com uma **estrela** no canto se for shiny. Nome, nível e o resto aparecem ao passar o mouse ou clicar.
+- **Escolher a box:** setas ◀ ▶ e uma lista com todas.
+- **Renomear:** cada box pode ganhar um nome (até 16 letras) para você se organizar.
+- **Fundo:** a área dos Pokémon é branca; o botão **Fundo** troca por um dos **30 papéis de parede dos jogos** (16 do Emerald e 14 do X/Y: floresta, cidade, deserto, praia, vulcão, neve…), um por box.
+- **Org. IVs:** ordena a box aberta pela soma dos IVs, do maior para o menor. Só entram na ordem os Pokémon **já avaliados**; os outros ficam no fim.
+- **Busca:** procura pelo nome em **todas as boxes**; cada resultado mostra em qual box está e clicar leva até ele.
+- **Arrastar:** entre o time e a box, dentro da box, ou para a box vizinha soltando em cima de uma das setas.
 - **Soltar** um Pokémon pede confirmação, porque não tem volta.
 - **Soltar vários:** segure o clique num Pokémon para marcá-lo; depois, cada clique marca ou desmarca outros. O botão "Soltar N" solta todos juntos (com confirmação). O time precisa ficar com pelo menos 1.
 - **Tirar item** devolve o item equipado para a bolsa.
@@ -373,12 +379,15 @@ As duas aparecem **separadas na carteira**, acima do painel do treinador.
 ## 12. Loja e Bolsa
 
 ### 12.1 Loja
+A loja tem três partes: as **seções** à esquerda, a **vitrine** no meio (só imagem, nome e preço de cada item) e, à direita, o **painel do item** que você clicou, com a descrição, a caixa de **quantidade** (começa em 1; digite quanto quiser, até 999 por compra), o **total** e o botão Comprar. O total é o preço do item vezes a quantidade.
+
 | Aba | O que tem |
 |---|---|
-| **Pokébolas** | as 25 bolas |
+| **Pokébolas** | só **Poké Ball, Great Ball e Ultra Ball** (as outras 22 bolas existem no jogo, mas não são vendidas) |
 | **Remédios** | Potions, Revives, curas de status, Ethers/Elixirs, Sacred Ash… |
 | **Evolução** | pedras, Linking Cord, maçãs, armaduras, Dragon Scale e outros itens de evoluir |
-| **Itens de batalha** | itens de batalha de todas as gerações (incensos, Thick Club, Leek…), sem os que ficam fora da loja |
+| **Itens de batalha** | itens de batalha de todas as gerações (incensos, Thick Club, Leek…), em ordem alfabética, sem os que ficam fora da loja |
+| **Up** | itens de treino: **Exp. Share, Lucky Egg, Everstone, Macho Brace** e os seis **Power** (Anklet, Band, Belt, Bracer, Lens, Weight), de segurar; **Ability Capsule** e **Ability Patch**, de usar |
 | **Mega Stones** | as 89 Mega Stones (inclusive as de Legends: Z-A e a **Rayquazite**), **1 gold cada** |
 | **TMs** | as de Scarlet/Violet |
 | **TRs** | as de Sword/Shield |
@@ -389,6 +398,9 @@ As duas aparecem **separadas na carteira**, acima do painel do treinador.
 | Tipo de item | O que fazer |
 |---|---|
 | **Remédios** | usar (dentro ou fora da batalha; Sacred Ash só fora) |
+| **Ability Capsule** | usar: troca a Ability pela outra Ability normal da espécie (em quem está com a Hidden Ability, volta para a normal; não funciona em quem só tem uma Ability normal) |
+| **Ability Patch** | usar: troca a Ability pela Hidden Ability; em quem já tem a Hidden, volta para a normal |
+| **Mints** | usar: muda a Nature do Pokémon para a da Mint (Adamant Mint → Adamant) |
 | **Evolução** | usar e evoluir |
 | **Itens de batalha** | equipar (o item anterior volta para a bolsa); frutas comidas somem no fim da batalha |
 | **TMs/TRs** | ensinar, se o Pokémon puder aprender; são gastas ao usar |
@@ -467,6 +479,9 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 | **Ovo Misterioso** | qualquer Pokémon | IVs normais |
 | **Ovo Misterioso A** | qualquer Pokémon | IVs de tier **A ou superior** (soma 120+) |
 | **Ovo Misterioso S** | qualquer Pokémon | IVs de tier **S ou superior** (soma 145+) |
+| **Ovo Misterioso S+** | qualquer Pokémon | IVs de tier **S+** (soma 171+) |
+| **Ovo Comum** | só Pokémon comuns: nunca lendário, mítico, Ultra Beast, inicial ou evolução de inicial | IVs normais |
+| **Ovo Comum A / S / S+** | o mesmo grupo do Ovo Comum | IVs de tier **A** (120+), **S** (145+) ou **S+** (171+) ou superior |
 | **Ovo Lendário** | um lendário, mítico ou Ultra Beast, **só a primeira forma da linha** (Cosmog e não Lunala; Type: Null e não Silvally; Meltan e não Melmetal) | IVs normais |
 | **Ovo Lendário A / S / S+** | o mesmo grupo do Ovo Lendário | IVs de tier **A** (120+), **S** (145+) ou **S+** (171+) ou superior |
 | **Ovo Inicial** | um dos 27 iniciais | IVs normais |
@@ -474,6 +489,7 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 
 - **Versão NT:** todo ovo existe também na versão **(NT)**. O ovo NT não pode ser trocado com outros jogadores e o Pokémon que nasce dele também é NT (selo 🔒 NT). Os ovos comuns e o que nasce deles podem ser trocados normalmente.
 
+- **Paradoxos fora:** os Pokémon do passado e do futuro (Great Tusk, Iron Valiant…), Koraidon e Miraidon **não nascem de nenhum ovo**.
 - **Chance igual** para todos do grupo do ovo (nos Misteriosos: comum, lendário, mítico, Ultra Beast…).
 - **5% de chance de shiny.**
 - O Pokémon nasce no **nível 1** e vai para o time (ou para o PC, se o time estiver cheio).
@@ -763,6 +779,13 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Títulos:** em Meu perfil dá para escolher um título liberado por conquista (1 em 1.000.000, P2W, CLT, Patrão, Burguesia, Membro de guilda, Líder de guilda). Aparece só no perfil.
 - **Pokédex shiny:** a lista da Pokédex ganhou a marca de **Ultra Ball** para quem você já teve na versão shiny (a Poké Ball continua marcando o capturado).
 - **Skins com os bônus da planilha:** as de lendário mudaram (normal +7% shiny, +5% raros, +7% silver, +5% captura, +7% XP; shiny +10/+7/+10/+5/+10) e as skins passaram a dar bônus de **XP**. Skins novas cadastradas: Galante, Chaveiro e Indiana Jones (conquistas, NT), seis sazonais e as quatro iniciais (Ash, Gary, May, Misty).
+- **PC novo:** 30 boxes de 50, casas só com o Pokémon andando e estrela de shiny, boxes com nome e com fundo (branco ou 30 papéis de parede dos jogos), botão **Org. IVs** e busca em todas as boxes. Saíram os números das boxes lado a lado.
+- **Arrumação da loja:** Pokébolas só Poké/Great/Ultra; saíram os remédios de Heal Powder a Rage Candy Bar e o Destiny Knot; aba nova **Up**; itens de batalha em ordem alfabética; Linking Cord com ícone.
+- **Máquina de cura:** o Centro Pokémon (o coração do topo e o prédio da cidade) agora abre a máquina de cura. Clique em "Curar meus Pokémon": as Pokébolas do time entram na máquina e a cura leva **5 segundos** (**2 segundos para VIP**). Sair antes do fim cancela a cura.
+- **Hidden Ability nos mapas:** todo Pokémon pode nascer com a Hidden Ability, com a mesma chance das outras (duas normais + Hidden = 1/3 cada). Ao evoluir, a Ability acompanha a da espécie nova.
+- **Itens novos:** **Ability Capsule** (troca entre as duas Abilities normais), **Ability Patch** (dá a Hidden Ability) e as **21 Mints** (trocam a Nature; fora da loja por enquanto).
+- **Loja nova:** seções na lateral, vitrine limpa e painel de compra com caixa de quantidade (saíram o "×10" e o número de itens que você tem na bolsa).
+- **IVs:** agora há uma forma só de revelar, **Avaliar IVs** (silver). Sem VIP aparece a faixa de cada IV; com VIP, o valor exato. A opção de pagar com gold saiu.
 - **Ovos novos:** Ovo Misterioso (comum), Ovo Lendário A, S e S+ e Ovo Inicial A. Todo ovo tem também a versão **(NT)**: nem o ovo nem o Pokémon que nasce podem ser trocados.
 - **Itens novos** (Itens-chave, ainda sem uso): Vale Poke S, Kit iniciante (NT) e as seis moedas sazonais.
 - **Trocas:** itens NT são recusados; Pokémon recebido em troca fica marcado e não vale para as conquistas de "consiga um…".
@@ -776,6 +799,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Brilho do shiny:** as skins shiny têm uma aura que pulsa e estrelinhas em volta do personagem.
 - **Minhas skins:** provador com o personagem andando com a skin escolhida; skins sem desenho ainda mostram "Visual em breve".
 - **Criação do personagem:** 24 cabelos novos (agora são 14 masculinos e 18 femininos) e cada sexo só vê os seus. A opção "Corpo" passou a se chamar **Sexo**. Quem já tinha um cabelo que ficou na lista do outro sexo continua com ele até editar o personagem.
+- **Ovos novos:** Ovo Misterioso S+ e o **Ovo Comum** (sem letra, A, S e S+), que só choca Pokémon comuns. Todos com versão (NT). Paradoxos, Koraidon e Miraidon não nascem mais de nenhum ovo.
 - **Ovo de Inicial:** antes da roleta do inicial aparece o aviso do ovo, com o botão "Abrir agora". A região só é escolhida depois que o inicial aparece.
 - **Pokébolas no cinto:** só aparecem com o personagem de frente.
 - **Personagem feminino mais magro:** cintura mais fina e sem a saliência na frente do tronco. As skins continuam servindo.

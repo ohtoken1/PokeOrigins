@@ -11,6 +11,7 @@ import { PRECO_REVELAR_IVS, faixaDoIv, itemDaLoja } from '../../../shared/loja';
 import { AMIZADE_MAXIMA, amizadeDe, textoAmizade } from '../../../shared/amizade';
 import { iconeItem } from './iconeItem';
 import { formatarId, saveDoPokemon, salvar } from '../estado';
+import { vipAtivo } from '../../../shared/vip';
 
 const NOMES: Record<Atributo, string> = { hp: 'HP', atk: 'Ataque', def: 'Defesa', spa: 'At. Esp.', spd: 'Def. Esp.', spe: 'Velocidade' };
 const CATEGORIAS: Record<string, string> = { Physical: 'Físico', Special: 'Especial', Status: 'Status' };
@@ -28,21 +29,35 @@ export function abrirDetalhes(p: PokemonIndividual): void {
   abrirJanela(pokemonPorId(p.especieId).nome, () => fichaPokemon(p), { classe: 'janela-detalhes' });
 }
 
-/** Caixa "IVs ocultos": silver revela a faixa de cada IV, gold (preparado para depois) o valor exato. */
-function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | null {
-  if (p.ivsRevelados) return null;
+/**
+ * Como os IVs aparecem na ficha: ocultos até a avaliação (paga em silver, uma forma só); depois dela, quem é VIP
+ * vê o valor exato e quem não é vê a faixa. Vale o VIP de AGORA: virar VIP mostra o exato dos já avaliados, e o
+ * VIP acabar volta para a faixa. `ivsRevelados` (o inicial) é sempre exato.
+ */
+function visaoDosIvs(p: PokemonIndividual): 'exato' | 'faixa' | 'oculto' {
+  if (p.ivsRevelados) return 'exato';
+  if (!p.ivsFaixa) return 'oculto';
   const save = saveDoPokemon(p);
+  return save && vipAtivo(save) ? 'exato' : 'faixa';
+}
+
+/** Caixa da avaliação dos IVs: o botão de pagar (antes) ou o aviso de que o VIP mostra o valor exato (depois, sem VIP). */
+function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | null {
+  const visao = visaoDosIvs(p);
+  if (visao === 'exato') return null;
+  if (visao === 'faixa')
+    return el('div', { class: 'revelar-ivs' }, el('div', {}, el('strong', {}, '🔓 IVs por faixa'), el('small', {}, 'Jogadores VIP veem o valor exato de cada IV.')));
+  const save = saveDoPokemon(p);
+  const vip = !!save && vipAtivo(save);
   const aviso = el('small', { class: 'aviso' }, '');
-  const pagar = (moeda: 'silver' | 'gold') => {
+  const pagar = () => {
     if (!save) return;
-    const preco = PRECO_REVELAR_IVS[moeda];
-    if (save[moeda] < preco) {
-      aviso.textContent = `${moeda === 'gold' ? 'Gold' : 'Silver'} insuficiente (você tem ${save[moeda]}).`;
+    if (save.silver < PRECO_REVELAR_IVS) {
+      aviso.textContent = `Silver insuficiente (você tem ${save.silver}).`;
       return;
     }
-    save[moeda] -= preco;
-    if (moeda === 'gold') p.ivsRevelados = true;
-    else p.ivsFaixa = true;
+    save.silver -= PRECO_REVELAR_IVS;
+    p.ivsFaixa = true;
     salvar(save);
     aoRevelar();
   };
@@ -52,15 +67,10 @@ function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | 
     el(
       'div',
       {},
-      el('strong', {}, p.ivsFaixa ? '🔓 IVs por faixa' : '🔒 IVs ocultos'),
-      el('small', {}, p.ivsFaixa ? 'Pague com gold para ver o valor exato.' : 'Silver mostra a faixa de cada IV (0–5, 6–10… 26–31); gold mostra o valor exato.'),
+      el('strong', {}, '🔒 IVs ocultos'),
+      el('small', {}, vip ? 'Avalie para ver o valor exato de cada IV (você é VIP).' : 'Avalie para ver a faixa de cada IV (0–5, 6–10… 26–31). Jogadores VIP veem o valor exato.'),
     ),
-    el(
-      'div',
-      { class: 'botoes' },
-      !p.ivsFaixa && el('button', { class: 'botao', disabled: !save, onclick: () => pagar('silver') }, `Ver faixas · ${PRECO_REVELAR_IVS.silver} silver`),
-      el('button', { class: 'botao botao-gold', disabled: !save, onclick: () => pagar('gold') }, `Ver exatos · ${PRECO_REVELAR_IVS.gold} gold`),
-    ),
+    el('div', { class: 'botoes' }, el('button', { class: 'botao', disabled: !save, onclick: pagar }, `Avaliar IVs · ${PRECO_REVELAR_IVS} silver`)),
     aviso,
   );
 }
@@ -76,6 +86,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
   const proximo = expParaNivel(dados.crescimento, p.nivel + 1);
   const totalEvs = ATRIBUTOS.reduce((s, a) => s + p.evs[a], 0);
   const totalBase = ATRIBUTOS.reduce((s, a) => s + base[a], 0);
+  const visao = visaoDosIvs(p);
 
   const marca = (a: Atributo) => (natureza.plus === a ? el('span', { class: 'sobe', title: 'Natureza aumenta' }, '▲') : natureza.minus === a ? el('span', { class: 'desce', title: 'Natureza diminui' }, '▼') : null);
 
@@ -92,9 +103,9 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
           {},
           el('th', {}, NOMES[a], ' ', marca(a)),
           el('td', {}, el('span', { class: 'barrinha', style: { '--v': String(Math.min(1, base[a] / 180)) } }), String(base[a])),
-          p.ivsRevelados
+          visao === 'exato'
             ? el('td', { class: p.ivs[a] === 31 ? 'perfeito' : '' }, String(p.ivs[a]))
-            : p.ivsFaixa
+            : visao === 'faixa'
               ? el('td', { class: `faixa ${faixaDoIv(p.ivs[a])[0] >= 26 ? 'perfeito' : ''}`, title: 'Faixa do IV' }, faixaDoIv(p.ivs[a]).join('–'))
               : el('td', { class: 'oculto', title: 'IV oculto' }, '?'),
           el('td', {}, String(p.evs[a])),
@@ -102,9 +113,9 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
         ),
       ),
     ),
-    el('tfoot', {}, el('tr', {}, el('th', {}, 'Total'), el('td', {}, String(totalBase)), el('td', {}, p.ivsRevelados
+    el('tfoot', {}, el('tr', {}, el('th', {}, 'Total'), el('td', {}, String(totalBase)), el('td', {}, visao === 'exato'
           ? String(ATRIBUTOS.reduce((s, a) => s + p.ivs[a], 0))
-          : p.ivsFaixa
+          : visao === 'faixa'
             ? ATRIBUTOS.map((a) => faixaDoIv(p.ivs[a])).reduce(([x, y], [a, b]) => [x + a, y + b], [0, 0]).join('–')
             : '?'), el('td', {}, `${totalEvs}/${EV_MAX_TOTAL}`), el('td'))),
   );

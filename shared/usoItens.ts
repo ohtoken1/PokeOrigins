@@ -3,7 +3,32 @@
 import { Dex } from '@pkmn/sim';
 import { especie, type PokemonIndividual } from './batalha/pokemon';
 import { idDaEvolucao } from './formasRegionais';
-import { CABO_DE_LIGACAO, ITENS_DE_SEGURAR_NOSSOS, PEDRAS_EVOLUCAO } from './loja';
+import { ABILITY_CAPSULE, ABILITY_PATCH, CABO_DE_LIGACAO, ITENS_DE_SEGURAR_NOSSOS, PEDRAS_EVOLUCAO } from './loja';
+
+/** Ability Capsule e Ability Patch: itens de USAR (o resto da aba Up é de segurar). */
+export const ehItemDeHabilidade = (itemId: string) => itemId === ABILITY_CAPSULE || itemId === ABILITY_PATCH;
+
+/**
+ * Usa a Ability Capsule (troca entre as duas Abilities normais; em quem está com a Hidden, volta para a primeira normal) ou o Ability Patch (vai para a Hidden Ability; em quem
+ * já tem a Hidden, volta para a primeira normal). Devolve se trocou e a frase para o jogador.
+ */
+export function usarItemDeHabilidade(itemId: string, p: PokemonIndividual, quem: string): { usou: boolean; mensagem: string } {
+  const h = especie(p.especieId).abilities;
+  const normais = [h['0'], h['1']].filter(Boolean) as string[];
+  let nova: string | undefined;
+  if (itemId === ABILITY_CAPSULE) {
+    // com a Hidden Ability, volta para a primeira normal (pedido do dono)
+    if (h.H && p.habilidade === h.H && !normais.includes(h.H)) nova = normais[0];
+    else if (normais.length < 2) return { usou: false, mensagem: `${quem} só tem uma Ability normal: a Ability Capsule não tem efeito.` };
+    else nova = normais.find((a) => a !== p.habilidade);
+  } else {
+    if (!h.H) return { usou: false, mensagem: `${quem} não tem Hidden Ability.` };
+    nova = p.habilidade === h.H ? normais[0] : h.H;
+  }
+  if (!nova || nova === p.habilidade) return { usou: false, mensagem: 'Não teria efeito.' };
+  p.habilidade = nova;
+  return { usou: true, mensagem: `A Ability de ${quem} agora é ${nova}!` };
+}
 
 /**
  * Para qual espécie o Pokémon evolui usando o item, ou null.

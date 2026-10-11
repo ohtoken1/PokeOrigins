@@ -1,4 +1,4 @@
-import { CATALOGO, CATEGORIAS, textoPreco, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
+import { CATALOGO, CATEGORIAS, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { salvar, type Save } from '../estado';
 import { bonusVip, vipAtivo } from '../../../shared/vip';
 import { abrirJanela } from './janela';
@@ -6,42 +6,56 @@ import { el } from './dom';
 import { iconeItem } from './iconeItem';
 
 const LIMITE_LISTA = 120;
+const MAXIMO_POR_COMPRA = 999;
 
-/** Loja: todos os itens do jogo, por categoria, com busca. Paga em silver (Mega Stones em gold). */
+/**
+ * Loja em três colunas (modelo aprovado pelo dono): seções à esquerda, vitrine no meio (só imagem, nome e preço) e,
+ * à direita, o painel do item clicado, com a descrição, a caixa de quantidade, o total e o Comprar. Com busca.
+ * Paga em silver (Mega Stones em gold).
+ */
 export function abrirLoja(save: Save, aoMudar: () => void): void {
   let categoria: CategoriaLoja = 'bolas';
   let busca = '';
+  let escolhido: ItemLoja | null = null;
+  let quantidade = 1;
 
-  const saldo = el('strong', { class: 'saldo' }, '');
+  const numero = (n: number) => n.toLocaleString('pt-BR');
+  const saldoSilver = el('span', {}, '');
+  const saldoGold = el('span', {}, '');
   const aviso = el('p', { class: 'aviso-bolsa', hidden: true }, '');
-  const lista = el('div', { class: 'lista-loja' });
-  const abas = el('nav', { class: 'abas abas-loja' });
+  const vitrine = el('div', { class: 'mercado-vitrine' });
+  const painel = el('aside', { class: 'mercado-painel' });
+  const abas = el('nav', { class: 'mercado-secoes' });
   const campoBusca = el('input', { type: 'search', placeholder: 'Buscar item ou golpe…', class: 'busca' });
 
-  const atualizarSaldo = () => (saldo.textContent = `${save.silver.toLocaleString('pt-BR')} silver · ${save.gold.toLocaleString('pt-BR')} gold`);
+  const moeda = (item?: Pick<ItemLoja, 'moeda'>) => el('span', { class: `mercado-moeda ${item?.moeda === 'gold' ? 'gold' : ''}`, title: item?.moeda === 'gold' ? 'gold' : 'silver' });
+  const atualizarSaldo = () => {
+    saldoSilver.textContent = numero(save.silver);
+    saldoGold.textContent = numero(save.gold);
+  };
   const carteira = (item: ItemLoja) => (item.moeda === 'gold' ? save.gold : save.silver);
 
   // VIP: 20% de desconto nas compras em silver (no total da compra, arredondado; Mega Stones em gold sem desconto)
-  const precoFinal = (item: ItemLoja, quantidade: number) =>
-    item.moeda === 'gold' ? item.preco * quantidade : Math.max(1, Math.round(item.preco * quantidade * bonusVip(save, 'precoLoja')));
-  const textoFinal = (item: ItemLoja, quantidade = 1) => `${precoFinal(item, quantidade).toLocaleString('pt-BR')} ${item.moeda ?? 'silver'}`;
-  const comVipNaLoja = () => vipAtivo(save);
+  const precoFinal = (item: ItemLoja, quantos: number) =>
+    item.moeda === 'gold' ? item.preco * quantos : Math.max(1, Math.round(item.preco * quantos * bonusVip(save, 'precoLoja')));
+  const textoFinal = (item: ItemLoja, quantos: number) => `${numero(precoFinal(item, quantos))} ${item.moeda ?? 'silver'}`;
+  const comDesconto = (item: ItemLoja) => vipAtivo(save) && item.moeda !== 'gold';
 
-  const comprar = (item: ItemLoja, quantidade: number) => {
-    const custo = precoFinal(item, quantidade);
+  const comprar = (item: ItemLoja, quantos: number) => {
+    const custo = precoFinal(item, quantos);
     if (carteira(item) < custo) {
-      aviso.textContent = `${item.moeda === 'gold' ? 'Gold' : 'Silver'} insuficiente para ${quantidade}× ${item.nome}.`;
+      aviso.textContent = `${item.moeda === 'gold' ? 'Gold' : 'Silver'} insuficiente para ${quantos}× ${item.nome}.`;
     } else {
       if (item.moeda === 'gold') save.gold -= custo;
       else save.silver -= custo;
-      save.itens[item.id] = (save.itens[item.id] ?? 0) + quantidade;
+      save.itens[item.id] = (save.itens[item.id] ?? 0) + quantos;
       salvar(save);
       aoMudar();
-      aviso.textContent = `Comprou ${quantidade}× ${item.nome} por ${textoFinal(item, quantidade)}${comVipNaLoja() && item.moeda !== 'gold' ? ' (desconto VIP)' : ''}.`;
+      aviso.textContent = `Comprou ${quantos}× ${item.nome} por ${textoFinal(item, quantos)}${comDesconto(item) ? ' (desconto VIP)' : ''}.`;
     }
     aviso.hidden = false;
     atualizarSaldo();
-    desenharLista();
+    desenharPainel();
   };
 
   function desenharAbas() {
@@ -50,13 +64,13 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
         el(
           'button',
           {
-            class: `aba ${!busca && c.id === categoria ? 'ativa' : ''}`,
+            class: `mercado-secao ${!busca && c.id === categoria ? 'ativa' : ''}`,
             onclick: () => {
               categoria = c.id;
               busca = '';
               campoBusca.value = '';
               desenharAbas();
-              desenharLista();
+              desenharVitrine(true);
             },
           },
           c.nome,
@@ -65,39 +79,97 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
     );
   }
 
-  function desenharLista() {
+  /** O painel do item escolhido: descrição, quantidade (padrão 1, digitável), total e Comprar. */
+  function desenharPainel() {
+    const item = escolhido;
+    if (!item) {
+      painel.replaceChildren(el('p', { class: 'mercado-vazio' }, 'Escolha um item.'));
+      return;
+    }
+    const campo = el('input', { type: 'number', min: 1, max: MAXIMO_POR_COMPRA, value: quantidade, 'aria-label': 'Quantidade' }) as HTMLInputElement;
+    const valor = el('span', {}, '');
+    const botao = el('button', { class: 'mercado-comprar', onclick: () => comprar(item, quantidade) }, 'Comprar') as HTMLButtonElement;
+    const atualizar = () => {
+      valor.textContent = numero(precoFinal(item, quantidade));
+      botao.disabled = carteira(item) < precoFinal(item, quantidade);
+    };
+    const definir = (n: number, escrever: boolean) => {
+      quantidade = Math.min(MAXIMO_POR_COMPRA, Math.max(1, Math.floor(n) || 1));
+      if (escrever) campo.value = String(quantidade);
+      atualizar();
+    };
+    campo.addEventListener('input', () => definir(Number(campo.value), false));
+    campo.addEventListener('blur', () => definir(quantidade, true));
+    campo.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') botao.click();
+    });
+    atualizar();
+    painel.replaceChildren(
+      el('div', { class: 'mercado-icone-grande' }, iconeItem(item)),
+      el('strong', { class: 'mercado-nome' }, item.nome),
+      el('p', { class: 'mercado-desc' }, item.descricao),
+      el(
+        'span',
+        { class: 'mercado-qtd' },
+        el('button', { 'aria-label': 'Menos', onclick: () => definir(quantidade - 1, true) }, '−'),
+        campo,
+        el('button', { 'aria-label': 'Mais', onclick: () => definir(quantidade + 1, true) }, '+'),
+      ),
+      el('div', { class: 'mercado-total' }, el('span', {}, comDesconto(item) ? 'Total (VIP −20%)' : 'Total'), el('span', { class: 'mercado-preco' }, moeda(item), valor)),
+      botao,
+    );
+  }
+
+  const escolher = (item: ItemLoja | null) => {
+    escolhido = item;
+    quantidade = 1;
+    for (const b of vitrine.querySelectorAll<HTMLElement>('.mercado-item')) b.classList.toggle('escolhido', b.dataset.id === item?.id);
+    desenharPainel();
+  };
+
+  /** A vitrine da seção (ou da busca). `trocar`: escolhe o primeiro item da lista nova. */
+  function desenharVitrine(trocar: boolean) {
     const termo = busca.trim().toLowerCase();
     const itens = termo
       ? CATALOGO.filter((i) => i.nome.toLowerCase().includes(termo) || i.descricao.toLowerCase().includes(termo))
       : CATALOGO.filter((i) => i.categoria === categoria);
-    lista.replaceChildren(
-      ...itens.slice(0, LIMITE_LISTA).map((item) =>
+    const visiveis = itens.slice(0, LIMITE_LISTA);
+    vitrine.replaceChildren(
+      ...visiveis.map((item) =>
         el(
-          'div',
-          { class: 'linha-item' },
-          iconeItem(item),
-          el('div', { class: 'texto' }, el('strong', {}, item.nome), el('p', {}, item.descricao)),
-          el('span', { class: 'quantidade', title: 'Na bolsa' }, `×${save.itens[item.id] ?? 0}`),
-          el('span', { class: `preco ${item.moeda === 'gold' ? 'preco-gold' : ''}`, title: comVipNaLoja() && item.moeda !== 'gold' ? `VIP: 20% de desconto (×10 = ${textoFinal(item, 10)} em vez de ${textoPreco(item, 10)})` : '' }, textoPreco(item)),
-          el('button', { class: 'botao', disabled: carteira(item) < precoFinal(item, 1), onclick: () => comprar(item, 1) }, 'Comprar'),
-          el('button', { class: 'botao secundario', disabled: carteira(item) < precoFinal(item, 10), onclick: () => comprar(item, 10) }, `×10 · ${textoFinal(item, 10)}`),
+          'button',
+          { class: 'mercado-item', 'data-id': item.id, title: item.nome, onclick: () => escolher(item) },
+          el('span', { class: 'mercado-icone' }, iconeItem(item)),
+          el('span', { class: 'mercado-nome' }, item.nome),
+          el('span', { class: 'mercado-preco' }, moeda(item), numero(item.preco)),
         ),
       ),
-      ...(itens.length > LIMITE_LISTA ? [el('p', { class: 'meta' }, `Mostrando ${LIMITE_LISTA} de ${itens.length}. Use a busca para achar o resto.`)] : []),
-      ...(itens.length === 0 ? [el('p', { class: 'meta' }, 'Nada encontrado.')] : []),
+      ...(itens.length > LIMITE_LISTA ? [el('p', { class: 'mercado-vazio' }, `Mostrando ${LIMITE_LISTA} de ${itens.length}. Use a busca para achar o resto.`)] : []),
+      ...(itens.length === 0 ? [el('p', { class: 'mercado-vazio' }, 'Nada encontrado.')] : []),
     );
+    escolher(trocar || !escolhido || !visiveis.includes(escolhido) ? (visiveis[0] ?? null) : escolhido);
+    if (trocar) vitrine.scrollTop = 0;
   }
 
   campoBusca.addEventListener('input', () => {
     busca = campoBusca.value;
     desenharAbas();
-    desenharLista();
+    desenharVitrine(true);
   });
 
   atualizarSaldo();
   desenharAbas();
-  desenharLista();
-  abrirJanela('Loja', () => el('div', { class: 'loja' }, el('div', { class: 'topo-loja' }, el('span', {}, 'Saldo: ', saldo), comVipNaLoja() ? el('span', { class: 'icone-vip', title: 'Compras em silver com 20% de desconto (o botão ×10 já mostra o preço com desconto)' }, 'VIP −20%') : null, campoBusca), abas, aviso, lista), {
-    classe: 'janela-loja',
-  });
+  desenharVitrine(true);
+  abrirJanela(
+    'Loja',
+    () =>
+      el(
+        'div',
+        { class: 'loja mercado' },
+        el('div', { class: 'mercado-topo' }, campoBusca, el('span', { class: 'mercado-saldo' }, moeda(), saldoSilver), el('span', { class: 'mercado-saldo' }, moeda({ moeda: 'gold' }), saldoGold)),
+        aviso,
+        el('div', { class: 'mercado-colunas' }, abas, vitrine, painel),
+      ),
+    { classe: 'janela-loja' },
+  );
 }

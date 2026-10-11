@@ -23,6 +23,12 @@ export interface ResultadoProgresso {
 /** Muda o nível mantendo o dano sofrido (como nos jogos: o HP sobe junto com o máximo). */
 function mudarNivelOuEspecie(p: PokemonIndividual, mudanca: Partial<Pick<PokemonIndividual, 'nivel' | 'especieId'>>) {
   const antes = hpMaximo(p);
+  // evolução: a Ability acompanha a espécie nova, no mesmo lugar (1ª, 2ª ou Hidden); sem esse lugar, a 1ª
+  if (mudanca.especieId !== undefined && mudanca.especieId !== p.especieId) {
+    const [velhas, novas] = [especie(p.especieId).abilities, especie(mudanca.especieId).abilities];
+    const lugar = (['0', '1', 'H'] as const).find((l) => velhas[l] === p.habilidade);
+    p.habilidade = (lugar && novas[lugar]) || novas['0'];
+  }
   Object.assign(p, mudanca);
   if (p.hp > 0) p.hp = Math.max(1, p.hp + hpMaximo(p) - antes);
 }

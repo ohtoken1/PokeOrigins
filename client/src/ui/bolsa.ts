@@ -2,7 +2,7 @@ import { especie, golpesIniciais, hpMaximo, nomeGolpe, ppMaximo, type PokemonInd
 import { evoluir, trocarGolpe } from '../../../shared/batalha/progresso';
 import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
-import { ehEquipavel, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
+import { ehEquipavel, ehItemDeHabilidade, usarItemDeHabilidade, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
 import { cuboPorItem } from '../../../shared/itensCustom';
 import { charmAte, charmAtivo, nomeCharm, tipoDoCharm, usarCharm } from '../../../shared/charms';
 import { textoDoTempo } from '../../../shared/viagem';
@@ -23,6 +23,8 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
   remedios: 'Usar',
   evolucao: 'Usar',
   batalha: 'Equipar',
+  up: 'Equipar',
+  mints: 'Usar',
   megapedras: 'Equipar',
   frutas: 'Equipar',
   gems: 'Equipar',
@@ -37,6 +39,8 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
   cubos: 'Usar',
   ovos: 'Chocar',
 };
+/** O botão do item: pela categoria; na aba Up, Ability Capsule e Ability Patch são de usar. */
+const acaoDe = (item: ItemLoja) => (ehItemDeHabilidade(item.id) ? 'Usar' : ACAO[item.categoria]);
 
 type Modo =
   | { tipo: 'lista' }
@@ -110,6 +114,21 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
         for (const golpe of r.golpesPendentes) aprender(p, golpe, () => {}, () => {});
         return [cubo ? `${quem} atravessou o tempo e virou ${pokemonPorId(para).nome}!` : `${quem} evoluiu para ${pokemonPorId(para).nome}!`, ...r.mensagens].join(' ');
       }
+      case 'mints': {
+        const natureza = item.natureza!;
+        if (p.natureza === natureza) return `A Nature de ${quem} já é ${natureza}.`;
+        gastar(item.id);
+        p.natureza = natureza;
+        return `A Nature de ${quem} agora é ${natureza}!`;
+      }
+      case 'up':
+        if (ehItemDeHabilidade(item.id)) {
+          const r = usarItemDeHabilidade(item.id, p, quem);
+          if (r.usou) gastar(item.id);
+          return r.mensagem;
+        }
+      // os outros itens da aba Up são de segurar
+      // falls through
       case 'batalha':
       case 'megapedras':
       case 'frutas':
@@ -196,7 +215,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
       return el(
         'div',
         { class: 'bolsa' },
-        el('p', {}, `${ACAO[item.categoria]} ${item.nome} em qual Pokémon?`),
+        el('p', {}, `${acaoDe(item)} ${item.nome} em qual Pokémon?`),
         el(
           'div',
           { class: 'vagas' },
@@ -269,7 +288,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                   },
                 }, ativo ? `Ativo · ${textoDoTempo(charmAte(save, tipo) - Date.now())}` : 'Usar');
               })(),
-              ACAO[item.categoria] &&
+              acaoDe(item) &&
                 el(
                   'button',
                   {
@@ -300,7 +319,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                       refazer();
                     },
                   },
-                  ACAO[item.categoria]!,
+                  acaoDe(item)!,
                 ),
             ),
           ),

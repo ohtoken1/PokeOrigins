@@ -9,7 +9,8 @@ import type { Destino, Navegar } from '../main';
 import { regiaoPorId } from '../../../shared/regioes';
 import { progressoTreinador } from '../../../shared/treinador';
 import { tempoRestanteVip, vipAtivo } from '../../../shared/vip';
-import { aoSalvar, carregarSave, curarTime } from '../estado';
+import { aoSalvar, carregarSave } from '../estado';
+import { abrirCura } from './cura';
 import { abrirBolsa } from './bolsa';
 import { el } from './dom';
 import { iconePokedex } from './barraTopo';
@@ -87,9 +88,7 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
       // atalhos fora da barra: botões hexagonais soltos, um do lado do outro
       el('div', { class: 'cab-atalhos-fora' },
           atalho('coracao', 'Centro Pokémon', () => {
-            curarTime(save);
-            avisar('Time curado!');
-            aoMudar();
+            abrirCura(save, aoMudar);
           }),
           // Pokémarket: jogadores vão até ele na cidade; o atalho fica só para administradores (pedido do dono)
           ehAdministrador() ? atalho('loja', 'Pokémarket', () => abrirLoja(save, aoMudar)) : null,

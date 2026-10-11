@@ -24,6 +24,10 @@ export interface Save {
   time: PokemonDoJogador[];
   /** PC: Pokémon guardados fora do time. */
   caixa: PokemonDoJogador[];
+  /** Nomes que o jogador deu às boxes do PC (posição = número da box; vazio = "Box N"). */
+  nomesBox?: (string | null)[];
+  /** Fundo escolhido para cada box do PC (id em `ui/fundosBox.ts`; vazio = branca). */
+  fundosBox?: (string | null)[];
   /** Quantidade de cada item na bolsa (id do item → quantidade). */
   itens: Record<string, number>;
   /** Moeda do jogo. */
@@ -120,8 +124,12 @@ export function registrarCapturado(save: Save, especieId: number, shiny = false)
 }
 
 export const TAMANHO_MAXIMO_TIME = 6;
-export const NUMERO_BOXES = 20;
-export const TAMANHO_BOX = 30;
+export const NUMERO_BOXES = 30;
+export const TAMANHO_BOX = 50;
+/** Tamanho máximo do nome que o jogador dá a uma box. */
+export const TAMANHO_NOME_BOX = 16;
+/** Nome da box: o que o jogador deu (`save.nomesBox`) ou "Box N". */
+export const nomeDaBox = (save: Save, box: number): string => save.nomesBox?.[box]?.trim() || `Box ${box + 1}`;
 
 /** Pokémon da box, na ordem em que aparecem. */
 export function pokemonsDaBox(save: Save, box: number): PokemonDoJogador[] {

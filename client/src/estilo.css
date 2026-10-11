@@ -2119,3 +2119,130 @@ button.missao-quadro:disabled { cursor: default; }
 .ovo-inicial.chocando { animation: ovo-inicial-choca 0.9s ease-in forwards; }
 @keyframes ovo-inicial-balanca { 0%, 45%, 100% { transform: rotate(0); } 53% { transform: rotate(-6deg); } 63% { transform: rotate(5deg); } 73% { transform: rotate(-3deg); } 83% { transform: rotate(2deg); } 91% { transform: rotate(0); } }
 @keyframes ovo-inicial-choca { 0% { transform: scale(1); } 60% { transform: scale(1.08); filter: brightness(1.6); } 100% { transform: scale(1.5); filter: brightness(6); opacity: 0; } }
+
+/* PC: box de 50 (10 × 5) com casas pequenas: só o Pokémon andando (sprite de mapa), a estrela do shiny e o cadeado */
+.janela.janela-pc { width: min(720px, 100%); }
+.pc-box { display: grid; gap: 8px; }
+.box-cabecalho { flex-wrap: wrap; margin-bottom: 0; }
+.box-seta.alvo { outline: 2px dashed var(--destaque); outline-offset: 2px; }
+.box-nome { width: 190px; background: var(--painel-2); color: var(--texto); border: 1px solid var(--destaque); border-radius: 8px; padding: 6px 10px; font: inherit; }
+.box-busca { display: flex; gap: 6px; justify-content: center; }
+.pc-busca { width: min(320px, 100%); background: var(--painel-2); color: var(--texto); border: 1px solid var(--borda); border-radius: 8px; padding: 6px 10px; font: inherit; }
+.box-busca .botao { padding: 4px 12px; }
+.pc .vagas-box { grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; padding: 8px; border-radius: 12px; background: #fff center / cover; border: 2px solid var(--borda); }
+.vagas-box .vaga { min-height: 0; aspect-ratio: 1; border-radius: 8px; }
+.vagas-box .vaga.vazia { border: 1px dashed rgb(20 34 56 / 0.18); }
+/* a área dos Pokémon é clara (branca ou com o fundo escolhido): casas sem cor, só com a borda ao passar o mouse / selecionar */
+.vaga.casa-box { padding: 2px; justify-content: center; background: transparent; overflow: hidden; color: #14233a; }
+button.vaga.casa-box:hover { border-color: rgb(20 34 56 / 0.35); background: rgb(255 255 255 / 0.35); }
+.vaga.casa-box.selecionada { border-color: #e0a800; background: rgb(255 214 64 / 0.3); }
+.vagas-box .vaga.alvo { outline-color: #e0a800; }
+.vagas-box.buscando > p { color: #44546c; }
+.sprite-mapa { display: grid; place-items: center; width: 100%; height: 100%; min-height: 0; pointer-events: none; }
+.sprite-mapa canvas, .sprite-mapa img, .sprite-mapa .sprite { max-width: 100%; max-height: 100%; width: auto; height: auto; }
+.casa-estrela { position: absolute; top: 1px; left: 3px; font-size: 0.72rem; line-height: 1; color: #ffcf2e; text-shadow: -1px 0 #5a3c00, 1px 0 #5a3c00, 0 -1px #5a3c00, 0 1px #5a3c00; pointer-events: none; }
+.casa-trancado { position: absolute; bottom: 1px; right: 2px; transform: scale(0.75); transform-origin: 100% 100%; pointer-events: none; filter: drop-shadow(0 1px 1px #000a); }
+/* resultado da busca: casas com o nome da box embaixo */
+.pc .vagas-box.buscando { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); max-height: 340px; overflow-y: auto; }
+.vagas-box.buscando .vaga.casa-resultado { aspect-ratio: auto; height: 84px; cursor: pointer; }
+.vagas-box.buscando .sprite-mapa { height: 56px; }
+.vagas-box.buscando > p { grid-column: 1 / -1; text-align: center; margin: 12px 0; }
+/* PC: escolher o fundo da box (amostras) */
+.sprite-mapa canvas, .sprite-mapa img { image-rendering: auto; }
+.fundos-box { display: grid; gap: 4px; padding: 8px; border-radius: 10px; background: var(--painel-2); }
+.fundos-box small { color: var(--texto-2); }
+.fundos-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 6px; }
+.fundo-amostra { aspect-ratio: 2 / 1; border-radius: 6px; border: 2px solid var(--borda); cursor: pointer; padding: 0; }
+.fundo-amostra:hover { border-color: var(--texto); }
+.fundo-amostra.ativo { border-color: var(--destaque); box-shadow: 0 0 0 2px var(--destaque); }
+
+/* Loja (ui/loja.ts): seções na lateral, vitrine de itens e painel de compra. Cartões e botões brancos e sólidos
+   (pedido do dono); a janela continua transparente. */
+.janela.janela-loja { width: min(1040px, 100%); }
+.mercado { display: grid; gap: 12px; }
+.mercado-topo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.mercado-topo .busca { flex: 1; min-width: 160px; padding: 8px 12px; border-radius: 10px; border: 1px solid #c9d2de; background: #fff; color: #1d2a3d; font: inherit; }
+.mercado-saldo { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgb(0 0 0 / 0.4); font-weight: 700; font-variant-numeric: tabular-nums; }
+.mercado-moeda { flex: none; width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #b9c2cf 70%); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.25); }
+.mercado-moeda.gold { background: radial-gradient(circle at 35% 35%, #fff3b0, #e9a400 70%); }
+.mercado-colunas { display: grid; grid-template-columns: 170px minmax(0, 1fr) 270px; gap: 14px; align-items: start; }
+.mercado-secoes { display: flex; flex-direction: column; gap: 8px; }
+.mercado-secao { font: inherit; font-weight: 700; text-align: left; padding: 8px 14px; border-radius: 10px; border: 1px solid #c3ccd8; background: linear-gradient(#f4f6f9, #dfe4eb); color: #5b6880; cursor: pointer; }
+.mercado-secao:hover { color: #1d2a3d; }
+.mercado-secao.ativa { background: linear-gradient(#2f7de1, #1c5fc0); border-color: #1c5fc0; color: #fff; }
+.mercado-vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; max-height: min(62vh, 560px); overflow-y: auto; padding: 3px; align-content: start; }
+.mercado-item { display: grid; justify-items: center; align-content: start; gap: 4px; padding: 10px 6px; background: #fff; border-radius: 10px; border: 2px solid #c9d2de; cursor: pointer; text-align: center; font: inherit; color: #1d2a3d; }
+.mercado-item:hover { border-color: #8fa3bf; }
+.mercado-item.escolhido { border-color: #1c5fc0; box-shadow: 0 0 0 3px rgb(47 125 225 / 0.35); }
+.mercado-icone { display: grid; place-items: center; height: 34px; }
+.mercado-icone > * { flex: none; }
+.mercado-nome { font-weight: 800; color: #1d2a3d; }
+.mercado-item .mercado-nome { font-size: 0.82rem; overflow-wrap: anywhere; }
+.mercado-preco { display: inline-flex; align-items: center; gap: 5px; font-weight: 800; font-variant-numeric: tabular-nums; color: #1d2a3d; }
+.mercado-item .mercado-preco { font-size: 0.8rem; color: #66738a; }
+.mercado-vazio { grid-column: 1 / -1; margin: 12px 0; text-align: center; color: var(--texto-2); }
+.mercado-painel { position: sticky; top: 0; display: grid; justify-items: center; gap: 10px; padding: 16px; background: #fff; border-radius: 12px; border: 1px solid #c9d2de; text-align: center; color: #1d2a3d; }
+.mercado-painel .mercado-vazio { color: #66738a; }
+.mercado-icone-grande { display: grid; place-items: center; width: 76px; height: 76px; border-radius: 14px; background: #eef1f6; border: 1px solid #d5dbe5; }
+.mercado-icone-grande > * { flex: none; transform: scale(2); image-rendering: pixelated; }
+.mercado-painel .mercado-nome { font-size: 1.1rem; }
+.mercado-desc { margin: 0; font-size: 0.88rem; color: #66738a; }
+.mercado-qtd { display: inline-flex; align-items: center; border-radius: 999px; background: #e7ebf1; border: 1px solid #c9d2de; overflow: hidden; }
+.mercado-qtd button { font: inherit; font-weight: 800; width: 32px; height: 32px; border: 0; background: none; color: #44526a; cursor: pointer; }
+.mercado-qtd button:hover { background: #d5dbe5; }
+.mercado-qtd input { width: 56px; height: 32px; border: 0; background: #fff; text-align: center; font: inherit; font-weight: 700; color: #1d2a3d; appearance: textfield; -moz-appearance: textfield; }
+.mercado-qtd input::-webkit-outer-spin-button, .mercado-qtd input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.mercado-total { width: 100%; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #d5dbe5; color: #66738a; font-size: 0.85rem; }
+.mercado-comprar { width: 100%; font: inherit; font-weight: 800; padding: 10px; border-radius: 8px; border: 0; background: #2e9e55; color: #fff; cursor: pointer; }
+.mercado-comprar:hover:not(:disabled) { filter: brightness(1.1); }
+.mercado-comprar:disabled { background: #b9c2cf; cursor: not-allowed; }
+@media (max-width: 760px) {
+  .mercado-colunas { grid-template-columns: 1fr; }
+  .mercado-secoes { flex-direction: row; flex-wrap: wrap; order: -2; }
+  .mercado-painel { position: static; order: -1; }
+  .mercado-vitrine { max-height: 46vh; }
+}
+
+/* Máquina de cura do Centro Pokémon (ui/cura.ts) */
+.cura-fundo { position: fixed; inset: 0; z-index: 1010; display: grid; place-items: center; padding: 16px; background: rgb(4 8 18 / 0.72); overflow: auto; }
+.cura-tela { width: min(560px, 100%); padding: 22px 18px 20px; border-radius: 18px; border: 2px solid rgb(52 80 122 / 0.8); background: radial-gradient(circle at 50% 30%, rgb(40 70 110 / 0.85), rgb(12 22 40 / 0.92)); backdrop-filter: blur(4px); box-shadow: 0 30px 60px rgb(0 0 0 / 0.5); display: grid; justify-items: center; gap: 16px; text-align: center; }
+.cura-titulo { margin: 0; font-size: 1.15rem; }
+.cura-frase { margin: 0; min-height: 1.4em; color: #cfe0f5; }
+
+.cura-maquina { position: relative; width: min(360px, 100%); padding: 14px 16px 18px; border-radius: 26px 26px 18px 18px; background: linear-gradient(#f3f6fa, #cfd8e3 60%, #b4c0cf); border: 3px solid #5b6b82; box-shadow: inset 0 3px 0 #fff, inset 0 -6px 0 rgb(0 0 0 / 0.12), 0 10px 0 #3b4658, 0 18px 24px rgb(0 0 0 / 0.45); }
+.cura-maquina::before, .cura-maquina::after { content: ''; position: absolute; bottom: -22px; width: 46px; height: 14px; border-radius: 0 0 10px 10px; background: #3b4658; }
+.cura-maquina::before { left: 34px; } .cura-maquina::after { right: 34px; }
+/* visor: batimento e barra */
+.cura-visor { position: relative; height: 64px; border-radius: 12px; background: #0e2a2a; border: 3px solid #5b6b82; overflow: hidden; box-shadow: inset 0 0 18px rgb(0 0 0 / 0.7); }
+.cura-visor svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cura-visor path { fill: none; stroke: #2c5f57; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.cura-maquina.curando .cura-visor path { stroke: #6ff7c8; filter: drop-shadow(0 0 4px #6ff7c8); stroke-dasharray: 60 400; animation: cura-batimento 1.1s linear infinite; }
+.cura-maquina.pronta .cura-visor path { stroke: #6ff7c8; filter: drop-shadow(0 0 4px #6ff7c8); }
+@keyframes cura-batimento { from { stroke-dashoffset: 460; } to { stroke-dashoffset: 0; } }
+.cura-barra { position: absolute; left: 8px; right: 8px; bottom: 6px; height: 6px; border-radius: 3px; background: rgb(255 255 255 / 0.12); overflow: hidden; }
+.cura-barra i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #36d39a, #b6ffe2); }
+/* luzes */
+.cura-luzes { display: flex; justify-content: space-between; margin: 10px 6px 8px; }
+.cura-luzes span { width: 12px; height: 12px; border-radius: 50%; background: #7d8a9c; border: 2px solid #5b6b82; }
+.cura-maquina.curando .cura-luzes span { animation: cura-luz 0.6s steps(1) infinite; }
+.cura-maquina.curando .cura-luzes span:nth-child(even) { animation-delay: 0.3s; }
+.cura-maquina.pronta .cura-luzes span { background: #57e39b; box-shadow: 0 0 8px #57e39b; }
+@keyframes cura-luz { 0% { background: #ffd84a; box-shadow: 0 0 8px #ffd84a; } 50% { background: #7d8a9c; box-shadow: none; } }
+/* bandeja com seis encaixes */
+.cura-bandeja { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 14px; padding: 14px 18px; border-radius: 14px; background: linear-gradient(#8fd0e8, #5aa9c9); border: 3px solid #5b6b82; box-shadow: inset 0 4px 8px rgb(0 0 0 / 0.3); }
+.cura-encaixe { position: relative; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 50% 60%, #2e5f78, #1d4257); box-shadow: inset 0 3px 5px rgb(0 0 0 / 0.5); display: grid; place-items: center; }
+.cura-bola { width: 78%; height: 78%; border-radius: 50%; border: 2px solid #1d2433; background: linear-gradient(#e8443f 0 44%, #1d2433 44% 56%, #f6f6f6 56%); position: relative; opacity: 0; transform: translateY(-38px) scale(0.7); }
+.cura-bola::after { content: ''; position: absolute; left: 50%; top: 50%; width: 30%; height: 30%; margin: -15% 0 0 -15%; border-radius: 50%; background: #f6f6f6; border: 2px solid #1d2433; }
+.cura-bola.posta { opacity: 1; transform: none; transition: transform 0.28s cubic-bezier(0.3, 1.6, 0.5, 1), opacity 0.12s; }
+.cura-maquina.curando .cura-bola.posta { animation: cura-brilho 0.7s ease-in-out infinite; }
+.cura-maquina.pronta .cura-bola.posta { animation: cura-pulo 0.45s ease-out; box-shadow: 0 0 12px 3px #b6ffe2; }
+@keyframes cura-brilho { 50% { box-shadow: 0 0 14px 5px #fff7b0; filter: brightness(1.35); } }
+@keyframes cura-pulo { 40% { transform: translateY(-8px); } }
+.cura-clarao { position: absolute; inset: 0; border-radius: inherit; background: #fff; opacity: 0; pointer-events: none; }
+.cura-maquina.pronta .cura-clarao { animation: cura-clarao 0.5s ease-out; }
+@keyframes cura-clarao { 0% { opacity: 0.85; } 100% { opacity: 0; } }
+
+.cura-botao { font: inherit; font-weight: 800; font-size: 1rem; padding: 11px 22px; border-radius: 10px; border: 0; background: #2e9e55; color: #fff; cursor: pointer; margin-top: 10px; }
+.cura-botao:hover:not(:disabled) { filter: brightness(1.1); }
+.cura-botao:disabled { background: #6c7a8d; cursor: default; }
+.cura-sair { font: inherit; background: none; border: 0; color: #a2b4cc; cursor: pointer; text-decoration: underline; }
