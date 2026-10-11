@@ -84,7 +84,7 @@ export class OutrosJogadores implements OuvinteSala {
     const corpo = cena.add.image(px, py, 'jogador-baixo-0').setOrigin(0.5, 28 / 32).setScale(1 / 1.6).setDepth(py);
     const sombra = cena.add.ellipse(px, py - 1, 15, 5, 0x000000, 0.28).setDepth(py - 0.5);
     const nome = cena.add
-      .text(px, py, j.nome, { fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: '#bfe3ff', stroke: '#16243a', strokeThickness: 5 })
+      .text(px, py, j.nome, { fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: '#bfe3ff', stroke: '#151310', strokeThickness: 5 })
       .setOrigin(0.5, 1)
       .setDepth(99999)
       .setScale(TAMANHO_NOME_TELA / (FONTE_NOME * ZOOM));

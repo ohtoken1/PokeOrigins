@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="24 40 530 180" role="img" aria-label="PokeOrigins">
+<defs><style>@font-face{font-family:'LogoRusso';src:url(data:font/woff2;base64,d09GMgABAAAAAAPIAA8AAAAAB2AAAAN0AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGhYbVBwYBmAAZBEICoRMg1wLGAABNgIkAywEIAWDXgcgDAcb1AXIBB4Iz/fdJV+56kNjBjiD1A7qbHZ/JHK1tvoSCnhImunl//FbvIl6FA0NEt0zyZNoYgjFHrC7YTVZjAAc8DaJYMBwdHDbk5EZ0b5p946Eopeqfwl7O3/XrJ5EAB1JJUIROBpRABE9HApCotlvCbHf9ieMIUapb9ZkXTGZIJABORb04708cY+c/J6QNUgrYaEPhnR4lX5btfo1alIMk5rawv+vQFsoYiHQLDIqI2QAAHNWjIZruigOBMfWqebw4CmqNSlNWcpTkR2uadsZVhVqHLEf2fvtgL3P3mvvtnfhG+iFAmHbuElSGWL2FN9meNDMpDc3CYOUjwlHvMNpODyOUHdoarcryI0DJ/eJTleNsdeFNuSGcuIYixy8Ro2rKwzhdDqE0gzhxJBKGUFKKp+qV9/wGm5imzSCVH1NtRpiGPUxlRZq8FWjly1q3DUaO8ddgxwrRhMtYBT0eKnaRh0hv+4jNW6dEEijmAOiQ2Xrv40tU+d6nVaZApnG9xqVbny6Kb2Y5noVd7SZz9esWJtGjdq0Hl/MsorFro3t1kifMrR3Xka2Hu9d7h3vvMHH7YHtkd55EQlH6h1uljA3iZeFCR+WLd8eIOT598+y1lpWMbS9K/RbNBUL/BTat5xFLfg1H09u3/XFsk7ePUmoc/d6a+b1JfS/c6TrpfGXK4jLW9JODnc1jV0b631eAyWj6huPz2dZUZa1fdooJ5TmGuLT/Hr7S6oX4lZVZH2Bxm7rW6jSXuaFzyzqdNGr+f/3/yt9r7YQIPTGKRorb+bK+vn/f///1ffeHJsSmYXnMoPshyUDpBfLSSaXY8nblmx6eRxLXnQsJBmyUFGPEEq/LOU9ckCx+80EnFBaWvQwyrWeswrzGg17QSRxsV6kUYSOvXq1KIhE1BIFY5L7VRe5gdZ0pzudKUg2stGN5nSlDZ3pDuysdPtGe7LSia60IhtVKUMlatCDbnSjE1XpiJ8s1MBPK3rQnqZ0pQ4HXXH3daIjJjnISnayk4MKdKInlduRjvShEkAHWN6UFhTE7NVgckwB5MQNyjlCk2aFJelEZ/rMHlqtqtIkPc3JgPfkIEtPozJjzmWQyTHI/raVhVnpSg8yyIW9aEN3Ws8Y9zPrdfTEj4EyeGbs3Co0pQN+rjflbCHlT0ULk+wd5ETP3y3sEZv1CQA=) format('woff2')}</style>
+<linearGradient id="fogo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd84a"/><stop offset=".5" stop-color="#ff8a1e"/><stop offset="1" stop-color="#e5261f"/></linearGradient>
+</defs>
+<g transform="skewX(-12) translate(48 0)">
+<rect x="30" y="52" width="12" height="136" fill="#e5261f"/>
+<rect x="50" y="52" width="6" height="136" fill="#ff8a1e"/>
+<g font-family="LogoRusso, sans-serif" stroke="#0b0e1d" stroke-linejoin="round" paint-order="stroke">
+<text x="74" y="100" font-size="46" letter-spacing="10" fill="#ffffff" stroke-width="9">POKE</text>
+<text x="70" y="176" font-size="88" fill="#0b0e1d" stroke-width="12" transform="translate(5 5)">ORIGINS</text>
+<text x="70" y="176" font-size="88" fill="url(#fogo)" stroke-width="12">ORIGINS</text>
+</g>
+<path d="M74 196h430l-12 12H62z" fill="#ffffff"/>
+<path d="M330 68h170l-8 10H322zM360 86h140l-8 8H352z" fill="#ff8a1e"/>
+</g>
+</svg>

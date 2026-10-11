@@ -805,6 +805,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Ovo de Inicial:** antes da roleta do inicial aparece o aviso do ovo, com o botão "Abrir agora". A região só é escolhida depois que o inicial aparece.
 - **Pokébolas no cinto:** só aparecem com o personagem de frente.
 - **Personagem feminino mais magro:** cintura mais fina e sem a saliência na frente do tronco. As skins continuam servindo.
+- **Logo e cores novas:** o jogo ganhou a logo "PokeOrigins" dourada (tela de entrada e barra do topo) e trocou o azul-escuro por **preto e dourado**. As barras de XP passaram a ser creme.
 
 ---
 

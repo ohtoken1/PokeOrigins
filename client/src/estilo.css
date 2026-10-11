@@ -1,12 +1,12 @@
 ﻿:root {
-  /* azul calmo (pedido do dono: fundo tranquilo, nada de vermelho) */
-  --fundo: #15263c;
-  --painel: #1b2f4a;
-  --painel-2: #233a58;
-  --borda: #34507a;
-  --texto: #eef3fa;
-  --texto-2: #a2b4cc;
-  --destaque: #ffcb05;
+  /* preto e dourado (escolha do dono, combinando com a logo) */
+  --fundo: #12110f;
+  --painel: #1a1815;
+  --painel-2: #2a2620;
+  --borda: #5a4a23;
+  --texto: #f5efe0;
+  --texto-2: #b0a58d;
+  --destaque: #e9b949;
   --perigo: #e64545;
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   color: var(--texto);
@@ -15,7 +15,7 @@
 
 * { box-sizing: border-box; }
 /* wallpaper calmo: anoitecer num vale com lua de Pokébola (client/public/fundo.svg) */
-body { margin: 0; min-height: 100vh; background: linear-gradient(rgb(8 14 30 / 0.45), rgb(8 14 30 / 0.45)) fixed, url('/fundo-campeoes.webp') center / cover no-repeat fixed, var(--fundo); }
+body { margin: 0; min-height: 100vh; background: linear-gradient(rgb(8 7 6 / 0.45), rgb(8 7 6 / 0.45)) fixed, url('/fundo-campeoes.webp') center / cover no-repeat fixed, var(--fundo); }
 /* wallpaper de cada bioma (cores que contrastam com o mapa) */
 body[data-fundo='grama'] { background-image: url('/fundo-grama.svg'); }
 body[data-fundo='agua'] { background-image: url('/fundo-agua.svg'); }
@@ -125,7 +125,7 @@ aside { display: flex; flex-direction: column; gap: 16px; }
 .preenchido.amarela { background: #f3c623; }
 .preenchido.vermelha { background: #ef4444; }
 .barra-exp { height: 4px; margin-top: 4px; }
-.barra-exp .preenchido { background: #4aa8ff; }
+.barra-exp .preenchido { background: #f3e6c4; }
 .vaga .barra-hp { margin-top: auto; height: 4px; }
 .vaga.desmaiado { opacity: 0.45; filter: grayscale(1); }
 
@@ -140,7 +140,7 @@ aside { display: flex; flex-direction: column; gap: 16px; }
 }
 .encontro:hover { border-color: rgb(255 255 255 / 0.25); }
 .encontro.arrastando { cursor: grabbing; animation: none; }
-.encontro.shiny { border-color: rgb(255 203 5 / 0.6); }
+.encontro.shiny { border-color: rgb(233 185 73 / 0.6); }
 .encontro .palco {
   flex: 0 0 160px; height: 160px; display: grid; place-items: center;
   background: radial-gradient(ellipse 34% 9% at 50% 88%, rgb(0 0 0 / 0.35) 0 99%, transparent 100%);
@@ -231,7 +231,7 @@ kbd { font: 600 0.7rem system-ui; padding: 1px 5px; border-radius: 4px; backgrou
   background: var(--painel-2); border: 1px solid var(--borda); border-left: 4px solid var(--acento, var(--borda));
 }
 .acoes-batalha .botao.grande { justify-content: center; }
-.acoes-batalha .botao.grande:hover:not(:disabled), .acoes-batalha .botao.item:hover:not(:disabled) { background: #2c4668; filter: none; }
+.acoes-batalha .botao.grande:hover:not(:disabled), .acoes-batalha .botao.item:hover:not(:disabled) { background: #36322b; filter: none; }
 .botao.lutar { --acento: #ef5350; }
 .botao.bolsa { --acento: #e2b23a; }
 .botao.pokemon { --acento: #3fd46b; }
@@ -313,7 +313,7 @@ button.vaga:hover { border-color: var(--borda); }
 .ficha-topo { display: flex; gap: 16px; align-items: flex-start; }
 .ficha-topo .palco {
   flex: 0 0 140px; height: 140px; display: grid; place-items: end center; overflow: hidden; border-radius: 12px;
-  background: radial-gradient(ellipse at 50% 88%, #3a4260 0 30%, transparent 31%), var(--painel-2);
+  background: radial-gradient(ellipse at 50% 88%, #36322b 0 30%, transparent 31%), var(--painel-2);
 }
 .ficha .resumo { flex: 1; display: grid; gap: 6px; min-width: 0; }
 .ficha .resumo h3 { margin: 0; }
@@ -386,7 +386,7 @@ button.vaga:hover { border-color: var(--borda); }
 /* Escolha do nível dos encontros (treinador 35+), no canto do mapa */
 .nivel-encontros {
   position: absolute; left: 10px; top: 10px; z-index: 4; display: flex; align-items: center; gap: 8px; line-height: normal;
-  padding: 6px 10px; border-radius: 10px; font-size: 0.8rem; background: rgb(20 36 58 / 0.9); border: 1px solid var(--borda);
+  padding: 6px 10px; border-radius: 10px; font-size: 0.8rem; background: rgb(20 19 16 / 0.9); border: 1px solid var(--borda);
 }
 .nivel-encontros input[type='range'] { width: 110px; }
 .nivel-encontros label { display: flex; align-items: center; gap: 4px; color: var(--texto-2); }
@@ -448,9 +448,9 @@ button.vaga:hover { border-color: var(--borda); }
 .icone { display: inline-flex; }
 
 /* Barra no topo do site */
-.barra-topo { position: sticky; top: 0; z-index: 800; background: rgb(16 30 50 / 0.92); backdrop-filter: blur(6px); border-bottom: 1px solid var(--borda); }
+.barra-topo { position: sticky; top: 0; z-index: 800; background: rgb(12 11 10 / 0.92); backdrop-filter: blur(6px); border-bottom: 1px solid var(--borda); }
 .barra-topo-conteudo { max-width: 1340px; margin: 0 auto; padding: 0 16px; height: 48px; display: flex; align-items: center; gap: 24px; }
-.barra-topo .marca { font-size: 1.05rem; letter-spacing: 0.02em; }
+.barra-topo .marca { flex: none; height: 30px; width: auto; display: block; }
 .abas-topo { display: flex; gap: 4px; }
 .som-topo { margin-left: auto; flex: none; display: flex; align-items: center; gap: 8px; }
 .volume-topo { width: 96px; }
@@ -471,7 +471,7 @@ button.vaga:hover { border-color: var(--borda); }
 .lugar { cursor: help; }
 .resumo-pokemon {
   position: absolute; z-index: 20; width: 230px; padding: 10px 12px; border-radius: 10px; pointer-events: none;
-  background: rgb(16 30 50 / 0.95); border: 1px solid var(--borda); box-shadow: 0 8px 20px rgb(0 0 0 / 0.4);
+  background: rgb(12 11 10 / 0.95); border: 1px solid var(--borda); box-shadow: 0 8px 20px rgb(0 0 0 / 0.4);
   display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; color: var(--texto); line-height: 1.3;
 }
 .resumo-pokemon[hidden] { display: none; }
@@ -482,7 +482,7 @@ button.vaga:hover { border-color: var(--borda); }
 .resumo-linha { display: flex; justify-content: space-between; gap: 10px; }
 .resumo-linha span { color: var(--texto-2); }
 .barra-xp { width: 100%; height: 3px; margin-top: 2px; border-radius: 2px; background: rgb(255 255 255 / 0.1); overflow: hidden; }
-.barra-xp > div { height: 100%; background: #5ab8ff; }
+.barra-xp > div { height: 100%; background: #f3e6c4; }
 /* PC com boxes */
 .janela.janela-pc { width: min(860px, 100%); }
 .pc .vagas-time, .pc .vagas-box { grid-template-columns: repeat(6, 1fr); }
@@ -532,7 +532,7 @@ button.vaga:hover { border-color: var(--borda); }
 /* atalhos para trocar de bioma (em cima do mapa) */
 .atalhos-biomas {
   position: fixed; left: 24px; top: 150px; z-index: 700; display: flex; flex-direction: column; gap: 6px; padding: 6px;
-  background: rgb(16 30 50 / 0.9); border: 1px solid var(--borda); border-radius: 12px; box-shadow: 0 8px 20px rgb(0 0 0 / 0.35);
+  background: rgb(12 11 10 / 0.9); border: 1px solid var(--borda); border-radius: 12px; box-shadow: 0 8px 20px rgb(0 0 0 / 0.35);
 }
 .atalhos-alca { font-size: 0.65rem; font-weight: 700; color: var(--texto-2); text-align: center; cursor: grab; user-select: none; touch-action: none; padding: 2px 0; }
 .atalhos-biomas.arrastando .atalhos-alca { cursor: grabbing; }
@@ -546,7 +546,7 @@ button.vaga:hover { border-color: var(--borda); }
   color: #fff; background: rgb(0 0 0 / 0.55); text-align: center;
 }
 .atalho-bioma:hover { opacity: 1; transform: translateY(-2px); }
-.atalho-bioma.ativo { opacity: 1; border-color: var(--destaque); box-shadow: 0 0 0 2px rgb(255 203 5 / 0.25); cursor: default; }
+.atalho-bioma.ativo { opacity: 1; border-color: var(--destaque); box-shadow: 0 0 0 2px rgb(233 185 73 / 0.25); cursor: default; }
 
 .ficha-coluna-sprite { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
 .botao-pokedex { padding: 6px 10px; font-size: 0.8rem; }
@@ -707,13 +707,13 @@ button.vaga:hover { border-color: var(--borda); }
 /* Fundos levemente transparentes (pedido do dono): janelas, ficha e resumo ao passar o mouse deixam ver o que está atrás */
 .janela-fundo { background: rgb(0 0 0 / 0.15); }
 .janela {
-  background: rgb(27 47 74 / 0.45);
+  background: rgb(26 24 21 / 0.45);
   -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-  --painel: rgb(27 47 74 / 0.35);
-  --painel-2: rgb(35 58 88 / 0.4);
+  --painel: rgb(26 24 21 / 0.35);
+  --painel-2: rgb(42 38 32 / 0.4);
 }
 .resumo-pokemon {
-  background: rgb(16 30 50 / 0.45);
+  background: rgb(12 11 10 / 0.45);
   -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
 }
 
@@ -723,7 +723,7 @@ button.vaga:hover { border-color: var(--borda); }
 .aba-menu.aberta .setinha { transform: rotate(180deg); }
 .menu-topo {
   position: absolute; top: calc(100% + 6px); right: 0; min-width: 180px; padding: 6px; display: flex; flex-direction: column; gap: 2px;
-  background: rgb(16 30 50 / 0.85); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  background: rgb(12 11 10 / 0.85); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
   border: 1px solid var(--borda); border-radius: 12px; box-shadow: 0 12px 28px rgb(0 0 0 / 0.4);
 }
 .menu-topo[hidden] { display: none; }
@@ -736,7 +736,7 @@ button.vaga:hover { border-color: var(--borda); }
 /* telas da Comunidade (em breve) */
 .tela-comunidade { max-width: 640px; margin: 0 auto; }
 .em-breve {
-  padding: 20px; border-radius: 14px; background: rgb(27 47 74 / 0.6); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  padding: 20px; border-radius: 14px; background: rgb(26 24 21 / 0.6); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
   border: 1px dashed var(--borda); display: flex; flex-direction: column; gap: 8px;
 }
 .em-breve p { margin: 0; }
@@ -750,7 +750,7 @@ button.vaga:hover { border-color: var(--borda); }
 @media (max-width: 760px) { .layout-personagem { grid-template-columns: 1fr; } }
 .palco-personagem {
   position: sticky; top: 64px; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 16px; border-radius: 16px;
-  background: rgb(27 47 74 / 0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
+  background: rgb(26 24 21 / 0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
 }
 .chao-personagem { width: 100%; display: grid; place-items: center; padding: 8px; border-radius: 12px; background: repeating-conic-gradient(#5aa25a 0 25%, #63ad61 0 50%) 0 0 / 32px 32px; }
 .personagem-grande { width: 256px; height: 256px; image-rendering: pixelated; }
@@ -758,7 +758,7 @@ button.vaga:hover { border-color: var(--borda); }
 .direcoes-personagem .ativo, .opcoes-personagem .ativo { border-color: var(--destaque); box-shadow: 0 0 0 1px var(--destaque) inset; }
 .painel-personagem {
   display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 16px;
-  background: rgb(27 47 74 / 0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
+  background: rgb(26 24 21 / 0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
 }
 .painel-personagem h3 { margin: 6px 0 0; font-size: 0.95rem; }
 .grupo-personagem > span { display: block; margin-bottom: 6px; font-size: 0.72rem; color: var(--texto-2); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -772,7 +772,7 @@ button.vaga:hover { border-color: var(--borda); }
 .dica-golpe {
   position: fixed; z-index: 100000; width: 250px; padding: 10px 12px; border-radius: 12px; pointer-events: none;
   display: flex; flex-direction: column; gap: 6px; font-size: 0.82rem; color: var(--texto); line-height: 1.35;
-  background: rgb(16 30 50 / 0.82); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  background: rgb(12 11 10 / 0.82); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
   border: 1px solid var(--borda); box-shadow: 0 10px 24px rgb(0 0 0 / 0.4);
 }
 .dica-golpe[hidden] { display: none; }
@@ -802,7 +802,7 @@ button.vaga:hover { border-color: var(--borda); }
 .chao-personagem { position: relative; }
 .nome-sobre {
   position: absolute; top: 20px; left: 50%; translate: -50% 0; font-weight: 800; font-size: 0.85rem; color: #fff;
-  text-shadow: 0 0 3px #16243a, 0 0 3px #16243a, 0 1px 2px #16243a; white-space: nowrap; pointer-events: none;
+  text-shadow: 0 0 3px #151310, 0 0 3px #151310, 0 1px 2px #151310; white-space: nowrap; pointer-events: none;
 }
 
 /* Opções */
@@ -810,7 +810,7 @@ button.vaga:hover { border-color: var(--borda); }
 .opcoes-salvo { margin-left: 10px; color: #3fd46b; font-weight: 700; }
 .opcoes-secao {
   display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 16px;
-  background: rgb(27 47 74 / 0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
+  background: rgb(26 24 21 / 0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
 }
 .opcoes-secao h2 { font-size: 1.05rem; margin: 0; }
 .opcoes-campo { display: flex; flex-direction: column; gap: 6px; }
@@ -860,7 +860,7 @@ button.vaga:hover { border-color: var(--borda); }
 .ovo-nasceu .tipos { justify-content: center; }
 
 /* fundo de batalha dos jogos oficiais (sorteado por bioma) */
-.arena.com-fundo { background: var(--fundo-batalha) center bottom / cover no-repeat, #1b2f4a; }
+.arena.com-fundo { background: var(--fundo-batalha) center bottom / cover no-repeat, #1a1815; }
 
 /* Caixas de HP no estilo dos jogos (4ª/5ª geração): fundo creme, borda escura, etiqueta HP, nível "Nv.5" */
 .caixa-info {
@@ -877,7 +877,7 @@ button.vaga:hover { border-color: var(--borda); }
 .caixa-info .linha-exp { margin-top: 4px; padding-block: 1px; }
 .caixa-info .rotulo-exp { color: #9ad0ff; font-size: 0.55rem; }
 .caixa-info .barra-exp { height: 4px; margin-top: 0; border-radius: 2px; background: #1c242c; }
-.caixa-info .barra-exp .preenchido { background: #48a8f8; }
+.caixa-info .barra-exp .preenchido { background: #f3e6c4; }
 .caixa-info .numeros { margin-top: 3px; font-size: 0.95rem; font-weight: 800; color: #2b2b2b; }
 /* estágios de atributo em cima da caixa */
 .caixa-info .boosts { position: absolute; left: 6px; bottom: calc(100% + 4px); display: flex; flex-wrap: wrap; gap: 4px; max-width: 100%; }
@@ -933,7 +933,7 @@ button.vaga:hover { border-color: var(--borda); }
 .golpes-abas { display: flex; gap: 6px; flex-wrap: wrap; }
 .golpes-npc {
   display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 14px;
-  background: rgb(27 47 74 / 0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
+  background: rgb(26 24 21 / 0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
 }
 .golpes-npc p { margin: 2px 0 0; color: var(--texto-2); font-size: 0.88rem; }
 .golpes-npc-icone {
@@ -1018,7 +1018,7 @@ button.vaga:hover { border-color: var(--borda); }
 .ranking-tabela th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--texto-2); }
 .ranking-tabela th:last-child, .ranking-tabela td.valor { text-align: right; }
 .ranking-tabela td.valor { font-weight: 800; }
-.ranking-tabela tr.eu td { background: rgb(255 203 5 / 0.08); }
+.ranking-tabela tr.eu td { background: rgb(233 185 73 / 0.08); }
 .ranking-tabela .posicao { width: 48px; font-weight: 900; }
 .ranking-tabela .posicao.p1 { color: #ffd34d; }
 .ranking-tabela .posicao.p2 { color: #d6dde6; }
@@ -1054,7 +1054,7 @@ button.vaga:hover { border-color: var(--borda); }
 .icone-aleatorio { position: relative; display: grid; place-items: center; }
 .icone-aleatorio b {
   position: absolute; right: -6px; bottom: -4px; width: 15px; height: 15px; border-radius: 50%; display: grid; place-items: center;
-  font-size: 0.7rem; background: #fff; color: #1b2f4a;
+  font-size: 0.7rem; background: #fff; color: #1a1815;
 }
 .icone-skin { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; overflow: hidden; background: linear-gradient(135deg, #3a2a00, #6b4d00); box-shadow: inset 0 0 0 2px #e8b931; }
 .icone-skin.skin-shiny { background: linear-gradient(135deg, #2b3550, #5a6a8c); box-shadow: inset 0 0 0 2px #dfe7ff; }
@@ -1069,7 +1069,7 @@ button.vaga:hover { border-color: var(--borda); }
 .painel-campo { display: flex; flex-direction: column; gap: 4px; }
 .chip-campo {
   display: flex; align-items: baseline; gap: 8px; padding: 3px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 700;
-  color: #fff; background: rgb(10 20 35 / 0.72); border-left: 4px solid var(--cor-campo, #9ab); box-shadow: 0 2px 6px rgb(0 0 0 / 0.3);
+  color: #fff; background: rgb(10 9 8 / 0.72); border-left: 4px solid var(--cor-campo, #9ab); box-shadow: 0 2px 6px rgb(0 0 0 / 0.3);
 }
 .chip-campo small { font-weight: 600; color: #cfd8e6; font-size: 0.72rem; }
 .chip-campo.clima-chuva, .chip-campo.clima-chuvaforte { --cor-campo: #4d9bff; }
@@ -1126,14 +1126,14 @@ button.vaga:hover { border-color: var(--borda); }
 /* Atalho da Pokédex no canto de cima, à esquerda */
 .atalho-pokedex { display: grid; place-items: center; width: 38px; height: 38px; margin-right: -12px; padding: 0; border: 0; border-radius: 10px; background: none; cursor: pointer; transition: transform 0.15s, background 0.15s; }
 .atalho-pokedex:hover { background: var(--painel-2); transform: rotate(-6deg) scale(1.08); }
-.atalho-pokedex.ativa { background: rgb(255 203 5 / 0.15); box-shadow: inset 0 0 0 2px var(--destaque); }
+.atalho-pokedex.ativa { background: rgb(233 185 73 / 0.15); box-shadow: inset 0 0 0 2px var(--destaque); }
 .icone-pokedex { display: grid; place-items: center; filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.4)); }
 /* menus do topo: abrem para a direita a partir da aba (o último, para a esquerda) e não quebram linha */
 .menu-topo { left: 0; right: auto; white-space: nowrap; }
 .aba-com-menu:last-child .menu-topo { left: auto; right: 0; }
 
 /* Cartões dos biomas: em cima o cenário de batalha do bioma; a parte do texto mais transparente (pedido do dono) */
-.cartao-bioma { background: rgb(27 47 74 / 0.4); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.cartao-bioma { background: rgb(26 24 21 / 0.4); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
 .cartao-bioma .faixa {
   height: 92px; background: var(--fundo-bioma) center 70% / cover no-repeat, linear-gradient(160deg, var(--cor-chao), var(--cor-bioma));
 }
@@ -1147,13 +1147,13 @@ button.vaga:hover { border-color: var(--borda); }
 .pedestal {
   display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 8px 12px; min-height: 200px; border-radius: 16px; cursor: pointer;
   color: var(--texto); font: inherit; text-align: center;
-  background: rgb(27 47 74 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 2px solid var(--borda);
+  background: rgb(26 24 21 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 2px solid var(--borda);
   transition: transform 0.15s, border-color 0.15s;
 }
 .pedestal:hover { transform: translateY(-4px); border-color: var(--destaque); }
 .pedestal.shiny { border-color: #e8c34a; box-shadow: 0 0 14px rgb(232 195 74 / 0.35); }
 .pedestal.desmaiado .pedestal-palco { filter: grayscale(1) opacity(0.6); }
-.pedestal.vazio { cursor: default; justify-content: center; border-style: dashed; color: var(--texto-2); background: rgb(27 47 74 / 0.2); }
+.pedestal.vazio { cursor: default; justify-content: center; border-style: dashed; color: var(--texto-2); background: rgb(26 24 21 / 0.2); }
 .pedestal.vazio:hover { transform: none; border-color: var(--borda); }
 .pedestal-palco {
   position: relative; width: 100%; height: 112px; display: grid; place-items: end center;
@@ -1171,14 +1171,14 @@ button.vaga:hover { border-color: var(--borda); }
 .batalha-area .batalha { flex: 0 1 760px; }
 .contador-turnos {
   align-self: flex-start; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 14px; border-radius: 14px;
-  background: rgb(16 30 50 / 0.85); border: 2px solid var(--borda); box-shadow: 0 10px 24px rgb(0 0 0 / 0.4);
+  background: rgb(12 11 10 / 0.85); border: 2px solid var(--borda); box-shadow: 0 10px 24px rgb(0 0 0 / 0.4);
 }
 .contador-turnos small { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--texto-2); font-weight: 800; }
 .contador-turnos strong { font-size: 1.8rem; font-variant-numeric: tabular-nums; line-height: 1; color: var(--destaque); }
 .registro-batalha {
   /* altura limitada: o registro rola por dentro em vez de esticar a janela da batalha */
   flex: 0 0 280px; display: flex; flex-direction: column; min-height: 0; max-height: min(620px, calc(100vh - 40px)); align-self: stretch; border-radius: 14px; overflow: hidden;
-  background: rgb(16 30 50 / 0.85); border: 2px solid var(--borda); box-shadow: 0 10px 24px rgb(0 0 0 / 0.4);
+  background: rgb(12 11 10 / 0.85); border: 2px solid var(--borda); box-shadow: 0 10px 24px rgb(0 0 0 / 0.4);
 }
 .registro-batalha h4 { margin: 0; padding: 10px 12px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--texto-2); border-bottom: 1px solid var(--borda); }
 .registro-lista { flex: 1; overflow-y: auto; padding: 8px 12px; display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; line-height: 1.35; height: 0; min-height: 200px; }
@@ -1191,7 +1191,7 @@ button.vaga:hover { border-color: var(--borda); }
 }
 
 /* ficha do seu Pokémon na batalha (passar o mouse): flutua por cima da janela */
-.resumo-pokemon.resumo-fixo { position: fixed; z-index: 1001; width: 250px; overflow-y: auto; background: rgb(16 30 50 / 0.94); }
+.resumo-pokemon.resumo-fixo { position: fixed; z-index: 1001; width: 250px; overflow-y: auto; background: rgb(12 11 10 / 0.94); }
 
 /* Administração */
 .tela-administracao { max-width: 860px; margin: 0 auto; }
@@ -1200,14 +1200,14 @@ button.vaga:hover { border-color: var(--borda); }
 .bonus-secao { display: flex; flex-direction: column; gap: 10px; }
 .bonus-linha {
   display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border-radius: 12px;
-  background: rgb(27 47 74 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
+  background: rgb(26 24 21 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda);
 }
 .bonus-linha > div:first-child { display: flex; flex-direction: column; gap: 2px; }
 .bonus-linha small { color: var(--texto-2); }
 .bonus-valores { display: flex; gap: 4px; }
 .aviso-bonus {
   display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin-bottom: 10px; padding: 8px 12px; border-radius: 10px;
-  background: rgb(255 203 5 / 0.12); border: 1px solid #8a6a1c; font-size: 0.85rem;
+  background: rgb(233 185 73 / 0.12); border: 1px solid #8a6a1c; font-size: 0.85rem;
 }
 .aviso-bonus strong { color: var(--destaque); }
 /* Buscar jogadores */
@@ -1217,11 +1217,11 @@ button.vaga:hover { border-color: var(--borda); }
 .custo-personagem { display: block; margin-top: 6px; color: var(--texto-2); font-size: 0.75rem; text-align: center; }
 .perfil-jogador { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 14px; }
 @media (max-width: 760px) { .perfil-jogador { grid-template-columns: minmax(0, 1fr); } }
-.perfil-painel, .perfil-lado { padding: 14px 16px; border-radius: 18px; background: rgb(20 28 44 / 0.85); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); }
+.perfil-painel, .perfil-lado { padding: 14px 16px; border-radius: 18px; background: rgb(15 14 12 / 0.85); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); }
 .perfil-painel h3 { margin: 0 0 10px; font-size: 1rem; }
 .perfil-lado { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
 .perfil-lado h2 { margin: 4px 0 0; font-size: 1.4rem; }
-.perfil-retrato { width: 140px; height: 140px; border-radius: 18px; background: repeating-linear-gradient(45deg, #2a4466 0 10px, #2f4c74 10px 20px); border: 2px solid var(--borda); display: grid; place-items: center; overflow: hidden; }
+.perfil-retrato { width: 140px; height: 140px; border-radius: 18px; background: repeating-linear-gradient(45deg, #343029 0 10px, #3e3931 10px 20px); border: 2px solid var(--borda); display: grid; place-items: center; overflow: hidden; }
 .perfil-retrato-canvas { width: 160px; height: 160px; flex: none; image-rendering: pixelated; transform: translateY(-14px); }
 .perfil-status { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.85rem; }
 .perfil-bolinha { width: 8px; height: 8px; border-radius: 50%; background: #8a93a6; }
@@ -1241,7 +1241,7 @@ button.vaga:hover { border-color: var(--borda); }
 .perfil-direita { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .perfil-numeros { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 @media (max-width: 760px) { .perfil-numeros { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.perfil-numero { border-radius: 14px; background: rgb(20 28 44 / 0.85); border: 1px solid var(--borda); border-left: 5px solid var(--destaque); padding: 12px; display: flex; flex-direction: column; }
+.perfil-numero { border-radius: 14px; background: rgb(15 14 12 / 0.85); border: 1px solid var(--borda); border-left: 5px solid var(--destaque); padding: 12px; display: flex; flex-direction: column; }
 .perfil-numero small { color: var(--texto-2); }
 .perfil-numero strong { font-size: 1.4rem; }
 .perfil-numero.n-capturados { border-left-color: #ef4444; }
@@ -1251,7 +1251,7 @@ button.vaga:hover { border-color: var(--borda); }
 .perfil-meio { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
 @media (max-width: 760px) { .perfil-meio { grid-template-columns: minmax(0, 1fr); } }
 .perfil-podio { display: flex; align-items: flex-end; justify-content: center; gap: 8px; height: 140px; }
-.podio-degrau { width: 72px; border-radius: 10px 10px 0 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding-top: 8px; color: #1b2f4a; font-weight: 900; }
+.podio-degrau { width: 72px; border-radius: 10px 10px 0 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding-top: 8px; color: #1a1815; font-weight: 900; }
 .podio-degrau strong { font-size: 1.3rem; }
 .podio-ouro { height: 136px; background: #f2c230; }
 .podio-prata { height: 112px; background: #c9ced6; }
@@ -1264,16 +1264,16 @@ button.vaga:hover { border-color: var(--borda); }
 .podio-bronze .medalha-disco { background: radial-gradient(circle at 35% 30%, #ffd9b0, #cd7f32 45%, #8a4f1c); }
 .perfil-seletor-regiao { width: 100%; margin-bottom: 10px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto); font: inherit; font-weight: 700; cursor: pointer; }
 .perfil-insignias { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; justify-items: center; }
-.perfil-insignias .insignia-img { width: 44px; height: 44px; padding: 6px; border-radius: 10px; background: rgb(35 58 88 / 0.6); }
+.perfil-insignias .insignia-img { width: 44px; height: 44px; padding: 6px; border-radius: 10px; background: rgb(42 38 32 / 0.6); }
 .perfil-time { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
 @media (max-width: 760px) { .perfil-time { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.perfil-capsula { min-width: 0; border-radius: 999px 999px 14px 14px; background: linear-gradient(180deg, #d94141 0 50%, #e8eef6 50% 100%); padding: 6px 6px 8px; text-align: center; color: #1b2f4a; font: inherit; font-size: 0.75rem; font-weight: 800; border: 2px solid #0e1a2c; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+.perfil-capsula { min-width: 0; border-radius: 999px 999px 14px 14px; background: linear-gradient(180deg, #d94141 0 50%, #e8eef6 50% 100%); padding: 6px 6px 8px; text-align: center; color: #1a1815; font: inherit; font-size: 0.75rem; font-weight: 800; border: 2px solid #0d0c0b; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
 .perfil-capsula:hover { border-color: var(--destaque); }
 .perfil-capsula .sprite { width: 64px; height: 64px; margin-bottom: -4px; }
-.perfil-capsula.vazia { background: rgb(35 58 88 / 0.6); color: var(--texto-2); border: 2px dashed var(--borda); cursor: default; justify-content: center; min-height: 90px; }
+.perfil-capsula.vazia { background: rgb(42 38 32 / 0.6); color: var(--texto-2); border: 2px dashed var(--borda); cursor: default; justify-content: center; min-height: 90px; }
 
 /* Cabeçalho fixo (embaixo da barra do topo) */
-.cabecalho-jogo { position: sticky; top: 48px; z-index: 790; background: rgb(16 30 50 / 0.82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-bottom: 1px solid var(--borda); }
+.cabecalho-jogo { position: sticky; top: 48px; z-index: 790; background: rgb(12 11 10 / 0.82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-bottom: 1px solid var(--borda); }
 .cabecalho-jogo[hidden] { display: none; }
 .cabecalho-conteudo { max-width: 1340px; margin: 0 auto; padding: 6px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; font-size: 0.8rem; }
 .cab-grupo { display: flex; align-items: center; gap: 8px; }
@@ -1303,7 +1303,7 @@ button.vaga:hover { border-color: var(--borda); }
 @media (max-width: 1100px) { .atalho-cabecalho span:not(.icone) { display: none; } }
 
 /* Passe de batalha (vitrine) */
-.passe-batalha { margin-top: 22px; padding: 14px 16px; border-radius: 16px; background: rgb(27 47 74 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); }
+.passe-batalha { margin-top: 22px; padding: 14px 16px; border-radius: 16px; background: rgb(26 24 21 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); }
 .passe-topo { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .passe-topo h2 { margin: 0; font-size: 1.1rem; }
 .passe-progresso { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
@@ -1358,7 +1358,9 @@ button.vaga:hover { border-color: var(--borda); }
 .cab-sem-vip { font-size: 0.78rem; padding: 2px 7px; }
 .cab-xp { min-width: 190px; gap: 4px; }
 .cab-xp small { font-size: 0.85rem; }
-.cab-xp .barra-exp { height: 9px; }
+.cab-xp .barra-exp { height: 9px; background: rgb(245 239 224 / 0.14); }
+/* creme, não dourado: o dourado ali confundiria com a barra de volume (pedido do dono) */
+.cab-xp .barra-exp .preenchido { background: #f3e6c4; }
 .cab-regiao strong { font-size: 1.1rem; }
 .cab-dex { font-size: 0.88rem; padding: 4px 12px; gap: 4px; }
 .cab-dex-barra { height: 5px; }
@@ -1394,7 +1396,7 @@ button.vaga:hover { border-color: var(--borda); }
 .tela-conta { max-width: 1100px; margin: 0 auto; }
 .conta-botoes { margin-top: 12px; }
 .lista-achievements { display: flex; flex-direction: column; gap: 8px; }
-.achievement { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: rgb(27 47 74 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); }
+.achievement { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: rgb(26 24 21 / 0.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); }
 .achievement.feito { border-color: #8a6a1c; background: rgb(255 201 60 / 0.1); }
 .achievement-selo { width: 30px; height: 30px; flex: none; border-radius: 50%; display: grid; place-items: center; font-size: 1rem; color: #2a1d00; border: 2px dashed var(--borda); }
 .achievement.feito .achievement-selo { border: 0; background: linear-gradient(135deg, #fff1a8, #ffc93c); }
@@ -1404,7 +1406,7 @@ button.vaga:hover { border-color: var(--borda); }
 .achievement-progresso { font-weight: 800; font-size: 0.85rem; white-space: nowrap; color: var(--texto-2); }
 .achievement.feito .achievement-progresso { color: var(--destaque); }
 .grade-skins { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-.cartao-skin { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px; border-radius: 12px; background: rgb(27 47 74 / 0.45); border: 1px solid var(--borda); text-align: center; }
+.cartao-skin { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px; border-radius: 12px; background: rgb(26 24 21 / 0.45); border: 1px solid var(--borda); text-align: center; }
 .cartao-skin .icone-skin { width: 56px; height: 56px; }
 .cartao-skin.em-uso { border-color: var(--destaque); }
 .skin-botoes { display: flex; flex-direction: column; gap: 5px; width: 100%; margin-top: 6px; }
@@ -1415,7 +1417,7 @@ button.vaga:hover { border-color: var(--borda); }
 .skin-botoes .botao { padding: 5px 8px; font-size: 0.8rem; }
 .cartao-skin .skin-bonus { color: var(--destaque); font-size: 0.74rem; line-height: 1.35; }
 .skins-total { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
-.skins-total span { padding: 6px 12px; border-radius: 99px; background: rgb(27 47 74 / 0.7); border: 1px solid var(--borda); font-weight: 700; font-size: 0.88rem; }
+.skins-total span { padding: 6px 12px; border-radius: 99px; background: rgb(26 24 21 / 0.7); border: 1px solid var(--borda); font-weight: 700; font-size: 0.88rem; }
 .skins-total strong { color: var(--destaque); }
 .cartao-skin .icone-skin .sprite { width: 72px; height: 72px; }
 
@@ -1433,7 +1435,7 @@ button.vaga:hover { border-color: var(--borda); }
 
 /* Duelos com treinadores */
 .tela-duelos { max-width: 900px; margin: 0 auto; }
-.cartao-duelo { padding: 16px 18px; border-radius: 16px; background: rgb(27 47 74 / 0.5); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); display: flex; flex-direction: column; gap: 12px; }
+.cartao-duelo { padding: 16px 18px; border-radius: 16px; background: rgb(26 24 21 / 0.5); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); border: 1px solid var(--borda); display: flex; flex-direction: column; gap: 12px; }
 .duelo-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
 .duelo-topo h2 { margin: 2px 0 0; font-size: 1.6rem; }
 .duelo-dificuldade { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
@@ -1446,7 +1448,7 @@ button.vaga:hover { border-color: var(--borda); }
 .duelo-info { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--texto-2); font-size: 0.88rem; }
 .duelo-info strong { color: var(--destaque); }
 .duelo-botoes { display: flex; gap: 8px; flex-wrap: wrap; }
-.lista-treinadores { margin-top: 16px; padding: 10px 14px; border-radius: 14px; background: rgb(27 47 74 / 0.35); border: 1px solid var(--borda); }
+.lista-treinadores { margin-top: 16px; padding: 10px 14px; border-radius: 14px; background: rgb(26 24 21 / 0.35); border: 1px solid var(--borda); }
 .lista-treinadores summary { cursor: pointer; font-weight: 800; }
 .grupo-treinadores h4 { margin: 12px 0 6px; display: flex; align-items: center; gap: 6px; }
 .linha-treinador-npc { display: grid; grid-template-columns: 130px 220px 1fr; align-items: center; gap: 8px; padding: 2px 0; border-bottom: 1px solid rgb(255 255 255 / 0.05); }
@@ -1482,9 +1484,9 @@ button.vaga:hover { border-color: var(--borda); }
 .lista-ginasios { display: grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: 10px; }
 .cartao-ginasio {
   display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--borda); border-left: 5px solid var(--cor-tipo);
-  background: rgb(27 47 74 / 0.5); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  background: rgb(26 24 21 / 0.5); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
 }
-.cartao-ginasio.vencido { background: linear-gradient(90deg, color-mix(in srgb, var(--cor-tipo) 14%, transparent), rgb(27 47 74 / 0.5)); }
+.cartao-ginasio.vencido { background: linear-gradient(90deg, color-mix(in srgb, var(--cor-tipo) 14%, transparent), rgb(26 24 21 / 0.5)); }
 .ginasio-texto { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .ginasio-texto h3 { margin: 0; display: flex; align-items: center; gap: 6px; }
 .ginasio-insignia { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; }
@@ -1522,9 +1524,9 @@ button.vaga:hover { border-color: var(--borda); }
 .simbolo-primal.alpha { color: #4db8ff; text-shadow: 0 0 12px #0070ff, 0 0 30px #00d0ff; }
 
 /* Evolução fora da batalha (pedra, Linking Cord) */
-.evolucao-tela { position: fixed; inset: 0; z-index: 200000; display: grid; place-items: center; background: rgba(5, 10, 20, 0.75); }
+.evolucao-tela { position: fixed; inset: 0; z-index: 200000; display: grid; place-items: center; background: rgba(5, 5, 4, 0.75); }
 .evolucao-caixa { background: var(--painel); border: 2px solid var(--borda); border-radius: 16px; padding: 20px 28px; display: grid; justify-items: center; gap: 12px; min-width: 320px; }
-.evolucao-palco { position: relative; width: 220px; height: 180px; display: grid; place-items: center; border-radius: 12px; background: radial-gradient(circle at 50% 60%, #2b4a7a, #0f1a2e 70%); overflow: hidden; }
+.evolucao-palco { position: relative; width: 220px; height: 180px; display: grid; place-items: center; border-radius: 12px; background: radial-gradient(circle at 50% 60%, #3b372f, #0e0d0b 70%); overflow: hidden; }
 .evolucao-luz { position: absolute; inset: -40%; background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.25), transparent 30%, rgba(255,255,255,0.2), transparent 60%); animation: evolucao-gira 3s linear infinite; }
 @keyframes evolucao-gira { to { transform: rotate(360deg); } }
 .evolucao-sprite { position: relative; width: 140px; height: 140px; object-fit: contain; image-rendering: pixelated; }
@@ -1537,7 +1539,7 @@ button.vaga:hover { border-color: var(--borda); }
   background: linear-gradient(#ef4444 0 46%, #1f2937 46% 54%, #f8fafc 54%); box-shadow: 0 1px 3px #0008;
 }
 .bola-time::after { content: ''; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #f8fafc; border: 1.5px solid #1f2937; }
-.bola-time.revelado { width: 30px; height: 30px; border-radius: 8px; background: rgb(15 26 46 / 0.75); border-color: #ffffff55; }
+.bola-time.revelado { width: 30px; height: 30px; border-radius: 8px; background: rgb(14 13 11 / 0.75); border-color: #ffffff55; }
 .bola-time.revelado::after { display: none; }
 .bola-time.revelado .sprite { width: 30px; height: 30px; object-fit: contain; image-rendering: pixelated; }
 .bola-time.desmaiado { filter: grayscale(1) brightness(0.6); }
@@ -1571,13 +1573,13 @@ button.vaga:hover { border-color: var(--borda); }
 /* Cidade: aviso curto e minimapa no canto de cima à direita */
 .cidade-aviso {
   position: absolute; left: 50%; top: 14px; transform: translate(-50%, -8px); z-index: 6; line-height: 1.3;
-  padding: 8px 16px; border-radius: 999px; background: rgba(14, 24, 42, 0.92); color: #fff; font-weight: 700;
+  padding: 8px 16px; border-radius: 999px; background: rgba(13, 12, 10, 0.92); color: #fff; font-weight: 700;
   opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s;
 }
 .cidade-aviso.visivel { opacity: 1; transform: translate(-50%, 0); }
 .minimapa {
   position: absolute; right: 10px; top: 10px; z-index: 4; line-height: 0; padding: 4px;
-  background: rgba(14, 24, 42, 0.82); border: 2px solid rgba(255, 255, 255, 0.35); border-radius: 10px;
+  background: rgba(13, 12, 10, 0.82); border: 2px solid rgba(255, 255, 255, 0.35); border-radius: 10px;
   box-shadow: 0 4px 14px rgb(0 0 0 / 0.4);
 }
 .minimapa-mapa { position: relative; border-radius: 6px; overflow: hidden; }
@@ -1593,16 +1595,17 @@ button.vaga:hover { border-color: var(--borda); }
 @media (max-width: 700px) { .minimapa { transform: scale(0.7); transform-origin: top right; } }
 
 /* Professores de golpes por cima da cidade: janela meio transparente */
-.janela-professores { background: rgba(18, 26, 44, 0.82) !important; backdrop-filter: blur(6px); max-width: 760px; }
+.janela-professores { background: rgba(14, 13, 11, 0.82) !important; backdrop-filter: blur(6px); max-width: 760px; }
 
 /* Tela de entrada (login / criar conta) */
 .tela-entrada { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
 .cartao-entrada {
   width: min(400px, 100%); padding: 28px 26px 24px; border-radius: 18px;
-  background: rgb(20 34 56 / 0.88); border: 1px solid var(--borda); box-shadow: 0 18px 50px rgb(0 0 0 / 0.45);
+  background: rgb(18 17 15 / 0.88); border: 1px solid var(--borda); box-shadow: 0 18px 50px rgb(0 0 0 / 0.45);
   backdrop-filter: blur(6px);
 }
 .logo-entrada { margin: 0 0 4px; text-align: center; font-size: 2.1rem; letter-spacing: 0.5px; color: var(--destaque); text-shadow: 0 3px 0 #2a5ea8, 0 5px 10px rgb(0 0 0 / 0.4); }
+.logo-entrada img { display: block; width: min(100%, 320px); height: auto; margin: 0 auto; }
 .entrada-texto { margin: 0 0 18px; text-align: center; color: var(--texto-2); line-height: 1.45; }
 .entrada-titulo { margin: 8px 0 6px; text-align: center; font-size: 1.15rem; }
 .abas-entrada { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-bottom: 16px; border-radius: 12px; background: var(--painel-2); }
@@ -1625,7 +1628,7 @@ button.vaga:hover { border-color: var(--borda); }
 .aviso-sincronia {
   position: fixed; left: 50%; bottom: 18px; translate: -50% 0; z-index: 2000; display: flex; align-items: center; gap: 12px;
   max-width: min(560px, calc(100vw - 32px)); padding: 10px 14px; border-radius: 12px; font-size: 0.9rem;
-  background: rgb(20 34 56 / 0.95); border: 1px solid var(--borda); border-left: 4px solid var(--destaque); box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+  background: rgb(18 17 15 / 0.95); border: 1px solid var(--borda); border-left: 4px solid var(--destaque); box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
 }
 .aviso-sincronia[hidden] { display: none; }
 .aviso-sincronia[data-estado='conflito'], .aviso-sincronia[data-estado='sessao'] { border-left-color: var(--perigo); }
@@ -1651,7 +1654,7 @@ input[type='range']::-moz-range-thumb {
   width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #e6ecf5);
   border: 3px solid var(--destaque); box-shadow: 0 2px 5px rgb(0 0 0 / 0.45); transition: transform 0.12s;
 }
-input[type='range']:hover::-webkit-slider-thumb, input[type='range']:focus-visible::-webkit-slider-thumb { transform: scale(1.2); box-shadow: 0 0 0 5px rgb(255 203 5 / 0.18), 0 2px 5px rgb(0 0 0 / 0.45); }
+input[type='range']:hover::-webkit-slider-thumb, input[type='range']:focus-visible::-webkit-slider-thumb { transform: scale(1.2); box-shadow: 0 0 0 5px rgb(233 185 73 / 0.18), 0 2px 5px rgb(0 0 0 / 0.45); }
 input[type='range']:hover::-moz-range-thumb { transform: scale(1.2); }
 input[type='range']:focus { outline: none; }
 input[type='range']:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -1660,7 +1663,7 @@ input[type='range']:disabled { opacity: 0.4; cursor: not-allowed; }
    ligado = bolinha à direita, trilho aceso em amarelo com brilho */
 input[type='checkbox'] {
   -webkit-appearance: none; appearance: none; flex: none; position: relative; width: 42px; height: 24px; margin: 0;
-  border-radius: 99px; cursor: pointer; background: #3a4458; border: 1px solid #4b5770;
+  border-radius: 99px; cursor: pointer; background: #37332c; border: 1px solid #4f4a3f;
   box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.4); transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 input[type='checkbox']::before {
@@ -1669,7 +1672,7 @@ input[type='checkbox']::before {
 }
 input[type='checkbox']:checked {
   background: linear-gradient(90deg, #f5a500, var(--destaque)); border-color: #ffe27a;
-  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.25), 0 0 10px rgb(255 203 5 / 0.45);
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.25), 0 0 10px rgb(233 185 73 / 0.45);
 }
 input[type='checkbox']:checked::before { translate: 18px 0; background: #fff; }
 input[type='checkbox']:hover:not(:disabled) { border-color: var(--destaque); }
@@ -1687,14 +1690,14 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .troca-colunas { display: grid; grid-template-columns: 1fr minmax(170px, 210px) 1fr; gap: 14px; align-items: stretch; }
 .troca-coluna {
   display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 14px; border-radius: 14px;
-  background: rgb(20 34 56 / 0.7); border: 2px solid var(--borda); transition: border-color 0.2s, box-shadow 0.2s;
+  background: rgb(18 17 15 / 0.7); border: 2px solid var(--borda); transition: border-color 0.2s, box-shadow 0.2s;
 }
 .troca-coluna.confirmada { border-color: #4fd36a; box-shadow: 0 0 14px rgb(79 211 106 / 0.25); }
 .troca-coluna header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .troca-coluna h3 { margin: 0; font-size: 1.05rem; overflow: hidden; text-overflow: ellipsis; }
 .troca-selo { flex: none; padding: 3px 9px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; background: var(--painel-2); color: var(--texto-2); }
 .troca-selo.ok { background: rgb(79 211 106 / 0.18); color: #7fe596; }
-.troca-selo.trocar { background: rgb(255 203 5 / 0.2); color: var(--destaque); }
+.troca-selo.trocar { background: rgb(233 185 73 / 0.2); color: var(--destaque); }
 .troca-oferta { display: flex; flex-direction: column; gap: 6px; min-height: 120px; }
 .troca-vazio { margin: auto 0; text-align: center; color: var(--texto-2); font-size: 0.88rem; }
 .troca-pokemon, .troca-item, .troca-moeda {
@@ -1739,9 +1742,9 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .troca-centro p { margin: 0; }
 .troca-trocar {
   padding: 16px 22px; font-size: 1.15rem; border-radius: 14px;
-  box-shadow: 0 0 0 4px rgb(255 203 5 / 0.18), 0 6px 18px rgb(0 0 0 / 0.4); animation: troca-pulsar 1.4s ease-in-out infinite;
+  box-shadow: 0 0 0 4px rgb(233 185 73 / 0.18), 0 6px 18px rgb(0 0 0 / 0.4); animation: troca-pulsar 1.4s ease-in-out infinite;
 }
-@keyframes troca-pulsar { 50% { box-shadow: 0 0 0 9px rgb(255 203 5 / 0.08), 0 6px 18px rgb(0 0 0 / 0.4); } }
+@keyframes troca-pulsar { 50% { box-shadow: 0 0 0 9px rgb(233 185 73 / 0.08), 0 6px 18px rgb(0 0 0 / 0.4); } }
 .troca-fim { font-size: 1.2rem; font-weight: 800; color: var(--texto); }
 .troca-centro.feita .troca-fim { color: #7fe596; }
 .troca-mensagem { margin: 0; min-height: 1.2em; text-align: center; color: #ff9a9a; font-size: 0.9rem; }
@@ -1755,7 +1758,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .aviso-convite {
   position: fixed; right: 18px; bottom: 18px; z-index: 2100; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0;
   max-width: min(340px, calc(100vw - 32px)); padding: 14px 16px; border-radius: 14px;
-  background: rgb(20 34 56 / 0.96); border: 1px solid var(--borda); border-left: 4px solid var(--destaque); box-shadow: 0 10px 28px rgb(0 0 0 / 0.45);
+  background: rgb(18 17 15 / 0.96); border: 1px solid var(--borda); border-left: 4px solid var(--destaque); box-shadow: 0 10px 28px rgb(0 0 0 / 0.45);
 }
 .aviso-convite[hidden] { display: none; }
 .aviso-convite-botoes { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
@@ -1764,7 +1767,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 /* Menu ao clicar em outro jogador no mapa (ui/menuJogador.ts) */
 .menu-jogador {
   position: fixed; z-index: 2200; min-width: 200px; display: flex; flex-direction: column; gap: 4px; padding: 8px;
-  border-radius: 14px; background: rgb(20 34 56 / 0.97); border: 1px solid var(--borda); box-shadow: 0 12px 30px rgb(0 0 0 / 0.5);
+  border-radius: 14px; background: rgb(18 17 15 / 0.97); border: 1px solid var(--borda); box-shadow: 0 12px 30px rgb(0 0 0 / 0.5);
 }
 .menu-jogador header { display: flex; flex-direction: column; padding: 4px 8px 8px; border-bottom: 1px solid var(--borda); margin-bottom: 2px; }
 .menu-jogador header small { color: var(--texto-2); }
@@ -1782,7 +1785,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .jogadores-lista { display: flex; flex-direction: column; gap: 6px; max-width: 520px; }
 .jogador-achado {
   display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; cursor: pointer; text-align: left;
-  background: rgb(27 47 74 / 0.75); border: 1px solid var(--borda); color: var(--texto); font: inherit;
+  background: rgb(26 24 21 / 0.75); border: 1px solid var(--borda); color: var(--texto); font: inherit;
 }
 .jogador-achado:hover { border-color: var(--destaque); }
 .jogador-achado small { color: var(--texto-2); }
@@ -1803,7 +1806,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .painel-chances {
   position: absolute; top: 60px; right: 10px; z-index: 29; width: min(360px, calc(100% - 20px)); max-height: calc(100% - 72px);
   overflow-y: auto; padding: 12px; border-radius: 14px; line-height: normal;
-  background: rgb(18 30 50 / 0.9); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1px solid var(--borda);
+  background: rgb(16 14 12 / 0.9); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1px solid var(--borda);
   box-shadow: 0 10px 28px rgb(0 0 0 / 0.45);
 }
 .painel-chances[hidden] { display: none; }
@@ -1812,14 +1815,14 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 /* Chat (Local, Global, Clã) ao lado do mapa */
 .chat { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
 .chat h2 { margin: 0; font-size: 1.05rem; }
-.chat-abas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; border-radius: 12px; background: rgb(20 34 56 / 0.85); border: 1px solid var(--borda); }
+.chat-abas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; border-radius: 12px; background: rgb(18 17 15 / 0.85); border: 1px solid var(--borda); }
 .chat-aba { position: relative; padding: 7px 2px; border: 0; border-radius: 9px; background: transparent; color: var(--texto-2); font: inherit; font-weight: 700; font-size: 0.88rem; cursor: pointer; }
 .chat-aba:hover { color: var(--texto); }
 .chat-aba.ativa { background: var(--destaque); color: #1a1a1a; }
 .chat-nao-lidas { position: absolute; top: -4px; right: 2px; min-width: 18px; padding: 1px 5px; border-radius: 99px; background: var(--perigo); color: #fff; font-size: 0.68rem; line-height: 1.3; }
 .chat-lista {
   height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding: 10px; border-radius: 12px;
-  background: rgb(20 34 56 / 0.85); border: 1px solid var(--borda); font-size: 0.86rem; overflow-wrap: anywhere;
+  background: rgb(18 17 15 / 0.85); border: 1px solid var(--borda); font-size: 0.86rem; overflow-wrap: anywhere;
 }
 .chat-msg { margin: 0; line-height: 1.35; }
 .chat-msg time { color: var(--texto-2); font-size: 0.72rem; margin-right: 6px; font-variant-numeric: tabular-nums; }
@@ -1840,7 +1843,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .chat-amigos, .conversa { display: flex; flex-direction: column; gap: 8px; }
 .chat-amigos > .chat-lista { height: 348px; gap: 6px; }
 .chat-amigos .conversa .chat-lista { height: 262px; }
-.chat-amigo-topo { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px; background: rgb(20 34 56 / 0.85); border: 1px solid var(--borda); }
+.chat-amigo-topo { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px; background: rgb(18 17 15 / 0.85); border: 1px solid var(--borda); }
 .chat-amigo-topo .chat-nome { margin: 0 0 0 auto; }
 .chat-amigo-topo .chat-nome::after { content: none; }
 .conversa strong.chat-nome { cursor: default; }
@@ -1853,7 +1856,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 }
 .chat-amigo:hover { border-color: var(--destaque); }
 .chat-amigo small { color: var(--texto-2); margin-left: auto; }
-.chat-pedido { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border-radius: 10px; background: rgb(255 203 5 / 0.08); border: 1px solid rgb(255 203 5 / 0.35); }
+.chat-pedido { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border-radius: 10px; background: rgb(233 185 73 / 0.08); border: 1px solid rgb(233 185 73 / 0.35); }
 .chat-pedido-botoes { display: flex; gap: 6px; }
 .chat-pedido-botoes .botao { flex: 1; padding: 5px 8px; font-size: 0.82rem; }
 .perfil-bolinha { flex: none; }
@@ -1872,7 +1875,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .amigos-lista:empty { display: none; }
 .amigo-linha {
   display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; padding: 10px 14px; border-radius: 12px;
-  background: rgb(27 47 74 / 0.75); border: 1px solid var(--borda);
+  background: rgb(26 24 21 / 0.75); border: 1px solid var(--borda);
 }
 .amigo-quem { display: flex; flex-direction: column; min-width: 0; margin-right: auto; }
 .amigo-quem small, .amigo-estado { color: var(--texto-2); }
@@ -1894,7 +1897,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .banco-campo { flex: 1 1 110px; min-width: 0; padding: 9px 11px; border-radius: 10px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto); font: inherit; font-variant-numeric: tabular-nums; }
 .banco-campo:focus { outline: 2px solid var(--destaque); outline-offset: 1px; }
 .banco-quantidade .botao { padding: 6px 12px; font-size: 0.85rem; }
-.banco-resumo { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: rgb(27 47 74 / 0.6); border: 1px solid var(--borda); }
+.banco-resumo { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: rgb(26 24 21 / 0.6); border: 1px solid var(--borda); }
 .banco-resumo > span:not(.banco-seta) { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; color: var(--texto-2); min-width: 0; }
 .banco-resumo .banco-moeda { color: var(--texto); font-size: 1rem; }
 .banco-seta { font-size: 1.3rem; color: var(--destaque); }
@@ -1906,7 +1909,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 /* Mural de anúncios (ui/mural.ts) e Administração → Anúncios */
 .janela.janela-mural { width: min(640px, 100%); }
 .mural { display: flex; flex-direction: column; gap: 10px; }
-.anuncio { padding: 14px 16px; border-radius: 14px; background: rgb(27 47 74 / 0.7); border: 1px solid var(--borda); border-left: 4px solid var(--borda); }
+.anuncio { padding: 14px 16px; border-radius: 14px; background: rgb(26 24 21 / 0.7); border: 1px solid var(--borda); border-left: 4px solid var(--borda); }
 .anuncio.novo { border-left-color: var(--destaque); }
 .anuncio header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .anuncio h3 { margin: 0; font-size: 1.05rem; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; overflow-wrap: anywhere; }
@@ -1919,7 +1922,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .aviso-anuncio {
   position: fixed; left: 50%; top: 14px; transform: translateX(-50%); z-index: 2100; display: flex; flex-direction: column; gap: 2px;
   max-width: min(420px, calc(100vw - 32px)); padding: 10px 18px; border-radius: 14px; text-align: center; pointer-events: none;
-  background: rgb(20 34 56 / 0.96); border: 1px solid var(--destaque); box-shadow: 0 10px 28px rgb(0 0 0 / 0.45);
+  background: rgb(18 17 15 / 0.96); border: 1px solid var(--destaque); box-shadow: 0 10px 28px rgb(0 0 0 / 0.45);
 }
 .aviso-anuncio[hidden] { display: none; }
 .aviso-anuncio strong { color: var(--destaque); font-size: 0.85rem; }
@@ -1931,7 +1934,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .tela-cla { max-width: 860px; margin: 0 auto; }
 .cla-cartao {
   padding: 18px; border-radius: 20px; margin-bottom: 18px; border: 2px solid #c9a227;
-  background: linear-gradient(160deg, rgb(38 58 98 / 0.95), rgb(18 28 48 / 0.95)); box-shadow: inset 0 0 0 2px rgb(0 0 0 / 0.35), 0 10px 26px rgb(0 0 0 / 0.4);
+  background: linear-gradient(160deg, rgb(42 39 34 / 0.95), rgb(15 14 12 / 0.95)); box-shadow: inset 0 0 0 2px rgb(0 0 0 / 0.35), 0 10px 26px rgb(0 0 0 / 0.4);
 }
 .cla-topo { display: flex; gap: 20px; align-items: flex-start; }
 .cla-identidade { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -1982,7 +1985,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .bandeira-escolhas { display: flex; flex-wrap: wrap; gap: 6px; }
 .bandeira-escolha { padding: 5px; border-radius: 10px; border: 2px solid transparent; background: rgb(0 0 0 / 0.28); cursor: pointer; line-height: 0; }
 .bandeira-escolha:hover { border-color: rgb(255 255 255 / 0.4); }
-.bandeira-escolha.ativa { border-color: var(--destaque); background: rgb(255 203 5 / 0.14); }
+.bandeira-escolha.ativa { border-color: var(--destaque); background: rgb(233 185 73 / 0.14); }
 .bandeira-cor { display: block; width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgb(0 0 0 / 0.5); box-shadow: inset 0 2px 3px rgb(255 255 255 / 0.3); }
 .grupo-cores .bandeira-escolha { border-radius: 50%; padding: 3px; }
 .perfil-cla { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 12px; background: rgb(0 0 0 / 0.25); border: 1px solid #c9a227; text-align: left; }
@@ -2002,23 +2005,23 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .trem-regiao { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 6px; border-radius: 12px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto); font: inherit; cursor: pointer; }
 .trem-regiao small { color: var(--texto-2); font-variant-numeric: tabular-nums; }
 .trem-regiao:hover:not(:disabled) { border-color: var(--destaque); }
-.trem-regiao.ativa { border-color: var(--destaque); background: rgb(27 47 74 / 0.9); box-shadow: 0 0 0 2px var(--destaque) inset; }
+.trem-regiao.ativa { border-color: var(--destaque); background: rgb(26 24 21 / 0.9); box-shadow: 0 0 0 2px var(--destaque) inset; }
 .trem-regiao:disabled { opacity: 0.45; cursor: not-allowed; }
 .trem-pagar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .trem-pagar small { grid-column: 1 / -1; color: var(--texto-2); }
 .trem-pagar .botao { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; }
 .trem-pagar .botao:disabled { opacity: 0.45; cursor: not-allowed; }
-.trem-viajando { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px; border-radius: 12px; background: rgb(27 47 74 / 0.6); border: 1px solid var(--borda); }
+.trem-viajando { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px; border-radius: 12px; background: rgb(26 24 21 / 0.6); border: 1px solid var(--borda); }
 .trem-viajando small { color: var(--texto-2); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.72rem; }
 .trem-relogio { font-size: 1.8rem; font-variant-numeric: tabular-nums; color: var(--destaque); }
 .aviso-viagem {
   position: fixed; left: 12px; top: 119px; z-index: 2050; display: flex; align-items: baseline; gap: 8px; padding: 2px 12px; border-radius: 999px; pointer-events: none;
-  background: rgb(20 34 56 / 0.94); border: 1px solid var(--destaque); box-shadow: 0 4px 12px rgb(0 0 0 / 0.4); font-size: 0.78rem; line-height: 1.3; white-space: nowrap;
+  background: rgb(18 17 15 / 0.94); border: 1px solid var(--destaque); box-shadow: 0 4px 12px rgb(0 0 0 / 0.4); font-size: 0.78rem; line-height: 1.3; white-space: nowrap;
 }
 .aviso-viagem[hidden] { display: none; }
 .aviso-viagem strong { color: var(--destaque); }
 .aviso-viagem span { font-variant-numeric: tabular-nums; }
-.aviso-mapas-viagem { padding: 18px; border-radius: 12px; background: rgb(20 34 56 / 0.85); border: 1px solid var(--destaque); }
+.aviso-mapas-viagem { padding: 18px; border-radius: 12px; background: rgb(18 17 15 / 0.85); border: 1px solid var(--destaque); }
 
 /* Arena da cidade (ui/arena.ts) */
 .arena-opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -2026,7 +2029,7 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .arena-opcao strong { font-size: 1.05rem; }
 .arena-opcao span { color: var(--texto-2); font-size: 0.85rem; }
 .arena-opcao small { color: var(--destaque); font-weight: 700; }
-.arena-opcao:hover:not(:disabled) { border-color: var(--destaque); background: rgb(27 47 74 / 0.9); }
+.arena-opcao:hover:not(:disabled) { border-color: var(--destaque); background: rgb(26 24 21 / 0.9); }
 .arena-opcao:disabled { opacity: 0.55; cursor: not-allowed; }
 @media (max-width: 520px) { .arena-opcoes { grid-template-columns: 1fr; } }
 
@@ -2067,7 +2070,7 @@ button.missao-quadro { font: inherit; cursor: pointer; }
 button.missao-quadro:hover:not(:disabled) { border-color: #c98a1a; transform: translateY(-2px); }
 button.missao-quadro:disabled { cursor: default; }
 .missao-tenho { color: #1f7a3a !important; font-weight: 800; }
-.missao-pedido { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin: 0; padding: 10px 14px; border-radius: 12px; background: rgb(27 47 74 / 0.6); border: 1px solid var(--borda); }
+.missao-pedido { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin: 0; padding: 10px 14px; border-radius: 12px; background: rgb(26 24 21 / 0.6); border: 1px solid var(--borda); }
 .missao-voltar { align-self: flex-start; }
 .missao-candidatos { max-height: 50vh; overflow-y: auto; }
 
@@ -2081,7 +2084,7 @@ button.missao-quadro:disabled { cursor: default; }
 .aviso-conquista {
   position: fixed; right: 18px; top: 128px; z-index: 2150; display: flex; flex-direction: column; gap: 3px; pointer-events: none;
   max-width: min(380px, calc(100vw - 32px)); padding: 10px 16px; border-radius: 14px;
-  background: rgb(20 34 56 / 0.96); border: 1px solid #ffc93c; box-shadow: 0 10px 28px rgb(0 0 0 / 0.45);
+  background: rgb(18 17 15 / 0.96); border: 1px solid #ffc93c; box-shadow: 0 10px 28px rgb(0 0 0 / 0.45);
 }
 .aviso-conquista[hidden] { display: none; }
 .aviso-conquista strong { color: #ffc93c; font-size: 0.85rem; }
@@ -2089,13 +2092,13 @@ button.missao-quadro:disabled { cursor: default; }
 .aviso-conquista small { color: var(--texto-2); }
 .conta-perfil { display: flex; flex-direction: column; gap: 14px; }
 .lista-titulos { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
-.titulo-opcao { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 14px; border-radius: 12px; cursor: pointer; color: inherit; font: inherit; background: rgb(27 47 74 / 0.6); border: 1px solid var(--borda); }
+.titulo-opcao { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 14px; border-radius: 12px; cursor: pointer; color: inherit; font: inherit; background: rgb(26 24 21 / 0.6); border: 1px solid var(--borda); }
 .titulo-opcao small { color: var(--texto-2); font-size: 0.75rem; }
 .titulo-opcao.em-uso { border-color: var(--destaque); background: rgb(255 201 60 / 0.12); }
 .titulo-opcao.em-uso small { color: var(--destaque); }
 .titulo-opcao:disabled { opacity: 0.5; cursor: not-allowed; }
 .perfil-titulo { display: inline-block; padding: 2px 12px; border-radius: 99px; font-size: 0.82rem; font-weight: 800; color: #2a1d00; background: linear-gradient(135deg, #fff1a8, #ffc93c); }
-.icone-simbolo { width: 32px; height: 32px; flex: none; border-radius: 8px; display: grid; place-items: center; font-size: 20px; line-height: 1; background: linear-gradient(135deg, #22344f, #3a5378); box-shadow: inset 0 0 0 2px #7f97bd; }
+.icone-simbolo { width: 32px; height: 32px; flex: none; border-radius: 8px; display: grid; place-items: center; font-size: 20px; line-height: 1; background: linear-gradient(135deg, #24211c, #484239); box-shadow: inset 0 0 0 2px #7f97bd; }
 .icone-simbolo.cat-skins { background: linear-gradient(135deg, #3a2a00, #6b4d00); box-shadow: inset 0 0 0 2px #e8b931; }
 .cartao-skin .icone-simbolo { width: 56px; height: 56px; font-size: 34px; }
 .icone-ovo.ovo-nt { position: relative; }
@@ -2131,10 +2134,10 @@ button.missao-quadro:disabled { cursor: default; }
 .box-busca .botao { padding: 4px 12px; }
 .pc .vagas-box { grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; padding: 8px; border-radius: 12px; background: #fff center / cover; border: 2px solid var(--borda); }
 .vagas-box .vaga { min-height: 0; aspect-ratio: 1; border-radius: 8px; }
-.vagas-box .vaga.vazia { border: 1px dashed rgb(20 34 56 / 0.18); }
+.vagas-box .vaga.vazia { border: 1px dashed rgb(18 17 15 / 0.18); }
 /* a área dos Pokémon é clara (branca ou com o fundo escolhido): casas sem cor, só com a borda ao passar o mouse / selecionar */
 .vaga.casa-box { padding: 2px; justify-content: center; background: transparent; overflow: hidden; color: #14233a; }
-button.vaga.casa-box:hover { border-color: rgb(20 34 56 / 0.35); background: rgb(255 255 255 / 0.35); }
+button.vaga.casa-box:hover { border-color: rgb(18 17 15 / 0.35); background: rgb(255 255 255 / 0.35); }
 .vaga.casa-box.selecionada { border-color: #e0a800; background: rgb(255 214 64 / 0.3); }
 .vagas-box .vaga.alvo { outline-color: #e0a800; }
 .vagas-box.buscando > p { color: #44546c; }
@@ -2204,8 +2207,8 @@ button.vaga.casa-box:hover { border-color: rgb(20 34 56 / 0.35); background: rgb
 }
 
 /* Máquina de cura do Centro Pokémon (ui/cura.ts) */
-.cura-fundo { position: fixed; inset: 0; z-index: 1010; display: grid; place-items: center; padding: 16px; background: rgb(4 8 18 / 0.72); overflow: auto; }
-.cura-tela { width: min(560px, 100%); padding: 22px 18px 20px; border-radius: 18px; border: 2px solid rgb(52 80 122 / 0.8); background: radial-gradient(circle at 50% 30%, rgb(40 70 110 / 0.85), rgb(12 22 40 / 0.92)); backdrop-filter: blur(4px); box-shadow: 0 30px 60px rgb(0 0 0 / 0.5); display: grid; justify-items: center; gap: 16px; text-align: center; }
+.cura-fundo { position: fixed; inset: 0; z-index: 1010; display: grid; place-items: center; padding: 16px; background: rgb(4 4 3 / 0.72); overflow: auto; }
+.cura-tela { width: min(560px, 100%); padding: 22px 18px 20px; border-radius: 18px; border: 2px solid rgb(90 74 35 / 0.8); background: radial-gradient(circle at 50% 30%, rgb(54 50 43 / 0.85), rgb(11 11 9 / 0.92)); backdrop-filter: blur(4px); box-shadow: 0 30px 60px rgb(0 0 0 / 0.5); display: grid; justify-items: center; gap: 16px; text-align: center; }
 .cura-titulo { margin: 0; font-size: 1.15rem; }
 .cura-frase { margin: 0; min-height: 1.4em; color: #cfe0f5; }
 
@@ -2245,7 +2248,7 @@ button.vaga.casa-box:hover { border-color: rgb(20 34 56 / 0.35); background: rgb
 .cura-botao { font: inherit; font-weight: 800; font-size: 1rem; padding: 11px 22px; border-radius: 10px; border: 0; background: #2e9e55; color: #fff; cursor: pointer; margin-top: 10px; }
 .cura-botao:hover:not(:disabled) { filter: brightness(1.1); }
 .cura-botao:disabled { background: #6c7a8d; cursor: default; }
-.cura-sair { font: inherit; background: none; border: 0; color: #a2b4cc; cursor: pointer; text-decoration: underline; }
+.cura-sair { font: inherit; background: none; border: 0; color: #b0a58d; cursor: pointer; text-decoration: underline; }
 
 /* Dynamax (batalha): o Pokémon fica gigante com brilho vermelho; `scale` soma com as animações que usam transform.
    O tamanho exato vem do código (`tamanhoDoDynamax`: até 1,45×, cabendo na arena); crescer e encolher têm transição. */

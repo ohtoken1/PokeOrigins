@@ -256,7 +256,7 @@ export class BiomaScene extends Phaser.Scene {
     this.nomeJogador = null;
     if (this.opcoes.nomeJogador)
       this.nomeJogador = this.add
-        .text(px, py, this.opcoes.nomeJogador, { fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: '#ffffff', stroke: '#16243a', strokeThickness: 5 })
+        .text(px, py, this.opcoes.nomeJogador, { fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: '#ffffff', stroke: '#151310', strokeThickness: 5 })
         .setOrigin(0.5, 1)
         .setDepth(100000);
     if (this.nomeJogador) {
@@ -326,7 +326,7 @@ export class BiomaScene extends Phaser.Scene {
     const t = this.add
       .text(x, y, acao ? `${texto} ›` : texto, {
         fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: cor,
-        backgroundColor: acao ? 'rgba(14,24,42,0.86)' : 'rgba(14,24,42,0.6)', padding: { x: 14, y: 6 },
+        backgroundColor: acao ? 'rgba(13,12,10,0.86)' : 'rgba(13,12,10,0.6)', padding: { x: 14, y: 6 },
       })
       .setOrigin(0.5, 1)
       .setDepth(99990)
@@ -335,7 +335,7 @@ export class BiomaScene extends Phaser.Scene {
     if (!acao) return;
     t.setInteractive({ useHandCursor: true });
     t.on('pointerover', () => t.setBackgroundColor('rgba(40,90,170,0.95)').setColor('#ffffff'));
-    t.on('pointerout', () => t.setBackgroundColor('rgba(14,24,42,0.86)').setColor(cor));
+    t.on('pointerout', () => t.setBackgroundColor('rgba(13,12,10,0.86)').setColor(cor));
     t.on('pointerdown', () => this.opcoes.aoClicarLocal?.(acao));
   }
 
