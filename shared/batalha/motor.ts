@@ -3,7 +3,7 @@
 // selvagem, então captura e fuga são feitas aqui, com as fórmulas dos jogos originais.
 import { especieComItem } from '../formas';
 import { megaPorForma } from '../megas';
-import { TERASTALLIZER_BAND } from '../loja';
+import { DYNAMAX_BAND, TERASTALLIZER_BAND } from '../loja';
 import { Battle, Dex } from '@pkmn/sim';
 import { AMIZADE_INICIAL, especie, ppComPPMax, ppMaximo, type PokemonIndividual } from './pokemon';
 import { aplicarRemedio, usarRemedio, type Item } from '../itens';
@@ -20,6 +20,9 @@ export type EventoBatalha = (
   | { tipo: 'tera'; lado: Lado; teraTipo: string; texto: string }
   /** Megaevoluiu: `forma` = espécie Mega no Showdown ("Charizard-Mega-X"). */
   | { tipo: 'mega'; lado: Lado; forma: string; texto: string }
+  /** Dynamax (3 turnos, HP dobrado, golpes viram Max Moves). `forma` = espécie Gigantamax no Showdown ("Charizard-Gmax") ou null. */
+  | { tipo: 'dynamax'; lado: Lado; forma: string | null; texto: string }
+  | { tipo: 'dynamaxFim'; lado: Lado; texto: string }
   /** Mudou de forma no meio da batalha (Primal Reversion…). */
   | { tipo: 'forma'; lado: Lado; forma: string; texto?: string }
   | { tipo: 'golpe'; lado: Lado; alvo: Lado | null; golpe: string; tipoGolpe: string; categoria: string; texto: string }
@@ -56,12 +59,15 @@ export interface OpcaoGolpe {
   pp: number;
   ppMax: number;
   desabilitado: boolean;
+  /** O Max Move (ou G-Max Move) em que este golpe vira com Dynamax; só vem quando o Pokémon pode usar ou está usando. */
+  max?: { id: string; nome: string; tipo: string; poder: number; desabilitado: boolean };
 }
 
 export type Pedido =
   /** `zGolpes[i]` = nome do Z-Move do golpe i (Pokémon segurando Z-Crystal), ou null. */
   /** `tera` = Tera Type se ainda pode terastalizar nesta batalha, ou null. `mega` = pode megaevoluir agora (Mega Stone certa). */
-  | { tipo: 'acao'; golpes: OpcaoGolpe[]; podeTrocar: boolean; podeFugir: boolean; zGolpes: (string | null)[] | null; tera: string | null; mega: boolean }
+  /** `dynamax` = pode usar Dynamax agora (segurando a Dynamax Band; 'gigantamax' se a espécie tem a forma). `dinamaxado` = está em Dynamax (os golpes são os `max`). */
+  | { tipo: 'acao'; golpes: OpcaoGolpe[]; podeTrocar: boolean; podeFugir: boolean; zGolpes: (string | null)[] | null; tera: string | null; mega: boolean; dynamax: 'dynamax' | 'gigantamax' | null; dinamaxado: boolean }
   | { tipo: 'troca' }
   | { tipo: 'fim' };
 
@@ -144,6 +150,8 @@ function conjuntoShowdown(p: PokemonIndividual, nome: string) {
     species: especieComItem(p.especieId, p.item),
     happiness: p.amizade ?? AMIZADE_INICIAL,
     teraType: p.teraTipo ?? especie(p.especieId).types[0],
+    // espécies com Gigantamax usam a forma e o G-Max Move ao dar Dynamax (sem "fator" especial: pedido do dono)
+    gigantamax: !!especie(p.especieId).canGigantamax,
     level: p.nivel,
     moves: p.golpes.map((g) => g.id),
     ability: p.habilidade,
@@ -240,6 +248,11 @@ export class BatalhaSelvagem {
     this.batalha.setPlayer('p1', { name: 'Jogador', team: this.indices.map((i) => conjuntoShowdown(time[i], `P${i}`)) as never });
     this.adversarios = treinador ? treinador.equipe : [selvagem];
     this.batalha.setPlayer('p2', { name: treinador ? treinador.nome : 'Selvagem', team: this.adversarios.map((p, k) => conjuntoShowdown(p, `S${k}`)) as never });
+    // Dynamax: o simulador só libera na 8ª geração; religamos para o jogador (a Dynamax Band é conferida em `pedido`).
+    // Treinadores, líderes e selvagens não usam.
+    const ladoJogador = this.batalha.p1;
+    ladoJogador.dynamaxUsed = false;
+    ladoJogador.canDynamaxNow = () => !ladoJogador.dynamaxUsed;
     this.objetos = this.batalha.p1.pokemon.slice();
     this.objetos.forEach((sim, k) => aplicarEstado(sim, time[this.indices[k]]));
     this.objetosAdv = this.batalha.p2.pokemon.slice();
@@ -272,9 +285,13 @@ export class BatalhaSelvagem {
     const req = this.batalha.p1.activeRequest as any;
     if (req?.forceSwitch) return { tipo: 'troca' };
     const ativo = req.active[0];
+    const maximos = ativo.maxMoves?.maxMoves as { move: string; disabled?: boolean }[] | undefined;
     const golpes: OpcaoGolpe[] = ativo.moves.map((m: any, i: number) => {
       const golpe = Dex.moves.get(m.id);
+      const max = maximos?.[i] ? Dex.moves.get(maximos[i].move) : null;
       return {
+        // poder do Max Move: vem do golpe de origem (golpe de status vira Max Guard, sem poder)
+        ...(max ? { max: { id: max.id, nome: max.name, tipo: max.type, poder: golpe.category === 'Status' ? 0 : (golpe.maxMove?.basePower ?? 0), desabilitado: !!maximos![i].disabled } } : {}),
         indice: i + 1,
         id: m.id,
         nome: golpe.name,
@@ -287,13 +304,16 @@ export class BatalhaSelvagem {
     });
     const preso = !!(ativo.trapped || ativo.maybeTrapped);
     const zGolpes = Array.isArray(ativo.canZMove) ? (ativo.canZMove as ({ move: string } | null)[]).map((z) => z?.move ?? null) : null;
-    // Terastal só segurando a Terastallizer Band (pedido do dono)
+    // Terastal só segurando o Tera Orb (pedido do dono)
     const comBanda = this.time[this.ativo]?.item === TERASTALLIZER_BAND;
     const tera = comBanda && typeof ativo.canTerastallize === 'string' ? (ativo.canTerastallize as string) : null;
     // contra treinador não dá para fugir
     // Mega só com Mega Stone (sem o atalho do Rayquaza por Dragon Ascent: pedido do dono)
     const mega = !!ativo.canMegaEvo && !!this.batalha.p1.active[0]?.getItem().megaStone;
-    return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso && !this.treinador, zGolpes, tera, mega };
+    // Dynamax só segurando a Dynamax Band, uma vez por batalha
+    const dinamaxado = !!this.batalha.p1.active[0]?.volatiles['dynamax'];
+    const dynamax = this.time[this.ativo]?.item === DYNAMAX_BAND && ativo.canDynamax && maximos ? (ativo.maxMoves.gigantamax ? 'gigantamax' : 'dynamax') : null;
+    return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso && !this.treinador, zGolpes, tera, mega, dynamax, dinamaxado };
   }
 
   /** Posições no time dos Pokémon que podem entrar no lugar do atual. */
@@ -304,10 +324,11 @@ export class BatalhaSelvagem {
 
   /**
    * `especial`: 'z' = usar como Z-Move (Z-Crystal certo); 'tera' = terastalizar antes de atacar;
-   * 'mega' = megaevoluir antes de atacar (Mega Stone certa). Cada um: uma vez por batalha.
+   * 'mega' = megaevoluir antes de atacar (Mega Stone certa); 'dynamax' = dar Dynamax antes de atacar (Dynamax Band).
+   * Cada um: uma vez por batalha.
    */
-  usarGolpe(indice: number, especial: 'z' | 'tera' | 'mega' | null = null): EventoBatalha[] {
-    const sufixo = { z: ' zmove', tera: ' terastallize', mega: ' mega' };
+  usarGolpe(indice: number, especial: 'z' | 'tera' | 'mega' | 'dynamax' | null = null): EventoBatalha[] {
+    const sufixo = { z: ' zmove', tera: ' terastallize', mega: ' mega', dynamax: ' dynamax' };
     return this.jogar(`move ${indice}${especial ? sufixo[especial] : ''}`);
   }
 
@@ -416,7 +437,8 @@ export class BatalhaSelvagem {
   /** Copia HP, status e PP do simulador de volta para o time e para o selvagem (se for capturado). */
   sincronizar(): void {
     const copiar = (sim: PokemonSim, p: PokemonIndividual) => {
-      p.hp = sim.fainted ? 0 : sim.hp;
+      // quem termina a batalha em Dynamax guarda o HP na medida normal
+      p.hp = sim.fainted ? 0 : sim.volatiles['dynamax'] ? sim.getUndynamaxedHP() : sim.hp;
       p.status = sim.fainted || !sim.status ? null : sim.status;
       // frutas comidas na batalha são gastas; os outros itens voltam ao dono no fim (como nos jogos atuais)
       if (p.item && !sim.item && Dex.items.get(p.item).isBerry) p.item = null;
@@ -760,7 +782,12 @@ export class BatalhaSelvagem {
         }
         case '-start': {
           const efeito = args[1].replace(/^move: /, '');
-          if (efeito === 'confusion') eventos.push({ tipo: 'mensagem', texto: `${quem} ficou confuso!` });
+          if (efeito === 'Dynamax') {
+            const lado = this.lado(args[0]);
+            const sim = lado === 'jogador' ? this.batalha.p1.active[0] : this.batalha.p2.active[0];
+            const giga = args[2] === 'Gmax';
+            eventos.push({ tipo: 'dynamax', lado, forma: giga && sim ? `${sim.species.name}-Gmax` : null, texto: giga ? `${quem} ficou gigante: Gigantamax!` : `${quem} ficou gigante: Dynamax!` });
+          } else if (efeito === 'confusion') eventos.push({ tipo: 'mensagem', texto: `${quem} ficou confuso!` });
           else if (efeito === 'Leech Seed') eventos.push({ tipo: 'mensagem', texto: `${quem} foi semeado!` });
           else if (efeito === 'Substitute') eventos.push({ tipo: 'mensagem', texto: `${quem} criou um substituto!` });
           break;
@@ -769,7 +796,8 @@ export class BatalhaSelvagem {
           if (args[1] === 'confusion') eventos.push({ tipo: 'mensagem', texto: `${quem} está confuso!` });
           break;
         case '-end':
-          if (args[1] === 'confusion') eventos.push({ tipo: 'mensagem', texto: `${quem} não está mais confuso!` });
+          if (args[1] === 'Dynamax') eventos.push({ tipo: 'dynamaxFim', lado: this.lado(args[0]), texto: `${quem} voltou ao tamanho normal.` });
+          else if (args[1] === 'confusion') eventos.push({ tipo: 'mensagem', texto: `${quem} não está mais confuso!` });
           break;
         case '-weather':
           if (!args.includes('[upkeep]')) eventos.push({ tipo: 'clima', clima: args[0] === 'none' ? null : args[0], texto: CLIMAS[args[0]] });

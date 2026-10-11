@@ -144,10 +144,10 @@ export async function animarTransformacao(
   lugar: HTMLElement,
   sprite: HTMLImageElement,
   trocar: () => void,
-  { cores, simbolo, rapida = false }: { cores: string[]; simbolo?: HTMLElement; rapida?: boolean },
+  { cores, simbolo, rapida = false, grande = false }: { cores: string[]; simbolo?: HTMLElement; rapida?: boolean; grande?: boolean },
 ) {
   const fundo = cores.length > 1 ? `conic-gradient(from 0deg, ${[...cores, cores[0]].join(', ')})` : `radial-gradient(circle, #fff 0 20%, ${cores[0]} 55%, transparent 72%)`;
-  const esfera = el('div', { class: 'transf-esfera', style: { background: fundo } });
+  const esfera = el('div', { class: `transf-esfera ${grande ? 'transf-grande' : ''}`, style: { background: fundo } });
   const raios = el('div', { class: 'transf-raios' }, ...Array.from({ length: 10 }, (_, i) => el('span', { style: { transform: `rotate(${i * 36}deg)`, background: cores[i % cores.length] } })));
   lugar.append(esfera, raios);
   if (simbolo) lugar.append(simbolo);
@@ -173,6 +173,26 @@ export async function animarTransformacao(
   raios.remove();
   simbolo?.remove();
   // tira o filtro preso pelo "fill: forwards" (o brilho da Mega vem da classe)
+  sprite.getAnimations().forEach((a) => a.cancel());
+}
+
+/**
+ * Fim do Dynamax: o contrário da transformação. A aura aparece grande em volta do Pokémon gigante e vai fechando;
+ * ele fica branco, `voltar` devolve o tamanho e a forma normais (o CSS encolhe com transição) e a aura some encolhendo.
+ */
+export async function animarFimDynamax(lugar: HTMLElement, sprite: HTMLImageElement, voltar: () => void, cores: string[]) {
+  const esfera = el('div', { class: 'transf-esfera transf-grande', style: { background: `conic-gradient(from 0deg, ${[...cores, cores[0]].join(', ')})` } });
+  lugar.append(esfera);
+  await Promise.all([
+    esperarAnimacao(esfera.animate([{ transform: 'scale(2.4) rotate(0deg)', opacity: 0 }, { transform: 'scale(1.25) rotate(-270deg)', opacity: 0.85 }], { duration: 650, easing: 'ease-out', fill: 'forwards' })),
+    esperarAnimacao(sprite.animate([{ filter: 'brightness(1)' }, { filter: 'brightness(8) saturate(0)' }], { duration: 650, fill: 'forwards' })),
+  ]);
+  voltar();
+  await Promise.all([
+    esperarAnimacao(esfera.animate([{ transform: 'scale(1.25) rotate(-270deg)', opacity: 0.85 }, { transform: 'scale(0) rotate(-720deg)', opacity: 0.2 }], { duration: 800, easing: 'ease-in', fill: 'forwards' })),
+    esperarAnimacao(sprite.animate([{ filter: 'brightness(8) saturate(0)' }, { filter: 'brightness(1)' }], { duration: 800, fill: 'forwards' })),
+  ]);
+  esfera.remove();
   sprite.getAnimations().forEach((a) => a.cancel());
 }
 

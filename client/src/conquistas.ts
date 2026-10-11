@@ -18,7 +18,7 @@ import { el } from './ui/dom';
 /** Coisas feitas uma vez que o save não mostra sozinho. */
 export type MarcaConquista =
   | 'charm' | 'cuboPassado' | 'cuboFuturo' | 'ticketEpico' | 'ticketLendario' | 'ticketMitico' | 'ovoLendario'
-  | 'lendarioEscapou' | 'lendarioUltraball' | 'mega' | 'tera' | 'guildaEntrou' | 'guildaCriou' | 'guildaMax';
+  | 'lendarioEscapou' | 'lendarioUltraball' | 'mega' | 'tera' | 'dynamax' | 'guildaEntrou' | 'guildaCriou' | 'guildaMax';
 
 const estadoDe = (save: Save): EstadoConquistas => {
   const e = (save.conquistas ??= { feitas: {}, marcas: {} });
@@ -101,6 +101,7 @@ const FIXAS: Record<string, (x: Contexto) => Progresso> = {
   'ovo-lendario': (x) => sim(!!x.marcas.ovoLendario),
   'duelos-todos': (x) => ({ valor: TREINADORES_NPC.filter((t) => (x.save.duelosVencidos ?? []).includes(t.id)).length, meta: TREINADORES_NPC.length }),
   mega: (x) => sim(!!x.marcas.mega),
+  dynamax: (x) => sim(!!x.marcas.dynamax),
   tera: (x) => sim(!!x.marcas.tera),
   'nivel-100': (x) => sim(x.meus.some((p) => p.nivel >= 100)),
   'time-100': (x) => ({ valor: Math.min(6, x.meus.filter((p) => p.nivel >= 100).length), meta: 6 }),

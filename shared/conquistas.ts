@@ -96,6 +96,7 @@ export const CONQUISTAS: Conquista[] = [
   c('duelos-todos', 'batalhas', '50/50', 'Vença todos os treinadores no "Duelos com treinadores".', silver(0.1)),
   c('mega', 'batalhas', 'Mega evolução', 'Mega evolua um Pokémon em batalha.', captura(0.01)),
   c('tera', 'batalhas', 'Terastall', 'Terastalize o Pokémon uma vez em batalha.', captura(0.01)),
+  c('dynamax', 'batalhas', 'Dynamax', 'Transforme seu Pokémon em Dynamax uma vez em batalha.', captura(0.01)),
   c('nivel-100', 'batalhas', 'Level 100', 'Evolua um Pokémon para o level 100.', captura(0.01)),
   c('time-100', 'batalhas', 'Time level 100', 'Evolua 6 Pokémon para o level 100.', captura(0.01)),
 

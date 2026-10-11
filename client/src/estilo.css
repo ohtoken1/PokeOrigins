@@ -2246,3 +2246,12 @@ button.vaga.casa-box:hover { border-color: rgb(20 34 56 / 0.35); background: rgb
 .cura-botao:hover:not(:disabled) { filter: brightness(1.1); }
 .cura-botao:disabled { background: #6c7a8d; cursor: default; }
 .cura-sair { font: inherit; background: none; border: 0; color: #a2b4cc; cursor: pointer; text-decoration: underline; }
+
+/* Dynamax (batalha): o Pokémon fica gigante com brilho vermelho; `scale` soma com as animações que usam transform.
+   O tamanho exato vem do código (`tamanhoDoDynamax`: até 1,45×, cabendo na arena); crescer e encolher têm transição. */
+.sprite-jogador, .sprite-selvagem { scale: 1; transition: scale 0.6s ease-out; }
+.sprite.dinamaxado { scale: 1.45; z-index: 2; filter: drop-shadow(0 0 5px #ff2d6f) drop-shadow(0 0 14px #c4003a99); }
+.transf-esfera.transf-grande { width: 220px; height: 220px; margin-left: -110px; }
+.botao-dynamax { border-color: #c4003a; }
+.botao-dynamax.ligado { background: linear-gradient(120deg, #7a0030, #c4003a 45%, #ff3d6e); color: #fff; text-shadow: 0 1px 2px #0009; border-color: transparent; font-weight: 800; }
+.golpe-dynamax { box-shadow: 0 0 0 2px #ff3d6eaa, 0 0 10px #c4003a88; }
