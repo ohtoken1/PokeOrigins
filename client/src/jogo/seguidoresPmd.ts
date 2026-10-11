@@ -25,7 +25,7 @@ export interface InfoPmd {
 
 type Anim = { largura: number; altura: number; duracoes: number[] };
 
-async function lerAnimData(numero: string): Promise<Record<'Walk' | 'Idle', Anim> | null> {
+export async function lerAnimData(numero: string): Promise<Record<'Walk' | 'Idle', Anim> | null> {
   try {
     const xml = new DOMParser().parseFromString(await (await fetch(`seguidores/${numero}/AnimData.xml`)).text(), 'text/xml');
     const achar = (nome: string): Anim | null => {

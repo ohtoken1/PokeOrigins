@@ -12,7 +12,7 @@ import { mostrarJogo } from '../jogo/jogoUnico';
 import { abrirBatalha } from '../batalha/telaBatalha';
 import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons } from '../dados';
 import { ajustesAdmin, aoMudarAdmin } from '../ui/admin';
-import { carregarSave, usarSave, curarTime, novoPokemon, salvar } from '../estado';
+import { carregarSave, usarSave, novoPokemon, salvar } from '../estado';
 import { abrirMenuJogador } from '../ui/menuJogador';
 import { montarChat } from '../ui/chat';
 import { el, selosTipos, spritePokemon } from '../ui/dom';
@@ -158,10 +158,6 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         { class: 'barra' },
         el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'regiao' }) }, '← Voltar'),
         el('h1', {}, `${bioma.nome}`, el('small', {}, ` · ${regiao.nome}`)),
-        botaoIcone('coracao', 'Curar time', () => {
-          curarTime(save);
-          atualizarTime();
-        }),
         ...botoesMenus(save, () => atualizarTime(), true),
         contador,
       ),

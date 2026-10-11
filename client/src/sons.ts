@@ -91,6 +91,8 @@ export function iniciarMusica(): void {
   window.addEventListener('keydown', comecar);
 }
 const volume = () => (ajustes.mudo ? 0 : ajustes.volume * ajustes.geral);
+/** Volume dos efeitos agora (0 no mudo), para sons tocados fora deste arquivo (máquina de cura). */
+export const volumeDosEfeitos = volume;
 
 // ---------- gritos ----------
 

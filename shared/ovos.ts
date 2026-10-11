@@ -1,5 +1,7 @@
 // Ovos: ao chocar, sai um Pokémon do grupo do ovo (chance igual entre eles), nível 1, 5% shiny.
-// - Ovo Misterioso (comum / A / S): QUALQUER Pokémon; com letra, IVs garantidos do tier ou superior.
+// - Ovo Misterioso (comum / A / S / S+): QUALQUER Pokémon; com letra, IVs garantidos do tier ou superior.
+// - Ovo Comum (comum / A / S / S+): só Pokémon comuns (sem lendário, mítico, Ultra Beast, nem inicial e suas evoluções).
+// Paradoxos (Great Tusk, Iron Valiant…, Koraidon e Miraidon) não nascem de NENHUM ovo (pedido do dono).
 // - Ovo Lendário (comum / A / S / S+): lendário/mítico/Ultra Beast (forma base).
 // - Ovo Inicial (comum / A): um dos 27 iniciais.
 // Cada ovo tem uma versão "(NT)" (id com -nt): o ovo não pode ser trocado e o Pokémon que nasce também não.
@@ -14,12 +16,12 @@ export interface Ovo {
   /** id na bolsa */
   id: string;
   nome: string;
-  /** cor do ícone: S, A e C = Misterioso (dourado, roxo, cinza), L = Lendário, I = Inicial */
-  letra: 'S' | 'A' | 'C' | 'L' | 'I';
+  /** cor do ícone: S, A e C = Misterioso (dourado, roxo, cinza), L = Lendário, I = Inicial, N = Comum */
+  letra: 'S' | 'A' | 'C' | 'L' | 'I' | 'N';
   /** o que vem escrito no ícone (o tier, ou a letra do grupo quando não tem tier) */
   rotulo: string;
   /** quem pode nascer */
-  grupo: 'todos' | 'lendarios' | 'iniciais';
+  grupo: 'todos' | 'comuns' | 'lendarios' | 'iniciais';
   /** tier mínimo garantido (soma dos IVs); sem tier = IVs normais (0–31) */
   tier?: TierOvo;
   /** versão NT: o ovo e o Pokémon que nasce não podem ser trocados */
@@ -35,19 +37,20 @@ export const CHANCE_SHINY_OVO = 0.05;
 const SOMA: Record<TierOvo, string> = { 'S+': '171+', S: '145+', A: '120+' };
 const QUEM: Record<Ovo['grupo'], string> = {
   todos: 'Choca um Pokémon qualquer (até lendário)',
+  comuns: 'Choca um Pokémon comum (nunca lendário, mítico, Ultra Beast nem inicial)',
   lendarios: 'Choca um lendário, mítico ou Ultra Beast (só a primeira forma da linha, ex.: Cosmog; chance igual para todos)',
   iniciais: 'Choca um dos 27 iniciais de todas as regiões (chance igual para todos)',
 };
-const NOME_GRUPO: Record<Ovo['grupo'], string> = { todos: 'Ovo Misterioso', lendarios: 'Ovo Lendário', iniciais: 'Ovo Inicial' };
-const ID_GRUPO: Record<Ovo['grupo'], string> = { todos: 'ovo-misterioso', lendarios: 'ovo-lendario', iniciais: 'ovo-inicial' };
+const NOME_GRUPO: Record<Ovo['grupo'], string> = { todos: 'Ovo Misterioso', comuns: 'Ovo Comum', lendarios: 'Ovo Lendário', iniciais: 'Ovo Inicial' };
+const ID_GRUPO: Record<Ovo['grupo'], string> = { todos: 'ovo-misterioso', comuns: 'ovo-comum', lendarios: 'ovo-lendario', iniciais: 'ovo-inicial' };
 
 function ovo(grupo: Ovo['grupo'], tier?: TierOvo): Ovo {
-  const letra = grupo === 'lendarios' ? 'L' : grupo === 'iniciais' ? 'I' : tier === 'S' ? 'S' : tier === 'A' ? 'A' : 'C';
+  const letra = grupo === 'lendarios' ? 'L' : grupo === 'iniciais' ? 'I' : grupo === 'comuns' ? 'N' : tier === 'S' || tier === 'S+' ? 'S' : tier === 'A' ? 'A' : 'C';
   return {
     id: `${ID_GRUPO[grupo]}${tier ? `-${tier.toLowerCase().replace('+', 'plus')}` : ''}`,
     nome: `${NOME_GRUPO[grupo]}${tier ? ` ${tier}` : ''}`,
     letra,
-    rotulo: tier ?? letra,
+    rotulo: tier ?? (letra === 'N' ? 'C' : letra),
     grupo,
     tier,
     descricao: `${QUEM[grupo]}${tier ? ` com IVs de tier ${tier} ou superior (soma ${SOMA[tier]})` : ''}. 5% de chance de shiny.`,
@@ -55,9 +58,14 @@ function ovo(grupo: Ovo['grupo'], tier?: TierOvo): Ovo {
 }
 
 const NORMAIS: Ovo[] = [
+  ovo('todos', 'S+'),
   ovo('todos', 'S'),
   ovo('todos', 'A'),
   ovo('todos'),
+  ovo('comuns'),
+  ovo('comuns', 'A'),
+  ovo('comuns', 'S'),
+  ovo('comuns', 'S+'),
   ovo('lendarios'),
   ovo('lendarios', 'A'),
   ovo('lendarios', 'S'),

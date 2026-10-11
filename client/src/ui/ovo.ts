@@ -12,6 +12,7 @@ import { iconeOvo } from './iconeItem';
 import { areaRoletas, botoesQuantidade } from './abrirVarios';
 import { ehLendario } from '../../../shared/encontros';
 import { especie } from '../../../shared/batalha/pokemon';
+import { ehParadoxo } from '../../../shared/formasRegionais';
 
 /** Duração da roleta do ovo (mais lenta que a do ticket, para dar expectativa). */
 const DURACAO_ROLETA = 9000;
@@ -54,16 +55,34 @@ function entregar(save: Save, r: ResultadoOvo, ovo: Ovo): string {
   return `${nome} foi enviado para o PC (Box ${guardarNoPC(save, p) + 1}).`;
 }
 
+/** É um inicial ou evolução de um (sobe a linha até a primeira forma). */
+function ehDeInicial(id: number, porSlug: Map<string, number>): boolean {
+  for (let atual: number | undefined = id, i = 0; atual !== undefined && i < 5; i++) {
+    if (TODOS_INICIAIS.includes(atual)) return true;
+    const pai: string | null = pokemonPorId(atual).evoluiDe;
+    atual = pai ? porSlug.get(pai) : undefined;
+  }
+  return false;
+}
+
+/**
+ * Quem pode nascer do ovo. Paradoxos (com Koraidon e Miraidon) não nascem de nenhum (pedido do dono).
+ * Lendário: lendários, míticos e Ultra Beasts, só a primeira forma da linha (Cosmog, não Lunala; Type: Null, não Silvally).
+ * Comum: sem lendário/mítico/Ultra Beast e sem inicial nem evolução de inicial.
+ */
+export function especiesDoOvo(ovo: Ovo): number[] {
+  if (ovo.grupo === 'iniciais') return TODOS_INICIAIS;
+  const todos = todosOsPokemons().filter((p) => !ehParadoxo(especie(p.id).name));
+  if (ovo.grupo === 'todos') return todos.map((p) => p.id);
+  if (ovo.grupo === 'lendarios') return todos.filter((p) => ehLendario(p) && !p.evoluiDe && !especie(p.id).prevo).map((p) => p.id);
+  const porSlug = new Map(todosOsPokemons().map((p) => [p.slug, p.id]));
+  return todos.filter((p) => !ehLendario(p) && !ehDeInicial(p.id, porSlug)).map((p) => p.id);
+}
+
 export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): void {
   const ovo = ovoPorId(ovoId);
   if (!ovo) return;
-  // Ovo Lendário: lendários, míticos e Ultra Beasts, só a primeira forma da linha (Cosmog, não Lunala; Type: Null, não Silvally)
-  const especies =
-    ovo.grupo === 'iniciais'
-      ? TODOS_INICIAIS
-      : todosOsPokemons()
-          .filter((p) => ovo.grupo === 'todos' || (ehLendario(p) && !p.evoluiDe && !especie(p.id).prevo))
-          .map((p) => p.id);
+  const especies = especiesDoOvo(ovo);
   const qualquer = () => especies[Math.floor(Math.random() * especies.length)];
   let girando = false;
 

@@ -24,6 +24,7 @@ As cores dos tiles são alteradas por filtro em cada bioma. Versões modificadas
   https://github.com/PMDCollab/SpriteCollab — `client/public/seguidores/` (andar e parado em 8 direções de 961 espécies; versão shiny de 918)
 
 ## Fundos de batalha
+- Fundos das boxes do PC: papéis de parede das boxes dos jogos oficiais (Pokémon Emerald e X/Y — © Nintendo/Game Freak/The Pokémon Company), obtidos do repositório do PKHeX (github.com/kwsch/PKHeX, pasta `PKHeX.Drawing.Misc/Resources/img/box`) — `client/public/fundos-box/`.
 - Cenários de batalha dos jogos oficiais (Pokémon X/Y, Omega Ruby/Alpha Sapphire e Black/White — © Nintendo/Game Freak/The Pokémon Company), obtidos do Pokémon Showdown (play.pokemonshowdown.com) — `client/public/batalha/`.
 
 ## Dados e sprites de Pokémon
@@ -31,6 +32,7 @@ As cores dos tiles são alteradas por filtro em cada bioma. Versões modificadas
 - Motor de batalha: Pokémon Showdown via `@pkmn/sim` (MIT)
 
 ## Imagens de itens
+- Mints, Ability Patch e Linking Cord: imagens oficiais dos jogos (© Nintendo/Game Freak/The Pokémon Company), obtidas do Serebii (serebii.net) — `client/public/itens/`.
 - Tera Shards e Teal Mask: imagens oficiais de Scarlet/Violet (© Nintendo/Game Freak/The Pokémon Company), obtidas do Serebii (serebii.net) — `client/public/itens/`.
 
 ## Animações dos golpes
