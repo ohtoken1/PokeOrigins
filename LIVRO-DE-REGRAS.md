@@ -45,9 +45,9 @@ Para jogar é preciso uma **conta** (aba **Criar conta** na tela de entrada): no
 O primeiro passo é montar o seu personagem:
 
 - **Nome de treinador:** de 3 a 16 letras, obrigatório. Aparece em cima do personagem no mapa.
-- **Corpo:** masculino ou feminino.
+- **Sexo:** masculino ou feminino.
 - **Tom de pele:** 7 opções.
-- **Cabelo:** 8 cortes e 13 cores.
+- **Cabelo:** 14 cortes masculinos e 18 femininos (cada sexo tem a sua lista; ao trocar de sexo, o cabelo vai para o primeiro da lista nova) e 13 cores.
 - **Roupas:** cor da camiseta, da calça e do tênis.
 - **Estilo Pokémon:** estampa na camiseta (Pokébola, raio, gota, chama ou lisa) e Pokébolas no cinto.
 
@@ -775,6 +775,8 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Visual das skins:** as nove skins de lendário dos tickets (normal e shiny) agora mudam o personagem no mapa, na cidade e no perfil, e os outros jogadores veem. São fantasias com capuz de cada Pokémon, animadas nas quatro direções (asas e nadadeiras batem ao andar); Zacian leva a espada nas costas e Zamazenta, o escudo.
 - **Brilho do shiny:** as skins shiny têm uma aura que pulsa e estrelinhas em volta do personagem.
 - **Minhas skins:** provador com o personagem andando com a skin escolhida; skins sem desenho ainda mostram "Visual em breve".
+- **Criação do personagem:** 24 cabelos novos (agora são 14 masculinos e 18 femininos) e cada sexo só vê os seus. A opção "Corpo" passou a se chamar **Sexo**. Quem já tinha um cabelo que ficou na lista do outro sexo continua com ele até editar o personagem.
+- **Personagem feminino mais magro:** cintura mais fina e sem a saliência na frente do tronco. As skins continuam servindo.
 
 ---
 

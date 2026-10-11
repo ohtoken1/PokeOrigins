@@ -1,10 +1,10 @@
 // Criação/edição do personagem (antes da roleta do inicial, ou depois pelo menu da região).
-// Camadas do LPC + detalhes Pokémon (boné, estampa, Pokébolas no cinto) em lpc.ts.
+// Camadas do LPC + detalhes Pokémon (estampa, Pokébolas no cinto) em lpc.ts. Cada sexo tem a sua lista de cabelos.
 import type { Tela } from '../main';
 import { carregarSave, salvar } from '../estado';
 import { PRECO_TROCAR_APARENCIA_GOLD, PRECO_TROCAR_NOME_GOLD } from '../../../shared/loja';
 import {
-  APARENCIA_PADRAO, CABELOS, CORES_CABELO, CORES_ROUPA, ESTAMPAS, PELES, carregarPaletas, montarPersonagem,
+  APARENCIA_PADRAO, CABELOS, CORES_CABELO, CORES_ROUPA, ESTAMPAS, PELES, cabelosDoSexo, carregarPaletas, montarPersonagem,
   type Aparencia, type FolhasPersonagem,
 } from '../personagem/lpc';
 import { el } from '../ui/dom';
@@ -77,6 +77,16 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
     return el('div', { class: 'grupo-personagem' }, el('span', {}, titulo), caixa);
   };
 
+  // cada sexo tem a sua lista de cabelos (pedido do dono): trocar o sexo refaz a lista e, se o cabelo não é dele, vai para o primeiro
+  const cabelos = el('div', {});
+  const listarCabelos = () => cabelos.replaceChildren(grupo('Cabelo', cabelosDoSexo(a.corpo), () => a.cabelo, (v) => (a.cabelo = v)));
+  const trocarSexo = (sexo: Aparencia['corpo']) => {
+    a.corpo = sexo;
+    if (CABELOS[a.cabelo]?.sexo !== sexo) a.cabelo = cabelosDoSexo(sexo)[0][0];
+    listarCabelos();
+  };
+  listarCabelos();
+
   const painel = el('div', { class: 'painel-personagem' }, el('p', { class: 'meta' }, 'Carregando cores…'));
   carregarPaletas().then((p) => {
     const meio = (cores: string[]) => cores[Math.floor(cores.length / 2)];
@@ -86,10 +96,10 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
       // boné: guardado para depois (pedido do dono)
       grupo('Estampa da camiseta', Object.entries(ESTAMPAS), () => a.estampa, (v) => (a.estampa = v as Aparencia['estampa'])),
       grupo('Pokébolas no cinto', [['sim', 'Com'], ['nao', 'Sem']], () => (a.cinto ? 'sim' : 'nao'), (v) => (a.cinto = v === 'sim')),
-      el('h3', {}, 'Corpo'),
-      grupo('Corpo', [['masc', 'Masculino'], ['fem', 'Feminino']], () => a.corpo, (v) => (a.corpo = v as Aparencia['corpo'])),
+      el('h3', {}, 'Aparência'),
+      grupo('Sexo', [['masc', 'Masculino'], ['fem', 'Feminino']], () => a.corpo, (v) => trocarSexo(v as Aparencia['corpo'])),
       grupo('Tom de pele', cor(PELES, p.body), () => a.pele, (v) => (a.pele = v)),
-      grupo('Cabelo', Object.entries(CABELOS), () => a.cabelo, (v) => (a.cabelo = v)),
+      cabelos,
       grupo('Cor do cabelo', cor(CORES_CABELO, p.hair), () => a.corCabelo, (v) => (a.corCabelo = v)),
       el('h3', {}, 'Roupas'),
       grupo('Camiseta', cor(CORES_ROUPA, p.cloth), () => a.camiseta, (v) => (a.camiseta = v)),

@@ -15,8 +15,8 @@
 As cores dos tiles são alteradas por filtro em cada bioma. Versões modificadas desses tiles seguem as mesmas licenças.
 
 ## Personagem do jogador
-- **Universal LPC Spritesheet Character Generator** (Liberated Pixel Cup) — vários artistas, lista por peça em `client/public/lpc/CREDITOS-LPC.csv` — CC-BY-SA 3.0 / GPL 3.0 / OGA-BY 3.0
-  https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator — `client/public/lpc/` (corpo, cabeça, olhos, cabelos, camiseta, calça, tênis; cores trocadas pelas paletas do próprio LPC)
+- **Universal LPC Spritesheet Character Generator** (Liberated Pixel Cup) — vários artistas, lista por peça em `client/public/lpc/CREDITOS-LPC.csv` — CC-BY-SA 3.0 / GPL 3.0 / OGA-BY 3.0 (alguns cabelos: CC0, CC-BY 3.0/4.0 ou GPL 2.0; a licença de cada um está na lista)
+  https://github.com/LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator — `client/public/lpc/` (corpo, cabeça, olhos, cabelos, camiseta, calça, tênis; cores trocadas pelas paletas do próprio LPC; o corpo e a camiseta femininos são afinados por código em `client/src/personagem/corpoFem.ts`: cintura mais fina e frente do tronco reta)
 - Boné, estampas da camiseta e Pokébolas do cinto: desenho próprio (código em `client/src/personagem/lpc.ts`).
 
 ## Pokémon que segue o jogador (iniciais)
