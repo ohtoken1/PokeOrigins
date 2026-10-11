@@ -32,7 +32,7 @@ As cores dos tiles são alteradas por filtro em cada bioma. Versões modificadas
 - Motor de batalha: Pokémon Showdown via `@pkmn/sim` (MIT)
 
 ## Imagens de itens
-- Mints, Ability Patch e Linking Cord: imagens oficiais dos jogos (© Nintendo/Game Freak/The Pokémon Company), obtidas do Serebii (serebii.net) — `client/public/itens/`.
+- Tera Orb, Dynamax Band, Mints, Ability Patch e Linking Cord: imagens oficiais dos jogos (© Nintendo/Game Freak/The Pokémon Company), obtidas do Serebii (serebii.net) — `client/public/itens/`.
 - Tera Shards e Teal Mask: imagens oficiais de Scarlet/Violet (© Nintendo/Game Freak/The Pokémon Company), obtidas do Serebii (serebii.net) — `client/public/itens/`.
 
 ## Animações dos golpes

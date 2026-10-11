@@ -1,25 +1,31 @@
 // Gera shared/data/formas-sprites.json: forma do Showdown (ex.: "Arceus-Fire") → nome do arquivo de sprite
 // na PokéAPI (ex.: "493-fire" ou "10007"). Só as formas que mudam por item segurado (Arceus, Silvally,
-// Genesect, Giratina/Dialga/Palkia-Origin, Ogerpon), as de batalha (Primal, Crowned, Ultra Necrozma) e as Megas.
-// Uso: node scripts/formas-sprites.mjs
-import { writeFileSync } from 'node:fs';
+// Genesect, Giratina/Dialga/Palkia-Origin, Ogerpon), as de batalha (Primal, Crowned, Ultra Necrozma), as Megas e as
+// Gigantamax. Uso: node scripts/formas-sprites.mjs  (ou `node scripts/formas-sprites.mjs gmax` para consultar só as
+// Gigantamax e juntar ao arquivo que já existe)
+import { readFileSync, writeFileSync } from 'node:fs';
 import { Dex } from '@pkmn/sim';
 
 const formas = Dex.species
   .all()
-  .filter((s) => s.num > 0 && s.isNonstandard !== 'CAP' && (s.requiredItem || s.requiredItems || s.isMega))
-  .map((s) => s.name);
+  .filter((s) => s.num > 0 && s.isNonstandard !== 'CAP' && (s.requiredItem || s.requiredItems || s.isMega || s.name.endsWith('-Gmax')))
+  .map((s) => s.name)
+  .filter((nome) => process.argv[2] !== 'gmax' || nome.endsWith('-Gmax'));
 
 const candidatos = (nome) => {
   const id = nome.toLowerCase().replace(/[^a-z0-9-]/g, '');
   const lista = [id];
   if (id.startsWith('ogerpon-')) lista.unshift(id.replace(/^ogerpon-(\w+)/, 'ogerpon-$1-mask'));
   // Megas com gênero no nome (Meowstic-M-Mega → meowstic-male-mega)
+  // Gigantamax com nome diferente na PokéAPI
+  if (id === 'urshifu-gmax') lista.unshift('urshifu-single-strike-gmax');
+  if (id === 'toxtricity-gmax') lista.unshift('toxtricity-amped-gmax');
   if (/-mega/.test(id)) lista.push(id.replace(/-m-mega/, '-male-mega').replace(/-f-mega/, '-female-mega'));
   return lista;
 };
 
-const saida = {};
+const ARQUIVO = 'shared/data/formas-sprites.json';
+const saida = process.argv[2] === 'gmax' ? JSON.parse(readFileSync(ARQUIVO, 'utf8')) : {};
 for (const nome of formas) {
   let achou = null;
   for (const c of candidatos(nome)) {
@@ -40,4 +46,4 @@ for (const nome of formas) {
   if (achou) saida[nome] = achou;
   console.log(nome.padEnd(28), achou ?? '— sem sprite');
 }
-writeFileSync('shared/data/formas-sprites.json', JSON.stringify(saida, null, 2) + '\n');
+writeFileSync(ARQUIVO, JSON.stringify(saida, null, 2) + '\n');

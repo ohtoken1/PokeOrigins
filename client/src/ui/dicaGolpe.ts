@@ -12,18 +12,22 @@ document.addEventListener('mousemove', (e) => {
   if (cartao && !cartao.hidden && (!atual?.isConnected || !atual.contains(e.target as Node))) cartao.hidden = true;
 });
 
-function conteudo(golpeId: string, pp?: { atual: number; max: number }): HTMLElement[] {
+function conteudo(golpeId: string, pp?: { atual: number; max: number }, origem?: string): HTMLElement[] {
   const m = Dex.moves.get(golpeId);
+  // Max Move: a categoria e o poder vêm do golpe de origem (os dados do Max Move em si são só um molde)
+  const base = origem ? Dex.moves.get(origem) : null;
+  const categoria = base ? base.category : m.category;
+  const poder = base ? (base.category === 'Status' ? 0 : (base.maxMove?.basePower ?? 0)) : m.basePower;
   const linha = (rotulo: string, valor: string) => el('div', { class: 'dica-golpe-linha' }, el('span', {}, rotulo), el('strong', {}, valor));
   return [
     el('div', { class: 'dica-golpe-topo' }, el('strong', {}, m.name), seloTipo(m.type)),
     el(
       'div',
       { class: 'dica-golpe-numeros' },
-      linha('Categoria', nomeCategoria(m.category)),
-      linha('Poder', m.basePower ? String(m.basePower) : '—'),
+      linha('Categoria', nomeCategoria(categoria)),
+      linha('Poder', poder ? String(poder) : '—'),
       linha('Precisão', m.accuracy === true ? 'Nunca erra' : `${m.accuracy}%`),
-      linha('PP', pp ? `${pp.atual}/${pp.max}` : String(ppMaximo(golpeId))),
+      linha('PP', pp ? `${pp.atual}/${pp.max}` : String(ppMaximo(origem ?? golpeId))),
       m.priority ? linha('Prioridade', `${m.priority > 0 ? '+' : ''}${m.priority}`) : null,
     ),
     el('p', { class: 'dica-golpe-desc' }, traduzir(m.shortDesc || m.desc) || 'Sem efeito adicional.'),
@@ -31,12 +35,12 @@ function conteudo(golpeId: string, pp?: { atual: number; max: number }): HTMLEle
 }
 
 /** Mostra o cartão do golpe ao lado de `alvo` enquanto o mouse estiver em cima. */
-export function dicaGolpe(alvo: HTMLElement, golpeId: string, pp?: () => { atual: number; max: number }): HTMLElement {
+export function dicaGolpe(alvo: HTMLElement, golpeId: string, pp?: () => { atual: number; max: number }, origem?: string): HTMLElement {
   alvo.addEventListener('mouseenter', () => {
     atual = alvo;
     cartao ??= el('div', { class: 'dica-golpe' });
     document.body.appendChild(cartao);
-    cartao.replaceChildren(...conteudo(golpeId, pp?.()));
+    cartao.replaceChildren(...conteudo(golpeId, pp?.(), origem));
     cartao.hidden = false;
     const r = alvo.getBoundingClientRect();
     const { offsetWidth: largura, offsetHeight: altura } = cartao;

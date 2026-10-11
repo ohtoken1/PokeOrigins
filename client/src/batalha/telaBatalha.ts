@@ -23,6 +23,28 @@ import { sortearTicketDaBatalha } from '../../../shared/tickets';
 import { curarTime, guardarNoPC, registrarCapturaNoRanking, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
 import { darXpAoCla } from '../cla';
 import { marcarConquista } from '../conquistas';
+
+const CORES_DYNAMAX = ['#c4003a', '#ff3d6e', '#7a0030', '#ff8fb0'];
+/**
+ * Quanto o Pokémon cresce no Dynamax: até 1,45×, mas sempre cabendo na arena (as imagens de Gigantamax já são
+ * grandes: Charizard tem 211 px de altura e quase não cresce mais).
+ */
+function tamanhoDoDynamax(img: HTMLImageElement) {
+  const [largura, altura] = [img.naturalWidth || 170, img.naturalHeight || 150];
+  // altura que sobra na arena, sem cobrir a caixa de nome/HP de cima (a arena é mais baixa em tela estreita)
+  const limite = Math.min(215, (img.closest<HTMLElement>('.arena')?.clientHeight ?? 340) - 93);
+  img.style.scale = Math.min(1.45, limite / altura, 250 / largura).toFixed(3);
+  // imagem mais alta que o lugar dela afundaria (a grade cresce para baixo): a margem devolve os pés ao chão
+  img.style.marginTop = `${-Math.max(0, altura - (img.parentElement?.clientHeight ?? altura))}px`;
+}
+/** Tira o Dynamax da imagem (classe e tamanho). */
+function tirarDynamaxDaImagem(img: HTMLElement) {
+  img.classList.remove('dinamaxado');
+  img.style.scale = '';
+  img.style.marginTop = '';
+}
+/** Imagem que o Pokémon de cada lado tinha antes do Gigantamax (para voltar quando o Dynamax acaba). */
+const spriteAntesDoDynamax: Record<string, string | null> = {};
 import { multConquistas } from '../../../shared/conquistas';
 import { ehLendario } from '../../../shared/encontros';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
@@ -31,7 +53,7 @@ import { iconeItem } from '../ui/iconeItem';
 import { resumoPokemon } from '../ui/resumo';
 import { dicaGolpe } from '../ui/dicaGolpe';
 import { nomeCategoria, traduzir } from '../../../shared/traducao';
-import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarRetorno, animarTransformacao, tremerArena } from './animacoes';
+import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarFimDynamax, animarRetorno, animarTransformacao, tremerArena } from './animacoes';
 import { HAZARDS, animarGolpeOriginal } from './efeitosGolpes';
 
 export type ResultadoBatalha = 'vitoria' | 'derrota' | 'captura' | 'fuga';
@@ -418,6 +440,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           info(ev.lado).zerarBoosts();
           marcarTera(ev.lado, null);
           sprite(ev.lado).classList.remove('megaevoluido');
+          tirarDynamaxDaImagem(sprite(ev.lado));
+          spriteAntesDoDynamax[ev.lado] = null;
           if (ev.lado === 'selvagem' && treinador) revelarNoTime((adversarioNaTela = ev.indice));
           // resumo aberto em cima do adversário: passa a mostrar quem entrou
           if (ev.lado === 'selvagem' && resumoAdversario && treinador?.equipe[ev.indice]) resumoAdversario = treinador.equipe[ev.indice];
@@ -497,6 +521,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           // grito mais grave ao desmaiar, como nos jogos
           void tocarGrito(ev.lado === 'jogador' ? save.time[batalha.ativo].especieId : selvagem.especieId, true);
           await animarDesmaio(sprite(ev.lado));
+          tirarDynamaxDaImagem(sprite(ev.lado));
           await dizer(ev.texto);
           break;
         case 'tera':
@@ -519,6 +544,45 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           const arquivoMega = arquivoSpriteForma(ev.forma);
           if (arquivoMega && /^\d+$/.test(arquivoMega)) void tocarGrito(Number(arquivoMega));
           info(ev.lado).renomear(megaPorForma(ev.forma)?.nome ?? ev.forma);
+          await dizer(ev.texto);
+          break;
+        }
+        case 'dynamax': {
+          // Dynamax: nuvens vermelhas envolvem o Pokémon e ele sai gigante (com a forma Gigantamax, se tiver sprite)
+          const alvo = sprite(ev.lado) as HTMLImageElement;
+          if (ev.lado === 'jogador') marcarConquista(save, 'dynamax');
+          spriteAntesDoDynamax[ev.lado] = alvo.src;
+          await animarTransformacao(
+            lugar(ev.lado),
+            alvo,
+            () => {
+              const trocou = !!ev.forma && trocarSpriteForma(alvo, ev.forma, { shiny: ev.lado === 'jogador' ? save.time[batalha.ativo].shiny : selvagem.shiny, costas: ev.lado === 'jogador' });
+              alvo.classList.add('dinamaxado');
+              tamanhoDoDynamax(alvo);
+              // Gigantamax: a imagem nova tem outro tamanho; acerta quando ela carregar (se ainda estiver gigante)
+              if (trocou) alvo.addEventListener('load', () => alvo.classList.contains('dinamaxado') && tamanhoDoDynamax(alvo), { once: true });
+            },
+            { cores: CORES_DYNAMAX, grande: true },
+          );
+          void tocarGrito(ev.lado === 'jogador' ? save.time[batalha.ativo].especieId : selvagem.especieId, true);
+          await dizer(ev.texto);
+          break;
+        }
+        case 'dynamaxFim': {
+          const alvo = sprite(ev.lado) as HTMLImageElement;
+          const antes = spriteAntesDoDynamax[ev.lado];
+          spriteAntesDoDynamax[ev.lado] = null;
+          // a aura vermelha volta fechando e o Pokémon encolhe (só se ele ainda está gigante na tela)
+          if (alvo.classList.contains('dinamaxado'))
+            await animarFimDynamax(
+              lugar(ev.lado),
+              alvo,
+              () => {
+                tirarDynamaxDaImagem(alvo);
+                if (antes && alvo.src !== antes) alvo.src = antes;
+              },
+              CORES_DYNAMAX,
+            );
           await dizer(ev.texto);
           break;
         }
@@ -574,33 +638,36 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
   }
 
   /** `modo`: 'z' = Z-Move ligado; 'tera' = Terastalizar ligado; 'mega' = Mega Evolução ligada (um de cada vez). */
-  function menuGolpes(modo: 'z' | 'tera' | 'mega' | null = null) {
+  function menuGolpes(modo: 'z' | 'tera' | 'mega' | 'dynamax' | null = null) {
     const pedido = batalha.pedido();
     if (pedido.tipo !== 'acao') return menuPrincipal();
     const z = pedido.zGolpes;
     const usarZ = modo === 'z';
+    // Dynamax ligado (ou já em Dynamax): os golpes aparecem como os Max Moves em que viram
+    const usarMax = pedido.dinamaxado || modo === 'dynamax';
+    const maxDe = (g: (typeof pedido.golpes)[number]) => (usarMax ? g.max : undefined);
     acoes.replaceChildren(
       ...pedido.golpes.map((g, i) =>
         // cartão com as informações do golpe ao passar o mouse
         dicaGolpe(el(
           'button',
           {
-            class: `botao golpe ${usarZ && z?.[i] ? 'golpe-z' : ''} ${modo === 'tera' ? 'golpe-tera' : ''} ${modo === 'mega' ? 'golpe-mega' : ''}`,
-            style: { '--cor-tipo': corTipo(g.tipo) },
-            disabled: g.desabilitado || (g.ppMax > 0 && g.pp <= 0) || (usarZ && !z?.[i]),
-            onclick: () => executar(() => batalha.usarGolpe(g.indice, usarZ && z?.[i] ? 'z' : modo === 'tera' || modo === 'mega' ? modo : null)),
+            class: `botao golpe ${usarZ && z?.[i] ? 'golpe-z' : ''} ${modo === 'tera' ? 'golpe-tera' : ''} ${modo === 'mega' ? 'golpe-mega' : ''} ${usarMax ? 'golpe-dynamax' : ''}`,
+            style: { '--cor-tipo': corTipo(maxDe(g)?.tipo ?? g.tipo) },
+            disabled: g.desabilitado || (g.ppMax > 0 && g.pp <= 0) || (usarZ && !z?.[i]) || !!maxDe(g)?.desabilitado,
+            onclick: () => executar(() => batalha.usarGolpe(g.indice, usarZ && z?.[i] ? 'z' : modo === 'tera' || modo === 'mega' || modo === 'dynamax' ? modo : null)),
           },
-          el('strong', {}, usarZ && z?.[i] ? z[i]! : g.nome),
+          el('strong', {}, usarZ && z?.[i] ? z[i]! : (maxDe(g)?.nome ?? g.nome)),
           el(
             'span',
             { class: 'detalhes' },
-            seloTipo(g.tipo),
+            seloTipo(maxDe(g)?.tipo ?? g.tipo),
             el('span', {}, nomeCategoria(g.categoria)),
             // Z-Move: poder do Z (ex.: Thunder Shock 40 → Gigavolt Havoc 100); Z de golpe de status não tem poder
-            el('span', {}, `Poder ${(usarZ && z?.[i] ? (Dex.moves.get(g.id).category === 'Status' ? 0 : Dex.moves.get(g.id).zMove?.basePower) : Dex.moves.get(g.id).basePower) || '—'}`),
+            el('span', {}, `Poder ${(maxDe(g) ? maxDe(g)!.poder : usarZ && z?.[i] ? (Dex.moves.get(g.id).category === 'Status' ? 0 : Dex.moves.get(g.id).zMove?.basePower) : Dex.moves.get(g.id).basePower) || '—'}`),
             g.ppMax > 0 ? el('span', {}, `PP ${g.pp}/${g.ppMax}`) : '',
           ),
-        ), g.id, g.ppMax > 0 ? () => ({ atual: g.pp, max: g.ppMax }) : undefined),
+        ), maxDe(g)?.id ?? g.id, g.ppMax > 0 ? () => ({ atual: g.pp, max: g.ppMax }) : undefined, maxDe(g) ? g.id : undefined),
       ),
       // Z-Crystal segurado: liga/desliga o Z-Move (uma vez por batalha)
       z ? botao(usarZ ? 'Z-Move ligado' : 'Z-Move', () => menuGolpes(usarZ ? null : 'z'), { class: `botao secundario botao-z ${usarZ ? 'ligado' : ''}` }) : '',
@@ -616,6 +683,13 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         ? botao([el('img', { class: 'mega-simbolo', src: 'batalha/mega-evolucao.svg', alt: '' }), modo === 'mega' ? 'Mega Evolução ligada' : 'Mega Evolução'] as never, () => menuGolpes(modo === 'mega' ? null : 'mega'), {
             class: `botao secundario botao-mega ${modo === 'mega' ? 'ligado' : ''}`,
             title: 'Megaevolui antes de atacar (uma vez por batalha)',
+          })
+        : '',
+      // Dynamax: segurando a Dynamax Band (uma vez por batalha); espécies com a forma dão Gigantamax
+      pedido.dynamax
+        ? botao(`${pedido.dynamax === 'gigantamax' ? 'Gigantamax' : 'Dynamax'}${modo === 'dynamax' ? ' ligado' : ''}`, () => menuGolpes(modo === 'dynamax' ? null : 'dynamax'), {
+            class: `botao secundario botao-dynamax ${modo === 'dynamax' ? 'ligado' : ''}`,
+            title: 'O Pokémon fica gigante antes de atacar: 3 turnos com o HP dobrado e Max Moves (uma vez por batalha)',
           })
         : '',
       botao('← Voltar', menuPrincipal, { class: 'botao secundario voltar' }),

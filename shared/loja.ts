@@ -106,12 +106,12 @@ export const faixaDoIv = (iv: number): [number, number] => FAIXAS_IV.find(([a, b
 export const PEDRAS_EVOLUCAO = ['firestone', 'waterstone', 'thunderstone', 'leafstone', 'moonstone', 'sunstone', 'shinystone', 'duskstone', 'dawnstone', 'icestone'];
 /** Item nosso (não existe no Showdown): quem segura ganha XP e EVs da batalha mesmo sem entrar em campo. */
 export const EXP_SHARE = 'expshare';
-/** Itens nossos de segurar: o Pokémon só terastaliza segurando a Terastallizer Band (pedido do dono). */
+/** Itens nossos de segurar: o Pokémon só terastaliza segurando o Tera Orb (pedido do dono; o id e o nome da constante são do nome antigo, "Terastallizer Band"). */
 export const TERASTALLIZER_BAND = 'terastallizerband';
 /** Dynamax Band: item de segurar; o Dynamax ainda não existe (o simulador da 9ª geração não tem). */
 export const DYNAMAX_BAND = 'dynamaxband';
 /** Nomes dos itens de segurar que não existem no Showdown (não vão para o simulador). */
-export const ITENS_DE_SEGURAR_NOSSOS: Record<string, string> = { [EXP_SHARE]: 'Exp. Share', [TERASTALLIZER_BAND]: 'Terastallizer Band', [DYNAMAX_BAND]: 'Dynamax Band', luckyegg: 'Lucky Egg', everstone: 'Everstone', amuletcoin: 'Amulet Coin', luckincense: 'Luck Incense' };
+export const ITENS_DE_SEGURAR_NOSSOS: Record<string, string> = { [EXP_SHARE]: 'Exp. Share', [TERASTALLIZER_BAND]: 'Tera Orb', [DYNAMAX_BAND]: 'Dynamax Band', luckyegg: 'Lucky Egg', everstone: 'Everstone', amuletcoin: 'Amulet Coin', luckincense: 'Luck Incense' };
 /** Descrições nossas para itens do Showdown cujo efeito no jogo é fora da batalha (EVs). */
 const DESCRICAO_DE_CAMPO: Record<string, string> = {
   machobrace: 'Segurando, o Pokémon ganha o dobro de EVs de cada Pokémon derrotado. Na batalha, a Speed cai pela metade.',
@@ -205,9 +205,9 @@ function montarCatalogo(): ItemLoja[] {
     const efeito = n.plus && n.minus ? `+${ATRIBUTO[n.plus]}, −${ATRIBUTO[n.minus]}` : 'sem bônus nem redução';
     add({ id: `${n.id}mint`, nome: `${n.name} Mint`, categoria: 'mints', natureza: n.name, imagem: `itens/${n.id}mint.png`, descricao: `Muda a Nature do Pokémon para ${n.name} (${efeito}).` });
   }
-  // ícones desenhados por nós (client/public/itens)
-  add({ id: TERASTALLIZER_BAND, nome: 'Terastallizer Band', categoria: 'batalha', imagem: 'itens/terastallizerband.svg', descricao: 'Pulseira com um cristal Tera. O Pokémon só pode terastalizar se estiver segurando ela (uma vez por batalha).' });
-  add({ id: DYNAMAX_BAND, nome: 'Dynamax Band', categoria: 'batalha', imagem: 'itens/dynamaxband.svg', descricao: 'Pulseira com uma Wishing Star para Dynamax e Gigantamax. O Dynamax ainda não existe no jogo.' });
+  // ícones oficiais dos jogos (client/public/itens, do Serebii)
+  add({ id: TERASTALLIZER_BAND, nome: 'Tera Orb', categoria: 'batalha', imagem: 'itens/teraorb.png', descricao: 'Orbe com energia Tera. O Pokémon só pode terastalizar se estiver segurando ele (uma vez por batalha).' });
+  add({ id: DYNAMAX_BAND, nome: 'Dynamax Band', categoria: 'batalha', imagem: 'itens/dynamaxband.png', descricao: 'Pulseira com uma Wishing Star. Segurando, o Pokémon pode usar Dynamax uma vez por batalha (Gigantamax, se a espécie tiver a forma): 3 turnos com o HP dobrado e Max Moves.' });
 
   // todos os itens do Showdown que têm uso no jogo (inclusive os de gerações passadas: incensos, Z-Crystals, gems…)
   // a Rayquazite (pedra nossa) entra pelos dados do Showdown; garante que ela venha mesmo se a lista já estava pronta
