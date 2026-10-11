@@ -9,11 +9,14 @@ import type { Aparencia } from './personagem/lpc';
 import type { EstadoPasse } from '../../shared/passe';
 import type { Viagem } from '../../shared/viagem';
 import type { EstadoQuadro } from '../../shared/missoesQuadro';
+import type { EstadoConquistas } from '../../shared/conquistas';
 import { api, ErroApi } from './conta';
 
 export type PokemonDoJogador = PokemonIndividual & {
   /** Box do PC onde está guardado (0 a NUMERO_BOXES − 1); só vale para quem está no PC. */
   box?: number;
+  /** De onde veio, quando não foi capturado: ovo, ticket ou troca com outro jogador (as conquistas olham isso). */
+  origem?: 'ovo' | 'ticket' | 'troca';
 };
 
 export interface Save {
@@ -37,6 +40,16 @@ export interface Save {
   vistos: number[];
   /** Espécies que o jogador já teve (capturou, ganhou ou evoluiu), mesmo se soltou depois. */
   capturados: number[];
+  /** Espécies que o jogador já teve na versão shiny (marca de Ultra Ball na Pokédex). */
+  capturadosShiny?: number[];
+  /** Conquistas (shared/conquistas.ts, client/src/conquistas.ts): as concluídas e as marcas de coisas feitas. */
+  conquistas?: EstadoConquistas;
+  /** Título escolhido em Meu perfil (id da conquista que deu o título). */
+  titulo?: string | null;
+  /** Treinadores de "Duelos com treinadores" já vencidos (ids). */
+  duelosVencidos?: string[];
+  /** Viagens de trem: quantas e por quais regiões passou (quem escreve é o servidor). */
+  trem?: { viagens: number; regioes: string[] };
   /** Visual do personagem (camadas LPC + detalhes Pokémon); sem isso, usa APARENCIA_PADRAO. */
   aparencia?: Aparencia;
   /** ANTIGO (opção removida da aba Opções). */
@@ -54,8 +67,10 @@ export interface Save {
   skinBonus?: string | null;
   /** Viagem de trem em andamento (shared/viagem.ts); quem cria e encerra é o servidor. */
   viagem?: Viagem | null;
-  /** Shiny Charm usado: quando o bônus acaba (ms; shared/campo.ts). */
-  shinyCharmAte?: number | null;
+  /** Charms usados (shared/charms.ts): tipo → quando o bônus acaba (ms). */
+  charms?: Record<string, number> | null;
+  /** Tipos de charm já usados alguma vez (conquista "Galante"). */
+  charmsUsados?: string[];
   /** Quadro de missões da cidade: as que já foram feitas (client/src/missoesQuadro.ts). */
   missoesQuadro?: EstadoQuadro;
   /** Insígnias conquistadas (ids dos líderes de ginásio, shared/ginasios.ts). */
@@ -94,10 +109,14 @@ export function registrarCapturaNoRanking(save: Save, p: PokemonDoJogador): void
   if (ehLendario(pokemonPorId(p.especieId))) e.capturasLendarios++;
 }
 
-/** Marca a espécie como capturada na Pokédex. */
-export function registrarCapturado(save: Save, especieId: number): void {
+/** Marca a espécie como capturada na Pokédex (e, se for shiny, também na marca de shiny). */
+export function registrarCapturado(save: Save, especieId: number, shiny = false): void {
   if (!save.vistos.includes(especieId)) save.vistos.push(especieId);
   if (!save.capturados.includes(especieId)) save.capturados.push(especieId);
+  if (shiny) {
+    save.capturadosShiny ??= [];
+    if (!save.capturadosShiny.includes(especieId)) save.capturadosShiny.push(especieId);
+  }
 }
 
 export const TAMANHO_MAXIMO_TIME = 6;
@@ -217,6 +236,8 @@ function normalizar(save: Save): Save {
   save.nivelEncontro ??= null;
   // saves antigos: começa o histórico com quem está no time e no PC
   save.capturados ??= [...new Set([...save.time, ...save.caixa].map((p) => p.especieId))];
+  // saves de antes da marca de shiny: começa pelos shiny que o jogador tem hoje
+  save.capturadosShiny ??= [...new Set([...save.time, ...save.caixa].filter((p) => p.shiny).map((p) => p.especieId))];
   // saves antigos: começa a contar pelos Pokémon que o jogador tem hoje (menos o inicial NT)
   if (!save.estatisticas) {
     const tem = [...save.time, ...save.caixa].filter((p) => !p.inegociavel);

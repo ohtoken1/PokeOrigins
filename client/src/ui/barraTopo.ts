@@ -38,7 +38,7 @@ const ABAS: Aba[] = [
     telas: ['conta-perfil', 'conta-achievements', 'conta-skins', 'opcoes'],
     itens: [
       { nome: '🧑 Meu perfil', destino: () => ({ tela: 'conta', secao: 'perfil' }) },
-      { nome: '🏆 Achievements', destino: () => ({ tela: 'conta', secao: 'achievements' }) },
+      { nome: '🏆 Conquistas', destino: () => ({ tela: 'conta', secao: 'achievements' }) },
       { nome: '🎨 Minhas skins', destino: () => ({ tela: 'conta', secao: 'skins' }) },
       { nome: '⚙️ Opções', destino: () => ({ tela: 'opcoes' }) },
       { nome: '🚪 Sair da conta', destino: () => ({ tela: 'inicio' }), acao: () => void sairDaConta() },

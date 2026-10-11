@@ -1,9 +1,10 @@
 // Itens nossos (não existem no Showdown): skins de lendários, cubos dos Pokémon do passado/futuro e itens-chave de forma (Prison Bottle, DNA Splicers,
 // Reveal Glass, Teal Mask). Saem dos tickets. A skin escolhida como "bônus" dá bônus (shared/skins.ts);
 // os itens-chave ainda não têm uso (pedido do dono).
-import { BONUS_SKIN, BONUS_SKIN_SHINY, textoBonusSkin } from './skins';
+import { TIPOS_DOS_CHARMS, idCharm, nomeCharm } from './charms';
+import { BONUS_SKIN, BONUS_SKIN_SHINY, SKINS_ESPECIAIS, TEXTO_ORIGEM_SKIN, textoBonusSkin } from './skins';
 
-export type CategoriaCustom = 'skins' | 'chave' | 'cubos';
+export type CategoriaCustom = 'skins' | 'chave' | 'cubos' | 'charms';
 /** De onde vem o Pokémon do cubo: do passado, do futuro ou lendário (Koraidon e Miraidon). */
 export type EraCubo = 'passado' | 'futuro' | 'lendario';
 
@@ -16,6 +17,10 @@ export interface ItemCustom {
   sprite?: string;
   /** endereço completo da imagem */
   imagem?: string;
+  /** charms: o tipo (o ícone é pintado na cor dele) */
+  charm?: string;
+  /** desenho provisório do ícone (itens ainda sem arte) */
+  simbolo?: string;
   /** skins: de qual Pokémon (o ícone mostra ele) */
   skin?: { especie: number; shiny: boolean };
   /** cubos: de qual Pokémon (o ícone mostra ele dentro do cubo) */
@@ -103,13 +108,40 @@ export const ICONE_FRAGMENTO = 'itens/fragmento-temporal.svg';
 /** Preço de cada cubo em Fragmentos Temporais (provisório). */
 export const PRECO_CUBO: Record<EraCubo, number> = { passado: 1, futuro: 1, lendario: 1 };
 
+/** Moedas dos eventos sazonais (ainda sem imagem e sem uso: o dono vai desenhar). */
+export const MOEDAS_SAZONAIS: { id: string; nome: string; evento: string }[] = [
+  { id: 'moeda-quaquaval', nome: 'Quaquaval Coin', evento: 'Carnaval' },
+  { id: 'moeda-bunnelby', nome: 'Bunnelby Coin', evento: 'Páscoa' },
+  { id: 'moeda-enamorus', nome: 'Enamorus Coin', evento: 'Dia dos Namorados' },
+  { id: 'moeda-pokeorigins', nome: 'Poke Origins Coin', evento: 'Aniversário do Poke Origins' },
+  { id: 'moeda-mimikyu', nome: 'Mimikyu Coin', evento: 'Halloween' },
+  { id: 'moeda-delibird', nome: 'Delibird Coin', evento: 'Natal' },
+];
+/** Selos dos eventos sazonais (pedido do dono: ficam na Database, fora da loja e do painel Admin; uso com o sistema sazonal). */
+export const SELOS_SAZONAIS: { id: string; nome: string; evento: string }[] = [
+  { id: 'selo-carnaval', nome: 'Selo do Carnaval', evento: 'Carnaval' },
+  { id: 'selo-pascoa', nome: 'Selo da Páscoa', evento: 'Páscoa' },
+  { id: 'selo-namorados', nome: 'Selo do Dia dos Namorados', evento: 'Dia dos Namorados' },
+  { id: 'selo-aniversario', nome: 'Selo do Aniversário Poke Origins', evento: 'Aniversário do Poke Origins' },
+  { id: 'selo-halloween', nome: 'Selo do Halloween', evento: 'Halloween' },
+  { id: 'selo-natal', nome: 'Selo do Natal', evento: 'Natal' },
+];
+export const ehSeloSazonal = (id: string) => id.startsWith('selo-');
+export const VALE_POKE_S = 'vale-poke-s';
+export const KIT_INICIANTE = 'kit-iniciante';
+
 export const ITENS_CUSTOM: ItemCustom[] = [
+  ...SKINS_ESPECIAIS.map((s): ItemCustom => ({ id: s.id, nome: s.nome, categoria: 'skins', simbolo: s.simbolo, descricao: `${TEXTO_ORIGEM_SKIN[s.origem]}. Bônus ao escolher como skin de bônus: ${textoBonusSkin(s.bonus)}.` })),
+  ...TIPOS_DOS_CHARMS.map((t): ItemCustom => ({ id: idCharm(t), nome: nomeCharm(t), categoria: 'charms', charm: t, descricao: `Amuleto raro: use para os Pokémon do tipo ${t[0].toUpperCase()}${t.slice(1)} terem 20% a mais de chance de aparecer shiny por 30 minutos. Só um deste tipo por vez.` })),
+  ...SELOS_SAZONAIS.map((s): ItemCustom => ({ id: s.id, nome: s.nome, categoria: 'chave', simbolo: '🏵️', descricao: `Selo do evento de ${s.evento}. Uso em breve.` })),
+  { id: VALE_POKE_S, nome: 'Vale Poke S', categoria: 'chave', simbolo: '🎟️', descricao: 'Procure a staff para ganhar um Pokémon à escolha S.' },
+  { id: KIT_INICIANTE, nome: 'Kit iniciante', categoria: 'chave', simbolo: '🎒', descricao: 'Um kit para quem está começando. O conteúdo ainda vai ser definido. NT: não pode ser trocado.' },
+  ...MOEDAS_SAZONAIS.map((m): ItemCustom => ({ id: m.id, nome: m.nome, categoria: 'chave', simbolo: '🪙', descricao: `Moeda do evento de ${m.evento}. Uso em breve.` })),
   ...CUBOS.map((c): ItemCustom => ({ id: c.id, nome: c.nome, categoria: 'cubos', cubo: { especie: c.especie, era: c.era }, descricao: `Transforma ${c.origens.map((n) => NOME_ORIGEM[n]).join(' ou ')} em ${c.nome.replace('Cubo de ', '')}, um Pokémon ${TEXTO_ERA[c.era]}. Use nele como uma pedra de evolução: IVs, EVs, natureza e shiny continuam os mesmos.` })),
   ...COM_SKIN.flatMap(([especie, nome]): ItemCustom[] => [
     { id: idSkin(nome), nome: `Skin ${nome}`, categoria: 'skins', skin: { especie, shiny: false }, descricao: `Visual especial para o ${nome}. Bônus ao escolher como skin de bônus: ${textoBonusSkin(BONUS_SKIN)}.` },
     { id: idSkin(nome, true), nome: `Skin ${nome} Shiny`, categoria: 'skins', skin: { especie, shiny: true }, descricao: `Visual especial para o ${nome} shiny. Bônus ao escolher como skin de bônus: ${textoBonusSkin(BONUS_SKIN_SHINY)}.` },
   ]),
-  { id: 'shinycharm', nome: 'Shiny Charm', categoria: 'chave', sprite: 'shiny-charm', descricao: 'Amuleto raro: use para ganhar 20% a mais de chance de encontrar Pokémon shiny por 1 hora. Só um por vez.' },
   { id: 'prisonbottle', nome: 'Prison Bottle', categoria: 'chave', sprite: 'prison-bottle', descricao: 'Garrafa que liberta o Hoopa Unbound. Uso em breve.' },
   { id: 'dnasplicers', nome: 'DNA Splicers', categoria: 'chave', sprite: 'dna-splicers', descricao: 'Junta o Kyurem com Reshiram ou Zekrom (White/Black Kyurem). Uso em breve.' },
   { id: 'revealglass', nome: 'Reveal Glass', categoria: 'chave', sprite: 'reveal-glass', descricao: 'Troca Tornadus, Thundurus, Landorus e Enamorus entre as formas Incarnate e Therian. Uso em breve.' },

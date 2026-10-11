@@ -4,7 +4,7 @@ import { Dex } from '@pkmn/sim';
 import { formaRegional, numeroNaDex } from '../../../shared/formasRegionais';
 import type { Tela } from '../main';
 import { BIOMAS } from '../../../shared/biomas';
-import { NIVEL_LENDARIO, ajustarTabela, biomaDoPokemon, ehLendario, faixaDosEncontros, montarTabela, probabilidades, type EntradaTabela } from '../../../shared/encontros';
+import { NIVEL_LENDARIO, ajustarTabela, biomaDoPokemon, ehLendario, faixaDosEncontros, montarTabela, probabilidades, type EntradaTabela, chanceShinyDe } from '../../../shared/encontros';
 import { nivelTreinador } from '../../../shared/treinador';
 import { comBonificacao, fontesDeBonus, textoMult, type AlvoChance } from '../bonificacao';
 import { ajustesAdmin } from '../ui/admin';
@@ -228,11 +228,12 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
     const c = i >= 0 ? probabilidades(tabela, faixa)[i] : 0;
     textoChance = c > 0 ? `${porcentagem(c)} (${umEm(c)}) por encontro` : `0% na sua faixa atual (Nv. ${faixa[0]}–${faixa[1]})`;
   }
-  const textoShiny = `${porcentagem(ajustes.chanceShiny)} (${umEm(ajustes.chanceShiny)})`;
+  const chanceShiny = chanceShinyDe(ajustes, p);
+  const textoShiny = `${porcentagem(chanceShiny)} (${umEm(chanceShiny)})`;
   // selos de quem está mudando a chance (VIP, Bonificação, futuramente skins…)
   const grupo = onde?.entrada.grupo ?? null;
   const alvoAparicao: AlvoChance | null = grupo === 'inicial' ? 'inicial' : grupo ? 'lendario' : null;
-  const fontes = fontesDeBonus();
+  const fontes = fontesDeBonus(p.tipos);
   const comSelos = (texto: string, alvo: AlvoChance | null) => {
     const daqui = alvo ? fontes.filter((f) => f.alvo === alvo) : [];
     return daqui.length
@@ -440,12 +441,25 @@ function pokebolinha(): HTMLElement {
   return marca;
 }
 
+/** Ultra Ball pequena: marca de "capturado na versão shiny". */
+function ultrabolinha(): HTMLElement {
+  const marca = el('span', { class: 'dex-marca capturado shiny', title: 'Shiny capturado' });
+  marca.innerHTML =
+    '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">' +
+    '<path d="M1.5 8a6.5 6.5 0 0 1 13 0z" fill="#1f2937"/><path d="M1.5 8a6.5 6.5 0 0 0 13 0z" fill="#f8fafc"/>' +
+    '<path d="M3.4 3.6 5.6 8H3.2M12.6 3.6 10.4 8h2.4" fill="#facc15"/><path d="M4.1 2.9a6.5 6.5 0 0 1 2-1.1L7.4 8H5.6zM11.9 2.9a6.5 6.5 0 0 0-2-1.1L8.6 8h1.8z" fill="#facc15"/>' +
+    '<circle cx="8" cy="8" r="6.5" fill="none" stroke="#1f2937" stroke-width="1.2"/><path d="M1.5 8h13" stroke="#1f2937" stroke-width="1.2"/>' +
+    '<circle cx="8" cy="8" r="2.1" fill="#f8fafc" stroke="#1f2937" stroke-width="1.2"/></svg>';
+  return marca;
+}
+
 export const telaPokedex = (inicial?: number, megaInicial?: string): Tela => (raiz) => {
   const todos = todosOsPokemons();
   const encontros = mapaDeEncontros(todos);
   const save = carregarSave();
   const vistos = new Set(save?.vistos ?? []);
   const capturados = new Set(save?.capturados ?? []);
+  const shinyCapturados = new Set(save?.capturadosShiny ?? []);
   // só os vistos mostram nome, imagem e dados (o painel de admin pode revelar tudo para testes)
   const visto = (id: number) => pokedexRevelada() || vistos.has(id) || capturados.has(id);
 
@@ -492,7 +506,9 @@ export const telaPokedex = (inicial?: number, megaInicial?: string): Tela => (ra
           spritePokemon(p, { animado: false }),
           el('span', { class: 'dex-num' }, `#${String(numeroNaDex(p)).padStart(3, '0')}`),
           el('span', { class: 'dex-nome' }, visto(p.id) ? p.nome : '???'),
-          capturados.has(p.id) ? pokebolinha() : vistos.has(p.id) ? el('span', { class: 'dex-marca', title: 'Visto' }, '○') : null,
+          el('span', { class: 'dex-marcas' },
+            capturados.has(p.id) ? pokebolinha() : vistos.has(p.id) ? el('span', { class: 'dex-marca', title: 'Visto' }, '○') : null,
+            shinyCapturados.has(p.id) ? ultrabolinha() : null),
         ),
       ),
     );
@@ -508,7 +524,7 @@ export const telaPokedex = (inicial?: number, megaInicial?: string): Tela => (ra
     el('main', { class: 'tela tela-pokedex' },
       el('header', { class: 'dex-cabecalho' },
         el('h1', {}, 'Pokédex', el('small', {}, ' · Nacional')),
-        el('span', { class: 'meta' }, `${vistos.size} vistos · ${capturados.size} capturados · ${todos.length} no total`),
+        el('span', { class: 'meta' }, `${vistos.size} vistos · ${capturados.size} capturados · ${shinyCapturados.size} shiny · ${todos.length} no total`),
       ),
       el('div', { class: 'layout-pokedex' },
         el('aside', { class: 'dex-coluna' }, busca, el('div', { class: 'dex-filtros' }, filtroRegiao, filtroTipo, filtroCategoria), lista),

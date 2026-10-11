@@ -3,6 +3,8 @@
 // Move Reminder/Move Tutor abrem os professores, estação = trem entre as regiões, Arena para os ginásios, Banco, Mural)
 // e o minimapa no canto mostra onde fica cada um. Clicar no nome abre direto; clicar no minimapa faz o personagem andar
 // sozinho até o lugar (a função abre quando ele chega); a saída do sul abre os mapas da região; andar com as teclas no meio do caminho cancela. Usa o mesmo jogo (Phaser) dos biomas, com o mapa da cidade e sem encontros.
+import { textoTranca } from '../../../shared/trancas';
+import { conteudoLiberado } from '../trancas';
 import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
 import type { BiomaScene, OpcoesBioma } from '../jogo/BiomaScene';
@@ -24,7 +26,8 @@ import { montarChat } from '../ui/chat';
 import { el } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
 import { painelTime } from '../ui/time';
-import { APARENCIA_PADRAO, montarPersonagem } from '../personagem/lpc';
+import { aparenciaDoSave } from '../personagem/aparencia';
+import { montarPersonagem } from '../personagem/lpc';
 
 /** NPCs que ainda não têm função. */
 const EM_BREVE: Record<string, string> = { sazonal: 'Evento sazonal', mercadonegro: 'Mercado negro' };
@@ -66,7 +69,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
   areaJogo.append(carregando);
 
   // boné guardado para depois (pedido do dono), como nos biomas
-  const aparencia = { ...(save.aparencia ?? APARENCIA_PADRAO), bone: 'nenhum' as const };
+  const aparencia = aparenciaDoSave(save);
   const opcoes: OpcoesBioma = {
     bioma: biomaPorId('grama'),
     cidade: true,
@@ -131,6 +134,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
     else if (acao === 'guildas') navegar({ tela: 'comunidade', secao: 'cla' });
     else if (acao === 'viajante') abrirLojaTemporal(save!, () => atualizarTime());
     else if (acao === 'missoes') abrirQuadroDeMissoes(save!, () => atualizarTime());
+    else if (acao === 'mercadonegro' && !conteudoLiberado('mercadoNegro')) avisar(`Mercado negro: ${textoTranca('mercadoNegro')}.`);
     else avisar(`${EM_BREVE[acao] ?? 'Este lugar'}: em breve.`);
   }
   const minimapa = montarMinimapa(areaJogo, () => cena(), irAoLocal);

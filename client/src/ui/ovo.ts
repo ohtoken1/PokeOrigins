@@ -1,7 +1,8 @@
 // Janela de chocar o Ovo Misterioso: roleta com Pokémon de todas as regiões (como a do ticket),
 // que para no Pokémon sorteado; ele vai para o time (ou PC) com IVs do tier garantido.
 import { IV_MIN_SHINY, hpMaximo } from '../../../shared/batalha/pokemon';
-import { NIVEL_OVO, chocarOvo, ovoPorId, type ResultadoOvo } from '../../../shared/ovos';
+import { NIVEL_OVO, chocarOvo, ovoPorId, type Ovo, type ResultadoOvo } from '../../../shared/ovos';
+import { marcarConquista } from '../conquistas';
 import { pokemonPorId, todosOsPokemons } from '../dados';
 import { TODOS_INICIAIS } from '../../../shared/regioes';
 import { TAMANHO_MAXIMO_TIME, guardarNoPC, novoPokemon, registrarCapturado, salvar, type Save } from '../estado';
@@ -32,11 +33,19 @@ function casa(id: number, shiny = false, porTipo = false): HTMLElement {
 }
 
 /** Coloca o Pokémon do ovo no time (ou no PC) e devolve a frase de onde ele foi. */
-function entregar(save: Save, r: ResultadoOvo): string {
+function entregar(save: Save, r: ResultadoOvo, ovo: Ovo): string {
   const p = novoPokemon(r.especie, NIVEL_OVO, r.shiny);
   p.ivs = r.ivs;
   p.hp = hpMaximo(p);
-  registrarCapturado(save, r.especie);
+  p.origem = 'ovo';
+  // ovo NT: o Pokémon que nasce também não pode ser trocado (os IVs continuam escondidos)
+  if (ovo.nt) {
+    p.inegociavel = true;
+    p.ivsRevelados = false;
+  }
+  registrarCapturado(save, r.especie, r.shiny);
+  // conquista: lendário saindo do Ovo Misterioso
+  if (ovo.grupo === 'todos' && ehLendario(pokemonPorId(r.especie))) marcarConquista(save, 'ovoLendario');
   const nome = `${pokemonPorId(r.especie).nome}${r.shiny ? ' ✨' : ''}`;
   if (save.time.length < TAMANHO_MAXIMO_TIME) {
     save.time.push(p);
@@ -76,7 +85,7 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
         save.itens[ovoId] -= n;
         if (save.itens[ovoId] <= 0) delete save.itens[ovoId];
         const todos = Array.from({ length: n }, () => chocarOvo(ovo, especies, IV_MIN_SHINY));
-        const frases = todos.map((x) => entregar(save, x));
+        const frases = todos.map((x) => entregar(save, x, ovo));
         salvar(save);
         const r = todos[0];
 
@@ -91,7 +100,7 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
                   spritePokemon(dados, { shiny: x.shiny, animado: false }),
                   el('strong', {}, `${dados.nome}${x.shiny ? ' ✨' : ''}`),
                   selosTipos(dados),
-                  el('small', {}, `Nv. ${NIVEL_OVO}${ovo.tier ? ` · IVs tier ${ovo.tier} ou superior` : ''}`),
+                  el('small', {}, `Nv. ${NIVEL_OVO}${ovo.tier ? ` · IVs tier ${ovo.tier} ou superior` : ''}${ovo.nt ? ' · NT' : ''}`),
                 );
               }),
             ),
@@ -109,7 +118,7 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
       return el(
         'div',
         { class: 'ticket' },
-        el('div', { class: 'ovo-topo' }, iconeOvo(ovo.letra), el('p', { class: 'meta' }, ovo.descricao)),
+        el('div', { class: 'ovo-topo' }, iconeOvo(ovo.letra, ovo.rotulo, ovo.nt), el('p', { class: 'meta' }, ovo.descricao)),
         roletas.raiz,
         areaBotoes,
         resultado,

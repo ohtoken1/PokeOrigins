@@ -52,6 +52,8 @@ export interface AjustesEncontro {
   soLendarios: boolean;
   /** chance de encontro a cada passo (0 a 1) */
   chancePorPasso: number;
+  /** charms ativos: multiplica a chance de shiny dos Pokémon do tipo (tipo → multiplicador) */
+  multShinyPorTipo?: Record<string, number>;
   /** multiplica a chance dos iniciais soltos (VIP) */
   multInicial?: number;
   /** número da Pokédex que sempre aparece (de qualquer bioma), ou null */
@@ -209,11 +211,17 @@ export function ajustarTabela(tabela: EntradaTabela[], ajustes: AjustesEncontro)
   return nova;
 }
 
+/** Chance de shiny deste Pokémon: a geral, vezes o charm do tipo dele (com dois tipos, vale o maior; não acumula). */
+export function chanceShinyDe(ajustes: AjustesEncontro, pokemon: Pick<PokemonBase, 'tipos'>): number {
+  const mult = Math.max(1, ...pokemon.tipos.map((t) => ajustes.multShinyPorTipo?.[t] ?? 1));
+  return Math.min(1, ajustes.chanceShiny * mult);
+}
+
 /** Encontro de teste: espécie e/ou nível escolhidos pelo administrador. */
 export function encontroForcado(pokemon: PokemonBase, [min, max]: Faixa, ajustes: AjustesEncontro, aleatorio = Math.random): Encontro {
   let nivel = ajustes.nivel ?? min + Math.floor(aleatorio() * (max - min + 1));
   if (ajustes.nivel === null && ehLendario(pokemon)) nivel = Math.max(NIVEL_LENDARIO, nivel);
-  return { pokemon, nivel: Math.max(1, Math.min(100, nivel)), shiny: aleatorio() < ajustes.chanceShiny };
+  return { pokemon, nivel: Math.max(1, Math.min(100, nivel)), shiny: aleatorio() < chanceShinyDe(ajustes, pokemon) };
 }
 
 const cabe = (e: EntradaTabela, nivel: number) => nivel >= e.nivelMin && nivel <= e.nivelMax;
@@ -311,5 +319,5 @@ export function sortearEncontro(tabela: EntradaTabela[], [min, max]: Faixa, alea
   }
   if (ajustes.nivel !== null) nivel = ajustes.nivel;
   else if (ehLendario(escolhido.pokemon)) nivel = Math.max(NIVEL_LENDARIO, nivel);
-  return { pokemon: escolhido.pokemon, nivel, shiny: aleatorio() < ajustes.chanceShiny };
+  return { pokemon: escolhido.pokemon, nivel, shiny: aleatorio() < chanceShinyDe(ajustes, escolhido.pokemon) };
 }

@@ -32,6 +32,8 @@ import { vigiarAmigos } from './amigos';
 import { vigiarCla } from './cla';
 import { vigiarAnuncios } from './anuncios';
 import { aoMudarViagem, vigiarViagem } from './viagem';
+import { vigiarConquistas } from './conquistas';
+import { vigiarEntregas } from './entregas';
 // o chat ouve o servidor desde a conexão (guarda as mensagens mesmo fora do mapa)
 import './ui/chat';
 
@@ -90,6 +92,10 @@ void garantirConta(raiz).then((conta) => {
   vigiarAnuncios();
   // trem: contagem no canto e, ao partir/chegar, o cabeçalho (região) e a tela dos mapas se atualizam
   vigiarViagem();
+  // conquistas: confere agora e depois de cada salvamento
+  vigiarConquistas();
+  // itens dados pela administração
+  vigiarEntregas();
   aoMudarViagem(() => (destinoAtual.tela === 'regiao' ? navegar(destinoAtual) : atualizarCabecalho?.(destinoAtual)));
   // com save, o jogo abre na tela de Início (o time lado a lado)
   navegar(carregarSave() ? { tela: 'inicio' } : { tela: 'inicial' });

@@ -13,7 +13,10 @@ import * as cambio from './cambio.ts';
 import * as anuncios from './anuncios.ts';
 import * as viagem from './viagem.ts';
 import * as ranking from './ranking.ts';
+import * as entregas from './entregas.ts';
 import { estaOnline, ligarMundo } from './mundo.ts';
+import { tituloAtivo } from '../../shared/conquistas.ts';
+import { temSkin, type ComSkins } from '../../shared/skins.ts';
 
 const PORTA = Number(process.env.PORT ?? 3001);
 const SITE = resolve(fileURLToPath(new URL('../../client/dist', import.meta.url)));
@@ -216,6 +219,14 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   const rotaAnuncio = caminho.match(/^\/api\/anuncios\/(\d{1,9})$/);
   if (rotaAnuncio && metodo === 'DELETE') return responder(res, 200, anuncios.apagar(exigirConta(req), Number(rotaAnuncio[1])));
 
+  // ---- itens dados pela administração (server/src/entregas.ts) ----
+  if (caminho === '/api/admin/itens' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 201, entregas.darItem(conta, await lerCorpo(req)));
+  }
+  if (caminho === '/api/entregas' && metodo === 'GET') return responder(res, 200, entregas.pendentes(exigirConta(req)));
+  if (caminho === '/api/entregas/receber' && metodo === 'POST') return responder(res, 200, entregas.receber(exigirConta(req)));
+
   // ---- ranking com todos os jogadores (server/src/ranking.ts) ----
   if (caminho === '/api/ranking' && metodo === 'GET') {
     exigirConta(req);
@@ -255,6 +266,9 @@ function perfilPublico(save: Record<string, unknown>) {
     vistos: save.vistos ?? [],
     capturados: save.capturados ?? [],
     estatisticas: save.estatisticas ?? null,
+    titulo: tituloAtivo(save),
+    // skin vestida (só se o item ainda está na bolsa); o jogo desenha o retrato com ela
+    skinVisual: save.itens && typeof save.itens === 'object' && temSkin(save as unknown as ComSkins, save.skinVisual as string | null) ? save.skinVisual : null,
     mostrarTime,
     time: mostrarTime ? time.map((p) => ({ especieId: p.especieId, nivel: p.nivel, shiny: !!p.shiny })) : [],
   };

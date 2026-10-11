@@ -3,7 +3,8 @@ import { BONIFICACAO_PADRAO, valorBonus, type Bonificacao, type ChaveBonus } fro
 import type { AjustesEncontro } from '../../shared/encontros';
 import { bonusVip, vipAtivo } from '../../shared/vip';
 import { bonusAtivoDaSkin } from '../../shared/skins';
-import { MULT_SHINY_CHARM, shinyCharmAtivo } from '../../shared/campo';
+import { MULT_CHARM, charmsAtivos, multShinyDosCharms, nomeCharm } from '../../shared/charms';
+import { bonusDasConquistas } from '../../shared/conquistas';
 import { carregarSave } from './estado';
 import { conta } from './conta';
 
@@ -33,7 +34,7 @@ export type AlvoChance = 'shiny' | 'lendario' | 'inicial';
 /** Uma fonte de bônus nas chances de encontro (aparece como selo na Pokédex). */
 export interface FonteBonus {
   /** classe do selo: bonificacao, vip, skin… */
-  id: 'bonificacao' | 'vip' | 'skin' | 'charm';
+  id: 'bonificacao' | 'vip' | 'skin' | 'charm' | 'conquistas';
   nome: string;
   alvo: AlvoChance;
   /** multiplicador (1,2 = +20%) */
@@ -42,9 +43,10 @@ export interface FonteBonus {
 
 /**
  * Todas as fontes de bônus de chance ativas agora. É daqui que sai a conta (comBonificacao) e os selos da Pokédex:
- * mecânica nova (ex.: skins) entra só nesta lista.
+ * mecânica nova (ex.: skins) entra só nesta lista. Com `tipos` (os de um Pokémon), entra também o charm ativo de
+ * um dos tipos dele (o charm só vale para o tipo; a conta fica em `multShinyPorTipo`).
  */
-export function fontesDeBonus(): FonteBonus[] {
+export function fontesDeBonus(tipos?: string[]): FonteBonus[] {
   const fontes: FonteBonus[] = [];
   const b = bonificacao();
   if (b.shiny > 1) fontes.push({ id: 'bonificacao', nome: 'Bonificação', alvo: 'shiny', mult: b.shiny });
@@ -62,8 +64,14 @@ export function fontesDeBonus(): FonteBonus[] {
     fontes.push({ id: 'skin', nome: 'Skin', alvo: 'lendario', mult: 1 + skins.raros });
     fontes.push({ id: 'skin', nome: 'Skin', alvo: 'inicial', mult: 1 + skins.raros });
   }
-  // Shiny Charm usado (vale por 1 hora)
-  if (save && shinyCharmAtivo(save)) fontes.push({ id: 'charm', nome: 'Shiny Charm', alvo: 'shiny', mult: MULT_SHINY_CHARM });
+  // bônus permanentes das conquistas concluídas
+  if (save) {
+    const mult = 1 + bonusDasConquistas(save).raros;
+    for (const alvo of ['shiny', 'lendario', 'inicial'] as const) fontes.push({ id: 'conquistas', nome: 'Conquistas', alvo, mult });
+  }
+  // charm do tipo deste Pokémon (30 minutos); com dois tipos e dois charms, vale um só
+  const charm = save && tipos ? charmsAtivos(save).find((t) => tipos.includes(t)) : undefined;
+  if (charm) fontes.push({ id: 'charm', nome: nomeCharm(charm), alvo: 'shiny', mult: MULT_CHARM });
   return fontes.filter((f) => f.mult !== 1);
 }
 
@@ -76,8 +84,10 @@ export const textoMult = (mult: number) => `${mult >= 1 ? '+' : '−'}${Math.rou
 /** Ajustes de encontro (do painel Admin) com todos os bônus de chance aplicados (bonificação, VIP…). */
 export function comBonificacao(a: AjustesEncontro): AjustesEncontro {
   const fontes = fontesDeBonus();
+  const save = carregarSave();
   return {
     ...a,
+    multShinyPorTipo: save ? multShinyDosCharms(save) : {},
     chanceShiny: Math.min(1, a.chanceShiny * multiplicadorDe('shiny', fontes)),
     multLendario: a.multLendario * multiplicadorDe('lendario', fontes),
     multInicial: (a.multInicial ?? 1) * multiplicadorDe('inicial', fontes),

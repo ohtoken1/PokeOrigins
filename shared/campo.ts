@@ -88,29 +88,5 @@ export const multSilverDoTime = (participantes: Pick<PokemonIndividual, 'item'>[
 /** Everstone: quem segura não evolui por nível nem por amizade. */
 export const impedeEvolucao = (p: Pick<PokemonIndividual, 'item'>) => p.item === EVERSTONE;
 
-// ---------- item-chave ----------
-/**
- * Shiny Charm (item-chave, fora da loja; pedido do dono): é USADO como uma poção e dá +20% na chance de shiny por
- * 1 hora (relógio de verdade). Só um por vez: com o bônus ativo o item fica travado (não estende nem acumula).
- */
-export const SHINY_CHARM = 'shinycharm';
-export const MULT_SHINY_CHARM = 1.2;
-export const DURACAO_SHINY_CHARM_MS = 60 * 60 * 1000;
-export interface ComShinyCharm {
-  itens: Record<string, number>;
-  /** quando o bônus do Shiny Charm acaba (ms) */
-  shinyCharmAte?: number | null;
-}
-export const shinyCharmAtivo = (save: Pick<ComShinyCharm, 'shinyCharmAte'>, agora = Date.now()) => (save.shinyCharmAte ?? 0) > agora;
-/** Usa um Shiny Charm da bolsa. Devolve '' se usou, ou o motivo de não usar. */
-export function usarShinyCharm(save: ComShinyCharm, agora = Date.now()): string {
-  if (shinyCharmAtivo(save, agora)) return 'O Shiny Charm já está ativo. Espere acabar para usar outro.';
-  if ((save.itens[SHINY_CHARM] ?? 0) < 1) return 'Você não tem Shiny Charm.';
-  save.itens[SHINY_CHARM] -= 1;
-  if (save.itens[SHINY_CHARM] <= 0) delete save.itens[SHINY_CHARM];
-  save.shinyCharmAte = agora + DURACAO_SHINY_CHARM_MS;
-  return '';
-}
-
 /** Run Away: fuga garantida de selvagem. */
 export const fugaGarantida = (habilidade: string) => Dex.abilities.get(habilidade).id === 'runaway';

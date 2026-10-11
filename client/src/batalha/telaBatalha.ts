@@ -13,7 +13,7 @@ import { evoluir, ganharExperiencia, trocarGolpe, type ResultadoProgresso } from
 import { pokemonPorId } from '../dados';
 import { ITENS, type ItemId } from '../../../shared/itens';
 import { efeitoBola } from '../../../shared/bolas';
-import { nivelTreinador } from '../../../shared/treinador';
+import { nivelMaximoEncontro, nivelTreinador } from '../../../shared/treinador';
 import { XP_POR_MISSAO, type Missao } from '../../../shared/passe';
 import { contarNasMissoes, textoMissao } from '../passe';
 import { EXP_SHARE, MOEDA } from '../../../shared/loja';
@@ -22,6 +22,9 @@ import { evsComItem, multSilverDoTime, multXpDoItem } from '../../../shared/camp
 import { sortearTicketDaBatalha } from '../../../shared/tickets';
 import { curarTime, guardarNoPC, registrarCapturaNoRanking, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
 import { darXpAoCla } from '../cla';
+import { marcarConquista } from '../conquistas';
+import { multConquistas } from '../../../shared/conquistas';
+import { ehLendario } from '../../../shared/encontros';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { iconeItem } from '../ui/iconeItem';
@@ -497,6 +500,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           await dizer(ev.texto);
           break;
         case 'tera':
+          if (ev.lado === 'jogador') marcarConquista(save, 'tera');
           marcarTera(ev.lado, ev.teraTipo);
           void animarDano(sprite(ev.lado));
           await dizer(ev.texto);
@@ -504,6 +508,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         case 'mega': {
           // Mega Evolução: esfera de arco-íris envolve o Pokémon, o símbolo da Mega aparece, ele troca e a luz estoura
           const alvo = sprite(ev.lado) as HTMLImageElement;
+          if (ev.lado === 'jogador') marcarConquista(save, 'mega');
           mensagem.textContent = `${ev.lado === 'jogador' ? nomeDe(save.time[batalha.ativo].especieId) : nomeDe(selvagem.especieId)} está reagindo à Mega Stone!`;
           await animarTransformacao(lugar(ev.lado), alvo, () => trocarSpriteForma(alvo, ev.forma, { shiny: ev.lado === 'jogador' ? save.time[batalha.ativo].shiny : selvagem.shiny, costas: ev.lado === 'jogador' }), {
             cores: ['#f08300', '#aacf52', '#00b9ef', '#e74291'],
@@ -721,8 +726,9 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       bioma: bioma.id,
       jaPossui: [...save.time, ...save.caixa].some((p) => p.especieId === selvagem.especieId),
     });
-    // VIP: +5% de chance de captura
-    const { capturou, tremidas, chance, eventos } = batalha.arremessarBola(efeito, bonusVip(save, 'captura') * multSkins(save, 'captura'));
+    // VIP, skin de bônus e conquistas aumentam a chance de captura
+    const { capturou, tremidas, chance, eventos } = batalha.arremessarBola(efeito, bonusVip(save, 'captura') * multSkins(save, 'captura') * multConquistas(save, 'captura'));
+    if (capturou && bola === 'ultraball' && ehLendario(dadosSelvagem)) marcarConquista(save, 'lendarioUltraball');
     const porcentagem = chance >= 1 ? '100' : chance < 0.001 ? '<0,1' : (chance * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
     mensagem.textContent = `Você arremessou uma ${ITENS[bola].nome}! Chance de captura: ${porcentagem}%`;
     if (capturou && bola === 'healball') curarAoCapturar = true;
@@ -792,14 +798,14 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
   /** O treinador ganha o mesmo XP que o Pokémon derrotado/capturado dá ao Pokémon em campo. */
   async function darXpTreinador() {
     const nivelAtivo = save.time[batalha.ativo]?.nivel ?? 1;
-    const xp = Math.round(xpPelosDerrotados(nivelAtivo) * bonusVip(save, 'xpTreinador') * bonificacao().xp);
+    const xp = Math.round(xpPelosDerrotados(nivelAtivo) * bonusVip(save, 'xpTreinador') * bonificacao().xp * multSkins(save, 'xp'));
     const antes = nivelTreinador(save.xpTreinador);
     save.xpTreinador += xp;
     // o clã ganha o mesmo XP (todos os membros enchem a mesma barra)
     darXpAoCla(xp);
     await dizer(`Você ganhou ${xp} XP de treinador!`);
     const depois = nivelTreinador(save.xpTreinador);
-    if (depois > antes) await dizer(`Seu nível de treinador subiu para ${depois}! Os Pokémon selvagens ficaram mais fortes.`);
+    if (depois > antes) await dizer(`Seu nível de treinador subiu para ${depois}!${nivelMaximoEncontro(depois) > nivelMaximoEncontro(antes) ? ' Os Pokémon selvagens ficaram mais fortes.' : ''}`);
   }
 
   /** Turno atual (Quick Ball e Timer Ball) e se a Heal Ball deve curar o capturado. */
@@ -826,7 +832,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         }
         // bônus de XP da administração (1x a 3x)
         // Lucky Egg: +50% para quem segura
-        const exp = Math.round(xpPelosDerrotados(p.nivel) * bonusVip(save, 'xpPokemon') * bonificacao().xp * multXpDoItem(p));
+        const exp = Math.round(xpPelosDerrotados(p.nivel) * bonusVip(save, 'xpPokemon') * bonificacao().xp * multSkins(save, 'xp') * multXpDoItem(p));
         const r = ganharExperiencia(p, exp, nomeDe, crescimentoDe);
         await mostrarProgresso(pos, r);
         if (r.evolucao) evolucoes.push({ pos, para: r.evolucao.para });
@@ -852,7 +858,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         await dizer(`${antes} está evoluindo!`);
         await animarEvolucao(spriteJogador as HTMLImageElement, modo3D ? urlSprite3D(para, { shiny: p.shiny, costas: true }) : ((p.shiny ? novo.sprites.gifCostasShiny : novo.sprites.gifCostas) ?? novo.sprites.costas ?? ''));
         const r = evoluir(p, para, nomeDe);
-        registrarCapturado(save, para);
+        registrarCapturado(save, para, p.shiny);
         infoJogador.definir(p);
         await dizer(`Parabéns! ${antes} evoluiu para ${novo.nome}!`);
         await mostrarProgresso(pos, r);
@@ -867,7 +873,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       if (treinador) {
         // Amulet Coin / Luck Incense: +20% se quem segura entrou em campo
         const amuleto = multSilverDoTime([...batalha.participantes].map((pos) => save.time[pos]));
-        const silver = Math.round(treinador.recompensa * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver') * amuleto);
+        const silver = Math.round(treinador.recompensa * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver') * multConquistas(save, 'silver') * amuleto);
         save.silver += silver;
         await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${MOEDA}!`);
       }
@@ -880,7 +886,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       await darXpTime();
       selvagem.hp = Math.max(1, selvagem.hp);
       if (curarAoCapturar) curar(selvagem);
-      registrarCapturado(save, selvagem.especieId);
+      registrarCapturado(save, selvagem.especieId, selvagem.shiny);
       registrarCapturaNoRanking(save, selvagem);
       await avisarMissoes(contarNasMissoes(save, 'capturar', selvagem.especieId));
       if (selvagem.shiny) await avisarMissoes(contarNasMissoes(save, 'shiny'));
@@ -890,6 +896,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         await dizer(`${dadosSelvagem.nome} foi enviado para o PC (Box ${box + 1}).`);
       }
     }
+    // conquista: derrotou um lendário selvagem ou fugiu dele
+    if (!treinador && (resultado === 'vitoria' || resultado === 'fuga') && ehLendario(dadosSelvagem)) marcarConquista(save, 'lendarioEscapou');
     // chance baixa de achar um ticket ao vencer ou capturar
     if (resultado === 'vitoria' || resultado === 'captura') {
       const ticket = sortearTicketDaBatalha();

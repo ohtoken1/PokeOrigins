@@ -1,7 +1,9 @@
 // Personagem do jogador montado com as camadas do LPC (Liberated Pixel Cup, client/public/lpc) +
 // detalhes Pokémon desenhados por código por cima: boné com logo de Pokébola, estampa na camiseta e
 // Pokébolas no cinto. Cada folha tem 4 linhas (cima, esquerda, baixo, direita) de quadros 64×64:
-// "walk" tem 9 quadros (o 0 é parado), "idle" tem 2.
+// "walk" tem 9 quadros (o 0 é parado), "idle" tem 2. Com uma skin de lendário (`aparencia.skin`), o personagem é
+// desenhado por skinsDesenho.ts em cima do corpo, da cabeça e do cabelo dele.
+import { desenharSkin, temArteDeSkin } from './skinsDesenho';
 
 export type Corpo = 'masc' | 'fem';
 export type Bone = 'nenhum' | 'vermelho' | 'azul' | 'verde' | 'preto' | 'amarelo';
@@ -20,6 +22,8 @@ export interface Aparencia {
   cinto: boolean;
   /** Nome de treinador (username), mostrado em cima do personagem no mapa. */
   nome?: string;
+  /** Skin vestida (id do item, ex.: "skin-kyogre-shiny"). Não fica no save: vem de `save.skinVisual` (aparenciaDoSave). */
+  skin?: string;
 }
 
 export const APARENCIA_PADRAO: Aparencia = {
@@ -180,11 +184,34 @@ function desenharBone(ctx: CanvasRenderingContext2D, ox: number, oy: number, cab
 export interface FolhasPersonagem {
   walk: HTMLCanvasElement;
   idle: HTMLCanvasElement;
+  /** Skin shiny: aura da folha de andar (mesmos quadros), para o brilho no mapa. */
+  aura?: HTMLCanvasElement | null;
 }
 
 /** Monta as folhas (andar e parado) do personagem com a aparência escolhida. */
 export async function montarPersonagem(a: Aparencia): Promise<FolhasPersonagem> {
   const p = await carregarPaletas();
+  // com skin: as roupas só dão o formato (sem cor), e o desenho todo é da skin
+  const skin = a.skin && temArteDeSkin(a.skin) ? a.skin : null;
+  const montarComSkin = async (anim: 'walk' | 'idle', idSkin: string) => {
+    const lista: [string, string[] | null, string][] = [
+      [`corpo/${a.corpo}/${anim}.png`, p.body[a.pele], 'corpo'],
+      [`cabeca/${a.corpo}/${anim}.png`, p.body[a.pele], 'cabeca'],
+      [`olhos/${anim}.png`, null, 'olhos'],
+      [`calca/${a.corpo}/${anim}.png`, null, 'calca'],
+      [`tenis/${a.corpo}/${anim}.png`, null, 'tenis'],
+      [`camiseta/${a.corpo}/${anim}.png`, null, 'camiseta'],
+      [`cabelo/${a.cabelo}/${anim}.png`, p.hair[a.corCabelo], 'cabelo'],
+    ];
+    const imgs = await Promise.all(lista.map(([src]) => imagem(src)));
+    const camadas = new Map<string, HTMLCanvasElement>();
+    imgs.forEach((img, i) => img && camadas.set(lista[i][2], recolorir(img, lista[i][1])));
+    return desenharSkin(camadas, idSkin, anim === 'walk');
+  };
+  if (skin) {
+    const [walk, idle] = await Promise.all([montarComSkin('walk', skin), montarComSkin('idle', skin)]);
+    if (walk && idle) return { walk: walk.folha, idle: idle.folha, aura: walk.aura };
+  }
   const montar = async (anim: 'walk' | 'idle') => {
     const lista: [string, string[] | null, string][] = [];
     if (a.cabelo === 'ponytail') lista.push([`cabelo/ponytail/fundo-${anim}.png`, p.hair[a.corCabelo], 'cabeloFundo']);

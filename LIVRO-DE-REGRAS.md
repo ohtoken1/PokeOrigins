@@ -118,7 +118,7 @@ O nível depende do **seu nível de treinador** e é igual em todos os biomas:
 
 - **Teto** = 5 × nível de treinador, no máximo 100.
 - **Faixa** = do teto − 4 até o teto (5 níveis).
-- Exemplos: treinador nível 1 → selvagens do nível 1 ao 5; nível 2 → 6 ao 10; nível 20 → 96 ao 100.
+- Exemplos: treinador nível 1 → selvagens do nível 1 ao 5; nível 2 → 6 ao 10; nível 20 → 96 ao 100. Do nível 21 ao 25 os selvagens continuam do 96 ao 100.
 
 Na aba **Opções** (barra do topo) você escolhe um teto **menor** (nunca maior), para caçar Pokémon de nível baixo.
 
@@ -182,9 +182,10 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 
 ## 5. Nível de treinador
 
-- **Níveis:** de 1 a 20, separado do nível dos Pokémon.
+- **Níveis:** de 1 a 25, separado do nível dos Pokémon. Os selvagens só sobem até o treinador 20; do 21 ao 25 o nível vale para conquistas e recompensas.
 - **Como ganha XP:** o treinador ganha o **mesmo XP** que o Pokémon em campo ganha ao **derrotar ou capturar**. Derrota e fuga não dão XP.
-- **Curva:** subir do nível *n* custa 262 × *n*^3,8 XP. O começo é rápido e o final é bem pesado (o nível 20 é para quem joga muito).
+- **Conteúdos com nível mínimo:** **Mercado negro** nível 3, **Guildas** (criar ou entrar) nível 10, **Torneios** nível 10 e **Liga Pokémon** nível 18. Abaixo do nível aparece um cadeado com o nível exigido. Quem já está numa guilda continua nela.
+- **Curva:** subir do nível *n* custa 262 × *n*^3,8 XP. O começo é rápido e o final é bem pesado (do 20 em diante é para quem joga muito).
 - **Efeito:** o nível de treinador define o teto dos selvagens (veja a [seção 3.2](#32-nível-dos-selvagens)).
 
 ---
@@ -450,7 +451,7 @@ Os Pokémon vêm no **nível 50**, com **5% de chance de shiny** e **cada IV de 
 | **Ticket de Zamazenta** | Zamazenta, Rusted Shield, Skin Zamazenta, Skin Zamazenta Shiny (0,25% cada) |
 | **Ticket de Ogerpon** | Ogerpon, Teal Mask, Hearthflame Mask, Wellspring Mask, Cornerstone Mask (0,2% cada) |
 
-**Skins** e os itens **Prison Bottle, DNA Splicers, Reveal Glass e Teal Mask** são itens nossos: por enquanto só existem na Bolsa (abas Skins e Itens-chave). A utilidade deles vem depois. As formas Therian, Unbound e Black/White Kyurem ainda não existem no jogo.
+**Skins** e os itens **Prison Bottle, DNA Splicers, Reveal Glass e Teal Mask** são itens nossos. As skins ficam em Minha conta → Minhas skins (ver "Skins" na seção 15); os outros ficam na aba Itens-chave da Bolsa e a utilidade deles vem depois. Também são Itens-chave, ainda sem uso: o **Vale Poke S** (procure a staff para ganhar um Pokémon à escolha S), o **Kit iniciante** (NT, conteúdo a definir) e as **moedas sazonais** (Quaquaval, Bunnelby, Enamorus, Poke Origins, Mimikyu e Delibird Coin). As formas Therian, Unbound e Black/White Kyurem ainda não existem no jogo.
 
 ### VIP
 - Um **bônus na sua conta por um tempo** (1 dia, 7 dias…). Ganhar mais VIP com ele ativo **soma** ao tempo que falta.
@@ -463,10 +464,15 @@ Itens raros da aba **Ovos** da Bolsa. Ao **chocar**, uma roleta passa pelos Pok�
 
 | Ovo | Quem nasce | O que garante |
 |---|---|---|
-| **Ovo Misterioso S** | qualquer Pokémon | IVs de tier **S ou superior** (soma 145+) |
+| **Ovo Misterioso** | qualquer Pokémon | IVs normais |
 | **Ovo Misterioso A** | qualquer Pokémon | IVs de tier **A ou superior** (soma 120+) |
+| **Ovo Misterioso S** | qualquer Pokémon | IVs de tier **S ou superior** (soma 145+) |
 | **Ovo Lendário** | um lendário, mítico ou Ultra Beast, **só a primeira forma da linha** (Cosmog e não Lunala; Type: Null e não Silvally; Meltan e não Melmetal) | IVs normais |
+| **Ovo Lendário A / S / S+** | o mesmo grupo do Ovo Lendário | IVs de tier **A** (120+), **S** (145+) ou **S+** (171+) ou superior |
 | **Ovo Inicial** | um dos 27 iniciais | IVs normais |
+| **Ovo Inicial A** | um dos 27 iniciais | IVs de tier **A ou superior** (soma 120+) |
+
+- **Versão NT:** todo ovo existe também na versão **(NT)**. O ovo NT não pode ser trocado com outros jogadores e o Pokémon que nasce dele também é NT (selo 🔒 NT). Os ovos comuns e o que nasce deles podem ser trocados normalmente.
 
 - **Chance igual** para todos do grupo do ovo (nos Misteriosos: comum, lendário, mítico, Ultra Beast…).
 - **5% de chance de shiny.**
@@ -505,7 +511,7 @@ A barra do topo tem:
 - **Jogar**: Mapas (regiões e biomas), **Cidade** (a cidade inicial, onde os jogadores ficam quando não estão caçando nem competindo; sem Pokémon selvagens; por enquanto só visual: os prédios ainda não abrem), **Duelos com treinadores**, **Ginásios** e **Continentes** ("em breve");
 - **Golpes**: Move Reminder e Move Tutor;
 - **Informações**: Ranking e Database;
-- **Minha conta**: **Meu perfil** (nível, Pokédex, capturas e time; botão para editar o personagem), **Achievements** (10 conquistas com progresso: capturas, shiny, lendário, Pokédex, time completo, nível de treinador, silver; recompensas em breve), **Minhas skins** (as skins que você ganha vão para cá, não para a Bolsa) e **Opções**;
+- **Minha conta**: **Meu perfil** (nível, Pokédex, capturas e time; botão para editar o personagem), **Conquistas** (69 conquistas com progresso e recompensa; ver "Conquistas e títulos" abaixo), **Minhas skins** (as skins que você ganha vão para cá, não para a Bolsa) e **Opções**;
 - **Comunidade**: **Buscar jogadores** (digite o nome de um treinador para ver o perfil: nível, Pokédex, capturas e time; busca por usuário ou nome de treinador), **Amigos** (pedidos de amizade, lista com quem está online, perfil e mensagem privada) e **Clã** (criar com bandeira própria, 5 vagas, cargos e nível de 1 a 10);
 - **Administração** (só para contas de administrador; enquanto não há contas, aparece para todos): **Bonificação** e, em breve, **Log** (tudo o que entra e sai no jogo, para achar abuso de bug), Jogadores, Eventos e Anúncios.
 
@@ -541,6 +547,52 @@ A aba **Ranking**, na barra do topo, tem 8 rankings. **Por enquanto só você ap
 Em saves antigos, a contagem começou pelos Pokémon que você já tinha (menos o inicial).
 
 ---
+
+### Conquistas e títulos
+Em **Minha conta → Conquistas**. A recompensa chega **na hora** em que a conquista é concluída (aparece um aviso na tela) e os bônus em porcentagem são **permanentes e se somam**.
+
+| Grupo | Conquistas | Recompensa |
+|---|---|---|
+| **Ginásios** | "\<Região\> é fichinha" (todos os ginásios de cada uma das 9 regiões) e "Poke Origins é fichinha" (todos) | **+5% de silver** em batalhas cada (50% no total) |
+| **Pokédex** | "Já vi de tudo em \<Região\>" (100% da Pokédex da região) e "no Poke Origins" (tudo) | **+1%** de chance de shiny, lendários e iniciais cada (10% no total) |
+| **Pokédex shiny** | "Já vi tudo colorido em \<Região\>" (todos os comuns da região na versão shiny) e "no Poke Origins" | **+1%** de chance de shiny, lendários e iniciais cada (10% no total) |
+| **Capturas raras** | Pokemon S+ · Shiny S+ · Na ultraball? (lendário na Ultra Ball) · Lendário S · Lendario Shiny · Por que o arceus não entra na pokebola? (derrotar um lendário ou fugir dele) · Isso era pra vir aqui? (lendário no Ovo Misterioso) | Master Ball · Ovo Lendário · Master Ball · Ovo Lendário · título **1 em 1.000.000** · Master Ball · Ovo Misterioso S |
+| **Batalhas** | 50/50 (vencer os 50 treinadores dos Duelos) · Mega evolução · Terastall · Level 100 · Time level 100 (6 Pokémon no 100) | +10% de silver · **+1% de captura** cada uma das outras |
+| **Treinador** | Nível 5 · 10 · 15 · 20 · 25 (Mestre pokemon) | Ovo Misterioso · Ovo Inicial A · Master Ball · Ovo Lendário · Ovo Lendário S |
+| **Riqueza** | Ter 500 mil · 1 milhão · 50 milhões de silver; ter 500 · 1.000 · 10.000 de gold | +1% · +2% · +7% de silver; títulos **CLT** · **Patrão** · **Burguesia** |
+| **Jornada** | Charmeiro (usar um Charm) · Galante (usar os 18 tipos de Charm; dá a **Skin Galante (NT)**) · cubo do passado · cubo do futuro · prêmio épico · lendário · mítico nos tickets · Viajante (1 viagem de trem) · Viajado (todas as regiões de trem) · União (entrar numa guilda) · Lider da união (criar uma guilda) · União max (guilda no nível máximo) | +1% de captura · 5 Fragmentos Temporais cada cubo · 1 · 10 Tickets de Arceus · título **P2W** · 50 mil de silver · **Skin Indiana Jones (NT)** · títulos **Membro de guilda** e **Líder de guilda** · Ovo Misterioso A |
+| **Coleção** | Concluir 25% · 50% · 75% · 100% das outras conquistas | Ovo Inicial A · Ovo Lendário A · Ovo Lendário S · Ovo Lendário S+ |
+
+- **Pokédex:** as **formas regionais** (Alolan, Galarian, Hisuian, Paldean) têm registro próprio: capturar a forma normal não conta para a regional, nem o contrário. Os Pokémon dos **cubos** (passado e futuro) têm número próprio e contam para os 100% de Paldea.
+- **Pokédex shiny:** só os "comuns", isto é, todos menos lendários, míticos, Ultra Beasts e os Pokémon do passado e do futuro. Na lista da Pokédex, a **Poké Ball** marca quem você já capturou e a **Ultra Ball** marca quem você já teve na versão **shiny**.
+- **Trocas:** Pokémon recebido em troca **conta para a Pokédex** (normal e shiny), mas **não** vale para "Lendário S", "Lendario Shiny", "Pokemon S+" e "Shiny S+" (o mesmo Pokémon não serve de conquista para vários jogadores). "Pokemon S+" e "Shiny S+" só valem para Pokémon **capturados** por você (ovo e ticket não contam); "Lendário S" e "Lendario Shiny" valem para qualquer forma de conseguir, menos troca.
+- **Itens NT** (ovos NT, skins e itens de conquista) não entram em trocas.
+- **Ainda não entraram** (dependem de sistemas que vão chegar, um por um): torneios PvP, Liga Pokémon, Safari Zone, breeding, farming, craft de Balls e de Charm, monotype, bosses da guilda e mundial, baú Pokémon, mercado negro, selos sazonais, Dynamax, doação e VIP, Discord e tutorial.
+
+**Títulos:** em **Meu perfil** você escolhe um dos títulos liberados pelas conquistas (clicar de novo tira). Ele aparece embaixo do seu nome no perfil, inclusive para os outros jogadores. Por enquanto o título **não** aparece no personagem no mapa.
+
+### Charms
+São 18, **um para cada tipo** (Fire Charm, Water Charm…), na aba **Charms** da Bolsa. O charm é **usado** como uma poção: por **30 minutos** de relógio, os Pokémon selvagens **daquele tipo** (em qualquer uma das duas tipagens) têm **20% a mais** de chance de aparecer shiny. Dá para ter charms de tipos diferentes ativos juntos; o mesmo tipo não acumula nem estende (o item fica travado até acabar). Um Pokémon de dois tipos com os dois charms ativos ganha os 20% uma vez só. O bônus multiplica com VIP, skin, conquistas e Bonificação, e aparece como selo no cabeçalho ("Fire Charm até 14:30") e na ficha da Pokédex. Por enquanto os charms só chegam pela administração. O antigo Shiny Charm saiu do jogo.
+
+### Skins
+Em **Minha conta → Minhas skins** você escolhe uma skin para o **visual** e uma para o **bônus** (podem ser diferentes). Só vale o bônus da skin escolhida.
+
+O **visual** troca a roupa do seu personagem no mapa, na cidade e no perfil, e os outros jogadores também veem. As nove skins de lendário (Kyogre, Groudon, Giratina, Hoopa, Dialga, Palkia, Kyurem, Zacian e Zamazenta) são fantasias com capuz do Pokémon; Zacian leva a espada nas costas e Zamazenta, o escudo. A versão **shiny** tem as cores do shiny e um **brilho**: uma aura que pulsa e estrelinhas em volta do personagem. A tela mostra um provador com o personagem andando. Só aparece a skin que você tem: se trocar a skin com outro jogador, o visual volta ao normal. As outras skins (conquistas, sazonais e iniciais) ainda não têm visual.
+
+| Skin | Shiny | Lendário/mítico/UB/inicial | Silver | Captura | XP | Como conseguir |
+|---|---|---|---|---|---|---|
+| Skin de lendário shiny | +10% | +7% | +10% | +5% | +10% | Tickets próprios (mítico) |
+| Skin de lendário | +7% | +5% | +7% | +5% | +7% | Tickets próprios (lendário) |
+| Skin Galante · Chaveiro · Indiana Jones | +1% | +1% | +3% | +1% | +3% | Conquistas (NT) |
+| Skin de Halloween | +3% | +2% | +3% | +2% | — | Sazonal |
+| Skin de Natal | +2% | +4% | +5% | — | +5% | Sazonal |
+| Skin de Carnaval | +3% | +3% | +1% | +4% | +2% | Sazonal |
+| Skin de Páscoa | +4% | +3% | — | +2% | +3% | Sazonal |
+| Skin de Dia dos Namorados | +5% | +4% | +3% | +3% | +3% | Sazonal |
+| Skin de Aniversário | +7% | +5% | +7% | +5% | +10% | Sazonal |
+| Skin Ash · Gary · May · Misty | +1% | +1% | +1% | +1% | +1% | Inicial (ainda não distribuídas) |
+
+O bônus de **XP** vale para os Pokémon e para o treinador. As skins sazonais e a Chaveiro ainda não têm como ser obtidas (os eventos e sistemas delas vêm depois).
 
 ## 16. Créditos
 
@@ -697,7 +749,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Run Away:** com o Pokémon em campo, a fuga de selvagem nunca falha.
 - **Amulet Coin e Luck Incense** (fora da loja): +20% de silver em duelos e ginásios se quem segura entrar em campo; não acumulam.
 - **Itens de segurar novos na loja:** **Lucky Egg** (+50% de XP), **Everstone** (não evolui por nível nem amizade), **Macho Brace** (dobro de EVs) e os **Power Items** (Power Weight, Bracer, Belt, Lens, Band, Anklet: +8 EVs no atributo por derrotado).
-- **Shiny Charm:** item-chave fora da loja, usado pela bolsa como uma poção. Ao usar, a chance de shiny fica 20% maior por **1 hora** (multiplica com VIP, skin e Bonificação). Só um por vez: enquanto o bônus está ativo o item fica travado (não estende o tempo nem acumula). O tempo corre mesmo com o jogo fechado.
+- **Charms por tipo** (no lugar do Shiny Charm): 18 charms, um por tipo, usados pela bolsa. Por **30 minutos**, +20% de chance de shiny só nos Pokémon daquele tipo. Tipos diferentes podem ficar ativos juntos; o mesmo tipo não acumula.
 - **Clã agora se chama Guilda** em todo o jogo (menu, tela, chat e perfil). A tela mostra primeiro as guildas que já existem para você entrar e, embaixo, a opção de criar a sua. O personagem **Guildas**, na cidade, abre essa tela.
 - **Novos moradores da cidade**, cada um na frente de uma casa ao sul da praça: **Guildas** (abre as guildas), **Evento sazonal** e **Mercado negro** (os dois ainda "em breve"). Têm marcador no minimapa (G, E e N).
 - **Menu de cima reorganizado:** **Jogar** leva direto para a cidade (mapas pela saída do sul, duelos e ginásios pela Arena); "Continentes" saiu. A aba **Informações** saiu: **Ranking** e **Database** ficam em **Comunidade**, junto de Buscar jogadores, Amigos e Guilda. Cada item do menu ganhou um iconezinho.
@@ -707,6 +759,22 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - A placa da **Arena** agora fica no meio dela, para dar para clicar de perto.
 - **Formas de Hisui** (16) agora aparecem em **Kalos**: Hisuian Growlithe, Voltorb, Qwilfish, Sneasel, Zorua, Zoroark e Lilligant soltos; Typhlosion, Samurott e Decidueye (raros como iniciais), Braviary, Sliggoo e Avalugg já no nível em que evoluiriam; Hisuian Arcanine e Electrode só evoluindo com pedra; Hisuian Goodra evoluindo o Hisuian Sliggoo.
 - **Tickets:** nova raridade **Mítico** (0,1%) com a skin shiny; o Lendário passou para 0,9% (0,3% para o Pokémon, 0,3% para o item e 0,3% para a skin). A seção "Chances" saiu da janela; as porcentagens continuam em "Prêmios possíveis".
+- **Conquistas com recompensa:** a tela Achievements virou **Conquistas**, com as 69 conquistas da planilha que já dá para fazer (ginásios, Pokédex normal e shiny por região, capturas raras, batalhas, nível de treinador, riqueza, jornada e coleção). A recompensa chega na hora: bônus permanentes de silver, de captura e de shiny/lendários/iniciais, itens, silver, Fragmentos Temporais e títulos. As que dependem de sistemas futuros entram depois.
+- **Títulos:** em Meu perfil dá para escolher um título liberado por conquista (1 em 1.000.000, P2W, CLT, Patrão, Burguesia, Membro de guilda, Líder de guilda). Aparece só no perfil.
+- **Pokédex shiny:** a lista da Pokédex ganhou a marca de **Ultra Ball** para quem você já teve na versão shiny (a Poké Ball continua marcando o capturado).
+- **Skins com os bônus da planilha:** as de lendário mudaram (normal +7% shiny, +5% raros, +7% silver, +5% captura, +7% XP; shiny +10/+7/+10/+5/+10) e as skins passaram a dar bônus de **XP**. Skins novas cadastradas: Galante, Chaveiro e Indiana Jones (conquistas, NT), seis sazonais e as quatro iniciais (Ash, Gary, May, Misty).
+- **Ovos novos:** Ovo Misterioso (comum), Ovo Lendário A, S e S+ e Ovo Inicial A. Todo ovo tem também a versão **(NT)**: nem o ovo nem o Pokémon que nasce podem ser trocados.
+- **Itens novos** (Itens-chave, ainda sem uso): Vale Poke S, Kit iniciante (NT) e as seis moedas sazonais.
+- **Trocas:** itens NT são recusados; Pokémon recebido em troca fica marcado e não vale para as conquistas de "consiga um…".
+- **Nível de treinador até 25:** a curva de XP continua a mesma; os selvagens param na faixa do nível 20 (96 a 100). Conquistas novas: **Mestre pokemon** (nível 25) e **Galante** (usar os 18 tipos de Charm).
+- **Selos sazonais** (Carnaval, Páscoa, Dia dos Namorados, Aniversário Poke Origins, Halloween e Natal): itens cadastrados na Database, ainda sem uso e fora da loja.
+- **Administração → Dar item:** a staff escolhe um item, a quantidade e o jogador. O item chega na hora para quem está online (com um aviso na tela) e no próximo login para quem não está.
+- **Trancas de nível de treinador:** Mercado negro (nível 3), Guildas (nível 10), Torneios (nível 10) e Liga Pokémon (nível 18).
+
+### v0.4 — 11 de outubro de 2026
+- **Visual das skins:** as nove skins de lendário dos tickets (normal e shiny) agora mudam o personagem no mapa, na cidade e no perfil, e os outros jogadores veem. São fantasias com capuz de cada Pokémon, animadas nas quatro direções (asas e nadadeiras batem ao andar); Zacian leva a espada nas costas e Zamazenta, o escudo.
+- **Brilho do shiny:** as skins shiny têm uma aura que pulsa e estrelinhas em volta do personagem.
+- **Minhas skins:** provador com o personagem andando com a skin escolhida; skins sem desenho ainda mostram "Visual em breve".
 
 ---
 
@@ -726,7 +794,7 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Tiers próprios do jogo**, no lugar dos tiers provisórios do Smogon.
 
 ### 🎟️ Tickets
-- Utilidade das **skins** e dos itens Prison Bottle, DNA Splicers, Reveal Glass e Teal Mask (formas Unbound, Black/White Kyurem, Therian).
+- Visual das **skins** de conquista, sazonais e iniciais; utilidade dos itens Prison Bottle, DNA Splicers, Reveal Glass e Teal Mask (formas Unbound, Black/White Kyurem, Therian).
 - Definir os **bônus do VIP**.
 
 ### 🧢 Personagem

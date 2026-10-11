@@ -1,24 +1,28 @@
-// Aba "Administração" (só para contas de administrador). Bonificação e Anúncios funcionam (os anúncios vão para
-// o Mural da cidade, pelo servidor); as outras seções ficam "em breve".
+// Aba "Administração" (só para contas de administrador). Bonificação, Dar item (manda um item para qualquer
+// jogador, pelo servidor) e Anúncios (vão para o Mural da cidade) funcionam; as outras seções ficam "em breve".
 import type { Tela } from '../main';
 import { NOMES_BONUS, VALORES_BONUS, textoBonus, type ChaveBonus } from '../../../shared/bonificacao';
 import { bonificacao, definirBonus, ehAdministrador } from '../bonificacao';
 import { ANUNCIO_TEXTO_MAX, ANUNCIO_TITULO_MAX } from '../../../shared/anuncios';
 import { anuncios, aoMudarAnuncios, apagarAnuncio, carregarAnuncios, publicarAnuncio } from '../anuncios';
-import { ErroApi } from '../conta';
+import { api, ErroApi } from '../conta';
+import { TODOS_OS_ITENS, nomeCategoriaItem } from '../../../shared/loja';
+import { darItemAoJogador } from '../entregas';
+import { iconeItem } from '../ui/iconeItem';
 import { el } from '../ui/dom';
 import { cartaoAnuncio } from '../ui/mural';
 
-export type SecaoAdministracao = 'bonificacao' | 'log' | 'jogadores' | 'eventos' | 'anuncios';
+export type SecaoAdministracao = 'bonificacao' | 'itens' | 'log' | 'jogadores' | 'eventos' | 'anuncios';
 
 export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBreve?: string }[] = [
   { id: 'bonificacao', nome: 'Bonificação' },
+  { id: 'itens', nome: 'Dar item' },
   {
     id: 'log',
     nome: 'Log',
     emBreve: 'Registro de tudo o que acontece no jogo: o que entra e sai (silver, gold, itens, Pokémon, tickets), quem fez e quando — para achar abuso de bug. Vai ser ligado com o servidor.',
   },
-  { id: 'jogadores', nome: 'Jogadores', emBreve: 'Ver e editar contas, banir e dar itens a jogadores (precisa do servidor).' },
+  { id: 'jogadores', nome: 'Jogadores', emBreve: 'Ver e editar contas e banir jogadores.' },
   { id: 'eventos', nome: 'Eventos', emBreve: 'Agendar eventos, como fim de semana com bônus ou Pokémon especiais.' },
   { id: 'anuncios', nome: 'Anúncios' },
 ];
@@ -74,6 +78,72 @@ function secaoAnuncios(): { elemento: HTMLElement; parar: () => void } {
   };
 }
 
+/** Dar item: escolhe um item do jogo, a quantidade e o jogador; o servidor entrega (na hora, se ele está online). */
+function secaoItens(): { elemento: HTMLElement; parar: () => void } {
+  const listaItens = el('datalist', { id: 'adm-itens' }, ...TODOS_OS_ITENS.map((i) => el('option', { value: i.nome }, nomeCategoriaItem(i.categoria))));
+  const listaJogadores = el('datalist', { id: 'adm-jogadores' });
+  const campoItem = el('input', { type: 'text', class: 'db-busca', list: 'adm-itens', placeholder: 'Nome do item', 'aria-label': 'Nome do item' }) as HTMLInputElement;
+  const campoQtd = el('input', { type: 'number', class: 'db-busca', min: '1', max: '9999', value: '1', 'aria-label': 'Quantidade' }) as HTMLInputElement;
+  const campoJogador = el('input', { type: 'text', class: 'db-busca', list: 'adm-jogadores', placeholder: 'Usuário do jogador', 'aria-label': 'Usuário do jogador', autocomplete: 'off' }) as HTMLInputElement;
+  const escolhido = el('div', { class: 'linha-escolhido' });
+  const aviso = el('p', { class: 'amigos-aviso', role: 'status' });
+  const itemEscolhido = () => TODOS_OS_ITENS.find((i) => i.nome.toLowerCase() === campoItem.value.trim().toLowerCase());
+  const mostrarItem = () => {
+    const item = itemEscolhido();
+    escolhido.replaceChildren(...(item ? [iconeItem(item), el('span', {}, el('strong', {}, item.nome), el('small', { class: 'meta' }, ` · ${nomeCategoriaItem(item.categoria)}`))] : []));
+  };
+  campoItem.addEventListener('input', mostrarItem);
+  // sugestões de jogadores enquanto digita (usuário ou nome de treinador)
+  let relogio = 0;
+  campoJogador.addEventListener('input', () => {
+    clearTimeout(relogio);
+    const termo = campoJogador.value.trim();
+    if (termo.length < 2) return;
+    relogio = window.setTimeout(async () => {
+      try {
+        const achados = await api<{ usuario: string; nome: string | null }[]>('GET', `/jogadores?busca=${encodeURIComponent(termo)}`);
+        listaJogadores.replaceChildren(...achados.map((j) => el('option', { value: j.usuario }, j.nome ?? '')));
+      } catch {
+        // sem sugestões: o envio ainda confere o usuário
+      }
+    }, 250);
+  });
+  let enviando = false;
+  const enviar = async () => {
+    if (enviando) return;
+    const item = itemEscolhido();
+    const quantidade = Math.round(Number(campoQtd.value));
+    const usuario = campoJogador.value.trim();
+    if (!item) return void (aviso.textContent = 'Escolha um item da lista.');
+    if (!(quantidade >= 1 && quantidade <= 9999)) return void (aviso.textContent = 'A quantidade vai de 1 a 9999.');
+    if (!usuario) return void (aviso.textContent = 'Diga para qual jogador vai.');
+    if (!confirm(`Dar ${quantidade}x ${item.nome} para ${usuario}?`)) return;
+    enviando = true;
+    aviso.textContent = '';
+    try {
+      const r = await darItemAoJogador(usuario, item.id, item.nome, quantidade);
+      aviso.textContent = `${quantidade}x ${item.nome} enviado para ${r.usuario}. Chega na hora se ele estiver online; senão, quando ele entrar.`;
+    } catch (e) {
+      aviso.textContent = e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.';
+    }
+    enviando = false;
+  };
+  return {
+    parar: () => clearTimeout(relogio),
+    elemento: el('section', { class: 'bonus-secao' },
+      el('p', { class: 'sub' }, 'Manda um item do jogo para um jogador. Ele recebe um aviso e o item vai para a bolsa (skins vão para Minhas skins).'),
+      listaItens, listaJogadores,
+      el('div', { class: 'cla-formulario admin-dar-item' },
+        el('label', { class: 'cla-campo' }, 'Item', campoItem),
+        escolhido,
+        el('label', { class: 'cla-campo' }, 'Quantidade', campoQtd),
+        el('label', { class: 'cla-campo' }, 'Jogador', campoJogador),
+        el('button', { class: 'botao cla-botao-criar', onclick: () => void enviar() }, 'Dar item')),
+      aviso,
+      el('small', { class: 'meta' }, 'Futuramente cada envio vai ficar registrado na aba Log.')),
+  };
+}
+
 export const telaAdministracao = (secaoInicial: SecaoAdministracao): Tela => (raiz, navegar) => {
   const tela = el('main', { class: 'tela tela-administracao' }, el('h1', {}, 'Administração'));
   raiz.append(tela);
@@ -84,7 +154,7 @@ export const telaAdministracao = (secaoInicial: SecaoAdministracao): Tela => (ra
   let secao = secaoInicial;
   const corpo = el('div', { class: 'admin-corpo' });
   // montada uma vez só (redesenhar a tela não apaga o que a pessoa está escrevendo)
-  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : null;
+  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : null;
 
   const linhaBonus = (chave: ChaveBonus) => {
     const atual = bonificacao()[chave];

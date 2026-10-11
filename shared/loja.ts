@@ -16,7 +16,7 @@ import { nomeCategoria, nomeTipo, traduzir } from './traducao';
 
 export type CategoriaLoja =
   | 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'megapedras' | 'frutas' | 'gems' | 'placas' | 'memorias' | 'zcristais' | 'lendarios'
-  | 'terashards' | 'chave' | 'skins' | 'cubos' | 'tm' | 'tr' | 'tickets' | 'ovos';
+  | 'terashards' | 'chave' | 'charms' | 'skins' | 'cubos' | 'tm' | 'tr' | 'tickets' | 'ovos';
 
 /** Abas da loja. */
 export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
@@ -38,6 +38,7 @@ export const CATEGORIAS_FORA_DA_LOJA: { id: CategoriaLoja; nome: string }[] = [
   { id: 'lendarios', nome: 'Itens de lendários' },
   { id: 'terashards', nome: 'Tera Shards' },
   { id: 'chave', nome: 'Itens-chave' },
+  { id: 'charms', nome: 'Charms' },
   { id: 'skins', nome: 'Skins' },
   { id: 'cubos', nome: 'Cubos' },
   { id: 'tickets', nome: 'Tickets' },
@@ -68,6 +69,10 @@ export interface ItemLoja {
   teraTipo?: string;
   /** skins: de qual Pokémon */
   skin?: { especie: number; shiny: boolean };
+  /** charms: o tipo */
+  charm?: string;
+  /** desenho provisório do ícone (itens nossos ainda sem arte) */
+  simbolo?: string;
   /** cubos: de qual Pokémon e de que era (shared/itensCustom.ts) */
   cubo?: { especie: number; era: 'passado' | 'futuro' | 'lendario' };
 }

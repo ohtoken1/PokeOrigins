@@ -10,8 +10,9 @@ import { pokemonPorId } from '../dados';
 import { PAUSA_MINIMA_ENCONTRO_MS } from '../../../shared/encontros';
 import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
 import { montarPersonagem, type FolhasPersonagem } from '../personagem/lpc';
+import { BrilhoSkin } from './brilhoSkin';
 import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
-import { garantirTexturaLpc, OutrosJogadores } from './outrosJogadores';
+import { garantirTexturaLpc, OutrosJogadores, texturaDaAura } from './outrosJogadores';
 import { digitando } from '../ui/digitando';
 import { entrarNaSala, moverOnline, sairDaSalaOnline, visualOnline, type DirecaoOnline, type JogadorOnline, type VisualOnline } from '../online';
 
@@ -141,6 +142,8 @@ export class BiomaScene extends Phaser.Scene {
   /** Textura do personagem LPC (null = desenho antigo) e a linha da folha (0 cima, 1 esquerda, 2 baixo, 3 direita). */
   private lpc: string | null = null;
   private linhaLpc = 2;
+  /** Brilho da skin shiny do jogador (aura + estrelinhas). */
+  private brilho: BrilhoSkin | null = null;
   /** Posição no ciclo de 8 quadros de andar (continua de um passo para o outro). */
   private cicloLpc = 0;
   /** alterna a perna que vai à frente a cada passo */
@@ -704,6 +707,9 @@ export class BiomaScene extends Phaser.Scene {
     this.lpc = nome;
     this.jogador.setTexture(nome, `${this.linhaLpc}-0`).setOrigin(0.5, 61 / 64).setFlipX(false).setScale(ESCALA_LPC);
     this.sombraJogador.setSize(16, 5);
+    this.brilho?.destruir();
+    const aura = texturaDaAura(this, nome);
+    this.brilho = aura ? new BrilhoSkin(this, this.jogador, aura) : null;
   }
 
   /** O nome fica sempre com ~13 px na tela, em qualquer zoom (o texto é desenhado grande e reduzido). */

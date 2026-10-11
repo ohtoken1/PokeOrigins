@@ -1,5 +1,6 @@
 // Clã do jogador (server/src/cla.ts): estado único, chamadas e o envio do XP ganho em batalha para o clã.
-import type { Bandeira } from '../../shared/cla';
+import { NIVEL_MAX_CLA, type Bandeira } from '../../shared/cla';
+import { conferirConquistasLogo, definirMarcasVivas } from './conquistas';
 import { api } from './conta';
 import { aoAvisoDoServidor } from './online';
 
@@ -49,6 +50,8 @@ export function aoMudarCla(f: () => void): () => void {
 }
 const adotar = (novo: Estado) => {
   estado = novo;
+  // conquistas da guilda (com folga: criar a guilda ainda troca o save pelo do servidor)
+  if (novo.cla) conferirConquistasLogo(2000);
   ouvintes.forEach((f) => f());
 };
 const pedir = async (caminho: string, corpo?: unknown) => adotar(await api<Estado>('POST', caminho, corpo ?? {}));
@@ -56,7 +59,13 @@ const pedir = async (caminho: string, corpo?: unknown) => adotar(await api<Estad
 export const carregarCla = async () => adotar(await api<Estado>('GET', '/cla'));
 export const listarClas = (busca: string) => api<ResumoCla[]>('GET', `/clas?busca=${encodeURIComponent(busca)}`);
 export const verCla = (id: number) => api<DetalheCla>('GET', `/clas/${id}`);
-export const criarCla = (dados: { nome: string; bandeira: Bandeira; descricao: string; aberto: boolean }) => pedir('/cla', dados);
+export const criarCla = async (dados: { nome: string; bandeira: Bandeira; descricao: string; aberto: boolean }) => {
+  await pedir('/cla', dados);
+  criouGuilda = true;
+};
+/** Criou uma guilda nesta sessão (conquista "Lider da união"). */
+let criouGuilda = false;
+definirMarcasVivas(() => ({ guildaEntrou: !!estado.cla, guildaMax: (estado.cla?.nivel ?? 0) >= NIVEL_MAX_CLA, guildaCriou: criouGuilda }));
 export const entrarNoCla = (id: number) => pedir(`/clas/${id}/entrar`);
 export const cancelarPedidoDeCla = (id: number) => pedir(`/clas/${id}/cancelar`);
 export const sairDoCla = () => pedir('/cla/sair');
