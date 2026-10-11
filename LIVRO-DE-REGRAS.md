@@ -54,7 +54,7 @@ O primeiro passo é montar o seu personagem:
 Dá para mudar o visual e o nome depois, pelo botão **✏️ Personagem** no menu da região.
 
 ### 1.2 A roleta do inicial
-Cada jogador **não escolhe** o inicial. Ele é sorteado numa roleta:
+Cada jogador **não escolhe** o inicial. Depois de criar o personagem aparece o aviso **"Você ganhou um Ovo de Inicial!"**, com o ovo balançando de leve; o botão **Abrir agora** leva à roleta que sorteia o inicial:
 
 - Entram os **27 iniciais de todas as regiões**, de Bulbasaur a Quaxly.
 - **Todos têm a mesma chance** (1 em 27).
@@ -776,6 +776,8 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Brilho do shiny:** as skins shiny têm uma aura que pulsa e estrelinhas em volta do personagem.
 - **Minhas skins:** provador com o personagem andando com a skin escolhida; skins sem desenho ainda mostram "Visual em breve".
 - **Criação do personagem:** 24 cabelos novos (agora são 14 masculinos e 18 femininos) e cada sexo só vê os seus. A opção "Corpo" passou a se chamar **Sexo**. Quem já tinha um cabelo que ficou na lista do outro sexo continua com ele até editar o personagem.
+- **Ovo de Inicial:** antes da roleta do inicial aparece o aviso do ovo, com o botão "Abrir agora". A região só é escolhida depois que o inicial aparece.
+- **Pokébolas no cinto:** só aparecem com o personagem de frente.
 - **Personagem feminino mais magro:** cintura mais fina e sem a saliência na frente do tronco. As skins continuam servindo.
 
 ---

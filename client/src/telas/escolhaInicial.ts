@@ -1,4 +1,4 @@
-// Começo do jogo: uma roleta sorteia o inicial entre os de TODAS as regiões (chance igual para os 27)
+// Começo do jogo: um aviso "Você ganhou um Ovo de Inicial" (botão Abrir agora) leva à roleta, que sorteia o inicial entre os de TODAS as regiões (chance igual para os 27)
 // e depois o jogador escolhe a região onde começa. O resultado é guardado assim que a roleta gira, para recarregar
 // a página não virar um "sortear de novo".
 import type { Tela } from '../main';
@@ -10,6 +10,8 @@ import { aparenciaNova, limparAparenciaNova } from './personagem';
 
 const CHAVE_SORTEIO = 'jogo-claude:sorteio-inicial';
 const LARGURA_ITEM = 96;
+/** O ovo dos jogos oficiais (sprite da PokéAPI, como os dos Pokémon). */
+const SPRITE_OVO = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png';
 
 const lerSorteio = (): number | null => {
   try {
@@ -110,14 +112,35 @@ export const telaEscolhaInicial: Tela = (raiz, navegar) => {
     girar(id);
   });
 
-  tela.append(
-    el('h1', {}, 'Roleta do inicial'),
-    el('p', { class: 'sub' }, `Gire para sortear seu primeiro Pokémon entre os ${TODOS_INICIAIS.length} iniciais de todas as regiões, todos com a mesma chance. Depois, escolha a região onde começar.`),
-    janela,
-    botao,
-    resultado,
-  );
-  // já sorteou antes (recarregou a página): mostra o mesmo resultado
+  // ---------- passo 0: o aviso do ovo (só para quem ainda não girou a roleta) ----------
   const salvo = lerSorteio();
-  if (salvo !== null) requestAnimationFrame(() => girar(salvo, true));
+  const mostrarRoleta = () =>
+    tela.replaceChildren(
+      el('h1', {}, 'Roleta do inicial'),
+      el('p', { class: 'sub' }, `Gire para sortear seu primeiro Pokémon entre os ${TODOS_INICIAIS.length} iniciais de todas as regiões, todos com a mesma chance. Depois, escolha a região onde começar.`),
+      janela,
+      botao,
+      resultado,
+    );
+  if (salvo === null) {
+    const ovo = el('div', { class: 'ovo-inicial' }, el('img', { src: SPRITE_OVO, alt: 'Ovo' }));
+    const abrir = el('button', { class: 'botao grande' }, 'Abrir agora') as HTMLButtonElement;
+    abrir.addEventListener('click', () => {
+      // o ovo some num clarão e a roleta aparece
+      abrir.disabled = true;
+      ovo.classList.add('chocando');
+      setTimeout(mostrarRoleta, 900);
+    });
+    tela.append(
+      el('section', { class: 'aviso-ovo-inicial' },
+        el('h1', {}, 'Você ganhou um Ovo de Inicial!'),
+        el('p', { class: 'sub' }, 'Dentro dele está o seu primeiro Pokémon: um dos iniciais de todas as regiões.'),
+        el('div', { class: 'ovo-inicial-palco' }, ovo),
+        abrir),
+    );
+    return;
+  }
+  mostrarRoleta();
+  // já sorteou antes (recarregou a página): mostra o mesmo resultado
+  requestAnimationFrame(() => girar(salvo, true));
 };

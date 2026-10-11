@@ -335,11 +335,12 @@ export async function montarPersonagem(a: Aparencia): Promise<FolhasPersonagem> 
           const meio = Math.round((tronco.esq + tronco.dir) / 2);
           padrao(ctx, ox + meio - Math.floor(e.linhas[0].length / 2), oy + tronco.topo + 7, e.linhas, e.cores);
         }
-        if (a.cinto && cintura && calca) {
+        // só de frente (pedido do dono): de lado e de costas a Pokébola não aparece
+        if (a.cinto && linha === 2 && cintura && calca) {
           const bola = ['rrr', 'kwk', 'www'];
           const cores: Record<string, string> = { r: '#e8443c', k: CONTORNO, w: '#f4f4f4' };
           const meio = Math.round((cintura.esq + cintura.dir) / 2);
-          const x0 = linha === 2 ? meio - 5 : linha === 0 ? meio + 3 : linha === 1 ? meio + 1 : meio - 3;
+          const x0 = meio - 5;
           const y0 = cintura.topo + 3;
           bola.forEach((l, j) =>
             [...l].forEach((ch, i) => {
