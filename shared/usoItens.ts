@@ -3,7 +3,7 @@
 import { Dex } from '@pkmn/sim';
 import { especie, type PokemonIndividual } from './batalha/pokemon';
 import { idDaEvolucao } from './formasRegionais';
-import { EVOLUCOES_NOSSAS } from './formasPorItem';
+import { EVOLUCOES_NOSSAS, MASCARAS_OGERPON } from './formasPorItem';
 import { ABILITY_CAPSULE, ABILITY_PATCH, CABO_DE_LIGACAO, ITENS_DE_SEGURAR_NOSSOS, PEDRAS_EVOLUCAO } from './loja';
 
 /** Ability Capsule e Ability Patch: itens de USAR (o resto da aba Up é de segurar). */
@@ -39,6 +39,9 @@ export function evolucaoPorItem(p: PokemonIndividual, itemId: string, existe: (n
   // itens de evolução nossos (pergaminhos do Kubfu)
   const nossa = EVOLUCOES_NOSSAS[itemId]?.[p.especieId];
   if (nossa && existe(nossa)) return nossa;
+  // máscaras da Ogerpon: só a Ogerpon normal vira a forma da máscara (sem volta)
+  const mascara = MASCARAS_OGERPON[itemId];
+  if (mascara && mascara !== p.especieId && p.especieId === MASCARAS_OGERPON.tealmask && existe(mascara)) return mascara;
   for (const nome of especie(p.especieId).evos ?? []) {
     const evo = Dex.species.get(nome);
     const id = idDaEvolucao(p.especieId, evo);

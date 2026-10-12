@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="a" cx="36%" cy="28%" r="85%">
+      <stop offset="0" stop-color="#fff6c4"/>
+      <stop offset=".42" stop-color="#eebd45"/>
+      <stop offset="1" stop-color="#8f5f0c"/>
+    </radialGradient>
+    <radialGradient id="b" cx="50%" cy="40%" r="70%">
+      <stop offset="0" stop-color="#3a3021"/>
+      <stop offset="1" stop-color="#12100c"/>
+    </radialGradient>
+    <linearGradient id="c" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff8d2"/>
+      <stop offset=".5" stop-color="#f2c44e"/>
+      <stop offset="1" stop-color="#b9820f"/>
+    </linearGradient>
+  </defs>
+  <!-- borda dourada serrilhada, miolo preto e a estrela de quatro pontas (a "origem") dentro de um aro -->
+  <circle cx="32" cy="32" r="30" fill="url(#a)" stroke="#5f3f06" stroke-width="2.5"/>
+  <circle cx="32" cy="32" r="26.5" fill="none" stroke="#7a5209" stroke-width="3" stroke-dasharray="2.2 2.420" opacity=".75"/>
+  <circle cx="32" cy="32" r="21" fill="url(#b)" stroke="#f6d370" stroke-width="2"/>
+  <circle cx="32" cy="32" r="14.5" fill="none" stroke="#c9961f" stroke-width="1.6"/>
+  <path d="M32 12.500Q34.8 29.2 51.5 32 34.8 34.8 32 51.5 29.2 34.8 12.5 32 29.2 29.2 32 12.500z" fill="url(#c)" stroke="#6b4a0c" stroke-width="1" stroke-linejoin="round"/>
+  <circle cx="32" cy="32" r="3.2" fill="#12100c" stroke="#fff3bd" stroke-width="1.2"/>
+  <path d="M11 22a23 23 0 0 1 19-13" fill="none" stroke="#fffbe0" stroke-width="3" stroke-linecap="round" opacity=".75"/>
+</svg>

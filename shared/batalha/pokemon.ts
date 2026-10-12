@@ -57,6 +57,8 @@ export interface PokemonIndividual {
   golpesAprendidos?: string[];
   /** Fusão (DNA Splicers, N-Solarizer, Reins of Unity): o Pokémon que está dentro deste e volta ao separar. */
   fundido?: PokemonIndividual;
+  /** Fusão: os IVs que este Pokémon tinha antes de se juntar (voltam ao separar). */
+  ivsAntesDaFusao?: Atributos;
 }
 
 /** Anota os golpes que o Pokémon sabe agora na memória dele (o que ele já soube nunca sai de lá). */

@@ -108,12 +108,12 @@ export const CONQUISTAS: Conquista[] = [
   c('treinador-25', 'treinador', 'Mestre pokemon', 'Alcance o nível 25 de treinador.', item('ovo-lendario-s', 'Ovo Lendário S')),
 
   // ---- riqueza: silver dá bônus (10% no total), gold dá títulos
-  c('silver-500k', 'riqueza', 'Rico', 'Tenha 500 mil de silver.', silver(0.01)),
-  c('silver-1kk', 'riqueza', 'Milionario', 'Tenha 1 milhão de silver.', silver(0.02)),
-  c('silver-50kk', 'riqueza', 'Multimilionario', 'Tenha 50 milhões de silver.', silver(0.07)),
-  c('gold-500', 'riqueza', 'Rico (Gold)', 'Tenha 500 de gold.', titulo('CLT')),
-  c('gold-1000', 'riqueza', 'Milionario (Gold)', 'Tenha 1.000 de gold.', titulo('Patrão')),
-  c('gold-10000', 'riqueza', 'Multimilionario (Gold)', 'Tenha 10.000 de gold.', titulo('Burguesia')),
+  c('silver-500k', 'riqueza', 'Rico', 'Tenha 500 mil de Poké Dólares.', silver(0.01)),
+  c('silver-1kk', 'riqueza', 'Milionario', 'Tenha 1 milhão de Poké Dólares.', silver(0.02)),
+  c('silver-50kk', 'riqueza', 'Multimilionario', 'Tenha 50 milhões de Poké Dólares.', silver(0.07)),
+  c('gold-500', 'riqueza', 'Rico (Origin Coins)', 'Tenha 500 Origin Coins.', titulo('CLT')),
+  c('gold-1000', 'riqueza', 'Milionario (Origin Coins)', 'Tenha 1.000 Origin Coins.', titulo('Patrão')),
+  c('gold-10000', 'riqueza', 'Multimilionario (Origin Coins)', 'Tenha 10.000 Origin Coins.', titulo('Burguesia')),
 
   // ---- jornada
   c('charmeiro', 'jornada', 'Charmeiro', 'Use um Charm uma vez.', captura(0.01)),
@@ -158,14 +158,14 @@ export const multConquistas = (s: ComConquistas, alvo: AlvoBonusConquista) => 1 
 
 const pct = (v: number) => `${(Math.round(v * 1000) / 10).toLocaleString('pt-BR')}%`;
 const TEXTO_BONUS: Record<AlvoBonusConquista, string> = {
-  silver: 'de silver em batalhas',
+  silver: 'de Poké Dólares em batalhas',
   raros: 'de chance de shiny, lendários e iniciais',
   captura: 'de chance de captura',
 };
 export function textoRecompensa(r: RecompensaConquista): string {
   if (r.tipo === 'bonus') return `+${pct(r.valor)} ${TEXTO_BONUS[r.alvo]}`;
   if (r.tipo === 'item') return `${r.quantidade}x ${r.nome}`;
-  if (r.tipo === 'silver') return `${r.quantidade.toLocaleString('pt-BR')} de silver`;
+  if (r.tipo === 'silver') return `${r.quantidade.toLocaleString('pt-BR')} de Poké Dólares`;
   if (r.tipo === 'fragmentos') return `${r.quantidade}x Fragmento Temporal`;
   return `Título "${r.titulo}"`;
 }

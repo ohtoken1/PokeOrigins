@@ -7,6 +7,7 @@ import { abrirBatalha } from '../batalha/telaBatalha';
 import { pokemonPorId } from '../dados';
 import { carregarSave, salvar } from '../estado';
 import { el, spritePokemon } from '../ui/dom';
+import { valorEmMoeda } from '../ui/moeda';
 
 /** Imagem do personagem (sprites do Pokémon Showdown, guardados em client/public/treinadores). */
 export const imagemTreinador = (id: string) => `treinadores/${id}.png`;
@@ -95,7 +96,7 @@ export const telaDuelos: Tela = (raiz, navegar) => {
           const d = pokemonPorId(p.especieId);
           return el('div', { class: 'duelo-pokemon' }, spritePokemon(d, { animado: false }), el('small', {}, `${d.nome} · Nv. ${p.nivel}`));
         })),
-      el('div', { class: 'duelo-info' }, el('strong', {}, `Recompensa: ${recompensa.toLocaleString('pt-BR')} silver`), el('small', { class: 'meta' }, ` (${RECOMPENSA_POR_POKEMON[npc.dificuldade]} por Pokémon derrotado)`)),
+      el('div', { class: 'duelo-info' }, el('strong', {}, 'Recompensa: ', valorEmMoeda('silver', recompensa)), el('small', { class: 'meta' }, ` (${RECOMPENSA_POR_POKEMON[npc.dificuldade]} por Pokémon derrotado)`)),
       el('div', { class: 'duelo-botoes' },
         el('button', {
           class: 'botao grande',

@@ -9,15 +9,17 @@ import { BOXES_INICIAIS, BOXES_MAXIMO, BOX_POKEMON, TAMANHO_BOX } from './pc';
 import { CHAVE_TEMPORAL, TICKETS } from './tickets';
 import { TIPOS_TERA } from './tera';
 import { ITENS_CUSTOM } from './itensCustom';
+import { MASCARAS_OGERPON } from './formasPorItem';
 import { MEGA_STONES, PRECO_MEGA_STONE_GOLD, RAYQUAZITE, megaDaPedra } from './megas';
 
 export { TIPOS_TERA };
 import { OVOS } from './ovos';
 import { nomeCategoria, nomeTipo, traduzir } from './traducao';
+import { nomeDaMoeda } from './moedas';
 
 export type CategoriaLoja =
   | 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'up' | 'mints' | 'megapedras' | 'frutas' | 'gems' | 'placas' | 'memorias' | 'zcristais' | 'lendarios'
-  | 'terashards' | 'chave' | 'charms' | 'skins' | 'cubos' | 'tm' | 'tr' | 'tickets' | 'ovos';
+  | 'terashards' | 'formas' | 'chave' | 'charms' | 'skins' | 'cubos' | 'tm' | 'tr' | 'tickets' | 'ovos';
 
 /** Abas da loja. */
 export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
@@ -40,6 +42,7 @@ export const CATEGORIAS_FORA_DA_LOJA: { id: CategoriaLoja; nome: string }[] = [
   { id: 'zcristais', nome: 'Z-Crystals' },
   { id: 'lendarios', nome: 'Itens de lendários' },
   { id: 'terashards', nome: 'Tera Shards' },
+  { id: 'formas', nome: 'Itens de forma' },
   { id: 'chave', nome: 'Itens-chave' },
   { id: 'charms', nome: 'Charms' },
   { id: 'skins', nome: 'Skins' },
@@ -84,8 +87,10 @@ export interface ItemLoja {
 
 /** Moeda do jogo. */
 export const MOEDA = 'silver';
+/** Como o jogador lê as moedas (silver = Poké Dólar, gold = Origin Coin). */
+export { NOME_MOEDA, nomeDaMoeda } from './moedas';
 /** Preço com a moeda certa ("1 silver", "1 gold"). */
-export const textoPreco = (i: Pick<ItemLoja, 'preco' | 'moeda'>, quantidade = 1) => `${(i.preco * quantidade).toLocaleString('pt-BR')} ${i.moeda ?? MOEDA}`;
+export const textoPreco = (i: Pick<ItemLoja, 'preco' | 'moeda'>, quantidade = 1) => `${(i.preco * quantidade).toLocaleString('pt-BR')} ${nomeDaMoeda(i.moeda ?? MOEDA, i.preco * quantidade)}`;
 export const PRECO_PADRAO = 1;
 /** Preços específicos (id do item → preço). Vazio por enquanto: tudo custa PRECO_PADRAO. */
 /**
@@ -139,6 +144,9 @@ export const DYNAMAX_BAND = 'dynamaxband';
 export const ITENS_DE_SEGURAR_NOSSOS: Record<string, string> = { [EXP_SHARE]: 'Exp. Share', [TERASTALLIZER_BAND]: 'Tera Orb', [DYNAMAX_BAND]: 'Dynamax Band', luckyegg: 'Lucky Egg', everstone: 'Everstone', amuletcoin: 'Amulet Coin', luckincense: 'Luck Incense' };
 /** Descrições nossas para itens do Showdown cujo efeito no jogo é fora da batalha (EVs). */
 const DESCRICAO_DE_CAMPO: Record<string, string> = {
+  wellspringmask: 'Usada na Ogerpon, ela vira a forma Wellspring Mask (Grass/Water). É gasta.',
+  hearthflamemask: 'Usada na Ogerpon, ela vira a forma Hearthflame Mask (Grass/Fire). É gasta.',
+  cornerstonemask: 'Usada na Ogerpon, ela vira a forma Cornerstone Mask (Grass/Rock). É gasta.',
   machobrace: 'Segurando, o Pokémon ganha o dobro de EVs de cada Pokémon derrotado. Na batalha, a Speed cai pela metade.',
   powerweight: 'Segurando, o Pokémon ganha +8 EVs de HP por Pokémon derrotado. Na batalha, a Speed cai pela metade.',
   powerbracer: 'Segurando, o Pokémon ganha +8 EVs de Attack por Pokémon derrotado. Na batalha, a Speed cai pela metade.',
@@ -183,13 +191,15 @@ function classificarItem(i: ReturnType<typeof Dex.items.get>): CategoriaLoja | n
   if (i.zMove) return 'zcristais';
   if (i.onPlate || /plate$/.test(i.id)) return 'placas';
   if (/memory$/.test(i.id)) return 'memorias';
+  // máscaras da Ogerpon: itens de evolução de uso único (pedido do dono), fora da loja
+  if (i.id in MASCARAS_OGERPON) return 'evolucao';
   if (i.itemUser?.length && i.itemUser.every(ehLendario)) return 'lendarios';
   if (/^Evolves/.test(desc)) return 'evolucao';
   return 'batalha';
 }
 const NA_LOJA = new Set<CategoriaLoja>(['bolas', 'remedios', 'evolucao', 'batalha', 'up', 'megapedras', 'tm', 'tr']);
 /** Itens de categorias vendidas que ficam fora da loja (pedido do dono). */
-const FORA_DA_LOJA = new Set(['amuletcoin', 'luckincense', 'destinyknot', 'healpowder', 'lavacookie', 'oldgateau', 'casteliacone', 'lumiosegalette', 'shaloursable', 'bigmalasada', 'ragecandybar']);
+const FORA_DA_LOJA = new Set(['wellspringmask', 'hearthflamemask', 'cornerstonemask', 'amuletcoin', 'luckincense', 'destinyknot', 'healpowder', 'lavacookie', 'oldgateau', 'casteliacone', 'lumiosegalette', 'shaloursable', 'bigmalasada', 'ragecandybar']);
 /** Das 25 Pokébolas, a loja só vende estas (pedido do dono); as outras saem de tickets/Admin. */
 const BOLAS_NA_LOJA = new Set(['pokeball', 'greatball', 'ultraball']);
 
@@ -219,8 +229,8 @@ function montarCatalogo(): ItemLoja[] {
   // itens de segurar com efeito fora da batalha (shared/campo.ts); não existem no Showdown
   add({ id: 'luckyegg', nome: 'Lucky Egg', categoria: 'up', sprite: 'lucky-egg', descricao: 'Segurando, o Pokémon ganha 50% a mais de XP.' });
   add({ id: 'everstone', nome: 'Everstone', categoria: 'up', sprite: 'everstone', descricao: 'Segurando, o Pokémon não evolui por nível nem por amizade.' });
-  add({ id: 'amuletcoin', nome: 'Amulet Coin', categoria: 'batalha', sprite: 'amulet-coin', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de silver. Não acumula com o Luck Incense.' });
-  add({ id: 'luckincense', nome: 'Luck Incense', categoria: 'batalha', sprite: 'luck-incense', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de silver. Não acumula com a Amulet Coin.' });
+  add({ id: 'amuletcoin', nome: 'Amulet Coin', categoria: 'batalha', sprite: 'amulet-coin', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de Poké Dólares. Não acumula com o Luck Incense.' });
+  add({ id: 'luckincense', nome: 'Luck Incense', categoria: 'batalha', sprite: 'luck-incense', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de Poké Dólares. Não acumula com a Amulet Coin.' });
   // abre uma box nova no PC (usado pela bolsa; regras em shared/pc.ts)
   add({ id: BOX_POKEMON, nome: 'Box Pokémon', categoria: 'up', imagem: 'itens/boxpokemon.svg', descricao: `Abre mais uma box no seu PC, com ${TAMANHO_BOX} lugares. Todo treinador começa com ${BOXES_INICIAIS} boxes e pode chegar a ${BOXES_MAXIMO}.` });
   // trocam a Ability (usados pela bolsa)

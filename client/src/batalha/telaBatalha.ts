@@ -18,7 +18,7 @@ import { efeitoBola } from '../../../shared/bolas';
 import { nivelMaximoEncontro, nivelTreinador } from '../../../shared/treinador';
 import { XP_POR_MISSAO, type Missao } from '../../../shared/passe';
 import { contarNasMissoes, textoMissao } from '../passe';
-import { EXP_SHARE, MOEDA } from '../../../shared/loja';
+import { EXP_SHARE, nomeDaMoeda } from '../../../shared/loja';
 import { multSkins } from '../../../shared/skins';
 import { evsComItem, multSilverDoTime, multXpDoItem } from '../../../shared/campo';
 import { sortearTicketDaBatalha } from '../../../shared/tickets';
@@ -952,7 +952,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         const amuleto = multSilverDoTime([...batalha.participantes].map((pos) => save.time[pos]));
         const silver = Math.round(treinador.recompensa * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver') * multConquistas(save, 'silver') * amuleto);
         save.silver += silver;
-        await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${MOEDA}!`);
+        await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${nomeDaMoeda('silver', silver)}!`);
       }
       await darXpTime();
       // missões diárias do passe: derrotar conta só selvagens; vitória em Duelos com treinadores conta duelo

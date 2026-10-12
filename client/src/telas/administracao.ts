@@ -1,5 +1,6 @@
-// Aba "Administração" (só para contas de administrador). Bonificação, Dar item (manda um item para qualquer
-// jogador, pelo servidor) e Anúncios (vão para o Mural da cidade) funcionam; as outras seções ficam "em breve".
+// Aba "Administração" (só para contas de administrador). Eventos (o que a staff liga na hora: por enquanto a
+// Bonificação), Dar item (manda um item para qualquer jogador, pelo servidor), Dar Pokémon e Anúncios (vão para o
+// Mural da cidade) funcionam; o Log fica "em breve".
 import type { Tela } from '../main';
 import { NOMES_BONUS, VALORES_BONUS, textoBonus, type ChaveBonus } from '../../../shared/bonificacao';
 import { bonificacao, definirBonus, ehAdministrador } from '../bonificacao';
@@ -13,18 +14,18 @@ import { iconeItem } from '../ui/iconeItem';
 import { el } from '../ui/dom';
 import { cartaoAnuncio } from '../ui/mural';
 
-export type SecaoAdministracao = 'bonificacao' | 'itens' | 'pokemon' | 'log' | 'eventos' | 'anuncios';
+export type SecaoAdministracao = 'itens' | 'pokemon' | 'log' | 'eventos' | 'anuncios';
 
 export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBreve?: string }[] = [
-  { id: 'bonificacao', nome: 'Bonificação' },
+  // só eventos que a staff ativa direto (pedido do dono); a Bonificação mora aqui
+  { id: 'eventos', nome: 'Eventos' },
   { id: 'itens', nome: 'Dar item' },
   { id: 'pokemon', nome: 'Dar Pokémon' },
   {
     id: 'log',
     nome: 'Log',
-    emBreve: 'Registro de tudo o que acontece no jogo: o que entra e sai (silver, gold, itens, Pokémon, tickets), quem fez e quando — para achar abuso de bug. Vai ser ligado com o servidor.',
+    emBreve: 'Registro de tudo o que acontece no jogo: o que entra e sai (Poké Dólares, Origin Coins, itens, Pokémon, tickets), quem fez e quando — para achar abuso de bug. Vai ser ligado com o servidor.',
   },
-  { id: 'eventos', nome: 'Eventos', emBreve: 'Agendar eventos, como fim de semana com bônus ou Pokémon especiais.' },
   { id: 'anuncios', nome: 'Anúncios' },
 ];
 
@@ -201,7 +202,9 @@ export const telaAdministracao = (secaoInicial: SecaoAdministracao): Tela => (ra
         : el(
             'section',
             { class: 'bonus-secao' },
-            el('p', { class: 'sub' }, 'Multiplicadores para todos os jogadores, de 1x até 3x. Valem na hora para as próximas batalhas e encontros.'),
+            el('p', { class: 'sub' }, 'Eventos que a staff liga e desliga na hora.'),
+            el('h2', {}, 'Bonificação'),
+            el('p', { class: 'meta' }, 'Multiplicadores para todos os jogadores, de 1x até 3x. Valem na hora para as próximas batalhas e encontros.'),
             ...(['silver', 'xp', 'shiny', 'lendario'] as ChaveBonus[]).map(linhaBonus),
             el('p', { class: 'meta' }, ativos.length ? `Ativos agora: ${ativos.map((k) => `${NOMES_BONUS[k].nome} ${textoBonus(b[k])}`).join(' · ')}` : 'Nenhum bônus ativo (tudo 1x).'),
             ativos.length

@@ -8,6 +8,7 @@ import { TAM, aleatorioComSemente, type InfoCidade, type Mapa, type NpcMapa, typ
 import { APARENCIA_PADRAO } from '../personagem/lpc';
 import { ESTATUA_FONTE, QUADROS_ARENA, QUADROS_FONTE, RECORTE_MART, TAM_ARENA, TAM_FONTE, TAM_POSTE, desenharArena, desenharFonte, desenharMart, desenharPoste, estatuaDePedra } from './cidadeDesenhos';
 import { TAM_BARRACA, TAM_CORREIO, desenharBandeirolas, desenharBarraca, desenharCaixaCorreio, desenharCercaBranca, desenharCercaMadeira, desenharCercaViva } from './cidadePecas';
+import { CASAS_DOS_NPCS, RECORTE_BANCO, desenharBanco } from './cidadeCasas';
 import { dentroDoLago, hash2, ruido, ruidoFractal, type FormaLago } from './ruido';
 
 /** Folhas de imagem dos objetos da cidade (chave da textura no Phaser → arquivo). */
@@ -56,7 +57,10 @@ const ARBUSTOS: [number, number][] = [
 export const PECAS: Record<string, Peca> = {
   centroPokemon: { folha: 'predios', x: 0, y: 416, w: 112, h: 128, porta: { x: 64, w: 16, largo: true }, rotulo: 'Centro Pokémon', acao: 'centro' },
   pokemarket: { w: RECORTE_MART.w, h: RECORTE_MART.h, desenhar: (f) => [desenharMart(f.predios)], porta: { x: 64, w: 16, largo: true }, rotulo: 'Pokémarket', acao: 'loja' },
-  banco: { folha: 'predios', x: 112, y: 0, w: 112, h: 80, porta: { x: 47, w: 18 }, rotulo: 'Banco', acao: 'banco' },
+  // Banco: o prédio do tileset redesenhado simétrico (pedido do dono)
+  banco: { w: RECORTE_BANCO.w, h: RECORTE_BANCO.h, desenhar: (f) => [desenharBanco(f.predios)], porta: { x: 47, w: 18 }, rotulo: 'Banco', acao: 'banco' },
+  // casas temáticas dos NPCs (jogo/cidadeCasas.ts)
+  ...CASAS_DOS_NPCS,
   estacao: { folha: 'predios', x: 0, y: 0, w: 112, h: 80, porta: { x: 47, w: 18 }, rotulo: 'Estação de trem', acao: 'estacao' },
   arena: { ...TAM_ARENA, desenhar: () => Array.from({ length: QUADROS_ARENA }, (_, i) => desenharArena(i)), solidas: 10, porta: { x: 112, w: 32 }, rotulo: 'Arena', rotuloNoMeio: true, acao: 'arena' },
   fonte: {
@@ -119,18 +123,20 @@ export const LARGURA_CIDADE = 141;
 export const ALTURA_CIDADE = 109;
 
 /** Aparência do NPC dos golpes (Move Reminder / Move Tutor). */
-const APARENCIA_PROFESSOR = { ...APARENCIA_PADRAO, pele: 'bronze', cabelo: 'messy1', corCabelo: 'white', camiseta: 'purple', calca: 'black', tenis: 'brown', estampa: 'nenhuma' as const, cinto: false };
+const APARENCIA_PROFESSOR = { ...APARENCIA_PADRAO, pele: 'bronze', cabelo: 'parted', corCabelo: 'white', camiseta: 'purple', calca: 'black', tenis: 'brown', estampa: 'nenhuma' as const, cinto: false };
 /** Move Tutor: o "espelho" do Move Reminder, com as cores trocadas. */
 /** Viajante do tempo: cabelo azul, roupa escura. */
-const APARENCIA_VIAJANTE = { ...APARENCIA_PADRAO, pele: 'light', cabelo: 'messy1', corCabelo: 'blue', camiseta: 'navy', calca: 'black', tenis: 'gray', estampa: 'nenhuma' as const, cinto: false };
+const APARENCIA_VIAJANTE = { ...APARENCIA_PADRAO, pele: 'light', cabelo: 'swoop', corCabelo: 'blue', camiseta: 'navy', calca: 'black', tenis: 'gray', estampa: 'nenhuma' as const, cinto: false };
 /** Guildas: mestre de guilda, de vermelho. */
-const APARENCIA_GUILDAS = { ...APARENCIA_PADRAO, pele: 'amber', cabelo: 'messy1', corCabelo: 'ginger', camiseta: 'maroon', calca: 'brown', tenis: 'black', estampa: 'nenhuma' as const, cinto: true };
+const APARENCIA_GUILDAS = { ...APARENCIA_PADRAO, pele: 'brown', cabelo: 'shorthawk', corCabelo: 'ginger', camiseta: 'maroon', calca: 'brown', tenis: 'black', estampa: 'nenhuma' as const, cinto: true };
 /** Evento sazonal: roupa festiva, cabelo rosa. */
 const APARENCIA_SAZONAL = { ...APARENCIA_PADRAO, corpo: 'fem' as const, pele: 'light', cabelo: 'ponytail', corCabelo: 'pink', camiseta: 'yellow', calca: 'orange', tenis: 'white', estampa: 'nenhuma' as const, cinto: false };
+/** Homem Suspeito: roupa escura, sentado no banco do campo de flores. */
+const APARENCIA_SUSPEITO = { ...APARENCIA_PADRAO, pele: 'olive', cabelo: 'unkempt', corCabelo: 'black', camiseta: 'gray', calca: 'black', tenis: 'gray', estampa: 'nenhuma' as const, cinto: false };
 /** Safari: guia de roupa cáqui e verde. */
-const APARENCIA_SAFARI = { ...APARENCIA_PADRAO, pele: 'bronze', cabelo: 'messy1', corCabelo: 'dark_brown', camiseta: 'tan', calca: 'forest', tenis: 'brown', estampa: 'nenhuma' as const, cinto: true };
+const APARENCIA_SAFARI = { ...APARENCIA_PADRAO, pele: 'bronze', cabelo: 'buzzcut', corCabelo: 'dark_brown', camiseta: 'tan', calca: 'forest', tenis: 'brown', estampa: 'nenhuma' as const, cinto: true };
 /** Mercado negro: todo de preto. */
-const APARENCIA_MERCADO_NEGRO = { ...APARENCIA_PADRAO, pele: 'taupe', cabelo: 'messy1', corCabelo: 'black', camiseta: 'black', calca: 'black', tenis: 'black', estampa: 'nenhuma' as const, cinto: false };
+const APARENCIA_MERCADO_NEGRO = { ...APARENCIA_PADRAO, corpo: 'fem' as const, pele: 'taupe', cabelo: 'bob', corCabelo: 'purple', camiseta: 'black', calca: 'black', tenis: 'black', estampa: 'nenhuma' as const, cinto: false };
 const APARENCIA_TUTOR = { ...APARENCIA_PROFESSOR, corpo: 'fem' as const, pele: 'light', cabelo: 'ponytail', corCabelo: 'dark_brown', camiseta: 'teal', calca: 'navy' };
 
 /** Árvores do core_outdoor_nature (tile do canto de cima, 2 × 3): redondas, pinheiros, outono. */
@@ -410,21 +416,32 @@ export function gerarMapaCidade(): Mapa {
     if (terreno[y][x] === 'chao' && !bloqueado[y][x]) colocarPar(`arbusto${k}`, x + 0.5, y + 1);
   // sul da praça: sobrados recuados da avenida do anel
   const baseSul = anel.y1 - RUA - 2;
-  // casas dos NPCs (pedido do dono: cada um mora numa casa, que vai ganhar um visual próprio depois)
+  // casas dos NPCs, cada uma com a cara do que ele faz (pedido do dono; desenhos em cidadeCasas.ts)
   const portaSazonal = casa('sobradoClaro', eixo - 15, baseSul);
-  const portaGuildas = casa('sobradoVermelho', eixo - 9, baseSul);
-  // casa do Viajante do tempo (pedido do dono: o NPC mora numa casa; ela vai ganhar um visual próprio depois)
-  const portaViajante = casa('sobradoCinza', espelho(eixo - 9), baseSul);
-  const portaMercadoNegro = casa('sobradoClaro', espelho(eixo - 15), baseSul);
+  const portaGuildas = casa('guildaSalao', eixo - 9, baseSul);
+  const portaViajante = casa('viajantePortal', espelho(eixo - 9), baseSul);
+  // Mercado negro: não é casa, é uma entrada de esgoto (sem cerca nem caixa de correio)
+  colocar('mercadoEsgoto', espelho(eixo - 15), baseSul);
+  const portaMercadoNegro = ultimaPorta as [number, number] | null;
   // quadras do sul: casas em fileira e café/casas na ruela
-  const casasSul: [string, string, number][] = [['casaMadeira', 'casaMadeira', anel.x0 + 9.5], ['casaVermelha', 'casaVermelha', anel.x0 + 15.5], ['casaVinho', 'casaMadeira2', anel.x0 + 21.5]];
-  // o guia do Safari mora na casa de madeira mais a oeste
-  let portaSafari: [number, number] | null = null;
+  // (do lado oeste, a primeira casa virou a creche do Safari e a segunda saiu para dar lugar ao cercado)
+  const casasSul: [string | null, string, number][] = [[null, 'casaMadeira', anel.x0 + 9.5], [null, 'casaVermelha', anel.x0 + 15.5], ['casaVinho', 'casaMadeira2', anel.x0 + 21.5]];
   for (const [a, b, x] of casasSul) {
-    const porta = casa(a, x, baseSul);
-    portaSafari ??= porta;
+    if (a) casa(a, x, baseSul);
     casa(b, espelho(x), baseSul);
   }
+  // Safari: creche com um cercado branco ao lado, onde Pokémon raros ficam soltos (pedido do dono). O fundo do cercado
+  // é a cerca da horta; a cerca da frente tem o portão na porta e uma divisória separa a entrada do cercado.
+  const safari = colocar('safariCreche', anel.x0 + 9.5, baseSul);
+  const portaSafari = ultimaPorta as [number, number] | null;
+  const cercado = { x0: safari.c1 + 1, x1: safari.c1 + 5, y0: baseSul - 6, y1: baseSul };
+  if (portaSafari) {
+    cerca('Branca', safari.c0 - 1, portaSafari[0] - 1, baseSul + 1);
+    cerca('Branca', portaSafari[1] + 1, cercado.x1 + 1, baseSul + 1);
+  }
+  colocar(`cercaBrancaV${cercado.y1 - cercado.y0 + 1}`, cercado.x1 + 1.5, baseSul + 1);
+  colocar('cercaBrancaV1', cercado.x0 + 0.5, baseSul + 1);
+  marcar(cercado.x0, cercado.y0, cercado.x1 - cercado.x0 + 1, cercado.y1 - cercado.y0 + 1);
   colocar('cafe', anel.x0 + 12.5, 68);
   casa('casaMadeira2', anel.x0 + 19.5, 68);
   casa('casaVinho', espelho(anel.x0 + 12.5), 68);
@@ -539,6 +556,8 @@ export function gerarMapaCidade(): Mapa {
     }
   // banquinho de piquenique no fim da trilha do campo de flores
   colocar('bancoFrente', 97, 99);
+  // Homem Suspeito sentado nele (o tile já é do banco): reseta EVs/nível/evolução e separa fusões (ui/suspeito.ts)
+  npcs.push({ x: 96, y: 98, dx: 8, dy: -5, sentado: true, nome: 'Homem Suspeito', aparencia: APARENCIA_SUSPEITO, acao: 'suspeito' });
   // pedras grandes na margem do lago e no campo de flores
   for (const [gx, gy] of [[28, 95], [51, 102], [47, 94], [90, 95], [108, 103], [101, 94]] as [number, number][]) if (cabe(gx, gy, 0)) plantar(gx, gy, undefined, true);
 
@@ -565,7 +584,12 @@ export function gerarMapaCidade(): Mapa {
     { especie: 25, x: 70, y: 64, raio: 4 }, { especie: 133, x: 61, y: 50, raio: 3 }, { especie: 39, x: 80, y: 50, raio: 2 },
     { especie: 54, x: 36, y: 33, raio: 2 }, { especie: 183, x: 105, y: 33, raio: 2 }, { especie: 52, x: 12, y: 51, raio: 3 },
     { especie: 58, x: 128, y: 51, raio: 3 }, { especie: 79, x: 53, y: 99, raio: 1 }, { especie: 12, x: 98, y: 100, raio: 4 },
-    { especie: 143, x: 106, y: 101, raio: 0 }, { especie: 16, x: 34, y: 76, raio: 3 }, { especie: 1, x: 106, y: 76, raio: 3 },
+    { especie: 143, x: 106, y: 101, raio: 0 }, { especie: 1, x: 106, y: 76, raio: 3 },
+  );
+  // Pokémon raros soltos no cercado do Safari (as cercas seguram: eles só andam em tile livre)
+  info.pokemons.push(
+    { especie: 113, x: cercado.x0 + 1, y: cercado.y0 + 1, raio: 3 }, { especie: 115, x: cercado.x1, y: cercado.y0 + 3, raio: 3 },
+    { especie: 123, x: cercado.x0 + 2, y: cercado.y1 - 1, raio: 3 }, { especie: 128, x: cercado.x1 - 1, y: cercado.y1, raio: 3 },
   );
   // não deixa ninguém nascer em cima de obstáculo
   const pisavel = (x: number, y: number) => !bloqueado[y][x] && terreno[y][x] !== 'jardim' && terreno[y][x] !== 'horta';

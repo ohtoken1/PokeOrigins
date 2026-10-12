@@ -1,10 +1,10 @@
-import { especie, golpesIniciais, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { ATRIBUTOS, especie, golpesIniciais, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { evoluir, trocarGolpe } from '../../../shared/batalha/progresso';
 import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { ehEquipavel, ehItemDeHabilidade, usarItemDeHabilidade, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
-import { cuboPorItem } from '../../../shared/itensCustom';
-import { FUSOES, GOLPE_DA_FORMA, ehItemDeForma, proximaForma } from '../../../shared/formasPorItem';
+import { KIT_INICIANTE, cuboPorItem, ehSeloSazonal } from '../../../shared/itensCustom';
+import { FUSOES, GOLPE_DA_FORMA, ehItemDeForma, ivDaFusao, jaMudouDeForma, outrasFormas, proximaForma } from '../../../shared/formasPorItem';
 import { BOXES_INICIAIS, BOXES_MAXIMO, BOX_POKEMON, numeroDeBoxes, podeAbrirBox } from '../../../shared/pc';
 import { charmAte, charmAtivo, nomeCharm, tipoDoCharm, usarCharm } from '../../../shared/charms';
 import { textoDoTempo } from '../../../shared/viagem';
@@ -12,7 +12,7 @@ import { pokemonPorId, todosOsPokemons } from '../dados';
 import { guardarNoPC, registrarCapturado, salvar, type PokemonDoJogador, type Save } from '../estado';
 import { abrirJanela } from './janela';
 import { confirmar } from './confirmar';
-import { corTipo, el } from './dom';
+import { corTipo, el, seloTipo, spritePokemon } from './dom';
 import { dicaGolpe } from './dicaGolpe';
 import { Dex } from '@pkmn/sim';
 import { iconeItem } from './iconeItem';
@@ -44,12 +44,14 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
 };
 /** O botão do item: pela categoria; na aba Up, Ability Capsule e Ability Patch são de usar. */
 /** Itens que são gastos ao usar num Pokémon e não voltam: perguntam "tem certeza?" (pedido do dono). */
-const PEDE_CONFIRMACAO = (item: ItemLoja) => ['evolucao', 'cubos', 'mints', 'terashards', 'tm', 'tr'].includes(item.categoria) || ehItemDeHabilidade(item.id);
-const acaoDe = (item: ItemLoja) => (ehItemDeHabilidade(item.id) || item.id === BOX_POKEMON || ehItemDeForma(item.id) ? 'Usar' : ACAO[item.categoria]);
+const PEDE_CONFIRMACAO = (item: ItemLoja) => ['evolucao', 'cubos', 'mints', 'terashards', 'tm', 'tr', 'formas'].includes(item.categoria) || ehItemDeHabilidade(item.id);
+const acaoDe = (item: ItemLoja) => (ehItemDeHabilidade(item.id) || item.id === BOX_POKEMON || item.id === KIT_INICIANTE || ehItemDeForma(item.id) ? 'Usar' : ACAO[item.categoria]);
 
 type Modo =
   | { tipo: 'lista' }
   | { tipo: 'alvo'; item: ItemLoja }
+  | { tipo: 'forma'; item: ItemLoja; p: PokemonIndividual; opcoes: number[] }
+  | { tipo: 'parceiro'; item: ItemLoja; p: PokemonIndividual; parceiros: PokemonIndividual[] }
   | { tipo: 'esquecer'; p: PokemonIndividual; golpe: string; aoAprender: () => void; aoDesistir: () => void };
 
 /** Bolsa fora da batalha: ver itens, usar remédios e pedras, ensinar TMs/TRs, equipar itens. */
@@ -97,43 +99,57 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
     return [...(esquecidos.length ? [`Esqueceu ${esquecidos.join(', ')}.`] : []), ...r.mensagens];
   };
 
-  /** Itens-chave de forma (Reveal Glass, Rotom Catalog, DNA Splicers…): não são gastos. */
-  const usarItemDeForma = (item: ItemLoja, p: PokemonIndividual): string => {
+  /** Itens de forma (Reveal Glass, Rotom Catalog, DNA Splicers…): gastos a cada uso que tem efeito (pedido do dono). */
+  /** Formas entre as quais o jogador escolhe: rodas com 3 ou mais formas (Deoxys, Rotom). */
+  const formasParaEscolher = (item: ItemLoja, p: PokemonIndividual): number[] => (FUSOES[item.id] ? [] : outrasFormas(item.id, p.especieId).filter(existe));
+  /** Fusão: quem do time pode se juntar com este Pokémon usando o item (o jogador escolhe qual; pedido do dono). */
+  const parceirosDaFusao = (item: ItemLoja, p: PokemonIndividual): PokemonIndividual[] =>
+    save.time.filter((q) => q !== p && (FUSOES[item.id] ?? []).some((f) => f.base === p.especieId && f.parceiro === q.especieId && existe(f.forma)));
+
+  /** Imagem de frente (animada se houver) de uma espécie, para as janelas de evolução. */
+  const imagemDe = (id: number, shiny: boolean): string => {
+    const d = pokemonPorId(id);
+    return (shiny ? d.sprites.gifShiny ?? d.sprites.frenteShiny : d.sprites.gif ?? d.sprites.frente) ?? '';
+  };
+
+  const usarItemDeForma = (item: ItemLoja, p: PokemonIndividual, escolhida?: number, parceiroEscolhido?: PokemonIndividual): string => {
     const quem = nome(p);
     const fusoes = FUSOES[item.id];
+    // sem volta (pedido do dono): quem já mudou de forma ou se juntou fica assim
+    if (jaMudouDeForma(item.id, p.especieId)) return `${quem} já mudou de forma e não volta mais. ${item.nome} não tem efeito.`;
     if (!fusoes) {
-      const para = proximaForma(item.id, p.especieId);
+      const para = escolhida ?? proximaForma(item.id, p.especieId);
       if (!para || !existe(para)) return `${item.nome} não tem efeito em ${quem}.`;
+      gastar(item.id);
+      void animarEvolucaoNaTela({ nome: quem, src: imagemDe(p.especieId, p.shiny) }, { nome: pokemonPorId(para).nome, src: imagemDe(para, p.shiny) }, { inicio: `O quê? ${quem} está mudando de forma!`, fim: `${quem} virou ${pokemonPorId(para).nome}!` });
       const mensagens = mudarForma(p, para);
       // Rotom: cada eletrodoméstico ensina o golpe dele (com 4 golpes, pergunta qual esquecer)
       const golpe = GOLPE_DA_FORMA[para];
       const aprendeu = golpe && !p.golpes.some((g) => g.id === golpe) ? aprender(p, golpe, () => {}, () => {}) : null;
       return [`${quem} mudou para ${pokemonPorId(para).nome}!`, ...mensagens, ...(aprendeu ? [aprendeu] : [])].join(' ');
     }
-    // separar: o parceiro que estava dentro volta para o time (ou para o PC, se o time está cheio)
-    const junta = fusoes.find((f) => f.forma === p.especieId);
-    if (junta) {
-      const parceiro = p.fundido as PokemonDoJogador | undefined;
-      const mensagens = mudarForma(p, junta.base);
-      delete p.fundido;
-      let volta = '';
-      if (parceiro) {
-        if (save.time.length < 6) save.time.push(parceiro);
-        else guardarNoPC(save, parceiro);
-        volta = ` ${nome(parceiro)} voltou para ${save.time.includes(parceiro) ? 'o time' : 'o PC'}.`;
-      }
-      return [`${quem} voltou a ser ${pokemonPorId(junta.base).nome}.${volta}`, ...mensagens].join(' ');
-    }
-    const opcoes = fusoes.filter((f) => f.base === p.especieId);
+    const opcoes = fusoes.filter((f) => f.base === p.especieId && (escolhida === undefined || f.forma === escolhida));
     if (!opcoes.length) return `${item.nome} não tem efeito em ${quem}.`;
-    const indice = save.time.findIndex((q) => q !== p && opcoes.some((f) => f.parceiro === q.especieId));
+    const indice = save.time.findIndex((q) => q !== p && (parceiroEscolhido ? q === parceiroEscolhido : opcoes.some((f) => f.parceiro === q.especieId)));
     if (indice < 0) return `Para usar ${item.nome}, ${opcoes.map((f) => pokemonPorId(f.parceiro).nome).join(' ou ')} precisa estar no time.`;
     const parceiro = save.time[indice];
     const fusao = opcoes.find((f) => f.parceiro === parceiro.especieId)!;
     if (!existe(fusao.forma)) return `${item.nome} não tem efeito em ${quem}.`;
+    gastar(item.id);
     save.time.splice(indice, 1);
     p.fundido = parceiro;
-    return [`${quem} se juntou com ${nome(parceiro)} e virou ${pokemonPorId(fusao.forma).nome}!`, ...mudarForma(p, fusao.forma)].join(' ');
+    void animarEvolucaoNaTela(
+      { nome: quem, src: imagemDe(p.especieId, p.shiny) },
+      { nome: pokemonPorId(fusao.forma).nome, src: imagemDe(fusao.forma, p.shiny) },
+      { parceiro: { nome: nome(parceiro), src: imagemDe(parceiro.especieId, parceiro.shiny) } },
+    );
+    // IVs da fusão: cada um fica entre o IV de um e o do outro (os originais ficam guardados para um futuro item de separação)
+    p.ivsAntesDaFusao = { ...p.ivs };
+    const [uidA, uidB] = [(p as PokemonDoJogador).uid ?? 0, parceiro.uid ?? 0];
+    ATRIBUTOS.forEach((a, i) => (p.ivs[a] = ivDaFusao(p.ivsAntesDaFusao![a], parceiro.ivs[a], uidA, uidB, i)));
+    const mensagens = mudarForma(p, fusao.forma);
+    if (p.hp > hpMaximo(p)) p.hp = hpMaximo(p);
+    return [`${quem} se juntou com ${nome(parceiro)} e virou ${pokemonPorId(fusao.forma).nome}!`, ...mensagens].join(' ');
   };
 
   const aplicar = (item: ItemLoja, p: PokemonIndividual): string | null => {
@@ -269,6 +285,63 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
       );
     }
 
+    if (modo.tipo === 'parceiro') {
+      // fusão: o jogador escolhe com quem juntar (pedido do dono)
+      const m = modo;
+      return el(
+        'div',
+        { class: 'bolsa' },
+        el('p', {}, `${m.item.nome}: juntar ${nome(m.p)} com qual Pokémon?`),
+        el(
+          'div',
+          { class: 'vagas' },
+          m.parceiros.map((q) =>
+            cartaoPokemon(q, {
+              onclick: async () => {
+                if (!(await confirmar(m.item.nome, `Juntar ${nome(m.p)} com ${nome(q)}? O item é gasto e a fusão não tem volta.`))) return;
+                concluir(usarItemDeForma(m.item, m.p, undefined, q));
+                refazer();
+              },
+            }),
+          ),
+        ),
+        el('p', { class: 'meta' }, 'Os IVs da fusão ficam entre os dos dois. A fusão não tem volta.'),
+        el('button', { class: 'botao', onclick: () => ((modo = { tipo: 'lista' }), refazer()) }, 'Cancelar'),
+      );
+    }
+
+    if (modo.tipo === 'forma') {
+      // mais de uma forma possível (Deoxys, Rotom…): o jogador escolhe qual (pedido do dono)
+      const m = modo;
+      return el(
+        'div',
+        { class: 'bolsa' },
+        el('p', {}, `${m.item.nome}: qual forma para ${nome(m.p)}?`),
+        el(
+          'div',
+          { class: 'escolha-forma' },
+          m.opcoes.map((id) => {
+            const d = pokemonPorId(id);
+            return el(
+              'button',
+              {
+                class: 'botao secundario',
+                onclick: async () => {
+                  if (!(await confirmar(m.item.nome, `Mudar ${nome(m.p)} para ${d.nome}? O item é gasto e ${nome(m.p)} não volta para a forma de antes.`))) return;
+                  concluir(usarItemDeForma(m.item, m.p, id));
+                  refazer();
+                },
+              },
+              spritePokemon(d, { shiny: m.p.shiny, animado: false }),
+              el('strong', {}, d.nome),
+              el('span', { class: 'tipos' }, d.tipos.map((tp) => seloTipo(tp))),
+            );
+          }),
+        ),
+        el('button', { class: 'botao', onclick: () => ((modo = { tipo: 'lista' }), refazer()) }, 'Cancelar'),
+      );
+    }
+
     if (modo.tipo === 'alvo') {
       const item = modo.item;
       return el(
@@ -282,6 +355,18 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
             cartaoPokemon(p, {
               onclick: async () => {
                 // itens que são gastos e não voltam pedem confirmação (remédios e itens de segurar, não)
+                if (ehItemDeForma(item.id)) {
+                  const opcoes = formasParaEscolher(item, p);
+                  if (opcoes.length > 1) {
+                    modo = { tipo: 'forma', item, p, opcoes };
+                    return refazer();
+                  }
+                  const parceiros = parceirosDaFusao(item, p);
+                  if (parceiros.length) {
+                    modo = { tipo: 'parceiro', item, p, parceiros };
+                    return refazer();
+                  }
+                }
                 if (PEDE_CONFIRMACAO(item) && !(await confirmar(item.nome, `${acaoDe(item)} ${item.nome} em ${nome(p)}? O item é gasto e não volta.`))) return;
                 const msg = aplicar(item, p);
                 if (msg) concluir(msg);
@@ -300,7 +385,8 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
 
     // lista por categoria (só mostra o que o jogador tem)
     const meus = Object.entries(save.itens)
-      .filter(([, qtd]) => qtd > 0)
+      // selos sazonais são de coleção: aparecem no perfil, não na bolsa
+      .filter(([id, qtd]) => qtd > 0 && !ehSeloSazonal(id))
       .map(([id, qtd]) => ({ item: itemDaLoja(id), qtd }))
       .filter((x): x is { item: ItemLoja; qtd: number } => !!x.item);
     // skins ficam em Minha conta → Minhas skins, não na bolsa
@@ -378,6 +464,9 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                           gastar(item.id);
                           concluir(`${revividos.map(nome).join(', ')} ${revividos.length > 1 ? 'foram revividos' : 'foi revivido'}!`);
                         }
+                      } else if (item.id === KIT_INICIANTE) {
+                        // o conteúdo ainda vai ser definido pelo dono: abrir não gasta nem entrega nada
+                        aviso = 'O Kit iniciante ainda está vazio. O conteúdo chega em breve!';
                       } else if (item.id === BOX_POKEMON) {
                         // abre uma box nova no PC, sem escolher Pokémon
                         if (!podeAbrirBox(save)) aviso = `Você já tem as ${BOXES_MAXIMO} boxes do PC.`;

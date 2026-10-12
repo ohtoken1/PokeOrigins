@@ -8,9 +8,10 @@ import type { Save } from '../estado';
 import { aoMudarViagem, comprarTicket, faltaDaViagem, ORDEM_DAS_REGIOES, viagemAtual } from '../viagem';
 import { el } from './dom';
 import { abrirJanela } from './janela';
+import { valorEmMoeda } from './moeda';
 
 const nomeDaRegiao = (id: string) => REGIOES.find((r) => r.id === id)?.nome ?? id;
-const moeda = (tipo: 'silver' | 'gold', valor: number) => el('span', { class: 'banco-moeda' }, el('span', { class: `icone-moeda moeda-${tipo}` }), el('strong', {}, valor.toLocaleString('pt-BR')), ` ${tipo}`);
+const moeda = valorEmMoeda;
 
 export function abrirEstacao(save: Save, aoMudar: () => void = () => {}): void {
   let destino: string | null = null;
@@ -68,12 +69,12 @@ export function abrirEstacao(save: Save, aoMudar: () => void = () => {}): void {
               aviso = '';
               janela.redesenhar();
             },
-          }, el('strong', {}, r.nome), el('small', {}, `${textoDoTempo(tempoDaViagemMs(ORDEM_DAS_REGIOES, save.regiao, r.id, vip))} · ${precoPara(r.id).toLocaleString('pt-BR')} silver`)))),
+          }, el('strong', {}, r.nome), el('small', {}, `${textoDoTempo(tempoDaViagemMs(ORDEM_DAS_REGIOES, save.regiao, r.id, vip))} · `, valorEmMoeda('silver', precoPara(r.id)))))),
       el('p', { class: 'banco-aviso', role: 'status' }, aviso),
       el('div', { class: 'trem-pagar' },
         el('small', {}, destino ? `Ticket para ${nomeDaRegiao(destino)}` : 'Escolha uma região para comprar o ticket'),
         destino
-          ? el('button', { class: 'botao', type: 'button', disabled: ocupado || save.silver < precoPara(destino), title: save.silver < precoPara(destino) ? 'Você não tem silver suficiente' : '', onclick: pagar },
+          ? el('button', { class: 'botao', type: 'button', disabled: ocupado || save.silver < precoPara(destino), title: save.silver < precoPara(destino) ? 'Você não tem Poké Dólares suficientes' : '', onclick: pagar },
               'Pagar ', moeda('silver', precoPara(destino)))
           : null));
   }, { classe: 'janela-banco', aoFechar: () => (clearInterval(tique), pararDeOuvir()) });

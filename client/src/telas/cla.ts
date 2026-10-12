@@ -16,6 +16,7 @@ import { desenharBandeira, editorDeBandeira } from '../ui/bandeira';
 import { el } from '../ui/dom';
 import { abrirJanela } from '../ui/janela';
 import { abrirPerfilDe } from './jogadores';
+import { valorEmMoeda } from '../ui/moeda';
 
 const mensagemDe = (e: unknown) => (e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.');
 const seloNivel = (nivel: number) => el('span', { class: 'cla-nivel', title: `Guilda nível ${nivel}` }, `Nv. ${nivel}`);
@@ -126,8 +127,8 @@ export const telaCla: Tela = (raiz) => {
     if (criando) return;
     const n = limparNomeCla(nome.value);
     if (!NOME_CLA_VALIDO.test(n)) return void (aviso.textContent = 'Nome da guilda: de 3 a 16 letras ou números.');
-    if ((carregarSave()?.gold ?? 0) < PRECO_CRIAR_CLA_GOLD) return void (aviso.textContent = `Criar uma guilda custa ${PRECO_CRIAR_CLA_GOLD} gold.`);
-    if (!confirm(`Criar a guilda "${n}" por ${PRECO_CRIAR_CLA_GOLD} gold?`)) return;
+    if ((carregarSave()?.gold ?? 0) < PRECO_CRIAR_CLA_GOLD) return void (aviso.textContent = `Criar uma guilda custa ${PRECO_CRIAR_CLA_GOLD} Origin Coins.`);
+    if (!confirm(`Criar a guilda "${n}" por ${PRECO_CRIAR_CLA_GOLD} Origin Coins?`)) return;
     criando = true;
     await fazer((async () => {
       // o servidor cobra o gold no save guardado: salva antes e pega o save de volta depois
@@ -179,7 +180,7 @@ export const telaCla: Tela = (raiz) => {
       el('label', { class: 'cla-campo' }, 'Nome', nome),
       el('label', { class: 'cla-campo' }, 'Descrição', descricao),
       el('label', { class: 'cla-campo linha' }, aberto, 'Entrada livre (desligado: só entra quem você aceitar)'),
-      el('button', { class: 'botao botao-gold cla-botao-criar', onclick: () => void criar() }, `Criar guilda · ${PRECO_CRIAR_CLA_GOLD} gold`)));
+      el('button', { class: 'botao botao-gold cla-botao-criar', onclick: () => void criar() }, 'Criar guilda · ', valorEmMoeda('gold', PRECO_CRIAR_CLA_GOLD))));
   const procura = el('section', { class: 'amigos-secao' }, el('h2', {}, 'Entrar em uma guilda'), el('div', { class: 'jogadores-busca' }, busca), lista);
 
   let tinhaCla: boolean | null = null;

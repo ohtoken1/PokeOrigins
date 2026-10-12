@@ -25,7 +25,7 @@ function achievements(save: Save): HTMLElement {
     secao.replaceChildren(
       el('p', { class: 'sub' }, `${feitas} de ${todas.length} concluídas. A recompensa chega na hora em que a conquista é concluída.`),
       el('div', { class: 'skins-total' },
-        el('span', {}, 'Silver em batalhas: ', el('strong', {}, pct(bonus.silver))),
+        el('span', {}, 'Poké Dólares em batalhas: ', el('strong', {}, pct(bonus.silver))),
         el('span', {}, 'Shiny, lendários e iniciais: ', el('strong', {}, pct(bonus.raros))),
         el('span', {}, 'Captura: ', el('strong', {}, pct(bonus.captura)))),
       ...GRUPOS_CONQUISTA.map((g) => {
@@ -130,7 +130,7 @@ function conteudoSkins(save: Save, redesenhar: () => void): HTMLElement[] {
     el('p', { class: 'sub' }, 'Escolha uma skin para o visual e uma para o bônus: podem ser skins diferentes. O visual muda o seu personagem no mapa e na cidade (os outros jogadores também veem); só vale o bônus da skin escolhida.'),
     el('div', { class: 'skins-provador-linha' }, provador(save), el('small', { class: 'meta' }, visual ? 'É assim que você aparece no mapa.' : 'Sem skin no visual: você aparece com o seu personagem normal.')),
     el('div', { class: 'skins-total' }, el('span', {}, 'Visual: ', el('strong', {}, nomeDe(visual))), el('span', {}, 'Bônus de: ', el('strong', {}, nomeDe(bonus)))),
-    el('div', { class: 'skins-total' }, ...([['shiny', 'Shiny'], ['raros', 'Lendário, mítico, Ultra Beast e inicial'], ['silver', 'Silver em batalhas'], ['captura', 'Captura'], ['xp', 'XP']] as const).map(([k, nome]) =>
+    el('div', { class: 'skins-total' }, ...([['shiny', 'Shiny'], ['raros', 'Lendário, mítico, Ultra Beast e inicial'], ['silver', 'Poké Dólares em batalhas'], ['captura', 'Captura'], ['xp', 'XP']] as const).map(([k, nome]) =>
       el('span', {}, `${nome}: `, el('strong', {}, `+${(Math.round(total[k] * 1000) / 10).toLocaleString('pt-BR')}%`)))),
     minhas.length
       ? el('div', { class: 'grade-skins' },

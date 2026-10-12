@@ -12,6 +12,7 @@ import { AMIZADE_MAXIMA, amizadeDe, textoAmizade } from '../../../shared/amizade
 import { iconeItem } from './iconeItem';
 import { formatarId, saveDoPokemon, salvar } from '../estado';
 import { vipAtivo } from '../../../shared/vip';
+import { valorEmMoeda } from './moeda';
 
 const NOMES: Record<Atributo, string> = { hp: 'HP', atk: 'Ataque', def: 'Defesa', spa: 'At. Esp.', spd: 'Def. Esp.', spe: 'Velocidade' };
 const CATEGORIAS: Record<string, string> = { Physical: 'Físico', Special: 'Especial', Status: 'Status' };
@@ -53,7 +54,7 @@ function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | 
   const pagar = () => {
     if (!save) return;
     if (save.silver < PRECO_REVELAR_IVS) {
-      aviso.textContent = `Silver insuficiente (você tem ${save.silver}).`;
+      aviso.textContent = `Poké Dólares insuficientes (você tem ${save.silver}).`;
       return;
     }
     save.silver -= PRECO_REVELAR_IVS;
@@ -70,7 +71,7 @@ function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | 
       el('strong', {}, '🔒 IVs ocultos'),
       el('small', {}, vip ? 'Avalie para ver o valor exato de cada IV (você é VIP).' : 'Avalie para ver a faixa de cada IV (0–5, 6–10… 26–31). Jogadores VIP veem o valor exato.'),
     ),
-    el('div', { class: 'botoes' }, el('button', { class: 'botao', disabled: !save, onclick: pagar }, `Avaliar IVs · ${PRECO_REVELAR_IVS} silver`)),
+    el('div', { class: 'botoes' }, el('button', { class: 'botao', disabled: !save, onclick: pagar }, 'Avaliar IVs · ', valorEmMoeda('silver', PRECO_REVELAR_IVS))),
     aviso,
   );
 }

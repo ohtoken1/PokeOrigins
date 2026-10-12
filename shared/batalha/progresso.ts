@@ -87,6 +87,17 @@ export function ganharExperiencia(
   return r;
 }
 
+/** Homem Suspeito: volta para o nível 1 (a experiência também); espécie, golpes, IVs e EVs continuam. */
+export function resetarNivel(p: PokemonIndividual, crescimento: string | null): void {
+  mudarNivelOuEspecie(p, { nivel: 1 });
+  p.exp = expParaNivel(crescimento, 1);
+}
+
+/** Homem Suspeito: troca a espécie sem aprender nada (voltar a evolução, separar fusão); a Ability acompanha. */
+export function voltarEspecie(p: PokemonIndividual, para: number): void {
+  mudarNivelOuEspecie(p, { especieId: para });
+}
+
 /** Aplica a evolução e devolve as mensagens dos golpes aprendidos ao evoluir. */
 export function evoluir(p: PokemonIndividual, para: number, nomeDe: (especieId: number) => string): ResultadoProgresso {
   const r: ResultadoProgresso = { mensagens: [], golpesPendentes: [], evolucao: null };

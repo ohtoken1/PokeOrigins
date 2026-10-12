@@ -81,7 +81,7 @@ export const multSkins = (s: ComSkins, chave: ChaveBonusSkin) => 1 + bonusAtivoD
 export const NOMES_BONUS_SKIN: [ChaveBonusSkin, string][] = [
   ['shiny', 'shiny'],
   ['raros', 'raros'],
-  ['silver', 'silver'],
+  ['silver', 'Poké Dólares'],
   ['captura', 'captura'],
   ['xp', 'XP'],
 ];

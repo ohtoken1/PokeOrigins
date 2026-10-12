@@ -6,4 +6,5 @@ export const SUFIXO_NT = '-nt';
 /** Itens que são sempre NT (prêmios de conquistas). */
 const SEMPRE_NT = new Set(['skin-galante', 'skin-chaveiro', 'skin-indianajones', 'kit-iniciante']);
 
-export const itemInegociavel = (id: string): boolean => id.endsWith(SUFIXO_NT) || SEMPRE_NT.has(id);
+// selos sazonais (selo-<evento>) são de coleção: ficam no perfil de quem ganhou
+export const itemInegociavel = (id: string): boolean => id.endsWith(SUFIXO_NT) || SEMPRE_NT.has(id) || id.startsWith('selo-');

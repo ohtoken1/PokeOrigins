@@ -123,6 +123,10 @@ export const FORMAS_REGIONAIS: FormaRegional[] = [
   f(20025, 'Unown-Z', 'unown-z', 'johto', 'Unown (Z)', 118, 5, 50, { ataque: 1, ataqueEspecial: 1 }, { sprite: '201-z', variante: true }),
   f(20026, 'Unown-Exclamation', 'unown-exclamation', 'johto', 'Unown (!)', 118, 5, 50, { ataque: 1, ataqueEspecial: 1 }, { sprite: '201-exclamation', variante: true }),
   f(20027, 'Unown-Question', 'unown-question', 'johto', 'Unown (?)', 118, 5, 50, { ataque: 1, ataqueEspecial: 1 }, { sprite: '201-question', variante: true }),
+  // Ogerpon com as outras máscaras: vêm das máscaras (itens de evolução de uso único, shared/formasPorItem.ts)
+  f(10273, 'Ogerpon-Wellspring', 'ogerpon-wellspring-mask', 'paldea', 'Ogerpon (Wellspring Mask)', 275, 12, 398, { ataque: 3 }, { foraDosMapas: true }),
+  f(10274, 'Ogerpon-Hearthflame', 'ogerpon-hearthflame-mask', 'paldea', 'Ogerpon (Hearthflame Mask)', 275, 12, 398, { ataque: 3 }, { foraDosMapas: true }),
+  f(10275, 'Ogerpon-Cornerstone', 'ogerpon-cornerstone-mask', 'paldea', 'Ogerpon (Cornerstone Mask)', 275, 12, 398, { ataque: 3 }, { foraDosMapas: true }),
   // cadastradas, mas FORA dos mapas, dos ovos e das Pokédex de região: só pelo Admin até o dono definir como se obtém
 f(10191, 'Urshifu-Rapid-Strike', 'urshifu-rapid-strike', 'galar', 'Urshifu (Rapid Strike)', 275, 19, 1050, { ataque: 3 }, { foraDosMapas: true }),
   f(10184, 'Toxtricity-Low-Key', 'toxtricity-low-key', 'galar', 'Toxtricity (Low Key)', 176, 16, 400, { ataqueEspecial: 2 }, { foraDosMapas: true }),

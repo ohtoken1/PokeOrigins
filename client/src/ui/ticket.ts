@@ -40,11 +40,11 @@ function entregar(save: Save, r: ResultadoTicket): string[] {
     }
     if (premio.tipo === 'silver') {
       save.silver += premio.quantidade;
-      return `+${numero(premio.quantidade)} silver.`;
+      return `+${numero(premio.quantidade)} Poké Dólares.`;
     }
     if (premio.tipo === 'gold') {
       save.gold += premio.quantidade;
-      return `+${numero(premio.quantidade)} gold.`;
+      return `+${numero(premio.quantidade)} Origin Coins.`;
     }
     if (premio.tipo === 'vip') {
       adicionarVip(save, premio.dias);
@@ -72,7 +72,7 @@ function visualPremio(premio: Premio, shiny = false): { imagem: HTMLElement; nom
     return { imagem: spritePokemon(dados, { shiny, animado: false }), nome: `${dados.nome}${shiny ? ' ✨' : ''}`, qtd: `Nv. ${premio.nivel} · IVs ${premio.ivMinimo}+` };
   }
   if (premio.tipo === 'silver' || premio.tipo === 'gold')
-    return { imagem: el('span', { class: `icone-moeda moeda-${premio.tipo}` }), nome: premio.tipo === 'silver' ? 'Silver' : 'Gold', qtd: numero(premio.quantidade) };
+    return { imagem: el('span', { class: `icone-moeda moeda-${premio.tipo}` }), nome: premio.tipo === 'silver' ? 'Poké Dólar' : 'Origin Coin', qtd: numero(premio.quantidade) };
   if (premio.tipo === 'vip') return { imagem: el('span', { class: 'icone-vip' }, 'VIP'), nome: 'VIP', qtd: `${premio.dias} dia${premio.dias > 1 ? 's' : ''}` };
   if (premio.tipo === 'aleatorio') {
     const [exemplo, nome] =

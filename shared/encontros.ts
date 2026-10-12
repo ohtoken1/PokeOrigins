@@ -17,12 +17,16 @@ export const CHANCE_ENCONTRO_POR_PASSO = 1;
  */
 export const PAUSA_MINIMA_ENCONTRO_MS = 150;
 /**
- * Peso de cada LINHA EVOLUTIVA no sorteio (pedido do dono: chances parecidas entre si, a raridade original
- * pesa pouco). Peso = PESO_BASE_LINHA + taxa de captura da forma base × PESO_POR_TAXA
- * (taxa 3 → ~101, taxa 255 → ~178: o mais comum sai no máximo ~1,8× mais que o mais raro).
+ * Raridade de cada LINHA EVOLUTIVA no sorteio (pedido do dono): três faixas pela taxa de captura da forma base, e
+ * dentro da faixa todas as linhas têm a MESMA chance. Os pesos são a proporção entre as faixas (7 : 5 : 3).
  */
-export const PESO_BASE_LINHA = 100;
-export const PESO_POR_TAXA = 0.3;
+export type Raridade = 'comum' | 'incomum' | 'raro';
+export const PESO_DA_RARIDADE: Record<Raridade, number> = { comum: 7, incomum: 5, raro: 3 };
+/** Taxa de captura mínima para ser comum; abaixo dela e acima de `TAXA_RARO` é incomum. */
+export const TAXA_COMUM = 200;
+/** Taxa de captura até a qual a linha é rara. */
+export const TAXA_RARO = 60;
+export const raridadeDaTaxa = (taxa: number): Raridade => (taxa >= TAXA_COMUM ? 'comum' : taxa > TAXA_RARO ? 'incomum' : 'raro');
 /** Chance FIXA por encontro de aparecer ALGUM inicial do bioma (pedido do dono: 1 em 12 mil); dentro dela, sorteia qual. */
 export const CHANCE_INICIAL = 1 / 12000;
 /** Chance FIXA por encontro de aparecer algum lendário (e, separadamente, algum mítico / alguma Ultra Beast): 1 em 20 mil. */
@@ -186,6 +190,9 @@ export function biomaDoPokemon(p: PokemonBase): string | null {
  * não contam: Pikachu continua sendo forma inicial; já Crobat (de Golbat) conta.
  */
 /** Forma base da linha evolutiva (Butterfree → Caterpie). */
+/** Primeira forma da linha evolutiva (Charizard → Charmander); bebês de gerações novas não contam. */
+export const formaBaseDe = (p: PokemonBase, todos: PokemonBase[]): PokemonBase => baseDaLinha(p, new Map(todos.map((x) => [x.slug, x])));
+
 function baseDaLinha(p: PokemonBase, porSlug: Map<string, PokemonBase>): PokemonBase {
   let atual = p;
   for (let anterior = anteriorDe(atual, porSlug); anterior; anterior = anteriorDe(atual, porSlug)) atual = anterior;
@@ -256,7 +263,7 @@ function montarTabelaCom(mora: (p: PokemonBase) => boolean, pokemons: PokemonBas
     .map((p) => {
       const [nivelMin, nivelMax] = faixas.get(p.id)!;
       const base = baseDaLinha(p, porSlug);
-      const peso = PESO_BASE_LINHA + base.taxaCaptura * PESO_POR_TAXA;
+      const peso = PESO_DA_RARIDADE[raridadeDaTaxa(base.taxaCaptura)];
       const grupo = grupoRaro(p, base);
       const chanceFixa = grupo === null ? null : grupo === 'inicial' ? CHANCE_INICIAL : CHANCE_LENDARIO;
       // variantes (letras do Unown, cores do Squawkabilly…) dividem a chance da linha da espécie normal

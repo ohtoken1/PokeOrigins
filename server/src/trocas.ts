@@ -103,8 +103,8 @@ function conferirOferta(save: SaveMin, oferta: Oferta, quem: string): PokemonSav
     if (itemInegociavel(item)) throw new ErroConta(`${quem}: item NT não pode ser trocado.`, 409);
     if ((save.itens[item] ?? 0) < qtd) throw new ErroConta(`${quem}: não tem itens suficientes.`, 409);
   }
-  if ((save.silver ?? 0) < oferta.silver) throw new ErroConta(`${quem}: silver insuficiente.`, 409);
-  if ((save.gold ?? 0) < oferta.gold) throw new ErroConta(`${quem}: gold insuficiente.`, 409);
+  if ((save.silver ?? 0) < oferta.silver) throw new ErroConta(`${quem}: Poké Dólares insuficientes.`, 409);
+  if ((save.gold ?? 0) < oferta.gold) throw new ErroConta(`${quem}: Origin Coins insuficientes.`, 409);
   return pokemons;
 }
 

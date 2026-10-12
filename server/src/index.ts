@@ -318,6 +318,8 @@ function perfilPublico(save: Record<string, unknown>) {
     capturados: save.capturados ?? [],
     estatisticas: save.estatisticas ?? null,
     titulo: tituloAtivo(save),
+    // selos sazonais (itens de coleção): só os ids que o jogador tem
+    selos: save.itens && typeof save.itens === 'object' ? Object.entries(save.itens as Record<string, unknown>).filter(([id, qtd]) => id.startsWith('selo-') && typeof qtd === 'number' && qtd > 0).map(([id]) => id) : [],
     // skin vestida (só se o item ainda está na bolsa); o jogo desenha o retrato com ela
     skinVisual: save.itens && typeof save.itens === 'object' && temSkin(save as unknown as ComSkins, save.skinVisual as string | null) ? save.skinVisual : null,
     mostrarTime,

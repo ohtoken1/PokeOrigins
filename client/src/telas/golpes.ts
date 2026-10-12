@@ -11,6 +11,7 @@ import { abrirJanela } from '../ui/janela';
 import { confirmar } from '../ui/confirmar';
 import { dicaGolpe } from '../ui/dicaGolpe';
 import { corTipo, el, seloTipo, spritePokemon } from '../ui/dom';
+import { valorEmMoeda } from '../ui/moeda';
 
 export type Professor = 'relembrar' | 'tutor';
 const PROFESSORES: Record<Professor, { nome: string; fala: string; preco: number; lista: (p: PokemonIndividual) => string[] }> = {
@@ -59,13 +60,13 @@ function corpoProfessores(save: Save, inicial: Professor, aoMudar?: () => void):
   const pagarEAprender = async (p: PokemonIndividual, golpe: string, esquecer: number | null) => {
     const preco = PROFESSORES[professor].preco;
     if (save.silver < preco) {
-      aviso = `Silver insuficiente (precisa de ${preco}, você tem ${save.silver}).`;
+      aviso = `Poké Dólares insuficientes (precisa de ${preco}, você tem ${save.silver}).`;
       return desenhar();
     }
     // "tem certeza?" antes de gastar o silver ou de esquecer um golpe (pedido do dono)
     const novo = Dex.moves.get(golpe).name;
     const quem = pokemonPorId(p.especieId).nome;
-    const partes = [`Ensinar ${novo} a ${quem}`, preco ? ` por ${preco.toLocaleString('pt-BR')} silver` : '', esquecer === null ? '?' : `? Ele vai esquecer ${Dex.moves.get(p.golpes[esquecer].id).name}.`];
+    const partes = [`Ensinar ${novo} a ${quem}`, preco ? ` por ${preco.toLocaleString('pt-BR')} Poké Dólares` : '', esquecer === null ? '?' : `? Ele vai esquecer ${Dex.moves.get(p.golpes[esquecer].id).name}.`];
     if (!(await confirmar(PROFESSORES[professor].nome, partes.join('')))) return;
     if (save.silver < preco || (esquecer !== null && !p.golpes[esquecer])) return desenhar();
     save.silver -= preco;
@@ -130,7 +131,7 @@ function corpoProfessores(save: Save, inicial: Professor, aoMudar?: () => void):
             aprendendo = id;
             desenhar();
           },
-        }, prof.preco ? `Aprender · ${prof.preco.toLocaleString('pt-BR')} silver` : 'Relembrar · grátis'),
+        }, ...(prof.preco ? ['Aprender · ', valorEmMoeda('silver', prof.preco)] : ['Relembrar · grátis'])),
         // já sabe 4 golpes: a escolha de qual esquecer abre aqui mesmo, ao lado de onde o jogador clicou (pedido do dono)
         escolhendo
           ? el('div', { class: 'golpe-esquecer' },
@@ -150,7 +151,7 @@ function corpoProfessores(save: Save, inicial: Professor, aoMudar?: () => void):
     corpo.replaceChildren(
       ...[abas,
       el('div', { class: 'golpes-npc' }, el('div', { class: 'golpes-npc-icone' }, professor === 'relembrar' ? 'R' : 'T'), el('div', {}, el('strong', {}, prof.nome), el('p', {}, prof.fala))),
-      el('div', { class: 'golpes-carteira' }, `Você tem ${save!.silver.toLocaleString('pt-BR')} silver`),
+      el('div', { class: 'golpes-carteira' }, 'Você tem ', valorEmMoeda('silver', save!.silver)),
       time,
       aviso ? el('p', { class: 'golpes-aviso', role: 'status' }, aviso) : null,
       atuais,

@@ -21,6 +21,7 @@ import { abrirEstacao } from '../ui/trem';
 import { abrirArena } from '../ui/arena';
 import { abrirQuadroDeMissoes } from '../ui/quadroMissoes';
 import { abrirLojaTemporal } from '../ui/lojaTemporal';
+import { abrirSuspeito } from '../ui/suspeito';
 import { viagemAtual } from '../viagem';
 import { REGIOES } from '../../../shared/regioes';
 import { abrirProfessores } from './golpes';
@@ -135,6 +136,8 @@ export const telaCidade: Tela = (raiz, navegar) => {
     else if (acao === 'mural') abrirMural();
     else if (acao === 'guildas') navegar({ tela: 'comunidade', secao: 'cla' });
     else if (acao === 'viajante') abrirLojaTemporal(save!, () => atualizarTime());
+    else if (acao === 'suspeito' && !conteudoLiberado('suspeito')) avisar(`Homem Suspeito: ${textoTranca('suspeito')}.`);
+    else if (acao === 'suspeito') abrirSuspeito(save!, () => atualizarTime());
     else if (acao === 'missoes') abrirQuadroDeMissoes(save!, () => atualizarTime());
     else if (acao === 'mercadonegro' && !conteudoLiberado('mercadoNegro')) avisar(`Mercado negro: ${textoTranca('mercadoNegro')}.`);
     else if (acao === 'mercadonegro') abrirMercado(save!, () => atualizarTime());

@@ -1,7 +1,8 @@
 // Itens que trocam a forma de um Pokémon, como nos jogos oficiais (pedido do dono). Sem imports: só números e ids.
-// Os itens-chave NÃO são gastos (dá para ir e voltar); os pergaminhos do Kubfu são de evolução e são gastos.
+// Todos são gastos no uso (pedido do dono: itens escassos) e NÃO têm volta: só funcionam na forma normal (a primeira
+// de cada lista) e a fusão não se separa (o dono vai criar um item de separação depois).
 
-/** Item-chave → listas de formas em roda: cada uso passa para a próxima (a última volta para a primeira). */
+/** Item → listas de formas: a primeira é a normal, as outras são onde o item leva. Com mais de uma, o jogador escolhe. */
 export const TROCAS_DE_FORMA: Record<string, number[][]> = {
   // Tornadus, Thundurus, Landorus, Enamorus: Incarnate ↔ Therian
   revealglass: [[641, 10019], [642, 10020], [645, 10021], [905, 10249]],
@@ -17,7 +18,7 @@ export const TROCAS_DE_FORMA: Record<string, number[][]> = {
   zygardecube: [[718, 10181]],
 };
 
-/** Fusão: o `parceiro` precisa estar no time; ele entra no `base` (fica guardado dentro) e volta ao separar. */
+/** Fusão: o `parceiro` precisa estar no time; ele entra no `base` e fica guardado dentro (ainda não há como separar). */
 export interface Fusao {
   base: number;
   parceiro: number;
@@ -39,16 +40,41 @@ export const EVOLUCOES_NOSSAS: Record<string, Record<number, number>> = {
   scrollofwaters: { 891: 10191 }, // Kubfu → Urshifu (Rapid Strike)
 };
 
+/** Máscaras da Ogerpon: itens de evolução de uso único, só na Ogerpon normal (sem volta; a Teal Mask ficou sem uso). */
+export const MASCARAS_OGERPON: Record<string, number> = { tealmask: 1017, wellspringmask: 10273, hearthflamemask: 10274, cornerstonemask: 10275 };
+/** Máscara que leva a essa forma da Ogerpon (para a Pokédex), ou undefined. A forma Teal é a espécie normal. */
+export const mascaraDaForma = (especieId: number): string | undefined => (especieId === 1017 ? undefined : Object.keys(MASCARAS_OGERPON).find((m) => MASCARAS_OGERPON[m] === especieId));
+
 /** Golpe que a forma aprende ao ser assumida, como nos jogos (os eletrodomésticos do Rotom). Some ao sair da forma. */
 export const GOLPE_DA_FORMA: Record<number, string> = { 10008: 'overheat', 10009: 'hydropump', 10010: 'blizzard', 10011: 'airslash', 10012: 'leafstorm' };
 
+/**
+ * IV da fusão (pedido do dono): um valor entre o IV de um e o do outro (os dois inclusive). O sorteio usa o número
+ * dos dois Pokémon, então o MESMO par dá sempre o mesmo resultado.
+ */
+export function ivDaFusao(a: number, b: number, uidA: number, uidB: number, indice: number): number {
+  const [min, max] = [Math.min(a, b), Math.max(a, b)];
+  let h = Math.imul(uidA + 1, 73856093) ^ Math.imul(uidB + 1, 19349663) ^ Math.imul(indice + 1, 83492791);
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  h = (h ^ (h >>> 16)) >>> 0;
+  return min + (h % (max - min + 1));
+}
+
 export const ehItemDeForma = (itemId: string): boolean => itemId in TROCAS_DE_FORMA || itemId in FUSOES;
 
-/** Para qual forma o item leva essa espécie (a próxima da roda), ou null se o item não serve nela. */
-export function proximaForma(itemId: string, especieId: number): number | null {
-  for (const roda of TROCAS_DE_FORMA[itemId] ?? []) {
-    const i = roda.indexOf(especieId);
-    if (i >= 0) return roda[(i + 1) % roda.length];
-  }
-  return null;
+/** Formas para onde o item leva essa espécie (para o jogador escolher). Só a forma normal muda: não tem volta. */
+export function outrasFormas(itemId: string, especieId: number): number[] {
+  const roda = (TROCAS_DE_FORMA[itemId] ?? []).find((r) => r[0] === especieId);
+  return roda ? roda.slice(1) : [];
 }
+
+/** Já está numa forma que este item dá (ou numa fusão dele): o item não desfaz. */
+export const jaMudouDeForma = (itemId: string, especieId: number): boolean =>
+  (TROCAS_DE_FORMA[itemId] ?? []).some((r) => r.indexOf(especieId) > 0) || (FUSOES[itemId] ?? []).some((f) => f.forma === especieId);
+
+/** Forma normal de quem mudou de forma por item (Deoxys Attack → Deoxys), ou null. Fusões não entram: essas se separam. */
+export const formaNormalDe = (especieId: number): number | null =>
+  Object.values(TROCAS_DE_FORMA).flat().find((r) => r.indexOf(especieId) > 0)?.[0] ?? null;
+
+/** Para qual forma o item leva essa espécie (a primeira da lista), ou null se o item não serve nela. */
+export const proximaForma = (itemId: string, especieId: number): number | null => outrasFormas(itemId, especieId)[0] ?? null;

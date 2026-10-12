@@ -138,7 +138,7 @@ export function criar(conta: banco.Conta, dados: Record<string, unknown>) {
   // ou as duas coisas acontecem, ou nenhuma
   banco.mudarSaves([conta.id], ([save]) => {
     const gold = typeof save.gold === 'number' && Number.isFinite(save.gold) ? save.gold : 0;
-    if (gold < PRECO_CRIAR_CLA_GOLD) throw new ErroConta(`Criar uma guilda custa ${PRECO_CRIAR_CLA_GOLD} gold.`);
+    if (gold < PRECO_CRIAR_CLA_GOLD) throw new ErroConta(`Criar uma guilda custa ${PRECO_CRIAR_CLA_GOLD} Origin Coins.`);
     save.gold = gold - PRECO_CRIAR_CLA_GOLD;
     banco.criarCla(nome, chave, JSON.stringify(bandeira), lerDescricao(dados.descricao), dados.aberto !== false, conta.id);
   });

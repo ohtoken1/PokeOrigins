@@ -46,8 +46,8 @@ export const CATEGORIAS_RANKING: { id: CategoriaRanking; nome: string; coluna: s
   { id: 'nivel', nome: 'Nível', coluna: 'Nível', descricao: 'Nível de treinador (empate: quem tem mais XP).', valor: (d) => d.nivel },
   { id: 'missoes', nome: 'Missões do quadro', coluna: 'Missões', descricao: 'Missões concluídas no Quadro de missões da cidade.', valor: (d) => d.missoes },
   { id: 'medalhas', nome: 'Medalhas de torneio', coluna: 'Medalhas', descricao: 'Medalhas ganhas nos torneios online.', valor: (d) => d.medalhas, emBreve: true },
-  { id: 'silver', nome: 'Silver', coluna: 'Silver', descricao: 'Silver na carteira.', valor: (d) => d.silver },
-  { id: 'gold', nome: 'Gold', coluna: 'Gold', descricao: 'Gold na carteira.', valor: (d) => d.gold },
+  { id: 'silver', nome: 'Poké Dólar', coluna: 'Poké Dólar', descricao: 'Poké Dólares na carteira.', valor: (d) => d.silver },
+  { id: 'gold', nome: 'Origin Coin', coluna: 'Origin Coin', descricao: 'Origin Coins na carteira.', valor: (d) => d.gold },
 ];
 
 /** Ordena do maior para o menor; no nível, o XP desempata. */

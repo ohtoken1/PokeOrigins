@@ -18,6 +18,7 @@ import { itemInegociavel } from '../../shared/naoTrocavel.ts';
 import { faixaDoIv, tierIv } from '../../shared/tierIv.ts';
 import { liberado, NIVEL_MINIMO } from '../../shared/trancas.ts';
 import { nivelTreinador } from '../../shared/treinador.ts';
+import { nomeDaMoeda } from '../../shared/moedas.ts';
 
 /** O que fica guardado em cada anúncio. */
 type Guardado = { pokemon?: PokemonSave; item?: string; quantidade?: number };
@@ -138,8 +139,8 @@ export function anunciar(conta: banco.Conta, dados: Record<string, unknown>) {
       guardado.quantidade = quantidade;
     } else {
       const quantidade = inteiro(dados.quantidade, 1, PRECO_MAXIMO_MERCADO);
-      if (quantidade === null) throw new ErroConta('Quantidade de gold inválida.');
-      if (saldo(save.gold) < quantidade) throw new ErroConta('Você não tem esse gold.', 409);
+      if (quantidade === null) throw new ErroConta('Quantidade de Origin Coins inválida.');
+      if (saldo(save.gold) < quantidade) throw new ErroConta('Você não tem esses Origin Coins.', 409);
       save.gold = saldo(save.gold) - quantidade;
       guardado.quantidade = quantidade;
     }
@@ -159,7 +160,7 @@ export function comprar(conta: banco.Conta, id: number) {
     if (l.vendedor === conta.id) throw new ErroConta('Este anúncio é seu.');
     const save = s as unknown as SaveMin;
     const moeda = l.moeda === 'gold' ? 'gold' : 'silver';
-    if (saldo(save[moeda]) < l.preco) throw new ErroConta(`Você não tem ${moeda} suficiente.`, 409);
+    if (saldo(save[moeda]) < l.preco) throw new ErroConta(`Você não tem ${nomeDaMoeda(moeda)} suficientes.`, 409);
     save[moeda] = saldo(save[moeda]) - l.preco;
     entregar(save, l.tipo, JSON.parse(l.dados) as Guardado, true);
     if (!banco.venderAnuncioMercado(id)) throw new ErroConta('Este anúncio não está mais à venda.', 409);

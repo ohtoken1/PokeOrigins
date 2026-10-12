@@ -58,6 +58,10 @@ export interface NpcMapa {
   aparencia: Aparencia;
   /** o que acontece ao clicar no nome */
   acao?: string;
+  /** sentado num banco: o tile é o do banco, sem sombra e sem as canelas; `dx`/`dy` (px) acertam o lugar no assento */
+  sentado?: boolean;
+  dx?: number;
+  dy?: number;
 }
 
 export interface Mapa {

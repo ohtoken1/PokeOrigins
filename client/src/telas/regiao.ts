@@ -96,8 +96,8 @@ export const telaRegiao: Tela = (raiz, navegar) => {
           el(
             'div',
             { class: 'carteira' },
-            el('div', { class: 'moeda moeda-silver', title: 'Silver: ganho jogando' }, el('span', { class: 'moeda-icone' }), el('small', {}, 'Silver'), el('strong', {}, save.silver.toLocaleString('pt-BR'))),
-            el('div', { class: 'moeda moeda-gold', title: 'Gold: moeda paga (por enquanto, pelo painel Admin)' }, el('span', { class: 'moeda-icone' }), el('small', {}, 'Gold'), el('strong', {}, save.gold.toLocaleString('pt-BR'))),
+            el('div', { class: 'moeda moeda-silver', title: 'Poké Dólar: ganho jogando' }, el('span', { class: 'moeda-icone' }), el('small', {}, 'Poké Dólar'), el('strong', {}, save.silver.toLocaleString('pt-BR'))),
+            el('div', { class: 'moeda moeda-gold', title: 'Origin Coin: moeda paga (por enquanto, pelo painel Admin)' }, el('span', { class: 'moeda-icone' }), el('small', {}, 'Origin Coin'), el('strong', {}, save.gold.toLocaleString('pt-BR'))),
             vipAtivo(save)
               ? el('div', { class: 'selo-vip-conta', title: 'VIP: bônus na conta por um tempo (os bônus ainda vão ser definidos)' }, el('span', { class: 'icone-vip' }, 'VIP'), el('small', {}, `ativo · acaba em ${tempoRestanteVip(save)}`))
               : null,

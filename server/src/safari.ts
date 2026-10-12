@@ -17,7 +17,7 @@ export function comprar(conta: banco.Conta) {
   banco.mudarSaves([conta.id], ([save]) => {
     const hoje = diaDoSafari(Date.now());
     if (ticketComprado(save.safari, hoje)) throw new ErroConta('Você já comprou o ticket extra de hoje.', 409);
-    if (saldo(save.gold) < PRECO_ENTRADA_SAFARI_GOLD) throw new ErroConta('Você não tem gold suficiente para o ticket.');
+    if (saldo(save.gold) < PRECO_ENTRADA_SAFARI_GOLD) throw new ErroConta('Você não tem Origin Coins suficientes para o ticket.');
     save.gold = saldo(save.gold) - PRECO_ENTRADA_SAFARI_GOLD;
     const aberto = lerSafariAberto(save.safari);
     save.safari = { dia: hoje, usadas: entradasUsadas(save.safari, hoje), comprada: true, ...(aberto ? { aberto } : {}) };

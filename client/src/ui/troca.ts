@@ -149,8 +149,8 @@ export function abrirTroca(inicial: Troca): void {
     el('div', { class: 'troca-item' }, iconeDoItem(id), el('span', {}, nomeItem(id)), el('strong', {}, `×${qtd}`),
       tirar ? el('button', { class: 'troca-tirar', title: 'Tirar da troca', 'aria-label': 'Tirar da troca', onclick: tirar }, '✕') : null);
   const moedas = (o: Oferta<unknown>) => [
-    o.silver ? el('div', { class: 'troca-moeda silver' }, el('span', { class: 'icone-moeda moeda-silver' }), `${formatar(o.silver)} silver`) : null,
-    o.gold ? el('div', { class: 'troca-moeda gold' }, el('span', { class: 'icone-moeda moeda-gold' }), `${formatar(o.gold)} gold`) : null,
+    o.silver ? el('div', { class: 'troca-moeda silver' }, el('span', { class: 'icone-moeda moeda-silver' }), formatar(o.silver)) : null,
+    o.gold ? el('div', { class: 'troca-moeda gold' }, el('span', { class: 'icone-moeda moeda-gold' }), formatar(o.gold)) : null,
   ];
   const vazio = (o: Oferta<unknown>) => !o.pokemons.length && !Object.keys(o.itens).length && !o.silver && !o.gold;
   const selo = (l: LadoTroca) =>

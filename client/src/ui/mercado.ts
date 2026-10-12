@@ -13,13 +13,14 @@ import { aoAvisoDoServidor } from '../online';
 import { el, seloGenero, spritePokemon } from './dom';
 import { iconeItem } from './iconeItem';
 import { abrirJanela } from './janela';
+import { nomeDaMoeda } from '../../../shared/moedas';
 
 type Aba = 'comprar' | 'vender' | 'meus';
 const numero = (n: number) => n.toLocaleString('pt-BR');
 const ATRIBUTOS: [string, string][] = [['hp', 'HP'], ['atk', 'Atk'], ['def', 'Def'], ['spa', 'SpA'], ['spd', 'SpD'], ['spe', 'Spe']];
-const ROTULO_TIPO: Record<TipoAnuncio, string> = { pokemon: 'Pokémon', item: 'Itens', gold: 'Gold' };
+const ROTULO_TIPO: Record<TipoAnuncio, string> = { pokemon: 'Pokémon', item: 'Itens', gold: 'Origin Coins' };
 
-const preco = (valor: number, moeda: MoedaMercado) => el('span', { class: `mn-preco ${moeda}` }, el('span', { class: `icone-moeda moeda-${moeda}` }), el('strong', {}, numero(valor)), ` ${moeda}`);
+const preco = (valor: number, moeda: MoedaMercado) => el('span', { class: `mn-preco ${moeda}` }, el('span', { class: `icone-moeda moeda-${moeda}` }), el('strong', {}, numero(valor)));
 const iconeDoItem = (id: string) => iconeItem(itemDaLoja(id) ?? { id, categoria: 'batalha' });
 const inteiro = (campo: HTMLInputElement, minimo: number, maximo: number) => Math.max(minimo, Math.min(maximo, Math.floor(Number(campo.value) || minimo)));
 
@@ -37,7 +38,7 @@ function tempoQueFalta(ms: number): string {
 /** Nome para a busca e para o título do anúncio. */
 function nomeDoAnuncio(a: AnuncioMercado): string {
   if (a.pokemon) return pokemonPorId(a.pokemon.especieId).nome;
-  if (a.tipo === 'gold') return `${numero(a.quantidade ?? 0)} gold`;
+  if (a.tipo === 'gold') return `${numero(a.quantidade ?? 0)} Origin Coins`;
   return nomeDoItem(a.item ?? '');
 }
 
@@ -125,7 +126,7 @@ export function abrirMercado(save: Save, aoMudar: () => void = () => {}): void {
             el('button', { class: 'botao', type: 'button', disabled: ocupado, onclick: () => void agir(() => comprarNoMercado(a.id), `Você comprou ${p ? nomeDoAnuncio(a) : a.tipo === 'gold' ? nomeDoAnuncio(a) : `${numero(a.quantidade ?? 1)}x ${nomeDoAnuncio(a)}`}.`) }, 'Confirmar'),
             el('button', { class: 'botao secundario', type: 'button', disabled: ocupado, onclick: () => ((confirmando = null), desenhar()) }, 'Não'))
         : el('div', { class: 'mn-acao' },
-            el('button', { class: 'botao', type: 'button', disabled: ocupado || falta, title: falta ? `Você não tem ${a.moeda} suficiente` : '', onclick: () => ((confirmando = a.id), desenhar()) }, 'Comprar'));
+            el('button', { class: 'botao', type: 'button', disabled: ocupado || falta, title: falta ? `Você não tem ${nomeDaMoeda(a.moeda)} suficientes` : '', onclick: () => ((confirmando = a.id), desenhar()) }, 'Comprar'));
 
     return el('div', { class: `mn-anuncio${p?.shiny ? ' shiny' : ''}${a.meu ? ' meu' : ''}` },
       el('div', { class: 'mn-icone' }, p && base ? spritePokemon(base, { shiny: p.shiny, animado: false }) : a.tipo === 'gold' ? el('span', { class: 'icone-moeda moeda-gold mn-gold' }) : iconeDoItem(a.item ?? '')),
@@ -194,7 +195,7 @@ export function abrirMercado(save: Save, aoMudar: () => void = () => {}): void {
     const escreverResumo = () => {
       const v = inteiro(campoPreco, 1, PRECO_MAXIMO_MERCADO);
       const taxa = taxaDaVenda(v);
-      resumo.textContent = `Taxa do mercado: ${TAXA_MERCADO * 100}%${taxa ? ` (${numero(taxa)} ${moeda})` : ' (preço abaixo de 20 não paga)'}. Se vender, você recebe ${numero(valorDoVendedor(v))} ${moeda}.`;
+      resumo.textContent = `Taxa do mercado: ${TAXA_MERCADO * 100}%${taxa ? ` (${numero(taxa)} ${nomeDaMoeda(moeda, taxa)})` : ' (preço abaixo de 20 não paga)'}. Se vender, você recebe ${numero(valorDoVendedor(v))} ${nomeDaMoeda(moeda, valorDoVendedor(v))}.`;
     };
     campoQtd.addEventListener('change', () => ((quantidade = inteiro(campoQtd, 1, maximo || 1)), desenhar()));
     campoPreco.addEventListener('input', escreverResumo);
@@ -221,14 +222,14 @@ export function abrirMercado(save: Save, aoMudar: () => void = () => {}): void {
                 el('select', { class: 'banco-campo', onchange: (e: Event) => ((item = (e.target as HTMLSelectElement).value), (quantidade = 1), desenhar()) },
                   ...itens.map(([id, q]) => el('option', { value: id, selected: id === item }, `${nomeDoItem(id)} (tem ${numero(q)})`))))
             : el('p', { class: 'troca-vazio' }, 'Você não tem itens que possam ser vendidos.')
-          : el('p', { class: 'meta' }, `Você tem ${numero(save.gold)} gold. O gold é vendido por silver.`),
-      vendendo === 'pokemon' ? null : el('label', { class: 'banco-quantidade' }, vendendo === 'gold' ? 'Quanto gold' : 'Quantidade (vendida toda junta)', campoQtd),
+          : el('p', { class: 'meta' }, `Você tem ${numero(save.gold)} Origin Coins. Origin Coins são vendidos por Poké Dólares.`),
+      vendendo === 'pokemon' ? null : el('label', { class: 'banco-quantidade' }, vendendo === 'gold' ? 'Quantos Origin Coins' : 'Quantidade (vendida toda junta)', campoQtd),
       el('label', { class: 'banco-quantidade' }, 'Preço total',
         el('span', { class: 'mn-preco-campo' }, campoPreco,
           vendendo === 'gold'
-            ? el('span', { class: 'mn-moeda-fixa' }, 'silver')
+            ? el('span', { class: 'mn-moeda-fixa' }, 'Poké Dólares')
             : el('select', { class: 'banco-campo mn-moeda', 'aria-label': 'Moeda', onchange: (e: Event) => ((moeda = (e.target as HTMLSelectElement).value as MoedaMercado), (valor = inteiro(campoPreco, 1, PRECO_MAXIMO_MERCADO)), desenhar()) },
-                el('option', { value: 'silver', selected: moeda === 'silver' }, 'silver'), el('option', { value: 'gold', selected: moeda === 'gold' }, 'gold')))),
+                el('option', { value: 'silver', selected: moeda === 'silver' }, 'Poké Dólares'), el('option', { value: 'gold', selected: moeda === 'gold' }, 'Origin Coins')))),
       resumo,
       el('p', { class: 'meta' }, `Você tem ${meus} de ${MAX_ANUNCIOS_POR_JOGADOR} anúncios. O que está anunciado sai do seu time, PC ou bolsa até vender, e volta se você tirar o anúncio ou se ninguém comprar em ${VALIDADE_ANUNCIO_MS / 3_600_000} horas.`),
       el('button', { class: 'botao mn-anunciar', type: 'button', disabled: ocupado || !pronto || cheio, title: cheio ? 'Você já tem o máximo de anúncios' : '', onclick: anunciar }, ocupado ? 'Anunciando…' : 'Anunciar'),

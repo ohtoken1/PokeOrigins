@@ -2,6 +2,7 @@
 // PvP ranqueado, números da jornada com medalhas de torneio, insígnias e time). Também é o "Meu perfil" da Minha
 // conta e o "Ver perfil" ao clicar em outro jogador no mapa (`abrirPerfilDe`).
 import type { Tela } from '../main';
+import { SELOS_SAZONAIS } from '../../../shared/itensCustom';
 import { progressoTreinador } from '../../../shared/treinador';
 import { lideresDaRegiao } from '../../../shared/ginasios';
 import { skinVestida } from '../personagem/aparencia';
@@ -29,6 +30,8 @@ export interface PerfilPublico {
     time: { especieId: number; nivel: number; shiny: boolean }[];
     /** título em uso (o servidor já confere se a conquista foi concluída) */
     titulo?: string | null;
+    /** selos sazonais que o jogador tem (ids) */
+    selos?: string[];
   };
 }
 
@@ -45,7 +48,7 @@ export async function abrirPerfilDe(usuario: string): Promise<void> {
 /** Perfil de outro jogador: o mesmo desenho, com o time só para ver (sem abrir a ficha) e escondido se ele quiser. */
 function perfilRemoto(r: PerfilPublico): HTMLElement {
   const save = { ...r.perfil, time: r.perfil.time } as unknown as Save;
-  return perfilJogador(save, { online: r.online, remoto: true, timeEscondido: !r.perfil.mostrarTime, cla: r.cla, titulo: r.perfil.titulo ?? null });
+  return perfilJogador(save, { online: r.online, remoto: true, timeEscondido: !r.perfil.mostrarTime, cla: r.cla, titulo: r.perfil.titulo ?? null, selos: r.perfil.selos ?? [] });
 }
 
 /** Medalha de torneio desenhada por código (fita + disco) com a quantidade do lado. */
@@ -74,6 +77,17 @@ function capsulaTime(p: PokemonDoJogador, remoto = false): HTMLElement {
     el('span', {}, d.nome, p.shiny ? el('span', { class: 'perfil-shiny' }, ' ★') : '', ` · ${p.nivel}`));
 }
 
+/** Selos sazonais (itens de coleção): todos os que existem, acesos os que o jogador tem. A arte ainda vai ser feita. */
+function painelSelos(tem: string[]): HTMLElement {
+  return el(
+    'div',
+    { class: 'perfil-selos' },
+    ...SELOS_SAZONAIS.map((s) =>
+      el('div', { class: `perfil-selo ${tem.includes(s.id) ? 'tem' : ''}`, title: `${s.nome}${tem.includes(s.id) ? '' : ' (ainda não tem)'}` }, el('span', {}, '🏵️'), el('small', {}, s.evento)),
+    ),
+  );
+}
+
 /** Insígnias com uma lista de regiões para escolher (começa na região atual do jogador). */
 function painelInsignias(save: Save): HTMLElement {
   const lista = el('div', { class: 'perfil-insignias' });
@@ -88,7 +102,7 @@ function painelInsignias(save: Save): HTMLElement {
   return el('div', {}, seletor, lista);
 }
 
-export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: boolean; timeEscondido?: boolean; cla?: PerfilPublico['cla']; titulo?: string | null } = {}): HTMLElement {
+export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: boolean; timeEscondido?: boolean; cla?: PerfilPublico['cla']; titulo?: string | null; selos?: string[] } = {}): HTMLElement {
   const e = save.estatisticas;
   // o próprio perfil está sempre online (é quem está jogando)
   const online = opcoes.online ?? save === carregarSave();
@@ -138,7 +152,8 @@ export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: b
       el('div', { class: 'perfil-meio' },
         caixa('Medalhas de torneio',
           el('div', { class: 'perfil-podio' }, degrau('prata', '2º', 'Prata', prata), degrau('ouro', '1º', 'Ouro', ouro), degrau('bronze', '3º', 'Bronze', bronze))),
-        caixa('Insígnias', painelInsignias(save))),
+        caixa('Insígnias', painelInsignias(save)),
+        caixa('Selos sazonais', painelSelos(opcoes.remoto ? (opcoes.selos ?? []) : SELOS_SAZONAIS.filter((s) => (save.itens?.[s.id] ?? 0) > 0).map((s) => s.id)))),
       caixa('Time', opcoes.timeEscondido
         ? el('p', { class: 'meta' }, 'Este treinador escolheu não mostrar a equipe.')
         : el('div', { class: 'perfil-time' }, ...save.time.map((p) => capsulaTime(p, opcoes.remoto)),

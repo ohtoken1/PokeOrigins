@@ -38,7 +38,7 @@ export const agora = () => ({ agora: Date.now() });
 
 export function comprar(conta: banco.Conta, dados: Record<string, unknown>) {
   const { destino, moeda } = dados;
-  if (moeda !== 'silver') throw new ErroConta('O ticket do trem é pago em silver.');
+  if (moeda !== 'silver') throw new ErroConta('O ticket do trem é pago em Poké Dólares.');
   const regiao = REGIOES.find((r) => r.id === destino);
   if (!regiao || !regiao.disponivel) throw new ErroConta('Região inválida.');
   if (!banco.lerSave(conta.id)) throw new ErroConta('Comece sua jornada antes de viajar.');
@@ -53,7 +53,7 @@ export function comprar(conta: banco.Conta, dados: Record<string, unknown>) {
     // VIP vale na hora da compra (o prazo ainda vem do save)
     const vip = typeof save.vipAte === 'number' && save.vipAte > hora;
     const preco = precoDoTicket(trechosEntre(ORDEM, de, regiao.id), vip);
-    if (saldo(save[moeda]) < preco) throw new ErroConta('Você não tem silver suficiente para o ticket.');
+    if (saldo(save[moeda]) < preco) throw new ErroConta('Você não tem Poké Dólares suficientes para o ticket.');
     save[moeda] = saldo(save[moeda]) - preco;
     save.viagem = { de, para: regiao.id, saiuEm: hora, chegaEm: hora + tempoDaViagemMs(ORDEM, de, regiao.id, vip) };
   });

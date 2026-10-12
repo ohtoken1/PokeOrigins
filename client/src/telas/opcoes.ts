@@ -92,7 +92,7 @@ export const telaOpcoes: Tela = (raiz, navegar) => {
     el('p', { class: 'sub' }, 'As mudanças são salvas sozinhas.', salvo),
     secao(
       'Perfil',
-      campo('Nome de treinador', nomeTreinador, `Aparece em cima do seu personagem no mapa. Para trocar (${PRECO_TROCAR_NOME_GOLD} gold), use "Mudar o visual do personagem".`),
+      campo('Nome de treinador', nomeTreinador, `Aparece em cima do seu personagem no mapa. Para trocar (${PRECO_TROCAR_NOME_GOLD} Origin Coins), use "Mudar o visual do personagem".`),
       el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'personagem' }) }, 'Mudar o visual do personagem'),
     ),
     secao(
