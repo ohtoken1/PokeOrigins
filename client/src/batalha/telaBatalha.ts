@@ -169,6 +169,7 @@ export const FUNDOS_BATALHA: Record<string, string[]> = {
   vulcao: ['vulcao-1.png', 'vulcao-2.jpg', 'vulcao-3.jpg'],
   caverna: ['caverna-1.jpg', 'caverna-2.jpg'],
   torre: ['torre-1.jpg', 'torre-2.jpg'],
+  pico: ['pico-1.png', 'pico-2.png', 'pico-5.png'],
 };
 /** Sorteia o fundo do bioma para esta batalha. */
 function sortearFundo(biomaId: string): string | null {

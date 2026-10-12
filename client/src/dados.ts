@@ -29,11 +29,14 @@ for (const lista of Object.values(POKEMONS_POR_REGIAO)) for (const p of lista) p
 
 // Formas regionais (Alola, Galar, Paldea e Hisui — estas em Kalos): entram na lista da região delas, com número próprio
 for (const lista of Object.keys(POKEMONS_POR_REGIAO)) POKEMONS_POR_REGIAO[lista] = [...POKEMONS_POR_REGIAO[lista]];
+const SO_CADASTRADOS: PokemonBase[] = [];
 for (const forma of FORMAS_REGIONAIS) {
   const normal = porId.get(Dex.species.get(forma.showdown).num);
   if (!normal) continue;
   const p = montarFormaRegional(forma, normal, (n) => porId.get(n)?.slug);
-  POKEMONS_POR_REGIAO[forma.regiao].push(p);
+  // as que ainda não se obtêm jogando ficam fora das listas de região (mapas, Pokédex da região)
+  if (forma.foraDosMapas) SO_CADASTRADOS.push(p);
+  else POKEMONS_POR_REGIAO[forma.regiao].push(p);
   porId.set(p.id, p);
 }
 // quem evolui de uma forma regional (Clodsire ← Paldean Wooper, Obstagoon ← Galarian Linoone…)
@@ -46,7 +49,7 @@ for (const p of porId.values()) {
 
 /** Todos os Pokémon carregados (todas as regiões), em ordem da Pokédex nacional. */
 // formas regionais logo depois da espécie normal (Rattata, Alolan Rattata, Raticate…)
-const TODOS = Object.values(POKEMONS_POR_REGIAO).flat().sort((a, b) => (a.numeroDex ?? a.id) - (b.numeroDex ?? b.id) || a.id - b.id);
+const TODOS = [...Object.values(POKEMONS_POR_REGIAO).flat(), ...SO_CADASTRADOS].sort((a, b) => (a.numeroDex ?? a.id) - (b.numeroDex ?? b.id) || a.id - b.id);
 export function todosOsPokemons(): PokemonBase[] {
   return TODOS;
 }

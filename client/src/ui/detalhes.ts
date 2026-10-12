@@ -101,7 +101,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
         el(
           'tr',
           {},
-          el('th', {}, NOMES[a], ' ', marca(a)),
+          el('th', { class: natureza.plus === a ? 'nat-sobe' : natureza.minus === a ? 'nat-desce' : '' }, NOMES[a], ' ', marca(a)),
           el('td', {}, el('span', { class: 'barrinha', style: { '--v': String(Math.min(1, base[a] / 180)) } }), String(base[a])),
           visao === 'exato'
             ? el('td', { class: p.ivs[a] === 31 ? 'perfeito' : '' }, String(p.ivs[a]))
@@ -109,7 +109,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
               ? el('td', { class: `faixa ${faixaDoIv(p.ivs[a])[0] >= 26 ? 'perfeito' : ''}`, title: 'Faixa do IV' }, faixaDoIv(p.ivs[a]).join('–'))
               : el('td', { class: 'oculto', title: 'IV oculto' }, '?'),
           el('td', {}, String(p.evs[a])),
-          el('td', { class: 'valor' }, a === 'hp' ? `${p.hp}/${max}` : String(valores[a])),
+          el('td', { class: `valor ${natureza.plus === a ? 'nat-sobe' : natureza.minus === a ? 'nat-desce' : ''}` }, a === 'hp' ? `${p.hp}/${max}` : String(valores[a])),
         ),
       ),
     ),

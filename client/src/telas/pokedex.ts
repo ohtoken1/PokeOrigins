@@ -53,6 +53,8 @@ export const regiaoDoNumero = (numero: number) => REGIOES.find((r) => numero >= 
 /** Região do Pokémon: a da forma regional (Alolan Rattata → Alola) ou a do número da Pokédex. */
 const regiaoDoPokemon = (p: PokemonBase) => {
   const forma = formaRegional(p.id);
+  // forma só cadastrada (sem jeito de obter ainda) não conta para a Pokédex de nenhuma região
+  if (forma?.foraDosMapas) return undefined;
   return forma ? REGIOES.find((r) => r.id === forma.regiao) : regiaoDoNumero(p.id);
 };
 

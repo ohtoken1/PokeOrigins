@@ -51,7 +51,7 @@ const trocas = new Map<string, Troca>();
 const ofertaVazia = (): Oferta => ({ pokemons: [], itens: {}, silver: 0, gold: 0 });
 
 // ---- tipos mínimos do save (o resto do save não interessa aqui) ----
-export type PokemonSave = { uid?: number; especieId: number; nivel: number; shiny?: boolean; genero?: string; item?: string | null; inegociavel?: boolean; trancado?: boolean; box?: number; [k: string]: unknown };
+export type PokemonSave = { uid?: number; especieId: number; nivel: number; shiny?: boolean; genero?: string; item?: string | null; inegociavel?: boolean; trancado?: boolean; fundido?: unknown; box?: number; [k: string]: unknown };
 export type SaveMin = { time: PokemonSave[]; caixa: PokemonSave[]; itens: Record<string, number>; silver: number; gold: number; proximoIdPokemon?: number; capturados?: number[]; vistos?: number[]; capturadosShiny?: number[]; aceitarTrocas?: boolean; xpTreinador?: number };
 
 function saveDe(contaId: number): SaveMin {
@@ -95,6 +95,7 @@ function conferirOferta(save: SaveMin, oferta: Oferta, quem: string): PokemonSav
     if (!p) throw new ErroConta(`${quem}: um Pokémon da oferta não está mais com o treinador.`, 409);
     if (p.inegociavel) throw new ErroConta(`${quem}: Pokémon NT não pode ser trocado.`, 409);
     if (p.trancado) throw new ErroConta(`${quem}: Pokémon trancado não pode ser trocado (destranque no PC).`, 409);
+    if (p.fundido) throw new ErroConta(`${quem}: separe a fusão antes de trocar esse Pokémon.`, 409);
     return p;
   });
   if (save.time.filter((p) => !oferta.pokemons.includes(p.uid ?? -1)).length < 1) throw new ErroConta(`${quem}: precisa ficar pelo menos 1 Pokémon no time.`, 409);

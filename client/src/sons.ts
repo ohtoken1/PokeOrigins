@@ -96,6 +96,8 @@ export const volumeDosEfeitos = volume;
 
 // ---------- gritos ----------
 
+import { especieRegional } from '../../shared/formasRegionais';
+
 /**
  * Toca o grito oficial (número da PokéAPI: espécie, forma regional 10091…, Mega 10034…).
  * `grave` = desmaio (mais lento e grave, como nos jogos). Resolve quando o grito acaba (máx. 2,5 s).
@@ -103,7 +105,8 @@ export const volumeDosEfeitos = volume;
 export function tocarGrito(numero: number, grave = false): Promise<void> {
   if (!volume()) return Promise.resolve();
   return new Promise((fim) => {
-    const audio = new Audio(`${URL_GRITOS}${numero}.ogg`);
+    // formas com número nosso (letras do Unown, 20001…) usam o grito da espécie normal
+    const audio = new Audio(`${URL_GRITOS}${numero >= 20000 ? (especieRegional(numero)?.num ?? numero) : numero}.ogg`);
     audio.volume = Math.min(1, volume() * 0.9);
     if (grave) {
       audio.preservesPitch = false;

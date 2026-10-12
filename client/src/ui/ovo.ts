@@ -12,7 +12,7 @@ import { iconeOvo } from './iconeItem';
 import { areaRoletas, botoesQuantidade } from './abrirVarios';
 import { ehLendario } from '../../../shared/encontros';
 import { especie } from '../../../shared/batalha/pokemon';
-import { ehParadoxo } from '../../../shared/formasRegionais';
+import { ehParadoxo, foraDosMapas } from '../../../shared/formasRegionais';
 
 /** Duração da roleta do ovo (mais lenta que a do ticket, para dar expectativa). */
 const DURACAO_ROLETA = 9000;
@@ -72,7 +72,7 @@ function ehDeInicial(id: number, porSlug: Map<string, number>): boolean {
  */
 export function especiesDoOvo(ovo: Ovo): number[] {
   if (ovo.grupo === 'iniciais') return TODOS_INICIAIS;
-  const todos = todosOsPokemons().filter((p) => !ehParadoxo(especie(p.id).name));
+  const todos = todosOsPokemons().filter((p) => !ehParadoxo(especie(p.id).name) && !foraDosMapas(p.id));
   if (ovo.grupo === 'todos') return todos.map((p) => p.id);
   if (ovo.grupo === 'lendarios') return todos.filter((p) => ehLendario(p) && !p.evoluiDe && !especie(p.id).prevo).map((p) => p.id);
   const porSlug = new Map(todosOsPokemons().map((p) => [p.slug, p.id]));

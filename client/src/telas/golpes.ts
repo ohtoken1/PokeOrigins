@@ -8,6 +8,7 @@ import { nomeCategoria } from '../../../shared/traducao';
 import { pokemonPorId } from '../dados';
 import { carregarSave, salvar, type Save } from '../estado';
 import { abrirJanela } from '../ui/janela';
+import { confirmar } from '../ui/confirmar';
 import { dicaGolpe } from '../ui/dicaGolpe';
 import { corTipo, el, seloTipo, spritePokemon } from '../ui/dom';
 
@@ -55,12 +56,18 @@ function corpoProfessores(save: Save, inicial: Professor, aoMudar?: () => void):
   let aviso = '';
   const corpo = el('div', { class: 'golpes-corpo' });
 
-  const pagarEAprender = (p: PokemonIndividual, golpe: string, esquecer: number | null) => {
+  const pagarEAprender = async (p: PokemonIndividual, golpe: string, esquecer: number | null) => {
     const preco = PROFESSORES[professor].preco;
     if (save.silver < preco) {
       aviso = `Silver insuficiente (precisa de ${preco}, você tem ${save.silver}).`;
       return desenhar();
     }
+    // "tem certeza?" antes de gastar o silver ou de esquecer um golpe (pedido do dono)
+    const novo = Dex.moves.get(golpe).name;
+    const quem = pokemonPorId(p.especieId).nome;
+    const partes = [`Ensinar ${novo} a ${quem}`, preco ? ` por ${preco.toLocaleString('pt-BR')} silver` : '', esquecer === null ? '?' : `? Ele vai esquecer ${Dex.moves.get(p.golpes[esquecer].id).name}.`];
+    if (!(await confirmar(PROFESSORES[professor].nome, partes.join('')))) return;
+    if (save.silver < preco || (esquecer !== null && !p.golpes[esquecer])) return desenhar();
     save.silver -= preco;
     const nome = pokemonPorId(p.especieId).nome;
     if (esquecer === null) {
@@ -98,20 +105,20 @@ function corpoProfessores(save: Save, inicial: Professor, aoMudar?: () => void):
       ),
     );
     const atuais = el('div', { class: 'golpes-atuais' },
-      el('span', { class: 'rotulo-secao' }, aprendendo ? `Esquecer qual golpe para aprender ${Dex.moves.get(aprendendo).name}?` : `Golpes de ${nome}`),
+      el('span', { class: 'rotulo-secao' }, `Golpes de ${nome}`),
       ...p.golpes.map((g, i) => {
         const m = Dex.moves.get(g.id);
-        const b = el('button', { class: `golpe-atual ${aprendendo ? 'escolher' : ''}`, style: { '--cor-tipo': corTipo(m.type) }, disabled: !aprendendo, onclick: () => aprendendo && pagarEAprender(p, aprendendo, i) },
+        const b = el('button', { class: 'golpe-atual', style: { '--cor-tipo': corTipo(m.type) }, disabled: true },
           el('strong', {}, m.name), seloTipo(m.type));
         return dicaGolpe(b, g.id, () => ({ atual: g.pp, max: ppMaximo(g.id) }));
       }),
-      aprendendo ? el('button', { class: 'botao secundario', onclick: () => ((aprendendo = null), desenhar()) }, 'Cancelar') : null,
     );
 
     const lista = prof.lista(p);
     const linhas = lista.map((id) => {
       const m = Dex.moves.get(id);
-      const linha = el('div', { class: 'golpe-oferta', style: { '--cor-tipo': corTipo(m.type) } },
+      const escolhendo = aprendendo === id;
+      const linha = el('div', { class: `golpe-oferta ${escolhendo ? 'escolhendo' : ''}`, style: { '--cor-tipo': corTipo(m.type) } },
         el('div', { class: 'golpe-oferta-nome' }, el('strong', {}, m.name), seloTipo(m.type)),
         el('small', {}, `${nomeCategoria(m.category)} · Poder ${m.basePower || '—'} · Precisão ${m.accuracy === true ? '—' : `${m.accuracy}%`} · PP ${m.pp}`),
         el('button', {
@@ -124,6 +131,18 @@ function corpoProfessores(save: Save, inicial: Professor, aoMudar?: () => void):
             desenhar();
           },
         }, prof.preco ? `Aprender · ${prof.preco.toLocaleString('pt-BR')} silver` : 'Relembrar · grátis'),
+        // já sabe 4 golpes: a escolha de qual esquecer abre aqui mesmo, ao lado de onde o jogador clicou (pedido do dono)
+        escolhendo
+          ? el('div', { class: 'golpe-esquecer' },
+              el('span', {}, `${nome} já sabe 4 golpes. Esquecer qual?`),
+              ...p.golpes.map((g, i) => {
+                const atual = Dex.moves.get(g.id);
+                const b = el('button', { class: 'golpe-atual escolher', style: { '--cor-tipo': corTipo(atual.type) }, onclick: () => pagarEAprender(p, id, i) }, el('strong', {}, atual.name), seloTipo(atual.type));
+                return dicaGolpe(b, g.id, () => ({ atual: g.pp, max: ppMaximo(g.id) }));
+              }),
+              el('button', { class: 'botao secundario', onclick: () => ((aprendendo = null), desenhar()) }, 'Cancelar'),
+            )
+          : null,
       );
       return dicaGolpe(linha, id);
     });

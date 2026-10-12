@@ -73,18 +73,21 @@ Depois da roleta, você escolhe onde começar. **Todas as 9 regiões** estão li
 
 ## 2. Regiões e biomas
 
-Cada região tem **5 biomas**:
+Cada região tem **6 biomas**:
 
 | Bioma | Tipos que moram nele |
 |---|---|
-| 🌿 **Campos Verdes** | Grass, Bug, Normal, Electric, Poison |
-| 🌊 **Mar Profundo** (subaquático) | Water, Ice |
-| 🌋 **Vulcão** | Fire |
-| ⛰️ **Caverna Rochosa** | Rock, Ground, Fighting, Dragon, Fairy, Steel |
+| 🌿 **Campos Verdes** | Grass, Bug, Normal, Poison |
+| 🌊 **Mar Profundo** (subaquático) | Water |
+| 🌋 **Vulcão** | Fire, Ground e os dragões puros |
+| ⛰️ **Caverna Rochosa** | Rock, Fighting, Steel |
 | 👻 **Torre Assombrada** | Ghost, Psychic, Dark |
+| 🏔️ **Pico Nevado** | Ice, Flying, Electric, Fairy |
 
 ### Cada Pokémon mora em UM bioma só
 O bioma é o do **tipo principal** do Pokémon. Exemplo: Gastly é Ghost/Poison, então mora na Torre. Se o tipo principal não tiver bioma, vale o segundo tipo.
+
+**Dragões:** quem é Dragon com outro tipo mora no bioma do **outro tipo** (Altaria é Dragon/Flying → Pico Nevado; Dreepy é Dragon/Ghost → Torre). Dragão puro (Axew, Goomy, Bagon) mora no **Vulcão**.
 
 **Exceções:** quando uma linha evolutiva tem exceção, ela vai inteira junto:
 
@@ -96,10 +99,13 @@ O bioma é o do **tipo principal** do Pokémon. Exemplo: Gastly é Ghost/Poison,
 | Koffing → Weezing | Vulcão |
 | Dratini → Dragonair → Dragonite | Mar Profundo |
 
+Além dessas, várias linhas foram movidas à mão para nenhum mapa ficar vazio (por exemplo: Pidgey e Spearow no Pico Nevado, Diglett e Cubone na Caverna, Litwick e Deino no Vulcão). O painel **%** de cada mapa mostra quem mora nele.
+
 ### Mapas
 - Cada bioma tem um mapa próprio, visto de cima, no estilo dos jogos de GBA/DS.
 - No canto do mapa há **atalhos** para pular direto para os outros biomas.
 - O Mar Profundo é **subaquático**: algas, corais, feixes de luz e bolhas.
+- O Pico Nevado tem neve caindo, lagos congelados e pinheiros cobertos de neve.
 
 > ℹ️ A lista de tipos por bioma acima é a configuração atual e pode mudar.
 
@@ -883,6 +889,19 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Tera Type aleatório:** Pokémon selvagem capturado agora vem com um Tera Type sorteado entre os 18 tipos, revelado só depois da captura.
 - **Mapas dos biomas:** o **Vulcão** ficou vulcânico de verdade (chão de rocha escura, poças de lava, rachaduras acesas, lascas de obsidiana e pequenos vulcões soltando fumaça); a **Caverna Rochosa** agora tem abismos escuros no lugar das poças; o **Mar Profundo** e a **Torre Assombrada** não têm mais poças nem buracos.
 - **Skins especiais com visual:** as 13 skins que só tinham bônus ganharam desenho no personagem (Galante, Chaveiro, Indiana Jones, Halloween, Natal, Carnaval, Páscoa, Dia dos Namorados, Aniversário, Ash, Gary, May e Misty). O rosto continua o do jogador; muda a roupa, e a maioria vem com chapéu ou acessório. As de Ash, Gary, May e Misty vêm também com o cabelo do personagem, a de Halloween tem cabeça de abóbora, a de Natal carrega o saco do Papai Noel nas costas, a de Carnaval é um folião de bloco (chapéu de palha, óculos escuros e camisa florida), a de Páscoa tem touca de coelho e a de Aniversário comemora o aniversário do PokeOrigins (preta, dourada e creme, com "PO" no peito).
+- **Atributos mais claros:** o que a Nature aumenta aparece em verde e o que ela diminui em vermelho, no nome e no valor (na ficha e no resumo). Na batalha, um atributo aumentado ou reduzido mostra o valor de antes e o de agora, por exemplo "105 → 210 +2".
+- **"Tem certeza?":** antes de ensinar um golpe nos professores, usar TM ou TR, pedra de evolução, cubo, Mint, Tera Shards, Ability Capsule ou Patch, charm e Box Pokémon, o jogo pergunta Sim ou Não. Remédios e itens de segurar continuam diretos.
+- **Pokébola no lugar certo:** a bola não pula mais para o canto da tela no meio da captura.
+- **Shiny e lendário no mapa:** a janela do encontro fica amarelo-clara quando é shiny e vermelho-clara quando é lendário, com contorno preto.
+- **Itens de forma, como nos jogos oficiais:** Reveal Glass (Tornadus, Thundurus, Landorus e Enamorus Therian), Prison Bottle (Hoopa Unbound), Gracidea (Shaymin Sky), Meteorite (formas do Deoxys), Rotom Catalog (eletrodomésticos do Rotom) e Zygarde Cube (Zygarde 10%). Não são gastos: cada uso passa para a forma seguinte. DNA Splicers (Kyurem com Zekrom ou Reshiram), N-Solarizer e N-Lunarizer (Necrozma com Solgaleo ou Lunala) e Reins of Unity (Calyrex com Glastrier ou Spectrier) juntam os dois Pokémon: o parceiro precisa estar no time, entra no outro e volta quando você usa o item de novo. Scroll of Darkness e Scroll of Waters evoluem o Kubfu para cada Urshifu (esses são gastos). Pokémon em fusão não pode ser trocado nem vendido.
+- **Formas novas nos mapas:** as 28 letras do Unown (Johto, dividem a chance de um Unown só), Wormadam Sandy e Trash, Lycanroc Midnight e Dusk, Basculin Blue-Striped e White-Striped, Pumpkaboo Small/Large/Super, Squawkabilly azul, amarelo e branco, e as fêmeas de Meowstic, Indeedee e Oinkologne. Cada forma tem registro próprio na Pokédex.
+- **Lendários remanejados:** vários lendários e míticos mudaram de mapa (Zapdos na Caverna, Ho-Oh na Torre, Latias e Latios nos Campos Verdes, entre outros). **Rotom** agora é raro como um inicial.
+- **Oricorio:** as quatro danças agora existem. Baile (Fire) no Vulcão, Pom-Pom (Electric) no Pico Nevado, Pa'u (Psychic) e Sensu (Ghost) na Torre, todas em Alola.
+- **Paldean Tauros:** cada raça no mapa do seu segundo tipo: Blaze no Vulcão, Aqua no Mar e Combat na Caverna.
+- **Iniciais de Hisui:** Hisuian Typhlosion agora aparece em Johto, Hisuian Samurott em Unova e Hisuian Decidueye em Alola (antes ficavam em Kalos).
+- **Sexto bioma, Pico Nevado:** montanha de neve com os tipos Ice, Flying, Electric e Fairy. Os tipos foram redistribuídos: Ground foi para o Vulcão, Ice saiu do Mar Profundo, Electric saiu dos Campos Verdes, e os dragões agora moram no bioma do outro tipo deles (dragão puro no Vulcão).
+- **Professores de golpes:** quando o Pokémon já sabe 4 golpes, a escolha de qual esquecer abre no próprio cartão do golpe clicado.
+- **Animações dos golpes novas:** os golpes agora usam as animações do Pokémon Showdown, as mesmas do site deles (934 golpes com animação própria).
 - **Limite de nível pelo treinador:** do treinador nível 1 ao 9, você só pode usar Pokémon até **10 × o seu nível de treinador** (treinador 3 → até o nível 30; treinador 6 → até o 60). Do treinador 10 em diante não há limite. Pokémon acima do limite ficam no PC (por troca, Mercado negro ou captura) até você ter nível, e quem está no time para de ganhar experiência ao chegar no limite.
 - **Pokémon de ticket nascem no nível 1** (antes 50), como os de ovo, para qualquer jogador poder usar o que ganhou.
 - **Preços:** Tera Orb e Dynamax Band a 100.000 silver cada; os outros itens de batalha passam a 20.000 silver e itens de evolução (pedras, Linking Cord e os outros) a 30.000 silver.

@@ -4,12 +4,14 @@ import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { ehEquipavel, ehItemDeHabilidade, usarItemDeHabilidade, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
 import { cuboPorItem } from '../../../shared/itensCustom';
+import { FUSOES, GOLPE_DA_FORMA, ehItemDeForma, proximaForma } from '../../../shared/formasPorItem';
 import { BOXES_INICIAIS, BOXES_MAXIMO, BOX_POKEMON, numeroDeBoxes, podeAbrirBox } from '../../../shared/pc';
 import { charmAte, charmAtivo, nomeCharm, tipoDoCharm, usarCharm } from '../../../shared/charms';
 import { textoDoTempo } from '../../../shared/viagem';
 import { pokemonPorId, todosOsPokemons } from '../dados';
-import { registrarCapturado, salvar, type Save } from '../estado';
+import { guardarNoPC, registrarCapturado, salvar, type PokemonDoJogador, type Save } from '../estado';
 import { abrirJanela } from './janela';
+import { confirmar } from './confirmar';
 import { corTipo, el } from './dom';
 import { dicaGolpe } from './dicaGolpe';
 import { Dex } from '@pkmn/sim';
@@ -41,7 +43,9 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
   ovos: 'Chocar',
 };
 /** O botão do item: pela categoria; na aba Up, Ability Capsule e Ability Patch são de usar. */
-const acaoDe = (item: ItemLoja) => (ehItemDeHabilidade(item.id) || item.id === BOX_POKEMON ? 'Usar' : ACAO[item.categoria]);
+/** Itens que são gastos ao usar num Pokémon e não voltam: perguntam "tem certeza?" (pedido do dono). */
+const PEDE_CONFIRMACAO = (item: ItemLoja) => ['evolucao', 'cubos', 'mints', 'terashards', 'tm', 'tr'].includes(item.categoria) || ehItemDeHabilidade(item.id);
+const acaoDe = (item: ItemLoja) => (ehItemDeHabilidade(item.id) || item.id === BOX_POKEMON || ehItemDeForma(item.id) ? 'Usar' : ACAO[item.categoria]);
 
 type Modo =
   | { tipo: 'lista' }
@@ -81,8 +85,60 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
     return null;
   };
 
+  /** Troca a espécie sem evoluir (itens de forma): esquece o que a forma nova não pode ter e nunca fica sem golpe. */
+  const mudarForma = (p: PokemonIndividual, para: number): string[] => {
+    const esquecidos = p.golpes.filter((g) => !especiePodeTerGolpe(para, g.id)).map((g) => nomeGolpe(g.id));
+    p.golpes = p.golpes.filter((g) => especiePodeTerGolpe(para, g.id));
+    if (p.golpesAprendidos) p.golpesAprendidos = p.golpesAprendidos.filter((id) => especiePodeTerGolpe(para, id));
+    const r = evoluir(p, para, (n) => pokemonPorId(n).nome);
+    if (!p.golpes.length && !r.golpesPendentes.length) p.golpes = golpesIniciais(para, p.nivel);
+    registrarCapturado(save, para, p.shiny);
+    for (const golpe of r.golpesPendentes) aprender(p, golpe, () => {}, () => {});
+    return [...(esquecidos.length ? [`Esqueceu ${esquecidos.join(', ')}.`] : []), ...r.mensagens];
+  };
+
+  /** Itens-chave de forma (Reveal Glass, Rotom Catalog, DNA Splicers…): não são gastos. */
+  const usarItemDeForma = (item: ItemLoja, p: PokemonIndividual): string => {
+    const quem = nome(p);
+    const fusoes = FUSOES[item.id];
+    if (!fusoes) {
+      const para = proximaForma(item.id, p.especieId);
+      if (!para || !existe(para)) return `${item.nome} não tem efeito em ${quem}.`;
+      const mensagens = mudarForma(p, para);
+      // Rotom: cada eletrodoméstico ensina o golpe dele (com 4 golpes, pergunta qual esquecer)
+      const golpe = GOLPE_DA_FORMA[para];
+      const aprendeu = golpe && !p.golpes.some((g) => g.id === golpe) ? aprender(p, golpe, () => {}, () => {}) : null;
+      return [`${quem} mudou para ${pokemonPorId(para).nome}!`, ...mensagens, ...(aprendeu ? [aprendeu] : [])].join(' ');
+    }
+    // separar: o parceiro que estava dentro volta para o time (ou para o PC, se o time está cheio)
+    const junta = fusoes.find((f) => f.forma === p.especieId);
+    if (junta) {
+      const parceiro = p.fundido as PokemonDoJogador | undefined;
+      const mensagens = mudarForma(p, junta.base);
+      delete p.fundido;
+      let volta = '';
+      if (parceiro) {
+        if (save.time.length < 6) save.time.push(parceiro);
+        else guardarNoPC(save, parceiro);
+        volta = ` ${nome(parceiro)} voltou para ${save.time.includes(parceiro) ? 'o time' : 'o PC'}.`;
+      }
+      return [`${quem} voltou a ser ${pokemonPorId(junta.base).nome}.${volta}`, ...mensagens].join(' ');
+    }
+    const opcoes = fusoes.filter((f) => f.base === p.especieId);
+    if (!opcoes.length) return `${item.nome} não tem efeito em ${quem}.`;
+    const indice = save.time.findIndex((q) => q !== p && opcoes.some((f) => f.parceiro === q.especieId));
+    if (indice < 0) return `Para usar ${item.nome}, ${opcoes.map((f) => pokemonPorId(f.parceiro).nome).join(' ou ')} precisa estar no time.`;
+    const parceiro = save.time[indice];
+    const fusao = opcoes.find((f) => f.parceiro === parceiro.especieId)!;
+    if (!existe(fusao.forma)) return `${item.nome} não tem efeito em ${quem}.`;
+    save.time.splice(indice, 1);
+    p.fundido = parceiro;
+    return [`${quem} se juntou com ${nome(parceiro)} e virou ${pokemonPorId(fusao.forma).nome}!`, ...mudarForma(p, fusao.forma)].join(' ');
+  };
+
   const aplicar = (item: ItemLoja, p: PokemonIndividual): string | null => {
     const quem = nome(p);
+    if (ehItemDeForma(item.id)) return usarItemDeForma(item, p);
     switch (item.categoria) {
       case 'remedios': {
         const msg = usarRemedio(ITENS[item.id as ItemId], p, quem);
@@ -224,7 +280,9 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
           { class: 'vagas' },
           save.time.map((p) =>
             cartaoPokemon(p, {
-              onclick: () => {
+              onclick: async () => {
+                // itens que são gastos e não voltam pedem confirmação (remédios e itens de segurar, não)
+                if (PEDE_CONFIRMACAO(item) && !(await confirmar(item.nome, `${acaoDe(item)} ${item.nome} em ${nome(p)}? O item é gasto e não volta.`))) return;
                 const msg = aplicar(item, p);
                 if (msg) concluir(msg);
                 else {
@@ -279,7 +337,8 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                 return el('button', {
                   class: 'botao', disabled: ativo,
                   title: ativo ? 'Só um deste tipo por vez: espere o bônus acabar' : '',
-                  onclick: () => {
+                  onclick: async () => {
+                    if (!(await confirmar(item.nome, `Usar ${item.nome}? O bônus dura 30 minutos e o item é gasto.`))) return;
                     const erro = usarCharm(save, tipo);
                     if (!erro) {
                       marcarConquista(save, 'charm');
@@ -296,8 +355,9 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                   'button',
                   {
                     class: 'botao',
-                    onclick: () => {
+                    onclick: async () => {
                       aviso = '';
+                      if (item.id === BOX_POKEMON && podeAbrirBox(save) && !(await confirmar(item.nome, 'Usar o Box Pokémon para abrir mais uma box no PC? O item é gasto.'))) return;
                       if (item.categoria === 'ovos') {
                         abrirJanelaOvo(save, item.id, () => {
                           aoMudar();

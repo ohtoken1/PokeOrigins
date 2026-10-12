@@ -213,12 +213,12 @@ export class BatalhaSelvagem {
 
   /**
    * Atributos do seu Pokémon em campo como estão AGORA na batalha: com os estágios (+1 Attack do Bulk Up…) e a forma
-   * atual (Mega), sem efeitos de item/ability. `estagio` = −6 a +6.
+   * atual (Mega), sem efeitos de item/ability. `estagio` = −6 a +6; `semEstagio` = o valor antes dos estágios (para mostrar "70 → 140").
    */
-  atributosEmCampo(): Record<'atk' | 'def' | 'spa' | 'spd' | 'spe', { valor: number; estagio: number }> | null {
+  atributosEmCampo(): Record<'atk' | 'def' | 'spa' | 'spd' | 'spe', { valor: number; estagio: number; semEstagio: number }> | null {
     const sim = this.batalha.p1.active[0];
     if (!sim || sim.fainted) return null;
-    const ler = (a: 'atk' | 'def' | 'spa' | 'spd' | 'spe') => ({ valor: sim.getStat(a, false, true), estagio: sim.boosts[a] ?? 0 });
+    const ler = (a: 'atk' | 'def' | 'spa' | 'spd' | 'spe') => ({ valor: sim.getStat(a, false, true), estagio: sim.boosts[a] ?? 0, semEstagio: sim.getStat(a, true, true) });
     return { atk: ler('atk'), def: ler('def'), spa: ler('spa'), spd: ler('spd'), spe: ler('spe') };
   }
 

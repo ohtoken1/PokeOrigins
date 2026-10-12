@@ -55,6 +55,8 @@ export interface PokemonIndividual {
    * o Move Reminder devolve qualquer um deles de graça (pedido do dono). Mantido por `lembrarGolpes`.
    */
   golpesAprendidos?: string[];
+  /** Fusão (DNA Splicers, N-Solarizer, Reins of Unity): o Pokémon que está dentro deste e volta ao separar. */
+  fundido?: PokemonIndividual;
 }
 
 /** Anota os golpes que o Pokémon sabe agora na memória dele (o que ele já soube nunca sai de lá). */
@@ -233,6 +235,8 @@ export function expGanha(expBaseDerrotado: number, nivelDerrotado: number, nivel
 
 /** Evoluções por nível que dependem só da hora ("de dia"/"à noite": Alolan Raticate, Obstagoon, Lycanroc…). */
 const CONDICOES_DE_HORA = ['during the day', 'at night'];
+/** Condições que os mapas ignoram: Lycanroc Dusk aparece solto a partir do 25, como os outros dois (pedido do dono). */
+const CONDICOES_SO_DOS_JOGOS = ['from a special Rockruff during the evening'];
 
 /**
  * Número da espécie para a qual evolui ao atingir o nível, ou null. Só evoluções por nível; as de dia/noite
@@ -309,6 +313,6 @@ export function nomeGolpe(id: string): string {
 export function nivelDeEvolucao(numero: number): number | null {
   const s = especie(numero);
   // nos mapas a hora não importa: Alolan Raticate (à noite) aparece a partir do 20 como o Raticate normal
-  const condicaoOk = !s.evoCondition || CONDICOES_DE_HORA.includes(s.evoCondition);
+  const condicaoOk = !s.evoCondition || CONDICOES_DE_HORA.includes(s.evoCondition) || CONDICOES_SO_DOS_JOGOS.includes(s.evoCondition);
   return !s.evoType && condicaoOk && !s.evoItem && s.evoLevel ? s.evoLevel : null;
 }

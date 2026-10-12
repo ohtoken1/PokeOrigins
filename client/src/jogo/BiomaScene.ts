@@ -289,6 +289,7 @@ export class BiomaScene extends Phaser.Scene {
     }
     this.opcoes.personagem?.folhas.then((f) => this.usarPersonagemLpc(this.opcoes.personagem!.chave, f));
     if (paleta.submerso) this.efeitosSubmersos();
+    if (paleta.nevado) this.efeitosDeNeve();
 
     const camera = this.cameras.main;
     camera.setZoom(zoomEscolhido * (Number(this.game.config.width) / LARGURA_TELA)).setBounds(0, 0, this.mapa.largura * TAM, this.mapa.altura * TAM).setRoundPixels(true);
@@ -464,6 +465,28 @@ export class BiomaScene extends Phaser.Scene {
   }
 
   /** Fundo do mar: feixes de luz balançando, bolhas subindo e o personagem azulado. */
+  /** Pico Nevado: flocos de neve caindo de lado, só em volta do que a câmera mostra. */
+  private efeitosDeNeve() {
+    if (!this.textures.exists('floco')) {
+      const floco = this.add.graphics();
+      floco.fillStyle(0xffffff, 1).fillRect(1, 0, 1, 3).fillRect(0, 1, 3, 1);
+      floco.generateTexture('floco', 3, 3);
+      floco.destroy();
+    }
+    this.add
+      .particles(0, 0, 'floco', {
+        emitZone: { type: 'random', source: new Phaser.Geom.Rectangle(-300, -230, 640, 300), quantity: 1 },
+        speedY: { min: 22, max: 46 },
+        speedX: { min: -22, max: -6 },
+        scale: { min: 0.5, max: 1.2 },
+        alpha: { start: 0.95, end: 0 },
+        lifespan: { min: 3500, max: 6500 },
+        frequency: 28,
+      })
+      .setDepth(5001)
+      .startFollow(this.jogador);
+  }
+
   private efeitosSubmersos() {
     const [w, h] = [this.mapa.largura * TAM, this.mapa.altura * TAM];
     this.jogador.setTint(0xc8e4ff);

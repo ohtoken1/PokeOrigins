@@ -120,6 +120,7 @@ export function anunciar(conta: banco.Conta, dados: Record<string, unknown>) {
       const p = uid === null ? undefined : [...save.time, ...save.caixa].find((x) => x.uid === uid);
       if (!p) throw new ErroConta('Este Pokémon não está mais com você.', 409);
       if (p.inegociavel) throw new ErroConta('Pokémon NT não pode ser vendido.', 409);
+      if (p.fundido) throw new ErroConta('Separe a fusão antes de vender esse Pokémon.', 409);
       if (p.trancado) throw new ErroConta('Pokémon trancado não pode ser vendido (destranque no PC).', 409);
       if (save.time.filter((x) => x !== p).length < 1) throw new ErroConta('Precisa ficar pelo menos 1 Pokémon no time.', 409);
       save.time = save.time.filter((x) => x !== p);

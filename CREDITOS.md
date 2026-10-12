@@ -33,9 +33,11 @@ As cores dos tiles são alteradas por filtro em cada bioma. Versões modificadas
 
 ## Imagens de itens
 - Tera Orb, Dynamax Band, Mints, Ability Patch e Linking Cord: imagens oficiais dos jogos (© Nintendo/Game Freak/The Pokémon Company), obtidas do Serebii (serebii.net) — `client/public/itens/`.
+- N-Solarizer, N-Lunarizer, Reins of Unity, Rotom Catalog, Scroll of Darkness e Scroll of Waters: imagens oficiais dos jogos (© Nintendo/Game Freak/The Pokémon Company), obtidas do Serebii (serebii.net) — `client/public/itens/`.
 - Tera Shards e Teal Mask: imagens oficiais de Scarlet/Violet (© Nintendo/Game Freak/The Pokémon Company), obtidas do Serebii (serebii.net) — `client/public/itens/`.
 
 ## Animações dos golpes
+- Animações dos golpes: Pokémon Showdown (github.com/smogon/pokemon-showdown-client) — `battle-animations-moves.ts` (CC0-1.0) e trechos de `battle-animations.ts` (MIT, Guangcong Luo e colaboradores), em `client/src/batalha/showdown/anims.js`.
 - Imagens de efeito (bola de fogo, folhas, raio, pedras, mordida, soco…) do Pokémon Showdown (play.pokemonshowdown.com/fx), carregadas direto do site deles.
 
 ## Mega Evolução

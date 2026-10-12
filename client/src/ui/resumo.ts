@@ -14,7 +14,7 @@ const linha = (rotulo: string, ...valor: (Node | string)[]) => el('div', { class
 /** `emBatalha`: atributos atuais na batalha (com estágios), no lugar dos calculados fora dela. */
 export function resumoPokemon(
   p: PokemonIndividual,
-  opcoes: { abilityConhecida: boolean; completo?: boolean; emBatalha?: Record<'atk' | 'def' | 'spa' | 'spd' | 'spe', { valor: number; estagio: number }> | null },
+  opcoes: { abilityConhecida: boolean; completo?: boolean; emBatalha?: Record<'atk' | 'def' | 'spa' | 'spd' | 'spe', { valor: number; estagio: number; semEstagio?: number }> | null },
 ): HTMLElement[] {
   const dados = pokemonPorId(p.especieId);
   const natureza = Dex.natures.get(p.natureza);
@@ -40,7 +40,8 @@ export function resumoPokemon(
     linha('Item', p.item ? nomeItemEquipado(p.item) : '—'),
     linha('Amizade', `${amizadeDe(p)}/${AMIZADE_MAXIMA}`),
     linha('Tera Type', seloTipo(p.teraTipo ?? especie(p.especieId).types[0])),
-    // atributos um embaixo do outro, com barrinha (▲/▼ = o que a Nature aumenta/diminui)
+    // atributos um embaixo do outro, com barrinha. Nature: o que ela aumenta fica VERDE e o que diminui VERMELHO, no
+    // nome e no valor (pedido do dono). Na batalha, com estágio: "70 → 140 +2" (o valor já aumentado em destaque)
     el(
       'div',
       { class: 'resumo-atributos' },
@@ -52,8 +53,13 @@ export function resumoPokemon(
           { class: `resumo-atributo ${marca}` },
           el('span', {}, NOMES_ATRIBUTOS[a], marca === 'sobe' ? ' ▲' : marca === 'desce' ? ' ▼' : ''),
           el('span', { class: 'resumo-barra' }, el('span', { style: { width: `${Math.min(100, (valores(a) / Math.max(60, p.nivel * 3)) * 100)}%` } })),
-          // na batalha, o valor já vem com o estágio (+1 Attack = ×1,5) e o estágio aparece do lado
-          el('strong', { class: e > 0 ? 'estagio-sobe' : e < 0 ? 'estagio-desce' : '' }, String(valores(a)), e ? el('small', {}, ` ${e > 0 ? '+' : ''}${e}`) : null),
+          el(
+            'strong',
+            { class: e > 0 ? 'estagio-sobe' : e < 0 ? 'estagio-desce' : '' },
+            e ? el('small', { class: 'antes' }, `${opcoes.emBatalha?.[a].semEstagio ?? base[a]} → `) : null,
+            String(valores(a)),
+            e ? el('small', { class: 'estagio' }, `${e > 0 ? '+' : ''}${e}`) : null,
+          ),
         );
       }),
     ),

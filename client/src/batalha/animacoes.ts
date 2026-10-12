@@ -93,15 +93,20 @@ export async function animarBola(arena: HTMLElement, alvo: HTMLElement, tremidas
     bola.className = 'pokebola';
     img.remove();
   });
-  arena.append(bola);
   const pos = (p: { x: number; y: number }, extra = '') => ({ transform: `translate(${p.x}px,${p.y}px) translate(-50%,-50%) ${extra}` });
+  // a bola SEMPRE tem uma posição própria: sem isso, entre uma animação e outra ela pulava para o canto de cima
+  // à esquerda da arena (era o que acontecia enquanto o Pokémon encolhia para entrar nela)
+  Object.assign(bola.style, pos(de));
+  arena.append(bola);
 
   await esperarAnimacao(
     bola.animate([pos(de, 'rotate(0)'), pos({ x: (de.x + para.x) / 2, y: Math.max(30, para.y - 45) }, 'rotate(360deg)'), pos(para, 'rotate(720deg)')], {
       duration: 900,
       easing: 'ease-out',
+      fill: 'forwards',
     }),
   );
+  Object.assign(bola.style, pos(para));
   await esperarAnimacao(alvo.animate([{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(0)', filter: 'brightness(4)' }], { duration: 400, fill: 'forwards' }));
   await esperarAnimacao(bola.animate([pos(para), pos(chao)], { duration: 420, easing: 'ease-in', fill: 'forwards' }));
   // fixa a posição no chão (sem depender da animação continuar valendo)

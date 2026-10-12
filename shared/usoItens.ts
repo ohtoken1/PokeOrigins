@@ -3,6 +3,7 @@
 import { Dex } from '@pkmn/sim';
 import { especie, type PokemonIndividual } from './batalha/pokemon';
 import { idDaEvolucao } from './formasRegionais';
+import { EVOLUCOES_NOSSAS } from './formasPorItem';
 import { ABILITY_CAPSULE, ABILITY_PATCH, CABO_DE_LIGACAO, ITENS_DE_SEGURAR_NOSSOS, PEDRAS_EVOLUCAO } from './loja';
 
 /** Ability Capsule e Ability Patch: itens de USAR (o resto da aba Up é de segurar). */
@@ -35,6 +36,9 @@ export function usarItemDeHabilidade(itemId: string, p: PokemonIndividual, quem:
  * `existe` filtra espécies que o jogo ainda não tem dados (ex.: evoluções de outras regiões).
  */
 export function evolucaoPorItem(p: PokemonIndividual, itemId: string, existe: (numero: number) => boolean): number | null {
+  // itens de evolução nossos (pergaminhos do Kubfu)
+  const nossa = EVOLUCOES_NOSSAS[itemId]?.[p.especieId];
+  if (nossa && existe(nossa)) return nossa;
   for (const nome of especie(p.especieId).evos ?? []) {
     const evo = Dex.species.get(nome);
     const id = idDaEvolucao(p.especieId, evo);

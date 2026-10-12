@@ -1,7 +1,7 @@
 // Sorteio de Pokémon selvagens. Fica em shared/ porque, no MMO, quem vai sortear é o
 // servidor (para ninguém trapacear); por enquanto o cliente usa o mesmo código.
 import { BIOMAS, type Bioma } from './biomas';
-import { ehParadoxo, numeroNaDex } from './formasRegionais';
+import { ehParadoxo, foraDosMapas, linhaDaVariante, numeroNaDex } from './formasRegionais';
 import { especie, nivelDeEvolucao } from './batalha/pokemon';
 import { TODOS_INICIAIS } from './regioes';
 import type { PokemonBase } from './tipos';
@@ -30,11 +30,14 @@ export const CHANCE_LENDARIO = 1 / 20000;
 /** Categorias raras: cada uma tem a sua chance total, dividida igualmente entre as linhas dela no bioma. */
 export type GrupoRaro = 'inicial' | 'lendario' | 'mitico' | 'ultra';
 
+/** Linhas comuns que o dono quis raras como um inicial (mesma chance e mesmo aviso): Rotom. */
+export const RAROS_COMO_INICIAL = [479];
+
 function grupoRaro(p: PokemonBase, base: PokemonBase): GrupoRaro | null {
   if (p.lendario) return 'lendario';
   if (p.mitico) return 'mitico';
   if ((especie(p.id).tags ?? []).includes('Ultra Beast')) return 'ultra';
-  if (TODOS_INICIAIS.includes(base.id)) return 'inicial';
+  if (TODOS_INICIAIS.includes(base.id) || RAROS_COMO_INICIAL.includes(base.id)) return 'inicial';
   return null;
 }
 /** Categoria rara de uma espécie (a linha inteira de um inicial conta como inicial), ou null se é comum. */
@@ -100,6 +103,7 @@ export const ehLendario = (p: PokemonBase) => p.lendario || p.mitico || (especie
 /**
  * Cada Pokémon mora em um único bioma: o do seu tipo principal (o primeiro).
  * Se nenhum bioma tiver o tipo principal, vale o segundo tipo. Exceções em BIOMA_FIXO.
+ * Dragões (pedido do dono): quem tem Dragon e outro tipo mora no bioma do OUTRO tipo; dragão puro mora no Vulcão.
  */
 /** Exceções escolhidas pelo dono (a linha evolutiva inteira vai junto). Número da Pokédex → bioma. */
 export const BIOMA_FIXO: Record<number, string> = {
@@ -108,11 +112,69 @@ export const BIOMA_FIXO: Record<number, string> = {
   88: 'vulcao', 89: 'vulcao', // Grimer, Muk → Vulcão
   109: 'vulcao', 110: 'vulcao', // Koffing, Weezing → Vulcão
   147: 'agua', 148: 'agua', 149: 'agua', // Dratini, Dragonair, Dragonite → Mar Profundo
+  // ajustes do dono para equilibrar os 6 biomas (a linha inteira vai junto)
+  213: 'caverna', 216: 'caverna', 217: 'caverna', 901: 'caverna', 235: 'caverna', // Johto: Shuckle, Teddiursa, Smeargle
+  451: 'vulcao', 452: 'vulcao', 434: 'vulcao', 435: 'vulcao', // Sinnoh: Skorupi, Stunky
+  459: 'pico', 460: 'pico', 396: 'pico', 397: 'pico', 398: 'pico', 441: 'pico', // Sinnoh: Snover, Starly, Chatot
+  453: 'caverna', 454: 'caverna', // Sinnoh: Croagunk
+  10253: 'vulcao', 980: 'vulcao', 967: 'vulcao', // Paldea: Paldean Wooper, Cyclizar
+  10251: 'vulcao', 10252: 'agua', // Paldean Tauros pelo segundo tipo: Blaze → Vulcão, Aqua → Mar (o Combat, só Fighting, fica na Caverna)
+  690: 'agua', 691: 'agua', 10234: 'agua', 904: 'agua', // Kalos: Skrelp, Hisuian Qwilfish
+  661: 'vulcao', 662: 'vulcao', 663: 'vulcao', // Kalos: Fletchling
+  701: 'grama', 707: 'grama', // Kalos: Hawlucha, Klefki
+  10238: 'torre', 10239: 'torre', // Kalos: Hisuian Zorua e Zoroark
+  767: 'agua', 768: 'agua', 747: 'agua', 748: 'agua', // Alola: Wimpod, Mareanie
+  757: 'vulcao', 758: 'vulcao', // Alola: Salandit
+  742: 'pico', 743: 'pico', // Alola: Cutiefly
+  10112: 'caverna', 10113: 'caverna', // Alola: Alolan Grimer e Muk
+  636: 'vulcao', 637: 'vulcao', 607: 'vulcao', 608: 'vulcao', 609: 'vulcao', 633: 'vulcao', 634: 'vulcao', 635: 'vulcao', // Unova: Larvesta, Litwick, Deino
+  519: 'pico', 520: 'pico', 521: 'pico', 595: 'pico', 596: 'pico', 627: 'pico', 628: 'pico', // Unova: Pidove, Joltik, Rufflet
+  629: 'caverna', 630: 'caverna', 529: 'caverna', 530: 'caverna', 551: 'caverna', 552: 'caverna', 553: 'caverna', // Unova: Vullaby, Drilbur, Sandile
+  622: 'torre', 623: 'torre', // Unova: Golett
+  845: 'agua', // Galar: Cramorant
+  10174: 'grama', 10175: 'grama', 862: 'grama', // Galar: Galarian Zigzagoon
+  837: 'vulcao', 838: 'vulcao', 839: 'vulcao', 880: 'vulcao', // Galar: Rolycoly, Dracozolt
+  343: 'torre', 344: 'torre', 337: 'torre', // Hoenn: Baltoy, Lunatone
+  338: 'vulcao', 336: 'vulcao', 293: 'vulcao', 294: 'vulcao', 295: 'vulcao', // Hoenn: Solrock, Seviper, Whismur
+  276: 'pico', 277: 'pico', 278: 'pico', 279: 'pico', // Hoenn: Taillow, Wingull
+  261: 'grama', 262: 'grama', // Hoenn: Poochyena
+  298: 'agua', 283: 'agua', 284: 'agua', // Hoenn: Azurill, Surskit
+  21: 'pico', 22: 'pico', 16: 'pico', 17: 'pico', 18: 'pico', 83: 'pico', 84: 'pico', 85: 'pico', // Kanto: Spearow, Pidgey, Farfetch'd, Doduo
+  111: 'caverna', 112: 'caverna', 464: 'caverna', 104: 'caverna', 105: 'caverna', 50: 'caverna', 51: 'caverna', // Kanto: Rhyhorn, Cubone, Diglett
+  102: 'torre', 103: 'torre', // Kanto: Exeggcute
+  // lendários, míticos e Ultra Beasts que o dono mudou de mapa
+  145: 'caverna', // Kanto: Zapdos
+  251: 'grama', // Johto: Celebi
+  249: 'caverna', // Johto: Lugia
+  250: 'torre', // Johto: Ho-Oh
+  228: 'vulcao', 229: 'vulcao', // Johto: Houndour
+  380: 'grama', 381: 'grama', // Hoenn: Latias, Latios
+  385: 'torre', // Hoenn: Jirachi
+  483: 'vulcao', // Sinnoh: Dialga
+  491: 'caverna', 486: 'caverna', // Sinnoh: Darkrai, Regigigas
+  488: 'pico', // Sinnoh: Cresselia
+  494: 'vulcao', // Unova: Victini
+  645: 'caverna', // Unova: Landorus
+  638: 'grama', // Unova: Cobalion
+  648: 'torre', 642: 'torre', // Unova: Meloetta, Thundurus
+  721: 'agua', // Kalos: Volcanion
+  717: 'grama', // Kalos: Yveltal
+  795: 'pico', // Alola: Pheromosa
+  803: 'vulcao', 804: 'vulcao', // Alola: Poipole
+  799: 'agua', // Alola: Guzzlord
+  802: 'torre', // Alola: Marshadow
+  898: 'grama', 893: 'grama', // Galar: Calyrex, Zarude
+  890: 'agua', 891: 'agua', 892: 'agua', // Galar: Eternatus, Kubfu
+  10170: 'vulcao', // Galar: Galarian Zapdos
+  888: 'caverna', // Galar: Zacian
+  1004: 'vulcao', 1003: 'caverna', 1002: 'pico', 1001: 'grama', // Paldea: Chi-Yu, Ting-Lu, Chien-Pao, Wo-Chien
+  1025: 'torre', 1014: 'caverna', 1016: 'pico', 1015: 'torre', 1024: 'agua', // Paldea: Pecharunt, Okidogi, Fezandipiti, Munkidori, Terapagos
 };
 
 export function biomaDoPokemon(p: PokemonBase): string | null {
   if (BIOMA_FIXO[p.id]) return BIOMA_FIXO[p.id];
   for (const tipo of p.tipos) {
+    if (tipo === 'dragon' && p.tipos.length > 1) continue;
     const bioma = BIOMAS.find((b) => b.tipos.includes(tipo));
     if (bioma) return bioma.id;
   }
@@ -189,7 +251,7 @@ function montarTabelaCom(mora: (p: PokemonBase) => boolean, pokemons: PokemonBas
   const porSlug = new Map(todos.map((p) => [p.slug, p]));
   return pokemons
     // Paradox (passado/futuro) existem no jogo mas não aparecem nos mapas (pedido do dono)
-    .filter((p) => !excluir.includes(p.id) && !evoluiSemNivel(p, porSlug) && !ehParadoxo(especie(p.id).name))
+    .filter((p) => !excluir.includes(p.id) && !evoluiSemNivel(p, porSlug) && !ehParadoxo(especie(p.id).name) && !foraDosMapas(p.id))
     .filter(mora)
     .map((p) => {
       const [nivelMin, nivelMax] = faixas.get(p.id)!;
@@ -197,7 +259,8 @@ function montarTabelaCom(mora: (p: PokemonBase) => boolean, pokemons: PokemonBas
       const peso = PESO_BASE_LINHA + base.taxaCaptura * PESO_POR_TAXA;
       const grupo = grupoRaro(p, base);
       const chanceFixa = grupo === null ? null : grupo === 'inicial' ? CHANCE_INICIAL : CHANCE_LENDARIO;
-      return { pokemon: p, peso, linha: base.id, grupo, chanceFixa, nivelMin, nivelMax };
+      // variantes (letras do Unown, cores do Squawkabilly…) dividem a chance da linha da espécie normal
+      return { pokemon: p, peso, linha: linhaDaVariante(base.id) ?? base.id, grupo, chanceFixa, nivelMin, nivelMax };
     });
 }
 
