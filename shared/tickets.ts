@@ -64,16 +64,16 @@ const item = (id: string, quantidade = 1): Premio => ({ tipo: 'item', id, quanti
 
 const COMUM: LinhaPremio[] = [linha('comum', 0.7, { tipo: 'aleatorio', grupo: 'terashard', quantidade: 4 })];
 const RARO: LinhaPremio[] = [
-  linha('raro', 0.06, { tipo: 'gold', quantidade: 30 }),
+  linha('raro', 0.06, { tipo: 'gold', quantidade: 20 }),
   linha('raro', 0.06, { tipo: 'vip', dias: 1 }),
   linha('raro', 0.06, { tipo: 'aleatorio', grupo: 'bola', quantidade: 50 }),
-  linha('raro', 0.06, { tipo: 'silver', quantidade: 500_000 }),
+  linha('raro', 0.06, { tipo: 'silver', quantidade: 50_000 }),
 ];
 const EPICO: LinhaPremio[] = [
-  linha('epico', 0.01, { tipo: 'gold', quantidade: 100 }),
+  linha('epico', 0.01, { tipo: 'gold', quantidade: 50 }),
   linha('epico', 0.01, { tipo: 'vip', dias: 7 }),
   linha('epico', 0.01, item('masterball')),
-  linha('epico', 0.01, { tipo: 'silver', quantidade: 1_000_000 }),
+  linha('epico', 0.01, { tipo: 'silver', quantidade: 100_000 }),
   linha('epico', 0.01, item('ovo-misterioso-a')),
 ];
 /** Lendário: os prêmios dividem o total por igual (1% sem mítico: 5 → 0,2% cada; 0,9% com mítico: 3 → 0,3% cada). */

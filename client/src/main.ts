@@ -6,6 +6,7 @@ import { telaEscolhaInicial } from './telas/escolhaInicial';
 import { telaRegiao } from './telas/regiao';
 import { telaBioma } from './telas/bioma';
 import { telaCidade } from './telas/cidade';
+import { telaSafari } from './telas/safari';
 import { telaPokedex } from './telas/pokedex';
 import { telaDatabase } from './telas/database';
 import { telaPersonagem } from './telas/personagem';
@@ -35,10 +36,11 @@ import { aoMudarViagem, vigiarViagem } from './viagem';
 import { vigiarConquistas } from './conquistas';
 import { vigiarEntregas } from './entregas';
 import { vigiarMercado } from './mercado';
+import { vigiarQuadro } from './missoesQuadro';
 // o chat ouve o servidor desde a conexão (guarda as mensagens mesmo fora do mapa)
 import './ui/chat';
 
-export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes'; professor?: 'relembrar' | 'tutor'; daCidade?: boolean } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' } | { tela: 'cidade' };
+export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes'; professor?: 'relembrar' | 'tutor'; daCidade?: boolean } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' } | { tela: 'cidade' } | { tela: 'safari' };
 export type Navegar = (destino: Destino) => void;
 /** Cada tela desenha dentro de `raiz` e pode devolver uma função de limpeza. */
 export type Tela = (raiz: HTMLElement, navegar: Navegar) => (() => void) | void;
@@ -72,6 +74,7 @@ const navegar: Navegar = (destino) => {
   else if (destino.tela === 'duelos') limparTelaAtual = telaDuelos(raiz, navegar);
   else if (destino.tela === 'ginasios') limparTelaAtual = telaGinasios(raiz, navegar);
   else if (destino.tela === 'cidade') limparTelaAtual = telaCidade(raiz, navegar);
+  else if (destino.tela === 'safari') limparTelaAtual = telaSafari(raiz, navegar);
   else limparTelaAtual = telaBioma(destino.biomaId)(raiz, navegar);
 };
 
@@ -98,6 +101,7 @@ void garantirConta(raiz).then((conta) => {
   // itens dados pela administração
   vigiarEntregas();
   vigiarMercado();
+  vigiarQuadro();
   aoMudarViagem(() => (destinoAtual.tela === 'regiao' ? navegar(destinoAtual) : atualizarCabecalho?.(destinoAtual)));
   // com save, o jogo abre na tela de Início (o time lado a lado)
   navegar(carregarSave() ? { tela: 'inicio' } : { tela: 'inicial' });

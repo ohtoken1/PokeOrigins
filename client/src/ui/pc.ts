@@ -1,6 +1,6 @@
 import { nomeItemEquipado } from '../../../shared/usoItens';
 import { pokemonPorId } from '../dados';
-import { NUMERO_BOXES, TAMANHO_BOX, TAMANHO_MAXIMO_TIME, TAMANHO_NOME_BOX, nomeDaBox, pokemonsDaBox, salvar, type PokemonDoJogador, type Save } from '../estado';
+import { numeroDeBoxes, TAMANHO_BOX, TAMANHO_MAXIMO_TIME, TAMANHO_NOME_BOX, nomeDaBox, pokemonsDaBox, salvar, type PokemonDoJogador, type Save } from '../estado';
 import { tornarArrastavel } from './arrastar';
 import { fichaPokemon } from './detalhes';
 import { abrirJanela } from './janela';
@@ -228,7 +228,7 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
       );
       const daBox = pokemonsDaBox(save, boxAtual);
       const irPara = (b: number) => {
-        boxAtual = (b + NUMERO_BOXES) % NUMERO_BOXES;
+        boxAtual = (b + numeroDeBoxes(save)) % numeroDeBoxes(save);
         renomeando = false;
         escolhendoFundo = false;
         refazer();
@@ -293,11 +293,11 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
       const lista = el(
         'select',
         { class: 'box-lista' },
-        ...Array.from({ length: NUMERO_BOXES }, (_, b) => el('option', { value: b, selected: b === boxAtual }, `${nomeDaBox(save, b)} (${pokemonsDaBox(save, b).length}/${TAMANHO_BOX})`)),
+        ...Array.from({ length: numeroDeBoxes(save) }, (_, b) => el('option', { value: b, selected: b === boxAtual }, `${nomeDaBox(save, b)} (${pokemonsDaBox(save, b).length}/${TAMANHO_BOX})`)),
       ) as HTMLSelectElement;
       lista.addEventListener('change', () => irPara(Number(lista.value)));
       const seta = (passo: number) => {
-        const b = (boxAtual + passo + NUMERO_BOXES) % NUMERO_BOXES;
+        const b = (boxAtual + passo + numeroDeBoxes(save)) % numeroDeBoxes(save);
         return el('button', { class: 'botao secundario box-seta', 'data-alvo': 'outra-box', 'data-box': b, title: `${nomeDaBox(save, b)} (solte um Pokémon aqui para mandar para ela)`, onclick: () => irPara(b) }, passo < 0 ? '◀' : '▶');
       };
       // renomear a box aberta (vazio = volta a ser "Box N")
@@ -360,7 +360,7 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
           const destino = el(
             'select',
             { class: 'box-lista' },
-            ...Array.from({ length: NUMERO_BOXES }, (_, b) =>
+            ...Array.from({ length: numeroDeBoxes(save) }, (_, b) =>
               el('option', { value: b, selected: b === p.box, disabled: b !== p.box && pokemonsDaBox(save, b).length >= TAMANHO_BOX }, nomeDaBox(save, b)),
             ),
           ) as HTMLSelectElement;

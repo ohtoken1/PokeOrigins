@@ -4,7 +4,7 @@
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { REGIOES } from '../../shared/regioes.ts';
-import { lerViagem, precoDoTicket, tempoDaViagemMs, textoDoTempo } from '../../shared/viagem.ts';
+import { lerViagem, precoDoTicket, tempoDaViagemMs, textoDoTempo, trechosEntre } from '../../shared/viagem.ts';
 
 const ORDEM = REGIOES.map((r) => r.id);
 const saldo = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? Math.floor(v) : 0);
@@ -38,7 +38,7 @@ export const agora = () => ({ agora: Date.now() });
 
 export function comprar(conta: banco.Conta, dados: Record<string, unknown>) {
   const { destino, moeda } = dados;
-  if (moeda !== 'silver' && moeda !== 'gold') throw new ErroConta('Escolha pagar com silver ou gold.');
+  if (moeda !== 'silver') throw new ErroConta('O ticket do trem é pago em silver.');
   const regiao = REGIOES.find((r) => r.id === destino);
   if (!regiao || !regiao.disponivel) throw new ErroConta('Região inválida.');
   if (!banco.lerSave(conta.id)) throw new ErroConta('Comece sua jornada antes de viajar.');
@@ -52,8 +52,8 @@ export function comprar(conta: banco.Conta, dados: Record<string, unknown>) {
     if (de === regiao.id) throw new ErroConta(`Você já está em ${regiao.nome}.`);
     // VIP vale na hora da compra (o prazo ainda vem do save)
     const vip = typeof save.vipAte === 'number' && save.vipAte > hora;
-    const preco = precoDoTicket(moeda, vip);
-    if (saldo(save[moeda]) < preco) throw new ErroConta(`Você não tem ${moeda} suficiente para o ticket.`);
+    const preco = precoDoTicket(trechosEntre(ORDEM, de, regiao.id), vip);
+    if (saldo(save[moeda]) < preco) throw new ErroConta('Você não tem silver suficiente para o ticket.');
     save[moeda] = saldo(save[moeda]) - preco;
     save.viagem = { de, para: regiao.id, saiuEm: hora, chegaEm: hora + tempoDaViagemMs(ORDEM, de, regiao.id, vip) };
   });
@@ -73,13 +73,11 @@ export function chegar(conta: banco.Conta) {
 
 /**
  * Save que o jogo mandou (PUT /api/save) de uma conta comum: a região e a viagem valem as que estão guardadas
- * (só o trem muda). Sem save guardado (jornada nova) vale a região escolhida e nenhuma viagem.
+ * (só o trem muda). `antes` = o save guardado; sem ele (jornada nova) vale a região escolhida e nenhuma viagem.
  */
-export function protegerRegiao(conta: banco.Conta, save: Record<string, unknown>): void {
+export function protegerRegiao(conta: banco.Conta, save: Record<string, unknown>, antes: Record<string, unknown> | null): void {
   if (conta.admin) return;
-  const guardado = banco.lerSave(conta.id);
-  if (!guardado) return void delete save.viagem;
-  const antes = JSON.parse(guardado.dados) as Record<string, unknown>;
+  if (!antes) return void delete save.viagem;
   save.regiao = antes.regiao;
   if (antes.viagem) save.viagem = antes.viagem;
   else delete save.viagem;

@@ -50,6 +50,16 @@ export interface PokemonIndividual {
    * (Pokémon antigos, de ovo, de ticket e de treinadores).
    */
   teraTipo?: string;
+  /**
+   * Todo golpe que este Pokémon já soube, por qualquer caminho (nível, TM/TR, Move Tutor, Egg Move de nascença):
+   * o Move Reminder devolve qualquer um deles de graça (pedido do dono). Mantido por `lembrarGolpes`.
+   */
+  golpesAprendidos?: string[];
+}
+
+/** Anota os golpes que o Pokémon sabe agora na memória dele (o que ele já soube nunca sai de lá). */
+export function lembrarGolpes(p: PokemonIndividual): void {
+  for (const g of p.golpes ?? []) if (!p.golpesAprendidos?.includes(g.id)) (p.golpesAprendidos ??= []).push(g.id);
 }
 
 /** Amizade de quem nasce/é capturado (valor-base da maioria das espécies na 8ª/9ª geração). */

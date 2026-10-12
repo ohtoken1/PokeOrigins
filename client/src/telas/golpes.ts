@@ -1,4 +1,4 @@
-// Aba "Golpes": Move Reminder (golpes por nível já esquecidos) e Move Tutor (só golpes de tutor, de qualquer geração).
+// Aba "Golpes": Move Reminder (de graça: golpes por nível e tudo o que o Pokémon já soube) e Move Tutor (só golpes de tutor, de qualquer geração).
 import { Dex } from '@pkmn/sim';
 import type { Tela } from '../main';
 import { ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
@@ -15,7 +15,7 @@ export type Professor = 'relembrar' | 'tutor';
 const PROFESSORES: Record<Professor, { nome: string; fala: string; preco: number; lista: (p: PokemonIndividual) => string[] }> = {
   relembrar: {
     nome: 'Move Reminder',
-    fala: 'Posso fazer seu Pokémon lembrar de qualquer golpe que ele aprende por nível até o nível atual, até os que ele esqueceu.',
+    fala: 'De graça, faço seu Pokémon lembrar de qualquer golpe que ele aprende por nível até o nível atual e de todo golpe que ele já soube: TM, TR, Move Tutor ou Egg Move.',
     preco: PRECO_RELEMBRAR,
     lista: golpesParaRelembrar,
   },
@@ -123,7 +123,7 @@ function corpoProfessores(save: Save, inicial: Professor, aoMudar?: () => void):
             aprendendo = id;
             desenhar();
           },
-        }, `Aprender · ${prof.preco} silver`),
+        }, prof.preco ? `Aprender · ${prof.preco.toLocaleString('pt-BR')} silver` : 'Relembrar · grátis'),
       );
       return dicaGolpe(linha, id);
     });

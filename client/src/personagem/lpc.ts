@@ -4,7 +4,7 @@
 // "walk" tem 9 quadros (o 0 é parado), "idle" tem 2. Com uma skin de lendário (`aparencia.skin`), o personagem é
 // desenhado por skinsDesenho.ts em cima do corpo, da cabeça e do cabelo dele.
 import { afinarCorpoFem } from './corpoFem';
-import { desenharSkin, temArteDeSkin } from './skinsDesenho';
+import { cabeloDaSkin, desenharSkin, temArteDeSkin } from './skinsDesenho';
 
 export type Corpo = 'masc' | 'fem';
 export type Bone = 'nenhum' | 'vermelho' | 'azul' | 'verde' | 'preto' | 'amarelo';
@@ -256,6 +256,8 @@ export async function montarPersonagem(a: Aparencia): Promise<FolhasPersonagem> 
   // com skin: as roupas só dão o formato (sem cor), e o desenho todo é da skin
   const skin = a.skin && temArteDeSkin(a.skin) ? a.skin : null;
   const montarComSkin = async (anim: 'walk' | 'idle', idSkin: string) => {
+    // skins de personagem oficial (Ash, Misty…) vêm com o cabelo dele
+    const [cabelo, corCabelo] = cabeloDaSkin(idSkin) ?? [a.cabelo, a.corCabelo];
     const lista: [string, string[] | null, string][] = [
       [`corpo/${a.corpo}/${anim}.png`, p.body[a.pele], 'corpo'],
       [`cabeca/${a.corpo}/${anim}.png`, p.body[a.pele], 'cabeca'],
@@ -263,8 +265,10 @@ export async function montarPersonagem(a: Aparencia): Promise<FolhasPersonagem> 
       [`calca/${a.corpo}/${anim}.png`, null, 'calca'],
       [`tenis/${a.corpo}/${anim}.png`, null, 'tenis'],
       [`camiseta/${a.corpo}/${anim}.png`, null, 'camiseta'],
-      [`cabelo/${a.cabelo}/${anim}.png`, p.hair[a.corCabelo], 'cabelo'],
+      [`cabelo/${cabelo}/${anim}.png`, p.hair[corCabelo], 'cabelo'],
     ];
+    // a parte do cabelo que passa por trás do corpo (as skins de roupa mostram o cabelo inteiro)
+    if (CABELOS[cabelo]?.fundo) lista.push([`cabelo/${cabelo}/fundo-${anim}.png`, p.hair[corCabelo], 'cabeloFundo']);
     const imgs = await Promise.all(lista.map(([src]) => imagem(src)));
     const camadas = new Map<string, HTMLCanvasElement>();
     imgs.forEach((img, i) => img && camadas.set(lista[i][2], recolorir(img, lista[i][1])));

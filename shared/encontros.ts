@@ -174,13 +174,23 @@ function faixasDeNivel(pokemons: PokemonBase[]): Map<number, Faixa> {
 
 /** `pokemons` = os da região; `todos` = todas as regiões carregadas (as faixas dependem das evoluções). */
 export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: number[] = [], todos: PokemonBase[] = pokemons): EntradaTabela[] {
+  return montarTabelaCom((p) => biomaDoPokemon(p) === bioma.id, pokemons, excluir, todos);
+}
+
+/**
+ * Tabela do Safari: todos os Pokémon (de qualquer região) que têm o `tipo`, primeiro ou segundo. As mesmas regras
+ * dos mapas valem (sem formas que só vêm por pedra/troca/amizade, sem Paradox, raros com chance fixa por categoria).
+ */
+export const montarTabelaDoTipo = (tipo: string, todos: PokemonBase[]): EntradaTabela[] => montarTabelaCom((p) => p.tipos.includes(tipo), todos, [], todos);
+
+function montarTabelaCom(mora: (p: PokemonBase) => boolean, pokemons: PokemonBase[], excluir: number[], todos: PokemonBase[]): EntradaTabela[] {
   // evoluções podem ser de outra região (Golbat de Kanto → Crobat de Johto): faixas olham todos
   const faixas = faixasDeNivel(todos);
   const porSlug = new Map(todos.map((p) => [p.slug, p]));
   return pokemons
     // Paradox (passado/futuro) existem no jogo mas não aparecem nos mapas (pedido do dono)
     .filter((p) => !excluir.includes(p.id) && !evoluiSemNivel(p, porSlug) && !ehParadoxo(especie(p.id).name))
-    .filter((p) => biomaDoPokemon(p) === bioma.id)
+    .filter(mora)
     .map((p) => {
       const [nivelMin, nivelMax] = faixas.get(p.id)!;
       const base = baseDaLinha(p, porSlug);

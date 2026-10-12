@@ -4,7 +4,7 @@ import Phaser from 'phaser';
 import { APARENCIA_PADRAO, montarPersonagem, type FolhasPersonagem } from '../personagem/lpc';
 import type { DirecaoOnline, JogadorOnline, OuvinteSala, VisualOnline } from '../online';
 import { DURACAO_PASSO, ESCALA_LPC, ESCALA_PMD, FONTE_NOME, QUADROS_POR_PASSO, TAMANHO_NOME_TELA, ZOOM } from './BiomaScene';
-import { BrilhoSkin } from './brilhoSkin';
+import { BrilhoShiny, BrilhoSkin } from './brilhoSkin';
 import { TAM } from './mapa';
 import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
 
@@ -156,6 +156,8 @@ export class OutrosJogadores implements OuvinteSala {
       o.sombraSeguidor = this.cena.add.ellipse(sx, sy - 1, Math.max(8, info.largura * ESCALA_PMD * 0.75), Math.max(8, info.largura * ESCALA_PMD * 0.75) * 0.32, 0x000000, 0.28).setDepth(sy - 0.5);
       o.seguidor = this.cena.add.sprite(sx, sy, `${info.prefixo}-Idle`).setOrigin(0.5, info.origemIdle).setScale(ESCALA_PMD).setDepth(sy);
       o.seguidor.play(`${info.prefixo}-idle-${o.linhaPmd}`);
+      // shiny: estrelinhas em volta (somem sozinhas quando o sprite é destruído)
+      if (seg.shiny) new BrilhoShiny(this.cena, o.seguidor);
     });
   }
 

@@ -17,7 +17,13 @@ const carregarImagem = (src: string) =>
   });
 
 /** Recorte de 10×10 tiles do mapa do bioma, reduzido para 60×60. */
-const CHAVE_CACHE = 'jogo-claude:miniaturas-v3';
+// mudou o desenho de algum bioma? Suba o número: o navegador de cada jogador desenha as miniaturas de novo
+const CHAVE_CACHE = 'jogo-claude:miniaturas-v4';
+try {
+  for (const v of ['v1', 'v2', 'v3']) localStorage.removeItem('jogo-claude:miniaturas-' + v);
+} catch {
+  /* sem acesso ao armazenamento */
+}
 const cacheSalvo = (): Record<string, string> => {
   try {
     return JSON.parse(localStorage.getItem(CHAVE_CACHE) ?? '{}');

@@ -2,7 +2,7 @@
 // e a recompensa, e abre a batalha. Lista de todos os treinadores embaixo.
 import type { Tela } from '../main';
 import { BIOMAS } from '../../../shared/biomas';
-import { NOMES_DIFICULDADE, RECOMPENSA_POR_DIFICULDADE, TREINADORES_NPC, montarTimeNpc, sortearTreinador, type Dificuldade, type TreinadorNpc } from '../../../shared/treinadoresNpc';
+import { NOMES_DIFICULDADE, RECOMPENSA_POR_POKEMON, recompensaDoDuelo, TREINADORES_NPC, montarTimeNpc, sortearTreinador, type Dificuldade, type TreinadorNpc } from '../../../shared/treinadoresNpc';
 import { abrirBatalha } from '../batalha/telaBatalha';
 import { pokemonPorId } from '../dados';
 import { carregarSave, salvar } from '../estado';
@@ -83,7 +83,7 @@ export const telaDuelos: Tela = (raiz, navegar) => {
   };
 
   const desenhar = () => {
-    const recompensa = RECOMPENSA_POR_DIFICULDADE[npc.dificuldade];
+    const recompensa = recompensaDoDuelo(npc.dificuldade, equipe.length);
     const podeLutar = save.time.some((p) => p.hp > 0);
     cartao.replaceChildren(
       el('div', { class: 'duelo-topo' },
@@ -95,7 +95,7 @@ export const telaDuelos: Tela = (raiz, navegar) => {
           const d = pokemonPorId(p.especieId);
           return el('div', { class: 'duelo-pokemon' }, spritePokemon(d, { animado: false }), el('small', {}, `${d.nome} · Nv. ${p.nivel}`));
         })),
-      el('div', { class: 'duelo-info' }, el('strong', {}, `Recompensa: ${recompensa.toLocaleString('pt-BR')} silver`)),
+      el('div', { class: 'duelo-info' }, el('strong', {}, `Recompensa: ${recompensa.toLocaleString('pt-BR')} silver`), el('small', { class: 'meta' }, ` (${RECOMPENSA_POR_POKEMON[npc.dificuldade]} por Pokémon derrotado)`)),
       el('div', { class: 'duelo-botoes' },
         el('button', {
           class: 'botao grande',

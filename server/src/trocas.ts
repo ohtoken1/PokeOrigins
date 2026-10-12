@@ -10,11 +10,10 @@ import { randomBytes } from 'node:crypto';
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { itemInegociavel } from '../../shared/naoTrocavel.ts';
+import { TAMANHO_BOX, numeroDeBoxes } from '../../shared/pc.ts';
 
 /** Mesmo do jogo (client/src/estado.ts). */
 const TAMANHO_MAXIMO_TIME = 6;
-const NUMERO_BOXES = 30;
-const TAMANHO_BOX = 50;
 const MAX_POKEMONS_POR_OFERTA = 6;
 const MAX_TIPOS_DE_ITEM = 20;
 /** Convite sem resposta e troca parada somem sozinhos. */
@@ -278,7 +277,7 @@ export function guardarPokemon(save: SaveMin, original: PokemonSave, deOutroJoga
     if (deOutroJogador) p.origem = 'troca';
     if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(p);
     else {
-      const box = Array.from({ length: NUMERO_BOXES }, (_, i) => i).find((i) => save.caixa.filter((x) => (x.box ?? 0) === i).length < TAMANHO_BOX);
+      const box = Array.from({ length: numeroDeBoxes(save) }, (_, i) => i).find((i) => save.caixa.filter((x) => (x.box ?? 0) === i).length < TAMANHO_BOX);
       if (box === undefined) throw new ErroConta('O PC de quem recebe está cheio.', 409);
       p.box = box;
       save.caixa.push(p);

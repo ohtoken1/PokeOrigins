@@ -12,6 +12,8 @@ import * as cla from './cla.ts';
 import * as cambio from './cambio.ts';
 import * as anuncios from './anuncios.ts';
 import * as viagem from './viagem.ts';
+import * as safari from './safari.ts';
+import * as missoes from './missoes.ts';
 import * as ranking from './ranking.ts';
 import * as entregas from './entregas.ts';
 import * as mercado from './mercado.ts';
@@ -109,7 +111,11 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     const c = await lerCorpo(req, TAMANHO_MAX_PEDIDO);
     if (!c.save || typeof c.save !== 'object' || typeof c.versao !== 'number') throw new ErroConta('Save inválido.');
     // conta comum: região e viagem só mudam pelo trem (server/src/viagem.ts)
-    viagem.protegerRegiao(conta, c.save as Record<string, unknown>);
+    const guardado = banco.lerSave(conta.id);
+    const antes = guardado ? (JSON.parse(guardado.dados) as Record<string, unknown>) : null;
+    viagem.protegerRegiao(conta, c.save as Record<string, unknown>, antes);
+    // entradas do Safari: valem as guardadas (server/src/safari.ts)
+    safari.proteger(c.save as Record<string, unknown>, antes);
     const texto = JSON.stringify(c.save);
     if (texto.length > TAMANHO_MAX_SAVE) throw new ErroConta('Save grande demais.', 413);
     const versao = banco.gravarSave(conta.id, texto, c.versao);
@@ -207,6 +213,23 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     return responder(res, 200, viagem.comprar(conta, await lerCorpo(req)));
   }
   if (caminho === '/api/viagem/chegar' && metodo === 'POST') return responder(res, 200, viagem.chegar(exigirConta(req)));
+
+  // ---- quadro de missões do servidor inteiro (server/src/missoes.ts) ----
+  if (caminho === '/api/missoes' && metodo === 'GET') {
+    exigirConta(req);
+    return responder(res, 200, missoes.listar());
+  }
+  if (caminho === '/api/missoes/concluir' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, missoes.concluir(conta, await lerCorpo(req)));
+  }
+
+  // ---- Safari: entradas do dia (server/src/safari.ts) ----
+  if (caminho === '/api/safari/comprar' && metodo === 'POST') return responder(res, 200, safari.comprar(exigirConta(req)));
+  if (caminho === '/api/safari/entrar' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, safari.entrar(conta, await lerCorpo(req)));
+  }
 
   // ---- anúncios da staff, lidos no mural da cidade (server/src/anuncios.ts) ----
   if (caminho === '/api/anuncios' && metodo === 'GET') {

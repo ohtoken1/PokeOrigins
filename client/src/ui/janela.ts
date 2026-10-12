@@ -22,7 +22,7 @@ export interface Janela {
 }
 
 /** Janela sobre a tela (Esc ou ✕ fecham). `conteudo` é chamado de novo a cada redesenho. */
-export function abrirJanela(titulo: string, conteudo: (janela: Janela) => HTMLElement, opcoes: { aoFechar?: () => void; classe?: string } = {}): Janela {
+export function abrirJanela(titulo: string, conteudo: (janela: Janela) => HTMLElement, opcoes: { aoFechar?: () => void; classe?: string; /** fica no meio da barra do título, entre o nome e o ✕ */ noTopo?: HTMLElement } = {}): Janela {
   const corpo = el('div', { class: 'janela-corpo' });
   const aoTeclar = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -41,7 +41,7 @@ export function abrirJanela(titulo: string, conteudo: (janela: Janela) => HTMLEl
     el(
       'div',
       { class: `janela ${opcoes.classe ?? ''}`, role: 'dialog', 'aria-label': titulo },
-      el('header', {}, el('h2', {}, titulo), el('button', { class: 'fechar', 'aria-label': 'Fechar', onclick: () => janela.fechar() }, '✕')),
+      el('header', {}, el('h2', {}, titulo), opcoes.noTopo ? el('div', { class: 'janela-no-topo' }, opcoes.noTopo) : null, el('button', { class: 'fechar', 'aria-label': 'Fechar', onclick: () => janela.fechar() }, '✕')),
       corpo,
     ),
   );

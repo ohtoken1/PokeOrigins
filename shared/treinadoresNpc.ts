@@ -22,7 +22,13 @@ export interface TreinadorNpc {
 /** IV de todos os atributos pela dificuldade (5 a 10). */
 export const IV_POR_DIFICULDADE: Record<Dificuldade, number> = { 1: 5, 2: 6, 3: 8, 4: 9, 5: 10 };
 /** Silver por vencer (provisório, o dono ajusta). */
-export const RECOMPENSA_POR_DIFICULDADE: Record<Dificuldade, number> = { 1: 100, 2: 200, 3: 400, 4: 700, 5: 1000 };
+/**
+ * Silver por POKÉMON DERROTADO num duelo (decisão do dono: paga pelo tamanho da luta, para time de 1 não ser atalho).
+ * Meta: 5 a 10 mil silver por hora com time cheio e tudo em um golpe (~60 a 70 duelos por hora).
+ */
+export const RECOMPENSA_POR_POKEMON: Record<Dificuldade, number> = { 1: 30, 2: 40, 3: 55, 4: 75, 5: 100 };
+/** Silver de um duelo contra um time de `pokemons` Pokémon. */
+export const recompensaDoDuelo = (dificuldade: Dificuldade, pokemons: number): number => RECOMPENSA_POR_POKEMON[dificuldade] * pokemons;
 export const NOMES_DIFICULDADE: Record<Dificuldade, string> = { 1: 'Fácil', 2: 'Normal', 3: 'Difícil', 4: 'Muito difícil', 5: 'Lendário' };
 
 const t = (id: string, nome: string, titulo: string, dificuldade: Dificuldade, time: number[]): TreinadorNpc => ({ id, nome, titulo, dificuldade, time });

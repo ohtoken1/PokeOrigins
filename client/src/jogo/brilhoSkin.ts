@@ -8,7 +8,7 @@ const TEMPO_ETAPA_MS = 90;
 const ETAPAS = [0, 1, 2, 1, 0];
 
 /** Texturas das estrelinhas (5×5), em três tamanhos. */
-function garantirFaiscas(cena: Phaser.Scene): void {
+export function garantirFaiscas(cena: Phaser.Scene): void {
   if (cena.textures.exists('faisca-skin-0')) return;
   for (let tam = 0; tam < FAISCAS; tam++) {
     const c = document.createElement('canvas');
@@ -81,6 +81,46 @@ export class BrilhoSkin {
   destruir(): void {
     this.cena.events.off(Phaser.Scenes.Events.POST_UPDATE, this.atualizar);
     this.aura.destroy();
+    for (const f of this.faiscas) f.img.destroy();
+    this.faiscas = [];
+  }
+}
+
+/**
+ * Brilho pequeno de um Pokémon shiny no mapa (o que segue o jogador): só estrelinhas piscando em volta (pedido do dono: sem aura); uma
+ * estrelinha de vez em quando. `alvo` = quem ele acompanha (posição = os pés).
+ */
+export class BrilhoShiny {
+  private faiscas: { img: Phaser.GameObjects.Image; dx: number; dy: number; nasceu: number }[] = [];
+  private proxima = 0;
+  private atualizar: () => void;
+
+  constructor(private cena: Phaser.Scene, private alvo: Phaser.GameObjects.Container | Phaser.GameObjects.Sprite) {
+    garantirFaiscas(cena);
+    this.atualizar = () => this.passo();
+    cena.events.on(Phaser.Scenes.Events.POST_UPDATE, this.atualizar);
+    cena.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.destruir());
+  }
+
+  private passo(): void {
+    const { alvo, cena } = this;
+    if (!alvo.active) return this.destruir();
+    const agora = cena.time.now;
+    if (agora >= this.proxima && alvo.visible) {
+      this.proxima = agora + 320 + Math.random() * 380;
+      const ang = Math.random() * Math.PI * 2;
+      this.faiscas.push({ img: cena.add.image(0, 0, 'faisca-skin-0'), dx: Math.cos(ang) * (8 + Math.random() * 6), dy: -9 + Math.sin(ang) * (7 + Math.random() * 6), nasceu: agora });
+    }
+    this.faiscas = this.faiscas.filter((f) => {
+      const etapa = Math.floor((agora - f.nasceu) / TEMPO_ETAPA_MS);
+      if (etapa >= ETAPAS.length) return void f.img.destroy(), false;
+      f.img.setTexture(`faisca-skin-${ETAPAS[etapa]}`).setPosition(alvo.x + f.dx, alvo.y + f.dy).setDepth(alvo.depth + 0.3).setVisible(alvo.visible);
+      return true;
+    });
+  }
+
+  destruir(): void {
+    this.cena.events.off(Phaser.Scenes.Events.POST_UPDATE, this.atualizar);
     for (const f of this.faiscas) f.img.destroy();
     this.faiscas = [];
   }

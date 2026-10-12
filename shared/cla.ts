@@ -3,7 +3,7 @@
 /** Vagas de um clã (contando o líder). */
 export const VAGAS_CLA = 5;
 /** Preço para criar um clã, em gold. */
-export const PRECO_CRIAR_CLA_GOLD = 1;
+export const PRECO_CRIAR_CLA_GOLD = 100;
 export const NIVEL_MAX_CLA = 10;
 /** XP que um Pokémon (curva média) precisa do nível 1 ao 100. */
 export const XP_POKEMON_1_AO_100 = 1_000_000;

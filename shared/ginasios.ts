@@ -17,7 +17,7 @@ export interface LiderGinasio extends TreinadorNpc {
 /** Dificuldade (IVs) pela ordem: os primeiros ginásios são mais fáceis. */
 const DIFICULDADE_POR_ORDEM: Dificuldade[] = [1, 1, 2, 2, 3, 3, 4, 5];
 /** Silver por vencer cada ginásio, pela ordem (provisório). */
-export const RECOMPENSA_GINASIO = [200, 300, 400, 500, 600, 700, 850, 1000];
+export const RECOMPENSA_GINASIO = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000];
 
 /** O último campo (opcional) troca o título (ex.: "Capitão de Alola"). */
 type Linha = [id: string, nome: string, tipo: string, insignia: string, time: number[], titulo?: string];

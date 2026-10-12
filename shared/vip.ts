@@ -6,8 +6,8 @@ export const DIA_MS = 24 * 60 * 60 * 1000;
 
 /** Multiplicadores do VIP. 1 = sem efeito. */
 export const BONUS_VIP = {
-  /** silver ganho por vitória (sem bônus por enquanto) */
-  silver: 1,
+  /** silver ganho por vitória: +15% */
+  silver: 1.15,
   /** XP de treinador: +20% */
   xpTreinador: 1.2,
   /** XP dos Pokémon: +20% */

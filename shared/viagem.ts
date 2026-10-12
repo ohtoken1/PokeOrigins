@@ -3,16 +3,16 @@
 // hora de chegada e troca a região é o servidor (server/src/viagem.ts). Este arquivo não importa nada (o servidor
 // também usa).
 
-/** Preço do ticket em cada moeda sem VIP (provisório: 1 para 1, pedido do dono). */
-export const PRECO_TICKET: Record<MoedaTicket, number> = { silver: 1, gold: 1 };
-export type MoedaTicket = 'silver' | 'gold';
+/** Preço do ticket por região de distância, em silver (decisão do dono: o trem não aceita gold). */
+export const PRECO_POR_TRECHO = 1_000;
+export type MoedaTicket = 'silver';
 /** Tempo de viagem por região de distância (provisório): Kanto → Johto = 1 trecho, Kanto → Paldea = 8. Vai diminuir com Fly e Surf. */
 export const TEMPO_POR_TRECHO_MS = 30_000;
-/** VIP (pedido do dono): metade do tempo e metade do preço em SILVER; em gold o preço é o mesmo. */
+/** VIP (pedido do dono): metade do tempo e metade do preço. */
 export const VIP_TEMPO_VIAGEM = 0.5;
 export const VIP_PRECO_SILVER = 0.5;
-/** Preço do ticket para este jogador (o desconto arredonda para cima: nunca sai de graça). */
-export const precoDoTicket = (moeda: MoedaTicket, vip: boolean): number => (vip && moeda === 'silver' ? Math.max(1, Math.ceil(PRECO_TICKET.silver * VIP_PRECO_SILVER)) : PRECO_TICKET[moeda]);
+/** Preço do ticket para uma viagem de `trechos` regiões (o desconto do VIP arredonda para cima: nunca sai de graça). */
+export const precoDoTicket = (trechos: number, vip: boolean): number => Math.max(1, Math.ceil(Math.max(1, trechos) * PRECO_POR_TRECHO * (vip ? VIP_PRECO_SILVER : 1)));
 
 /** Viagem em andamento, guardada no save. As horas são do relógio do servidor. */
 export interface Viagem {

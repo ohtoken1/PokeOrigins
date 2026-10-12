@@ -477,3 +477,27 @@ const sqlEntregaPokemon = {
 export const criarEntregaPokemon = (contaId: number, dados: string, nome: string, de: string) => void sqlEntregaPokemon.criar.run(contaId, dados, nome, de, Date.now());
 export const entregasPokemonDaConta = (contaId: number) => sqlEntregaPokemon.daConta.all(contaId) as unknown as EntregaPokemon[];
 export const apagarEntregaPokemon = (id: number) => void sqlEntregaPokemon.apagar.run(id);
+
+// ---- quadro de missões: quem concluiu cada missão (o quadro é do servidor inteiro; server/src/missoes.ts) ----
+db.exec(`
+  CREATE TABLE IF NOT EXISTS missoes_quadro (
+    id TEXT PRIMARY KEY,
+    conta_id INTEGER NOT NULL,
+    por TEXT NOT NULL,
+    quando INTEGER NOT NULL
+  );
+`);
+const sqlMissoes = {
+  recentes: db.prepare('SELECT id, por, quando FROM missoes_quadro WHERE quando > ? ORDER BY quando DESC'),
+  uma: db.prepare('SELECT id, por, quando FROM missoes_quadro WHERE id = ?'),
+  criar: db.prepare('INSERT INTO missoes_quadro (id, conta_id, por, quando) VALUES (?, ?, ?, ?)'),
+  limpar: db.prepare('DELETE FROM missoes_quadro WHERE quando < ?'),
+};
+type MissaoGuardada = { id: string; por: string; quando: number };
+/** Concluídas no último dia (as missões ficam 12 horas no quadro). */
+export const missoesConcluidas = () => sqlMissoes.recentes.all(Date.now() - 24 * 60 * 60 * 1000) as unknown as MissaoGuardada[];
+export const missaoConcluida = (id: string) => sqlMissoes.uma.get(id) as unknown as MissaoGuardada | undefined;
+export function concluirMissao(id: string, contaId: number, por: string, quando: number): void {
+  sqlMissoes.criar.run(id, contaId, por, quando);
+  sqlMissoes.limpar.run(quando - 7 * 24 * 60 * 60 * 1000);
+}

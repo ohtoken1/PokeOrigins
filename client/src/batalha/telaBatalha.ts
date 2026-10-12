@@ -945,7 +945,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       if (treinador?.mensagemVitoria) await dizer(treinador.mensagemVitoria);
       await darXpTreinador();
       // silver só em batalhas contra treinadores e ginásios (pedido do dono): selvagem não dá
-      if (treinador) {
+      if (treinador && treinador.recompensa > 0) {
         // Amulet Coin / Luck Incense: +20% se quem segura entrou em campo
         const amuleto = multSilverDoTime([...batalha.participantes].map((pos) => save.time[pos]));
         const silver = Math.round(treinador.recompensa * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver') * multConquistas(save, 'silver') * amuleto);

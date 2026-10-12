@@ -146,6 +146,16 @@ export function gerarMapa(semente: string, paleta: Paleta): Mapa {
   // lagos retangulares (a moldura de margem do tileset só encaixa em retângulos), sem encostar
   // em caminhos nem em outros lagos; mínimo 3×3 para caber os cantos e as bordas
   for (let i = 0, tentativas = 0; i < paleta.lagos * ESCALA && tentativas < 200 * ESCALA; tentativas++) {
+    if (paleta.vulcanico || paleta.abismo) {
+      // lava e abismos são desenhados por código: podem ter forma solta (duas manchas juntas)
+      const [cx, cy] = [entre(8, LARGURA - 9), entre(8, ALTURA - 9)];
+      if (terreno[cy][cx] !== 'chao') continue;
+      const raio = 1.6 + r() * 2.2;
+      mancha(cx, cy, raio, 'liquido', ['chao']);
+      mancha(cx + entre(-3, 3), cy + entre(-2, 2), raio * 0.8, 'liquido', ['chao']);
+      i++;
+      continue;
+    }
     const [w, h] = [entre(4, 9), entre(3, 6)];
     const [lx, ly] = [entre(4, LARGURA - w - 4), entre(4, ALTURA - h - 4)];
     let cabe = true;
@@ -291,15 +301,25 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
       const tipo = terreno[y][x];
 
       if (tipo === 'liquido') {
+        const terra = (v: Terreno | null) => v !== 'liquido' && v !== null;
+        if (paleta.abismo || paleta.vulcanico) {
+          const beiras: Beiras = [terra(t(x, y - 1)), terra(t(x, y + 1)), terra(t(x - 1, y)), terra(t(x + 1, y))];
+          if (paleta.abismo) desenharAbismo(ctx, px, py, beiras, t(x, y - 2) !== 'liquido', r);
+          else desenharLava(ctx, px, py, beiras, [terra(t(x - 1, y - 1)), terra(t(x + 1, y - 1)), terra(t(x - 1, y + 1)), terra(t(x + 1, y + 1))], r);
+          continue;
+        }
         // textura repetida em blocos de 6×6 para não aparecer emenda
         tile(agua, [AGUA[0] + (x % 6), AGUA[1] + (y % 6)], px, py);
-        const terra = (v: Terreno | null) => v !== 'liquido' && v !== null;
         const col = terra(t(x - 1, y)) ? 0 : terra(t(x + 1, y)) ? 2 : 1;
         const lin = terra(t(x, y - 1)) ? 0 : terra(t(x, y + 1)) ? 2 : 1;
         if (col !== 1 || lin !== 1) tile(agua, [MARGEM[0] + col, MARGEM[1] + lin], px, py);
         continue;
       }
 
+      if (paleta.vulcanico) {
+        desenharChaoVulcao(ctx, tipo, px, py, r, (v) => v === 'caminho' || v === null, t(x, y - 1), t(x, y + 1), t(x - 1, y), t(x + 1, y));
+        continue;
+      }
       if (paleta.submerso) {
         desenharFundoDoMar(ctx, tipo, px, py, r, (v) => v === 'caminho' || v === null, t(x, y - 1), t(x, y + 1), t(x - 1, y), t(x + 1, y), () => tile(buch, AREIA, px, py));
         continue;
@@ -389,7 +409,8 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
   }
 
   for (const f of mapa.cidade ? [] : mapa.flores) {
-    if (paleta.submerso) desenharConcha(ctx, f.x * TAM, f.y * TAM, f.dx + f.dy);
+    if (paleta.vulcanico) ctx.drawImage(rachaduraPronta((f.dx * 3 + f.dy) % 8), f.x * TAM, f.y * TAM);
+    else if (paleta.submerso) desenharConcha(ctx, f.x * TAM, f.y * TAM, f.dx + f.dy);
     else tile(buch, FLORES[(f.dx + f.dy) % FLORES.length], f.x * TAM, f.y * TAM);
   }
   for (const p of mapa.pedrinhas) tile(natureza, paleta.pedrinhas[(p.x + p.y) % paleta.pedrinhas.length], p.x * TAM, p.y * TAM);
@@ -409,6 +430,9 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
       // fundo do mar: maioria corais, algumas rochas
       if (paleta.rochas && (g.x * 5 + g.y * 3) % 7 === 0) tile(natureza, escolher(paleta.rochas), g.x * TAM, g.y * TAM, 2, 2);
       else ctx.drawImage(coralPronto((g.x * 3 + g.y * 5) % CORES_CORAL.length, (g.x * 7 + g.y * 11) % 6), g.x * TAM - 8, g.y * TAM - 16);
+    } else if (paleta.vulcanico && (g.x * 5 + g.y * 3) % 5 === 0) {
+      // vulcão: um em cada cinco obstáculos é um cone com lava (passa 8 px acima do espaço 2×2)
+      ctx.drawImage(conePronto((g.x + g.y) % 3), g.x * TAM, g.y * TAM - 8);
     } else if (paleta.obstaculo === 'rocha' && paleta.rochas) {
       tile(natureza, escolher(paleta.rochas), g.x * TAM, g.y * TAM, 2, 2);
     } else ctx.drawImage(grandePronto(paleta), g.x * TAM, g.y * TAM);
@@ -539,6 +563,165 @@ function desenharTrilho(ctx: Ctx, px: number, py: number, metadeDeBaixo: boolean
   ctx.fillStyle = '#c8ccd4';
   ctx.fillRect(px, y, TAM, 1);
 }
+
+// ---------- vulcão e abismos (desenhados por código) ----------
+
+/** Onde o líquido encosta em chão: [em cima, embaixo, à esquerda, à direita]. */
+type Beiras = [boolean, boolean, boolean, boolean];
+const BASALTO = '#2f2624', BASALTO_CLARO = '#3f3330', BASALTO_ESCURO = '#201918';
+
+/** Chão do vulcão: rocha escura com grãos; trilha de cinza mais clara; no lugar do mato, lascas de obsidiana com brasas. */
+function desenharChaoVulcao(
+  ctx: Ctx, tipo: Terreno, px: number, py: number, r: () => number, ehTrilha: (v: Terreno | null) => boolean,
+  cima: Terreno | null, baixo: Terreno | null, esq: Terreno | null, dir: Terreno | null,
+) {
+  const trilha = tipo === 'caminho';
+  ctx.fillStyle = trilha ? '#5e504a' : BASALTO;
+  ctx.fillRect(px, py, TAM, TAM);
+  for (let i = 0; i < 6; i++) {
+    ctx.fillStyle = r() < 0.5 ? (trilha ? '#71625b' : BASALTO_CLARO) : trilha ? '#4b3f3b' : BASALTO_ESCURO;
+    ctx.fillRect(px + Math.floor(r() * 15), py + Math.floor(r() * 15), r() < 0.35 ? 2 : 1, 1);
+  }
+  if (trilha) {
+    ctx.fillStyle = '#1c1514';
+    if (!ehTrilha(cima)) ctx.fillRect(px, py, TAM, 1);
+    if (!ehTrilha(baixo)) ctx.fillRect(px, py + TAM - 1, TAM, 1);
+    if (!ehTrilha(esq)) ctx.fillRect(px, py, 1, TAM);
+    if (!ehTrilha(dir)) ctx.fillRect(px + TAM - 1, py, 1, TAM);
+    return;
+  }
+  if (tipo !== 'mato') return;
+  // lascas de obsidiana (no lugar do mato alto) com brasas no pé
+  ctx.fillStyle = 'rgba(160,40,10,0.22)';
+  ctx.fillRect(px, py, TAM, TAM);
+  for (let k = 0; k < 3; k++) {
+    const meio = px + 3 + k * 5 + Math.floor(r() * 2), altura = 6 + Math.floor(r() * 6);
+    for (let i = 0; i < altura; i++) {
+      const larg = Math.max(1, Math.round(((altura - i) / altura) * 4));
+      ctx.fillStyle = '#120d0d';
+      ctx.fillRect(meio - Math.floor(larg / 2), py + TAM - 1 - i, larg, 1);
+      ctx.fillStyle = '#5e4e4a';
+      ctx.fillRect(meio - Math.floor(larg / 2), py + TAM - 1 - i, 1, 1);
+    }
+  }
+  for (let i = 0; i < 3; i++) {
+    ctx.fillStyle = i ? '#ff7a1a' : '#ffd060';
+    ctx.fillRect(px + 1 + Math.floor(r() * 14), py + 11 + Math.floor(r() * 5), 1, 1);
+  }
+}
+
+/** Lava: laranja com veios claros e crostas escuras; beira de rocha queimada com o brilho por dentro. */
+function desenharLava(ctx: Ctx, px: number, py: number, [cima, baixo, esq, dir]: Beiras, [ce, cd, be, bd]: Beiras, r: () => number) {
+  ctx.fillStyle = '#dc4a16';
+  ctx.fillRect(px, py, TAM, TAM);
+  for (let i = 0; i < 3; i++) {
+    const [x, y, w] = [px + Math.floor(r() * 11), py + Math.floor(r() * 14) + 1, 3 + Math.floor(r() * 3)];
+    ctx.fillStyle = '#ff9a24';
+    ctx.fillRect(x, y, w, 2);
+    ctx.fillStyle = '#ffe070';
+    ctx.fillRect(x + 1, y, w - 2, 1);
+  }
+  for (let i = 0; i < 2; i++) {
+    ctx.fillStyle = '#8a2410';
+    ctx.fillRect(px + Math.floor(r() * 13), py + Math.floor(r() * 14), 2 + Math.floor(r() * 2), 1);
+  }
+  // beiras: 2 px de rocha queimada, depois o clarão da lava
+  const faixa = (x: number, y: number, w: number, h: number, cor: string) => { ctx.fillStyle = cor; ctx.fillRect(px + x, py + y, w, h); };
+  if (cima) { faixa(0, 0, TAM, 3, '#150f0e'); faixa(0, 3, TAM, 1, '#ffe070'); faixa(0, 4, TAM, 1, '#ff9a24'); }
+  if (baixo) { faixa(0, TAM - 2, TAM, 2, '#150f0e'); faixa(0, TAM - 3, TAM, 1, '#ffb030'); }
+  if (esq) { faixa(0, 0, 2, TAM, '#150f0e'); faixa(2, cima ? 3 : 0, 1, TAM - (cima ? 3 : 0) - (baixo ? 2 : 0), '#ffb030'); }
+  if (dir) { faixa(TAM - 2, 0, 2, TAM, '#150f0e'); faixa(TAM - 3, cima ? 3 : 0, 1, TAM - (cima ? 3 : 0) - (baixo ? 2 : 0), '#ffb030'); }
+  // cantos arredondados
+  const canto = (x: number, y: number, sx: number, sy: number) => { for (let i = 0; i < 4; i++) faixa(sx > 0 ? x : x - (3 - i), y + i * sy - (sy < 0 ? 0 : 0), 4 - i, 1, i === 3 ? '#150f0e' : BASALTO); };
+  // quinas para dentro (chão só na diagonal)
+  const quina = (x: number, y: number) => { faixa(x, y, 3, 3, '#ffb030'); faixa(x === 0 ? 0 : x + 1, y === 0 ? 0 : y + 1, 2, 2, '#150f0e'); };
+  if (ce && !cima && !esq) quina(0, 0);
+  if (cd && !cima && !dir) quina(TAM - 3, 0);
+  if (be && !baixo && !esq) quina(0, TAM - 3);
+  if (bd && !baixo && !dir) quina(TAM - 3, TAM - 3);
+  if (cima && esq) canto(0, 0, 1, 1);
+  if (cima && dir) canto(TAM - 1, 0, -1, 1);
+  if (baixo && esq) canto(0, TAM - 1, 1, -1);
+  if (baixo && dir) canto(TAM - 1, TAM - 1, -1, -1);
+}
+
+/** Abismo (caverna): buraco vazio e escuro; na beira de cima aparece a parede de pedra descendo. */
+function desenharAbismo(ctx: Ctx, px: number, py: number, [cima, baixo, esq, dir]: Beiras, segundaLinha: boolean, r: () => number) {
+  ctx.fillStyle = '#050404';
+  ctx.fillRect(px, py, TAM, TAM);
+  const faixa = (x: number, y: number, w: number, h: number, cor: string) => { ctx.fillStyle = cor; ctx.fillRect(px + x, py + y, w, h); };
+  if (cima) {
+    // parede: clareia perto da borda e some no escuro
+    const TONS = ['#6a5c4c', '#5a4d40', '#4a3f34', '#3c332a', '#2e2720', '#221d18', '#18140f', '#100d0a'];
+    TONS.forEach((cor, i) => faixa(0, 1 + i * 2, TAM, 2, cor));
+    faixa(0, 0, TAM, 1, '#120e0a');
+    // veios da rocha descendo
+    for (let i = 0; i < 3; i++) { const x = Math.floor(r() * 15); faixa(x, 2, 1, 6 + Math.floor(r() * 7), 'rgba(0,0,0,0.35)'); }
+  } else if (segundaLinha) {
+    // logo abaixo da parede: ainda um resto de luz
+    faixa(0, 0, TAM, 2, '#0e0b09');
+    faixa(0, 2, TAM, 2, '#090706');
+  }
+  if (esq) { faixa(0, 0, 1, TAM, '#120e0a'); faixa(1, 0, 2, TAM, 'rgba(90,76,62,0.5)'); faixa(3, 0, 2, TAM, 'rgba(90,76,62,0.2)'); }
+  if (dir) { faixa(TAM - 1, 0, 1, TAM, '#120e0a'); faixa(TAM - 3, 0, 2, TAM, 'rgba(90,76,62,0.5)'); faixa(TAM - 5, 0, 2, TAM, 'rgba(90,76,62,0.2)'); }
+  if (baixo) { faixa(0, TAM - 1, TAM, 1, '#120e0a'); faixa(0, TAM - 2, TAM, 1, 'rgba(120,104,86,0.55)'); }
+}
+
+/** Rachadura no chão com lava acesa dentro (no lugar das flores). 8 formatos. */
+const rachaduraPronta = (variante: number) =>
+  pronto('rachadura:' + variante, TAM, TAM, (ctx) => {
+    const r = aleatorioComSemente('rachadura' + variante);
+    let [x, y] = [2 + Math.floor(r() * 4), 2 + Math.floor(r() * 4)];
+    const pontos: [number, number][] = [];
+    for (let i = 0; i < 10 && x < 15 && y < 15; i++) {
+      pontos.push([x, y]);
+      if (r() < 0.6) x++;
+      if (r() < 0.6) y++;
+    }
+    ctx.fillStyle = '#140e0d';
+    for (const [a, b] of pontos) ctx.fillRect(a - 1, b - 1, 3, 3);
+    ctx.fillStyle = '#ff7a1a';
+    for (const [a, b] of pontos) ctx.fillRect(a, b, 1, 1);
+    ctx.fillStyle = '#ffe070';
+    pontos.forEach(([a, b], i) => { if (i % 3 === 1) ctx.fillRect(a, b, 1, 1); });
+  });
+
+/** Cone de vulcão pequeno (32 × 40: passa 8 px acima do espaço 2×2), com a cratera acesa e lava escorrendo. */
+const conePronto = (variante: number) =>
+  pronto('cone:' + variante, 32, 40, (ctx) => {
+    const r = aleatorioComSemente('cone' + variante);
+    elipse(ctx, 16, 37, 14, 3, 'rgba(0,0,0,0.3)');
+    for (let y = 9; y <= 37; y++) {
+      const meia = Math.round(4 + ((y - 9) / 28) * 11);
+      ctx.fillStyle = '#100b0b';
+      ctx.fillRect(16 - meia - 1, y, meia * 2 + 2, 1);
+      ctx.fillStyle = '#2c2220';
+      ctx.fillRect(16 - meia, y, meia * 2, 1);
+      ctx.fillStyle = '#4a3c38';
+      ctx.fillRect(16 - meia, y, Math.max(2, Math.round(meia / 3)), 1);
+      ctx.fillStyle = '#1a1312';
+      ctx.fillRect(16 + meia - Math.max(2, Math.round(meia / 3)), y, Math.max(2, Math.round(meia / 3)), 1);
+    }
+    // sulcos na encosta
+    ctx.fillStyle = '#1a1312';
+    for (let i = 0; i < 4; i++) { const x = 9 + Math.floor(r() * 14); ctx.fillRect(x, 16 + Math.floor(r() * 8), 1, 5 + Math.floor(r() * 6)); }
+    // cratera
+    elipse(ctx, 16, 9, 5, 2, '#100b0b');
+    elipse(ctx, 16, 9, 4, 1, '#ff7a1a');
+    ctx.fillStyle = '#ffe070';
+    ctx.fillRect(14, 9, 4, 1);
+    // lava escorrendo
+    let x = 15 + variante;
+    for (let y = 11; y < 22 + variante * 3; y++) {
+      ctx.fillStyle = '#ff7a1a';
+      ctx.fillRect(x, y, 2, 1);
+      ctx.fillStyle = '#ffd060';
+      ctx.fillRect(x, y, 1, 1);
+      if (r() < 0.35) x += r() < 0.5 ? -1 : 1;
+    }
+    // fumaça
+    for (const [fx, fy, fr] of [[14, 5, 2], [18, 3, 2], [15, 1, 1]]) elipse(ctx, fx, fy, fr + 1, fr, 'rgba(150,140,138,0.45)');
+  });
 
 // ---------- fundo do mar (desenhado por código) ----------
 

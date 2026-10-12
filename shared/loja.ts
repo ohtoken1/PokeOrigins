@@ -5,6 +5,7 @@
 import { Dex } from '@pkmn/sim';
 import maquinas from './data/maquinas.json';
 import { ITENS, type ItemId } from './itens';
+import { BOXES_INICIAIS, BOXES_MAXIMO, BOX_POKEMON, TAMANHO_BOX } from './pc';
 import { CHAVE_TEMPORAL, TICKETS } from './tickets';
 import { TIPOS_TERA } from './tera';
 import { ITENS_CUSTOM } from './itensCustom';
@@ -87,17 +88,41 @@ export const MOEDA = 'silver';
 export const textoPreco = (i: Pick<ItemLoja, 'preco' | 'moeda'>, quantidade = 1) => `${(i.preco * quantidade).toLocaleString('pt-BR')} ${i.moeda ?? MOEDA}`;
 export const PRECO_PADRAO = 1;
 /** Preços específicos (id do item → preço). Vazio por enquanto: tudo custa PRECO_PADRAO. */
-export const PRECOS: Record<string, number> = {};
+/**
+ * Preço de cada categoria (primeira rodada da economia, aprovada pelo dono para o Closed Beta; régua: 5 a 10 mil
+ * silver por hora de jogo). TMs e TRs vão ser vistos um por um depois.
+ */
+export const PRECO_DA_CATEGORIA: Partial<Record<CategoriaLoja, number>> = { remedios: 100, evolucao: 30_000, batalha: 20_000, up: 10_000, tm: 20_000, tr: 20_000 };
+/** Preços que fogem do da categoria. */
+export const PRECOS: Record<string, number> = {
+  // Pokébolas (decisão do dono)
+  pokeball: 20, greatball: 100, ultraball: 250,
+  // remédios
+  potion: 30, superpotion: 100, hyperpotion: 250, maxpotion: 500, fullrestore: 800,
+  freshwater: 40, sodapop: 60, lemonade: 90, moomoomilk: 120, energypowder: 60, energyroot: 150,
+  revive: 400, maxrevive: 1_500, revivalherb: 1_000, sacredash: 5_000,
+  antidote: 50, burnheal: 50, iceheal: 50, awakening: 50, paralyzeheal: 50, fullheal: 200,
+  ether: 300, maxether: 500, elixir: 600, maxelixir: 1_000,
+  // treino (decisão do dono: bem caros)
+  expshare: 100_000, luckyegg: 100_000,
+  // abre mais uma box no PC (decisão do dono)
+  boxpokemon: 500_000,
+  // Tera Orb e Dynamax Band (decisão do dono)
+  terastallizerband: 100_000, dynamaxband: 100_000,
+  powerweight: 50_000, powerbracer: 50_000, powerbelt: 50_000, powerlens: 50_000, powerband: 50_000, poweranklet: 50_000,
+};
+/** Itens da loja vendidos só por GOLD (decisão do dono), com o preço. As Mega Stones também são (PRECO_MEGA_STONE_GOLD). */
+export const PRECOS_EM_GOLD: Record<string, number> = { abilitycapsule: 50, abilitypatch: 100 };
 /** Silver inicial (provisório). Silver só se ganha vencendo treinadores e ginásios; selvagens não dão (pedido do dono). */
 export const SILVER_INICIAL = 1000;
 /**
  * Preço em silver para avaliar os IVs de um Pokémon (provisório). Uma forma só de pagar (pedido do dono): depois de
  * avaliado, quem é VIP vê o valor exato e quem não é vê a FAIXA de cada IV.
  */
-export const PRECO_REVELAR_IVS = 100;
+export const PRECO_REVELAR_IVS = 5_000;
 /** Trocar o nome de treinador e mudar a aparência do personagem depois de criado (provisório; criar é grátis). */
-export const PRECO_TROCAR_NOME_GOLD = 1;
-export const PRECO_TROCAR_APARENCIA_GOLD = 1;
+export const PRECO_TROCAR_NOME_GOLD = 50;
+export const PRECO_TROCAR_APARENCIA_GOLD = 50;
 /** Faixas de IV mostradas a quem não é VIP (o 31 fica junto com 26+). */
 // as faixas moram em tierIv.ts (arquivo que o servidor também lê)
 export { FAIXAS_IV, faixaDoIv } from './tierIv';
@@ -130,7 +155,7 @@ const ITENS_DE_UP = new Set(['machobrace', 'powerweight', 'powerbracer', 'powerb
 /** Item nosso (não existe no Showdown): faz evoluir quem evolui por troca, como o Linking Cord do Legends: Arceus. */
 export const CABO_DE_LIGACAO = 'linkingcord';
 
-const preco = (id: string) => PRECOS[id] ?? PRECO_PADRAO;
+const preco = (id: string, categoria: CategoriaLoja) => PRECOS[id] ?? PRECO_DA_CATEGORIA[categoria] ?? PRECO_PADRAO;
 
 const ehLendario = (nome: string) => (Dex.species.get(nome).tags ?? []).some((t) => /Legendary|Mythical/.test(t));
 
@@ -175,7 +200,8 @@ function montarCatalogo(): ItemLoja[] {
     const naLoja = NA_LOJA.has(item.categoria) && !FORA_DA_LOJA.has(item.id) && (item.categoria !== 'bolas' || BOLAS_NA_LOJA.has(item.id));
     // Mega Stones custam gold (pedido do dono)
     if (item.categoria === 'megapedras') itens.push({ ...item, naLoja, moeda: 'gold', preco: PRECOS[item.id] ?? PRECO_MEGA_STONE_GOLD });
-    else itens.push({ ...item, naLoja, preco: naLoja ? preco(item.id) : 0 });
+    else if (PRECOS_EM_GOLD[item.id]) itens.push({ ...item, naLoja, moeda: 'gold', preco: PRECOS_EM_GOLD[item.id] });
+    else itens.push({ ...item, naLoja, preco: naLoja ? preco(item.id, item.categoria) : 0 });
   };
 
   for (const id of Object.keys(ITENS) as ItemId[]) {
@@ -195,6 +221,8 @@ function montarCatalogo(): ItemLoja[] {
   add({ id: 'everstone', nome: 'Everstone', categoria: 'up', sprite: 'everstone', descricao: 'Segurando, o Pokémon não evolui por nível nem por amizade.' });
   add({ id: 'amuletcoin', nome: 'Amulet Coin', categoria: 'batalha', sprite: 'amulet-coin', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de silver. Não acumula com o Luck Incense.' });
   add({ id: 'luckincense', nome: 'Luck Incense', categoria: 'batalha', sprite: 'luck-incense', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de silver. Não acumula com a Amulet Coin.' });
+  // abre uma box nova no PC (usado pela bolsa; regras em shared/pc.ts)
+  add({ id: BOX_POKEMON, nome: 'Box Pokémon', categoria: 'up', imagem: 'itens/boxpokemon.svg', descricao: `Abre mais uma box no seu PC, com ${TAMANHO_BOX} lugares. Todo treinador começa com ${BOXES_INICIAIS} boxes e pode chegar a ${BOXES_MAXIMO}.` });
   // trocam a Ability (usados pela bolsa)
   add({ id: ABILITY_CAPSULE, nome: 'Ability Capsule', categoria: 'up', sprite: 'ability-capsule', descricao: 'Troca a Ability do Pokémon pela outra Ability normal da espécie. Em quem tem a Hidden Ability, volta para a normal.' });
   add({ id: ABILITY_PATCH, nome: 'Ability Patch', categoria: 'up', imagem: 'itens/abilitypatch.png', descricao: 'Troca a Ability do Pokémon pela Hidden Ability da espécie. Em quem já tem a Hidden Ability, volta para a normal.' });

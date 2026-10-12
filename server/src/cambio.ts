@@ -19,6 +19,8 @@ const saldo = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v 
 export const cofre = () => banco.lerCofre();
 
 export function trocar(conta: banco.Conta, dados: Record<string, unknown>) {
+  // banco fechado para jogadores comuns até a economia abrir (decisão do dono)
+  if (!conta.admin) throw new ErroConta('O banco está fechado por enquanto.', 403);
   const { operacao, quantidade } = dados;
   if (operacao !== 'comprar' && operacao !== 'vender') throw new ErroConta('Operação inválida.');
   if (!Number.isSafeInteger(quantidade) || (quantidade as number) < 1) throw new ErroConta('Quantidade inválida.');

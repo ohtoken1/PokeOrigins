@@ -13,8 +13,10 @@ import { carregarSave, usarSave, salvar } from '../estado';
 import { abrirCura } from '../ui/cura';
 import { abrirLoja } from '../ui/loja';
 import { abrirBanco } from '../ui/banco';
+import { ehAdministrador } from '../bonificacao';
 import { abrirMercado } from '../ui/mercado';
 import { abrirMural } from '../ui/mural';
+import { abrirSafari } from '../ui/safari';
 import { abrirEstacao } from '../ui/trem';
 import { abrirArena } from '../ui/arena';
 import { abrirQuadroDeMissoes } from '../ui/quadroMissoes';
@@ -128,6 +130,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
       navegar({ tela: 'regiao' });
     }
     else if (acao === 'arena') abrirArena(navegar);
+    else if (acao === 'banco' && !ehAdministrador()) avisar('Banco: fechado por enquanto.');
     else if (acao === 'banco') abrirBanco(save!, () => atualizarTime());
     else if (acao === 'mural') abrirMural();
     else if (acao === 'guildas') navegar({ tela: 'comunidade', secao: 'cla' });
@@ -135,6 +138,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
     else if (acao === 'missoes') abrirQuadroDeMissoes(save!, () => atualizarTime());
     else if (acao === 'mercadonegro' && !conteudoLiberado('mercadoNegro')) avisar(`Mercado negro: ${textoTranca('mercadoNegro')}.`);
     else if (acao === 'mercadonegro') abrirMercado(save!, () => atualizarTime());
+    else if (acao === 'safari') abrirSafari(save!, navegar, () => atualizarTime());
     else avisar(`${EM_BREVE[acao] ?? 'Este lugar'}: em breve.`);
   }
   const minimapa = montarMinimapa(areaJogo, () => cena(), irAoLocal);
