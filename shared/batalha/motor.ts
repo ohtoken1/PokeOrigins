@@ -757,9 +757,15 @@ export class BatalhaSelvagem {
         case '-boost':
         case '-unboost': {
           const n = Number(args[2]);
-          const verbo = comando === '-boost' ? 'aumentou' : 'diminuiu';
-          const intensidade = n === 0 ? ` não pode mais ${comando === '-boost' ? 'aumentar' : 'diminuir'}` : n >= 3 ? ` ${verbo} drasticamente` : n === 2 ? ` ${verbo} muito` : ` ${verbo}`;
-          eventos.push({ tipo: 'boost', lado: this.lado(args[0]), atributo: args[1], quantidade: comando === '-boost' ? n : -n, texto: `${NOMES_ATRIBUTOS[args[1]] ?? args[1]} de ${quem}${intensidade}!` });
+          const sobe = comando === '-boost';
+          const atributo = NOMES_ATRIBUTOS[args[1]] ?? args[1];
+          // cada frase inteira, sem pedaços colados: é assim que a tradução (client/src/idioma.ts) consegue reconhecer
+          const texto =
+            n === 0 ? (sobe ? `${atributo} de ${quem} não pode mais aumentar!` : `${atributo} de ${quem} não pode mais diminuir!`)
+            : n >= 3 ? (sobe ? `${atributo} de ${quem} aumentou drasticamente!` : `${atributo} de ${quem} diminuiu drasticamente!`)
+            : n === 2 ? (sobe ? `${atributo} de ${quem} aumentou muito!` : `${atributo} de ${quem} diminuiu muito!`)
+            : sobe ? `${atributo} de ${quem} aumentou!` : `${atributo} de ${quem} diminuiu!`;
+          eventos.push({ tipo: 'boost', lado: this.lado(args[0]), atributo: args[1], quantidade: sobe ? n : -n, texto });
           break;
         }
         case '-setboost':

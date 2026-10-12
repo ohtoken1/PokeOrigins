@@ -66,8 +66,11 @@ function montar(dicionario: Record<string, string>): void {
     const partes = pt.split(/\{\d+\}/);
     // modelo com pouco texto fixo ("{0} de {1}") só casa com pedaços curtos, sem pontuação de frase: senão pegaria qualquer coisa
     const fixo = partes.join('').trim().length;
-    const parte = fixo < 8 ? '([^.!?:\\n]{1,40}?)' : '([\\s\\S]+?)';
-    const re = new RegExp('^' + partes.map(escapar).join(parte) + '$');
+    // (o ponto só fecha frase quando vem seguido de espaço: "1.250" e "Sp. Atk" passam)
+    const parte = fixo < 8 ? '((?:Sp\\. |\\.(?=\\S)|[^.!?:\\n]){1,40}?)' : '([\\s\\S]+?)';
+    // a parte que muda no FIM do modelo pode vir vazia ("…({3} da vida){4}": os avisos do golpe nem sempre existem)
+    const ultima = partes[partes.length - 1] === '' && partes.length > 2 ? parte.replace('{1,40}?', '{0,40}?').replace('+?)', '*?)') : parte;
+    const re = new RegExp('^' + partes.map(escapar).reduce((junto, pedaco, i) => junto + (i === partes.length - 1 ? ultima : parte) + pedaco) + '$');
     const inicio = partes[0].length >= 2 ? partes[0].slice(0, 2) : '';
     const lista = modelos.get(inicio) ?? [];
     lista.push({ peso: partes.join('').length, re, saida: traducao });
@@ -105,7 +108,7 @@ export function tr(texto: string): string {
   }
   if (saida === null && /[.!?:·]\s|\n/.test(texto)) {
     // várias frases juntas ("X evoluiu! Aprendeu Y."): traduz uma por uma
-    const partes = texto.split(/(?<=[.!?:])(\s+)|(\s*·\s*|\n+)/).filter((p) => p !== undefined && p !== '');
+    const partes = texto.split(/(?<=[.!?:])(?<!Sp\.)(\s+)|(\s*·\s*|\n+)/).filter((p) => p !== undefined && p !== '');
     if (partes.length > 1) {
       const novas = partes.map((p) => (/^\s*·?\s*$/.test(p) ? p : (traduzirMiolo(p) ?? traduzirMiolo(p.trim()) ?? p)));
       if (novas.some((p, i) => p !== partes[i])) saida = novas.join('');
@@ -118,6 +121,13 @@ export function tr(texto: string): string {
         saida = texto.endsWith(pt) ? tr(texto.slice(0, -pt.length)) + traducao : traducao + tr(texto.slice(pt.length));
         break;
       }
+    }
+  }
+  if (saida === null && texto.length <= 80) {
+    // fim de frase montado com modelo ("Charizard" + " aumentou muito"): procura, espaço por espaço, um final conhecido
+    for (let i = texto.indexOf(' ', 1); i > 0 && saida === null; i = texto.indexOf(' ', i + 1)) {
+      const fim = traduzirMiolo(texto.slice(i)) ?? traduzirMiolo(texto.slice(i + 1));
+      if (fim !== null) saida = tr(texto.slice(0, i)) + (fim.startsWith(' ') ? '' : ' ') + fim;
     }
   }
   if (guardado.size > 5000) guardado.clear();

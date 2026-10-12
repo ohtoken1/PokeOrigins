@@ -1,0 +1,280 @@
+490	Hace daño igual a 1/2 del HP actual del objetivo.
+491	40% de probabilidad de bajar 1 nivel la precisión del objetivo.
+492	Un objetivo dormido pierde 1/4 del HP máximo por turno.
+493	Hace daño igual al nivel del usuario.
+494	Baja 1 nivel el Attack y el Sp. Atk del objetivo.
+495	Sube 1 nivel todos los atributos (no precisión/evasión). Atrapa al usuario.
+496	100% de probabilidad de paralizar al objetivo.
+497	Protege de los ataques que hacen daño. Contacto: -2 Defense.
+498	Atrapa al objetivo y baja 1 nivel su Defense y su Sp. Def cada turno.
+499	Tatsugiri comido (Curly|Droopy|Stretchy): +1 Attack|Defense|Speed.
+500	Dura 2-3 turnos. Después confunde al usuario.
+501	Sin efecto adicional. Golpea al rival o rivales.
+502	Reparte por igual el HP del usuario y del objetivo.
+503	Baja 1 nivel Attack y Sp. Atk del objetivo. El usuario cambia.
+504	La potencia se duplica si el usuario actúa después del objetivo.
+505	Esparce monedas.
+506	Todos los Pokémon en campo se debilitarán en 3 turnos.
+507	Desaparece en el turno 1. Golpea en el turno 2. Rompe la protección.
+508	Envenena al rival o rivales.
+509	Envenena al objetivo.
+510	Si el objetivo es un aliado, le cura el 50% de su HP máximo.
+511	Falla si el objetivo no lleva objeto.
+512	Golpea 10 veces. Cada golpe puede fallar.
+513	Si usa un movimiento Fire, el objetivo pierde 1/4 del HP máximo.
+514	10% de probabilidad de congelar al rival o rivales.
+515	Promedia el Attack y el Sp. Atk con los del objetivo.
+516	Intercambia los cambios de Attack y Sp. Atk con el objetivo.
+517	Intercambia el Attack y la Defense del usuario.
+518	+20 de potencia por cada mejora de atributo del usuario.
+519	100% de probabilidad de subir 1 nivel el Attack del usuario.
+520	40, 80 o 120 de potencia, o cura al objetivo 1/4 del HP máximo.
+521	Con Electric Terrain: 1.5x de potencia.
+522	Durante 2 turnos, el objetivo no puede curarse.
+523	5 turnos. En el suelo: más potencia Psychic, a salvo de la prioridad.
+524	Pasa el problema de estado del usuario al objetivo.
+525	Copia los cambios de atributos actuales del objetivo.
+526	100% de probabilidad de subir 1 nivel la Defense del usuario.
+527	Daña al objetivo según su Defense, no su Sp. Def.
+528	Daño al azar igual a 0.5x-1.5x el nivel del usuario.
+529	60 de potencia, +20 por cada mejora de atributo del objetivo.
+530	Cura el problema de estado del objetivo; si lo hace, el usuario recupera 1/2 del HP máximo.
+531	Si un rival está cambiando, lo golpea con 2x de potencia.
+532	Obliga al objetivo a actuar último este turno.
+533	Protege a los aliados de los ataques con prioridad este turno.
+534	Sube 1 nivel Sp. Atk, Sp. Def y Speed del usuario.
+535	Sube 1 nivel el Attack del usuario si lo golpean mientras lo usa.
+536	+50 de potencia por cada vez que golpearon al usuario. Máximo 6 golpes.
+537	Destruye las pantallas. El tipo depende de la forma del usuario.
+538	Durante 5 turnos, una lluvia intensa potencia los movimientos Water.
+539	Libera al usuario de trampas, ataduras y Leech Seed; +1 Speed.
+540	Carga y golpea al rival o rivales en el turno 2. Índice de crítico alto.
+541	Recupera el último objeto que usó el usuario.
+542	Durante 5 turnos, el daño físico a los aliados se reduce a la mitad.
+543	El usuario pasa a ser del mismo tipo que el objetivo.
+544	El usuario se cura de quemadura, veneno o parálisis.
+545	10% de probabilidad de dormir al rival o rivales. Meloetta se transforma.
+546	El usuario duerme 2 turnos y recupera el HP y el estado.
+547	La potencia se duplica si un aliado se debilitó el turno anterior.
+548	Máximo 102 de potencia con la amistad máxima.
+549	El tipo varía según el tipo principal del usuario.
+550	Revive a un Pokémon debilitado con el 50% del HP.
+551	2x de potencia si el objetivo está en el suelo con Electric Terrain.
+552	30% de probabilidad de hacer retroceder al rival o rivales.
+553	El usuario cambia su Ability por la del objetivo.
+554	Cura el 50% del HP. Pierde el tipo <T> hasta el final del turno.
+555	Sube 1 nivel Attack y Sp. Atk de los Pokémon de tipo <T> en el suelo.
+556	La potencia se duplica si otros usaron Round este turno.
+557	50% de probabilidad de quemar al objetivo. Descongela al usuario.
+558	Durante 5 turnos, protege al equipo del usuario de los problemas de estado.
+559	Quita 1/8 del HP máximo cada turno; 1/4 a <T> y Water.
+560	20% de probabilidad de quemar al rival o rivales. No falla con lluvia.
+561	Durante 5 turnos hay tormenta de arena. Rock: 1.5x de Sp. Def.
+562	30% de probabilidad de quemar al objetivo. Descongela al objetivo.
+563	Golpea 2-5 veces. Usuario: -1 Defense, +1 Speed tras el último golpe.
+564	Baja 2 niveles la Defense del objetivo.
+565	El efecto varía con el terreno (30% de probabilidad de paralizar).
+566	40% de probabilidad de bajar 2 niveles la Sp. Def del objetivo.
+567	20% de probabilidad de bajar 1 nivel la Sp. Def del objetivo.
+568	El usuario gasta 1/2 de su HP máximo para pasar un sustituto.
+569	Debilita de un golpe a objetivos que no sean Ice. Falla si el usuario es de menor nivel.
+570	20% de envenenar. Físico y de contacto si así es más fuerte.
+571	Baja 1 nivel Defense y Sp. Def; sube 2 niveles Attack, Sp. Atk y Speed.
+572	El usuario debe recibir daño físico antes de actuar.
+573	Sube 2 niveles la Speed y 1 nivel el Attack del usuario.
+574	El usuario recupera 1/2 de su HP máximo; 2/3 con Sandstorm.
+575	Protege de los ataques que hacen daño. Contacto: -1 Speed.
+576	La Ability del objetivo pasa a ser Simple.
+577	Copia de forma permanente el último movimiento que usó el objetivo.
+578	El usuario y el objetivo intercambian sus Abilities.
+579	100% de probabilidad de bajar 1 nivel el Sp. Atk del objetivo.
+580	Sube 1 nivel la Defense del usuario en el turno 1. Golpea en el turno 2.
+581	Carga y golpea en el turno 2. 30% de hacer retroceder. Crítico alto.
+582	El usuario y el rival vuelan en el turno 1. Hace daño en el turno 2.
+583	Puede golpear a Pokémon que usan Bounce, Fly o Sky Drop.
+584	El usuario debe estar dormido. Usa otro movimiento conocido.
+585	10% de probabilidad de envenenar a los Pokémon adyacentes.
+586	Quita la inmunidad a Ground del objetivo.
+587	La potencia se duplica si el objetivo está paralizado, y lo cura.
+588	40% de probabilidad de envenenar al objetivo.
+589	100% de probabilidad de bajar 1 nivel el Sp. Atk del rival o rivales.
+590	El usuario roba ciertos movimientos de apoyo para usarlos él.
+591	Índice de golpe crítico alto. No puede ser redirigido.
+592	El usuario debe estar dormido. 30% de probabilidad de hacer retroceder al objetivo.
+593	Durante 5 turnos cae nieve. Ice: 1.5x de Defense.
+594	Cambia el tipo del objetivo a Water.
+595	Carga en el turno 1. Golpea en el turno 2. Sin carga con sol.
+596	Siempre hace 20 HP de daño.
+597	Cura la quemadura del objetivo.
+598	Roba las mejoras del objetivo antes de hacer daño.
+599	Intercambia la Speed con el objetivo.
+600	Sube 2 niveles el Attack del objetivo y baja 2 niveles su Defense.
+601	Daña a los rivales en el suelo al entrar. Máximo 3 capas.
+602	Protege de los movimientos. Contacto: pierde 1/8 del HP máximo.
+603	Baja 2 niveles la Speed del usuario.
+604	Baja 4 PP del último movimiento del objetivo.
+605	Más potencia cuantos más usos de Stockpile.
+606	Los movimientos de los rivales del objetivo se redirigen a él este turno.
+607	30% de probabilidad de bajar 1 nivel el Attack del rival o rivales.
+608	Daña a los rivales al entrar. Cuenta la debilidad a Rock.
+609	Falla si no hay terreno activo. Termina el terreno.
+610	10% de probabilidad de subir 1 nivel la Defense del usuario.
+611	Baja 1 nivel la Speed de los rivales en el suelo al entrar.
+612	Sube 1 nivel Defense y Sp. Def del usuario. Máximo 3 usos.
+613	La potencia se duplica si el último movimiento del usuario falló.
+614	Pone Stealth Rock en el lado del objetivo.
+615	El usuario recupera HP igual al Attack del objetivo. Le baja 1 nivel el Attack.
+616	Baja 2 niveles la Speed del rival o rivales.
+617	El usuario pierde 1/4 de su HP máximo.
+618	Debe llevar una Berry para usarlo. El usuario se come la Berry, Defense +2.
+619	El usuario gasta 1/4 de su HP máximo para poner un sustituto.
+620	Suele atacar primero. Falla si el objetivo no está atacando.
+621	Durante 5 turnos, un sol intenso potencia los movimientos Fire.
+622	Baja 1 nivel el Attack y la Defense del usuario.
+623	Confunde al objetivo.
+624	Golpea a los Pokémon adyacentes. Daño doble contra Dive.
+625	Siempre es golpe crítico. Golpea 3 veces.
+626	Sube 2 niveles el Attack del objetivo y lo confunde.
+627	Cura al usuario según los usos de Stockpile.
+628	Baja 2 niveles la evasión del rival o rivales.
+629	El usuario intercambia el objeto que lleva con el del objetivo.
+630	Sube 2 niveles el Attack del usuario.
+631	Golpea a los Pokémon adyacentes que comparten tipo con el usuario.
+632	La Speed del objetivo baja 1 nivel durante 3 turnos.
+633	Golpea dos veces. Este movimiento no comprueba la precisión.
+634	Sube 3 niveles el Sp. Atk del usuario.
+635	Durante 4 turnos, la Speed de los aliados se duplica.
+636	Cura el estado del usuario y sube 1 nivel Sp. Atk y Sp. Def.
+637	El objetivo recibe -1 Speed y se vuelve más débil a Fire.
+638	El objetivo no puede usar movimientos de estado en sus 3 turnos siguientes.
+639	Todos los Pokémon en campo consumen las Berries que llevan.
+640	El tipo varía según el Drive que lleve.
+641	Confunde a los Pokémon adyacentes.
+642	Durante 3 turnos, el objetivo flota, pero los movimientos no fallan contra él.
+643	El usuario cambia.
+644	Si está terastalizado: físico si Attack > Sp. Atk, tipo = Tera.
+645	Terapagos-Stellar: tipo <T>, golpea a los dos rivales.
+646	Usuario en un terreno: la potencia se duplica y el tipo varía.
+647	Baja al suelo a los rivales adyacentes. El primer golpe es neutro contra Flying.
+648	Golpea a los rivales adyacentes. Les impide cambiar.
+649	Durante 2 turnos, el objetivo no puede usar movimientos de sonido.
+650	30% de probabilidad de paralizar. No falla con lluvia.
+651	10% de probabilidad de paralizar al objetivo.
+652	10% de probabilidad de paralizar. 10% de probabilidad de hacer retroceder.
+653	Baja 1 nivel el Attack y la Defense del objetivo.
+654	Usuario: +1 Attack y Speed. Quita todos los sustitutos y trampas.
+655	Invierte los cambios de atributos del objetivo.
+656	El objetivo no puede elegir el mismo movimiento dos veces seguidas.
+657	Envenena gravemente al objetivo. Los de tipo <T> no fallan.
+658	Envenena a los rivales en el suelo al entrar. Máximo 2 capas.
+659	Baja 1 nivel la Speed del objetivo y lo envenena.
+660	Copia los atributos, movimientos, tipos y Ability del objetivo.
+661	20% de probabilidad de paralizar, quemar o congelar al objetivo.
+662	Añade Ghost a los tipos del objetivo.
+663	Actúa último. Durante 5 turnos, el orden de los turnos se invierte.
+664	Crítico alto. Objetivo: 50% -1 Defense, 30% de retroceder.
+665	Golpea 3 veces. Cada golpe puede fallar, pero la potencia sube.
+666	Golpea 3 veces.
+667	Más potencia cuantos menos PP le queden a este movimiento.
+668	Golpea 2 veces. Cada golpe tiene un 20% de probabilidad de envenenar.
+669	100% de hacer retroceder. Falla si el objetivo no usa prioridad.
+670	Dura 3 turnos. Los Pokémon en campo no pueden dormirse.
+671	Baja 1 nivel Attack/Sp. Atk/Speed de los rivales envenenados.
+672	La potencia se duplica si el objetivo está envenenado.
+673	Sube 1 nivel Attack, Defense y Speed del usuario.
+674	Este movimiento no comprueba la precisión. Actúa último.
+675	Tiene un 33% de retroceso. 10% de probabilidad de paralizar al objetivo.
+676	La potencia se duplica si el objetivo está dormido, y lo despierta.
+677	Úsalo con <T> o Fire Pledge para un efecto adicional.
+678	Suele atacar primero. Golpea 2-5 veces en un turno.
+679	La potencia se duplica y el tipo varía con cada clima.
+680	Protege a los aliados de los movimientos de varios objetivos este turno.
+681	20% de probabilidad de paralizar al rival o rivales. Con lluvia no falla.
+682	Quema al objetivo.
+683	El turno siguiente recupera el 50% del HP máximo del usuario.
+684	Durante 5 turnos, se intercambian todas las Defense y Sp. Def.
+685	Sube 1 nivel el Attack y el Sp. Atk del usuario.
+686	La Ability del objetivo pasa a ser Insomnia.
+687	Duerme al objetivo después de 1 turno.
+688	La bonificación por mismo tipo (STAB) de este Pokémon es 2 en vez de 1.5.
+689	Los movimientos de tipo <T> de este Pokémon pasan a ser de tipo <T> y tienen 1.2x de potencia.
+690	Si este Pokémon es debilitado por un movimiento de contacto, quien lo usó pierde 1/4 de su HP máximo.
+691	Mientras este Pokémon está en campo, los efectos del clima quedan desactivados.
+692	Los ataques de este Pokémon tienen 1.3x de potencia si es el último en actuar en el turno.
+693	Si este Pokémon (no su sustituto) recibe un golpe crítico, su Attack sube 12 niveles.
+694	Con 1/2 o menos del HP máximo: +1 Attack, Sp. Atk y Speed, y -1 Defense y Sp. Def.
+695	Al entrar, este Pokémon se estremece si algún rival tiene un movimiento supereficaz o que debilita de un golpe.
+696	Impide que los Pokémon rivales elijan cambiar, salvo que estén en el aire.
+697	Este Pokémon y sus aliados están protegidos de los movimientos con prioridad del rival.
+698	Protege al usuario y a los aliados de Attract, Disable, Encore, Heal Block, Taunt y Torment.
+699	Combinación de las Abilities Unnerve y Chilling Neigh.
+700	Combinación de las Abilities Unnerve y Grim Neigh.
+701	Mientras este Pokémon está en campo, el multiplicador de Dark Aura y Fairy Aura es 0.75x.
+702	Los rivales dormidos pierden 1/8 de su HP máximo al final de cada turno.
+703	Los ataques especiales de los aliados de este Pokémon tienen la potencia multiplicada por 1.3.
+704	Este Pokémon no puede recibir golpes críticos.
+705	Después de debilitar a un Pokémon: sube 1 nivel Attack, Sp. Atk y Speed. Una vez por combate.
+706	Los Pokémon en campo sin esta Ability tienen la Sp. Def multiplicada por 0.75.
+707	El atributo más alto de este Pokémon sube 1 nivel si ataca y debilita a otro Pokémon.
+708	El Sp. Atk de este Pokémon sube 1 nivel cuando llega a 1/2 o menos de su HP máximo.
+709	Impide que otros Pokémon bajen la Defense de este Pokémon.
+710	Con 1/3 o menos de su HP máximo, el atributo ofensivo de este Pokémon es 1.5x con ataques Fire.
+711	Este Pokémon es inmune a los movimientos de bala.
+712	Si este Pokémon come una Berry, recupera 1/3 de su HP máximo después del efecto de la Berry.
+713	El Attack de este Pokémon sube 1 nivel si ataca y debilita a otro Pokémon.
+714	Si Sunny Day está activo, la Speed de este Pokémon se duplica.
+715	Impide que otros Pokémon bajen los atributos de este Pokémon.
+716	El tipo de este Pokémon cambia al del movimiento que lo golpea, salvo que ya tenga ese tipo.
+717	Este Pokémon no puede tener problemas de estado y se considera dormido.
+718	Si el aliado es Dondozo: este Pokémon no puede actuar ni ser golpeado, y Dondozo gana +2 en todos los atributos.
+719	El Sp. Atk de este Pokémon sube 2 niveles por cada atributo suyo que baje un rival.
+720	Los movimientos de este Pokémon tienen la precisión multiplicada por 1.3.
+721	Si a este Pokémon le suben un atributo, baja en su lugar, y viceversa.
+722	Este Pokémon puede envenenar o envenenar gravemente a un Pokémon sin importar su tipo.
+723	Al entrar, este Pokémon copia todos los cambios de atributos de su aliado.
+724	Si este Pokémon recibe un golpe, baja 1 nivel la Speed de todos los demás Pokémon en campo.
+725	Si este Pokémon come una Berry, la comerá otra vez al final del turno siguiente.
+726	Al entrar, los cambios de atributos de los aliados de este Pokémon vuelven a 0.
+727	Si este Pokémon recibe un ataque, hay un 30% de probabilidad de que ese movimiento quede desactivado.
+728	30% de probabilidad de enamorar a los Pokémon del género opuesto que hagan contacto.
+729	Impide Explosion/Mind Blown/Misty Explosion/Self-Destruct/Aftermath mientras está en campo.
+730	Después de que otro Pokémon use un movimiento de baile, este Pokémon usa el mismo movimiento.
+731	Mientras este Pokémon está en campo, un movimiento Dark usado por cualquier Pokémon tiene 1.33x de potencia.
+732	Al entrar, la Defense de este Pokémon sube 1 nivel. Una vez por combate.
+733	Mientras este Pokémon tiene 1/2 o menos de su HP máximo, su Attack y su Sp. Atk se reducen a la mitad.
+734	El Attack de este Pokémon sube 2 niveles por cada atributo suyo que baje un rival.
+735	Al entrar, empiezan vientos fuertes hasta que esta Ability deje de estar activa en el combate.
+736	Al entrar, empieza un sol extremadamente intenso hasta que esta Ability deje de estar activa en el combate.
+737	(Solo Mimikyu) El primer golpe que recibe se bloquea, y en su lugar pierde 1/8 del HP.
+738	Al entrar, sube 1 nivel el Attack o el Sp. Atk según la defensa más débil de los rivales.
+739	El atributo ofensivo de este Pokémon se multiplica por 1.5 al usar un ataque de tipo <T>.
+740	Al entrar, este Pokémon invoca Rain Dance.
+741	Al entrar, este Pokémon invoca Sunny Day.
+742	Este Pokémon recupera 1/4 con <T> y 1/8 con lluvia; recibe 1.25x de <T> y pierde 1/8 con sol.
+743	El contador de sueño de este Pokémon baja de 2 en 2 en vez de 1.
+744	Este Pokémon recupera 1/4 de su HP máximo al recibir movimientos Ground; inmunidad a Ground.
+745	30% de probabilidad de envenenar, paralizar o dormir a quien haga contacto con este Pokémon.
+746	Al entrar, este Pokémon invoca Electric Terrain.
+747	Este Pokémon gana el efecto de Charge cuando recibe un golpe de un ataque.
+748	Al entrar, la Defense de este Pokémon sube 1 nivel.
+749	Al entrar, el Attack de este Pokémon sube 1 nivel.
+750	Al entrar, la Speed de este Pokémon sube 1 nivel.
+751	Al entrar, la Sp. Def de este Pokémon sube 1 nivel.
+752	Este Pokémon cambia cuando llega a 1/2 o menos de su HP máximo.
+753	Mientras este Pokémon está en campo, un movimiento Fairy usado por cualquier Pokémon tiene 1.33x de potencia.
+754	Este Pokémon recibe 3/4 del daño de los ataques supereficaces.
+755	30% de probabilidad de quemar al Pokémon que haga contacto con este Pokémon.
+756	Mientras este Pokémon está quemado, sus ataques especiales tienen 1.5x de potencia.
+757	Los ataques Fire de este Pokémon hacen 1.5x de daño si recibe un movimiento Fire; inmunidad a Fire.
+758	Si el usuario es Cherrim y Sunny Day está activo, su Attack y su Sp. Def y los de sus aliados son 1.5x.
+759	A los Pokémon de tipo <T> de este lado, otros Pokémon no pueden bajarles atributos ni causarles problemas de estado.
+760	Este Pokémon recibe 1/2 del daño de los movimientos de contacto y 2x del daño de los movimientos Fire.
+761	El tipo de Castform cambia al del clima actual, salvo con Sandstorm.
+762	Al entrar, este Pokémon es avisado del movimiento más potente de los rivales.
+763	Los aliados de este Pokémon reciben 3/4 del daño de los ataques de otros Pokémon.
+764	Al entrar, este Pokémon identifica los objetos que llevan todos los Pokémon rivales.
+765	La Defense de este Pokémon se duplica.
+766	Si este Pokémon tiene el HP al máximo, sus movimientos de tipo <T> tienen +1 de prioridad.
+767	Este Pokémon come las Berries con 1/2 del HP máximo o menos en vez del 1/4 habitual.
+768	Este Pokémon es inmune a los movimientos de estado.
+769	A los Pokémon que hagan contacto con este Pokémon les baja 1 nivel la Speed.

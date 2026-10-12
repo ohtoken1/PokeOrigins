@@ -10,17 +10,19 @@ import { api, ErroApi } from '../conta';
 import { TODOS_OS_ITENS, nomeCategoriaItem } from '../../../shared/loja';
 import { darItemAoJogador } from '../entregas';
 import { secaoDarPokemon } from './adminPokemon';
+import { secaoBanimentos } from './adminBanimentos';
 import { iconeItem } from '../ui/iconeItem';
 import { el } from '../ui/dom';
 import { cartaoAnuncio } from '../ui/mural';
 
-export type SecaoAdministracao = 'itens' | 'pokemon' | 'log' | 'eventos' | 'anuncios';
+export type SecaoAdministracao = 'itens' | 'pokemon' | 'banimentos' | 'log' | 'eventos' | 'anuncios';
 
 export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBreve?: string }[] = [
   // só eventos que a staff ativa direto (pedido do dono); a Bonificação mora aqui
   { id: 'eventos', nome: 'Eventos' },
   { id: 'itens', nome: 'Dar item' },
   { id: 'pokemon', nome: 'Dar Pokémon' },
+  { id: 'banimentos', nome: 'Banimentos' },
   {
     id: 'log',
     nome: 'Log',
@@ -176,7 +178,7 @@ export const telaAdministracao = (secaoInicial: SecaoAdministracao): Tela => (ra
   let secao = secaoInicial;
   const corpo = el('div', { class: 'admin-corpo' });
   // montada uma vez só (redesenhar a tela não apaga o que a pessoa está escrevendo)
-  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : secao === 'pokemon' ? secaoDarPokemon() : null;
+  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : secao === 'pokemon' ? secaoDarPokemon() : secao === 'banimentos' ? secaoBanimentos() : null;
 
   const linhaBonus = (chave: ChaveBonus) => {
     const atual = bonificacao()[chave];

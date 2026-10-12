@@ -94,7 +94,11 @@ function porNoLetreiro(aviso: AvisoLetreiro): void {
   if (letreiro.length > LETREIRO_GUARDADOS) letreiro.shift();
   avisarTodos({ t: 'letreiro', aviso });
 }
-/** Aviso de banimento para todos (para o sistema de banir, quando existir). */
+/** Fecha a conexão de uma conta (banimento): o jogo dela para de receber e de mandar. */
+export function derrubar(contaId: number): void {
+  porConta.get(contaId)?.ws.close(4003, 'Conta banida');
+}
+/** Aviso de banimento para todos (server/src/banimentos.ts). */
 export const avisarBanimento = (jogador: string) => porNoLetreiro({ id: proximoAviso++, quando: Date.now(), tipo: 'banido', jogador });
 
 /** Aviso escrito pela staff (Administração → Anúncios → Publicar aviso). Devolve o texto que foi para a barra. */

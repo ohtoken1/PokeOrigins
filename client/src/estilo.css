@@ -2405,3 +2405,10 @@ button.vaga.casa-box:hover { border-color: rgb(18 17 15 / 0.35); background: rgb
 .safari-andamento strong { font-size: 1.2rem; color: var(--destaque); }
 .safari-botoes { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 @media (max-width: 520px) { .safari-tipos { grid-template-columns: repeat(3, 1fr); } }
+
+/* Administração → Banimentos */
+.ban-lista { display: flex; flex-direction: column; gap: 10px; margin: 8px 0 18px; }
+.ban-cartao { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border: 1px solid var(--borda); border-radius: 10px; background: var(--painel); align-items: flex-start; }
+.ban-cartao.ativo { border-color: #b3403a; }
+.ban-topo { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.ban-motivo { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }

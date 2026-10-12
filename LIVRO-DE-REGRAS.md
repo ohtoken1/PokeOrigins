@@ -143,7 +143,7 @@ A faixa segue o nível de evolução oficial.
 
 ### 3.4 Safari (na Cidade)
 
-Fale com o guia **Safari**, no quintal de uma casa ao sul da praça.
+Fale com o guia **Safari**, na creche ao sul da praça. Requer **treinador nível 15**.
 
 - **Você escolhe um tipo** (Fire, Water, Dragon… os 18). O Safari tem **3 salas só suas**: ninguém mais entra nelas.
 - Em cada sala andam **10 Pokémon daquele tipo** (vale o primeiro ou o segundo tipo), de **todas as regiões**, no nível dos seus encontros. Passe o mouse para ver nome e nível.
@@ -915,6 +915,9 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Teal Mask com uso:** usada numa Ogerpon de outra máscara, ela volta para a forma padrão (o Homem Suspeito não faz mais isso).
 - **Cosmog e Meltan** selvagens aparecem sempre no nível 10 (os outros lendários e míticos continuam no 50 ou mais). O Meltan evolui para Melmetal no nível 50.
 - **Ovo Misterioso:** iniciais e lendários/míticos agora só nascem na forma base (as evoluções deles só evoluindo).
+- **Banimentos:** a administração pode tirar um jogador do jogo por 1 hora, 1 dia, 3, 7 ou 30 dias, ou para sempre, sempre com o motivo registrado. O jogador banido sai na hora e, ao tentar entrar, lê o motivo e até quando vale. O aviso passa na barrinha para todos.
+- **Evento sazonal:** quando não há evento ativo, o NPC avisa "Nenhum evento sazonal ativo no momento".
+- **Safari com tranca:** agora pede **treinador nível 15**.
 - **Idiomas:** o jogo agora pode ser jogado em português, inglês ou espanhol. A escolha fica em **Opções** e na tela de entrada, pelas bandeiras. Nomes de Pokémon, golpes, itens, Abilities, Natures e tipos continuam em inglês nos três idiomas.
 - **Casas com a cara de cada NPC:** a Guilda ganhou um salão medieval com estandartes; o Viajante do tempo, uma casa metade passado e metade futuro, com um relógio grande e um portal aceso; o Safari virou uma creche no meio de um lote só dela, com um cercado grande de cada lado, onde Chansey, Kangaskhan, Eevee, Scyther, Tauros e Porygon ficam soltos; e o Mercado negro agora é uma entrada de esgoto. O Banco ficou simétrico.
 - **NPCs com visuais diferentes:** cada um com o seu cabelo e o seu jeito.

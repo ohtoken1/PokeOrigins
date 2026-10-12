@@ -141,7 +141,11 @@ export const telaCidade: Tela = (raiz, navegar) => {
     else if (acao === 'missoes') abrirQuadroDeMissoes(save!, () => atualizarTime());
     else if (acao === 'mercadonegro' && !conteudoLiberado('mercadoNegro')) avisar(`Mercado negro: ${textoTranca('mercadoNegro')}.`);
     else if (acao === 'mercadonegro') abrirMercado(save!, () => atualizarTime());
+    // quem já está num Safari aberto continua; para entrar num novo vale a tranca
+    else if (acao === 'safari' && !conteudoLiberado('safari') && !save!.safari?.aberto) avisar(`Safari: ${textoTranca('safari')}.`);
     else if (acao === 'safari') abrirSafari(save!, navegar, () => atualizarTime());
+    // evento sazonal: o NPC fica fechado enquanto a staff não liga nenhum (ainda não há eventos sazonais)
+    else if (acao === 'sazonal') avisar('🔒 Nenhum evento sazonal ativo no momento.');
     else avisar(`${EM_BREVE[acao] ?? 'Este lugar'}: em breve.`);
   }
   const minimapa = montarMinimapa(areaJogo, () => cena(), irAoLocal);

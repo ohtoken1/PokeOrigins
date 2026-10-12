@@ -501,3 +501,45 @@ export function concluirMissao(id: string, contaId: number, por: string, quando:
   sqlMissoes.criar.run(id, contaId, por, quando);
   sqlMissoes.limpar.run(quando - 7 * 24 * 60 * 60 * 1000);
 }
+
+// ---- banimentos (server/src/banimentos.ts): cada linha fica guardada para sempre, é o registro de quem baniu e por quê ----
+db.exec(`
+  CREATE TABLE IF NOT EXISTS banimentos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    conta_id INTEGER NOT NULL REFERENCES contas(id) ON DELETE CASCADE,
+    usuario TEXT NOT NULL,
+    motivo TEXT NOT NULL,
+    por TEXT NOT NULL,
+    criado_em INTEGER NOT NULL,
+    ate INTEGER,
+    revogado_em INTEGER,
+    revogado_por TEXT
+  );
+  CREATE INDEX IF NOT EXISTS banimentos_conta ON banimentos (conta_id);
+`);
+export interface Banimento {
+  id: number;
+  conta_id: number;
+  usuario: string;
+  motivo: string;
+  por: string;
+  criado_em: number;
+  /** null = para sempre */
+  ate: number | null;
+  revogado_em: number | null;
+  revogado_por: string | null;
+}
+const sqlBanimento = {
+  ativo: db.prepare('SELECT * FROM banimentos WHERE conta_id = ? AND revogado_em IS NULL AND (ate IS NULL OR ate > ?) ORDER BY ate IS NULL DESC, ate DESC LIMIT 1'),
+  criar: db.prepare('INSERT INTO banimentos (conta_id, usuario, motivo, por, criado_em, ate) VALUES (?, ?, ?, ?, ?, ?)'),
+  revogar: db.prepare('UPDATE banimentos SET revogado_em = ?, revogado_por = ? WHERE conta_id = ? AND revogado_em IS NULL AND (ate IS NULL OR ate > ?)'),
+  listar: db.prepare('SELECT * FROM banimentos ORDER BY id DESC LIMIT ?'),
+  apagarSessoes: db.prepare('DELETE FROM sessoes WHERE conta_id = ?'),
+};
+export const banimentoAtivo = (contaId: number, agora = Date.now()) => sqlBanimento.ativo.get(contaId, agora) as unknown as Banimento | undefined;
+export const criarBanimento = (contaId: number, usuario: string, motivo: string, por: string, ate: number | null) =>
+  void sqlBanimento.criar.run(contaId, usuario, motivo, por, Date.now(), ate);
+export const revogarBanimentos = (contaId: number, por: string) => sqlBanimento.revogar.run(Date.now(), por, contaId, Date.now()).changes > 0;
+export const listarBanimentos = (limite: number) => sqlBanimento.listar.all(limite) as unknown as Banimento[];
+/** Derruba todas as sessões da conta (ela tem de entrar de novo). */
+export const apagarSessoesDaConta = (contaId: number) => void sqlBanimento.apagarSessoes.run(contaId);

@@ -1,0 +1,277 @@
+770	El Attack de este Pokémon es 1.5x, pero solo puede elegir el primer movimiento que ejecute.
+771	Si Grassy Terrain está activo, la Defense de este Pokémon se multiplica por 1.5.
+772	Al entrar, este Pokémon invoca Grassy Terrain.
+773	El Sp. Atk de este Pokémon sube 1 nivel si ataca y debilita a otro Pokémon.
+774	Inmune a Intimidate. Si lo intimidan: +1 Attack. No puede ser obligado a cambiar.
+775	Si lo golpean tras Surf/Dive, el atacante pierde 1/4 del HP máximo y recibe -1 Defense o parálisis.
+776	Si este Pokémon tiene un problema de estado, su Attack es 1.5x; ignora la reducción de daño físico por quemadura.
+777	Al entrar, invoca Electric Terrain. Con Electric Terrain, el Sp. Atk es 1.3333x.
+778	Si el último objeto usado es una Berry, 50% de probabilidad de recuperarla al final de cada turno. 100% con sol.
+779	30% de probabilidad de curar el problema de estado del aliado de este Pokémon al final de cada turno.
+780	El daño Fire contra este Pokémon se calcula con 1/2 del atributo ofensivo; 1/2 del daño de quemadura.
+781	El peso de este Pokémon se duplica.
+782	Al entrar, este Pokémon recupera 1/4 del HP máximo de su aliado, redondeado hacia abajo.
+783	El Attack de este Pokémon se duplica.
+784	Si es Morpeko, cambia entre Full Belly y Hangry Mode al final de cada turno.
+785	El Attack de este Pokémon es 1.5x y la precisión de sus ataques físicos es 0.8x.
+786	Este Pokémon se cura de su problema de estado al final de cada turno si Rain Dance está activo.
+787	Impide que otros Pokémon bajen el Attack de este Pokémon.
+788	Si nieva, este Pokémon recupera 1/16 de su HP máximo cada turno.
+789	Si es Eiscue, el primer golpe físico que recibe hace 0 de daño. El efecto se recupera con nieve.
+790	Este Pokémon recibe 1/2 del daño de los ataques especiales.
+791	Otros no pueden bajar la precisión de este Pokémon; ignora la evasión de ellos.
+792	Este Pokémon aparece como el último Pokémon del equipo hasta que recibe daño directo.
+793	Este Pokémon no puede ser envenenado. Ganar esta Ability estando envenenado lo cura.
+794	Al entrar, este Pokémon se transforma en el Pokémon rival que tiene enfrente.
+795	Los movimientos ignoran sustitutos y Reflect/Light Screen/Safeguard/Mist/Aurora Veil del rival.
+796	Si este Pokémon es debilitado por un movimiento, quien lo usó pierde la misma cantidad de HP.
+797	Este Pokémon no puede retroceder. Inmune a Intimidate.
+798	Este Pokémon no puede dormirse. Ganar esta Ability estando dormido lo cura.
+799	Al entrar, este Pokémon baja 1 nivel el Attack de los rivales.
+800	Al entrar, el Attack de este Pokémon sube 1 nivel. Una vez por combate.
+801	Los Pokémon que hagan contacto con este Pokémon pierden 1/8 de su HP máximo.
+802	Los ataques de puño de este Pokémon tienen 1.2x de potencia. Sucker Punch no se potencia.
+803	El Attack de este Pokémon sube 1 nivel después de recibir daño de un movimiento de tipo <T>.
+804	El objeto que lleva este Pokémon no tiene efecto, salvo Macho Brace. No se puede usar Fling.
+805	Si Sunny Day está activo, este Pokémon no puede tener problemas de estado y Rest le fallará.
+806	Este Pokémon es inmune a Ground; Gravity/Ingrain/Smack Down/Iron Ball lo anulan.
+807	El tipo de este Pokémon cambia al del movimiento que está usando. Una vez por entrada.
+808	El peso de este Pokémon se reduce a la mitad.
+809	Este Pokémon atrae los movimientos Electric para subir 1 nivel su Sp. Atk; inmunidad a Electric.
+810	Este Pokémon no puede ser paralizado. Ganar esta Ability estando paralizado lo cura.
+811	Hacer contacto con este Pokémon cambia la Ability del atacante a Lingering Aroma.
+812	Este Pokémon daña a quienes le drenan HP tanto como se habrían curado.
+813	Los movimientos de sonido de este Pokémon pasan a ser de tipo <T>.
+814	Los ataques de este Pokémon no hacen contacto con el objetivo.
+815	Este Pokémon bloquea ciertos movimientos de estado y los devuelve a quien los usó.
+816	Este Pokémon solo puede recibir daño de ataques directos.
+817	Si este Pokémon no lleva objeto, roba el del Pokémon al que golpea con un ataque.
+818	Este Pokémon no puede ser congelado. Ganar esta Ability estando congelado lo cura.
+819	Impide que los Pokémon rivales de tipo <T> elijan cambiar.
+820	Si este Pokémon tiene un problema de estado, su Defense se multiplica por 1.5.
+821	Los movimientos de pulso de este Pokémon tienen 1.5x de potencia. Heal Pulse cura 3/4 del HP máximo del objetivo.
+822	Los ataques de este Pokémon son golpes críticos si el objetivo está envenenado.
+823	Los tipos de este Pokémon cambian según el terreno. El tipo vuelve al terminar el terreno.
+824	Los movimientos <T> y Normal golpean a Ghost. No le pueden bajar la precisión; ignora la evasión.
+825	Si un aliado en campo tiene esta Ability o Plus, el Sp. Atk de este Pokémon es 1.5x.
+826	Si fueran a bajar los atributos de este Pokémon, bajan los del atacante en su lugar.
+827	Al entrar, este Pokémon invoca Misty Terrain.
+828	Los movimientos de este Pokémon y sus efectos ignoran las Abilities de otros Pokémon.
+829	Cada turno sube 2 niveles un atributo al azar (salvo precisión/evasión) y baja 1 nivel otro.
+830	La Speed de este Pokémon sube 1 nivel si recibe un movimiento Electric; inmunidad a Electric.
+831	Si este Pokémon tiene el HP al máximo, el daño de los ataques que recibe se reduce a la mitad.
+832	Si este Pokémon es Arceus, su tipo cambia según la Plate que lleve.
+833	A los Pokémon que hagan contacto con este Pokémon les cambia la Ability a Mummy.
+834	Los movimientos de estado de este Pokémon actúan últimos en su nivel de prioridad e ignoran las Abilities.
+835	Este Pokémon se cura de su problema de estado al cambiar.
+836	Los ataques supereficaces de este Pokémon hacen 1.25x de daño.
+837	Mientras este Pokémon está en campo, las Abilities no tienen efecto.
+838	Todos los movimientos usados por este Pokémon o contra él siempre aciertan.
+839	Los movimientos de este Pokémon pasan a ser de tipo <T> y tienen 1.2x de potencia.
+840	Este Pokémon no puede ser enamorado ni provocado. Inmune a Intimidate.
+841	Cuando a un Pokémon rival le sube un atributo, este Pokémon copia el efecto.
+842	Al entrar, invoca Sunny Day. Con Sunny Day, el Attack es 1.3333x.
+843	Este Pokémon es inmune a los movimientos de polvo, al daño de Sandstorm y a Effect Spore.
+844	Con 1/3 o menos de su HP máximo, el atributo ofensivo de este Pokémon es 1.5x con ataques Grass.
+845	Este Pokémon no puede ser confundido. Inmune a Intimidate.
+846	Los movimientos de daño de este Pokémon golpean dos veces. El segundo golpe hace un cuarto del daño.
+847	Este Pokémon y sus aliados no pueden ser envenenados. Al entrar, cura a los aliados envenenados.
+848	Hacer contacto con este Pokémon inicia el efecto de Perish Song para él y para el atacante.
+849	Si este Pokémon no lleva objeto y recibe un movimiento de contacto, roba el objeto del atacante.
+850	Si este Pokémon no lleva objeto, encuentra uno usado este turno por un Pokémon adyacente.
+851	Si un aliado en campo tiene esta Ability o Minus, el Sp. Atk de este Pokémon es 1.5x.
+852	Estando envenenado, este Pokémon recupera 1/8 de su HP máximo cada turno; no pierde HP.
+853	30% de probabilidad de envenenar al Pokémon que haga contacto con este Pokémon.
+854	Pecharunt: si este Pokémon envenena a un objetivo, el objetivo también queda confuso.
+855	Los movimientos de contacto de este Pokémon tienen un 30% de probabilidad de envenenar.
+856	Si es Zygarde 10%/50%, cambia a Complete si tiene 1/2 del HP máximo o menos al final del turno.
+857	Este Pokémon copia la Ability de un aliado que se debilita.
+858	Los movimientos de los aliados de este Pokémon tienen la potencia multiplicada por 1.3.
+859	Los movimientos de estado de este Pokémon tienen +1 de prioridad, pero los de tipo <T> son inmunes.
+860	Si este Pokémon es el objetivo del movimiento de un rival, ese movimiento pierde un PP adicional.
+861	Al entrar, empieza una lluvia intensa hasta que esta Ability deje de estar activa en el combate.
+862	Ningún efecto puede redirigir los movimientos de este Pokémon a otro objetivo.
+863	Con Sunny Day activo o Booster Energy usada: el atributo más alto es 1.3x, o 1.5x si es Speed.
+864	Al entrar, este Pokémon invoca Psychic Terrain.
+865	Este Pokémon recibe 1/2 del daño de los movimientos de sonido. Los suyos tienen 1.3x de potencia.
+866	El daño Ghost a este Pokémon se calcula con el atributo ofensivo a la mitad; no puede tener problemas de estado.
+867	Con Electric Terrain activo o Booster Energy usada: el atributo más alto es 1.3x, o 1.5x si es Speed.
+868	Este Pokémon tiene un 30% de probabilidad de actuar primero en su nivel de prioridad con movimientos de ataque.
+869	Si este Pokémon tiene un problema de estado, su Speed es 1.5x; ignora la bajada de Speed por parálisis.
+870	Si Rain Dance está activo, este Pokémon recupera 1/16 de su HP máximo cada turno.
+871	La Speed sube 1 nivel si recibe un ataque de tipo Bug, Dark o <T>, o si lo intimidan.
+872	Los ataques con retroceso o daño por fallo de este Pokémon tienen 1.2x de potencia; no Struggle.
+873	Este Pokémon recupera 1/3 de su HP máximo, redondeado hacia abajo, al cambiar.
+874	Cuando este Pokémon come ciertas Berries, los efectos se duplican.
+875	Los ataques de este Pokémon hacen 1.25x a objetivos del mismo género; 0.75x a los del género opuesto.
+876	Si este Pokémon es Silvally, su tipo cambia según la Memory que lleve.
+877	Este Pokémon no recibe daño de retroceso, salvo por Struggle/Life Orb/daño por fallo.
+878	Los ataques <T>/<T>/Steel de este Pokémon hacen 1.3x con Sandstorm; inmunidad a ella.
+879	Si Sandstorm está activo, la Speed de este Pokémon se duplica; inmunidad a Sandstorm.
+880	Cuando este Pokémon recibe un ataque, empieza el efecto de Sandstorm.
+881	Al entrar, este Pokémon invoca Sandstorm.
+882	Si Sandstorm está activo, la evasión de este Pokémon es 1.25x; inmunidad a Sandstorm.
+883	El Attack de este Pokémon sube 1 nivel si recibe un movimiento Grass; inmunidad a Grass.
+884	Si el usuario es Wishiwashi, cambia a School Form si tiene más de 1/4 del HP máximo; si no, a Solo Form.
+885	Los movimientos <T> y Normal golpean a Ghost. Inmune a Intimidate.
+886	Al entrar, terminan los efectos de Aurora Veil, Light Screen y Reflect en los dos lados.
+887	Cuando este Pokémon recibe un ataque, empieza el efecto de Grassy Terrain.
+888	Los movimientos de este Pokémon tienen el doble de probabilidad de efecto secundario.
+889	Impide que los rivales elijan cambiar, salvo que también tengan esta Ability.
+890	Los movimientos de corte de este Pokémon tienen la potencia multiplicada por 1.5.
+891	Este Pokémon tiene un 33% de probabilidad de curarse de su problema de estado al final de cada turno.
+892	Los ataques con efectos secundarios de este Pokémon tienen 1.3x de potencia; anula los efectos.
+893	A este Pokémon no le afecta el efecto secundario del ataque de otro Pokémon.
+894	Si es Minior, al entrar o al final del turno cambia a Core con 1/2 del HP máximo o menos; si no, a Meteor.
+895	Cuando sube o baja un atributo de este Pokémon, la cantidad se duplica.
+896	Los ataques de varios golpes de este Pokémon siempre golpean el máximo de veces.
+897	Al entrar, el Attack y la Speed de este Pokémon se reducen a la mitad durante 5 turnos.
+898	Si nieva, la Speed de este Pokémon se duplica.
+899	Si este Pokémon da un golpe crítico, el daño se multiplica por 1.5.
+900	Si nieva, la evasión de este Pokémon es 1.25x.
+901	Al entrar, este Pokémon invoca la nieve.
+902	Si Sunny Day está activo, el Sp. Atk de este Pokémon es 1.5x; pierde 1/8 del HP máximo por turno.
+903	El Sp. Atk de este Pokémon sube 1 nivel cuando otro Pokémon se debilita.
+904	Este Pokémon es inmune a los movimientos de sonido, salvo que él los use.
+905	La Speed de este Pokémon sube 1 nivel al final de cada turno completo en campo.
+906	El atributo ofensivo de este Pokémon se duplica contra un objetivo que entró este turno.
+907	Este Pokémon actúa último entre los Pokémon que usan movimientos de igual o mayor prioridad.
+908	La Defense de este Pokémon sube 1 nivel después de recibir daño de un movimiento.
+909	Si es Aegislash, cambia a Blade antes de atacar y a Shield antes de King's Shield.
+910	30% de probabilidad de paralizar al Pokémon que haga contacto con este Pokémon.
+911	Si este Pokémon retrocede, su Speed sube 1 nivel.
+912	La Speed de este Pokémon sube 6 niveles después de recibir daño de movimientos <T>/Water.
+913	Los movimientos de tipo <T> de este Pokémon y sus aliados tienen la potencia multiplicada por 1.5.
+914	Los ataques de este Pokémon que no hacen retroceder ganan un 10% de probabilidad de hacerlo.
+915	Este Pokémon no puede perder el objeto que lleva por la Ability o el ataque de otro Pokémon.
+916	Este Pokémon atrae los movimientos Water para subir 1 nivel su Sp. Atk; inmunidad a Water.
+917	Los ataques de mordisco de este Pokémon tienen 1.5x de potencia. Bug Bite no se potencia.
+918	Si este Pokémon tiene el HP al máximo, sobrevive a un golpe con al menos 1 HP. Inmune a los movimientos que debilitan de un golpe.
+919	Este Pokémon no puede ser obligado a cambiar por el ataque o el objeto de otro Pokémon.
+920	El índice de golpe crítico de este Pokémon sube 1 nivel.
+921	Al entrar, este Pokémon baja 1 nivel la evasión de los rivales. Una vez por combate.
+922	Los movimientos de este Pokémon tienen un 10% más de potencia por cada aliado debilitado, hasta 5 aliados.
+923	Si Electric Terrain está activo, la Speed de este Pokémon se duplica.
+924	Con 1/3 o menos de su HP máximo, el atributo ofensivo de este Pokémon es 1.5x con ataques Bug.
+925	Este Pokémon y sus aliados no pueden dormirse; los que ya duermen no se despiertan.
+926	Si Rain Dance está activo, la Speed de este Pokémon se duplica.
+927	Los Pokémon en campo sin esta Ability tienen la Defense multiplicada por 0.75.
+928	Si un aliado usa su objeto, este Pokémon le da el suyo de inmediato.
+929	Si otro Pokémon quema, envenena o paraliza a este Pokémon, también recibe ese estado.
+930	Los Pokémon en campo sin esta Ability tienen el Attack multiplicado por 0.75.
+931	La evasión de este Pokémon se duplica mientras está confuso.
+932	Los movimientos de 60 de potencia o menos de este Pokémon tienen 1.5x de potencia, incluido Struggle.
+933	Este Pokémon no recibe daño de los ataques de sus aliados.
+934	Terapagos: terastalizar termina los efectos del clima y del terreno. Una vez por combate.
+935	Terapagos: con el HP al máximo, los ataques recibidos tienen 0.5x de eficacia, salvo inmunidad natural.
+936	Si este Pokémon es Terapagos, se transforma en su Terastal Form al entrar.
+937	El Attack de este Pokémon sube 1 nivel al recibir daño de movimientos Fire; no puede ser quemado.
+938	Los movimientos de tipo Fire/<T> contra este Pokémon hacen daño con el atributo ofensivo a la mitad.
+939	Los ataques poco eficaces de este Pokémon hacen el doble de daño.
+940	Con 1/3 o menos de su HP máximo, el atributo ofensivo de este Pokémon es 1.5x con ataques Water.
+941	Los movimientos de contacto de este Pokémon tienen la potencia multiplicada por 1.3.
+942	Mientras este Pokémon está envenenado, sus ataques físicos tienen 1.5x de potencia.
+943	Los ataques de este Pokémon tienen un 30% de probabilidad de envenenar gravemente.
+944	Si este Pokémon recibe un ataque físico, se ponen Toxic Spikes en el lado rival.
+945	Al entrar, o cuando puede, este Pokémon copia la Ability de un rival adyacente al azar.
+946	El atributo ofensivo de este Pokémon se multiplica por 1.3 al usar un ataque de tipo <T>.
+947	Los movimientos de curación de este Pokémon tienen +3 de prioridad.
+948	Este Pokémon se salta un turno de cada dos en vez de usar un movimiento.
+949	Este Pokémon ignora los cambios de atributos de otros Pokémon al recibir o hacer daño.
+950	La Speed se duplica al perder el objeto; la mejora se pierde si cambia o recibe otro objeto o Ability.
+951	Mientras este Pokémon está en campo, impide que los Pokémon rivales usen sus Berries.
+952	Los movimientos de contacto de este Pokémon ignoran la protección del objetivo, salvo Max Guard.
+953	Los Pokémon en campo sin esta Ability tienen el Sp. Atk multiplicado por 0.75.
+954	Los movimientos de este Pokémon y sus aliados tienen la precisión multiplicada por 1.1.
+955	Este Pokémon recupera 1/4 de su HP máximo al recibir movimientos Electric; inmunidad a Electric.
+956	Los Pokémon que hagan contacto con este Pokémon intercambian su Ability con esta.
+957	Este Pokémon recupera 1/4 de su HP máximo al recibir movimientos Water; inmunidad a Water.
+958	La potencia Water de este Pokémon es 2x; no puede ser quemado; la potencia Fire contra él se reduce a la mitad.
+959	La Defense de este Pokémon sube 2 niveles después de recibir daño de un movimiento de tipo <T>.
+960	Este Pokémon no puede ser quemado. Ganar esta Ability estando quemado lo cura.
+961	Si un ataque físico golpea a este Pokémon, la Defense baja 1 nivel y la Speed sube 2.
+962	La Defense de este Pokémon sube 2 niveles si recibe un movimiento Fire; inmunidad a Fire.
+963	Este Pokémon gana el efecto de Charge al recibir un movimiento de viento o al empezar Tailwind.
+964	El Attack sube 1 nivel si recibe un movimiento de viento o empieza Tailwind. Inmunidad a los movimientos de viento.
+965	Este Pokémon solo puede recibir daño de movimientos supereficaces y de daño indirecto.
+966	Los movimientos de estado que comprueban la precisión tienen un 50% de precisión contra este Pokémon.
+967	Si es Darmanitan, al final del turno cambia a Standard con más de 1/2 del HP máximo; si no, a Zen.
+968	Si este Pokémon es Palafin en Zero Form, al cambiar pasa a Hero Form.
+969	Quita los objetos que llevan los Pokémon adyacentes.
+970	El tipo <T> del usuario se vuelve sin tipo; debe ser Fire.
+971	Baja 1 nivel Defense, Sp. Def y Speed del usuario.
+972	Si el portador tiene un movimiento Bug, este objeto le permite usar un Z-Move Bug.
+973	El Multi-Attack del portador es de tipo <T>.
+974	Si el portador tiene un movimiento Dark, este objeto le permite usar un Z-Move Dark.
+975	Si el portador tiene un movimiento Dragon, este objeto le permite usar un Z-Move Dragon.
+976	Si el portador tiene un movimiento Electric, este objeto le permite usar un Z-Move Electric.
+977	Si el portador tiene un movimiento Fairy, este objeto le permite usar un Z-Move Fairy.
+978	Si el portador tiene un movimiento Fighting, este objeto le permite usar un Z-Move Fighting.
+979	Si el portador tiene un movimiento Fire, este objeto le permite usar un Z-Move Fire.
+980	Si el portador tiene un movimiento Flying, este objeto le permite usar un Z-Move Flying.
+981	Si el portador tiene un movimiento Ghost, este objeto le permite usar un Z-Move Ghost.
+982	Si el portador tiene un movimiento Grass, este objeto le permite usar un Z-Move Grass.
+983	Si el portador tiene un movimiento Ground, este objeto le permite usar un Z-Move Ground.
+984	Si el portador tiene un movimiento Ice, este objeto le permite usar un Z-Move Ice.
+985	Si el portador tiene un movimiento Normal, este objeto le permite usar un Z-Move Normal.
+986	Si el portador tiene un movimiento Poison, este objeto le permite usar un Z-Move Poison.
+987	Si el portador tiene un movimiento Psychic, este objeto le permite usar un Z-Move Psychic.
+988	Si el portador tiene un movimiento Rock, este objeto le permite usar un Z-Move Rock.
+989	Si el portador tiene un movimiento Steel, este objeto le permite usar un Z-Move Steel.
+990	Si el portador tiene un movimiento Water, este objeto le permite usar un Z-Move Water.
+991	Si lo lleva un Alolan Raichu con Thunderbolt, puede usar Stoked Sparksurfer.
+992	Recupera 20 HP con 1/2 del HP máximo o menos. Un solo uso.
+993	Si lo lleva Kyogre, este objeto activa su Primal Reversion en combate.
+994	Si lo lleva Groudon, este objeto activa su Primal Reversion en combate.
+995	El Techno Blast del portador es de tipo <T>.
+996	Si lo lleva Decidueye con Spirit Shackle, puede usar Sinister Arrow Raid.
+997	Si lo lleva Clamperl, su Sp. Def se duplica.
+998	Si lo lleva Clamperl, su Sp. Atk se duplica.
+999	Si lo lleva Eevee con Last Resort, puede usar Extreme Evoboost.
+1000	Si lo lleva Incineroar con Darkest Lariat, puede usar Malicious Moonsault.
+1001	Si lo lleva Kommo-o con Clanging Scales, puede usar Clangorous Soulblaze.
+1002	Si lo lleva Farfetch’d o Sirfetch’d, su índice de golpe crítico sube 2 niveles.
+1003	Si lo lleva Farfetch’d, su índice de golpe crítico sube 2 niveles.
+1004	Si lo lleva Chansey, su índice de golpe crítico sube 2 niveles.
+1005	Lunala o Dawn Wings Necrozma con Moongeist Beam pueden usar un Z-Move especial.
+1006	Solgaleo o Dusk Mane Necrozma con Sunsteel Strike pueden usar un Z-Move especial.
+1007	Si lo lleva una forma de Lycanroc con Stone Edge, puede usar Splintered Stormshards.
+1008	Si lo lleva Marshadow con Spectral Thief, puede usar Soul-Stealing 7-Star Strike.
+1009	Si lo lleva un Ditto que no se ha transformado, su Defense se duplica.
+1010	Si lo lleva un Ditto que no se ha transformado, su Speed se duplica.
+1011	Si lo lleva Mew con <T>, puede usar Genesis Supernova.
+1012	Si lo lleva Mimikyu con Play Rough, puede usar Let's Snuggle Forever.
+1013	Si lo lleva Pikachu con Volt Tackle, puede usar Catastropika.
+1014	Si lo lleva un Pikachu con gorra con Thunderbolt, puede usar 10,000,000 Volt Thunderbolt.
+1015	Si lo lleva Primarina con Sparkling Aria, puede usar Oceanic Operetta.
+1016	Hace evolucionar a Spritzee a Aromatisse al intercambiarlo.
+1017	Hace evolucionar a Swirlix a Slurpuff al intercambiarlo.
+1018	Si lo lleva Snorlax con Giga Impact, puede usar Pulverizing Pancake.
+1019	Si lo lleva un Tapu con Nature's Madness, puede usar Guardian of Alola.
+1020	Si lo lleva Cubone o Marowak, su Attack se duplica.
+1021	Dusk Mane/Dawn Wings Necrozma: Ultra Burst y luego Z-Move con Photon Geyser.
+1022	El movimiento base define la potencia. Rivales: dormidos, envenenados o paralizados.
+1023	El movimiento base define la potencia. Rivales: -1/6 del HP, 4 turnos.
+1024	El movimiento base define la potencia. Rivales: atrapados 4-5 turnos.
+1025	El movimiento base define la potencia. Aliados: índice de crítico +1.
+1026	El movimiento base define la potencia. Rivales: enamorados.
+1027	El movimiento base define la potencia. Rivales: último movimiento -2 PP.
+1028	Siempre 160 de potencia. Ignora las Abilities.
+1029	El movimiento base define la potencia. Aliados: +1/6 del HP máximo.
+1030	El movimiento base define la potencia. Rivales: -2 Speed.
+1031	El movimiento base define la potencia. Rivales: confusos.
+1032	El movimiento base define la potencia. Inicia Gravity.
+1033	El movimiento base define la potencia. Rivales: envenenados.
+1034	El movimiento base define la potencia. Rivales: con Torment.
+1035	El movimiento base define la potencia. Atraviesa Max Guard.
+1036	El movimiento base define la potencia. 50% de recuperar las Berries.
+1037	El movimiento base define la potencia. Aliados: Aurora Veil.
+1038	El movimiento base define la potencia. Objetivo: 50% de Yawn.
+1039	El movimiento base define la potencia. Rivales: trampa de Steel.
+1040	El movimiento base define la potencia. Rivales: Stealth Rock.
+1041	El movimiento base define la potencia. Rivales: envenenados o paralizados.
+1042	El movimiento base define la potencia. Aliados: estado curado.
+1043	El movimiento base define la potencia. Rivales: -1 de evasión.
+1044	El movimiento base define la potencia. Rivales: atrapados.
+1045	El movimiento base define la potencia. Rivales: paralizados.
+1046	El movimiento base define la potencia. Termina el terreno y las trampas.
