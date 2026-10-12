@@ -424,24 +424,29 @@ export function gerarMapaCidade(): Mapa {
   colocar('mercadoEsgoto', espelho(eixo - 15), baseSul);
   const portaMercadoNegro = ultimaPorta as [number, number] | null;
   // quadras do sul: casas em fileira e café/casas na ruela
-  // (do lado oeste, a primeira casa virou a creche do Safari e a segunda saiu para dar lugar ao cercado)
-  const casasSul: [string | null, string, number][] = [[null, 'casaMadeira', anel.x0 + 9.5], [null, 'casaVermelha', anel.x0 + 15.5], ['casaVinho', 'casaMadeira2', anel.x0 + 21.5]];
-  for (const [a, b, x] of casasSul) {
-    if (a) casa(a, x, baseSul);
-    casa(b, espelho(x), baseSul);
-  }
-  // Safari: creche com um cercado branco ao lado, onde Pokémon raros ficam soltos (pedido do dono). O fundo do cercado
-  // é a cerca da horta; a cerca da frente tem o portão na porta e uma divisória separa a entrada do cercado.
-  const safari = colocar('safariCreche', anel.x0 + 9.5, baseSul);
+  // (do lado oeste as três casas saíram: o lote inteiro é do Safari; pedido do dono)
+  for (const [peca, x] of [['casaMadeira', anel.x0 + 9.5], ['casaVermelha', anel.x0 + 15.5], ['casaMadeira2', anel.x0 + 21.5]] as [string, number][]) casa(peca, espelho(x), baseSul);
+  // Safari: a creche no meio do lote, com um cercado branco grande de cada lado onde Pokémon raros ficam soltos.
+  // O fundo dos cercados é a cerca da horta; a cerca da frente tem o portão na porta e duas divisórias separam a
+  // entrada (a faixa na frente da creche) dos cercados.
+  const safari = colocar('safariCreche', anel.x0 + 15.5, baseSul);
   const portaSafari = ultimaPorta as [number, number] | null;
-  const cercado = { x0: safari.c1 + 1, x1: safari.c1 + 5, y0: baseSul - 6, y1: baseSul };
+  const LARGURA_CERCADO = 6;
+  const cercados = [
+    { x0: safari.c0 - LARGURA_CERCADO, x1: safari.c0 - 1, y0: baseSul - 6, y1: baseSul },
+    { x0: safari.c1 + 1, x1: safari.c1 + LARGURA_CERCADO, y0: baseSul - 6, y1: baseSul },
+  ];
   if (portaSafari) {
-    cerca('Branca', safari.c0 - 1, portaSafari[0] - 1, baseSul + 1);
-    cerca('Branca', portaSafari[1] + 1, cercado.x1 + 1, baseSul + 1);
+    cerca('Branca', cercados[0].x0 - 1, portaSafari[0] - 1, baseSul + 1);
+    cerca('Branca', portaSafari[1] + 1, cercados[1].x1 + 1, baseSul + 1);
   }
-  colocar(`cercaBrancaV${cercado.y1 - cercado.y0 + 1}`, cercado.x1 + 1.5, baseSul + 1);
-  colocar('cercaBrancaV1', cercado.x0 + 0.5, baseSul + 1);
-  marcar(cercado.x0, cercado.y0, cercado.x1 - cercado.x0 + 1, cercado.y1 - cercado.y0 + 1);
+  const alturaCercado = cercados[0].y1 - cercados[0].y0 + 1;
+  colocar(`cercaBrancaV${alturaCercado}`, cercados[0].x0 - 0.5, baseSul + 1);
+  colocar(`cercaBrancaV${alturaCercado}`, cercados[1].x1 + 1.5, baseSul + 1);
+  // divisórias na linha da frente, encostadas na creche
+  colocar('cercaBrancaV1', cercados[0].x1 + 0.5, baseSul + 1);
+  colocar('cercaBrancaV1', cercados[1].x0 + 0.5, baseSul + 1);
+  for (const c of cercados) marcar(c.x0, c.y0, c.x1 - c.x0 + 1, c.y1 - c.y0 + 1);
   colocar('cafe', anel.x0 + 12.5, 68);
   casa('casaMadeira2', anel.x0 + 19.5, 68);
   casa('casaVinho', espelho(anel.x0 + 12.5), 68);
@@ -586,10 +591,11 @@ export function gerarMapaCidade(): Mapa {
     { especie: 58, x: 128, y: 51, raio: 3 }, { especie: 79, x: 53, y: 99, raio: 1 }, { especie: 12, x: 98, y: 100, raio: 4 },
     { especie: 143, x: 106, y: 101, raio: 0 }, { especie: 1, x: 106, y: 76, raio: 3 },
   );
-  // Pokémon raros soltos no cercado do Safari (as cercas seguram: eles só andam em tile livre)
+  // Pokémon raros soltos nos cercados do Safari (as cercas seguram: eles só andam em tile livre)
+  const [esq, dir] = cercados;
   info.pokemons.push(
-    { especie: 113, x: cercado.x0 + 1, y: cercado.y0 + 1, raio: 3 }, { especie: 115, x: cercado.x1, y: cercado.y0 + 3, raio: 3 },
-    { especie: 123, x: cercado.x0 + 2, y: cercado.y1 - 1, raio: 3 }, { especie: 128, x: cercado.x1 - 1, y: cercado.y1, raio: 3 },
+    { especie: 113, x: esq.x0 + 1, y: esq.y0 + 1, raio: 3 }, { especie: 115, x: esq.x0 + 3, y: esq.y0 + 4, raio: 3 }, { especie: 133, x: esq.x0 + 1, y: esq.y1, raio: 3 },
+    { especie: 123, x: dir.x0 + 2, y: dir.y0 + 1, raio: 3 }, { especie: 128, x: dir.x1 - 1, y: dir.y0 + 4, raio: 3 }, { especie: 137, x: dir.x1 - 1, y: dir.y1, raio: 3 },
   );
   // não deixa ninguém nascer em cima de obstáculo
   const pisavel = (x: number, y: number) => !bloqueado[y][x] && terreno[y][x] !== 'jardim' && terreno[y][x] !== 'horta';

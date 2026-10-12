@@ -1,0 +1,349 @@
+1694	Catch chance 4x on Pokémon that evolve with a Moon Stone.	Probabilidad de captura 4x en Pokémon que evolucionan con Moon Stone.
+1696	Catch chance 8x if the wild Pokémon is the same species and the opposite gender of yours.	Probabilidad de captura 8x si el salvaje es de la misma especie y del género opuesto al de tu Pokémon.
+1698	Better the heavier the wild Pokémon is; worse on light ones.	Mejor cuanto más pesado sea el Pokémon salvaje; peor en los ligeros.
+1700	Catch chance 4x on Pokémon with base Speed 100 or more.	Probabilidad de captura 4x en Pokémon con Speed base 100 o más.
+1702	Catch chance 3.5x on Water- or Bug-type Pokémon.	Probabilidad de captura 3,5x en Pokémon de tipo Agua o Bicho.
+1704	Catch chance 3.5x in the Deep Sea.	Probabilidad de captura 3,5x en el Mar Profundo.
+1706	Better the lower the wild Pokémon's level (up to 4x at level 1; no bonus from 30 on).	Mejor cuanto más bajo sea el nivel del salvaje (hasta 4x en nivel 1; sin bonus a partir del 30).
+1708	Catch chance 3.5x on species you already have.	Probabilidad de captura 3,5x en especies que ya tienes.
+1710	Gets better every turn of the battle, up to 4x.	Mejora en cada turno del combate, hasta 4x.
+1712	Catch chance 5x if used on the first turn.	Probabilidad de captura 5x si se usa en el primer turno.
+1714	Catch chance 3x in dark places (Rocky Cave and Haunted Tower).	Probabilidad de captura 3x en lugares oscuros (Cueva Rocosa y Torre Embrujada).
+1716	Catch chance 4x on sleeping Pokémon.	Probabilidad de captura 4x en Pokémon dormidos.
+1718	Made for Ultra Beasts (5x); on other Pokémon the chance is very low (0.1x).	Hecha para Ultra Beasts (5x); en otros Pokémon la probabilidad es muy baja (0,1x).
+1722	Restores 20 HP of a Pokémon.	Recupera 20 HP de un Pokémon.
+1724	Restores 60 HP of a Pokémon.	Recupera 60 HP de un Pokémon.
+1726	Restores 120 HP of a Pokémon.	Recupera 120 HP de un Pokémon.
+1728	Restores all the HP of a Pokémon.	Recupera todo el HP de un Pokémon.
+1732	Mineral water. Restores 30 HP of a Pokémon.	Agua mineral. Recupera 30 HP de un Pokémon.
+1734	A fizzy soda. Restores 50 HP of a Pokémon.	Refresco con gas. Recupera 50 HP de un Pokémon.
+1736	A very sweet lemonade. Restores 70 HP of a Pokémon.	Limonada muy dulce. Recupera 70 HP de un Pokémon.
+1738	Very nutritious milk. Restores 100 HP of a Pokémon.	Leche muy nutritiva. Recupera 100 HP de un Pokémon.
+1740	A bitter powder. Restores 60 HP of a Pokémon.	Polvo amargo. Recupera 60 HP de un Pokémon.
+1742	A very bitter root. Restores 120 HP of a Pokémon.	Raíz muy amarga. Recupera 120 HP de un Pokémon.
+1744	Revives a fainted Pokémon with half its HP.	Revive a un Pokémon debilitado con la mitad del HP.
+1746	Revives a fainted Pokémon with all its HP.	Revive a un Pokémon debilitado con todo el HP.
+1748	A very bitter herb. Revives a fainted Pokémon with all its HP.	Hierba muy amarga. Revive a un Pokémon debilitado con todo el HP.
+1750	Revives all fainted Pokémon in the team with all their HP. Only outside battle.	Revive a todos los Pokémon debilitados del equipo con todo el HP. Solo fuera del combate.
+1752	Cures a poisoned Pokémon.	Cura a un Pokémon envenenado.
+1754	Cures a burned Pokémon.	Cura a un Pokémon quemado.
+1756	Thaws a Pokémon.	Descongela a un Pokémon.
+1758	Wakes up a sleeping Pokémon.	Despierta a un Pokémon dormido.
+1760	Cures a paralyzed Pokémon.	Cura a un Pokémon paralizado.
+1764	A very bitter powder. Cures any status condition.	Polvo muy amargo. Cura cualquier problema de estado.
+1780	Restores 10 PP of the move that has used the most PP.	Recupera 10 PP del movimiento que más PP gastó.
+1784	Restores 10 PP of all moves.	Recupera 10 PP de todos los movimientos.
+1787	{0} was revived!	¡{0} fue revivido!
+1788	{0} recovered {1} HP!	¡{0} recuperó {1} HP!
+1789	{0} was cured {1}!	¡{0} fue curado {1}!
+1790	The PP of {0}'s moves was restored!	¡El PP de los movimientos de {0} fue recuperado!
+1791	The PP of one of {0}'s moves was restored!	¡El PP de un movimiento de {0} fue recuperado!
+1843	legendary from another era	legendario de otra era
+1844	{0} Cube	Cubo de {0}
+1845	Time Fragment	Fragmento Temporal
+1847	Carnival	Carnaval
+1849	Easter	Pascua
+1851	Valentine's Day	Día de San Valentín
+1853	Poke Origins Anniversary	Aniversario de Poke Origins
+1857	Christmas	Navidad
+1858	Carnival Seal	Sello del Carnaval
+1859	Easter Seal	Sello de Pascua
+1860	Valentine's Day Seal	Sello de San Valentín
+1861	Poke Origins Anniversary Seal	Sello del Aniversario Poke Origins
+1862	Halloween Seal	Sello de Halloween
+1863	Christmas Seal	Sello de Navidad
+1864	{0}. Bonus when chosen as the bonus skin: {1}.	{0}. Bonus al elegirla como skin de bonus: {1}.
+1865	A rare charm: use it so that {0}{1}-type Pokémon have 20% more chance of appearing shiny for 30 minutes. Only one of this type at a time.	Amuleto raro: úsalo para que los Pokémon de tipo {0}{1} tengan un 20% más de probabilidad de aparecer shiny durante 30 minutos. Solo uno de este tipo a la vez.
+1866	Seal of the {0} event. Collection item: it shows on your profile, not in the bag.	Sello del evento de {0}. Objeto de colección: aparece en tu perfil, no en la mochila.
+1867	Poke Voucher S	Vale Poke S
+1868	Contact the staff to get an S Pokémon of your choice.	Busca a la administración para ganar un Pokémon S a tu elección.
+1869	Starter Kit	Kit de inicio
+1870	A kit for those who are starting out. Using it opens the kit (its contents are still to be defined). NT: can't be traded.	Un kit para quienes están empezando. Usarlo abre el kit (el contenido todavía está por definir). NT: no se puede intercambiar.
+1871	Currency of the {0} event. Use coming soon.	Moneda del evento de {0}. Uso próximamente.
+1872	Turns {0} into {1}, a Pokémon {2}. Use it on it like an evolution stone: IVs, EVs, nature and shiny stay the same.	Transforma a {0} en {1}, un Pokémon {2}. Úsalo en él como una piedra evolutiva: IVs, EVs, naturaleza y shiny siguen igual.
+1873	{0} Skin	Skin {0}
+1874	Special look for {0}. Bonus when chosen as the bonus skin: {1}.	Aspecto especial para {0}. Bonus al elegirla como skin de bonus: {1}.
+1875	Shiny {0} Skin	Skin {0} Shiny
+1876	Special look for shiny {0}. Bonus when chosen as the bonus skin: {1}.	Aspecto especial para {0} shiny. Bonus al elegirla como skin de bonus: {1}.
+1878	Changes Hoopa into its Unbound form. Can't be undone. Used up on use.	Cambia a Hoopa a la forma Unbound. No tiene vuelta atrás. Se gasta al usarlo.
+1880	Joins Kyurem with the Zekrom (Black Kyurem) or Reshiram (White Kyurem) in the team. Can't be undone. Used up on use.	Une a Kyurem con el Zekrom (Black Kyurem) o el Reshiram (White Kyurem) que esté en el equipo. No tiene vuelta atrás. Se gasta al usarlo.
+1882	Changes Tornadus, Thundurus, Landorus and Enamorus into their Therian form. Can't be undone. Used up on use.	Cambia a Tornadus, Thundurus, Landorus y Enamorus a la forma Therian. No tiene vuelta atrás. Se gasta al usarlo.
+1884	Changes Shaymin into its Sky form. Can't be undone. Used up on use.	Cambia a Shaymin a la forma Sky. No tiene vuelta atrás. Se gasta al usarla.
+1886	Changes Deoxys into its Attack, Defense or Speed form (you choose). Can't be undone. Used up on use.	Cambia a Deoxys a la forma Attack, Defense o Speed (tú eliges). No tiene vuelta atrás. Se gasta al usarlo.
+1888	Changes Rotom into Heat, Wash, Frost, Fan or Mow (you choose). Can't be undone. Used up on use.	Cambia a Rotom a Heat, Wash, Frost, Fan o Mow (tú eliges). No tiene vuelta atrás. Se gasta al usarlo.
+1890	Changes Zygarde 50% into its 10% form. Can't be undone. Used up on use.	Cambia a Zygarde 50% a la forma 10%. No tiene vuelta atrás. Se gasta al usarlo.
+1892	Joins Necrozma with the Solgaleo in the team (Dusk Mane). Can't be undone. Used up on use.	Une a Necrozma con el Solgaleo que esté en el equipo (Dusk Mane). No tiene vuelta atrás. Se gasta al usarlo.
+1894	Joins Necrozma with the Lunala in the team (Dawn Wings). Can't be undone. Used up on use.	Une a Necrozma con la Lunala que esté en el equipo (Dawn Wings). No tiene vuelta atrás. Se gasta al usarlo.
+1896	Joins Calyrex with the Glastrier (Ice Rider) or Spectrier (Shadow Rider) in the team. Can't be undone. Used up on use.	Une a Calyrex con el Glastrier (Ice Rider) o el Spectrier (Shadow Rider) que esté en el equipo. No tiene vuelta atrás. Se gasta al usarlo.
+1898	Evolves Kubfu into Single Strike Urshifu (Fighting/Dark). It is used up.	Evoluciona a Kubfu a Urshifu Single Strike (Fighting/Dark). Se gasta.
+1900	Evolves Kubfu into Rapid Strike Urshifu (Fighting/Water). It is used up.	Evoluciona a Kubfu a Urshifu Rapid Strike (Fighting/Water). Se gasta.
+1902	Ogerpon's original mask. No use for now.	La máscara original de Ogerpon. Sin uso por ahora.
+1903	Poké Balls	Poké Balls
+1904	Medicine	Medicinas
+1905	Battle items	Objetos de combate
+1916	Legendary items	Objetos de legendarios
+1918	Form items	Objetos de forma
+1919	Key items	Objetos clave
+1922	Cubes	Cubos
+1924	Eggs	Huevos
+1932	Used on Ogerpon, it becomes the Wellspring Mask form (Grass/Water). It is used up.	Usada en Ogerpon, se convierte en la forma Wellspring Mask (Grass/Water). Se gasta.
+1933	Used on Ogerpon, it becomes the Hearthflame Mask form (Grass/Fire). It is used up.	Usada en Ogerpon, se convierte en la forma Hearthflame Mask (Grass/Fire). Se gasta.
+1934	Used on Ogerpon, it becomes the Cornerstone Mask form (Grass/Rock). It is used up.	Usada en Ogerpon, se convierte en la forma Cornerstone Mask (Grass/Rock). Se gasta.
+1935	When held, the Pokémon gains double the EVs from each defeated Pokémon. In battle, Speed is halved.	Si lo lleva, el Pokémon gana el doble de EVs de cada Pokémon derrotado. En combate, la Speed baja a la mitad.
+1936	When held, the Pokémon gains +8 HP EVs per defeated Pokémon. In battle, Speed is halved.	Si lo lleva, el Pokémon gana +8 EVs de HP por Pokémon derrotado. En combate, la Speed baja a la mitad.
+1937	When held, the Pokémon gains +8 Attack EVs per defeated Pokémon. In battle, Speed is halved.	Si lo lleva, el Pokémon gana +8 EVs de Attack por Pokémon derrotado. En combate, la Speed baja a la mitad.
+1938	When held, the Pokémon gains +8 Defense EVs per defeated Pokémon. In battle, Speed is halved.	Si lo lleva, el Pokémon gana +8 EVs de Defense por Pokémon derrotado. En combate, la Speed baja a la mitad.
+1939	When held, the Pokémon gains +8 Sp. Atk EVs per defeated Pokémon. In battle, Speed is halved.	Si lo lleva, el Pokémon gana +8 EVs de Sp. Atk por Pokémon derrotado. En combate, la Speed baja a la mitad.
+1940	When held, the Pokémon gains +8 Sp. Def EVs per defeated Pokémon. In battle, Speed is halved.	Si lo lleva, el Pokémon gana +8 EVs de Sp. Def por Pokémon derrotado. En combate, la Speed baja a la mitad.
+1941	When held, the Pokémon gains +8 Speed EVs per defeated Pokémon. In battle, Speed is halved.	Si lo lleva, el Pokémon gana +8 EVs de Speed por Pokémon derrotado. En combate, la Speed baja a la mitad.
+1942	Makes certain Pokémon evolve.	Hace evolucionar a ciertos Pokémon.
+1944	Evolves Pokémon that evolve by trade (if an item is needed, it must be equipped).	Hace evolucionar a los Pokémon que evolucionan por intercambio (si necesita un objeto, debe llevarlo equipado).
+1945	When held, the Pokémon gains XP and EVs from every win or catch, even without entering battle.	Si lo lleva, el Pokémon gana XP y EVs de toda victoria o captura, aunque no entre en combate.
+1946	When held, the Pokémon gains 50% more XP.	Si lo lleva, el Pokémon gana un 50% más de XP.
+1947	When held, the Pokémon doesn't evolve by level or by friendship.	Si lo lleva, el Pokémon no evoluciona por nivel ni por amistad.
+1948	If the holder enters battle, a battle against a trainer or gym gives 20% more Poké Dollars. Doesn't stack with the Luck Incense.	Si quien lo lleva entra en combate, el combate contra un entrenador o gimnasio da un 20% más de Poké Dólares. No se acumula con el Luck Incense.
+1949	If the holder enters battle, a battle against a trainer or gym gives 20% more Poké Dollars. Doesn't stack with the Amulet Coin.	Si quien lo lleva entra en combate, el combate contra un entrenador o gimnasio da un 20% más de Poké Dólares. No se acumula con la Amulet Coin.
+1950	Pokémon Box	Box Pokémon
+1951	Opens one more box in your PC, with {0} slots. Every trainer starts with {1} boxes and can reach {2}.	Abre una box más en tu PC, con {0} plazas. Todo entrenador empieza con {1} boxes y puede llegar a {2}.
+1953	Swaps the Pokémon's Ability for the species' other normal Ability. On one with the Hidden Ability, it goes back to the normal one.	Cambia la Ability del Pokémon por la otra Ability normal de la especie. En quien tiene la Hidden Ability, vuelve a la normal.
+1955	Swaps the Pokémon's Ability for the species' Hidden Ability. On one that already has the Hidden Ability, it goes back to the normal one.	Cambia la Ability del Pokémon por la Hidden Ability de la especie. En quien ya tiene la Hidden Ability, vuelve a la normal.
+1956	no bonus or reduction	sin bonus ni reducción
+1958	Changes the Pokémon's Nature to {0} ({1}).	Cambia la Nature del Pokémon a {0} ({1}).
+1959	An orb with Tera energy. The Pokémon can only Terastallize while holding it (once per battle).	Orbe con energía Tera. El Pokémon solo puede teracristalizar si lo lleva (una vez por combate).
+1960	A band with a Wishing Star. When held, the Pokémon can Dynamax once per battle (Gigantamax, if the species has the form): 3 turns with doubled HP and Max Moves.	Pulsera con una Wishing Star. Si la lleva, el Pokémon puede usar Dynamax una vez por combate (Gigantamax, si la especie tiene la forma): 3 turnos con el doble de HP y Max Moves.
+1961	When held, {0} can Mega Evolve into {1} in battle (once per battle).	Si la lleva, {0} puede megaevolucionar a {1} en combate (una vez por combate).
+1963	Collect {0} to change a Pokémon's Tera Type to {1}.	Junta {0} para cambiar el Tera Type de un Pokémon a {1}.
+1964	{0} · {1} · Power {2} · {3}	{0} · {1} · Potencia {2} · {3}
+1970	Hatches any Pokémon (even a legendary)	Eclosiona un Pokémon cualquiera (hasta legendario)
+1971	Hatches a common Pokémon (never a legendary, mythical, Ultra Beast or starter)	Eclosiona un Pokémon común (nunca legendario, mítico, Ultra Beast ni inicial)
+1972	Hatches a legendary, mythical or Ultra Beast (only the first form of the line, e.g. Cosmog; equal chance for all)	Eclosiona un legendario, mítico o Ultra Beast (solo la primera forma de la línea, p. ej. Cosmog; misma probabilidad para todos)
+1973	Hatches one of the 27 starters of all regions (equal chance for all)	Eclosiona uno de los 27 iniciales de todas las regiones (misma probabilidad para todos)
+1974	Common Egg	Huevo Común
+1975	Starter Egg	Huevo Inicial
+1979	~with IVs of tier {0} or higher (sum {1})	~con IVs de tier {0} o superior (suma {1})
+1981	{0} NT: the egg and the Pokémon that hatches can't be traded.	{0} NT: el huevo y el Pokémon que nazca no se pueden intercambiar.
+1982	Overall	General
+1983	Points	Puntos
+1984	Sum of points: {0} per catch, {1} per shiny, {2} per legendary, {3} per trainer level and {4} per tournament medal.	Suma de puntos: {0} por captura, {1} por shiny, {2} por legendario, {3} por nivel de entrenador y {4} por medalla de torneo.
+1985	Catches	Capturas
+1986	Pokémon caught in battle (eggs and tickets don't count).	Pokémon capturados en combate (huevos y tickets no cuentan).
+1987	Shiny catches	Capturas shiny
+1988	Shiny Pokémon caught in battle.	Pokémon shiny capturados en combate.
+1989	Legendaries	Legendarios
+1990	Legendaries, mythicals and Ultra Beasts caught in battle.	Legendarios, míticos y Ultra Beasts capturados en combate.
+1991	Trainer level (tie: whoever has more XP).	Nivel de entrenador (empate: quien tenga más XP).
+1992	Board missions	Misiones del tablón
+1993	Missions	Misiones
+1994	Missions completed on the town's Mission board.	Misiones completadas en el Tablón de misiones de la ciudad.
+1995	Medals	Medallas
+1996	Medals won in online tournaments.	Medallas ganadas en los torneos en línea.
+1997	Poké Dollars in the wallet.	Poké Dólares en la cartera.
+1998	Origin Coins in the wallet.	Origin Coins en la cartera.
+1999	Unknown region: {0}	Región desconocida: {0}
+2000	Achievement prize (NT: can't be traded)	Premio de logro (NT: no se puede intercambiar)
+2001	Starter skin	Skin inicial
+2002	Gallant Skin	Skin Galante
+2003	Locksmith Skin	Skin Cerrajero
+2004	Indiana Jones Skin
+2005	Halloween Skin	Skin de Halloween
+2006	Christmas Skin	Skin de Navidad
+2007	Carnival Skin	Skin de Carnaval
+2008	Easter Skin	Skin de Pascua
+2009	Valentine's Day Skin	Skin de San Valentín
+2010	Anniversary Skin	Skin de Aniversario
+2011	Ash Skin
+2012	Gary Skin
+2013	May Skin
+2014	Misty Skin
+2015	Reset EVs	Reiniciar EVs
+2016	Resets all of the Pokémon's EVs to zero. IVs, Nature and level stay.	Pone a cero todos los EVs del Pokémon. Los IVs, la Nature y el nivel siguen igual.
+2017	Reset level	Reiniciar nivel
+2018	The Pokémon goes back to level 1. Species, moves, IVs and EVs stay.	El Pokémon vuelve al nivel 1. La especie, los movimientos, los IVs y los EVs siguen igual.
+2019	Reset evolution	Reiniciar evolución
+2020	The Pokémon goes back to the first form of its line, at the same level, and forgets the moves that form can't have. It also undoes form changes made by items (Deoxys, Rotom, Hoopa…), except fusions.	El Pokémon vuelve a la primera forma de su línea, en el mismo nivel, y olvida los movimientos que esa forma no puede tener. También deshace el cambio de forma por objeto (Deoxys, Rotom, Hoopa…), menos la fusión.
+2021	Separate Pokémon	Separar Pokémon
+2022	Undoes a fusion (Black/White Kyurem, Necrozma, Calyrex): both go back to how they were, each with its original IVs.	Deshace una fusión (Black/White Kyurem, Necrozma, Calyrex): los dos vuelven a ser como eran, cada uno con sus IVs originales.
+2024	Epic	Épico
+2025	{0} Ticket	Ticket de {0}
+2026	Open it to draw a prize. Legendary tier: {0} (IVs 15+, 5% shiny chance), its item or the skin. Mythical tier: the shiny skin.	Ábrelo para sortear un premio. En el legendario: {0} (IVs 15+, 5% de probabilidad de shiny), su objeto o la skin. En el mítico: la skin shiny.
+2027	Open it to draw a prize. Epic tier: a random Plate. Legendary tier: Arceus (IVs 10+, 5% shiny chance).	Ábrelo para sortear un premio. En el épico: una Plate aleatoria. En el legendario: Arceus (IVs 10+, 5% de probabilidad de shiny).
+2028	Therian Ticket	Ticket Therian
+2029	Open it to draw a prize. Legendary tier: Landorus, Thundurus, Tornadus or Enamorus (IVs 15+, 5% shiny chance) or the Reveal Glass.	Ábrelo para sortear un premio. En el legendario: Landorus, Thundurus, Tornadus o Enamorus (IVs 15+, 5% de probabilidad de shiny) o la Reveal Glass.
+2030	Ogerpon Ticket	Ticket de Ogerpon
+2031	Open it to draw a prize. Legendary tier: Ogerpon (IVs 15+, 5% shiny chance) or one of the 4 masks.	Ábrelo para sortear un premio. En el legendario: Ogerpon (IVs 15+, 5% de probabilidad de shiny) o una de las 4 máscaras.
+2032	Time Key	Llave Temporal
+2033	Use it to open a rift in time and receive the cube of a Pokémon from the past, the future or, with a lot of luck, Koraidon or Miraidon.	Úsala para abrir una grieta en el tiempo y recibir el cubo de un Pokémon del pasado, del futuro o, con mucha suerte, de Koraidon o Miraidon.
+2036	🔒 Requires trainer level {0}	🔒 Requiere nivel de entrenador {0}
+2037	Easy	Fácil
+2038	Hard	Difícil
+2039	Very hard	Muy difícil
+2045	Team Rocket	Team Rocket
+2047	Friend from Unova	Amiga de Unova
+2049	Friend from Kalos	Amiga de Kalos
+2051	Team Magma Leader	Líder del Team Magma
+2053	Team Aqua Leader	Líder del Team Aqua
+2055	Alola Rival	Rival de Alola
+2057	Johto Rival	Rival de Johto
+2059	Hoenn Rival	Rival de Hoenn
+2061	Sinnoh Rival	Rival de Sinnoh
+2063	Galar Rival	Rival de Galar
+2066	Friend from Paldea	Amigo de Paldea
+2069	Team Star Boss	Jefa del Team Star
+2071	Kanto Elite Four	Elite Four de Kanto
+2075	Johto Elite Four	Elite Four de Johto
+2078	Hoenn Elite Four	Elite Four de Hoenn
+2082	Sinnoh Elite Four	Elite Four de Sinnoh
+2085	Unova Elite Four	Elite Four de Unova
+2089	Kalos Elite Four	Elite Four de Kalos
+2091	Team Galactic Leader	Líder del Team Galactic
+2093	Team Flare Leader	Líder del Team Flare
+2094	King of Team Plasma	Rey del Team Plasma
+2096	Johto Champion	Campeón de Johto
+2098	Kanto Champion	Campeón de Kanto
+2100	Legend of Mt. Silver	Leyenda del Monte Silver
+2102	Hoenn Champion	Campeón de Hoenn
+2105	Sinnoh Champion	Campeona de Sinnoh
+2107	Unova Champion	Campeón de Unova
+2109	Unova Champion	Campeona de Unova
+2111	Kalos Champion	Campeona de Kalos
+2113	Professor and Alola Champion	Profesor y Campeón de Alola
+2115	Galar Champion	Campeón de Galar
+2117	Paldea Champion	Campeona de Paldea
+2120	Team Plasma Leader	Líder del Team Plasma
+2122	Merchant from Hisui	Mercader de Hisui
+2124	World Champion (anime)	Campeón Mundial (anime)
+2125	{0} has only one normal Ability: the Ability Capsule has no effect.	{0} solo tiene una Ability normal: la Ability Capsule no tiene efecto.
+2126	{0} has no Hidden Ability.	{0} no tiene Hidden Ability.
+2127	{0}'s Ability is now {1}!	¡La Ability de {0} ahora es {1}!
+2132	Player not found.	Jugador no encontrado.
+2133	This is you.	Este eres tú.
+2134	You are already friends.	Ya sois amigos.
+2135	You already sent a request to this player.	Ya enviaste una solicitud a este jugador.
+2136	Your friends list is full ({0}).	Tu lista de amigos está llena ({0}).
+2137	This player's friends list is full.	La lista de amigos de este jugador está llena.
+2138	You sent too many requests. Wait a few minutes.	Enviaste demasiadas solicitudes. Espera unos minutos.
+2139	You have too many requests awaiting a reply.	Tienes demasiadas solicitudes esperando respuesta.
+2140	This request no longer exists.	Esta solicitud ya no existe.
+2141	You are not friends.	No sois amigos.
+2142	Empty message.	Mensaje vacío.
+2143	Easy! Wait a little before sending another message.	¡Calma! Espera un poco para enviar otro mensaje.
+2144	Only the staff can do this.	Solo la administración puede hacer esto.
+2145	Write the announcement's title.	Escribe el título del anuncio.
+2146	Write the announcement's text.	Escribe el texto del anuncio.
+2147	This announcement no longer exists.	Este anuncio ya no existe.
+2151	The bank is closed for now.	El banco está cerrado por ahora.
+2152	Invalid operation.	Operación no válida.
+2153	Invalid amount.	Cantidad no válida.
+2154	At most {0} Origin Coins at a time.	Como máximo {0} Origin Coins a la vez.
+2155	Start your journey before using the bank.	Empieza tu aventura antes de usar el banco.
+2156	You don't have enough Origin Coins.	No tienes suficientes Origin Coins.
+2157	The bank only has {0} Origin Coins right now.	El banco solo tiene {0} Origin Coins ahora.
+2158	The bank only has {0} Poké Dollars right now.	El banco solo tiene {0} Poké Dólares ahora.
+2159	Value too large.	Valor demasiado grande.
+2160	Guild not found.	Gremio no encontrado.
+2161	Guilds open at trainer level {0}.	Los gremios se abren en el nivel {0} de entrenador.
+2162	You are already in a guild.	Ya estás en un gremio.
+2163	Invalid banner.	Bandera no válida.
+2164	A guild with this name already exists.	Ya existe un gremio con este nombre.
+2165	Start your journey before creating a guild.	Empieza tu aventura antes de crear un gremio.
+2166	This guild is full.	Este gremio está lleno.
+2167	You already have too many requests awaiting a reply.	Ya tienes demasiadas solicitudes esperando respuesta.
+2168	You are not in a guild.	No estás en un gremio.
+2169	Only the leader or the vice-leader can do this.	Solo el líder o el vicelíder puede hacer esto.
+2170	Only the leader can do this.	Solo el líder puede hacer esto.
+2171	This player is not in the guild.	Este jugador no está en el gremio.
+2172	The guild is full.	El gremio está lleno.
+2173	This player has already joined another guild.	Este jugador ya entró en otro gremio.
+2174	The vice-leader can only kick regular members.	El vicelíder solo puede expulsar a miembros comunes.
+2175	Invalid rank.	Cargo no válido.
+2177	The password needs at least {0} characters.	La contraseña necesita al menos {0} caracteres.
+2178	Password too long.	Contraseña demasiado larga.
+2179	That username already exists.	Ese nombre de usuario ya existe.
+2180	An account with that e-mail already exists.	Ya existe una cuenta con ese e-mail.
+2181	Wrong username or password.	Usuario o contraseña incorrectos.
+2182	Invalid item.	Objeto no válido.
+2183	The amount goes from 1 to {0}.	La cantidad va de 1 a {0}.
+2184	This player already has too many deliveries waiting.	Este jugador ya tiene demasiadas entregas esperando.
+2185	Invalid Pokémon.	Pokémon no válido.
+2189	This player hasn't started the game yet.	Este jugador todavía no empezó el juego.
+2190	Too many attempts. Wait a few minutes.	Demasiados intentos. Espera unos minutos.
+2192	Request too large.	Petición demasiado grande.
+2193	Invalid request.	Petición no válida.
+2194	Session expired. Sign in again.	Sesión caducada. Entra de nuevo.
+2195	Invalid save.	Partida guardada no válida.
+2196	Save too large.	Partida guardada demasiado grande.
+2197	Not found.	No encontrado.
+2200	Forbidden.	Prohibido.
+2204	Start your journey before using the black market.	Empieza tu aventura antes de usar el mercado negro.
+2205	The black market opens at trainer level {0}.	El mercado negro se abre en el nivel {0} de entrenador.
+2206	Broken listing.	Anuncio dañado.
+2207	Invalid listing.	Anuncio no válido.
+2208	The price goes from 1 to {0}.	El precio va de 1 a {0}.
+2209	Choose the currency of the price.	Elige la moneda del precio.
+2210	You can have up to {0} listings at the same time (counting sales and returns that haven't arrived yet).	Puedes tener hasta {0} anuncios a la vez (contando ventas y devoluciones que todavía no llegaron).
+2211	This Pokémon is no longer with you.	Este Pokémon ya no está contigo.
+2212	NT Pokémon can't be sold.	Un Pokémon NT no se puede vender.
+2213	Separate the fusion before selling this Pokémon.	Separa la fusión antes de vender este Pokémon.
+2214	A locked Pokémon can't be sold (unlock it in the PC).	Un Pokémon bloqueado no se puede vender (desbloquéalo en el PC).
+2215	At least 1 Pokémon must stay in the team.	Tiene que quedar al menos 1 Pokémon en el equipo.
+2216	NT items can't be sold.	Un objeto NT no se puede vender.
+2217	You don't have that amount of the item.	No tienes esa cantidad del objeto.
+2218	Invalid amount of Origin Coins.	Cantidad de Origin Coins no válida.
+2219	You don't have those Origin Coins.	No tienes esos Origin Coins.
+2220	This listing is no longer for sale.	Este anuncio ya no está a la venta.
+2221	This listing is yours.	Este anuncio es tuyo.
+2222	You don't have enough {0}.	No tienes suficientes {0}.
+2223	Listing not found.	Anuncio no encontrado.
+2224	This listing has already been sold.	Este anuncio ya fue vendido.
+2225	This mission has already left the board.	Esta misión ya salió del tablón.
+2226	Invalid mission.	Misión no válida.
+2227	Start your journey before doing missions.	Empieza tu aventura antes de hacer misiones.
+2228	You have already completed this mission.	Ya completaste esta misión.
+2229	{0} has already completed this mission.	{0} ya completó esta misión.
+2230	This Pokémon is not yours.	Este Pokémon no es tuyo.
+2231	This Pokémon doesn't fulfill the mission.	Este Pokémon no cumple la misión.
+2235	Enter a map to talk in the local chat.	Entra en un mapa para hablar en el chat local.
+2236	Start your journey before entering the Safari.	Empieza tu aventura antes de entrar en el Safari.
+2237	You already bought today's extra ticket.	Ya compraste el ticket extra de hoy.
+2238	You don't have enough Origin Coins for the ticket.	No tienes suficientes Origin Coins para el ticket.
+2239	Choose the Safari type.	Elige el tipo del Safari.
+2240	You are already in a Safari. Finish or leave it before entering another.	Ya estás en un Safari. Termínalo o sal de él antes de entrar en otro.
+2241	You're out of Safari Tickets for today.	Se acabaron tus Tickets Safari de hoy.
+2242	The invite expired.	La invitación caducó.
+2243	The trade was idle for too long.	El intercambio estuvo parado demasiado tiempo.
+2244	Trade not found.	Intercambio no encontrado.
+2245	{0}: a Pokémon in the offer is no longer with the trainer.	{0}: un Pokémon de la oferta ya no está con el entrenador.
+2246	{0}: NT Pokémon can't be traded.	{0}: un Pokémon NT no se puede intercambiar.
+2247	{0}: a locked Pokémon can't be traded (unlock it in the PC).	{0}: un Pokémon bloqueado no se puede intercambiar (desbloquéalo en el PC).
+2248	{0}: separate the fusion before trading this Pokémon.	{0}: separa la fusión antes de intercambiar este Pokémon.
+2249	{0}: at least 1 Pokémon must stay in the team.	{0}: tiene que quedar al menos 1 Pokémon en el equipo.
+2250	{0}: NT items can't be traded.	{0}: un objeto NT no se puede intercambiar.
+2251	{0}: doesn't have enough items.	{0}: no tiene suficientes objetos.
+2252	{0}: not enough Poké Dollars.	{0}: Poké Dólares insuficientes.
+2253	{0}: not enough Origin Coins.	{0}: Origin Coins insuficientes.
+2254	Invalid offer.	Oferta no válida.
+2255	At most {0} Pokémon per trade.	Como máximo {0} Pokémon por intercambio.
+2256	At most {0} kinds of item per trade.	Como máximo {0} tipos de objeto por intercambio.
+2257	Say who you want to trade with.	Di con quién quieres intercambiar.
+2258	You can't trade with yourself.	No puedes intercambiar contigo mismo.
+2259	{0} is not accepting trades.	{0} no está aceptando intercambios.
+2260	You are already in a trade.	Ya estás en un intercambio.
+2261	{0} is already in a trade.	{0} ya está en un intercambio.
+2262	This invite is no longer valid.	Esta invitación ya no es válida.
+2263	{0} declined the trade.	{0} rechazó el intercambio.
+2264	The trade is not open.	El intercambio no está abierto.
+2265	You already confirmed: now you can only trade or cancel.	Ya confirmaste: ahora solo se puede intercambiar o cancelar.
+2266	After confirming, you can only trade or cancel.	Después de confirmar, solo se puede intercambiar o cancelar.
+2267	{0} canceled the trade.	{0} canceló el intercambio.
+2268	Both need to confirm before trading.	Los dos tienen que confirmar antes de intercambiar.
+2269	Could not complete the trade.	No se pudo hacer el intercambio.
+2270	The receiver's PC is full.	El PC de quien recibe está lleno.
+2271	The train ticket is paid in Poké Dollars.	El ticket del tren se paga en Poké Dólares.
+2272	Invalid region.	Región no válida.
+2273	Start your journey before traveling.	Empieza tu aventura antes de viajar.
+2274	You are already traveling to {0}.	Ya estás viajando a {0}.
+2275	Your current region is invalid.	Tu región actual no es válida.
+2276	You are already in {0}.	Ya estás en {0}.
+2277	You don't have enough Poké Dollars for the ticket.	No tienes suficientes Poké Dólares para el ticket.
+2278	You are not traveling.	No estás viajando.
+2279	The train hasn't arrived yet: {0} left.	El tren todavía no llegó: faltan {0}.

@@ -1,0 +1,335 @@
+306	No guild found with "{0}".	No se encontró ningún gremio con "{0}".
+307	There are no guilds yet. Create the first one!	Todavía no existe ningún gremio. ¡Crea el primero!
+308	Create your guild	Crea tu gremio
+309	Design the banner, pick the name and bring up to {0} friends ({1} slots including you).	Diseña la bandera, elige el nombre y llama hasta a {0} amigos ({1} plazas contigo).
+310	Name	Nombre
+311	Open entry (off: only those you accept can join)	Entrada libre (apagado: solo entra quien tú aceptes)
+312	Create guild ·~	Crear gremio ·~
+313	Join a guild	Entrar en un gremio
+314	Guilds open at trainer level {0}. Keep battling and catching to level up.	Los gremios se abren en el nivel {0} de entrenador. Sigue combatiendo y capturando para subir de nivel.
+315	Your friends list will be here.	Tu lista de amigos estará aquí.
+316	Add friends by trainer name	Añadir amigos por nombre de entrenador
+317	See who is online and in which biome	Ver quién está en línea y en qué bioma
+318	Invite to battles and trades	Invitar a combates e intercambios
+319	Guild	Gremio
+320	Create or join a guild to play as a group.	Crea un gremio o entra en uno para jugar en grupo.
+321	Create a guild with a name and emblem	Crear un gremio con nombre y emblema
+322	Members, ranks and guild chat	Miembros, cargos y chat del gremio
+323	Tournaments and ranking between guilds	Torneos y ranking entre gremios
+324	Continents	Continentes
+325	The continents of the game world.	Los continentes del mundo del juego.
+326	Travel between continents	Viajar entre continentes
+327	Regions and biomes of each continent	Regiones y biomas de cada continente
+328	Pokémon unique to each place	Pokémon propios de cada lugar
+329	Trainer duels	Duelos con entrenadores
+330	Battles against NPC trainers, with their own teams.	Combates contra entrenadores NPC, con equipos propios.
+331	Trainers with different teams and levels	Entrenadores con equipos y niveles diferentes
+332	Rewards in Poké Dollars and XP	Recompensas en Poké Dólares y XP
+333	They gain friendship like in wild battles	Ganan amistad como en los combates salvajes
+334	Gyms	Gimnasios
+335	Challenge the gym leaders of each region.	Desafía a los líderes de gimnasio de cada región.
+336	Leaders with type-themed teams	Líderes con equipos temáticos por tipo
+337	Badges for winning	Medallas al ganar
+338	Special rewards	Recompensas especiales
+339	This part is still to be made.	Esta parte todavía está por hacer.
+340	{0} of {1} completed. The reward arrives the moment the achievement is completed.	{0} de {1} completados. La recompensa llega en el momento en que se completa el logro.
+341	Poké Dollars in battles:~	Poké Dólares en combates:~
+342	Shiny, legendaries and starters:~	Shiny, legendarios e iniciales:~
+343	Catch:~	Captura:~
+344	Reward: {0}	Recompensa: {0}
+345	Completed	Completado
+346	Titles	Títulos
+347	Choose a title to show on your profile. They are unlocked by achievements.	Elige un título para mostrar en tu perfil. Se desbloquean con logros.
+349	Click to remove	Haz clic para quitar
+350	Click to use	Haz clic para usar
+351	Complete the achievement "{0}"	Completa el logro "{0}"
+352	In use	En uso
+353	Unlocked	Desbloqueado
+354	Achievement: {0}	Logro: {0}
+355	No title in use.	Ningún título en uso.
+356	Choose one skin for the look and one for the bonus: they can be different skins. The look changes your character on the map and in town (other players see it too); only the bonus of the chosen skin counts.	Elige una skin para el aspecto y otra para el bonus: pueden ser skins diferentes. El aspecto cambia tu personaje en el mapa y en la ciudad (los demás jugadores también lo ven); solo cuenta el bonus de la skin elegida.
+357	This is how you appear on the map.	Así es como apareces en el mapa.
+358	No skin for the look: you appear with your normal character.	Sin skin de aspecto: apareces con tu personaje normal.
+359	Look:~	Aspecto:~
+360	Bonus from:~	Bonus de:~
+361	Legendary, mythical, Ultra Beast and starter	Legendario, mítico, Ultra Beast e inicial
+362	Poké Dollars in battles	Poké Dólares en combates
+363	Catch	Captura
+364	✓ Look	✓ Aspecto
+365	Use look	Usar aspecto
+366	The art for this skin isn't ready yet	El dibujo de esta skin todavía no está listo
+367	Look coming soon	Aspecto próximamente
+368	✓ Bonus	✓ Bonus
+369	Use bonus	Usar bonus
+370	You don't have any skins yet. They come from the legendary and mythical ticket prizes, achievements and events.	Todavía no tienes ninguna skin. Salen en los premios legendario y mítico de los tickets, en logros y en eventos.
+371	My profile	Mi perfil
+372	My skins	Mis skins
+373	Start a game to see your account.	Empieza una partida para ver tu cuenta.
+374	Start	Empezar
+375	Edit character	Editar personaje
+376	Search in {0}…	Buscar en {0}…
+377	Show more	Mostrar más
+378	{0} result{1}	{0} resultado{1}
+384	Typings	Tipos
+386	Regions	Regiones
+388	Categories	Categorías
+390	Types	Tipos
+393	Items	Objetos
+394	In and out of the shop	En la tienda y fuera de ella
+395	Sold in the shop	Se venden en la tienda
+396	Not in the shop	Fuera de la tienda
+397	Category	Categoría
+398	Effect	Efecto
+399	Shop	Tienda
+401	Pokémon in the game	Pokémon en el juego
+402	Moves	Movimientos
+406	Type	Tipo
+407	Power	Potencia
+408	Accuracy	Precisión
+409	Priority	Prioridad
+411	~· game information	~· información del juego
+412	Start a game to duel.	Empieza una partida para combatir.
+413	Drawing an opponent…	Sorteando rival…
+414	Battle!	¡Combatir!
+415	Drawing…	Sorteando…
+416	{0} · Lv. {1}
+417	Reward:~	Recompensa:~
+418	~({0} per defeated Pokémon)	~({0} por Pokémon derrotado)
+419	Your whole team has fainted: heal at the Pokémon Center	Todo tu equipo está debilitado: cúralo en el Centro Pokémon
+420	Draw another	Sortear otro
+421	A trainer is drawn from 50 characters from the games and the anime.	Se sortea un entrenador entre 50 personajes de los juegos y del anime.
+423	Could not reach the server. Trying again…	No se pudo contactar con el servidor. Intentando de nuevo…
+424	E.g.: Ash_123	Ej.: Ash_123
+425	you@email.com	tu@email.com
+426	Username	Nombre de usuario
+427	3 to 16 letters, numbers or _	3 a 16 letras, números o _
+428	Username or e-mail	Usuario o e-mail
+430	Password	Contraseña
+431	Confirm password	Confirmar contraseña
+432	Create account	Crear cuenta
+433	At least 6 characters	Al menos 6 caracteres
+434	Keep me signed in on this computer	Mantener la sesión en este ordenador
+435	Username: 3 to 16 letters, numbers or _.	Nombre de usuario: 3 a 16 letras, números o _.
+436	Invalid e-mail.	E-mail no válido.
+437	Type your username or e-mail.	Escribe tu usuario o e-mail.
+438	The password needs at least 6 characters.	La contraseña necesita al menos 6 caracteres.
+439	Type your password.	Escribe tu contraseña.
+440	The passwords don't match.	Las contraseñas no coinciden.
+441	Creating…	Creando…
+442	Signing in…	Entrando…
+443	Something went wrong. Try again.	Algo salió mal. Inténtalo de nuevo.
+444	Sign in to your account to play.	Entra en tu cuenta para jugar.
+445	Move it to my account	Llevarlo a mi cuenta
+446	Start from scratch	Empezar de cero
+447	Start from scratch on this account? The old progress stays saved in this browser.	¿Empezar de cero en esta cuenta? El progreso antiguo sigue guardado en este navegador.
+448	Progress found	Progreso encontrado
+449	This browser has progress from before accounts existed ({0}{1} Pokémon). Do you want to move it to this account?	Este navegador tiene un progreso de antes de las cuentas ({0}{1} Pokémon). ¿Quieres llevarlo a esta cuenta?
+450	trainer {0},~	entrenador {0},~
+451	Where does your journey begin?	¿Dónde empieza tu aventura?
+453	🎲 Spin the wheel	🎲 Girar la ruleta
+454	Your first Pokémon is…	Tu primer Pokémon es…
+455	🔒 NT (untradeable) · IVs 20 in every stat	🔒 NT (no intercambiable) · IVs 20 en todas las estadísticas
+456	Starter wheel	Ruleta del inicial
+457	Spin to draw your first Pokémon among the {0} starters of all regions, all with the same chance. Then choose the region where you start.	Gira para sortear tu primer Pokémon entre los {0} iniciales de todas las regiones, todos con la misma probabilidad. Después, elige la región donde empezar.
+458	Egg	Huevo
+459	Open now	Abrir ahora
+460	You got a Starter Egg!	¡Ganaste un Huevo de Inicial!
+461	Inside it is your first Pokémon: one of the starters of all regions.	Dentro está tu primer Pokémon: uno de los iniciales de todas las regiones.
+462	~(not earned yet)	~(todavía no conseguida)
+463	Start a game to challenge the gyms.	Empieza una partida para desafiar a los gimnasios.
+464	You are traveling to {0}. The gyms open when the train arrives.	Estás viajando a {0}. Los gimnasios se abren cuando llegue el tren.
+465	You are in {0}. To challenge the gyms of {1}, take the train there.	Estás en {0}. Para desafiar a los gimnasios de {1}, viaja en tren hasta allí.
+466	You earned the {0}!	¡Ganaste la {0}!
+467	Badges of {0}: {1}/{2}	Medallas de {0}: {1}/{2}
+468	Gym {0} · {1}	Gimnasio {0} · {1}
+469	{0} earned	{0} conseguida
+470	reward already received	recompensa ya recibida
+471	{0} Poké Dollars on the first win	{0} Poké Dólares en la primera victoria
+472	Rematch	Revancha
+473	Challenge	Desafiar
+474	Defeat the leaders to earn the badges.	Vence a los líderes para ganar las medallas.
+475	For free, I make your Pokémon remember any move it learns by level up to its current level, and every move it has ever known: TM, TR, Move Tutor or Egg Move.	Gratis, hago que tu Pokémon recuerde cualquier movimiento que aprende por nivel hasta su nivel actual y todo movimiento que ya supo: TM, TR, Move Tutor o Egg Move.
+476	I teach the tutor moves the species learned in any game (no TMs or Egg Moves).	Enseño los movimientos de tutor que la especie aprendió en cualquier juego (sin TMs ni Egg Moves).
+477	← Back to town	← Volver a la ciudad
+478	Start a game to use the move teachers.	Empieza una partida para usar a los maestros de movimientos.
+479	Move teachers	Maestros de movimientos
+480	Not enough Poké Dollars (you need {0}, you have {1}).	Poké Dólares insuficientes (necesitas {0}, tienes {1}).
+481	Teach {0} to {1}	Enseñar {0} a {1}
+482	~for {0} Poké Dollars	~por {0} Poké Dólares
+483	? It will forget {0}.	? Olvidará {0}.
+484	{0} learned {1}!	¡{0} aprendió {1}!
+485	{0} forgot {1} and learned {2}!	¡{0} olvidó {1} y aprendió {2}!
+486	{0} · Lv.{1}
+487	{0}'s moves	Movimientos de {0}
+488	{0} · Power {1} · Accuracy {2} · PP {3}	{0} · Potencia {1} · Precisión {2} · PP {3}
+489	Learn ·~	Aprender ·~
+490	Remember · free	Recordar · gratis
+491	{0} already knows 4 moves. Forget which one?	{0} ya sabe 4 movimientos. ¿Cuál olvidar?
+494	You have~	Tienes~
+495	{0} move{1} available	{0} movimiento{1} disponible{1}
+496	{0} has no new moves for {1}.	{0} no tiene movimientos nuevos para {1}.
+497	Click to see its sheet · drag to change the order	Haz clic para ver la ficha · arrastra para cambiar el orden
+499	Holding {0}	Lleva {0}
+500	Daily missions	Misiones diarias
+501	{0} missions per day, renewed at midnight (the amounts are the same for all players that day). Each one is worth {1} pass XP (up to 2 levels per day). Defeat and catch: wild Pokémon only.	{0} misiones al día, se renuevan a medianoche (las cantidades son las mismas para todos los jugadores ese día). Cada una vale {1} XP del pase (hasta 2 niveles al día). Derrotar y capturar: solo Pokémon salvajes.
+503	Reward to be defined	Recompensa por definir
+504	Battle pass	Pase de batalla
+505	Season 1 · rewards coming soon	Temporada 1 · recompensas próximamente
+506	Missions {0}/{1}	Misiones {0}/{1}
+507	Level {0} of {1}	Nivel {0} de {1}
+508	Complete!	¡Completo!
+509	Free	Gratis
+511	Home	Inicio
+512	You haven't started your journey yet.	Todavía no empezaste tu aventura.
+513	Trainer	Entrenador
+514	Hello, {0}!	¡Hola, {0}!
+515	Your team	Tu equipo
+516	~· drag to change the order	~· arrastra para cambiar el orden
+517	{0}'s profile	Perfil de {0}
+518	Could not open the profile.	No se pudo abrir el perfil.
+519	See its sheet	Ver la ficha
+520	~(doesn't have it yet)	~(todavía no la tiene)
+521	Badge region	Región de las medallas
+522	Online now	En línea ahora
+523	Guild {0} · level {1}	Gremio {0} · nivel {1}
+524	Trainer Lv. {0}	Entrenador Nv. {0}
+525	Region:	Región:
+526	Trainer since:	Entrenador desde:
+527	Ranked PvP is still to be made	El PvP clasificatorio todavía está por hacer
+528	Ranked PvP	PvP clasificatorio
+529	Unranked	Sin clasificación
+530	Seen	Vistos
+531	Caught	Capturados
+532	Dex complete	Dex completa
+533	{0} of {1} species (all regions)	{0} de {1} especies (todas las regiones)
+534	Tournament medals	Medallas de torneo
+535	Silver	Plata
+536	Gold	Oro
+538	Badges	Medallas
+539	Seasonal seals	Sellos de temporada
+540	Team	Equipo
+541	This trainer chose not to show their team.	Este entrenador eligió no mostrar su equipo.
+542	Search players	Buscar jugadores
+543	Type a trainer's name to see their profile.	Escribe el nombre de un entrenador para ver su perfil.
+544	Options	Opciones
+545	Start a game to see the options.	Empieza una partida para ver las opciones.
+546	Saved	Guardado
+547	Lv. {0} (the max for your level)	Nv. {0} (el máximo de tu nivel)
+548	✓ Saved	✓ Guardado
+549	Changes are saved automatically.	Los cambios se guardan solos.
+550	Trainer name	Nombre de entrenador
+551	It appears above your character on the map. To change it ({0} Origin Coins), use "Change the character's look".	Aparece encima de tu personaje en el mapa. Para cambiarlo ({0} Origin Coins), usa "Cambiar el aspecto del personaje".
+552	Change the character's look	Cambiar el aspecto del personaje
+553	Privacy and invitations	Privacidad e invitaciones
+554	Show my team	Mostrar mi equipo
+555	Other players see your team on your profile.	Los demás jugadores ven tu equipo en tu perfil.
+556	Accept trade requests	Aceptar solicitudes de intercambio
+557	Off: trade requests from other players are declined automatically.	Apagado: las solicitudes de intercambio de otros jugadores se rechazan solas.
+558	Accept duel challenges	Aceptar desafíos de duelo
+559	Off: duel challenges from other players are declined automatically.	Apagado: los desafíos de duelo de otros jugadores se rechazan solos.
+560	Trades and duels between players are still coming; your choice is already saved.	Los intercambios y duelos entre jugadores todavía están por llegar; tu elección ya queda guardada.
+561	Encounters	Encuentros
+562	Max level of wild Pokémon	Nivel máximo de los Pokémon salvajes
+563	Automatic (always the max for your trainer level)	Automático (siempre el máximo de tu nivel de entrenador)
+564	You can only choose a level lower than your max, never higher. Encounters go from 4 levels below up to the chosen level.	Solo puedes elegir un nivel menor que tu máximo, nunca mayor. Los encuentros van desde 4 niveles por debajo hasta el nivel elegido.
+565	Sound	Sonido
+566	Background music	Música de fondo
+567	Pokémon cries	Gritos de los Pokémon
+568	Master volume	Volumen general
+569	The same control as in the corner of the top bar.	El mismo control de la esquina de la barra superior.
+570	Mute the game	Silenciar el juego
+571	The same button as in the corner of the top bar.	El mismo botón de la esquina de la barra superior.
+572	Performance	Rendimiento
+573	Performance mode	Modo rendimiento
+574	Turn on performance mode	Activar el modo rendimiento
+575	For weaker computers and phones: turns off clouds, leaves, birds, fireflies, butterflies, townspeople and Pokémon strolling around town, and draws the game at normal resolution (the pixel art gets a little jagged). Takes effect on the next map you open.	Para ordenadores y móviles más modestos: apaga nubes, hojas, pájaros, luciérnagas, mariposas, vecinos y Pokémon paseando por la ciudad, y dibuja el juego en resolución normal (el pixel art queda un poco dentado). Vale a partir del próximo mapa que abras.
+576	Hair	Pelo
+577	Loading colors…	Cargando colores…
+578	Pokémon style	Estilo Pokémon
+579	T-shirt print	Estampado de la camiseta
+580	Poké Balls on the belt	Poké Balls en el cinturón
+581	With	Con
+582	Without	Sin
+583	Appearance	Apariencia
+584	Sex	Sexo
+585	Male	Masculino
+586	Female	Femenino
+587	Skin tone	Tono de piel
+588	Hair color	Color del pelo
+589	Clothes	Ropa
+590	T-shirt	Camiseta
+591	Pants	Pantalón
+592	Sneakers	Zapatillas
+593	Turn the character	Girar el personaje
+594	↻ Turn	↻ Girar
+595	E.g.: Ash	Ej.: Ash
+596	Continue →	Continuar →
+597	Save · {0} Origin Coins	Guardar · {0} Origin Coins
+598	Change the name: {0} Origin Coins · change the appearance: {1} Origin Coins · you have {2} Origin Coins	Cambiar el nombre: {0} Origin Coins · cambiar la apariencia: {1} Origin Coins · tienes {2} Origin Coins
+599	Choose a name with 3 to 16 letters.	Elige un nombre de 3 a 16 letras.
+600	Not enough Origin Coins: you need {0}, you have {1}.	Origin Coins insuficientes: necesitas {0}, tienes {1}.
+601	Create your trainer	Crea tu entrenador
+602	Change your trainer's look or name (each change costs Origin Coins).	Cambia el aspecto o el nombre de tu entrenador (cada cambio cuesta Origin Coins).
+603	Choose your character's look. You can change it later (with Origin Coins).	Elige el aspecto de tu personaje. Se puede cambiar después (con Origin Coins).
+604	Character: Universal LPC Spritesheet Character Generator — artists in lpc/CREDITOS-LPC.csv (CC-BY-SA 3.0 / GPL 3.0 / OGA-BY 3.0). Cap, prints and Poké Balls: own artwork.	Personaje: Universal LPC Spritesheet Character Generator — artistas en lpc/CREDITOS-LPC.csv (CC-BY-SA 3.0 / GPL 3.0 / OGA-BY 3.0). Gorra, estampados y Poké Balls: dibujo propio.
+605	Fast	Rápido
+606	Medium-slow	Medio-lento
+607	Slow	Lento
+608	1 in {0}	1 de cada {0}
+609	You haven't seen this Pokémon yet. Find it in some biome to unlock its information.	Todavía no has visto este Pokémon. Encuéntralo en algún bioma para desbloquear su información.
+610	~hidden	~oculta
+615	Immune	Inmune
+616	Use {0}	Usar {0}
+617	the mask	la máscara
+618	Wild · Lv. {0}	Suelto · Nv. {0}
+619	{0}+ (rare)	{0}+ (raro)
+620	Only with the {0}, used on {1}	Solo con el {0}, usado en {1}
+621	Only by evolving · {0}	Solo evolucionando · {0}
+622	Doesn't appear in the wild	No aparece suelto
+623	{0} ({1}) per encounter	{0} ({1}) por encuentro
+624	0% in your current range (Lv. {0}–{1})	0% en tu rango actual (Nv. {0}–{1})
+625	{0}: {1} on the chance (already included in the value beside it)	{0}: {1} en la probabilidad (ya incluido en el valor de al lado)
+626	Genderless	Sin género
+629	Lv.
+630	Move	Movimiento
+631	{0} · {1} · Power {2}\n{3}	{0} · {1} · Potencia {2}\n{3}
+632	Legendary	Legendario
+633	Mythical	Mítico
+634	Baby	Bebé
+636	Back	Espalda
+637	Height	Altura
+639	Weight	Peso
+641	Gender	Género
+642	Catch rate	Ratio de captura
+643	Growth	Crecimiento
+644	Base XP	XP base
+646	Where to find it	Dónde encontrarlo
+647	Legendary chance	Probabilidad del legendario
+648	Encounter chance	Probabilidad de aparición
+649	Shiny chance	Probabilidad de shiny
+650	Base catch	Captura base
+651	{0} (Poké Ball, full HP)	{0} (Poké Ball, HP completo)
+652	Base stats	Estadísticas base
+653	Damage taken by type	Daño recibido por tipo
+654	Evolution	Evolución
+655	Does not evolve.	No evoluciona.
+656	With a cube, {0} becomes {1}. The cubes come from the Time Key and from the Time traveler's shop, in town.	Con un cubo, {0} se convierte en {1}. Los cubos salen de la Llave Temporal y de la tienda del Viajero del tiempo, en la ciudad.
+657	Moves by level	Movimientos por nivel
+658	Other moves	Otros movimientos
+659	TMs and TRs	TMs y TRs
+663	Normal form	Forma normal
+664	How to Mega Evolve	Cómo megaevolucionar
+666	~· shop: {0}	~· tienda: {0}
+667	In battle	En combate
+668	Once per battle, with the Mega Evolution button; it goes back to normal at the end of the battle.	Una vez por combate, con el botón Mega Evolución; vuelve a la normalidad al final del combate.
+669	Other Megas	Otras Megas
+670	Shiny caught	Shiny capturado
+671	Search by name or number…	Buscar por nombre o número…
+672	Seen	Visto
+673	~· National	~· Nacional
+674	{0} seen · {1} caught · {2} shiny · {3} in total	{0} vistos · {1} capturados · {2} shiny · {3} en total
+675	You	Tú
+677	Online tournaments are still to be made. When they exist, the medals will show up here.	Los torneos en línea todavía están por hacer. Cuando existan, las medallas aparecerán aquí.
+678	Start a game to join the ranking.	Empieza una partida para entrar en el ranking.
+679	No connection to the server: showing only you.	Sin conexión con el servidor: solo se te muestra a ti.
+680	{0} trainers in the ranking. Other players' numbers update every half minute.	{0} entrenadores en el ranking. Los números de los demás jugadores se actualizan cada medio minuto.

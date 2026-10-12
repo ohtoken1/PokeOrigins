@@ -11,6 +11,7 @@
     "start": "npm run start -w server",
     "admin": "npm run admin -w server --",
     "dados": "node scripts/baixar-pokeapi.mjs",
-    "maquinas": "node scripts/baixar-maquinas.mjs"
+    "maquinas": "node scripts/baixar-maquinas.mjs",
+    "idiomas": "node scripts/idiomas-extrair.mjs"
   }
 }

@@ -1,0 +1,85 @@
+# Textos que o extrator não numera: pedaços em minúsculas e frases montadas com um pedaço variável.
+Título	Title	Título
+Quantidade	Amount	Cantidad
+Item	Item	Objeto
+Jogador	Player	Jugador
+Administração	Administration	Administración
+Em breve	Coming soon	Próximamente
+em breve	coming soon	próximamente
+Nível	Level	Nivel
+Sem VIP	No VIP	Sin VIP
+Não foi possível convidar.	Could not invite.	No se pudo invitar.
+Idioma	Language	Idioma
+Nomes de Pokémon, golpes, itens, Abilities, Natures e tipos ficam em inglês em todos os idiomas.	Names of Pokémon, moves, items, Abilities, Natures and types stay in English in every language.	Los nombres de Pokémon, movimientos, objetos, Abilities, Natures y tipos quedan en inglés en todos los idiomas.
+Perfil	Profile	Perfil
+1331	~can't {0} any further	~ya no puede {0} más
+1332	~{0} drastically	~{0} drásticamente
+1333	~{0} sharply	~{0} mucho
+1334	{1}'s {0}{2}!	¡{0} de {1}{2}!
+1335	{1}'s {0} was maximized!	¡{0} de {1} llegó al máximo!
+aumentou	rose	aumentó
+diminuiu	fell	disminuyó
+aumentar	rise	aumentar
+diminuir	fall	disminuir
+do seu lado	on your side	en tu lado
+{0} foi queimado!	{0} was burned!	¡{0} fue quemado!
+{0} foi paralisado!	{0} was paralyzed!	¡{0} fue paralizado!
+{0} adormeceu!	{0} fell asleep!	¡{0} se durmió!
+{0} foi congelado!	{0} was frozen solid!	¡{0} fue congelado!
+{0} foi envenenado!	{0} was poisoned!	¡{0} fue envenenado!
+{0} foi gravemente envenenado!	{0} was badly poisoned!	¡{0} fue gravemente envenenado!
+{0} não está mais queimado!	{0} is no longer burned!	¡{0} ya no está quemado!
+{0} não está mais paralisado!	{0} is no longer paralyzed!	¡{0} ya no está paralizado!
+{0} não está mais envenenado!	{0} is no longer poisoned!	¡{0} ya no está envenenado!
+{0} acordou!	{0} woke up!	¡{0} se despertó!
+{0} descongelou!	{0} thawed out!	¡{0} se descongeló!
+{0} se curou!	{0} was cured!	¡{0} se curó!
+foi revivido	was revived	fue revivido
+foram revividos	were revived	fueron revividos
+da queimadura	of its burn	de la quemadura
+da paralisia	of its paralysis	de la parálisis
+do sono	from its sleep	del sueño
+do congelamento	from being frozen	de la congelación
+do veneno	of its poison	del veneno
+do status	of its status condition	del problema de estado
+super efetivo	super effective	supereficaz
+sem fim	endless	sin fin
+qualquer bioma	any biome	cualquier bioma
+por pedido	by request	por solicitud
+o time	the team	el equipo
+a bolsa	the bag	la mochila
+entrada livre	open entry	entrada libre
+do passado	from the past	del pasado
+do futuro	from the future	del futuro
+de dia	during the day	de día
+de chance de captura	catch chance	de probabilidad de captura
+tickets abertos	tickets opened	tickets abiertos
+chaves usadas	keys used	llaves usadas
+vaga vazia	empty slot	plaza vacía
+Vaga livre	Open slot	Plaza libre
+Poké Dólares	Poké Dollars
+Poké Dólar	Poké Dollar
+{0} Poké Dólares	{0} Poké Dollars
+{0} Poké Dólar	{0} Poké Dollar
+1 Poké Dólar	1 Poké Dollar
+Vulcão	Volcano	Volcán
+Selvagem	Wild	Salvaje
+{0}{1}. 5% de chance de shiny.	{0}{1}. 5% shiny chance.	{0}{1}. 5% de probabilidad de shiny.
+222	~· {0} online	
+1040	~{0} shiny!	~¡{0} shiny!
+1730	Restores all HP and cures any status condition.	Recupera todo el HP y cura cualquier problema de estado.
+1762	Cures any status condition.	Cura cualquier problema de estado.
+1766	A Lavaridge cookie. Cures any status condition.	Galleta de Lavaridge. Cura cualquier problema de estado.
+1768	An Eterna sweet. Cures any status condition.	Dulce de Eterna. Cura cualquier problema de estado.
+1770	Castelia ice cream. Cures any status condition.	Helado de Castelia. Cura cualquier problema de estado.
+1772	A Lumiose galette. Cures any status condition.	Galette de Lumiose. Cura cualquier problema de estado.
+1774	A Shalour cookie. Cures any status condition.	Galleta de Shalour. Cura cualquier problema de estado.
+1776	An Alolan malasada. Cures any status condition.	Malasada de Alola. Cura cualquier problema de estado.
+1778	A Mahogany sweet. Cures any status condition.	Dulce de Mahogany. Cura cualquier problema de estado.
+1782	Restores all the PP of the move that has used the most PP.	Recupera todo el PP del movimiento que más PP gastó.
+1786	Restores all the PP of all moves.	Recupera todo el PP de todos los movimientos.
+2186	EVs add up to at most 510.	Los EVs suman como máximo 510.
+2187	The Pokémon needs 1 to 4 moves.	El Pokémon necesita de 1 a 4 movimientos.
+2188	Repeated move.	Movimiento repetido.
+2233	Session expired	Sesión caducada
+2234	Opened in another tab	Abierto en otra pestaña

@@ -16,6 +16,7 @@ import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
 import { garantirTexturaLpc, OutrosJogadores, texturaDaAura } from './outrosJogadores';
 import { digitando } from '../ui/digitando';
 import { entrarNaSala, moverOnline, sairDaSalaOnline, visualOnline, type DirecaoOnline, type JogadorOnline, type VisualOnline } from '../online';
+import { tr } from '../idioma';
 
 /** Tamanho da tela do jogo em pixels (a câmera mostra 40×27 tiles ampliados 1,5×). */
 export const LARGURA_TELA = 960;
@@ -350,7 +351,7 @@ export class BiomaScene extends Phaser.Scene {
    */
   private rotulo(texto: string, x: number, y: number, cor = '#ffffff', acao?: string) {
     const t = this.add
-      .text(x, y, acao ? `${texto} ›` : texto, {
+      .text(x, y, acao ? `${tr(texto)} ›` : tr(texto), {
         fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: cor,
         backgroundColor: acao ? 'rgba(13,12,10,0.86)' : 'rgba(13,12,10,0.6)', padding: { x: 14, y: 6 },
       })

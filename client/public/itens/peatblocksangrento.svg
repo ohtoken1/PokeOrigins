@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Peat Block Sangrento: a turfa em vermelho, com a lua de sangue em cima -->
+  <path d="M4 12 17 6l11 5v11l-12 6-12-6z" fill="#5a1418" stroke="#1f0508" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M4 12 17 6l11 5-12 6z" fill="#8a1d22"/>
+  <path d="M16 17v11l12-6V11z" fill="#3d0c10"/>
+  <path d="M7 12.2 17 7.6l7.6 3.4-8.6 4.2z" fill="#c8242c" opacity=".85"/>
+  <path d="M4 12l12 5 12-6M16 17v11" fill="none" stroke="#1f0508" stroke-width=".8" opacity=".6"/>
+  <path d="M7 16.5l4 1.8M6.5 20l5 2.2M9 23.6l4 1.8M19 20l5-2.4M19.5 24l6-3M22 15.5l3-1.4" stroke="#d9484e" stroke-width="1" stroke-linecap="round" opacity=".75"/>
+  <circle cx="12" cy="11.4" r=".8" fill="#ff8a8a"/><circle cx="18.5" cy="9.6" r=".7" fill="#ff8a8a"/><circle cx="16" cy="13.2" r=".7" fill="#7a0f15"/>
+  <circle cx="24.5" cy="6.5" r="4" fill="#e0262e" stroke="#1f0508" stroke-width="1"/><circle cx="23.3" cy="5.4" r="1.1" fill="#ff8a8a" opacity=".8"/>
+</svg>

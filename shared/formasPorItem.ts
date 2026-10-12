@@ -38,9 +38,27 @@ export const FUSOES: Record<string, Fusao[]> = {
 export const EVOLUCOES_NOSSAS: Record<string, Record<number, number>> = {
   scrollofdarkness: { 891: 892 }, // Kubfu → Urshifu (Single Strike)
   scrollofwaters: { 891: 10191 }, // Kubfu → Urshifu (Rapid Strike)
+  peatblock: { 217: 901 }, // Ursaring → Ursaluna
+  peatblocksangrento: { 217: 10272 }, // Ursaring → Ursaluna Bloodmoon (item nosso)
+  blackaugurite: { 123: 900 }, // Scyther → Kleavor
+  // Temporal Stone (pedra nossa): Galarian Yamask → Runerigus, Stantler → Wyrdeer, Basculin White-Striped → Basculegion,
+  // Hisuian Qwilfish → Overqwil, Primeape → Annihilape, Bisharp → Kingambit
+  temporalstone: { 10179: 867, 234: 899, 10247: 902, 10234: 904, 57: 979, 625: 983 },
+  goldstone: { 999: 1000 }, // Gimmighoul → Gholdengo (pedra nossa)
+  // Milcery → Alcremie: qualquer um dos sete Sweets
+  ...Object.fromEntries(['strawberrysweet', 'lovesweet', 'berrysweet', 'cloversweet', 'flowersweet', 'starsweet', 'ribbonsweet'].map((doce) => [doce, { 868: 869 }])),
 };
+/** Itens de evolução que não existem no Showdown: nomes (os outros vêm de lá). */
+export const NOME_DO_ITEM_DE_EVOLUCAO: Record<string, string> = {
+  scrollofdarkness: 'Scroll of Darkness', scrollofwaters: 'Scroll of Waters', peatblock: 'Peat Block', peatblocksangrento: 'Peat Block Sangrento', blackaugurite: 'Black Augurite', temporalstone: 'Temporal Stone', goldstone: 'Gold Stone',
+};
+/** Evolução por item cuja fêmea tem forma própria (Basculegion → Basculegion fêmea). */
+export const FORMA_DA_FEMEA: Record<number, number> = { 902: 10248 };
+/** Itens (nossos ou dos Sweets) que levam a essa espécie, para a Pokédex. */
+export const itensQueEvoluemPara = (especieId: number): string[] =>
+  Object.keys(EVOLUCOES_NOSSAS).filter((item) => Object.values(EVOLUCOES_NOSSAS[item]).some((para) => para === especieId || FORMA_DA_FEMEA[para] === especieId));
 
-/** Máscaras da Ogerpon: itens de evolução de uso único, só na Ogerpon normal (sem volta; a Teal Mask ficou sem uso). */
+/** Máscaras da Ogerpon: itens de evolução de uso único, só na Ogerpon normal; a Teal Mask faz o caminho de volta (as três formas → Ogerpon normal). */
 export const MASCARAS_OGERPON: Record<string, number> = { tealmask: 1017, wellspringmask: 10273, hearthflamemask: 10274, cornerstonemask: 10275 };
 /** Máscara que leva a essa forma da Ogerpon (para a Pokédex), ou undefined. A forma Teal é a espécie normal. */
 export const mascaraDaForma = (especieId: number): string | undefined => (especieId === 1017 ? undefined : Object.keys(MASCARAS_OGERPON).find((m) => MASCARAS_OGERPON[m] === especieId));

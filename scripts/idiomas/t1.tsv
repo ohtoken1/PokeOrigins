@@ -1,0 +1,253 @@
+0	New announcement on the town board	Nuevo anuncio en el tablón de la ciudad
+5	What? {0} and {1} are joining together!	¿Qué? ¡{0} y {1} se están uniendo!
+6	What? {0} is evolving!	¿Qué? ¡{0} está evolucionando!
+8	{0} and {1} joined together and became {2}!	¡{0} y {1} se unieron y se convirtieron en {2}!
+9	Congratulations! {0} evolved into {1}!	¡Felicidades! ¡{0} evolucionó a {1}!
+14	Oh no! The Pokémon broke free!	¡Oh, no! ¡El Pokémon se escapó!
+15	Aww! It appeared to be caught!	¡Ay! ¡Parecía que lo habías atrapado!
+16	Argh! Almost had it!	¡Argh! ¡Casi!
+17	Shoot! It was so close!	¡Vaya! ¡Faltó muy poco!
+25	Rain	Lluvia
+26	Harsh sunlight	Sol intenso
+27	Sandstorm	Tormenta de arena
+28	Snow	Nieve
+29	Hail	Granizo
+30	Extremely harsh sunlight	Sol extremo
+31	Heavy rain	Lluvia torrencial
+32	Mysterious winds	Vientos misteriosos
+35	Lv.{0}
+36	Not seen yet	Todavía no apareció
+37	EVs when defeated	EVs al derrotarlo
+38	Moves already used	Movimientos ya usados
+39	Used {0} PP	Gastó {0} PP
+41	It hasn't used any move yet.	Todavía no usó ningún movimiento.
+42	Turn	Turno
+43	Battle log	Registro del combate
+44	{0} turn{1}
+46	Turn {0}	Turno {0}
+49	{0} is reacting to the Mega Stone!	¡{0} está reaccionando a la Mega Stone!
+51	What will {0} do?	¿Qué hará {0}?
+52	Fight	Luchar
+53	Bag	Mochila
+55	Run	Huir
+56	Power {0}	Potencia {0}
+57	Z-Move on	Z-Move activado
+59	Terastallize on ({0})	Teracristalizar activado ({0})
+60	Terastallize ({0})	Teracristalizar ({0})
+61	Mega Evolution on	Mega Evolución activada
+62	Mega Evolution	Mega Evolución
+63	Mega Evolves before attacking (once per battle)	Megaevoluciona antes de atacar (una vez por combate)
+66	~on	~activado
+67	The Pokémon becomes giant before attacking: 3 turns with doubled HP and Max Moves (once per battle)	El Pokémon se vuelve gigante antes de atacar: 3 turnos con el doble de HP y Max Moves (una vez por combate)
+68	← Back	← Volver
+70	Use {0} on which Pokémon?	¿Usar {0} en qué Pokémon?
+71	{0} Lv. {1}
+72	It would have no effect.	No tendría efecto.
+73	You used {0}. {1}	Usaste {0}. {1}
+74	Choose the next Pokémon!	¡Elige el siguiente Pokémon!
+75	Switch to which Pokémon?	¿Cambiar por qué Pokémon?
+76	{0} Lv. {1}{2}
+77	~(in battle)	~(en combate)
+78	Come back, {0}!	¡Vuelve, {0}!
+79	You threw a {0}!	¡Lanzaste una {0}!
+80	You threw a {0}! Catch chance: {1}%	¡Lanzaste una {0}! Probabilidad de captura: {1}%
+81	Gotcha! {0} was caught!	¡Ya está! ¡{0} fue capturado!
+82	You got away safely!	¡Escapaste sin problemas!
+83	You couldn't get away!	¡No pudiste huir!
+84	{0} wants to learn~	{0} quiere aprender~
+85	, but it already knows 4 moves. Forget which one?	, pero ya conoce 4 movimientos. ¿Cuál olvidar?
+86	Don't learn {0}	No aprender {0}
+87	{0} did not learn {1}.	{0} no aprendió {1}.
+88	1, 2 and... Ta-da! {0} forgot {1} and learned {2}!	1, 2 y... ¡Listo! ¡{0} olvidó {1} y aprendió {2}!
+89	Mission complete: {0}! +{1} battle pass XP.	¡Misión completada: {0}! +{1} XP del pase de batalla.
+90	You earned {0} trainer XP!	¡Ganaste {0} XP de entrenador!
+91	Your trainer level went up to {0}!{1}	¡Tu nivel de entrenador subió a {0}!{1}
+92	~Wild Pokémon got stronger.	~Los Pokémon salvajes se volvieron más fuertes.
+93	What? {0} wants to evolve into {1}!	¿Qué? ¡{0} quiere evolucionar a {1}!
+94	Let it evolve	Dejar evolucionar
+95	Stop the evolution	Detener la evolución
+96	{0} did not evolve.	{0} no evolucionó.
+97	{0} is evolving!	¡{0} está evolucionando!
+98	You defeated {0}!	¡Venciste a {0}!
+99	You earned {0} {1}!	¡Ganaste {0} {1}!
+100	{0} was sent to the PC (Box {1}).{2}	{0} fue enviado al PC (Box {1}).{2}
+101	Lucky! You found a {0}! (it's in the Bag)	¡Qué suerte! ¡Encontraste un {0}! (está en la Mochila)
+102	You have no more Pokémon that can fight!	¡No te quedan Pokémon que puedan luchar!
+103	You rushed to the Pokémon Center and your team was healed.	Corriste al Centro Pokémon y tu equipo fue curado.
+104	{0}, {1}, wants to battle!	¡{0}, {1}, quiere combatir!
+105	{0} sent out {1}!	¡{0} envió a {1}!
+106	A wild {0} appeared!	¡Apareció un {0} salvaje!
+107	Bonus	Bonificación
+109	Achievements	Logros
+110	Leader	Líder
+111	Vice-leader	Vicelíder
+112	Member	Miembro
+115	{0} achievements completed!	¡{0} logros completados!
+116	Achievement completed!	¡Logro completado!
+117	and {0} more. See them in My account → Achievements.	y {0} más. Míralos en Mi cuenta → Logros.
+119	No connection to the server.	Sin conexión con el servidor.
+120	Server error.	Error del servidor.
+121	Pokémon {0} not loaded	Pokémon {0} no cargado
+122	You received from the staff	Recibiste de la administración
+125	Could not save your progress right now. Try again.	No se pudo guardar tu progreso ahora. Inténtalo de nuevo.
+128	Exit to the maps	Salida a los mapas
+130	Pokémon Center	Centro Pokémon
+132	Bank	Banco
+133	Train station	Estación de tren
+137	Announcement board	Tablón de anuncios
+138	Mission board	Tablón de misiones
+142	Time traveler	Viajero del tiempo
+143	Guilds	Gremios
+144	Seasonal event	Evento de temporada
+145	Black market	Mercado negro
+147	Suspicious Man	Hombre Sospechoso
+153	Requires trainer level {0} to use a level {1} Pokémon	Requiere nivel de entrenador {0} para usar un Pokémon de nivel {1}
+155	Sold {0} for {1} {2}	Vendiste {0} por {1} {2}
+156	{0} came back: nobody bought it	{0} volvió: nadie lo compró
+157	This mission has already been completed.	Esta misión ya fue completada.
+158	This one has the {0} Nature; the mission asks for {1}.	Este tiene la Nature {0}; la misión pide {1}.
+159	This Pokémon doesn't have the IV or the quality the mission asks for.	Este Pokémon no tiene el IV o la calidad que pide la misión.
+160	Could not complete the mission right now.	No se pudo completar la misión ahora.
+161	Catch {0} shiny Pokémon	Capturar {0} Pokémon shiny
+162	Win {0} trainer duels	Ganar {0} duelos con entrenadores
+163	Defeat	Derrotar
+164	Catch	Capturar
+165	Play → Trainer duels	Jugar → Duelos con entrenadores
+166	Spiky	De punta
+167	Messy	Desordenado
+168	Bangs	Flequillo
+169	Curly	Rizado
+170	Straight	Liso
+171	Parted	Con raya
+172	Curtains	Cortina
+173	Tousled	Despeinado
+174	Wild	Rebelde
+175	Cowlick	Remolino
+176	Military	Militar
+177	Buzz cut	Rapado
+178	Coily	Crespo
+179	Mohawk	Cresta
+180	Long	Largo
+181	Ponytail	Coleta
+182	Bob	Melena corta
+184	Long straight	Largo liso
+185	Very long	Muy largo
+186	Wavy	Ondulado
+187	Long curly	Rizado largo
+188	Medium	Medio
+189	Long bangs	Flequillo largo
+190	Side bangs	Flequillo de lado
+191	Loose	Suelto
+192	Half up	Semirrecogido
+193	High ponytail	Coleta alta
+194	Pigtails	Coletas
+195	Bunches	Dos coletas
+196	Braid	Trenza
+197	Princess	Princesa
+198	No cap	Sin gorra
+199	Red	Rojo
+200	Blue	Azul
+201	Green	Verde
+202	Black	Negro
+203	Yellow	Amarillo
+204	Plain	Lisa
+205	Poké Ball	Poké Ball
+206	Bolt	Rayo
+207	Drop	Gota
+208	Flame	Llama
+209		En línea
+210		Desconectado
+211	Trainer name…	Nombre del entrenador…
+212	Search for a trainer to add	Buscar entrenador para añadir
+213	Friends	Amigos
+214	Add friend	Añadir amigo
+215	Requests received ({0})	Solicitudes recibidas ({0})
+216	Accept	Aceptar
+217	{0} is now your friend.	{0} ahora es tu amigo.
+218	Decline	Rechazar
+219	Requests sent ({0})	Solicitudes enviadas ({0})
+220	Cancel	Cancelar
+221	My friends ({0})	Mis amigos ({0})
+222		~· {0} en línea
+223	Profile	Perfil
+224	Message	Mensaje
+225	Remove	Eliminar
+226	Remove {0} from your friends? Your conversation will be deleted too.	¿Eliminar a {0} de tus amigos? La conversación también se borrará.
+227	You don't have any friends yet. Search for a trainer by name above and send a request.	Todavía no tienes amigos. Busca un entrenador por su nombre arriba y envíale una solicitud.
+228	Already your friend	Ya es tu amigo
+229	Request sent	Solicitud enviada
+230	Accept request	Aceptar solicitud
+231	Add	Añadir
+232	Request sent to {0}.	Solicitud enviada a {0}.
+233	No trainer found with "{0}".	No se encontró ningún entrenador con "{0}".
+234	Trainer Lv. {0} · {1} steps · {2} seen	Entrenador Nv. {0} · {1} pasos · {2} vistos
+235	Lv. {0}
+236	Appearing now: {0}	Aparece ahora: {0}
+237	Appears in another level range: {0}	Aparece en otro rango: {0}
+238	Doesn't appear in the wild: {0}	No aparece suelto: {0}
+239	● Already caught	● Ya capturado
+240	○ Already seen (not caught)	○ Ya visto (no capturado)
+241	— Never seen	— Nunca visto
+242	See in the Pokédex	Ver en la Pokédex
+244	Caught	Capturado
+245	Pokémon in this biome · Lv. {0}{1}	Pokémon de este bioma · Nv. {0}{1}
+246	~· (admin: forced Pokémon)	~· (admin: Pokémon forzado)
+247	Pokémon in this biome	Pokémon de este bioma
+248	Pokémon in this biome and their chances	Pokémon de este bioma y sus probabilidades
+249	Walk with the arrow keys or W A S D. A Pokémon appears at every step: press Enter to fight, or keep walking to run away.	Camina con las flechas o W A S D. En cada paso aparece un Pokémon: Enter para luchar, o sigue caminando para huir.
+250	Loading map…	Cargando mapa…
+251	Your team has fainted. Heal at the Pokémon Center.	Tu equipo está debilitado. Cúralo en el Centro Pokémon.
+252	Town	Ciudad
+253	Walk with the arrow keys or W A S D. Wild Pokémon don't appear here. Click the name of a place on screen to use it right away, or click the minimap to make your character walk there: Pokémon Center, Pokémarket, Bank, Announcement board, Move Reminder, Move Tutor… At the train station you travel to another region; the south exit leads to the maps.	Camina con las flechas o W A S D. Aquí no aparecen Pokémon salvajes. Haz clic en el nombre de un lugar que esté en pantalla para usarlo al instante, o en el minimapa para que tu personaje camine hasta allí: Centro Pokémon, Pokémarket, Banco, Tablón de anuncios, Move Reminder, Move Tutor… En la estación de tren viajas a otra región; la salida del sur lleva a los mapas.
+254	Loading town…	Cargando ciudad…
+255	Heading there… (walk with the keys to cancel)	Yendo hacia allí… (camina con las teclas para cancelar)
+256	Can't get there right now.	No se puede llegar allí ahora.
+257	You are traveling to {0}. The maps open when the train arrives.	Estás viajando a {0}. Los mapas se abren cuando llegue el tren.
+258	Bank: closed for now.	Banco: cerrado por ahora.
+259	Suspicious Man: {0}.	Hombre Sospechoso: {0}.
+260	Black market: {0}.	Mercado negro: {0}.
+261	This place	Este lugar
+262	Guild level {0}	Gremio nivel {0}
+263	No description.	Sin descripción.
+264	Max level	Nivel máximo
+265	{0}% to level {1}	{0}% para el nivel {1}
+266	Open entry	Entrada libre
+267	Entry by request	Entrada por solicitud
+268	To level {0}	Para el nivel {0}
+269	Guild experience: {0}%	Experiencia del gremio: {0}%
+270	Guild missions~	Misiones del gremio~
+271	Experience and missions belong to the whole guild: what each member does counts for everyone.	La experiencia y las misiones son de todo el gremio: lo que hace cada miembro suma para todos.
+272	Members	Miembros
+273	~me	~yo
+274	Share of the guild's experience that came from this member	Parte de la experiencia del gremio que vino de este miembro
+275	Open slot	Plaza libre
+276	Make vice-leader	Hacer vicelíder
+277	Make member	Hacer miembro
+278	Hand over leadership	Ceder el liderazgo
+279	Hand the guild's leadership over to {0}? You become vice-leader.	¿Ceder el liderazgo del gremio a {0}? Pasas a ser vicelíder.
+280	Kick	Expulsar
+281	Kick {0} from the guild?	¿Expulsar a {0} del gremio?
+282	Guild description	Descripción del gremio
+283	Edit guild	Editar gremio
+284	Description	Descripción
+285	Open entry (off: only those accepted by the leader or vice-leader can join)	Entrada libre (apagado: solo entra quien acepte el líder o el vicelíder)
+286	Save	Guardar
+287	My guild	Mi gremio
+288	Join requests ({0})	Solicitudes de entrada ({0})
+289	Edit banner and description	Editar bandera y descripción
+290	Leave guild	Salir del gremio
+291	You are the only member: if you leave, the guild is deleted. Leave anyway?	Eres el único miembro: al salir, el gremio se borra. ¿Salir de todos modos?
+292	When you leave, leadership passes to the vice-leader (or the oldest member). Leave the guild?	Al salir, el liderazgo pasa al vicelíder (o al miembro más antiguo). ¿Salir del gremio?
+293	Leave the guild?	¿Salir del gremio?
+294	Guild name	Nombre del gremio
+295	Description (optional)	Descripción (opcional)
+296	Search guild by name…	Buscar gremio por nombre…
+297	Search guild	Buscar gremio
+298	Guild name: 3 to 16 letters or numbers.	Nombre del gremio: de 3 a 16 letras o números.
+299	Creating a guild costs {0} Origin Coins.	Crear un gremio cuesta {0} Origin Coins.
+300	Create the guild "{0}" for {1} Origin Coins?	¿Crear el gremio "{0}" por {1} Origin Coins?
+301	Cancel request	Cancelar solicitud
+302	Full	Lleno
+303	Enter	Entrar
+304	Ask to join	Pedir entrar
+305	View	Ver

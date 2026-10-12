@@ -4,7 +4,7 @@
 import { ATRIBUTOS, golpesIniciais, hpMaximo } from '../../../shared/batalha/pokemon';
 import { resetarNivel, voltarEspecie } from '../../../shared/batalha/progresso';
 import { formaBaseDe } from '../../../shared/encontros';
-import { FUSOES, MASCARAS_OGERPON, formaNormalDe } from '../../../shared/formasPorItem';
+import { FUSOES, formaNormalDe } from '../../../shared/formasPorItem';
 import { nomeDaMoeda } from '../../../shared/moedas';
 import { PRECO_SUSPEITO, SERVICOS_SUSPEITO, type ServicoSuspeito } from '../../../shared/suspeito';
 import { especiePodeTerGolpe } from '../../../shared/usoItens';
@@ -22,12 +22,11 @@ const nome = (p: PokemonDoJogador) => pokemonPorId(p.especieId).nome;
 
 /**
  * Primeira forma da linha deste Pokémon, ou null se ele já é a primeira. Quem mudou de forma por item (Deoxys, Rotom,
- * Hoopa, Therian…; pedido do dono) e a Ogerpon de máscara voltam para a forma normal. Fusões não: essas se separam.
+ * Hoopa, Therian…; pedido do dono) voltam para a forma normal. A Ogerpon de máscara não: quem desfaz é a Teal Mask. Fusões não: essas se separam.
  */
 function formaInicial(p: PokemonDoJogador): number | null {
   const normal = formaNormalDe(p.especieId);
   if (normal !== null) return normal;
-  if (p.especieId !== MASCARAS_OGERPON.tealmask && Object.values(MASCARAS_OGERPON).includes(p.especieId)) return MASCARAS_OGERPON.tealmask;
   const base = formaBaseDe(pokemonPorId(p.especieId), todosOsPokemons());
   return base.id === p.especieId ? null : base.id;
 }

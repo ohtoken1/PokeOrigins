@@ -2,7 +2,7 @@ import { ATRIBUTOS, especie, golpesIniciais, hpMaximo, nomeGolpe, ppMaximo, type
 import { evoluir, trocarGolpe } from '../../../shared/batalha/progresso';
 import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
-import { ehEquipavel, ehItemDeHabilidade, usarItemDeHabilidade, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
+import { SEGURAR_OU_EVOLUIR, ehEquipavel, ehItemDeHabilidade, usarItemDeHabilidade, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
 import { KIT_INICIANTE, cuboPorItem, ehSeloSazonal } from '../../../shared/itensCustom';
 import { FUSOES, GOLPE_DA_FORMA, ehItemDeForma, ivDaFusao, jaMudouDeForma, outrasFormas, proximaForma } from '../../../shared/formasPorItem';
 import { BOXES_INICIAIS, BOXES_MAXIMO, BOX_POKEMON, numeroDeBoxes, podeAbrirBox } from '../../../shared/pc';
@@ -173,7 +173,9 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
         // mesma animação da evolução por nível, numa janela por cima da bolsa
         const [de, novo] = [pokemonPorId(p.especieId), pokemonPorId(para)];
         const imagem = (d: typeof de) => (p.shiny ? d.sprites.gifShiny ?? d.sprites.frenteShiny : d.sprites.gif ?? d.sprites.frente) ?? '';
-        void animarEvolucaoNaTela({ nome: quem, src: imagem(de) }, { nome: novo.nome, src: imagem(novo) });
+        // Teal Mask: não é evolução, a Ogerpon volta à forma padrão
+        const volta = item.id === 'tealmask';
+        void animarEvolucaoNaTela({ nome: quem, src: imagem(de) }, { nome: novo.nome, src: imagem(novo) }, volta ? { inicio: `O quê? ${quem} está mudando de forma!`, fim: `${quem} voltou à forma padrão!` } : undefined);
         // cubo (pedido do dono): a forma nova esquece os golpes que ela não pode ter (antes de aprender os dela)
         const esquecidos = cubo ? p.golpes.filter((g) => !especiePodeTerGolpe(para, g.id)).map((g) => nomeGolpe(g.id)) : [];
         if (cubo) p.golpes = p.golpes.filter((g) => especiePodeTerGolpe(para, g.id));
@@ -187,7 +189,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
         if (cubo?.era === 'passado') marcarConquista(save, 'cuboPassado');
         else if (cubo?.era === 'futuro') marcarConquista(save, 'cuboFuturo');
         for (const golpe of r.golpesPendentes) aprender(p, golpe, () => {}, () => {});
-        return [cubo ? `${quem} atravessou o tempo e virou ${pokemonPorId(para).nome}!` : `${quem} evoluiu para ${pokemonPorId(para).nome}!`, ...r.mensagens].join(' ');
+        return [cubo ? `${quem} atravessou o tempo e virou ${pokemonPorId(para).nome}!` : volta ? `${quem} voltou à forma padrão!` : `${quem} evoluiu para ${pokemonPorId(para).nome}!`, ...r.mensagens].join(' ');
       }
       case 'mints': {
         const natureza = item.natureza!;
@@ -368,7 +370,10 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                   }
                 }
                 if (PEDE_CONFIRMACAO(item) && !(await confirmar(item.nome, `${acaoDe(item)} ${item.nome} em ${nome(p)}? O item é gasto e não volta.`))) return;
-                const msg = aplicar(item, p);
+                // Razor Claw e Razor Fang são de segurar, mas também evoluem Sneasel e Gligar: o jogador escolhe
+                const evolui = SEGURAR_OU_EVOLUIR.has(item.id) ? evolucaoPorItem(p, item.id, existe) : null;
+                const evoluir = !!evolui && (await confirmar(item.nome, `${nome(p)} pode evoluir para ${pokemonPorId(evolui).nome} com ${item.nome}. Evoluir agora? O item é gasto e não volta. Respondendo "Não", ele só segura o item.`));
+                const msg = aplicar(evoluir ? { ...item, categoria: 'evolucao' } : item, p);
                 if (msg) concluir(msg);
                 else {
                   // vai perguntar qual golpe esquecer

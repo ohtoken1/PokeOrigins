@@ -1067,6 +1067,13 @@ button.vaga:hover { border-color: var(--borda); }
 
 /* Tickets: moedas, VIP, item aleatório, skins e chance de cada prêmio */
 .icone-moeda { display: inline-block; width: 26px; height: 26px; border-radius: 50%; }
+/* Idioma: botões com a bandeira (Opções e tela de entrada) */
+.idiomas { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.idioma { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 10px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto); font: inherit; font-weight: 600; cursor: pointer; }
+.idioma svg { width: 30px; height: 20px; border-radius: 3px; box-shadow: 0 0 0 1px rgb(0 0 0 / 0.45); flex: none; }
+.idioma:hover, .idioma.ativo { border-color: var(--destaque); }
+.idioma.ativo { background: var(--dourado); color: var(--texto-no-dourado); }
+.opcoes-secao .idiomas, .tela-opcoes .idiomas { justify-content: flex-start; }
 /* Poké Dólar (silver) e Origin Coin (gold): desenhos em client/public/itens */
 .icone-moeda.moeda-silver { background: url('/itens/pokedolar.svg') center / contain no-repeat; border-radius: 0; box-shadow: none; }
 .icone-moeda.moeda-gold { background: url('/itens/origincoin.svg') center / contain no-repeat; border-radius: 0; box-shadow: none; }

@@ -1,5 +1,5 @@
 // Experiência, subida de nível, golpes novos e evolução depois de uma batalha.
-import { evolucaoPorAmizade } from '../amizade';
+import { evolucaoPorAmizade, evolucaoPorGolpe } from '../amizade';
 import {
   especie,
   evolucaoPorNivel,
@@ -82,7 +82,8 @@ export function ganharExperiencia(
 
   // por nível; ou, se subiu de nível com amizade alta, por amizade (Golbat → Crobat, Eevee → Espeon/Umbreon…)
   // Everstone: quem segura não evolui (nome fixo aqui para não importar shared/campo.ts, que importa encontros)
-  const para = p.item === 'everstone' ? null : (evolucaoPorNivel(p.especieId, p.nivel) ?? (p.nivel > nivelAntes ? evolucaoPorAmizade(p) : null));
+  // sabendo um golpe (Lickitung com Rollout), também só ao subir de nível; vem antes da amizade (Eevee com golpe Fairy = Sylveon)
+  const para = p.item === 'everstone' ? null : (evolucaoPorNivel(p.especieId, p.nivel, undefined, p) ?? (p.nivel > nivelAntes ? (evolucaoPorGolpe(p) ?? evolucaoPorAmizade(p)) : null));
   if (para && especie(para)) r.evolucao = { de: p.especieId, para };
   return r;
 }

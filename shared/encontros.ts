@@ -48,6 +48,9 @@ function grupoRaro(p: PokemonBase, base: PokemonBase): GrupoRaro | null {
 export const categoriaRara = (p: PokemonBase, todos: PokemonBase[]): GrupoRaro | null => grupoRaro(p, baseDaLinha(p, new Map(todos.map((x) => [x.slug, x]))));
 /** Lendários e míticos aparecem desde o começo, mas nunca abaixo deste nível. */
 export const NIVEL_LENDARIO = 50;
+/** Exceções (pedido do dono): Cosmog e Meltan evoluem por nível, então aparecem sempre neste nível, não no 50+. */
+export const NIVEL_FIXO_DO_LENDARIO: Record<number, number> = { 789: 10, 808: 10 };
+const nivelDoLendario = (id: number, nivel: number) => NIVEL_FIXO_DO_LENDARIO[id] ?? Math.max(NIVEL_LENDARIO, nivel);
 
 export type Faixa = [number, number];
 
@@ -302,7 +305,7 @@ export function chanceShinyDe(ajustes: AjustesEncontro, pokemon: Pick<PokemonBas
 /** Encontro de teste: espécie e/ou nível escolhidos pelo administrador. */
 export function encontroForcado(pokemon: PokemonBase, [min, max]: Faixa, ajustes: AjustesEncontro, aleatorio = Math.random): Encontro {
   let nivel = ajustes.nivel ?? min + Math.floor(aleatorio() * (max - min + 1));
-  if (ajustes.nivel === null && ehLendario(pokemon)) nivel = Math.max(NIVEL_LENDARIO, nivel);
+  if (ajustes.nivel === null && ehLendario(pokemon)) nivel = nivelDoLendario(pokemon.id, nivel);
   return { pokemon, nivel: Math.max(1, Math.min(100, nivel)), shiny: aleatorio() < chanceShinyDe(ajustes, pokemon) };
 }
 
@@ -400,6 +403,6 @@ export function sortearEncontro(tabela: EntradaTabela[], [min, max]: Faixa, alea
     nivel = Math.max(escolhido.nivelMin, Math.min(escolhido.nivelMax, nivel));
   }
   if (ajustes.nivel !== null) nivel = ajustes.nivel;
-  else if (ehLendario(escolhido.pokemon)) nivel = Math.max(NIVEL_LENDARIO, nivel);
+  else if (ehLendario(escolhido.pokemon)) nivel = nivelDoLendario(escolhido.pokemon.id, nivel);
   return { pokemon: escolhido.pokemon, nivel, shiny: aleatorio() < chanceShinyDe(ajustes, escolhido.pokemon) };
 }

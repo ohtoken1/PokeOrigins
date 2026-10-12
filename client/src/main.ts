@@ -38,6 +38,7 @@ import { vigiarConquistas } from './conquistas';
 import { vigiarEntregas } from './entregas';
 import { vigiarMercado } from './mercado';
 import { vigiarQuadro } from './missoesQuadro';
+import { prepararIdioma } from './idioma';
 // o chat ouve o servidor desde a conexão (guarda as mensagens mesmo fora do mapa)
 import './ui/chat';
 
@@ -81,7 +82,8 @@ const navegar: Navegar = (destino) => {
 
 ativarDeslizantes();
 // primeiro a conta (tela de entrada); só depois o jogo monta barra, cabeçalho e painel
-void garantirConta(raiz).then((conta) => {
+// o idioma vem antes de tudo: a tela de entrada já aparece traduzida
+void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   if (conta.admin) montarPainelAdmin(() => navegar(destinoAtual));
   marcarAba = montarBarraTopo(navegar);
   // música de fundo começa no primeiro clique/tecla

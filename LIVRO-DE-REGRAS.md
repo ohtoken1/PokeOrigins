@@ -314,7 +314,10 @@ Level, Love, Moon, Heavy, Fast, Repeat e Dream Ball funcionam como nos jogos.
 - **Evolução:**
   - por nível: acontece no fim da batalha, e você pode **deixar evoluir** ou **parar a evolução** (ela é oferecida de novo no próximo nível);
   - por **amizade**: ao subir de nível com amizade **160 ou mais** (Golbat → Crobat, Pichu → Pikachu…). Os que dependem da hora usam o relógio do computador: Eevee vira **Espeon de dia (6h–18h)** e **Umbreon à noite**;
-  - por pedra, troca etc.: usa o item na Bolsa. A **Linking Cord** substitui a troca; se a troca exige um item, o Pokémon precisa estar segurando esse item.
+  - por pedra, troca etc.: usa o item na Bolsa. A **Linking Cord** substitui a troca; se a troca exige um item, o Pokémon precisa estar segurando esse item;
+  - por **golpe**: sobe de nível sabendo o golpe certo, como nos jogos (Lickitung com Rollout, Aipom com Double Hit, Tangela/Yanma/Piloswine com Ancient Power, Steenee com Stomp, Mime Jr. e Bonsly com Mimic…). **Sylveon**: Eevee com um golpe Fairy e amizade 160 ou mais;
+  - **evoluções especiais do PokeOrigins**: quem nos jogos oficiais pede uma condição que não existe aqui evolui por nível. No **40**: Mantine, Probopass, Sirfetch'd, Pawmot, Brambleghast e Rabsca. No **50**: Melmetal. Pangoro (32), Malamar (30) e Goodra (50) só precisam do nível. Tyrogue evolui no 20 conforme Attack e Defense;
+  - **itens que evoluem ao usar**: Peat Block (Ursaluna), **Peat Block Sangrento** (Ursaluna Bloodmoon), Black Augurite (Kleavor), Razor Claw (Weavile e Sneasler), Razor Fang (Gliscor), Oval Stone (Chansey), qualquer Sweet (Alcremie), **Temporal Stone** (Runerigus, Wyrdeer, Basculegion, Overqwil, Annihilape e Kingambit) e **Gold Stone** (Gholdengo). Razor Claw e Razor Fang também servem para segurar: a bolsa pergunta o que você quer.
 
 ### 8.1 Amizade
 - Vai de **0 a 255**. Todo Pokémon começa com **50**.
@@ -908,7 +911,12 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Itens de forma e fusões sem volta:** o item só funciona na forma normal, e depois de usado o Pokémon fica na forma nova. Fusões não se separam pelo item (quem separa é o Homem Suspeito). A Ogerpon só muda a partir da forma normal; a Teal Mask ficou sem uso por enquanto.
 - **Moedas com nome novo:** o silver virou **Poké Dólar** e o gold virou **Origin Coin**, cada um com um desenho novo de moeda. Só o nome e o desenho mudaram: saldos e preços continuam os mesmos.
 - **Homem Suspeito:** NPC novo, sentado no banco do campo de flores (perto da saída sul, à direita). Ele faz quatro coisas num Pokémon do seu time: **Resetar EVs** (zera todos; 50.000 Poké Dólares), **Resetar nível** (volta ao nível 1; 25.000), **Resetar evolução** (volta à primeira forma da linha, no mesmo nível, e esquece os golpes que ela não pode ter; também desfaz mudança de forma por item, como Deoxys, Rotom e Hoopa; 200.000) e **Separar Pokémon** (desfaz as fusões de Kyurem, Necrozma e Calyrex: os dois voltam com os IVs originais; 200.000). Requer **treinador nível 10**.
-- **Casas com a cara de cada NPC:** a Guilda ganhou um salão medieval com estandartes; o Viajante do tempo, uma casa metade passado e metade futuro, com um relógio grande e um portal aceso; o Safari virou uma creche com um cercado ao lado, onde Chansey, Kangaskhan, Scyther e Tauros ficam soltos; e o Mercado negro agora é uma entrada de esgoto. O Banco ficou simétrico.
+- **Evoluções que faltavam:** vários Pokémon que não tinham como evoluir agora têm (seção 8): por nível 40, por saber um golpe ou usando um item. Itens novos: **Peat Block**, **Peat Block Sangrento**, **Black Augurite**, **Temporal Stone** e **Gold Stone**.
+- **Teal Mask com uso:** usada numa Ogerpon de outra máscara, ela volta para a forma padrão (o Homem Suspeito não faz mais isso).
+- **Cosmog e Meltan** selvagens aparecem sempre no nível 10 (os outros lendários e míticos continuam no 50 ou mais). O Meltan evolui para Melmetal no nível 50.
+- **Ovo Misterioso:** iniciais e lendários/míticos agora só nascem na forma base (as evoluções deles só evoluindo).
+- **Idiomas:** o jogo agora pode ser jogado em português, inglês ou espanhol. A escolha fica em **Opções** e na tela de entrada, pelas bandeiras. Nomes de Pokémon, golpes, itens, Abilities, Natures e tipos continuam em inglês nos três idiomas.
+- **Casas com a cara de cada NPC:** a Guilda ganhou um salão medieval com estandartes; o Viajante do tempo, uma casa metade passado e metade futuro, com um relógio grande e um portal aceso; o Safari virou uma creche no meio de um lote só dela, com um cercado grande de cada lado, onde Chansey, Kangaskhan, Eevee, Scyther, Tauros e Porygon ficam soltos; e o Mercado negro agora é uma entrada de esgoto. O Banco ficou simétrico.
 - **NPCs com visuais diferentes:** cada um com o seu cabelo e o seu jeito.
 - **Moedinha nos preços:** preços, saldos e recompensas mostram o desenho da moeda com o número.
 - **Administração:** a Bonificação foi para dentro da aba **Eventos**, que fica só com o que a staff ativa na hora.

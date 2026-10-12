@@ -65,6 +65,8 @@ export interface ItemLoja {
   golpe?: string;
   /** imagem da PokéAPI (sprites/items/<sprite>.png) para itens sem ícone no Showdown */
   sprite?: string;
+  /** aba da loja onde o item aparece, quando a categoria dele não tem aba (Rotom Catalog, de `formas`, fica em Evolução) */
+  abaDaLoja?: CategoriaLoja;
   /** endereço completo da imagem (Tera Shards, que não existem no Showdown nem na PokéAPI) */
   imagem?: string;
   /** vendido na loja? (false: só tickets/Admin) */
@@ -147,6 +149,11 @@ const DESCRICAO_DE_CAMPO: Record<string, string> = {
   wellspringmask: 'Usada na Ogerpon, ela vira a forma Wellspring Mask (Grass/Water). É gasta.',
   hearthflamemask: 'Usada na Ogerpon, ela vira a forma Hearthflame Mask (Grass/Fire). É gasta.',
   cornerstonemask: 'Usada na Ogerpon, ela vira a forma Cornerstone Mask (Grass/Rock). É gasta.',
+  // evoluções que nos jogos pedem segurar o item e subir de nível: aqui é só usar (pedido do dono)
+  razorclaw: 'Segurando, a chance de golpe crítico sobe 1 estágio. Usada em Sneasel, ele evolui para Weavile (o Hisuian Sneasel, para Sneasler); aí ela é gasta.',
+  razorfang: 'Segurando, os golpes ganham 10% de chance de fazer o alvo hesitar. Usada em Gligar, ele evolui para Gliscor; aí ela é gasta.',
+  ovalstone: 'Usada em Happiny, ele evolui para Chansey. É gasta.',
+  ...Object.fromEntries(['strawberrysweet', 'lovesweet', 'berrysweet', 'cloversweet', 'flowersweet', 'starsweet', 'ribbonsweet'].map((doce) => [doce, 'Usado em Milcery, ele evolui para Alcremie. É gasto.'])),
   machobrace: 'Segurando, o Pokémon ganha o dobro de EVs de cada Pokémon derrotado. Na batalha, a Speed cai pela metade.',
   powerweight: 'Segurando, o Pokémon ganha +8 EVs de HP por Pokémon derrotado. Na batalha, a Speed cai pela metade.',
   powerbracer: 'Segurando, o Pokémon ganha +8 EVs de Attack por Pokémon derrotado. Na batalha, a Speed cai pela metade.',
@@ -225,6 +232,12 @@ function montarCatalogo(): ItemLoja[] {
   }
   add({ id: CABO_DE_LIGACAO, nome: 'Linking Cord', categoria: 'evolucao', imagem: 'itens/linkingcord.png', descricao: 'Faz evoluir Pokémon que evoluem por troca (se precisar de item, ele deve estar equipado).' });
 
+  // itens de evolução do Legends: Arceus (não existem no Showdown)
+  add({ id: 'peatblock', nome: 'Peat Block', categoria: 'evolucao', imagem: 'itens/peatblock.svg', descricao: 'Bloco de turfa. Evolui o Ursaring para Ursaluna. É gasto.' });
+  add({ id: 'blackaugurite', nome: 'Black Augurite', categoria: 'evolucao', imagem: 'itens/blackaugurite.svg', descricao: 'Pedra negra e afiada. Evolui o Scyther para Kleavor. É gasta.' });
+  // pedra nossa (pedido do dono), na loja
+  add({ id: 'temporalstone', nome: 'Temporal Stone', categoria: 'evolucao', imagem: 'itens/temporalstone.svg', descricao: 'Pedra com um relógio preso dentro. Evolui Galarian Yamask, Stantler, Basculin (White-Striped), Hisuian Qwilfish, Primeape e Bisharp. É gasta.' });
+
   add({ id: EXP_SHARE, nome: 'Exp. Share', categoria: 'up', sprite: 'exp-share', descricao: 'Segurando, o Pokémon ganha XP e EVs de toda vitória ou captura, mesmo sem entrar em campo.' });
   // itens de segurar com efeito fora da batalha (shared/campo.ts); não existem no Showdown
   add({ id: 'luckyegg', nome: 'Lucky Egg', categoria: 'up', sprite: 'lucky-egg', descricao: 'Segurando, o Pokémon ganha 50% a mais de XP.' });
@@ -282,11 +295,16 @@ function montarCatalogo(): ItemLoja[] {
   return [...itens.filter((i) => i.categoria !== 'batalha'), ...batalha];
 }
 
+/** Itens nossos (de `ITENS_CUSTOM`) que a loja vende (pedido do dono): preço, moeda e a aba onde aparecem. */
+const CUSTOM_NA_LOJA: Record<string, Pick<ItemLoja, 'preco' | 'moeda' | 'abaDaLoja'>> = {
+  rotomcatalog: { preco: 50, moeda: 'gold', abaDaLoja: 'evolucao' },
+};
+
 /** Todos os itens do jogo (Database, bolsa e Admin). */
 export const TODOS_OS_ITENS: ItemLoja[] = [
   ...montarCatalogo(),
   // itens nossos: skins e itens-chave (sem uso por enquanto)
-  ...ITENS_CUSTOM.map((i): ItemLoja => ({ ...i, preco: 0, naLoja: false })),
+  ...ITENS_CUSTOM.map((i): ItemLoja => (CUSTOM_NA_LOJA[i.id] ? { ...i, naLoja: true, ...CUSTOM_NA_LOJA[i.id] } : { ...i, preco: 0, naLoja: false })),
   ...TICKETS.map((t): ItemLoja => ({ id: t.id, nome: t.nome, categoria: 'tickets', descricao: t.descricao, preco: 0, naLoja: false, sprite: 'eon-ticket' })),
   // Chave Temporal: abre como um ticket (aba Tickets da bolsa)
   { id: CHAVE_TEMPORAL.id, nome: CHAVE_TEMPORAL.nome, categoria: 'tickets', descricao: CHAVE_TEMPORAL.descricao, preco: 0, naLoja: false, sprite: 'secret-key' },

@@ -4,3 +4,6 @@ dist/
 .DS_Store
 .trad/
 server/dados/
+# listas geradas por npm run idiomas
+shared/data/idiomas/_textos.json
+shared/data/idiomas/_faltam-*.json

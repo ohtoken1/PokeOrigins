@@ -155,5 +155,8 @@ export const ITENS_CUSTOM: ItemCustom[] = [
   { id: 'reinsofunity', nome: 'Reins of Unity', categoria: 'formas', imagem: 'itens/reinsofunity.png', descricao: 'Junta o Calyrex com o Glastrier (Ice Rider) ou o Spectrier (Shadow Rider) que estiver no time. Não tem volta. É gasto no uso.' },
   { id: 'scrollofdarkness', nome: 'Scroll of Darkness', categoria: 'evolucao', imagem: 'itens/scrollofdarkness.png', descricao: 'Evolui o Kubfu para Urshifu Single Strike (Fighting/Dark). É gasto.' },
   { id: 'scrollofwaters', nome: 'Scroll of Waters', categoria: 'evolucao', imagem: 'itens/scrollofwaters.png', descricao: 'Evolui o Kubfu para Urshifu Rapid Strike (Fighting/Water). É gasto.' },
-  { id: 'tealmask', nome: 'Teal Mask', categoria: 'evolucao', imagem: 'itens/tealmask.png', descricao: 'A máscara original da Ogerpon. Sem uso por enquanto.' },
+  // pedras nossas (pedido do dono), desenhadas no molde das pedras de evolução; fora da loja por enquanto
+  { id: 'peatblocksangrento', nome: 'Peat Block Sangrento', categoria: 'evolucao', imagem: 'itens/peatblocksangrento.svg', descricao: 'Bloco de turfa encharcado de vermelho, da cor da lua de sangue. Evolui o Ursaring para Ursaluna (Bloodmoon). É gasto.' },
+  { id: 'goldstone', nome: 'Gold Stone', categoria: 'evolucao', imagem: 'itens/goldstone.svg', descricao: 'Pedra de ouro maciço. Evolui o Gimmighoul para Gholdengo. É gasta.' },
+  { id: 'tealmask',nome: 'Teal Mask', categoria: 'evolucao', imagem: 'itens/tealmask.png', descricao: 'A máscara original da Ogerpon. Usada numa Ogerpon de outra máscara, ela volta para a forma padrão. É gasta.' },
 ];

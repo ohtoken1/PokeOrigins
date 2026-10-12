@@ -133,7 +133,7 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
     const termo = busca.trim().toLowerCase();
     const itens = termo
       ? CATALOGO.filter((i) => i.nome.toLowerCase().includes(termo) || i.descricao.toLowerCase().includes(termo))
-      : CATALOGO.filter((i) => i.categoria === categoria);
+      : CATALOGO.filter((i) => (i.abaDaLoja ?? i.categoria) === categoria);
     const visiveis = itens.slice(0, LIMITE_LISTA);
     vitrine.replaceChildren(
       ...visiveis.map((item) =>

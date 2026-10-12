@@ -1,0 +1,302 @@
+1062	Hide sheet	Ocultar ficha
+1063	See sheet	Ver ficha
+1064	Take {0}	Quitar {0}
+1065	The team needs at least 1 Pokémon	El equipo necesita al menos 1 Pokémon
+1066	Store in {0}	Guardar en {0}
+1067	Team full	Equipo lleno
+1068	Move to the team	Llevar al equipo
+1069	🔒 Trainer level {0}	🔒 Entrenador nivel {0}
+1070	Move	Mover
+1071	Unlock	Desbloquear
+1072	Lock	Bloquear
+1073	Locked: unlock it to be able to release	Bloqueado: desbloquéalo para poder liberarlo
+1074	Team ({0}/{1})	Equipo ({0}/{1})
+1075	Save name	Guardar nombre
+1076	Name this box	Dar un nombre a esta box
+1077	✏️ Rename	✏️ Renombrar
+1078	Change this box's background	Cambiar el fondo de esta box
+1079	🖼️ Background	🖼️ Fondo
+1080	Sorts this box by the sum of IVs, highest to lowest. Only appraised ones are sorted; the others stay at the end.	Ordena esta box por la suma de los IVs, de mayor a menor. Solo entran los ya evaluados; los demás quedan al final.
+1081	⇅ Sort IVs	⇅ Ord. IVs
+1082	Clear the search	Borrar la búsqueda
+1084	{0} marked for release	{0} marcado{1} para liberar
+1085	The team must keep at least 1 Pokémon	El equipo tiene que quedarse con al menos 1 Pokémon
+1086	Click a Pokémon to see the options, drag to move, or hold the click to mark several and release them together.	Haz clic en un Pokémon para ver las opciones, arrastra para mover, o mantén el clic para marcar varios y liberarlos juntos.
+1088	★ Shiny legendary	★ Legendario shiny
+1089	★ Legendary	★ Legendario
+1090	Wild Pokémon!	¡Pokémon salvaje!
+1091	~Lv. {0}
+1092	Shortcut: Enter	Atajo: Enter
+1093	Fight~	Luchar~
+1095	Keep walking to run away	Sigue caminando para huir
+1096	Drag to resize	Arrastra para cambiar el tamaño
+1097	Quality {0} · sum of IVs between {1} and {2} (out of 186)	Calidad {0} · suma de los IVs entre {1} y {2} (de 186)
+1098	{0} · {1} 31 · {2} · Quality {3}	{0} · {1} 31 · {2} · Calidad {3}
+1099	Completed by {0}: no longer available	Completada por {0}: ya no está disponible
+1100	Click to choose one of your Pokémon and complete it	Haz clic para elegir un Pokémon tuyo y completarla
+1101	Quality	Calidad
+1102	Leaves the board at the next draw	Sale del tablón en el próximo sorteo
+1103	Completed by you	Completada por ti
+1104	Completed by {0}	Completada por {0}
+1105	Time until this mission leaves the board	Tiempo hasta que esta misión salga del tablón
+1106	Leaves in {0}	Sale en {0}
+1107	This mission has left the board.	Esta misión salió del tablón.
+1108	{0} completed this mission first.	{0} completó esta misión antes.
+1109	← Back to the board	← Volver al tablón
+1110	Choose the Pokémon that fulfills the mission (team and PC). You don't hand it over: it stays with you.	Elige el Pokémon que cumple la misión (equipo y PC). No lo entregas: se queda contigo.
+1111	You don't have any {0} in your team or PC.	No tienes ningún {0} en el equipo ni en el PC.
+1112	Mission complete! +{0} Origin Coins.	¡Misión completada! +{0} Origin Coins.
+1113	Missions completed by you: {0} (see the ranking in Community → Ranking).~	Misiones completadas por ti: {0} (mira el ranking en Comunidad → Ranking).~
+1114	The board is the same for all players: each mission can only be completed by ONE player, the first to present a Pokémon with the requested IV, Nature and quality. You don't lose the Pokémon. New missions in~	El tablón es el mismo para todos los jugadores: cada misión solo puede completarla UN jugador, el primero que presente un Pokémon con el IV, la Nature y la calidad pedidos. No pierdes el Pokémon. Nuevas misiones en~
+1115	Possible Abilities	Abilities posibles
+1116	~(min–max)	~(mín.–máx.)
+1117	Safari Ticket	Ticket Safari
+1118	Administrator: enters without spending a ticket	Administrador: entra sin gastar ticket
+1119	Today's Safari Tickets: {0} of {1}. They come back at midnight.	Tickets Safari de hoy: {0} de {1}. Vuelven a medianoche.
+1120	Free tickets	Tickets libres
+1121	{0} of {1} tickets	{0} de {1} tickets
+1122	Buy 1 more Safari Ticket for {0} Origin Coins	Comprar 1 Ticket Safari más por {0} Origin Coins
+1123	You don't have enough Origin Coins	No tienes suficientes Origin Coins
+1124	Buy 1 more ticket for {0} Origin Coins (valid today only)	Comprar 1 ticket más por {0} Origin Coins (vale solo hoy)
+1125	Safari Ticket bought! It's valid until midnight tonight.	¡Ticket Safari comprado! Vale hasta la medianoche de hoy.
+1126	Could not buy the ticket right now.	No se pudo comprar el ticket ahora.
+1127	Pay {0} Origin Coins?	¿Pagar {0} Origin Coins?
+1128	Safari in progress	Safari en curso
+1129	Room {0} of {1}	Sala {0} de {1}
+1130	Continue	Continuar
+1131	Really abandon it? You won't get the ticket back	¿Abandonar de verdad? El ticket no se devuelve
+1132	Abandon	Abandonar
+1133	You're out of tickets for today. Come back tomorrow!	Se acabaron tus tickets de hoy. ¡Vuelve mañana!
+1134	You're out of tickets for today. Buy one more with the + up there or come back tomorrow.	Se acabaron tus tickets de hoy. Compra uno más en el + de arriba o vuelve mañana.
+1135	Choose a type. There are {0} rooms just for you, each with {1} Pokémon of that type walking around: click one to battle, the others leave and the exit at the top opens. Here shiny and rare Pokémon appear 10× more often than on the maps. Each Safari uses 1 ticket.	Elige un tipo. Son {0} salas solo para ti, cada una con {1} Pokémon de ese tipo caminando: haz clic en uno para combatir, los demás se van y la salida de arriba se abre. Aquí los shiny y los Pokémon raros aparecen 10× más que en los mapas. Cada Safari gasta 1 ticket.
+1136	Tickets come back in {0}	Los tickets vuelven en {0}
+1137	Safari type	Tipo del Safari
+1138	Could not enter the Safari right now.	No se pudo entrar en el Safari ahora.
+1139	Enter the {0} Safari	Entrar en el Safari de {0}
+1140	Choose a type	Elige un tipo
+1141	Bonus turned on by the staff	Bonus activado por la administración
+1142	{0} used: +20% shiny chance on Pokémon of that type	{0} usado: +20% de probabilidad de shiny en los Pokémon de ese tipo
+1143	{0} until {1}	{0} hasta las {1}
+1144	Reload	Recargar
+1145	No connection to the server. Your progress is kept here and sent when it comes back.	Sin conexión con el servidor. Tu progreso queda guardado aquí y se envía cuando vuelva.
+1146	Your session expired. Reload to sign in again (the progress is kept here).	Tu sesión caducó. Recarga para entrar de nuevo (el progreso queda guardado aquí).
+1147	Your progress was saved in another tab or computer. Reload the page.	Tu progreso se guardó en otra pestaña u ordenador. Recarga la página.
+1149	Has no EVs	No tiene EVs
+1150	Already at level 1	Ya está en el nivel 1
+1151	Not a fusion	No es una fusión
+1152	Separate the two first	Separa a los dos primero
+1153	Already the first form	Ya es la primera forma
+1154	{0}'s EVs were reset to zero.	Los EVs de {0} se pusieron a cero.
+1155	{0} went back to level 1.	{0} volvió al nivel 1.
+1156	{0} went back to being {1}.	{0} volvió a ser {1}.
+1157	{0} and {1} were separated. {2} went back to {3}.	{0} y {1} fueron separados. {2} volvió a {3}.
+1158	the PC	el PC
+1159	"Psst… I undo things nobody else undoes. Just don't ask how."	"Pst… yo deshago cosas que los demás no deshacen. Solo no preguntes cómo."
+1160	{0} on {1} for {2}? This can't be undone.	¿{0} en {1} por {2}? Esto no tiene vuelta atrás.
+1161	Costs~	Cuesta~
+1162	~· You have~	~· Tienes~
+1163	Not enough Poké Dollars for this service.	Poké Dólares insuficientes para este servicio.
+1164	On which Pokémon of the team?	¿En qué Pokémon del equipo?
+1165	{0} ×{1} went to {2}.	{0} ×{1} fue a {2}.
+1166	+{0} Poké Dollars.	+{0} Poké Dólares.
+1168	+{0} day{1} of VIP on your account.	+{0} día{1} de VIP en tu cuenta.
+1169	Lv. {0} · IVs {1}+
+1170	{0} day{1}	{0} día{1}
+1171	Random Tera Shard	Tera Shard aleatoria
+1172	Random Poké Ball	Poké Ball aleatoria
+1173	Random Plate	Plate aleatoria
+1174	{0} {1} · the best: {2}!	{0} {1} · lo mejor: ¡{2}!
+1175	Possible prizes	Premios posibles
+1183	Locked: can't be released	Bloqueado: no se puede liberar
+1184	NT · Untradeable	NT · No intercambiable
+1185	XP: {0} left to Lv. {1}	XP: faltan {0} para el Nv. {1}
+1186	Your team ({0}/{1})	Tu equipo ({0}/{1})
+1187	Arriving…	Llegando…
+1188	Traveling	Viajando
+1189	While the train hasn't arrived, you can use the town normally. The maps open when the trip ends.	Mientras el tren no llega, puedes usar la ciudad con normalidad. Los mapas se abren cuando termine el viaje.
+1190	Have a nice trip! The train to {0} has left.	¡Buen viaje! El tren a {0} ha salido.
+1191	You are in {0}	Estás en {0}
+1192	Choose the region. The farther it is, the longer the trip takes and the more the ticket costs.{0}	Elige la región. Cuanto más lejos, más tarda el viaje y más caro es el ticket.{0}
+1193	~VIP: half the time and half the price.	~VIP: la mitad del tiempo y la mitad del precio.
+1194	Destination region	Región de destino
+1195	Ticket to {0}	Ticket a {0}
+1196	Choose a region to buy the ticket	Elige una región para comprar el ticket
+1197	You don't have enough Poké Dollars	No tienes suficientes Poké Dólares
+1198	Pay~	Pagar~
+1199	Could not answer the invite.	No se pudo responder a la invitación.
+1200	~wants to trade with you.	~quiere intercambiar contigo.
+1201	Trade with {0}	Intercambio con {0}
+1202	Lv. {0}{1}
+1203	Remove from the trade	Quitar del intercambio
+1204	Clicked Trade	Hizo clic en Intercambiar
+1205	✓ Confirmed	✓ Confirmado
+1206	Setting up…	Preparando…
+1208	Nothing offered yet.	Nada ofrecido todavía.
+1209	from {0}	de {0}
+1210	Add Pokémon, items or currency.	Añade Pokémon, objetos o monedas.
+1213	+ Item	+ Objeto
+1214	NT: can't be traded	NT: no se puede intercambiar
+1215	No Pokémon available.	Ningún Pokémon disponible.
+1216	Offer {0}	Ofrecer {0}
+1217	Your bag is empty.	Tu mochila está vacía.
+1218	~(you have {0})	~(tienes {0})
+1219	Accept the invite to start.	Acepta la invitación para empezar.
+1220	Waiting for {0} to accept the invite…	Esperando a que {0} acepte la invitación…
+1221	Trade done!	¡Intercambio hecho!
+1222	What you received is already in your team, PC and bag.	Lo que recibiste ya está en tu equipo, PC y mochila.
+1223	Trade canceled	Intercambio cancelado
+1224	Set up your offer and click Confirm. When both have confirmed, the Trade button appears.	Prepara tu oferta y haz clic en Confirmar. Cuando los dos confirmen, aparece el botón Intercambiar.
+1225	Waiting for {0} to click Trade…	Esperando a que {0} haga clic en Intercambiar…
+1226	⇄ Trade	⇄ Intercambiar
+1227	{0} has already clicked Trade.	{0} ya hizo clic en Intercambiar.
+1228	Cancel trade	Cancelar intercambio
+1229	You arrived in {0}!	¡Llegaste a {0}!
+1230	Traveling to {0}	Viajando a {0}
+1231	Arrives in {0}	Llega en {0}
+1232	Best friends!	¡Mejores amigos!
+1233	Very attached to you	Muy apegado a ti
+1234	Likes you a lot	Te quiere mucho
+1235	Likes you	Le caes bien
+1236	Getting used to you	Se está acostumbrando a ti
+1237	Still wary	Todavía desconfía
+1238	is no longer burned	ya no está quemado
+1239	is no longer paralyzed	ya no está paralizado
+1240	is no longer poisoned	ya no está envenenado
+1241	Special Attack	Ataque Especial
+1242	Special Defense	Defensa Especial
+1243	Evasion	Evasión
+1248	It started to rain!	¡Empezó a llover!
+1249	The sunlight turned harsh!	¡El sol se volvió muy fuerte!
+1250	A sandstorm kicked up!	¡Empezó una tormenta de arena!
+1251	It started to snow!	¡Empezó a nevar!
+1252	It started to hail!	¡Empezó a caer granizo!
+1253	The sunlight turned extremely harsh!	¡El sol se volvió extremadamente fuerte!
+1254	A heavy rain began to fall!	¡Empezó una lluvia torrencial!
+1255	A mysterious wind is protecting Flying-type Pokémon!	¡Un viento misterioso protege a los Pokémon voladores!
+1256	The weather went back to normal.	El clima volvió a la normalidad.
+1257	on the opposing side	en el lado rival
+1258	Pointed stones float {0}!	¡Piedras puntiagudas flotan {0}!
+1259	Spikes were scattered on the ground {0}!	¡Se esparcieron púas por el suelo {0}!
+1260	Poison spikes were scattered on the ground {0}!	¡Se esparcieron púas venenosas por el suelo {0}!
+1261	A sticky web was spread on the ground {0}!	¡Una red pegajosa se extendió por el suelo {0}!
+1262	Reflect protects {0} against physical moves!	¡Reflect protege {0} contra movimientos físicos!
+1263	Light Screen protects {0} against special moves!	¡Light Screen protege {0} contra movimientos especiales!
+1264	Aurora Veil protects {0}!	¡Aurora Veil protege {0}!
+1265	The Tailwind blew {0}!	¡El Tailwind sopló {0}!
+1266	Safeguard protects {0} against status conditions!	¡Safeguard protege {0} contra problemas de estado!
+1267	Mist protects {0} against stat drops!	¡Mist protege {0} contra la pérdida de estadísticas!
+1268	The pointed stones disappeared {0}!	¡Las piedras puntiagudas desaparecieron {0}!
+1269	The spikes disappeared {0}!	¡Las púas desaparecieron {0}!
+1270	The poison spikes disappeared {0}!	¡Las púas venenosas desaparecieron {0}!
+1271	The sticky web disappeared {0}!	¡La red pegajosa desapareció {0}!
+1272	{0} started {1}!	¡{0} empezó {1}!
+1273	{0} ended {1}.	{0} terminó {1}.
+1274	No Pokémon able to fight	Ningún Pokémon en condiciones de luchar
+1276	Wild	Salvaje
+1283	Invalid choice: {0}	Elección no válida: {0}
+1285	{1}'s {0}	{0} de {1}
+1286	wild {0}	{0} salvaje
+1287	Go, {0}!	¡Adelante, {0}!
+1288	The effects on both sides of the field swapped places!	¡Los efectos de los dos lados del campo cambiaron de lugar!
+1289	{0} Mega Evolved into {1}!	¡{0} megaevolucionó a {1}!
+1290	{0} underwent Primal Reversion and returned to its primal form!	¡{0} hizo la Primal Reversion y volvió a su forma primigenia!
+1291	{0} Terastallized! It is now the {1} type!	¡{0} teracristalizó! ¡Ahora es de tipo {1}!
+1292	{0} surrounded itself with Z-Power!	¡{0} se rodeó de Z-Power!
+1293	{0} received {1}!	¡{0} recibió {1}!
+1294	{0} is floating with an Air Balloon!	¡{0} está flotando con un Air Balloon!
+1295	{0} is holding {1}!	¡{0} lleva {1}!
+1296	{0} used {1}!	¡{0} usó {1}!
+1297	{0} ate {1}!	¡{0} se comió {1}!
+1298	{0}'s Air Balloon popped!	¡El Air Balloon de {0} estalló!
+1299	{0} lost {1}!	¡{0} perdió {1}!
+1300	{0} was hurt by its burn!	¡{0} fue herido por la quemadura!
+1301	{0} was hurt by poison!	¡{0} fue herido por el veneno!
+1302	{0} took recoil damage!	¡{0} sufrió daño de retroceso!
+1303	It hurt itself in its confusion!	¡Se hirió en su confusión!
+1304	{0} had its energy drained!	¡A {0} le drenaron la energía!
+1305	{0} restored HP with {1}!	¡{0} recuperó HP con {1}!
+1306	{0} was hurt by {2}'s {1}!	¡{0} fue herido por {1} de {2}!
+1307	{0} lost HP because of {1}!	¡{0} perdió HP por culpa de {1}!
+1308	{0} was buffeted by the weather!	¡{0} fue golpeado por el clima!
+1309	{0} was affected by {1}!	¡{0} fue afectado por {1}!
+1310	{0} lost {1} HP ({2} of its health)!	¡{0} perdió {1} de HP ({2} de la vida)!
+1311	{0} used {1} and dealt {2} damage ({3} of its health){4}	{0} usó {1} y causó {2} de daño ({3} de la vida){4}
+1312	{0} hit again: {1} damage ({2} of its health){3}	{0} golpeó de nuevo: {1} de daño ({2} de la vida){3}
+1313	{0} ({1} damage, {2} of its health)	{0} ({1} de daño, {2} de la vida)
+1314	{0} fainted!	¡{0} se debilitó!
+1315	It's super effective!	¡Es supereficaz!
+1316	It's not very effective...	No es muy eficaz...
+1317	not very effective	no es muy eficaz
+1318	It doesn't affect {0}...	No afecta a {0}...
+1319	A critical hit!	¡Un golpe crítico!
+1320	critical	crítico
+1321	{0}'s attack missed!	¡{0} falló el ataque!
+1322	But it failed!	¡Pero falló!
+1323	It's a one-hit KO!	¡Es un K.O. en un golpe!
+1324	Hit {0} time(s)!	¡Acertó {0} vez(es)!
+1325	{0} is fast asleep.	{0} está profundamente dormido.
+1326	{0} is paralyzed! It can't move!	¡{0} está paralizado! ¡No puede moverse!
+1327	{0} is frozen solid!	¡{0} está congelado!
+1328	{0} flinched!	¡{0} retrocedió del miedo!
+1329	{0} must recharge!	¡{0} necesita recargarse!
+1330	{0} couldn't move!	¡{0} no pudo moverse!
+1336	{0}'s stat changes were reset!	¡Las estadísticas de {0} volvieron a la normalidad!
+1337	Everyone's stat changes were reset!	¡Las estadísticas de todos volvieron a la normalidad!
+1338	{0} covered the battlefield!	¡{0} cubrió el campo de batalla!
+1339	{0} disappeared from the field.	{0} desapareció del campo.
+1341	{0} became giant: Gigantamax!	¡{0} se volvió gigante: Gigantamax!
+1342	{0} became giant: Dynamax!	¡{0} se volvió gigante: Dynamax!
+1343	{0} became confused!	¡{0} quedó confuso!
+1344	{0} was seeded!	¡{0} fue sembrado!
+1345	{0} made a substitute!	¡{0} creó un sustituto!
+1346	{0} is confused!	¡{0} está confuso!
+1347	{0} returned to its normal size.	{0} volvió a su tamaño normal.
+1348	{0} is no longer confused!	¡{0} ya no está confuso!
+1349	{0} is getting ready!	¡{0} se está preparando!
+1352	{0} is already at the max level for your trainer level and gained no experience.	{0} ya está en el nivel máximo para tu nivel de entrenador y no ganó experiencia.
+1353	{0} gained {1} experience points!	¡{0} ganó {1} puntos de experiencia!
+1354	{0} grew to level {1}!	¡{0} subió al nivel {1}!
+1355	Green Fields	Campos Verdes
+1356	Fields with Grass, Bug, Normal and Poison Pokémon.	Campos con Pokémon de planta, bicho, normales y venenosos.
+1357	Deep Sea	Mar Profundo
+1358	Deep waters and underwater currents.	Aguas profundas y corrientes submarinas.
+1359	Hot rocks, rivers of lava and Fire, Ground and Dragon Pokémon.	Rocas calientes, ríos de lava y Pokémon de fuego, de tierra y dragones.
+1360	Rocky Cave	Cueva Rocosa
+1361	Stone tunnels, with Rock, Steel and Fighting Pokémon.	Túneles de piedra, con Pokémon de roca, de acero y luchadores.
+1362	Haunted Tower	Torre Embrujada
+1363	Ghosts and Psychic Pokémon wander the floors.	Fantasmas y Pokémon psíquicos vagan por los pisos.
+1364	Snowy Peak	Pico Nevado
+1365	A mountain of snow and wind, with Ice, Flying, Electric and Fairy Pokémon.	Montaña de nieve y viento, con Pokémon de hielo, voladores, eléctricos y hadas.
+1366	Unknown biome: {0}	Bioma desconocido: {0}
+1367	Poké Dollars earned by winning battles.	Poké Dólares ganados al vencer combates.
+1368	Experience for Pokémon and the trainer.	Experiencia de los Pokémon y del entrenador.
+1369	Shiny appearance	Aparición de shiny
+1370	Chance of a wild Pokémon being shiny.	Probabilidad de que un salvaje sea shiny.
+1371	Legendary appearance	Aparición de legendario
+1372	Chance of legendaries, mythicals and Ultra Beasts in encounters.	Probabilidad de legendarios, míticos y Ultra Beasts en los encuentros.
+1378	Common	Común
+1379	Uncommon	Poco común
+1380	Rare	Raro
+1381	Starter	Inicial
+1382	Paradox	Paradoja
+1384	The {0} is already active. Wait for it to end before using another.	El {0} ya está activo. Espera a que termine para usar otro.
+1385	You don't have {0}.	No tienes {0}.
+1386	Pennant	Banderín
+1387	Pointed	Punta
+1388	Swallowtail	Cola de golondrina
+1389	Shield	Escudo
+1390	Vertical half	Mitad vertical
+1391	Horizontal half	Mitad horizontal
+1393	Stripes	Rayas
+1394	Band	Franja
+1395	Border	Borde
+1396	Chevron	Galón
+1398	Star	Estrella
+1399	Crown	Corona
+1400	Moon	Luna
+1401	Claws	Garras
+1402	Paw	Pata
+1403	Shiny Pokédex	Pokédex shiny
+1404	Rare catches	Capturas raras
+1405	Battles	Combates
+1406	Wealth	Riqueza

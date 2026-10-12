@@ -3,7 +3,7 @@
 import { Dex } from '@pkmn/sim';
 import { especie, type PokemonIndividual } from './batalha/pokemon';
 import { idDaEvolucao } from './formasRegionais';
-import { EVOLUCOES_NOSSAS, MASCARAS_OGERPON } from './formasPorItem';
+import { EVOLUCOES_NOSSAS, FORMA_DA_FEMEA, MASCARAS_OGERPON } from './formasPorItem';
 import { ABILITY_CAPSULE, ABILITY_PATCH, CABO_DE_LIGACAO, ITENS_DE_SEGURAR_NOSSOS, PEDRAS_EVOLUCAO } from './loja';
 
 /** Ability Capsule e Ability Patch: itens de USAR (o resto da aba Up é de segurar). */
@@ -31,16 +31,22 @@ export function usarItemDeHabilidade(itemId: string, p: PokemonIndividual, quem:
   return { usou: true, mensagem: `A Ability de ${quem} agora é ${nova}!` };
 }
 
+/** Itens de segurar que também evoluem ao serem usados (Sneasel → Weavile/Sneasler, Gligar → Gliscor): a bolsa pergunta. */
+export const SEGURAR_OU_EVOLUIR = new Set(['razorclaw', 'razorfang']);
+
 /**
  * Para qual espécie o Pokémon evolui usando o item, ou null.
  * `existe` filtra espécies que o jogo ainda não tem dados (ex.: evoluções de outras regiões).
  */
 export function evolucaoPorItem(p: PokemonIndividual, itemId: string, existe: (numero: number) => boolean): number | null {
   // itens de evolução nossos (pergaminhos do Kubfu)
-  const nossa = EVOLUCOES_NOSSAS[itemId]?.[p.especieId];
+  const normal = EVOLUCOES_NOSSAS[itemId]?.[p.especieId];
+  // a fêmea vai para a forma dela, quando existe (Basculegion)
+  const nossa = normal && p.genero === 'F' && FORMA_DA_FEMEA[normal] && existe(FORMA_DA_FEMEA[normal]) ? FORMA_DA_FEMEA[normal] : normal;
   if (nossa && existe(nossa)) return nossa;
-  // máscaras da Ogerpon: só a Ogerpon normal vira a forma da máscara (sem volta)
+  // máscaras da Ogerpon: só a Ogerpon normal vira a forma da máscara; a Teal Mask traz as outras de volta à normal
   const mascara = MASCARAS_OGERPON[itemId];
+  if (itemId === 'tealmask') return p.especieId !== mascara && Object.values(MASCARAS_OGERPON).includes(p.especieId) && existe(mascara) ? mascara : null;
   if (mascara && mascara !== p.especieId && p.especieId === MASCARAS_OGERPON.tealmask && existe(mascara)) return mascara;
   for (const nome of especie(p.especieId).evos ?? []) {
     const evo = Dex.species.get(nome);
