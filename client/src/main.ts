@@ -1,6 +1,7 @@
 import './estilo.css';
 import './estilo-pokedex.css';
-import { carregarSave } from './estado';
+import { carregarSave, salvar } from './estado';
+import { ajustarTimeAoLimite } from './limiteNivel';
 import { iniciarMusica } from './sons';
 import { telaEscolhaInicial } from './telas/escolhaInicial';
 import { telaRegiao } from './telas/regiao';
@@ -96,6 +97,11 @@ void garantirConta(raiz).then((conta) => {
   vigiarAnuncios();
   // trem: contagem no canto e, ao partir/chegar, o cabeçalho (região) e a tela dos mapas se atualizam
   vigiarViagem();
+  // limite de nível pelo treinador: quem estava no time acima do limite (save de antes da regra) vai para o PC
+  {
+    const s = carregarSave();
+    if (s && ajustarTimeAoLimite(s)) salvar(s);
+  }
   // conquistas: confere agora e depois de cada salvamento
   vigiarConquistas();
   // itens dados pela administração

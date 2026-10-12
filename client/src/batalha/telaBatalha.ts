@@ -1,4 +1,5 @@
 import { bonificacao } from '../bonificacao';
+import { podeUsar, tetoDoJogador, textoDoLimite } from '../limiteNivel';
 import { bonusVip } from '../../../shared/vip';
 import { AMIZADE_POR_BATALHA, ganharAmizade } from '../../../shared/amizade';
 import { trocarSpriteForma } from '../ui/formas';
@@ -908,7 +909,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         // bônus de XP da administração (1x a 3x)
         // Lucky Egg: +50% para quem segura
         const exp = Math.round(xpPelosDerrotados(p.nivel) * bonusVip(save, 'xpPokemon') * bonificacao().xp * multSkins(save, 'xp') * multXpDoItem(p));
-        const r = ganharExperiencia(p, exp, nomeDe, crescimentoDe);
+        const r = ganharExperiencia(p, exp, nomeDe, crescimentoDe, tetoDoJogador(save));
         await mostrarProgresso(pos, r);
         if (r.evolucao) evolucoes.push({ pos, para: r.evolucao.para });
       }
@@ -970,10 +971,12 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       if (selvagem.shiny || rara) avisarCapturaRara(selvagem.especieId, selvagem.shiny, rara);
       await avisarMissoes(contarNasMissoes(save, 'capturar', selvagem.especieId));
       if (selvagem.shiny) await avisarMissoes(contarNasMissoes(save, 'shiny'));
-      if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(selvagem);
+      // acima do limite de nível do treinador (um lendário nível 50, por exemplo): vai para o PC até poder ser usado
+      const usavel = podeUsar(save, selvagem);
+      if (usavel && save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(selvagem);
       else {
         const box = guardarNoPC(save, selvagem);
-        await dizer(`${dadosSelvagem.nome} foi enviado para o PC (Box ${box + 1}).`);
+        await dizer(`${dadosSelvagem.nome} foi enviado para o PC (Box ${box + 1}).${usavel ? '' : ` ${textoDoLimite(selvagem)}.`}`);
       }
     }
     // conquista: derrotou um lendário selvagem ou fugiu dele

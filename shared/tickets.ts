@@ -57,7 +57,8 @@ export interface Ticket {
 // ---------- prêmios que se repetem (planilha) ----------
 const linha = (raridade: Raridade, chance: number, ...pacote: Premio[]): LinhaPremio => ({ raridade, chance, pacote });
 /** Nível dos lendários dos tickets (o mesmo mínimo dos lendários selvagens). */
-const NIVEL_POKEMON_TICKET = 50;
+/** Nível 1 (pedido do dono): com o limite de nível pelo treinador, qualquer jogador pode usar o que tirou. */
+const NIVEL_POKEMON_TICKET = 1;
 const CHANCE_SHINY_TICKET = 0.05;
 const pokemon = (especie: number, ivMinimo = 15): Premio => ({ tipo: 'pokemon', especie, nivel: NIVEL_POKEMON_TICKET, chanceShiny: CHANCE_SHINY_TICKET, ivMinimo });
 const item = (id: string, quantidade = 1): Premio => ({ tipo: 'item', id, quantidade });

@@ -1,5 +1,7 @@
 import { nomeItemEquipado } from '../../../shared/usoItens';
 import { pokemonPorId } from '../dados';
+import { treinadorParaUsar } from '../../../shared/treinador';
+import { podeUsar, textoDoLimite } from '../limiteNivel';
 import { numeroDeBoxes, TAMANHO_BOX, TAMANHO_MAXIMO_TIME, TAMANHO_NOME_BOX, nomeDaBox, pokemonsDaBox, salvar, type PokemonDoJogador, type Save } from '../estado';
 import { tornarArrastavel } from './arrastar';
 import { fichaPokemon } from './detalhes';
@@ -69,6 +71,8 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
     const tipo = alvo.dataset.alvo;
     const i = Number(alvo.dataset.i ?? 0);
     if (tipo === 'time') {
+      // acima do limite de nível do treinador: não entra no time
+      if (!noTime(p) && !podeUsar(save, p)) return false;
       if (noTime(p)) {
         colocarNoTime(p, i);
         return true;
@@ -350,11 +354,11 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
               'button',
               {
                 class: 'botao secundario',
-                disabled: save.time.length >= TAMANHO_MAXIMO_TIME,
-                title: save.time.length >= TAMANHO_MAXIMO_TIME ? 'Time cheio' : '',
+                disabled: save.time.length >= TAMANHO_MAXIMO_TIME || !podeUsar(save, p),
+                title: !podeUsar(save, p) ? textoDoLimite(p) : save.time.length >= TAMANHO_MAXIMO_TIME ? 'Time cheio' : '',
                 onclick: () => (colocarNoTime(p, save.time.length), mudou(), refazer()),
               },
-              'Levar para o time',
+              podeUsar(save, p) ? 'Levar para o time' : `🔒 Treinador nível ${treinadorParaUsar(p.nivel)}`,
             ),
           );
           const destino = el(

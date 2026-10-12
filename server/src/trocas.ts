@@ -11,6 +11,7 @@ import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { itemInegociavel } from '../../shared/naoTrocavel.ts';
 import { TAMANHO_BOX, numeroDeBoxes } from '../../shared/pc.ts';
+import { nivelMaximoPokemon, nivelTreinador } from '../../shared/treinador.ts';
 
 /** Mesmo do jogo (client/src/estado.ts). */
 const TAMANHO_MAXIMO_TIME = 6;
@@ -51,7 +52,7 @@ const ofertaVazia = (): Oferta => ({ pokemons: [], itens: {}, silver: 0, gold: 0
 
 // ---- tipos mínimos do save (o resto do save não interessa aqui) ----
 export type PokemonSave = { uid?: number; especieId: number; nivel: number; shiny?: boolean; genero?: string; item?: string | null; inegociavel?: boolean; trancado?: boolean; box?: number; [k: string]: unknown };
-export type SaveMin = { time: PokemonSave[]; caixa: PokemonSave[]; itens: Record<string, number>; silver: number; gold: number; proximoIdPokemon?: number; capturados?: number[]; vistos?: number[]; capturadosShiny?: number[]; aceitarTrocas?: boolean };
+export type SaveMin = { time: PokemonSave[]; caixa: PokemonSave[]; itens: Record<string, number>; silver: number; gold: number; proximoIdPokemon?: number; capturados?: number[]; vistos?: number[]; capturadosShiny?: number[]; aceitarTrocas?: boolean; xpTreinador?: number };
 
 function saveDe(contaId: number): SaveMin {
   const s = banco.lerSave(contaId);
@@ -275,7 +276,9 @@ export function guardarPokemon(save: SaveMin, original: PokemonSave, deOutroJoga
     delete p.box;
     // veio de troca: não serve para as conquistas de "consiga um…" (o mesmo Pokémon não vale para vários jogadores)
     if (deOutroJogador) p.origem = 'troca';
-    if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(p);
+    // acima do limite de nível do treinador de quem recebe: vai para o PC (ele só usa quando tiver nível)
+    const usavel = p.nivel <= nivelMaximoPokemon(nivelTreinador(save.xpTreinador ?? 0));
+    if (usavel && save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(p);
     else {
       const box = Array.from({ length: numeroDeBoxes(save) }, (_, i) => i).find((i) => save.caixa.filter((x) => (x.box ?? 0) === i).length < TAMANHO_BOX);
       if (box === undefined) throw new ErroConta('O PC de quem recebe está cheio.', 409);

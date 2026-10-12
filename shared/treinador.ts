@@ -36,6 +36,16 @@ export function progressoTreinador(xpTotal: number): { nivel: number; atual: num
   return { nivel, atual: xpTotal - xpTotalParaNivel(nivel), necessario: xpParaSubir(nivel) };
 }
 
+/**
+ * Limite de nível dos Pokémon que o jogador pode USAR (pedido do dono): do treinador 1 ao 9, até 10 × o nível dele
+ * (treinador 3 → nível 30); do 10 em diante, sem limite. Acima do limite o Pokémon fica no PC e quem está no
+ * time para de ganhar XP ao chegar nele. Segura a corrida de nível no começo e a conta nova com Pokémon emprestado.
+ */
+export const TREINADOR_SEM_LIMITE = 10;
+export const nivelMaximoPokemon = (nivelTreinador: number): number => (nivelTreinador >= TREINADOR_SEM_LIMITE ? 100 : Math.max(1, nivelTreinador) * 10);
+/** Nível de treinador necessário para usar um Pokémon deste nível. */
+export const treinadorParaUsar = (nivelPokemon: number): number => Math.min(TREINADOR_SEM_LIMITE, Math.ceil(nivelPokemon / 10));
+
 /** Os encontros vão do (teto − 4) ao teto: 5 níveis (treinador 1 → 1–5, treinador 2 → 6–10…). */
 export const FAIXA_NIVEIS_ENCONTRO = 4;
 

@@ -504,7 +504,7 @@ Itens **raros**, para que certos prêmios não sejam algo que todo mundo tem.
 | Épico | 1× Ovo Misterioso A | 1% |
 
 ### Lendário de cada ticket (1% no total, dividido por igual)
-Os Pokémon vêm no **nível 50**, com **5% de chance de shiny** e **cada IV de 15 a 31** (Arceus: de 10 a 31).
+Os Pokémon vêm no **nível 1**, com **5% de chance de shiny** e **cada IV de 15 a 31** (Arceus: de 10 a 31).
 
 | Ticket | Prêmios lendários |
 |---|---|
@@ -883,6 +883,8 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Tera Type aleatório:** Pokémon selvagem capturado agora vem com um Tera Type sorteado entre os 18 tipos, revelado só depois da captura.
 - **Mapas dos biomas:** o **Vulcão** ficou vulcânico de verdade (chão de rocha escura, poças de lava, rachaduras acesas, lascas de obsidiana e pequenos vulcões soltando fumaça); a **Caverna Rochosa** agora tem abismos escuros no lugar das poças; o **Mar Profundo** e a **Torre Assombrada** não têm mais poças nem buracos.
 - **Skins especiais com visual:** as 13 skins que só tinham bônus ganharam desenho no personagem (Galante, Chaveiro, Indiana Jones, Halloween, Natal, Carnaval, Páscoa, Dia dos Namorados, Aniversário, Ash, Gary, May e Misty). O rosto continua o do jogador; muda a roupa, e a maioria vem com chapéu ou acessório. As de Ash, Gary, May e Misty vêm também com o cabelo do personagem, a de Halloween tem cabeça de abóbora, a de Natal carrega o saco do Papai Noel nas costas, a de Carnaval é um folião de bloco (chapéu de palha, óculos escuros e camisa florida), a de Páscoa tem touca de coelho e a de Aniversário comemora o aniversário do PokeOrigins (preta, dourada e creme, com "PO" no peito).
+- **Limite de nível pelo treinador:** do treinador nível 1 ao 9, você só pode usar Pokémon até **10 × o seu nível de treinador** (treinador 3 → até o nível 30; treinador 6 → até o 60). Do treinador 10 em diante não há limite. Pokémon acima do limite ficam no PC (por troca, Mercado negro ou captura) até você ter nível, e quem está no time para de ganhar experiência ao chegar no limite.
+- **Pokémon de ticket nascem no nível 1** (antes 50), como os de ovo, para qualquer jogador poder usar o que ganhou.
 - **Preços:** Tera Orb e Dynamax Band a 100.000 silver cada; os outros itens de batalha passam a 20.000 silver e itens de evolução (pedras, Linking Cord e os outros) a 30.000 silver.
 - **Ícones novos:** cada ticket de prêmio ganhou a cor e a inicial do seu Pokémon (Kyogre é um K azul, Groudon um G vermelho…), e os 18 charms agora usam a imagem original do Shiny Charm pintada na cor do tipo.
 - **Box Pokémon:** o PC passa a começar com 15 boxes (antes 30). O item novo **Box Pokémon** (500.000 silver, aba Up do Pokémarket) abre mais uma box, até 30. Quem já tinha Pokémon guardado além da 15ª box continua com as boxes que usa.
