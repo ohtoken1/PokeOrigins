@@ -15,6 +15,7 @@ import { abrirBolsa } from './bolsa';
 import { el } from './dom';
 import { iconePokedex } from './barraTopo';
 import { icone, type NomeIcone } from './icones';
+import { montarLetreiro } from './letreiro';
 import { abrirLoja } from './loja';
 import { abrirPC } from './pc';
 
@@ -32,6 +33,8 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
     else desenhar();
   };
   const aviso = el('span', { class: 'cabecalho-aviso', role: 'status' });
+  // barrinha de avisos de todos os jogadores: é sempre o mesmo elemento, para a animação não recomeçar a cada redesenho
+  const letreiro = montarLetreiro();
   let relogioAviso = 0;
   const avisar = (texto: string) => {
     aviso.textContent = texto;
@@ -97,6 +100,7 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
           // Mapas: jogadores saem pela saída do sul da cidade; para eles o atalho leva à cidade
           ehAdministrador() ? atalho('mapa', 'Mapas', () => navegar({ tela: 'regiao' })) : atalho('mapa', 'Cidade', () => navegar({ tela: 'cidade' })),
           aviso),
+      letreiro,
     );
   }
 

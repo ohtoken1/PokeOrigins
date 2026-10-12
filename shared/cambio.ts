@@ -1,10 +1,11 @@
 // Banco da cidade: troca de silver por gold e de gold por silver (este arquivo não importa nada: o servidor usa).
-// Valores provisórios (pedido do dono: 1 para 1 nos dois sentidos, até a economia ser definida).
+// Câmbio do dono: comprar 1 gold custa 10 mil silver, vender 1 gold rende 7,5 mil (a diferença fica no cofre).
+// O banco está FECHADO para jogadores comuns por enquanto (só administradores; conferido também no servidor).
 
 /** Quanto de silver custa COMPRAR 1 gold. */
-export const GOLD_CUSTA_SILVER = 1;
+export const GOLD_CUSTA_SILVER = 10_000;
 /** Quanto de silver rende VENDER 1 gold. */
-export const GOLD_VALE_SILVER = 1;
+export const GOLD_VALE_SILVER = 7_500;
 /** Maior quantidade de gold por operação. */
 export const CAMBIO_MAX_POR_VEZ = 1_000_000;
 

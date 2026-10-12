@@ -25,7 +25,7 @@ export function mostrarJogo(area: HTMLElement, opcoes: OpcoesBioma): { cena: () 
       width: LARGURA_TELA * resolucao(),
       height: ALTURA_TELA * resolucao(),
       pixelArt: true,
-      backgroundColor: '#15263c',
+      backgroundColor: '#12110f',
       scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_HORIZONTALLY },
     });
     jogo.scene.add('bioma', BiomaScene, false);

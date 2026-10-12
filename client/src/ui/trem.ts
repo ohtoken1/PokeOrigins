@@ -1,7 +1,7 @@
 // Estação de trem da cidade: compra o ticket (silver ou gold) e escolhe a região. Quanto mais longe na ordem das
 // regiões, mais a viagem demora. Quem cobra e conta o tempo é o servidor (client/src/viagem.ts).
 import { REGIOES } from '../../../shared/regioes';
-import { precoDoTicket, tempoDaViagemMs, textoDoTempo, type MoedaTicket } from '../../../shared/viagem';
+import { precoDoTicket, tempoDaViagemMs, textoDoTempo, trechosEntre } from '../../../shared/viagem';
 import { vipAtivo } from '../../../shared/vip';
 import { ErroApi } from '../conta';
 import type { Save } from '../estado';
@@ -10,7 +10,7 @@ import { el } from './dom';
 import { abrirJanela } from './janela';
 
 const nomeDaRegiao = (id: string) => REGIOES.find((r) => r.id === id)?.nome ?? id;
-const moeda = (tipo: MoedaTicket, valor: number) => el('span', { class: 'banco-moeda' }, el('span', { class: `icone-moeda moeda-${tipo}` }), el('strong', {}, valor.toLocaleString('pt-BR')), ` ${tipo}`);
+const moeda = (tipo: 'silver' | 'gold', valor: number) => el('span', { class: 'banco-moeda' }, el('span', { class: `icone-moeda moeda-${tipo}` }), el('strong', {}, valor.toLocaleString('pt-BR')), ` ${tipo}`);
 
 export function abrirEstacao(save: Save, aoMudar: () => void = () => {}): void {
   let destino: string | null = null;
@@ -38,14 +38,15 @@ export function abrirEstacao(save: Save, aoMudar: () => void = () => {}): void {
     }
     relogio = () => {};
     const vip = vipAtivo(save);
-    const pagar = (tipo: MoedaTicket) => async () => {
+    const precoPara = (id: string) => precoDoTicket(trechosEntre(ORDEM_DAS_REGIOES, save.regiao, id), vip);
+    const pagar = async () => {
       if (!destino || ocupado) return;
       ocupado = true;
       aviso = '';
       janela.redesenhar();
       try {
         const para = destino;
-        await comprarTicket(para, tipo);
+        await comprarTicket(para, 'silver');
         aviso = `Boa viagem! O trem para ${nomeDaRegiao(para)} partiu.`;
         destino = null;
         aoMudar();
@@ -57,7 +58,7 @@ export function abrirEstacao(save: Save, aoMudar: () => void = () => {}): void {
     };
     return el('div', { class: 'trem' },
       el('div', { class: 'banco-saldo' }, el('small', {}, `Você está em ${nomeDaRegiao(save.regiao)}`), moeda('silver', save.silver), moeda('gold', save.gold)),
-      el('p', { class: 'meta' }, `Escolha a região. Quanto mais longe, mais a viagem demora.${vip ? ' VIP: metade do tempo e metade do preço em silver.' : ''}`),
+      el('p', { class: 'meta' }, `Escolha a região. Quanto mais longe, mais a viagem demora e mais caro é o ticket.${vip ? ' VIP: metade do tempo e metade do preço.' : ''}`),
       el('div', { class: 'trem-regioes', role: 'radiogroup', 'aria-label': 'Região de destino' },
         ...REGIOES.filter((r) => r.id !== save.regiao).map((r) =>
           el('button', {
@@ -67,13 +68,14 @@ export function abrirEstacao(save: Save, aoMudar: () => void = () => {}): void {
               aviso = '';
               janela.redesenhar();
             },
-          }, el('strong', {}, r.nome), el('small', {}, textoDoTempo(tempoDaViagemMs(ORDEM_DAS_REGIOES, save.regiao, r.id, vip)))))),
+          }, el('strong', {}, r.nome), el('small', {}, `${textoDoTempo(tempoDaViagemMs(ORDEM_DAS_REGIOES, save.regiao, r.id, vip))} · ${precoPara(r.id).toLocaleString('pt-BR')} silver`)))),
       el('p', { class: 'banco-aviso', role: 'status' }, aviso),
       el('div', { class: 'trem-pagar' },
         el('small', {}, destino ? `Ticket para ${nomeDaRegiao(destino)}` : 'Escolha uma região para comprar o ticket'),
-        ...(['silver', 'gold'] as MoedaTicket[]).map((tipo) =>
-          el('button', { class: 'botao', type: 'button', disabled: !destino || ocupado || save[tipo] < precoDoTicket(tipo, vip), title: save[tipo] < precoDoTicket(tipo, vip) ? `Você não tem ${tipo} suficiente` : '', onclick: pagar(tipo) },
-            'Pagar ', moeda(tipo, precoDoTicket(tipo, vip))))));
+        destino
+          ? el('button', { class: 'botao', type: 'button', disabled: ocupado || save.silver < precoPara(destino), title: save.silver < precoPara(destino) ? 'Você não tem silver suficiente' : '', onclick: pagar },
+              'Pagar ', moeda('silver', precoPara(destino)))
+          : null));
   }, { classe: 'janela-banco', aoFechar: () => (clearInterval(tique), pararDeOuvir()) });
 
   const tique = window.setInterval(() => relogio(), 500);

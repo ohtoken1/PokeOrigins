@@ -123,7 +123,7 @@ export const CONQUISTAS: Conquista[] = [
   c('ticket-epico', 'jornada', 'Sorte?', 'Consiga um prêmio épico no sistema de tickets.', item('ticket-arceus', 'Ticket de Arceus')),
   c('ticket-lendario', 'jornada', 'Homem de sorte', 'Consiga um prêmio lendário no sistema de tickets.', item('ticket-arceus', 'Ticket de Arceus', 10)),
   c('ticket-mitico', 'jornada', 'Ganhei na loteria', 'Consiga um prêmio mítico no sistema de tickets.', titulo('P2W')),
-  c('trem-1', 'jornada', 'Viajante', 'Viaje de trem uma vez.', { tipo: 'silver', quantidade: 50_000 }),
+  c('trem-1', 'jornada', 'Viajante', 'Viaje de trem uma vez.', { tipo: 'silver', quantidade: 5_000 }),
   c('trem-todas', 'jornada', 'Viajado', 'Viaje por todas as regiões de trem.', item('skin-indianajones', 'Skin Indiana Jones (NT)')),
   c('guilda-entrar', 'jornada', 'União', 'Entre em uma guilda.', titulo('Membro de guilda')),
   c('guilda-criar', 'jornada', 'Lider da união', 'Crie uma guilda.', titulo('Líder de guilda')),

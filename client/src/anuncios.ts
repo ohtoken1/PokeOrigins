@@ -19,6 +19,8 @@ export function aoMudarAnuncios(f: () => void): () => void {
 }
 export const carregarAnuncios = async () => adotar(await api<Anuncio[]>('GET', '/anuncios'));
 export const publicarAnuncio = async (titulo: string, texto: string) => adotar(await api<Anuncio[]>('POST', '/anuncios', { titulo, texto }));
+/** Aviso curto da staff: não vai para o mural, passa na barrinha de avisos de todos (ui/letreiro.ts). */
+export const publicarAviso = (texto: string) => api<{ texto: string }>('POST', '/avisos', { texto });
 export const apagarAnuncio = async (id: number) => adotar(await api<Anuncio[]>('DELETE', `/anuncios/${id}`));
 
 // ---- o que este jogador já leu (fica no navegador: é só o selo de "novo") ----

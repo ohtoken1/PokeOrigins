@@ -20,7 +20,7 @@ const ABAS: Aba[] = [
   {
     nome: 'Jogar',
     menu: true,
-    telas: ['inicial', 'regiao', 'bioma', 'personagem', 'cidade', 'duelos', 'ginasios'],
+    telas: ['inicial', 'regiao', 'bioma', 'personagem', 'cidade', 'safari', 'duelos', 'ginasios'],
     itens: [
       // jogadores chegam aos mapas pela saída do sul da cidade (pedido do dono); o atalho fica só para administradores
       { nome: '🗺️ Mapas', soAdmin: true, destino: () => (carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' }) },
@@ -156,7 +156,7 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
       el(
         'div',
         { class: 'barra-topo-conteudo' },
-        el('strong', { class: 'marca' }, 'PokeOrigins'),
+        el('img', { class: 'marca', src: '/logo/origens-antigas-barra.svg', alt: 'PokeOrigins' }),
         el('div', { class: 'abas-topo' }, ...botoes.map((b) => b.raiz)),
         controlesSom(),
       ),

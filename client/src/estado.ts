@@ -1,5 +1,6 @@
 // Save do jogador: fica na conta (servidor), com o objeto único em memória e uma cópia no navegador até chegar lá.
-import { atributosZerados, curar, gerarIndividuo, hpMaximo, type PokemonIndividual } from '../../shared/batalha/pokemon';
+import { BOXES_MAXIMO, TAMANHO_BOX, numeroDeBoxes } from '../../shared/pc';
+import { atributosZerados, curar, gerarIndividuo, hpMaximo, lembrarGolpes, type PokemonIndividual } from '../../shared/batalha/pokemon';
 import { IV_INICIAL } from '../../shared/regioes';
 import { ITENS_INICIAIS } from '../../shared/itens';
 import { SILVER_INICIAL } from '../../shared/loja';
@@ -8,12 +9,13 @@ import { pokemonPorId } from './dados';
 import type { Aparencia } from './personagem/lpc';
 import type { EstadoPasse } from '../../shared/passe';
 import type { Viagem } from '../../shared/viagem';
+import type { EstadoSafari } from '../../shared/safari';
 import type { EstadoQuadro } from '../../shared/missoesQuadro';
 import type { EstadoConquistas } from '../../shared/conquistas';
 import { api, ErroApi } from './conta';
 
 export type PokemonDoJogador = PokemonIndividual & {
-  /** Box do PC onde está guardado (0 a NUMERO_BOXES − 1); só vale para quem está no PC. */
+  /** Box do PC onde está guardado (0 a numeroDeBoxes(save) − 1); só vale para quem está no PC. */
   box?: number;
   /** De onde veio, quando não foi capturado: ovo, ticket ou troca com outro jogador (as conquistas olham isso). */
   origem?: 'ovo' | 'ticket' | 'troca';
@@ -26,6 +28,8 @@ export interface Save {
   caixa: PokemonDoJogador[];
   /** Nomes que o jogador deu às boxes do PC (posição = número da box; vazio = "Box N"). */
   nomesBox?: (string | null)[];
+  /** Boxes abertas com o item Box Pokémon, além das 15 iniciais (shared/pc.ts). */
+  boxesExtras?: number;
   /** Fundo escolhido para cada box do PC (id em `ui/fundosBox.ts`; vazio = branca). */
   fundosBox?: (string | null)[];
   /** Quantidade de cada item na bolsa (id do item → quantidade). */
@@ -71,6 +75,8 @@ export interface Save {
   skinBonus?: string | null;
   /** Viagem de trem em andamento (shared/viagem.ts); quem cria e encerra é o servidor. */
   viagem?: Viagem | null;
+  /** Safari (shared/safari.ts): entradas usadas hoje (do servidor) e o Safari em andamento. */
+  safari?: EstadoSafari | null;
   /** Charms usados (shared/charms.ts): tipo → quando o bônus acaba (ms). */
   charms?: Record<string, number> | null;
   /** Tipos de charm já usados alguma vez (conquista "Galante"). */
@@ -124,8 +130,8 @@ export function registrarCapturado(save: Save, especieId: number, shiny = false)
 }
 
 export const TAMANHO_MAXIMO_TIME = 6;
-export const NUMERO_BOXES = 30;
-export const TAMANHO_BOX = 50;
+// boxes do PC: 15 para todos, mais uma por Box Pokémon usado, até 30 (shared/pc.ts)
+export { TAMANHO_BOX, numeroDeBoxes };
 /** Tamanho máximo do nome que o jogador dá a uma box. */
 export const TAMANHO_NOME_BOX = 16;
 /** Nome da box: o que o jogador deu (`save.nomesBox`) ou "Box N". */
@@ -141,9 +147,10 @@ export function pokemonsDaBox(save: Save, box: number): PokemonDoJogador[] {
  * (Com o PC todo cheio, fica na última box mesmo passando do limite.)
  */
 export function guardarNoPC(save: Save, p: PokemonDoJogador, preferida = 0): number {
-  let box = NUMERO_BOXES - 1;
-  for (let i = 0; i < NUMERO_BOXES; i++) {
-    const b = (preferida + i) % NUMERO_BOXES;
+  const boxes = numeroDeBoxes(save);
+  let box = boxes - 1;
+  for (let i = 0; i < boxes; i++) {
+    const b = (preferida + i) % boxes;
     if (pokemonsDaBox(save, b).length < TAMANHO_BOX) {
       box = b;
       break;
@@ -206,6 +213,8 @@ function garantirIds(save: Save): void {
   let proximo = Math.max(save.proximoIdPokemon ?? 1, ...todos.map((p) => (p.uid ?? 0) + 1));
   const semId: PokemonDoJogador[] = [];
   for (const p of todos) {
+    // a cada salvar, o que o Pokémon sabe entra na memória dele (Move Reminder)
+    lembrarGolpes(p);
     // ID repetido (cópia de objeto) também ganha um novo
     if (p.uid && !usados.has(p.uid)) usados.add(p.uid);
     else semId.push(p);
@@ -227,7 +236,7 @@ function normalizar(save: Save): Save {
   save.time = save.time.map(atualizar);
   save.caixa = (save.caixa ?? []).map(atualizar);
   // saves antigos (PC sem boxes): distribui pela ordem, 30 por box
-  save.caixa.forEach((p, i) => (p.box ??= Math.min(NUMERO_BOXES - 1, Math.floor(i / TAMANHO_BOX))));
+  save.caixa.forEach((p, i) => (p.box ??= Math.min(BOXES_MAXIMO - 1, Math.floor(i / TAMANHO_BOX))));
   garantirIds(save);
 
   const itens: Record<string, number> = { ...ITENS_INICIAIS, ...(save.itens ?? {}) };

@@ -61,7 +61,8 @@ export const telaGinasios: Tela = (raiz, navegar) => {
         nome: lider.nome,
         titulo: lider.titulo,
         equipe,
-        recompensa: RECOMPENSA_GINASIO[lider.ordem - 1],
+        // o silver do ginásio só sai na PRIMEIRA vitória (decisão do dono); depois dá para lutar de novo, sem prêmio
+        recompensa: jaTinha ? 0 : RECOMPENSA_GINASIO[lider.ordem - 1],
         imagem: imagemTreinador(lider.id),
         mensagemVitoria: jaTinha ? undefined : `Você ganhou a ${lider.insignia}!`,
       },
@@ -97,7 +98,7 @@ export const telaGinasios: Tela = (raiz, navegar) => {
               el('h3', {}, l.nome, ' ', seloTipo(l.tipo)),
               el('div', { class: 'ginasio-insignia' }, insigniaVisual(l, ganha), el('span', {}, ganha ? `${l.insignia} conquistada` : l.insignia)),
               el('div', { class: 'mini-time' }, ...equipe.map((p) => spritePokemon(pokemonPorId(p.especieId), { animado: false }))),
-              el('small', { class: 'meta' }, `${NOMES_DIFICULDADE[l.dificuldade]} · ${RECOMPENSA_GINASIO[l.ordem - 1].toLocaleString('pt-BR')} silver`)),
+              el('small', { class: 'meta' }, `${NOMES_DIFICULDADE[l.dificuldade]} · ${save!.insignias?.includes(l.id) ? 'recompensa já recebida' : `${RECOMPENSA_GINASIO[l.ordem - 1].toLocaleString('pt-BR')} silver na primeira vitória`}`)),
             el('button', { class: `botao ${ganha ? 'secundario' : ''}`, disabled: !podeLutar, title: fechado, onclick: () => desafiar(l) }, ganha ? 'Revanche' : 'Desafiar'));
         })),
     );

@@ -3,26 +3,27 @@
 import type { Tela } from '../main';
 import { NOMES_BONUS, VALORES_BONUS, textoBonus, type ChaveBonus } from '../../../shared/bonificacao';
 import { bonificacao, definirBonus, ehAdministrador } from '../bonificacao';
-import { ANUNCIO_TEXTO_MAX, ANUNCIO_TITULO_MAX } from '../../../shared/anuncios';
-import { anuncios, aoMudarAnuncios, apagarAnuncio, carregarAnuncios, publicarAnuncio } from '../anuncios';
+import { ANUNCIO_TEXTO_MAX, ANUNCIO_TITULO_MAX, AVISO_MAX } from '../../../shared/anuncios';
+import { anuncios, aoMudarAnuncios, apagarAnuncio, carregarAnuncios, publicarAnuncio, publicarAviso } from '../anuncios';
 import { api, ErroApi } from '../conta';
 import { TODOS_OS_ITENS, nomeCategoriaItem } from '../../../shared/loja';
 import { darItemAoJogador } from '../entregas';
+import { secaoDarPokemon } from './adminPokemon';
 import { iconeItem } from '../ui/iconeItem';
 import { el } from '../ui/dom';
 import { cartaoAnuncio } from '../ui/mural';
 
-export type SecaoAdministracao = 'bonificacao' | 'itens' | 'log' | 'jogadores' | 'eventos' | 'anuncios';
+export type SecaoAdministracao = 'bonificacao' | 'itens' | 'pokemon' | 'log' | 'eventos' | 'anuncios';
 
 export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBreve?: string }[] = [
   { id: 'bonificacao', nome: 'Bonificação' },
   { id: 'itens', nome: 'Dar item' },
+  { id: 'pokemon', nome: 'Dar Pokémon' },
   {
     id: 'log',
     nome: 'Log',
     emBreve: 'Registro de tudo o que acontece no jogo: o que entra e sai (silver, gold, itens, Pokémon, tickets), quem fez e quando — para achar abuso de bug. Vai ser ligado com o servidor.',
   },
-  { id: 'jogadores', nome: 'Jogadores', emBreve: 'Ver e editar contas e banir jogadores.' },
   { id: 'eventos', nome: 'Eventos', emBreve: 'Agendar eventos, como fim de semana com bônus ou Pokémon especiais.' },
   { id: 'anuncios', nome: 'Anúncios' },
 ];
@@ -54,6 +55,24 @@ function secaoAnuncios(): { elemento: HTMLElement; parar: () => void } {
     }
     publicando = false;
   };
+  // aviso: só o texto, numa linha, passando na barrinha de avisos (o título não é usado)
+  const avisar = async () => {
+    if (publicando) return;
+    const linha = texto.value.replace(/\s+/g, ' ').trim();
+    if (!linha) return void (aviso.textContent = 'Escreva o texto do aviso.');
+    if (linha.length > AVISO_MAX) return void (aviso.textContent = `O aviso da barrinha tem até ${AVISO_MAX} letras (este tem ${linha.length}).`);
+    publicando = true;
+    aviso.textContent = '';
+    try {
+      await publicarAviso(linha);
+      titulo.value = texto.value = '';
+      contar();
+      aviso.textContent = 'Aviso enviado para a barrinha de avisos de todos.';
+    } catch (e) {
+      erro(e);
+    }
+    publicando = false;
+  };
   const desenhar = () => {
     const lista = anuncios();
     publicados.replaceChildren(...(lista.length
@@ -67,11 +86,13 @@ function secaoAnuncios(): { elemento: HTMLElement; parar: () => void } {
   return {
     parar,
     elemento: el('section', { class: 'bonus-secao' },
-      el('p', { class: 'sub' }, 'O que você publicar aqui aparece no Mural de anúncios da cidade para todos os jogadores. Quem estiver com o jogo aberto recebe um aviso na hora.'),
+      el('p', { class: 'sub' }, `"Publicar anúncio" põe o título e o texto no Mural de anúncios da cidade. "Publicar aviso" manda só o texto (até ${AVISO_MAX} letras, sem título) para a barrinha de avisos embaixo do cabeçalho de todos, por 30 minutos.`),
       el('div', { class: 'cla-formulario' },
         el('label', { class: 'cla-campo' }, 'Título', titulo),
         el('label', { class: 'cla-campo' }, 'Texto', texto, contador),
-        el('button', { class: 'botao cla-botao-criar', onclick: () => void publicar() }, 'Publicar anúncio')),
+        el('div', { class: 'anuncio-botoes' },
+          el('button', { class: 'botao cla-botao-criar', onclick: () => void publicar() }, 'Publicar anúncio'),
+          el('button', { class: 'botao secundario cla-botao-criar', title: 'Só o texto, numa linha', onclick: () => void avisar() }, 'Publicar aviso'))),
       aviso,
       el('h2', { class: 'anuncios-titulo' }, 'No mural agora'),
       publicados),
@@ -154,7 +175,7 @@ export const telaAdministracao = (secaoInicial: SecaoAdministracao): Tela => (ra
   let secao = secaoInicial;
   const corpo = el('div', { class: 'admin-corpo' });
   // montada uma vez só (redesenhar a tela não apaga o que a pessoa está escrevendo)
-  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : null;
+  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : secao === 'pokemon' ? secaoDarPokemon() : null;
 
   const linhaBonus = (chave: ChaveBonus) => {
     const atual = bonificacao()[chave];

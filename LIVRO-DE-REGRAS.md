@@ -135,6 +135,18 @@ A faixa segue o nível de evolução oficial.
 
 ---
 
+### 3.4 Safari (na Cidade)
+
+Fale com o guia **Safari**, no quintal de uma casa ao sul da praça.
+
+- **Você escolhe um tipo** (Fire, Water, Dragon… os 18). O Safari tem **3 salas só suas**: ninguém mais entra nelas.
+- Em cada sala andam **10 Pokémon daquele tipo** (vale o primeiro ou o segundo tipo), de **todas as regiões**, no nível dos seus encontros. Passe o mouse para ver nome e nível.
+- **Clique em um** para batalhar. Os outros 9 vão embora e a **saída de cima** abre para a sala seguinte. Fugir ou vencer sem capturar também gasta a sala. Perder a batalha encerra o Safari.
+- **Chances 10× maiores** que nos mapas: shiny **1 em 150**; algum inicial **1 em 1.200**; algum lendário, algum mítico e alguma Ultra Beast **1 em 2.000** cada (divididos por igual entre os daquele tipo, como nos mapas). **Os seus bônus não somam aqui** (VIP, Pokédex, skins, charms, conquistas, bonificação).
+- **Shiny anda com um clarão dourado e estrelinhas**: dá para ver de longe.
+- **Tickets Safari:** cada Safari gasta 1 ticket. Todo dia você tem **1** (ou **2** se for **VIP**), e pode comprar **mais 1 por dia** com **20 gold** no botão **+**. O contador fica no alto da janela do guia (ex.: 1/1). Os tickets voltam à meia-noite (horário de Brasília); o comprado também só vale no dia.
+- Saiu da tela no meio? O Safari fica guardado: volte ao guia e clique em **Continuar**. Abandonar não devolve o ticket.
+
 ## 4. Raridade e chances
 
 ### 4.1 O sorteio é por LINHA EVOLUTIVA
@@ -224,13 +236,15 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 - **Tamanho do time dele:** o mesmo número de Pokémon do seu time (+1 nos muito difíceis e lendários), usando os mais fortes do time dele.
 - **Sem EVs.** IVs baixos e iguais em todos os atributos, pela força do treinador:
 
-| Dificuldade | Estrelas | IVs | Recompensa (provisória) |
+| Dificuldade | Estrelas | IVs | Silver por Pokémon derrotado |
 |---|---|---|---|
-| Fácil | ★ | 5 | 100 silver |
-| Normal | ★★ | 6 | 200 silver |
-| Difícil | ★★★ | 8 | 400 silver |
-| Muito difícil (Elite Four, chefes) | ★★★★ | 9 | 700 silver |
-| Lendário (campeões, Ghetsis, Ash) | ★★★★★ | 10 | 1.000 silver |
+| Fácil | ★ | 5 | 8 silver |
+| Normal | ★★ | 6 | 11 silver |
+| Difícil | ★★★ | 8 | 14 silver |
+| Muito difícil (Elite Four, chefes) | ★★★★ | 9 | 18 silver |
+| Lendário (campeões, Ghetsis, Ash) | ★★★★★ | 10 | 22 silver |
+
+A recompensa é **por Pokémon do treinador**: um time de 6 na dificuldade Lendário paga 6 × 22 = 132 silver (7 Pokémon = 154). Quem entra com um Pokémon só enfrenta menos e ganha menos.
 
 - **Regras do duelo:** não dá para fugir nem jogar Pokébola. O treinador manda o próximo Pokémon quando um desmaia. Na maioria das vezes ele escolhe o golpe que mais machuca (tipo, STAB e poder).
 - **Vitória:** silver da dificuldade (com bônus de VIP e da administração), XP e EVs de **todos** os Pokémon dele para quem lutou, XP de treinador e amizade +5. **Derrota:** o time é curado, sem recompensa.
@@ -245,7 +259,7 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 | IVs | 5 | 5 | 6 | 6 | 8 | 8 | 9 | 10 |
 | Silver | 200 | 300 | 400 | 500 | 600 | 700 | 850 | 1.000 |
 
-- **Vencer** dá a **insígnia** (uma vez) e o silver (toda vez; depois de ganhar, o botão vira **Revanche**). As insígnias aparecem com o **desenho de verdade** de cada uma (apagadas até você conquistar) na tela dos Ginásios e no **cabeçalho** (as da região atual; clicar abre os Ginásios). Os selos de Alola têm o desenho do cristal Z do tipo, mas **não são itens** (nenhuma insígnia é item).
+- **Vencer** dá a **insígnia** e o silver **só na primeira vitória**; depois de ganhar, o botão vira **Revanche** (vale o XP, sem silver). As insígnias aparecem com o **desenho de verdade** de cada uma (apagadas até você conquistar) na tela dos Ginásios e no **cabeçalho** (as da região atual; clicar abre os Ginásios). Os selos de Alola têm o desenho do cristal Z do tipo, mas **não são itens** (nenhuma insígnia é item).
 
 ## 7. Captura
 
@@ -254,6 +268,7 @@ No mapa, o painel **"Pokémon deste bioma"** mostra cada morador como um botãoz
 - **Bônus de status:** dormindo ou congelado ×2,5; paralisado, envenenado ou queimado ×1,5.
 - Ao arremessar, o jogo mostra a **chance de captura** daquele arremesso.
 - A Pokédex mostra a **captura base** de cada espécie (Poké Ball, HP cheio).
+- **Tera Type do capturado:** todo Pokémon selvagem ganha um **Tera Type sorteado na hora da captura**, com a mesma chance para os 18 tipos (um Pikachu pode sair com Tera Type Water, por exemplo). Só dá para saber depois de capturar: aparece na ficha do Pokémon. Pokémon capturados antes dessa mudança, de ovo e de ticket continuam com o tipo principal da espécie. Dá para trocar com Tera Shards.
 
 ### 7.2 Pokébolas
 São 25 Pokébolas, com os efeitos dos jogos:
@@ -298,7 +313,7 @@ Level, Love, Moon, Heavy, Fast, Repeat e Dream Ball funcionam como nos jogos.
 
 ## 9. IVs ocultos
 
-Os IVs de um Pokémon capturado **começam escondidos** ("?" na ficha). Para revelar, use **Avaliar IVs** na ficha (100 silver, provisório). O que aparece depois depende de você ser VIP:
+Os IVs de um Pokémon capturado **começam escondidos** ("?" na ficha). Para revelar, use **Avaliar IVs** na ficha (5.000 silver). O que aparece depois depende de você ser VIP:
 
 | Jogador | O que vê depois de avaliar |
 |---|---|
@@ -333,7 +348,7 @@ O inicial (IV 20 em tudo, soma 120) é sempre **A**.
 - **Item segurado:** aparece como um ícone pequeno no canto do cartão do Pokémon. Para dar um item, use **Equipar** na Bolsa; para tirar, use o PC.
 
 ### 10.2 PC
-- **Espaço:** **30 boxes de 50 Pokémon** (1.500 vagas).
+- **Espaço:** todo treinador começa com **15 boxes de 50 Pokémon** (750 vagas). Cada **Box Pokémon** (Pokémarket, aba Up, 500.000 silver) usado pela bolsa abre mais uma box, até o máximo de **30**.
 - **Casas da box:** cada casa mostra só o Pokémon **andando** (o mesmo desenho do mapa), com uma **estrela** no canto se for shiny. Nome, nível e o resto aparecem ao passar o mouse ou clicar.
 - **Escolher a box:** setas ◀ ▶ e uma lista com todas.
 - **Renomear:** cada box pode ganhar um nome (até 16 letras) para você se organizar.
@@ -356,10 +371,10 @@ O inicial (IV 20 em tudo, soma 120) é sempre **A**.
 ### 10.4 Professores de golpes (na Cidade)
 Na **Cidade**, clique no nome do **Move Reminder** ou do **Move Tutor** (lado a lado, no oeste) para abrir a janela dos professores. Escolha o Pokémon do time e o golpe; se ele já souber 4, você escolhe qual esquecer.
 
-| Professor | O que ensina | Preço (provisório) |
+| Professor | O que ensina | Preço |
 |---|---|---|
-| **Move Reminder** | qualquer golpe que a espécie aprende **por nível** até o nível atual, inclusive os esquecidos | 50 silver |
-| **Move Tutor** | só os golpes de **tutor**, de **qualquer geração** dos jogos (inclusive os das formas anteriores); TMs e Egg Moves não entram | 100 silver |
+| **Move Reminder** | qualquer golpe que a espécie aprende **por nível** até o nível atual e **todo golpe que aquele Pokémon já soube** (TM, TR, Move Tutor, Egg Move) | **grátis** |
+| **Move Tutor** | só os golpes de **tutor**, de **qualquer geração** dos jogos (inclusive os das formas anteriores); TMs e Egg Moves não entram | 5.000 silver |
 
 ---
 
@@ -372,9 +387,52 @@ Na **Cidade**, clique no nome do **Move Reminder** ou do **Move Tutor** (lado a 
 
 As duas aparecem **separadas na carteira**, acima do painel do treinador.
 
-> ⚠️ A economia ainda é provisória. Hoje **todo item da loja custa 1 silver**, só para testes.
+> ⚠️ Estes são os preços da **primeira rodada** da economia, para o Closed Beta. Vão ser ajustados depois de alguns dias de jogo.
+
+**Como se ganha:** silver vem dos **duelos** (30 a 100 por Pokémon derrotado; VIP ganha +15%) e da **primeira vitória** em cada ginásio (1.000 a 8.000). Selvagens não dão silver. **Gold** é a moeda paga; dá para ganhar um pouco no Quadro de missões e, com sorte, em tickets.
+
+| Loja | Preço |
+|---|---|
+| Poké Ball / Great Ball / Ultra Ball | 20 / 100 / 250 silver |
+| Potion / Super / Hyper / Max Potion | 30 / 100 / 250 / 500 silver |
+| Full Restore · Revive · Max Revive | 800 · 400 · 1.500 silver |
+| Curas de status · Full Heal | 50 · 200 silver |
+| Ether / Max Ether / Elixir / Max Elixir | 300 / 500 / 600 / 1.000 silver |
+| Itens de evolução | 30.000 silver |
+| Itens de batalha | 20.000 silver |
+| Tera Orb, Dynamax Band | 100.000 silver |
+| Everstone, Macho Brace | 10.000 silver |
+| Power Items | 50.000 silver |
+| Exp. Share, Lucky Egg | 100.000 silver |
+| Box Pokémon (abre uma box no PC) | 500.000 silver |
+| TMs e TRs | 20.000 silver |
+| Ability Capsule / Ability Patch | 50 / 100 **gold** |
+| Mega Stones | 500 **gold** |
+
+| Serviço | Preço |
+|---|---|
+| Avaliar IVs | 5.000 silver |
+| Move Reminder | grátis |
+| Move Tutor | 5.000 silver por golpe |
+| Trem | 1.000 silver por região de distância (VIP: metade); não aceita gold |
+| Criar guilda | 100 gold |
+| Trocar nome / aparência | 50 gold cada |
+| Ticket Safari extra | 20 gold |
+
+O **Banco** está fechado para jogadores por enquanto.
 
 ---
+
+### Mercado negro (na Cidade)
+Fale com o NPC **Mercado negro**, na frente de uma casa ao sul da praça (treinador nível 3). Lá os jogadores vendem uns para os outros (na aba Vender dá para buscar o seu Pokémon pelo nome):
+- **O que dá para anunciar:** Pokémon, itens da bolsa e gold. Pokémon **NT** ou **trancado** e itens NT não entram, e sempre precisa ficar 1 Pokémon no seu time.
+- **Preço:** quem anuncia escolhe o valor e a moeda (silver ou gold). **Gold só é vendido por silver.** Itens e gold são vendidos em lote: o comprador leva tudo de uma vez.
+- **Taxa:** o mercado fica com **5%** do preço (arredondado para baixo; preço menor que 20 não paga taxa). Esse valor some do jogo.
+- **Enquanto está anunciado**, o Pokémon, o item ou o gold sai do seu time, PC ou bolsa. Volta se você tirar o anúncio ou se ninguém comprar em **1 dia** (24 horas).
+- **Limite:** 10 anúncios por jogador ao mesmo tempo.
+- **O que o comprador vê de um Pokémon:** espécie, nível, shiny, gênero, Nature, Ability, item que segura e golpes. **Tier e IVs só aparecem se o vendedor já avaliou**; quem é VIP vê o valor exato, os outros veem a faixa.
+- **Quando vende:** o pagamento chega sozinho, com um aviso na tela (na hora, se você está jogando; no próximo login, se não está).
+- Pokémon comprado conta para a Pokédex, mas, como nas trocas, não conta para as conquistas de "consiga um…".
 
 ## 12. Loja e Bolsa
 
@@ -388,7 +446,7 @@ A loja tem três partes: as **seções** à esquerda, a **vitrine** no meio (só
 | **Evolução** | pedras, Linking Cord, maçãs, armaduras, Dragon Scale e outros itens de evoluir |
 | **Itens de batalha** | itens de batalha de todas as gerações (incensos, Thick Club, Leek…), em ordem alfabética, sem os que ficam fora da loja |
 | **Up** | itens de treino: **Exp. Share, Lucky Egg, Everstone, Macho Brace** e os seis **Power** (Anklet, Band, Belt, Bracer, Lens, Weight), de segurar; **Ability Capsule** e **Ability Patch**, de usar |
-| **Mega Stones** | as 89 Mega Stones (inclusive as de Legends: Z-A e a **Rayquazite**), **1 gold cada** |
+| **Mega Stones** | as 89 Mega Stones (inclusive as de Legends: Z-A e a **Rayquazite**), **500 gold cada** |
 | **TMs** | as de Scarlet/Violet |
 | **TRs** | as de Sword/Shield |
 
@@ -435,14 +493,14 @@ Itens **raros**, para que certos prêmios não sejam algo que todo mundo tem.
 | Raridade | Prêmio | Chance |
 |---|---|---|
 | Comum | 4× Tera Shard (tipo aleatório) | 70% |
-| Raro | 30 gold | 6% |
+| Raro | 20 gold | 6% |
 | Raro | 1 dia de VIP | 6% |
 | Raro | 50× Pokébola aleatória (qualquer uma, menos Master Ball) | 6% |
-| Raro | 500.000 silver | 6% |
-| Épico | 100 gold | 1% |
+| Raro | 50.000 silver | 6% |
+| Épico | 50 gold | 1% |
 | Épico | 7 dias de VIP | 1% |
 | Épico | 1× Master Ball | 1% |
-| Épico | 1.000.000 silver | 1% |
+| Épico | 100.000 silver | 1% |
 | Épico | 1× Ovo Misterioso A | 1% |
 
 ### Lendário de cada ticket (1% no total, dividido por igual)
@@ -468,7 +526,7 @@ Os Pokémon vêm no **nível 50**, com **5% de chance de shiny** e **cada IV de 
 ### VIP
 - Um **bônus na sua conta por um tempo** (1 dia, 7 dias…). Ganhar mais VIP com ele ativo **soma** ao tempo que falta.
 - Enquanto está ativo, aparece um selo **VIP** com o tempo restante embaixo da carteira.
-- **Os bônus ainda vão ser definidos** (hoje o VIP não muda nada). Já está preparado para dar mais silver por vitória e mais XP de treinador.
+- **Bônus do VIP:** +15% de silver nas vitórias contra treinadores e ginásios, +20% de XP (treinador e Pokémon), +20% de chance de shiny, +10% de raros, +5% na captura e 20% de desconto na loja.
 - Quando existirem contas, o VIP fica guardado na conta.
 
 ### Ovos
@@ -533,6 +591,16 @@ A barra do topo tem:
 
 ### Cabeçalho fixo
 Embaixo da barra do topo fica um **cabeçalho** que acompanha todas as telas, inclusive o mapa do bioma (só some na criação do personagem e na roleta do inicial): o **ícone da Pokédex** (atalho) com quanto você já capturou da Pokédex da região (ex.: 1/151 · 0,7%), nome do treinador, **VIP** ou não, nível e barra de XP de treinador, **região** atual, **insígnias** da região (ganhas nos Ginásios), os **selos dos bônus ativos** (ex.: "Silver 1,5x", "XP 2x", "Shiny 2x"; só informam), **silver** e **gold**, e, logo abaixo dele à direita, os atalhos em **botões redondos estilo Pokébola** (pretos, com borda e faixa brancas e o desenho do destino no centro; o nome aparece ao passar o mouse) : **Centro Pokémon** (cura o time), **Pokémarket**, **Bolsa**, **PC** e **Mapas**.
+
+### Barrinha de avisos
+Embaixo do cabeçalho passa uma barrinha com avisos para **todos os jogadores**, na hora em que acontecem:
+- alguém **capturou um shiny**;
+- alguém capturou um **lendário, mítico, Ultra Beast ou inicial** (a linha inteira do inicial conta);
+- alguém tirou um **prêmio lendário ou mítico** num ticket;
+- **avisos da staff**;
+- banimentos (quando o sistema de banir existir).
+
+Cada aviso fica passando por 30 minutos; os 12 mais novos aparecem em fila. Passar o mouse em cima pausa a barrinha.
 
 ### Bonificação
 A administração pode multiplicar, para todos os jogadores, de **1x até 3x** (1x, 1,5x, 2x, 2,5x, 3x):
@@ -805,6 +873,25 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Ovo de Inicial:** antes da roleta do inicial aparece o aviso do ovo, com o botão "Abrir agora". A região só é escolhida depois que o inicial aparece.
 - **Pokébolas no cinto:** só aparecem com o personagem de frente.
 - **Personagem feminino mais magro:** cintura mais fina e sem a saliência na frente do tronco. As skins continuam servindo.
+- **Logo e cores novas:** o jogo ganhou a logo "PokeOrigins" dourada (tela de entrada e barra do topo) e trocou o azul-escuro por **preto e dourado**. As barras de XP passaram a ser creme.
+- **Mercado negro:** o NPC da cidade agora funciona. Jogadores anunciam Pokémon, itens e gold por silver ou gold, e outros compram; o mercado fica com 5% (regras na seção 11).
+- **Janelas mais fáceis de ler:** as janelas que abrem por cima do mapa ficaram menos transparentes.
+- **Barrinha de avisos** embaixo do cabeçalho: mostra para todos as capturas de shiny, lendário, mítico, Ultra Beast e inicial, os prêmios lendários e míticos dos tickets e os avisos da staff.
+- **Mercado negro:** anúncios valem 1 dia, e a aba Vender tem busca pelo nome do Pokémon.
+- **Vale Pokémon S:** a staff agora consegue entregar um Pokémon montado para um jogador (é assim que o vale é trocado). O Pokémon chega com um aviso na tela, já com os IVs avaliados.
+- **Botões:** ficam marrons parados e dourados quando selecionados ou com o mouse em cima.
+- **Tera Type aleatório:** Pokémon selvagem capturado agora vem com um Tera Type sorteado entre os 18 tipos, revelado só depois da captura.
+- **Mapas dos biomas:** o **Vulcão** ficou vulcânico de verdade (chão de rocha escura, poças de lava, rachaduras acesas, lascas de obsidiana e pequenos vulcões soltando fumaça); a **Caverna Rochosa** agora tem abismos escuros no lugar das poças; o **Mar Profundo** e a **Torre Assombrada** não têm mais poças nem buracos.
+- **Skins especiais com visual:** as 13 skins que só tinham bônus ganharam desenho no personagem (Galante, Chaveiro, Indiana Jones, Halloween, Natal, Carnaval, Páscoa, Dia dos Namorados, Aniversário, Ash, Gary, May e Misty). O rosto continua o do jogador; muda a roupa, e a maioria vem com chapéu ou acessório. As de Ash, Gary, May e Misty vêm também com o cabelo do personagem, a de Halloween tem cabeça de abóbora, a de Natal carrega o saco do Papai Noel nas costas, a de Carnaval é um folião de bloco (chapéu de palha, óculos escuros e camisa florida), a de Páscoa tem touca de coelho e a de Aniversário comemora o aniversário do PokeOrigins (preta, dourada e creme, com "PO" no peito).
+- **Preços:** Tera Orb e Dynamax Band a 100.000 silver cada; os outros itens de batalha passam a 20.000 silver e itens de evolução (pedras, Linking Cord e os outros) a 30.000 silver.
+- **Ícones novos:** cada ticket de prêmio ganhou a cor e a inicial do seu Pokémon (Kyogre é um K azul, Groudon um G vermelho…), e os 18 charms agora usam a imagem original do Shiny Charm pintada na cor do tipo.
+- **Box Pokémon:** o PC passa a começar com 15 boxes (antes 30). O item novo **Box Pokémon** (500.000 silver, aba Up do Pokémarket) abre mais uma box, até 30. Quem já tinha Pokémon guardado além da 15ª box continua com as boxes que usa.
+- **Move Reminder de graça e com memória:** relembrar não custa mais nada, e ele devolve qualquer golpe que aquele Pokémon já soube (TM, TR, Move Tutor ou Egg Move), não só os de nível. O TM continua sendo gasto ao ensinar, mas o golpe nunca mais se perde. Vale a partir desta versão: golpes esquecidos antes dela não ficaram guardados.
+- **Mais silver nos duelos:** cada Pokémon derrotado passa a valer de 30 a 100 silver, conforme a dificuldade (antes 8 a 22), e o **VIP** ganha +15% de silver nas vitórias.
+- **Economia, primeira rodada:** duelos pagam por Pokémon derrotado (8 a 22 silver cada); ginásio paga silver só na primeira vitória; Poké Ball 20, Great Ball 100 e Ultra Ball 250 silver; tickets dão 20 ou 50 gold e 50 mil ou 100 mil silver; câmbio do banco definido em 10.000 silver por gold na compra e 7.500 na venda, mas o **banco está fechado** para jogadores por enquanto.
+- **Economia, tabela de preços:** a loja deixou de custar 1 silver (tabela na seção 11); Exp. Share e Lucky Egg 100 mil, Power Items 50 mil, TMs e TRs 20 mil; Ability Capsule e Patch só por gold (50 e 100); Mega Stones 500 gold; avaliar IVs e professores 5.000 silver; trem a 1.000 silver por região, sem gold; guilda 100 gold; nome e aparência 50 gold; Ticket Safari extra 20 gold; ginásios de 1.000 a 8.000 silver.
+- **Quadro de missões para o servidor inteiro:** cada missão agora só pode ser concluída por **um jogador**. Quem apresentar primeiro o Pokémon certo leva o gold, e a missão aparece como "Concluída por Fulano" para todos até o próximo sorteio.
+- **Safari:** evento novo na Cidade. Escolha um tipo e atravesse 3 salas com 10 Pokémon andando em cada uma; clique no que quiser enfrentar. Shiny e raros 10× mais comuns. 1 Ticket Safari por dia, 2 para VIP, e mais 1 comprado com gold.
 
 ---
 

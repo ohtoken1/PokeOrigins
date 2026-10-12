@@ -4,13 +4,14 @@ import { TAM, desenharMapa, gerarMapa, type Mapa } from './mapa';
 import { FOLHAS_CIDADE, PECAS, URL_ESTATUA, gerarMapaCidade, type ImagensCidade, type Peca } from './cidade';
 import { sombraProjetada } from './cidadeDesenhos';
 import { montarVidaDaCidade, type VidaDaCidade } from './cidadeVida';
+import { gerarMapaSafari, montarVidaDoSafari, type OpcoesSafari, type VidaDoSafari } from './safariVida';
 import { modoDesempenho } from '../desempenho';
 import { PALETAS } from './paletas';
 import { pokemonPorId } from '../dados';
 import { PAUSA_MINIMA_ENCONTRO_MS } from '../../../shared/encontros';
 import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
 import { montarPersonagem, type FolhasPersonagem } from '../personagem/lpc';
-import { BrilhoSkin } from './brilhoSkin';
+import { BrilhoShiny, BrilhoSkin } from './brilhoSkin';
 import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
 import { garantirTexturaLpc, OutrosJogadores, texturaDaAura } from './outrosJogadores';
 import { digitando } from '../ui/digitando';
@@ -76,6 +77,12 @@ function areaDesenhada(img: HTMLImageElement): { topo: number; base: number } {
 /** Mapas já gerados (o desenho fica guardado como textura no jogo, que é reaproveitado). */
 const mapasGerados = new Map<string, Mapa>();
 
+/**
+ * Quais shiny que seguem o jogador brilham: `null` = todos (pedido do dono; o teste foi só com o Charizard). Uma lista de
+ * espécies limita a elas.
+ */
+const SEGUIDORES_COM_BRILHO: number[] | null = null;
+
 export interface Seguidor {
   especie: number;
   shiny: boolean;
@@ -86,6 +93,8 @@ export interface OpcoesBioma {
   bioma: Bioma;
   /** Mapa da cidade (sem encontros) no lugar do mapa do bioma. */
   cidade?: boolean;
+  /** Safari: mapa das 3 salas, com os Pokémon andando (jogo/safariVida.ts); o `bioma` só dá o visual. */
+  safari?: OpcoesSafari;
   /** Primeiro Pokémon do time, que anda atrás do jogador. */
   seguidor: Seguidor | null;
   /** Chamado quando o mapa terminou de ser montado. */
@@ -144,6 +153,8 @@ export class BiomaScene extends Phaser.Scene {
   private linhaLpc = 2;
   /** Brilho da skin shiny do jogador (aura + estrelinhas). */
   private brilho: BrilhoSkin | null = null;
+  /** brilho do Pokémon shiny que segue o jogador */
+  private brilhoSeguidor: BrilhoShiny | null = null;
   /** Posição no ciclo de 8 quadros de andar (continua de um passo para o outro). */
   private cicloLpc = 0;
   /** alterna a perna que vai à frente a cada passo */
@@ -157,6 +168,8 @@ export class BiomaScene extends Phaser.Scene {
   private opcoes!: OpcoesBioma;
   /** cidade: moradores e Pokémon passeando (ocupam tiles) */
   private vida: VidaDaCidade | null = null;
+  /** Safari: Pokémon andando nas salas e portões */
+  private safari: VidaDoSafari | null = null;
   /** outros jogadores na mesma sala online */
   private outros: OutrosJogadores | null = null;
 
@@ -185,6 +198,8 @@ export class BiomaScene extends Phaser.Scene {
     this.pmd = null;
     this.linhaPmd = 0;
     this.vida = null;
+    this.safari = null;
+    this.brilhoSeguidor = null;
     this.outros = null;
   }
 
@@ -207,10 +222,10 @@ export class BiomaScene extends Phaser.Scene {
     const { bioma } = this.opcoes;
     const paleta = PALETAS[bioma.id] ?? PALETAS.grama;
     // mapa de cada bioma (e da cidade) é gerado e desenhado só na primeira visita; depois vem da memória
-    const idMapa = this.opcoes.cidade ? 'cidade' : bioma.id;
+    const idMapa = this.opcoes.cidade ? 'cidade' : this.opcoes.safari ? `safari-${bioma.id}` : bioma.id;
     let mapa = mapasGerados.get(idMapa);
     if (!mapa) {
-      mapa = this.opcoes.cidade ? gerarMapaCidade() : gerarMapa(bioma.id, paleta);
+      mapa = this.opcoes.cidade ? gerarMapaCidade() : this.opcoes.safari ? gerarMapaSafari() : gerarMapa(bioma.id, paleta);
       mapasGerados.set(idMapa, mapa);
     }
     this.mapa = mapa;
@@ -242,6 +257,14 @@ export class BiomaScene extends Phaser.Scene {
       this.vida = montarVidaDaCidade(this, this.mapa, () => ({ x: this.pos.x, y: this.pos.y, seguidor: this.posSeguidor }), modoDesempenho());
     }
 
+    if (this.opcoes.safari) {
+      // continuar um Safari: começa na entrada da sala em que parou
+      const inicio = { x: this.mapa.inicio.x, y: this.mapa.inicio.y - this.opcoes.safari.sala * 20 };
+      this.pos = { ...inicio };
+      this.posSeguidor = { ...inicio };
+      this.safari = montarVidaDoSafari(this, this.mapa, () => ({ x: this.pos.x, y: this.pos.y, seguidor: this.posSeguidor }), this.opcoes.safari);
+    }
+
     const [sx, sy] = this.pesDoTile(this.posSeguidor.x, this.posSeguidor.y);
     this.imgSeguidor = this.add.sprite(0, 0, '__DEFAULT').setOrigin(0.5, 0.9).setScale(ESCALA_DETALHE);
     this.seguidor = this.add.container(sx, sy, [this.imgSeguidor]).setVisible(false);
@@ -256,7 +279,7 @@ export class BiomaScene extends Phaser.Scene {
     this.nomeJogador = null;
     if (this.opcoes.nomeJogador)
       this.nomeJogador = this.add
-        .text(px, py, this.opcoes.nomeJogador, { fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: '#ffffff', stroke: '#16243a', strokeThickness: 5 })
+        .text(px, py, this.opcoes.nomeJogador, { fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: '#ffffff', stroke: '#151310', strokeThickness: 5 })
         .setOrigin(0.5, 1)
         .setDepth(100000);
     if (this.nomeJogador) {
@@ -326,7 +349,7 @@ export class BiomaScene extends Phaser.Scene {
     const t = this.add
       .text(x, y, acao ? `${texto} ›` : texto, {
         fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: cor,
-        backgroundColor: acao ? 'rgba(14,24,42,0.86)' : 'rgba(14,24,42,0.6)', padding: { x: 14, y: 6 },
+        backgroundColor: acao ? 'rgba(13,12,10,0.86)' : 'rgba(13,12,10,0.6)', padding: { x: 14, y: 6 },
       })
       .setOrigin(0.5, 1)
       .setDepth(99990)
@@ -335,7 +358,7 @@ export class BiomaScene extends Phaser.Scene {
     if (!acao) return;
     t.setInteractive({ useHandCursor: true });
     t.on('pointerover', () => t.setBackgroundColor('rgba(40,90,170,0.95)').setColor('#ffffff'));
-    t.on('pointerout', () => t.setBackgroundColor('rgba(14,24,42,0.86)').setColor(cor));
+    t.on('pointerout', () => t.setBackgroundColor('rgba(13,12,10,0.86)').setColor(cor));
     t.on('pointerdown', () => this.opcoes.aoClicarLocal?.(acao));
   }
 
@@ -509,6 +532,11 @@ export class BiomaScene extends Phaser.Scene {
     return { aparencia, seguidor: this.dadosSeguidor };
   }
 
+  /** Safari: a batalha com o Pokémon clicado vai começar (os outros somem e o portão abre). */
+  escolherNoSafari() {
+    this.safari?.escolher();
+  }
+
   pausar(pausado: boolean) {
     this.pausado = pausado;
   }
@@ -638,6 +666,8 @@ export class BiomaScene extends Phaser.Scene {
 
   private carregarSeguidor() {
     const d = this.dadosSeguidor;
+    this.brilhoSeguidor?.destruir();
+    this.brilhoSeguidor = d?.shiny && (!SEGUIDORES_COM_BRILHO || SEGUIDORES_COM_BRILHO.includes(d.especie)) ? new BrilhoShiny(this, this.seguidor) : null;
     if (!d) {
       this.seguidor.setVisible(false);
       return;
@@ -749,7 +779,7 @@ export class BiomaScene extends Phaser.Scene {
 
     const x = this.pos.x + dx;
     const y = this.pos.y + dy;
-    if (x < 0 || y < 0 || x >= this.mapa.largura || y >= this.mapa.altura || this.mapa.bloqueado[y][x] || this.vida?.ocupa(x, y)) return;
+    if (x < 0 || y < 0 || x >= this.mapa.largura || y >= this.mapa.altura || this.mapa.bloqueado[y][x] || this.vida?.ocupa(x, y) || this.safari?.ocupa(x, y) || this.safari?.bloqueia(x, y)) return;
 
     // o seguidor vai para onde o jogador estava
     const anterior = this.pos;
@@ -786,6 +816,7 @@ export class BiomaScene extends Phaser.Scene {
         } else this.jogador.setTexture(`jogador-${this.direcao}-0`);
         this.atualizarProfundidade();
         this.opcoes.aoPisar();
+        this.safari?.pisou(x, y);
         // anti-macro: o encontro só sai quando o jogador para (segurando a tecla ou andando sem parar, nada aparece)
         const passo = this.passos;
         const opcoes = this.opcoes;

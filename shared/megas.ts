@@ -45,7 +45,7 @@ export interface Mega {
 }
 
 /** Preço de cada Mega Stone na loja, em gold (pedido do dono). */
-export const PRECO_MEGA_STONE_GOLD = 1;
+export const PRECO_MEGA_STONE_GOLD = 500;
 
 /** "Charizard-Mega-X" → "Mega Charizard X"; "Meowstic-M-Mega" → "Mega Meowstic". */
 function nomeMega(forma: string, base: string): string {

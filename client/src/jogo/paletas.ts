@@ -22,6 +22,10 @@ export interface Paleta {
   filtroLiquido: string;
   /** fundo do mar: chão de areia, algas no lugar do mato, conchas, luz e bolhas */
   submerso?: boolean;
+  /** vulcão: chão de rocha escura, lava, rachaduras acesas e cones de vulcão (desenhados por código) */
+  vulcanico?: boolean;
+  /** caverna: os "lagos" são buracos vazios (abismos), sem nada dentro */
+  abismo?: boolean;
 }
 
 const ARVORES_VERDES: [number, number][] = [[48, 0], [44, 0], [50, 0], [46, 0]];
@@ -41,13 +45,13 @@ export const PALETAS: Record<string, Paleta> = {
     filtroObjetos: 'none',
     filtroLiquido: 'none',
   },
-  // fundo do mar: corais (desenhados por código) e rochas; "lagos" viram fossas escuras
+  // fundo do mar: corais (desenhados por código) e rochas; sem poças (já é tudo água, pedido do dono)
   agua: {
     obstaculo: 'coral',
     rochas: ROCHA_CINZA,
     pedrinhas: PEDRINHAS_CINZAS,
     copa: ['#4a1428', '#b83a58', '#f2727e', '#ffc2b8'],
-    lagos: 6,
+    lagos: 0,
     filtro: 'saturate(0.2) brightness(1.08)',
     filtroObjetos: 'saturate(0.6) brightness(0.85)',
     filtroLiquido: 'brightness(0.32) saturate(1.5)',
@@ -58,10 +62,11 @@ export const PALETAS: Record<string, Paleta> = {
     rochas: ROCHA_MARROM,
     pedrinhas: PEDRINHAS_MARRONS,
     copa: ['#1e1414', '#3a2a28', '#54403a', '#76605a'],
-    lagos: 5,
+    lagos: 7,
     filtro: 'sepia(0.7) hue-rotate(-35deg) saturate(1.6) brightness(0.7)',
-    filtroObjetos: 'brightness(0.8)',
+    filtroObjetos: 'grayscale(0.75) brightness(0.55)',
     filtroLiquido: 'hue-rotate(170deg) saturate(2.2) brightness(1.15)',
+    vulcanico: true,
   },
   caverna: {
     obstaculo: 'rocha',
@@ -72,12 +77,14 @@ export const PALETAS: Record<string, Paleta> = {
     filtro: 'sepia(0.85) saturate(0.55) brightness(0.85)',
     filtroObjetos: 'none',
     filtroLiquido: 'saturate(0.4) brightness(0.45)',
+    abismo: true,
   },
   torre: {
     obstaculo: 'lapide',
     pedrinhas: PEDRINHAS_CINZAS,
     copa: ['#1e1a24', '#5a5a66', '#7e7e8a', '#a8a8b4'],
-    lagos: 2,
+    // sem buracos (pedido do dono)
+    lagos: 0,
     filtro: 'hue-rotate(115deg) saturate(0.75) brightness(0.62)',
     filtroObjetos: 'hue-rotate(200deg) saturate(0.5) brightness(0.7)',
     filtroLiquido: 'hue-rotate(40deg) saturate(0.7) brightness(0.35)',

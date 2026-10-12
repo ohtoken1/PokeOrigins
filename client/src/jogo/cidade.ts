@@ -127,6 +127,8 @@ const APARENCIA_VIAJANTE = { ...APARENCIA_PADRAO, pele: 'light', cabelo: 'messy1
 const APARENCIA_GUILDAS = { ...APARENCIA_PADRAO, pele: 'amber', cabelo: 'messy1', corCabelo: 'ginger', camiseta: 'maroon', calca: 'brown', tenis: 'black', estampa: 'nenhuma' as const, cinto: true };
 /** Evento sazonal: roupa festiva, cabelo rosa. */
 const APARENCIA_SAZONAL = { ...APARENCIA_PADRAO, corpo: 'fem' as const, pele: 'light', cabelo: 'ponytail', corCabelo: 'pink', camiseta: 'yellow', calca: 'orange', tenis: 'white', estampa: 'nenhuma' as const, cinto: false };
+/** Safari: guia de roupa cáqui e verde. */
+const APARENCIA_SAFARI = { ...APARENCIA_PADRAO, pele: 'bronze', cabelo: 'messy1', corCabelo: 'dark_brown', camiseta: 'tan', calca: 'forest', tenis: 'brown', estampa: 'nenhuma' as const, cinto: true };
 /** Mercado negro: todo de preto. */
 const APARENCIA_MERCADO_NEGRO = { ...APARENCIA_PADRAO, pele: 'taupe', cabelo: 'messy1', corCabelo: 'black', camiseta: 'black', calca: 'black', tenis: 'black', estampa: 'nenhuma' as const, cinto: false };
 const APARENCIA_TUTOR = { ...APARENCIA_PROFESSOR, corpo: 'fem' as const, pele: 'light', cabelo: 'ponytail', corCabelo: 'dark_brown', camiseta: 'teal', calca: 'navy' };
@@ -416,8 +418,11 @@ export function gerarMapaCidade(): Mapa {
   const portaMercadoNegro = casa('sobradoClaro', espelho(eixo - 15), baseSul);
   // quadras do sul: casas em fileira e café/casas na ruela
   const casasSul: [string, string, number][] = [['casaMadeira', 'casaMadeira', anel.x0 + 9.5], ['casaVermelha', 'casaVermelha', anel.x0 + 15.5], ['casaVinho', 'casaMadeira2', anel.x0 + 21.5]];
+  // o guia do Safari mora na casa de madeira mais a oeste
+  let portaSafari: [number, number] | null = null;
   for (const [a, b, x] of casasSul) {
-    casa(a, x, baseSul);
+    const porta = casa(a, x, baseSul);
+    portaSafari ??= porta;
     casa(b, espelho(x), baseSul);
   }
   colocar('cafe', anel.x0 + 12.5, 68);
@@ -465,6 +470,8 @@ export function gerarMapaCidade(): Mapa {
     { x: (portaGuildas?.[1] ?? cx - 9) + 1, y: baseSul, nome: 'Guildas', aparencia: APARENCIA_GUILDAS, acao: 'guildas' },
     { x: (portaSazonal?.[1] ?? cx - 15) + 1, y: baseSul, nome: 'Evento sazonal', aparencia: APARENCIA_SAZONAL, acao: 'sazonal' },
     { x: (portaMercadoNegro?.[0] ?? cx + 16) - 1, y: baseSul, nome: 'Mercado negro', aparencia: APARENCIA_MERCADO_NEGRO, acao: 'mercadonegro' },
+    // Safari: 3 salas com Pokémon de um tipo andando (telas/safari.ts)
+    { x: (portaSafari?.[1] ?? anel.x0 + 10) + 1, y: baseSul, nome: 'Safari', aparencia: APARENCIA_SAFARI, acao: 'safari' },
   ];
   for (const n of npcs) {
     bloqueado[n.y][n.x] = true;

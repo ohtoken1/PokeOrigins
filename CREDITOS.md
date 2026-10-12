@@ -47,3 +47,6 @@ As cores dos tiles são alteradas por filtro em cada bioma. Versões modificadas
 
 ## Imagens das insígnias
 - Insígnias dos ginásios (© Nintendo/Game Freak/The Pokémon Company): PokéAPI sprites (github.com/PokeAPI/sprites, sprites/badges) e, as de Galar, WikiDex (wikidex.net) — `client/public/insignias/`.
+
+## Logo
+- Fontes das logos em `client/public/logo/` (só as letras do nome, embutidas no SVG), licença SIL Open Font License 1.1: **Cinzel Decorative**, de Natanael Gama (`origens-antigas.svg`, `origens-antigas-barra.svg`), e **Russo One**, de Jovanny Lemonad (`torneio.svg`). Desenho das logos feito para o jogo.

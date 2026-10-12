@@ -7,10 +7,11 @@ import { arquivoSpriteForma } from '../../../shared/formas';
 import { megaPorForma } from '../../../shared/megas';
 import type { Bioma } from '../../../shared/biomas';
 import { BatalhaSelvagem, type EventoBatalha, type Lado } from '../../../shared/batalha/motor';
-import { atributos, curar, especie, expGanha, expParaNivel, faixaVelocidade, ganharEvs, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { atributos, curar, especie, expGanha, expParaNivel, faixaVelocidade, ganharEvs, hpMaximo, nomeGolpe, ppMaximo, sortearTeraTipo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { Dex } from '@pkmn/sim';
 import { evoluir, ganharExperiencia, trocarGolpe, type ResultadoProgresso } from '../../../shared/batalha/progresso';
-import { pokemonPorId } from '../dados';
+import { pokemonPorId, todosOsPokemons } from '../dados';
+import { avisarCapturaRara } from '../online';
 import { ITENS, type ItemId } from '../../../shared/itens';
 import { efeitoBola } from '../../../shared/bolas';
 import { nivelMaximoEncontro, nivelTreinador } from '../../../shared/treinador';
@@ -46,7 +47,7 @@ function tirarDynamaxDaImagem(img: HTMLElement) {
 /** Imagem que o Pokémon de cada lado tinha antes do Gigantamax (para voltar quando o Dynamax acaba). */
 const spriteAntesDoDynamax: Record<string, string | null> = {};
 import { multConquistas } from '../../../shared/conquistas';
-import { ehLendario } from '../../../shared/encontros';
+import { categoriaRara, ehLendario } from '../../../shared/encontros';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { iconeItem } from '../ui/iconeItem';
@@ -944,7 +945,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       if (treinador?.mensagemVitoria) await dizer(treinador.mensagemVitoria);
       await darXpTreinador();
       // silver só em batalhas contra treinadores e ginásios (pedido do dono): selvagem não dá
-      if (treinador) {
+      if (treinador && treinador.recompensa > 0) {
         // Amulet Coin / Luck Incense: +20% se quem segura entrou em campo
         const amuleto = multSilverDoTime([...batalha.participantes].map((pos) => save.time[pos]));
         const silver = Math.round(treinador.recompensa * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver') * multConquistas(save, 'silver') * amuleto);
@@ -960,8 +961,13 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       await darXpTime();
       selvagem.hp = Math.max(1, selvagem.hp);
       if (curarAoCapturar) curar(selvagem);
+      // Tera Type do selvagem: sorteado só agora, na captura (chance igual entre os 18 tipos)
+      selvagem.teraTipo = sortearTeraTipo();
       registrarCapturado(save, selvagem.especieId, selvagem.shiny);
       registrarCapturaNoRanking(save, selvagem);
+      // letreiro de todos os jogadores: shiny, lendário, mítico, Ultra Beast ou inicial
+      const rara = categoriaRara(dadosSelvagem, todosOsPokemons());
+      if (selvagem.shiny || rara) avisarCapturaRara(selvagem.especieId, selvagem.shiny, rara);
       await avisarMissoes(contarNasMissoes(save, 'capturar', selvagem.especieId));
       if (selvagem.shiny) await avisarMissoes(contarNasMissoes(save, 'shiny'));
       if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(selvagem);

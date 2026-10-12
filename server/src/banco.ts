@@ -405,3 +405,99 @@ const sqlCofre = {
 export const garantirCofre = (silver: number, gold: number) => void sqlCofre.criar.run(silver, gold);
 export const lerCofre = () => sqlCofre.ler.get() as { silver: number; gold: number };
 export const mudarCofre = (silver: number, gold: number) => void sqlCofre.mudar.run(silver, gold);
+
+// ---- mercado negro (server/src/mercado.ts): o que está à venda fica GUARDADO aqui, fora do save do vendedor ----
+db.exec(`
+  CREATE TABLE IF NOT EXISTS mercado (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    vendedor INTEGER NOT NULL REFERENCES contas(id) ON DELETE CASCADE,
+    tipo TEXT NOT NULL,
+    dados TEXT NOT NULL,
+    preco INTEGER NOT NULL CHECK (preco > 0),
+    moeda TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'ativo',
+    criado_em INTEGER NOT NULL,
+    expira_em INTEGER NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS mercado_status ON mercado (status, id);
+  CREATE INDEX IF NOT EXISTS mercado_vendedor ON mercado (vendedor);
+`);
+export interface LinhaMercado {
+  id: number;
+  vendedor: number;
+  vendedor_nome: string;
+  tipo: string;
+  dados: string;
+  preco: number;
+  moeda: string;
+  /** ativo = à venda (ou vencido, esperando o dono buscar); vendido = esperando o vendedor buscar o pagamento. */
+  status: string;
+  criado_em: number;
+  expira_em: number;
+}
+const COLUNAS_MERCADO = 'm.id, m.vendedor, c.usuario AS vendedor_nome, m.tipo, m.dados, m.preco, m.moeda, m.status, m.criado_em, m.expira_em';
+const sqlMercado = {
+  criar: db.prepare('INSERT INTO mercado (vendedor, tipo, dados, preco, moeda, criado_em, expira_em) VALUES (?, ?, ?, ?, ?, ?, ?)'),
+  ativos: db.prepare(`SELECT ${COLUNAS_MERCADO} FROM mercado m JOIN contas c ON c.id = m.vendedor WHERE m.status = 'ativo' AND m.expira_em > ? ORDER BY m.id DESC LIMIT ?`),
+  porId: db.prepare(`SELECT ${COLUNAS_MERCADO} FROM mercado m JOIN contas c ON c.id = m.vendedor WHERE m.id = ?`),
+  doVendedor: db.prepare(`SELECT ${COLUNAS_MERCADO} FROM mercado m JOIN contas c ON c.id = m.vendedor WHERE m.vendedor = ? ORDER BY m.id`),
+  vender: db.prepare("UPDATE mercado SET status = 'vendido' WHERE id = ? AND status = 'ativo'"),
+  apagar: db.prepare('DELETE FROM mercado WHERE id = ?'),
+};
+export const criarAnuncioMercado = (vendedor: number, tipo: string, dados: string, preco: number, moeda: string, expiraEm: number) =>
+  Number(sqlMercado.criar.run(vendedor, tipo, dados, preco, moeda, Date.now(), expiraEm).lastInsertRowid);
+export const anunciosAtivosMercado = (agora: number, limite: number) => sqlMercado.ativos.all(agora, limite) as unknown as LinhaMercado[];
+export const anuncioMercado = (id: number) => sqlMercado.porId.get(id) as unknown as LinhaMercado | undefined;
+export const anunciosDoVendedor = (contaId: number) => sqlMercado.doVendedor.all(contaId) as unknown as LinhaMercado[];
+/** Devolve se o anúncio ainda estava à venda (falso = outro comprou antes). */
+export const venderAnuncioMercado = (id: number) => sqlMercado.vender.run(id).changes > 0;
+export const apagarAnuncioMercado = (id: number) => void sqlMercado.apagar.run(id);
+
+// ---- Pokémon dados pela administração, esperando o jogo do jogador buscar (server/src/entregas.ts) ----
+db.exec(`
+  CREATE TABLE IF NOT EXISTS entregas_pokemon (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    conta_id INTEGER NOT NULL REFERENCES contas(id) ON DELETE CASCADE,
+    dados TEXT NOT NULL,
+    nome TEXT NOT NULL,
+    de TEXT NOT NULL,
+    criado_em INTEGER NOT NULL
+  );
+`);
+export interface EntregaPokemon {
+  id: number;
+  dados: string;
+  nome: string;
+}
+const sqlEntregaPokemon = {
+  criar: db.prepare('INSERT INTO entregas_pokemon (conta_id, dados, nome, de, criado_em) VALUES (?, ?, ?, ?, ?)'),
+  daConta: db.prepare('SELECT id, dados, nome FROM entregas_pokemon WHERE conta_id = ? ORDER BY id'),
+  apagar: db.prepare('DELETE FROM entregas_pokemon WHERE id = ?'),
+};
+export const criarEntregaPokemon = (contaId: number, dados: string, nome: string, de: string) => void sqlEntregaPokemon.criar.run(contaId, dados, nome, de, Date.now());
+export const entregasPokemonDaConta = (contaId: number) => sqlEntregaPokemon.daConta.all(contaId) as unknown as EntregaPokemon[];
+export const apagarEntregaPokemon = (id: number) => void sqlEntregaPokemon.apagar.run(id);
+
+// ---- quadro de missões: quem concluiu cada missão (o quadro é do servidor inteiro; server/src/missoes.ts) ----
+db.exec(`
+  CREATE TABLE IF NOT EXISTS missoes_quadro (
+    id TEXT PRIMARY KEY,
+    conta_id INTEGER NOT NULL,
+    por TEXT NOT NULL,
+    quando INTEGER NOT NULL
+  );
+`);
+const sqlMissoes = {
+  recentes: db.prepare('SELECT id, por, quando FROM missoes_quadro WHERE quando > ? ORDER BY quando DESC'),
+  uma: db.prepare('SELECT id, por, quando FROM missoes_quadro WHERE id = ?'),
+  criar: db.prepare('INSERT INTO missoes_quadro (id, conta_id, por, quando) VALUES (?, ?, ?, ?)'),
+  limpar: db.prepare('DELETE FROM missoes_quadro WHERE quando < ?'),
+};
+type MissaoGuardada = { id: string; por: string; quando: number };
+/** Concluídas no último dia (as missões ficam 12 horas no quadro). */
+export const missoesConcluidas = () => sqlMissoes.recentes.all(Date.now() - 24 * 60 * 60 * 1000) as unknown as MissaoGuardada[];
+export const missaoConcluida = (id: string) => sqlMissoes.uma.get(id) as unknown as MissaoGuardada | undefined;
+export function concluirMissao(id: string, contaId: number, por: string, quando: number): void {
+  sqlMissoes.criar.run(id, contaId, por, quando);
+  sqlMissoes.limpar.run(quando - 7 * 24 * 60 * 60 * 1000);
+}

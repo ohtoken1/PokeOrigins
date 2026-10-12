@@ -5,13 +5,11 @@
 import { Dex } from '@pkmn/sim';
 import type { PokemonIndividual } from './batalha/pokemon';
 import { TIERS_IV, tierIv } from './tierIv';
+import { INTERVALO_MISSOES_MS, MAXIMO_NO_QUADRO, MISSOES_POR_RODADA, RECOMPENSA_MISSAO_GOLD, RODADAS_NO_QUADRO, rodadaDe } from './missoesRegras';
 
-/** De quanto em quanto tempo entram missões novas. */
-export const INTERVALO_MISSOES_MS = 2 * 60 * 60 * 1000;
-export const MISSOES_POR_RODADA = 2;
-export const MAXIMO_NO_QUADRO = 12;
-/** Recompensa em gold pela qualidade pedida (pedido do dono). */
-export const RECOMPENSA_MISSAO_GOLD: Record<string, number> = { C: 1, B: 2, A: 3, S: 4 };
+// os números moram em missoesRegras.ts (arquivo que o servidor também lê)
+export { INTERVALO_MISSOES_MS, MAXIMO_NO_QUADRO, MISSOES_POR_RODADA, RECOMPENSA_MISSAO_GOLD, rodadaDe };
+
 export const recompensaDaMissao = (m: Pick<MissaoQuadro, 'qualidade'>) => RECOMPENSA_MISSAO_GOLD[m.qualidade] ?? 1;
 
 export type AtributoIv = keyof PokemonIndividual['ivs'];
@@ -46,9 +44,6 @@ function aleatorioCom(semente: string): () => number {
   };
 }
 
-export const rodadaDe = (agora: number) => Math.floor(agora / INTERVALO_MISSOES_MS);
-/** Quantas rodadas ficam no quadro ao mesmo tempo (12 missões = 6 rodadas de 2: cada missão fica 12 horas). */
-const RODADAS_NO_QUADRO = Math.floor(MAXIMO_NO_QUADRO / MISSOES_POR_RODADA);
 
 /**
  * Espécies sem repetir no quadro (pedido do dono): em vez de sortear cada rodada sozinha, o jogo embaralha a lista

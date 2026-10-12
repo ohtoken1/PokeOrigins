@@ -6,6 +6,7 @@ import { ITENS } from '../../../shared/itens';
 import { corTipo, el, spritePokemon } from './dom';
 import { ovoPorId } from '../../../shared/ovos';
 import { pokemonPorId } from '../dados';
+import { iconeTicketDoPokemon } from './ticketEvento';
 
 /** Ícone de skin: o Pokémon pequeno numa moldura dourada (prateada no shiny). */
 export function iconeSkin(especie: number, shiny: boolean): HTMLElement {
@@ -45,23 +46,66 @@ export function iconeOvo(letra: string, rotulo = letra, nt = false): HTMLElement
 }
 
 /**
- * Ícone de charm: o desenho do Shiny Charm dos jogos (pingente arredondado com argola e brilhos) pintado na cor do
- * tipo (pedido do dono).
+ * Ícone de charm: a imagem ORIGINAL do Shiny Charm dos jogos (client/public/itens/shinycharm.png, da PokéAPI)
+ * repintada na cor do tipo (pedido do dono: pintar o item, não desenhar outro). A parte colorida troca de matiz e
+ * mantém o claro/escuro do desenho; branco, cinza e contorno ficam como são.
  */
+const charmsPintados = new Map<string, Promise<string>>();
+let charmOriginal: Promise<HTMLImageElement> | null = null;
+function hsl(r: number, g: number, b: number): [number, number, number] {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min;
+  if (!d) return [0, 0, l];
+  const s = d / (1 - Math.abs(2 * l - 1));
+  const h = max === r ? ((g - b) / d + 6) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [h * 60, s, l];
+}
+function rgb(h: number, s: number, l: number): [number, number, number] {
+  const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs(((h / 60) % 2) - 1)), m = l - c / 2;
+  const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
+}
+/** Pixel da parte colorida do desenho (o que troca de cor). */
+const colorido = (s: number, l: number) => s > 0.2 && l > 0.15 && l < 0.93;
+function pintarCharm(cor: string): Promise<string> {
+  charmOriginal ??= new Promise((ok, erro) => {
+    const img = new Image();
+    img.onload = () => ok(img);
+    img.onerror = erro;
+    img.src = 'itens/shinycharm.png';
+  });
+  return charmOriginal.then((img) => {
+    const tela = document.createElement('canvas');
+    tela.width = img.naturalWidth;
+    tela.height = img.naturalHeight;
+    const ctx = tela.getContext('2d')!;
+    ctx.drawImage(img, 0, 0);
+    const dados = ctx.getImageData(0, 0, tela.width, tela.height);
+    const px = dados.data;
+    const n = parseInt(cor.slice(1), 16);
+    const [h, s, l] = hsl(n >> 16, (n >> 8) & 255, n & 255);
+    // claridade média da parte colorida: ela vira a cor do tipo, e o resto fica mais claro ou mais escuro em volta
+    let soma = 0, quantos = 0;
+    for (let i = 0; i < px.length; i += 4) {
+      const [, sp, lp] = hsl(px[i], px[i + 1], px[i + 2]);
+      if (px[i + 3] && colorido(sp, lp)) (soma += lp), quantos++;
+    }
+    const media = quantos ? soma / quantos : 0.5;
+    for (let i = 0; i < px.length; i += 4) {
+      const [, sp, lp] = hsl(px[i], px[i + 1], px[i + 2]);
+      if (!px[i + 3] || !colorido(sp, lp)) continue;
+      [px[i], px[i + 1], px[i + 2]] = rgb(h, Math.max(s, 0.25), Math.min(0.92, Math.max(0.12, l + (lp - media))));
+    }
+    ctx.putImageData(dados, 0, 0);
+    return tela.toDataURL();
+  });
+}
 export function iconeCharm(tipo: string): HTMLElement {
   const cor = corTipo(tipo);
-  const caixa = el('div', { class: 'icone-charm', style: { '--cor-tipo': cor } });
-  const g = `charm-${tipo}`;
-  caixa.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-    <defs><linearGradient id="${g}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset=".45" stop-color="${cor}"/><stop offset="1" stop-color="${cor}"/></linearGradient></defs>
-    <circle cx="12" cy="4.2" r="2.4" fill="none" stroke="#e8c45a" stroke-width="1.5"/><circle cx="12" cy="4.2" r="2.4" fill="none" stroke="#7a5a10" stroke-width=".5"/>
-    <path d="M12 6.4c4.6 0 7.6 3.2 7.6 7.6 0 4.6-3.3 8-7.6 8s-7.6-3.4-7.6-8c0-4.4 3-7.6 7.6-7.6z" fill="${cor}" stroke="#1d2433" stroke-width="1.3"/>
-    <path d="M12 7.4c3.9 0 6.5 2.7 6.5 6.6 0 4-2.8 7-6.5 7s-6.5-3-6.5-7c0-3.9 2.6-6.6 6.5-6.6z" fill="url(#${g})"/>
-    <path d="M5.6 15.5c.8 3.2 3.3 5.5 6.4 5.5s5.600-2.300 6.400-5.500c-1.700 1.900-3.900 2.900-6.400 2.900s-4.700-1-6.400-2.900z" fill="#000" opacity=".22"/>
-    <path d="M12 9.300l1.100 3.200 3.200 1.100-3.200 1.100-1.100 3.200-1.100-3.200-3.200-1.100 3.200-1.100z" fill="#fff" stroke="#1d2433" stroke-width=".5" stroke-linejoin="round"/>
-    <path d="M16.300 9.200l.4 1.200 1.200.4-1.200.4-.4 1.200-.4-1.200-1.200-.4 1.200-.4zM8 15.600l.35 1 1 .35-1 .35-.35 1-.35-1-1-.35 1-.35z" fill="#fff"/>
-  </svg>`;
-  return caixa;
+  const img = el('img', { class: 'icone-png', alt: '' });
+  if (!charmsPintados.has(cor)) charmsPintados.set(cor, pintarCharm(cor));
+  void charmsPintados.get(cor)!.then((src) => (img.src = src), () => (img.src = 'itens/shinycharm.png'));
+  return el('div', { class: 'icone-charm', style: { '--cor-tipo': cor } }, img);
 }
 
 /** Ícone de cubo: o Pokémon dentro de um cubo (âmbar = passado, ciano = futuro, laranja = lendário). */
@@ -80,6 +124,10 @@ export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 's
   if (item.skin) return iconeSkin(item.skin.especie, item.skin.shiny);
   if (item.cubo) return iconeCubo(item.cubo.especie, item.cubo.era);
   if (item.charm) return iconeCharm(item.charm);
+  if (item.categoria === 'tickets') {
+    const ticket = iconeTicketDoPokemon(item.id);
+    if (ticket) return el('div', { class: 'icone-caixa' }, ticket);
+  }
   if (item.imagem) {
     const img = el('img', { class: 'icone-png icone-imagem', src: item.imagem, alt: '', loading: 'lazy', referrerpolicy: 'no-referrer' });
     img.addEventListener('error', () => img.replaceWith(reserva()), { once: true });

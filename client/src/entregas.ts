@@ -1,6 +1,7 @@
 // Itens dados pela administração (server/src/entregas.ts): o jogo busca as entregas ao abrir e quando o servidor
 // avisa, salva o que está pendente, recebe o save já com os itens e mostra um aviso. Durante uma batalha espera
 // ela acabar (trocar o save no meio perderia o que a batalha está mexendo).
+import type { PokemonIndividual } from '../../shared/batalha/pokemon';
 import { api } from './conta';
 import { adotarSaveDoServidor, carregarSave, salvarAgora, type Save } from './estado';
 import { aoAvisoDoServidor } from './online';
@@ -11,6 +12,10 @@ type Resposta = { entregas: { nome: string; quantidade: number }[]; save?: Save;
 /** A administração manda um item para um jogador (só contas de administrador; o servidor confere). */
 export const darItemAoJogador = (usuario: string, item: string, nome: string, quantidade: number) =>
   api<{ usuario: string }>('POST', '/admin/itens', { usuario, item, nome, quantidade });
+
+/** A administração manda um Pokémon montado (Administração → Dar Pokémon). `nome` é o que aparece no aviso de quem recebe. */
+export const darPokemonAoJogador = (usuario: string, pokemon: PokemonIndividual, nome: string) =>
+  api<{ usuario: string }>('POST', '/admin/pokemon', { usuario, pokemon, nome });
 
 export function vigiarEntregas(): void {
   const aviso = el('div', { class: 'aviso-anuncio aviso-entrega', role: 'status', hidden: true });

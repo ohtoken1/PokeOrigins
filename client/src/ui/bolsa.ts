@@ -4,6 +4,7 @@ import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { ehEquipavel, ehItemDeHabilidade, usarItemDeHabilidade, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
 import { cuboPorItem } from '../../../shared/itensCustom';
+import { BOXES_INICIAIS, BOXES_MAXIMO, BOX_POKEMON, numeroDeBoxes, podeAbrirBox } from '../../../shared/pc';
 import { charmAte, charmAtivo, nomeCharm, tipoDoCharm, usarCharm } from '../../../shared/charms';
 import { textoDoTempo } from '../../../shared/viagem';
 import { pokemonPorId, todosOsPokemons } from '../dados';
@@ -40,7 +41,7 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
   ovos: 'Chocar',
 };
 /** O botão do item: pela categoria; na aba Up, Ability Capsule e Ability Patch são de usar. */
-const acaoDe = (item: ItemLoja) => (ehItemDeHabilidade(item.id) ? 'Usar' : ACAO[item.categoria]);
+const acaoDe = (item: ItemLoja) => (ehItemDeHabilidade(item.id) || item.id === BOX_POKEMON ? 'Usar' : ACAO[item.categoria]);
 
 type Modo =
   | { tipo: 'lista' }
@@ -104,6 +105,8 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
         // cubo (pedido do dono): a forma nova esquece os golpes que ela não pode ter (antes de aprender os dela)
         const esquecidos = cubo ? p.golpes.filter((g) => !especiePodeTerGolpe(para, g.id)).map((g) => nomeGolpe(g.id)) : [];
         if (cubo) p.golpes = p.golpes.filter((g) => especiePodeTerGolpe(para, g.id));
+        // o Move Reminder também não devolve o que a forma nova não pode ter
+        if (cubo && p.golpesAprendidos) p.golpesAprendidos = p.golpesAprendidos.filter((id) => especiePodeTerGolpe(para, id));
         const r = evoluir(p, para, (n) => pokemonPorId(n).nome);
         // nunca fica sem golpe: sem nenhum, recebe os do nível dela
         if (!p.golpes.length && !r.golpesPendentes.length) p.golpes = golpesIniciais(para, p.nivel);
@@ -314,6 +317,15 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                           for (const p of revividos) p.hp = hpMaximo(p);
                           gastar(item.id);
                           concluir(`${revividos.map(nome).join(', ')} ${revividos.length > 1 ? 'foram revividos' : 'foi revivido'}!`);
+                        }
+                      } else if (item.id === BOX_POKEMON) {
+                        // abre uma box nova no PC, sem escolher Pokémon
+                        if (!podeAbrirBox(save)) aviso = `Você já tem as ${BOXES_MAXIMO} boxes do PC.`;
+                        else {
+                          // quem ainda usa boxes do tempo em que eram 30 abre a seguinte à última que tem
+                          save.boxesExtras = numeroDeBoxes(save) - BOXES_INICIAIS + 1;
+                          gastar(item.id);
+                          concluir(`Box nova aberta no PC! Agora você tem ${numeroDeBoxes(save)} boxes.`);
                         }
                       } else modo = { tipo: 'alvo', item };
                       refazer();

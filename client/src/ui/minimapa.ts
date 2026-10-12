@@ -23,6 +23,7 @@ const MARCADORES: Record<string, { cor: string; letra: string }> = {
   guildas: { cor: '#a8323a', letra: 'G' },
   sazonal: { cor: '#e08a2a', letra: 'E' },
   mercadonegro: { cor: '#2a2a33', letra: 'N' },
+  safari: { cor: '#7a8a3a', letra: 'F' },
 };
 
 export function montarMinimapa(area: HTMLElement, cena: () => BiomaScene | null, aoClicar: (acao: string) => void): { parar(): void } {
