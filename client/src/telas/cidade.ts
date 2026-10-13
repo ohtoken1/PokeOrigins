@@ -21,6 +21,7 @@ import { abrirEstacao } from '../ui/trem';
 import { abrirArena } from '../ui/arena';
 import { abrirQuadroDeMissoes } from '../ui/quadroMissoes';
 import { abrirLojaTemporal } from '../ui/lojaTemporal';
+import { abrirSuspeito } from '../ui/suspeito';
 import { viagemAtual } from '../viagem';
 import { REGIOES } from '../../../shared/regioes';
 import { abrirProfessores } from './golpes';
@@ -135,10 +136,16 @@ export const telaCidade: Tela = (raiz, navegar) => {
     else if (acao === 'mural') abrirMural();
     else if (acao === 'guildas') navegar({ tela: 'comunidade', secao: 'cla' });
     else if (acao === 'viajante') abrirLojaTemporal(save!, () => atualizarTime());
+    else if (acao === 'suspeito' && !conteudoLiberado('suspeito')) avisar(`Homem Suspeito: ${textoTranca('suspeito')}.`);
+    else if (acao === 'suspeito') abrirSuspeito(save!, () => atualizarTime());
     else if (acao === 'missoes') abrirQuadroDeMissoes(save!, () => atualizarTime());
     else if (acao === 'mercadonegro' && !conteudoLiberado('mercadoNegro')) avisar(`Mercado negro: ${textoTranca('mercadoNegro')}.`);
     else if (acao === 'mercadonegro') abrirMercado(save!, () => atualizarTime());
+    // quem já está num Safari aberto continua; para entrar num novo vale a tranca
+    else if (acao === 'safari' && !conteudoLiberado('safari') && !save!.safari?.aberto) avisar(`Safari: ${textoTranca('safari')}.`);
     else if (acao === 'safari') abrirSafari(save!, navegar, () => atualizarTime());
+    // evento sazonal: o NPC fica fechado enquanto a staff não liga nenhum (ainda não há eventos sazonais)
+    else if (acao === 'sazonal') avisar('🔒 Nenhum evento sazonal ativo no momento.');
     else avisar(`${EM_BREVE[acao] ?? 'Este lugar'}: em breve.`);
   }
   const minimapa = montarMinimapa(areaJogo, () => cena(), irAoLocal);

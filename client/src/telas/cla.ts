@@ -1,7 +1,7 @@
 // Comunidade → Clã. Sem clã: criar (bandeira + nome, custa gold) ou entrar num da lista. Com clã: bandeira, nível
 // (só a porcentagem), missões do nível, membros com o cargo (líder, vice-líder, membro) e a gestão de quem pode.
 import {
-  BANDEIRA_PADRAO, DESCRICAO_CLA_MAX, limparNomeCla, NIVEL_MAX_CLA, NOME_CLA_MAX, NOME_CLA_VALIDO, PRECO_CRIAR_CLA_GOLD, VAGAS_CLA, type Bandeira,
+  BANDEIRA_PADRAO, bonusDoCla, DESCRICAO_CLA_MAX, XP_CLA_POR_POKEMON_DE_TREINADOR, XP_CLA_POR_SELVAGEM, XP_CLA_POR_TORNEIO, limparNomeCla, NIVEL_MAX_CLA, NOME_CLA_MAX, NOME_CLA_VALIDO, PRECO_CRIAR_CLA_GOLD, VAGAS_CLA, type Bandeira,
 } from '../../../shared/cla';
 import {
   aoMudarCla, cancelarPedidoDeCla, carregarCla, criarCla, editarCla, entrarNoCla, expulsarDoCla, listarClas, meuCla, meusPedidosDeCla,
@@ -16,8 +16,21 @@ import { desenharBandeira, editorDeBandeira } from '../ui/bandeira';
 import { el } from '../ui/dom';
 import { abrirJanela } from '../ui/janela';
 import { abrirPerfilDe } from './jogadores';
+import { valorEmMoeda } from '../ui/moeda';
 
 const mensagemDe = (e: unknown) => (e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.');
+const pct = (v: number) => `+${Math.round(v * 100)}%`;
+/** Os bônus que o nível da guilda dá a todos os membros, e o que o próximo nível acrescenta. */
+function secaoBonus(nivel: number): HTMLElement {
+  const agora = bonusDoCla(nivel);
+  const linhas: [string, number][] = [['Aparição de shiny', agora.shiny], ['XP de Pokémon e de treinador', agora.xp], ['Aparição de lendários e iniciais', agora.raros], ['Poké Dólares em batalhas', agora.silver]];
+  const proximo = nivel >= NIVEL_MAX_CLA ? '' : (nivel + 1) % 2 ? 'No próximo nível: +1% de shiny e de XP.' : 'No próximo nível: +1% de lendários e de Poké Dólares.';
+  return el('section', { class: 'cla-missoes' },
+    el('h3', {}, 'Bônus da guilda'),
+    el('ul', {}, ...linhas.map(([nome, v]) => el('li', { class: v > 0 ? 'feita' : '' }, `${nome}: ${pct(v)}`))),
+    el('small', {}, `Valem para todos os membros. ${proximo}`));
+}
+
 const seloNivel = (nivel: number) => el('span', { class: 'cla-nivel', title: `Guilda nível ${nivel}` }, `Nv. ${nivel}`);
 const seloCargo = (cargo: MembroCla['cargo']) => el('span', { class: `cla-cargo cargo-${cargo}` }, NOME_CARGO[cargo]);
 
@@ -38,10 +51,9 @@ function cartaoDoCla(c: DetalheCla, acoes: (m: MembroCla) => (HTMLElement | null
       el('h3', {}, `Para o nível ${c.nivel + 1}`),
       el('ul', {},
         el('li', { class: c.progresso >= 99.9 ? 'feita' : '' }, `Experiência da guilda: ${c.progresso.toLocaleString('pt-BR')}%`),
-        ...(c.missoes.length
-          ? c.missoes.map((m) => el('li', { class: m.feita ? 'feita' : '' }, m.texto))
-          : [el('li', { class: 'em-definicao' }, 'Missões da guilda ', el('span', { class: 'selo-em-breve' }, 'Em breve'))])),
-      el('small', {}, 'A experiência e as missões são da guilda inteira: o que cada membro faz soma para todos.')),
+        ...c.missoes.map((m) => el('li', { class: m.feita ? 'feita' : '' }, m.texto))),
+      el('small', {}, `A experiência é da guilda inteira: cada Pokémon selvagem derrotado ou capturado por um membro vale ${XP_CLA_POR_SELVAGEM} ponto, cada Pokémon do time de um treinador vencido vale ${XP_CLA_POR_POKEMON_DE_TREINADOR} e cada torneio vale ${XP_CLA_POR_TORNEIO}.`)),
+    secaoBonus(c.nivel),
     el('section', { class: 'cla-membros' },
       el('h3', {}, 'Membros'),
       ...c.membros.map((m) => el('div', { class: `cla-membro${m.usuario === conta()?.usuario ? ' eu' : ''}` },
@@ -126,8 +138,8 @@ export const telaCla: Tela = (raiz) => {
     if (criando) return;
     const n = limparNomeCla(nome.value);
     if (!NOME_CLA_VALIDO.test(n)) return void (aviso.textContent = 'Nome da guilda: de 3 a 16 letras ou números.');
-    if ((carregarSave()?.gold ?? 0) < PRECO_CRIAR_CLA_GOLD) return void (aviso.textContent = `Criar uma guilda custa ${PRECO_CRIAR_CLA_GOLD} gold.`);
-    if (!confirm(`Criar a guilda "${n}" por ${PRECO_CRIAR_CLA_GOLD} gold?`)) return;
+    if ((carregarSave()?.gold ?? 0) < PRECO_CRIAR_CLA_GOLD) return void (aviso.textContent = `Criar uma guilda custa ${PRECO_CRIAR_CLA_GOLD} Origin Coins.`);
+    if (!confirm(`Criar a guilda "${n}" por ${PRECO_CRIAR_CLA_GOLD} Origin Coins?`)) return;
     criando = true;
     await fazer((async () => {
       // o servidor cobra o gold no save guardado: salva antes e pega o save de volta depois
@@ -179,7 +191,7 @@ export const telaCla: Tela = (raiz) => {
       el('label', { class: 'cla-campo' }, 'Nome', nome),
       el('label', { class: 'cla-campo' }, 'Descrição', descricao),
       el('label', { class: 'cla-campo linha' }, aberto, 'Entrada livre (desligado: só entra quem você aceitar)'),
-      el('button', { class: 'botao botao-gold cla-botao-criar', onclick: () => void criar() }, `Criar guilda · ${PRECO_CRIAR_CLA_GOLD} gold`)));
+      el('button', { class: 'botao botao-gold cla-botao-criar', onclick: () => void criar() }, 'Criar guilda · ', valorEmMoeda('gold', PRECO_CRIAR_CLA_GOLD))));
   const procura = el('section', { class: 'amigos-secao' }, el('h2', {}, 'Entrar em uma guilda'), el('div', { class: 'jogadores-busca' }, busca), lista);
 
   let tinhaCla: boolean | null = null;

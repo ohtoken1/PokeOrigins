@@ -1,6 +1,7 @@
 import './estilo.css';
 import './estilo-pokedex.css';
-import { carregarSave } from './estado';
+import { carregarSave, salvar } from './estado';
+import { ajustarTimeAoLimite } from './limiteNivel';
 import { iniciarMusica } from './sons';
 import { telaEscolhaInicial } from './telas/escolhaInicial';
 import { telaRegiao } from './telas/regiao';
@@ -37,6 +38,7 @@ import { vigiarConquistas } from './conquistas';
 import { vigiarEntregas } from './entregas';
 import { vigiarMercado } from './mercado';
 import { vigiarQuadro } from './missoesQuadro';
+import { prepararIdioma } from './idioma';
 // o chat ouve o servidor desde a conexão (guarda as mensagens mesmo fora do mapa)
 import './ui/chat';
 
@@ -80,7 +82,8 @@ const navegar: Navegar = (destino) => {
 
 ativarDeslizantes();
 // primeiro a conta (tela de entrada); só depois o jogo monta barra, cabeçalho e painel
-void garantirConta(raiz).then((conta) => {
+// o idioma vem antes de tudo: a tela de entrada já aparece traduzida
+void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   if (conta.admin) montarPainelAdmin(() => navegar(destinoAtual));
   marcarAba = montarBarraTopo(navegar);
   // música de fundo começa no primeiro clique/tecla
@@ -96,6 +99,11 @@ void garantirConta(raiz).then((conta) => {
   vigiarAnuncios();
   // trem: contagem no canto e, ao partir/chegar, o cabeçalho (região) e a tela dos mapas se atualizam
   vigiarViagem();
+  // limite de nível pelo treinador: quem estava no time acima do limite (save de antes da regra) vai para o PC
+  {
+    const s = carregarSave();
+    if (s && ajustarTimeAoLimite(s)) salvar(s);
+  }
   // conquistas: confere agora e depois de cada salvamento
   vigiarConquistas();
   // itens dados pela administração

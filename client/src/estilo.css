@@ -25,6 +25,7 @@ body[data-fundo='agua'] { background-image: url('/fundo-agua.svg'); }
 body[data-fundo='vulcao'] { background-image: url('/fundo-vulcao.svg'); }
 body[data-fundo='caverna'] { background-image: url('/fundo-caverna.svg'); }
 body[data-fundo='torre'] { background-image: url('/fundo-torre.svg'); }
+body[data-fundo='pico'] { background-image: url('/fundo-pico.svg'); }
 h1, h2 { margin: 0 0 6px; }
 h1 small, h2 small { color: var(--texto-2); font-weight: 500; }
 h2 { font-size: 1rem; }
@@ -144,7 +145,8 @@ aside { display: flex; flex-direction: column; gap: 16px; }
 }
 .encontro:hover { border-color: rgb(255 255 255 / 0.25); }
 .encontro.arrastando { cursor: grabbing; animation: none; }
-.encontro.shiny { border-color: rgb(233 185 73 / 0.6); }
+/* shiny: janela amarelo bem clarinho com contorno preto; lendário: vermelho bem clarinho (pedido do dono) */
+.encontro.shiny, .encontro.shiny:hover { background: rgb(255 244 170 / 0.88); border-color: #000; }
 .encontro .palco {
   flex: 0 0 160px; height: 160px; display: grid; place-items: center;
   background: radial-gradient(ellipse 34% 9% at 50% 88%, rgb(0 0 0 / 0.35) 0 99%, transparent 100%);
@@ -159,7 +161,9 @@ aside { display: flex; flex-direction: column; gap: 16px; }
 .encontro.lendario .nome { color: #ff5a4a; }
 .encontro.lendario .aviso { color: #ff5a4a; }
 .encontro.shiny.lendario .nome { background: linear-gradient(90deg, #ffd84a, #ff5a4a); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 1px 1px #000); }
-.encontro.lendario { border-color: rgb(255 90 74 / 0.6); }
+.encontro.lendario, .encontro.lendario:hover { background: rgb(255 196 190 / 0.88); border-color: #000; }
+.encontro.shiny :is(.dica, .nome small), .encontro.lendario :is(.dica, .nome small) { color: #2a2620; text-shadow: none; }
+.encontro.shiny.lendario, .encontro.shiny.lendario:hover { background: linear-gradient(90deg, rgb(255 244 170 / 0.88), rgb(255 196 190 / 0.88)); }
 .encontro .tipos { justify-content: flex-start; }
 .encontro .botao { padding: 6px 12px; margin-top: 2px; }
 .encontro .dica { margin: 0; font-size: 0.72rem; color: #e8ecf4; }
@@ -336,8 +340,11 @@ button.vaga:hover { border-color: var(--borda); }
 .tabela-atributos tfoot { color: var(--texto-2); }
 .tabela-atributos .valor { font-weight: 700; }
 .tabela-atributos .perfeito { color: #3fd46b; font-weight: 700; }
-.tabela-atributos .sobe { color: #ef6a6a; font-size: 0.7rem; }
-.tabela-atributos .desce { color: #6aa8ef; font-size: 0.7rem; }
+/* Nature: o que aumenta em verde, o que diminui em vermelho (nome e valor; pedido do dono) */
+.tabela-atributos .sobe { color: #5fd67a; font-size: 0.7rem; }
+.tabela-atributos .desce { color: #ef6a6a; font-size: 0.7rem; }
+.tabela-atributos .nat-sobe { color: #5fd67a; }
+.tabela-atributos .nat-desce { color: #ef6a6a; }
 .barrinha {
   display: inline-block; width: 60px; height: 5px; margin-right: 8px; border-radius: 999px; vertical-align: middle;
   background: linear-gradient(90deg, #f3c623 calc(var(--v) * 100%), #0b0d14 0);
@@ -514,8 +521,8 @@ button.vaga:hover { border-color: var(--borda); }
 .resumo-atributo { display: grid; grid-template-columns: 70px 1fr 30px; align-items: center; gap: 8px; }
 .resumo-atributo > span:first-child { color: var(--texto-2); }
 .resumo-atributo strong { text-align: right; font-variant-numeric: tabular-nums; }
-.resumo-atributo.sobe > span:first-child { color: #ff8a80; }
-.resumo-atributo.desce > span:first-child { color: #82b1ff; }
+.resumo-atributo.sobe > span:first-child, .resumo-atributo.sobe strong { color: #5fd67a; }
+.resumo-atributo.desce > span:first-child, .resumo-atributo.desce strong { color: #ef6a6a; }
 .resumo-barra { height: 5px; border-radius: 3px; background: rgb(255 255 255 / 0.08); overflow: hidden; }
 .resumo-barra > span { display: block; height: 100%; border-radius: 3px; background: #5ab8ff; }
 .resumo-golpes { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; padding-top: 6px; border-top: 1px solid rgb(255 255 255 / 0.08); }
@@ -703,10 +710,10 @@ button.vaga:hover { border-color: var(--borda); }
 .moeda-icone { grid-row: 1 / 3; width: 26px; height: 26px; border-radius: 50%; }
 .moeda small { color: var(--texto-2); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .moeda strong { font-size: 1.1rem; font-variant-numeric: tabular-nums; }
-.moeda-silver .moeda-icone { background: radial-gradient(circle at 35% 35%, #ffffff, #c3cbd8 45%, #7d8798); box-shadow: inset 0 0 0 2px #9aa4b5; }
+.moeda-silver .moeda-icone { background: url('/itens/pokedolar.svg') center / contain no-repeat; border-radius: 0; box-shadow: none; }
 .moeda-silver strong { color: #dfe5ee; }
 .moeda-gold { border-color: #8a6a1c; }
-.moeda-gold .moeda-icone { background: radial-gradient(circle at 35% 35%, #fff6c8, #f2c230 45%, #a87412); box-shadow: inset 0 0 0 2px #c9961f; }
+.moeda-gold .moeda-icone { background: url('/itens/origincoin.svg') center / contain no-repeat; border-radius: 0; box-shadow: none; }
 .moeda-gold strong { color: #f5c842; }
 .botao.botao-gold { background: #f2c230; color: #2a1d00; }
 
@@ -971,6 +978,15 @@ button.vaga:hover { border-color: var(--borda); }
   display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px;
   background: var(--painel); border: 1px solid var(--borda); border-left: 4px solid var(--cor-tipo);
 }
+/* professores: a escolha de qual golpe esquecer abre dentro do cartão clicado */
+.golpe-oferta.escolhendo { border-color: var(--destaque); box-shadow: 0 0 0 2px rgb(233 185 73 / 0.35); }
+.golpe-esquecer { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--borda); }
+.golpe-esquecer > span { font-size: 0.82rem; color: var(--destaque); font-weight: 700; }
+.golpe-esquecer .golpe-atual { width: 100%; justify-content: space-between; }
+/* bolsa: escolher a forma (Deoxys, Rotom…) */
+.escolha-forma { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin: 8px 0 12px; }
+.escolha-forma .botao { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 6px; }
+.escolha-forma .tipos { display: flex; gap: 4px; }
 .golpe-oferta-nome { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .golpe-oferta small { color: var(--texto-2); }
 .golpe-oferta .botao { align-self: flex-start; padding: 5px 10px; font-size: 0.8rem; }
@@ -1051,8 +1067,16 @@ button.vaga:hover { border-color: var(--borda); }
 
 /* Tickets: moedas, VIP, item aleatório, skins e chance de cada prêmio */
 .icone-moeda { display: inline-block; width: 26px; height: 26px; border-radius: 50%; }
-.icone-moeda.moeda-silver { background: radial-gradient(circle at 35% 35%, #ffffff, #c3cbd8 45%, #7d8798); box-shadow: inset 0 0 0 2px #9aa4b5; }
-.icone-moeda.moeda-gold { background: radial-gradient(circle at 35% 35%, #fff6c8, #f2c230 45%, #a87412); box-shadow: inset 0 0 0 2px #c9961f; }
+/* Idioma: botões com a bandeira (Opções e tela de entrada) */
+.idiomas { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.idioma { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 10px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto); font: inherit; font-weight: 600; cursor: pointer; }
+.idioma svg { width: 30px; height: 20px; border-radius: 3px; box-shadow: 0 0 0 1px rgb(0 0 0 / 0.45); flex: none; }
+.idioma:hover, .idioma.ativo { border-color: var(--destaque); }
+.idioma.ativo { background: var(--dourado); color: var(--texto-no-dourado); }
+.opcoes-secao .idiomas, .tela-opcoes .idiomas { justify-content: flex-start; }
+/* Poké Dólar (silver) e Origin Coin (gold): desenhos em client/public/itens */
+.icone-moeda.moeda-silver { background: url('/itens/pokedolar.svg') center / contain no-repeat; border-radius: 0; box-shadow: none; }
+.icone-moeda.moeda-gold { background: url('/itens/origincoin.svg') center / contain no-repeat; border-radius: 0; box-shadow: none; }
 .icone-vip {
   display: inline-grid; place-items: center; padding: 3px 7px; border-radius: 6px; font-weight: 900; font-style: italic; font-size: 0.78rem; letter-spacing: 0.04em;
   color: #2a1400; background: linear-gradient(135deg, #fff1a8, #ffc93c 45%, #ff8a1f); box-shadow: 0 0 0 1px #7a4300, 0 0 10px #ffb30066;
@@ -1127,7 +1151,12 @@ button.vaga:hover { border-color: var(--borda); }
 
 /* Roletas de Pokémon: Ultra Beast vermelho, mítico roxo (lendário continua laranja) */
 .fundo-ultra { background: #d93a3a; color: #fff; }
-.fundo-mitico { background: #8d4fe0; color: #fff; }
+/* classe própria: `.fundo-mitico` é a raridade mítica dos tickets (vermelha) e esta regra a deixava roxa */
+.fundo-pk-mitico { background: #8d4fe0; color: #fff; }
+/* prêmio mítico de ticket: cartão com fundo vermelho (pedido do dono) */
+.premio.premio-mitico { background: linear-gradient(135deg, rgb(255 92 138 / 0.35), rgb(216 27 67 / 0.45)); border-color: #ff5c8a; box-shadow: 0 0 8px rgb(255 92 138 / 0.45); }
+.premio.premio-mitico small { color: #ffd9e2; }
+.botoes-quantidade .botao.abrir-escolhido { min-width: 130px; }
 
 /* Atalho da Pokédex no canto de cima, à esquerda */
 .atalho-pokedex { display: grid; place-items: center; width: 38px; height: 38px; margin-right: -12px; padding: 0; border: 0; border-radius: 10px; background: none; cursor: pointer; transition: transform 0.15s, background 0.15s; }
@@ -1269,6 +1298,12 @@ button.vaga:hover { border-color: var(--borda); }
 .podio-prata .medalha-disco { background: radial-gradient(circle at 35% 30%, #ffffff, #c9ced6 45%, #858c96); }
 .podio-bronze .medalha-disco { background: radial-gradient(circle at 35% 30%, #ffd9b0, #cd7f32 45%, #8a4f1c); }
 .perfil-seletor-regiao { width: 100%; margin-bottom: 10px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto); font: inherit; font-weight: 700; cursor: pointer; }
+/* selos sazonais no perfil: apagados até o jogador ganhar */
+.perfil-selos { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.perfil-selo { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; border-radius: 10px; background: rgb(42 38 32 / 0.6); opacity: 0.3; filter: grayscale(1); text-align: center; }
+.perfil-selo.tem { opacity: 1; filter: none; box-shadow: 0 0 0 1px var(--destaque); }
+.perfil-selo span { font-size: 1.5rem; line-height: 1; }
+.perfil-selo small { font-size: 0.62rem; color: var(--texto-2); line-height: 1.1; }
 .perfil-insignias { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; justify-items: center; }
 .perfil-insignias .insignia-img { width: 44px; height: 44px; padding: 6px; border-radius: 10px; background: rgb(42 38 32 / 0.6); }
 .perfil-time { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
@@ -1520,6 +1555,9 @@ button.vaga:hover { border-color: var(--borda); }
 .fx-anel { width: 90px; height: 90px; border: 5px solid; border-radius: 50%; }
 .fx-escudo { width: 130px; height: 130px; border: 3px solid; border-radius: 50%; background: radial-gradient(circle, transparent 55%, rgba(255,255,255,0.25)); }
 .fx-tela { position: absolute; inset: 0; pointer-events: none; z-index: 5; mix-blend-mode: screen; }
+/* animações do Showdown: o fundo colorido do golpe fica atrás dos Pokémon; os efeitos, sem serrilhar */
+.fx-fundo-golpe { position: absolute; inset: 0; pointer-events: none; z-index: 0; background-size: cover !important; background-position: center !important; }
+.fx-showdown { object-fit: fill; will-change: transform, opacity; }
 
 /* Transformações na batalha (Mega, Primal, formas) */
 .transf-esfera { position: absolute; left: 50%; bottom: 22%; width: 150px; height: 150px; margin-left: -75px; border-radius: 50%; z-index: 4; pointer-events: none; filter: blur(2px); mix-blend-mode: screen; }
@@ -1536,7 +1574,9 @@ button.vaga:hover { border-color: var(--borda); }
 .evolucao-luz { position: absolute; inset: -40%; background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.25), transparent 30%, rgba(255,255,255,0.2), transparent 60%); animation: evolucao-gira 3s linear infinite; }
 @keyframes evolucao-gira { to { transform: rotate(360deg); } }
 .evolucao-sprite { position: relative; width: 140px; height: 140px; object-fit: contain; image-rendering: pixelated; }
-.evolucao-texto { margin: 0; font-weight: 700; text-align: center; }
+.evolucao-palco.fusao { width: 360px; }
+.evolucao-palco.fusao > img { grid-area: 1 / 1; }
+.evolucao-texto { margin: 0; font-weight: 700; text-align: center; max-width: 360px; }
 
 /* Time do adversário na batalha: Pokébolas até cada Pokémon entrar em campo */
 .time-adversario { position: absolute; top: 104px; right: 10px; z-index: 2; display: flex; gap: 4px; pointer-events: auto; }
@@ -1559,10 +1599,13 @@ button.vaga:hover { border-color: var(--borda); }
 .botao-trancar.ligado { border-color: #ffd84a; color: #ffd84a; }
 
 /* resumo do seu Pokémon na batalha: atributo com estágio (+1, −2…) */
-.resumo-atributo strong.estagio-sobe { color: #ff8a80; }
-.resumo-atributo strong.estagio-desce { color: #82b1ff; }
+.resumo-atributo strong.estagio-sobe { color: #7dff9a; }
+.resumo-atributo strong.estagio-desce { color: #ff6b6b; }
 .resumo-atributo strong small { font-size: 0.7rem; }
-.resumo-atributo { grid-template-columns: 70px 1fr 52px; }
+.resumo-atributo strong small.antes { color: var(--texto-2); font-weight: 400; }
+.resumo-atributo strong small.estagio { margin-left: 4px; padding: 0 4px; border-radius: 6px; background: rgb(255 255 255 / 0.12); }
+.resumo-atributo { grid-template-columns: 70px 1fr auto; }
+.resumo-atributo strong { white-space: nowrap; min-width: 30px; }
 /* Início: arrastar para trocar a ordem do time */
 .fila-time .pedestal.arrastavel { touch-action: none; }
 .fila-time .pedestal.arrastando { z-index: 5; opacity: 0.85; pointer-events: none; }
@@ -1894,7 +1937,8 @@ input[type='checkbox']:disabled { opacity: 0.45; cursor: not-allowed; }
 .banco { display: flex; flex-direction: column; gap: 12px; }
 .banco-saldo { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 16px; padding: 10px 14px; border-radius: 12px; background: rgb(0 0 0 / 0.25); border: 1px solid var(--borda); }
 .banco-saldo small { width: 100%; color: var(--texto-2); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.72rem; }
-.banco-moeda { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.banco-moeda { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; vertical-align: middle; }
+.botao .banco-moeda .icone-moeda, small .banco-moeda .icone-moeda { width: 16px; height: 16px; }
 .banco-moeda .icone-moeda { width: 18px; height: 18px; border-radius: 50%; flex: none; }
 .banco-abas { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .banco .meta { margin: 0; }
@@ -2103,7 +2147,27 @@ button.missao-quadro:disabled { cursor: default; }
 .titulo-opcao.em-uso { border-color: var(--destaque); background: rgb(255 201 60 / 0.12); }
 .titulo-opcao.em-uso small { color: var(--destaque); }
 .titulo-opcao:disabled { opacity: 0.5; cursor: not-allowed; }
-.perfil-titulo { display: inline-block; padding: 2px 12px; border-radius: 99px; font-size: 0.82rem; font-weight: 800; color: #2a1d00; background: linear-gradient(135deg, #fff1a8, #ffc93c); }
+/* balão do título: o tema dá a cor (--t1 claro, --t2 escuro, --t3 brilho), o grau dá o acabamento */
+.balao-titulo { --t1: #ffe9a3; --t2: #c9962a; --t3: #ffd766; --tinta: #2a1d00; position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 99px; font-size: 0.82rem; font-weight: 800; line-height: 1.3; white-space: nowrap; }
+.balao-simbolo { font-size: 0.9em; }
+.balao-titulo.tema-guilda { --t1: #9fd3ee; --t2: #2f6f8f; --t3: #6fc6f2; --tinta: #06202d; }
+.balao-titulo.tema-riqueza { --t1: #ffe9a3; --t2: #c9962a; --t3: #ffd766; --tinta: #2a1d00; }
+.balao-titulo.tema-shiny { --t1: #fff6c9; --t2: #f08bd0; --t3: #9fe8ff; --tinta: #2a1038; }
+.balao-titulo.tema-mitico { --t1: #ffb3c7; --t2: #b3123f; --t3: #ff5f8f; --tinta: #fff; }
+/* grau 1: liso e discreto, só o contorno na cor do tema */
+.balao-titulo.grau-1 { color: var(--t1); background: rgb(26 24 21 / 0.7); border: 1px solid var(--t2); font-weight: 700; }
+/* grau 2: preenchido em degradê */
+.balao-titulo.grau-2 { color: var(--tinta); background: linear-gradient(135deg, var(--t1), var(--t2)); border: 1px solid var(--t1); }
+/* grau 3: degradê, contorno claro e brilho em volta */
+.balao-titulo.grau-3 { color: var(--tinta); background: linear-gradient(135deg, var(--t1), var(--t3) 45%, var(--t2)); border: 2px solid #fff6d6; padding: 4px 14px; font-size: 0.88rem; box-shadow: 0 0 10px var(--t3), inset 0 1px 0 rgb(255 255 255 / 0.6); }
+/* grau 4: o de cima + um reflexo que passa de tempos em tempos */
+.balao-titulo.grau-4 { color: var(--tinta); background: linear-gradient(120deg, var(--t2), var(--t1) 35%, var(--t3) 65%, var(--t2)); border: 2px solid #fff; padding: 4px 14px; font-size: 0.88rem; letter-spacing: 0.02em; box-shadow: 0 0 14px var(--t3), 0 0 4px #fff, inset 0 1px 0 rgb(255 255 255 / 0.7); }
+.balao-titulo.grau-4::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.75) 50%, transparent 65%); transform: translateX(-120%); animation: balao-reflexo 3.2s ease-in-out infinite; pointer-events: none; }
+.balao-titulo.tema-shiny.grau-4 { background: linear-gradient(120deg, #ffd1f0, #fff6c9 30%, #b9f3ff 60%, #d9c2ff); }
+@keyframes balao-reflexo { 0%, 55% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+@media (prefers-reduced-motion: reduce) { .balao-titulo.grau-4::after { animation: none; } }
+.titulo-opcao:disabled .balao-titulo { filter: grayscale(0.85); box-shadow: none; }
+.titulo-opcao:disabled .balao-titulo::after { display: none; }
 .icone-simbolo { width: 32px; height: 32px; flex: none; border-radius: 8px; display: grid; place-items: center; font-size: 20px; line-height: 1; background: linear-gradient(135deg, #24211c, #484239); box-shadow: inset 0 0 0 2px #7f97bd; }
 .icone-simbolo.cat-skins { background: linear-gradient(135deg, #3a2a00, #6b4d00); box-shadow: inset 0 0 0 2px #e8b931; }
 .cartao-skin .icone-simbolo { width: 56px; height: 56px; font-size: 34px; }
@@ -2172,8 +2236,8 @@ button.vaga.casa-box:hover { border-color: rgb(18 17 15 / 0.35); background: rgb
 .mercado-topo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .mercado-topo .busca { flex: 1; min-width: 160px; padding: 8px 12px; border-radius: 10px; border: 1px solid #c9d2de; background: #fff; color: #1d2a3d; font: inherit; }
 .mercado-saldo { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgb(0 0 0 / 0.4); font-weight: 700; font-variant-numeric: tabular-nums; }
-.mercado-moeda { flex: none; width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #b9c2cf 70%); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.25); }
-.mercado-moeda.gold { background: radial-gradient(circle at 35% 35%, #fff3b0, #e9a400 70%); }
+.mercado-moeda { flex: none; width: 14px; height: 14px; background: url('/itens/pokedolar.svg') center / contain no-repeat; }
+.mercado-moeda.gold { background-image: url('/itens/origincoin.svg'); }
 .mercado-colunas { display: grid; grid-template-columns: 170px minmax(0, 1fr) 270px; gap: 14px; align-items: start; }
 .mercado-secoes { display: flex; flex-direction: column; gap: 8px; }
 .mercado-secao { font: inherit; font-weight: 700; text-align: left; padding: 8px 14px; border-radius: 10px; border: 1px solid #c3ccd8; background: linear-gradient(#f4f6f9, #dfe4eb); color: #5b6880; cursor: pointer; }
@@ -2366,3 +2430,22 @@ button.vaga.casa-box:hover { border-color: rgb(18 17 15 / 0.35); background: rgb
 .safari-andamento strong { font-size: 1.2rem; color: var(--destaque); }
 .safari-botoes { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 @media (max-width: 520px) { .safari-tipos { grid-template-columns: repeat(3, 1fr); } }
+
+/* Administração → Banimentos */
+.ban-lista { display: flex; flex-direction: column; gap: 10px; margin: 8px 0 18px; }
+.ban-cartao { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border: 1px solid var(--borda); border-radius: 10px; background: var(--painel); align-items: flex-start; }
+.ban-cartao.ativo { border-color: #b3403a; }
+.ban-topo { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.ban-motivo { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* bolsa com o desenho da loja: os botões do item (Usar, Equipar, Abrir…) ficam como o Comprar */
+.bolsa-loja { display: flex; flex-direction: column; gap: 12px; }
+.bolsa-loja .mercado-painel .botao { width: 100%; padding: 10px; border-radius: 8px; border: 0; background: #2e9e55; color: #fff; font-weight: 800; }
+.bolsa-loja .mercado-painel .botao:hover:not(:disabled) { background: #2e9e55; color: #fff; filter: brightness(1.1); }
+.bolsa-loja .mercado-painel .botao:disabled { background: #b9c2cf; color: #fff; cursor: not-allowed; }
+.bolsa-loja .mercado-item .mercado-preco { color: #1d2a3d; }
+
+/* Energies (material de craft): esfera na cor do tipo com uma centelha */
+.icone-energia { width: 32px; height: 32px; flex: none; display: grid; place-items: center; }
+.icone-energia i { position: relative; width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff 0 8%, color-mix(in srgb, var(--cor-tipo) 65%, #fff) 22%, var(--cor-tipo) 55%, color-mix(in srgb, var(--cor-tipo) 55%, #000) 100%); box-shadow: 0 0 0 2px #2a2620, 0 0 6px 1px var(--cor-tipo); }
+.icone-energia i::after { content: ''; position: absolute; inset: 5px; background: #fff; opacity: 0.92; clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); }

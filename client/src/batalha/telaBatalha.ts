@@ -1,4 +1,5 @@
 import { bonificacao } from '../bonificacao';
+import { podeUsar, tetoDoJogador, textoDoLimite } from '../limiteNivel';
 import { bonusVip } from '../../../shared/vip';
 import { AMIZADE_POR_BATALHA, ganharAmizade } from '../../../shared/amizade';
 import { trocarSpriteForma } from '../ui/formas';
@@ -17,13 +18,16 @@ import { efeitoBola } from '../../../shared/bolas';
 import { nivelMaximoEncontro, nivelTreinador } from '../../../shared/treinador';
 import { XP_POR_MISSAO, type Missao } from '../../../shared/passe';
 import { contarNasMissoes, textoMissao } from '../passe';
-import { EXP_SHARE, MOEDA } from '../../../shared/loja';
+import { EXP_SHARE, nomeDaMoeda } from '../../../shared/loja';
 import { multSkins } from '../../../shared/skins';
 import { evsComItem, multSilverDoTime, multXpDoItem } from '../../../shared/campo';
 import { sortearTicketDaBatalha } from '../../../shared/tickets';
+import { nomeEnergia, sortearEnergia } from '../../../shared/materiais';
 import { curarTime, guardarNoPC, registrarCapturaNoRanking, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
-import { darXpAoCla } from '../cla';
+import { bonusDaMinhaGuilda, darXpAoCla } from '../cla';
+import { XP_CLA_POR_POKEMON_DE_TREINADOR, XP_CLA_POR_SELVAGEM } from '../../../shared/cla';
 import { marcarConquista } from '../conquistas';
+import { semNt } from '../../../shared/naoTrocavel';
 
 const CORES_DYNAMAX = ['#c4003a', '#ff3d6e', '#7a0030', '#ff8fb0'];
 /**
@@ -46,7 +50,7 @@ function tirarDynamaxDaImagem(img: HTMLElement) {
 }
 /** Imagem que o Pokémon de cada lado tinha antes do Gigantamax (para voltar quando o Dynamax acaba). */
 const spriteAntesDoDynamax: Record<string, string | null> = {};
-import { multConquistas } from '../../../shared/conquistas';
+import { multConquistas, multTitulo } from '../../../shared/conquistas';
 import { categoriaRara, ehLendario } from '../../../shared/encontros';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
@@ -168,6 +172,7 @@ export const FUNDOS_BATALHA: Record<string, string[]> = {
   vulcao: ['vulcao-1.png', 'vulcao-2.jpg', 'vulcao-3.jpg'],
   caverna: ['caverna-1.jpg', 'caverna-2.jpg'],
   torre: ['torre-1.jpg', 'torre-2.jpg'],
+  pico: ['pico-1.png', 'pico-2.png', 'pico-5.png'],
 };
 /** Sorteia o fundo do bioma para esta batalha. */
 function sortearFundo(biomaId: string): string | null {
@@ -803,11 +808,11 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     });
     // VIP, skin de bônus e conquistas aumentam a chance de captura
     const { capturou, tremidas, chance, eventos } = batalha.arremessarBola(efeito, bonusVip(save, 'captura') * multSkins(save, 'captura') * multConquistas(save, 'captura'));
-    if (capturou && bola === 'ultraball' && ehLendario(dadosSelvagem)) marcarConquista(save, 'lendarioUltraball');
+    if (capturou && semNt(bola) === 'ultraball' && ehLendario(dadosSelvagem)) marcarConquista(save, 'lendarioUltraball');
     const porcentagem = chance >= 1 ? '100' : chance < 0.001 ? '<0,1' : (chance * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
     mensagem.textContent = `Você arremessou uma ${ITENS[bola].nome}! Chance de captura: ${porcentagem}%`;
     if (capturou && bola === 'healball') curarAoCapturar = true;
-    await animarBola(arena, spriteSelvagem, tremidas, capturou, bola);
+    await animarBola(arena, spriteSelvagem, tremidas, capturou, semNt(bola));
     if (capturou) {
       await dizer(`Pegou! ${dadosSelvagem.nome} foi capturado!`);
       return finalizar('captura');
@@ -873,11 +878,11 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
   /** O treinador ganha o mesmo XP que o Pokémon derrotado/capturado dá ao Pokémon em campo. */
   async function darXpTreinador() {
     const nivelAtivo = save.time[batalha.ativo]?.nivel ?? 1;
-    const xp = Math.round(xpPelosDerrotados(nivelAtivo) * bonusVip(save, 'xpTreinador') * bonificacao().xp * multSkins(save, 'xp'));
+    const xp = Math.round(xpPelosDerrotados(nivelAtivo) * bonusVip(save, 'xpTreinador') * bonificacao().xp * multSkins(save, 'xp') * multTitulo(save) * (1 + bonusDaMinhaGuilda().xp));
     const antes = nivelTreinador(save.xpTreinador);
     save.xpTreinador += xp;
-    // o clã ganha o mesmo XP (todos os membros enchem a mesma barra)
-    darXpAoCla(xp);
+    // a guilda ganha PONTOS pela ação (não o XP): 1 por selvagem, 1 por Pokémon do time do treinador vencido
+    darXpAoCla(treinador ? treinador.equipe.length * XP_CLA_POR_POKEMON_DE_TREINADOR : XP_CLA_POR_SELVAGEM);
     await dizer(`Você ganhou ${xp} XP de treinador!`);
     const depois = nivelTreinador(save.xpTreinador);
     if (depois > antes) await dizer(`Seu nível de treinador subiu para ${depois}!${nivelMaximoEncontro(depois) > nivelMaximoEncontro(antes) ? ' Os Pokémon selvagens ficaram mais fortes.' : ''}`);
@@ -907,8 +912,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         }
         // bônus de XP da administração (1x a 3x)
         // Lucky Egg: +50% para quem segura
-        const exp = Math.round(xpPelosDerrotados(p.nivel) * bonusVip(save, 'xpPokemon') * bonificacao().xp * multSkins(save, 'xp') * multXpDoItem(p));
-        const r = ganharExperiencia(p, exp, nomeDe, crescimentoDe);
+        const exp = Math.round(xpPelosDerrotados(p.nivel) * bonusVip(save, 'xpPokemon') * bonificacao().xp * multSkins(save, 'xp') * multTitulo(save) * (1 + bonusDaMinhaGuilda().xp) * multXpDoItem(p));
+        const r = ganharExperiencia(p, exp, nomeDe, crescimentoDe, tetoDoJogador(save));
         await mostrarProgresso(pos, r);
         if (r.evolucao) evolucoes.push({ pos, para: r.evolucao.para });
       }
@@ -948,9 +953,9 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       if (treinador && treinador.recompensa > 0) {
         // Amulet Coin / Luck Incense: +20% se quem segura entrou em campo
         const amuleto = multSilverDoTime([...batalha.participantes].map((pos) => save.time[pos]));
-        const silver = Math.round(treinador.recompensa * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver') * multConquistas(save, 'silver') * amuleto);
+        const silver = Math.round(treinador.recompensa * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver') * multConquistas(save, 'silver') * multTitulo(save) * (1 + bonusDaMinhaGuilda().silver) * amuleto);
         save.silver += silver;
-        await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${MOEDA}!`);
+        await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${nomeDaMoeda('silver', silver)}!`);
       }
       await darXpTime();
       // missões diárias do passe: derrotar conta só selvagens; vitória em Duelos com treinadores conta duelo
@@ -970,14 +975,24 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       if (selvagem.shiny || rara) avisarCapturaRara(selvagem.especieId, selvagem.shiny, rara);
       await avisarMissoes(contarNasMissoes(save, 'capturar', selvagem.especieId));
       if (selvagem.shiny) await avisarMissoes(contarNasMissoes(save, 'shiny'));
-      if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(selvagem);
+      // acima do limite de nível do treinador (um lendário nível 50, por exemplo): vai para o PC até poder ser usado
+      const usavel = podeUsar(save, selvagem);
+      if (usavel && save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(selvagem);
       else {
         const box = guardarNoPC(save, selvagem);
-        await dizer(`${dadosSelvagem.nome} foi enviado para o PC (Box ${box + 1}).`);
+        await dizer(`${dadosSelvagem.nome} foi enviado para o PC (Box ${box + 1}).${usavel ? '' : ` ${textoDoLimite(selvagem)}.`}`);
       }
     }
     // conquista: derrotou um lendário selvagem ou fugiu dele
     if (!treinador && (resultado === 'vitoria' || resultado === 'fuga') && ehLendario(dadosSelvagem)) marcarConquista(save, 'lendarioEscapou');
+    // selvagem derrotado ou capturado: 10% de deixar a Energy do tipo principal dele (material de craft)
+    if (!treinador && (resultado === 'vitoria' || resultado === 'captura')) {
+      const energia = sortearEnergia(dadosSelvagem.tipos);
+      if (energia) {
+        save.itens[energia] = (save.itens[energia] ?? 0) + 1;
+        await dizer(`${dadosSelvagem.nome} deixou uma ${nomeEnergia(dadosSelvagem.tipos[0])}! (está na Bolsa)`);
+      }
+    }
     // chance baixa de achar um ticket ao vencer ou capturar
     if (resultado === 'vitoria' || resultado === 'captura') {
       const ticket = sortearTicketDaBatalha();

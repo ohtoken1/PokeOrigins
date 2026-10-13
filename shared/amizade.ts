@@ -3,6 +3,7 @@
 // (Golbat → Crobat, Eevee → Espeon/Umbreon…) evolui ao subir de nível.
 import { Dex } from '@pkmn/sim';
 import { idDaEvolucao } from './formasRegionais';
+import { CONDICAO_SYLVEON } from './evolucoesEspeciais';
 import { AMIZADE_INICIAL, especie, type PokemonIndividual } from './batalha/pokemon';
 
 export { AMIZADE_INICIAL };
@@ -26,6 +27,21 @@ export function textoAmizade(valor: number): string {
   if (valor >= 100) return 'Gosta de você';
   if (valor >= 50) return 'Está se acostumando com você';
   return 'Ainda desconfiado';
+}
+
+/**
+ * Evolução por saber um golpe ao subir de nível, como nos jogos (Lickitung com Rollout → Lickilicky, Aipom com
+ * Double Hit → Ambipom…). Sylveon: Eevee com um golpe Fairy e amizade alta.
+ */
+export function evolucaoPorGolpe(p: PokemonIndividual): number | null {
+  for (const nome of especie(p.especieId).evos ?? []) {
+    const evo = Dex.species.get(nome);
+    const id = idDaEvolucao(p.especieId, evo);
+    if (id === null || id <= 0) continue;
+    if (evo.evoType === 'levelMove' && evo.evoMove && p.golpes.some((g) => g.id === Dex.moves.get(evo.evoMove!).id)) return id;
+    if (evo.evoCondition === CONDICAO_SYLVEON && amizadeDe(p) >= AMIZADE_PARA_EVOLUIR && p.golpes.some((g) => Dex.moves.get(g.id).type === 'Fairy')) return id;
+  }
+  return null;
 }
 
 /** Evolução por amizade ao subir de nível (respeita "de dia"/"à noite" pelo relógio do computador). */

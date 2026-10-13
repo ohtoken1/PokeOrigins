@@ -20,7 +20,7 @@ export const VALORES_BONUS = [1, 1.5, 2, 2.5, 3];
 export const BONIFICACAO_PADRAO: Bonificacao = { silver: 1, xp: 1, shiny: 1, lendario: 1 };
 
 export const NOMES_BONUS: Record<ChaveBonus, { nome: string; descricao: string }> = {
-  silver: { nome: 'Silver', descricao: 'Silver ganho ao vencer batalhas.' },
+  silver: { nome: 'Poké Dólar', descricao: 'Poké Dólares ganhos ao vencer batalhas.' },
   xp: { nome: 'XP', descricao: 'Experiência dos Pokémon e do treinador.' },
   shiny: { nome: 'Aparição de shiny', descricao: 'Chance de um selvagem ser shiny.' },
   lendario: { nome: 'Aparição de lendário', descricao: 'Chance de lendários, míticos e Ultra Beasts nos encontros.' },

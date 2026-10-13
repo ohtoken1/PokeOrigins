@@ -93,15 +93,20 @@ export async function animarBola(arena: HTMLElement, alvo: HTMLElement, tremidas
     bola.className = 'pokebola';
     img.remove();
   });
-  arena.append(bola);
   const pos = (p: { x: number; y: number }, extra = '') => ({ transform: `translate(${p.x}px,${p.y}px) translate(-50%,-50%) ${extra}` });
+  // a bola SEMPRE tem uma posição própria: sem isso, entre uma animação e outra ela pulava para o canto de cima
+  // à esquerda da arena (era o que acontecia enquanto o Pokémon encolhia para entrar nela)
+  Object.assign(bola.style, pos(de));
+  arena.append(bola);
 
   await esperarAnimacao(
     bola.animate([pos(de, 'rotate(0)'), pos({ x: (de.x + para.x) / 2, y: Math.max(30, para.y - 45) }, 'rotate(360deg)'), pos(para, 'rotate(720deg)')], {
       duration: 900,
       easing: 'ease-out',
+      fill: 'forwards',
     }),
   );
+  Object.assign(bola.style, pos(para));
   await esperarAnimacao(alvo.animate([{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(0)', filter: 'brightness(4)' }], { duration: 400, fill: 'forwards' }));
   await esperarAnimacao(bola.animate([pos(para), pos(chao)], { duration: 420, easing: 'ease-in', fill: 'forwards' }));
   // fixa a posição no chão (sem depender da animação continuar valendo)
@@ -198,19 +203,51 @@ export async function animarFimDynamax(lugar: HTMLElement, sprite: HTMLImageElem
 
 /**
  * Evolução fora da batalha (pedra, Linking Cord…): janela por cima de tudo com o Pokémon piscando entre a forma
- * antiga e a nova, como na evolução por nível. Resolve quando o jogador fecha.
+ * antiga e a nova, como na evolução por nível. Resolve quando o jogador fecha. `opcoes.inicio`/`fim` trocam as
+ * frases (mudança de forma); `opcoes.parceiro` = fusão: os dois aparecem lado a lado, vão e voltam cada vez mais
+ * perto, viram luz e se juntam no meio, e daí segue a evolução para a forma nova.
  */
-export function animarEvolucaoNaTela(antes: { nome: string; src: string }, depois: { nome: string; src: string }): Promise<void> {
+export function animarEvolucaoNaTela(
+  antes: { nome: string; src: string },
+  depois: { nome: string; src: string },
+  opcoes: { inicio?: string; fim?: string; parceiro?: { nome: string; src: string } } = {},
+): Promise<void> {
+  const parceiro = opcoes.parceiro;
   const img = el('img', { class: 'sprite evolucao-sprite', src: antes.src, alt: '' }) as HTMLImageElement;
-  const texto = el('p', { class: 'evolucao-texto' }, `O quê? ${antes.nome} está evoluindo!`);
+  const outro = parceiro ? (el('img', { class: 'sprite evolucao-sprite', src: parceiro.src, alt: '' }) as HTMLImageElement) : null;
+  const texto = el('p', { class: 'evolucao-texto' }, opcoes.inicio ?? (parceiro ? `O quê? ${antes.nome} e ${parceiro.nome} estão se juntando!` : `O quê? ${antes.nome} está evoluindo!`));
   const ok = el('button', { class: 'botao', hidden: true }, 'OK');
-  const fundo = el('div', { class: 'evolucao-tela' }, el('div', { class: 'evolucao-caixa' }, el('div', { class: 'evolucao-palco' }, el('div', { class: 'evolucao-luz' }), img), texto, ok));
+  const fundo = el('div', { class: 'evolucao-tela' }, el('div', { class: 'evolucao-caixa' }, el('div', { class: parceiro ? 'evolucao-palco fusao' : 'evolucao-palco' }, el('div', { class: 'evolucao-luz' }), outro, img), texto, ok));
   document.body.append(fundo);
+  // fusão: cada um começa de um lado
+  const LADO = 95;
+  const parado = (x: number) => ({ transform: `translateX(${x}px)`, filter: 'brightness(1)' });
+  if (outro) {
+    img.animate([parado(-LADO), parado(-LADO)], { duration: 1, fill: 'forwards' });
+    outro.animate([parado(LADO), parado(LADO)], { duration: 1, fill: 'forwards' });
+  }
   return new Promise((resolver) => {
     void (async () => {
       await new Promise((r) => setTimeout(r, 700));
+      if (outro) {
+        // aproximam, recuam, aproximam mais… e na última viram luz e se encontram no meio
+        const luz = (x: number) => ({ transform: `translateX(${x}px)`, filter: 'brightness(8) saturate(0)' });
+        const juntar = (sinal: number) => [
+          { ...parado(sinal * LADO), offset: 0 },
+          { ...parado(sinal * 55), offset: 0.18 },
+          { ...parado(sinal * 85), offset: 0.32 },
+          { ...parado(sinal * 35), offset: 0.5 },
+          { ...parado(sinal * 70), offset: 0.64 },
+          { ...luz(sinal * 60), offset: 0.76 },
+          { ...luz(0), offset: 1 },
+        ];
+        const tempo = { duration: 2600, easing: 'ease-in-out', fill: 'forwards' as const };
+        await Promise.all([esperarAnimacao(img.animate(juntar(-1), tempo)), esperarAnimacao(outro.animate(juntar(1), tempo))]);
+        outro.remove();
+        img.getAnimations().forEach((a) => a.cancel());
+      }
       await animarEvolucao(img, depois.src);
-      texto.textContent = `Parabéns! ${antes.nome} evoluiu para ${depois.nome}!`;
+      texto.textContent = opcoes.fim ?? (parceiro ? `${antes.nome} e ${parceiro.nome} se juntaram e viraram ${depois.nome}!` : `Parabéns! ${antes.nome} evoluiu para ${depois.nome}!`);
       ok.hidden = false;
       ok.focus();
     })();

@@ -4,6 +4,7 @@
 // Surf…), depois pelas marcas do golpe (soco, mordida, corte, som, chute) e por fim pela categoria e pelo tipo.
 import { Dex } from '@pkmn/sim';
 import { corTipo, el } from '../ui/dom';
+import { animarComShowdown } from './animShowdown';
 
 const FX = 'https://play.pokemonshowdown.com/fx/';
 
@@ -352,9 +353,16 @@ function roteiro(golpeId: string, categoria: string, tipo: string): (ctx: Contex
 export async function animarGolpeOriginal(arena: HTMLElement, atacante: HTMLElement, alvo: HTMLElement | null, golpeId: string, tipo: string, categoria: string, oposto: HTMLElement | null = null) {
   const ctx: Contexto = { arena, atacante, alvo, oposto, tipo, cor: corTipo(tipo), golpe: golpeId };
   try {
+    // primeiro a animação do próprio Pokémon Showdown (animShowdown.ts); os hazards continuam com a nossa, porque as
+    // peças ficam no chão. Sem alvo: golpe em si mesmo fica no atacante, os outros miram o outro lado.
+    if (!HAZARDS[golpeId]) {
+      const emSi = ['self', 'allySide', 'allyTeam', 'adjacentAllyOrSelf', 'adjacentAlly', 'allies'].includes(Dex.moves.get(golpeId).target);
+      const defensor = alvo ?? (emSi ? atacante : oposto ?? atacante);
+      if (await animarComShowdown(arena, atacante, defensor, golpeId)) return;
+    }
     await roteiro(golpeId, categoria, tipo)(ctx);
   } finally {
     // nada de efeito sobrando na arena se algo falhar no meio
-    arena.querySelectorAll('.fx-golpe, .fx-tela').forEach((e) => e.remove());
+    arena.querySelectorAll('.fx-golpe, .fx-tela, .fx-fundo-golpe').forEach((e) => e.remove());
   }
 }

@@ -3,6 +3,7 @@
 import { buscarConta, cadastrar, entrar, ErroApi, type Conta } from '../conta';
 import { arquivarSaveAntigo, iniciarSaveDaConta, salvar, saveAntigoDoNavegador, type Save } from '../estado';
 import { el } from '../ui/dom';
+import { seletorDeIdioma } from '../idioma';
 
 /** Resolve quando há uma conta logada e o save dela já está em memória. */
 export async function garantirConta(raiz: HTMLElement): Promise<Conta> {
@@ -32,6 +33,7 @@ function aguardarServidor(raiz: HTMLElement): Promise<void> {
     el('div', { class: 'tela-entrada' },
       el('div', { class: 'cartao-entrada' },
         el('h1', { class: 'logo-entrada' }, el('img', { src: '/logo/origens-antigas.svg', alt: 'PokeOrigins' })),
+        seletorDeIdioma(),
         el('p', { class: 'entrada-texto' }, 'Não foi possível falar com o servidor. Tentando de novo…'),
       ),
     ),
@@ -114,6 +116,7 @@ function formularioEntrada(raiz: HTMLElement): Promise<void> {
       el('div', { class: 'tela-entrada' },
         el('div', { class: 'cartao-entrada' },
           el('h1', { class: 'logo-entrada' }, el('img', { src: '/logo/origens-antigas.svg', alt: 'PokeOrigins' })),
+          seletorDeIdioma(),
           el('p', { class: 'entrada-texto' }, 'Entre na sua conta para jogar.'),
           formulario,
         ),
@@ -145,6 +148,7 @@ function oferecerSaveAntigo(raiz: HTMLElement): Promise<void> {
       el('div', { class: 'tela-entrada' },
         el('div', { class: 'cartao-entrada' },
           el('h1', { class: 'logo-entrada' }, el('img', { src: '/logo/origens-antigas.svg', alt: 'PokeOrigins' })),
+          seletorDeIdioma(),
           el('h2', { class: 'entrada-titulo' }, 'Progresso encontrado'),
           el('p', { class: 'entrada-texto' },
             `Este navegador tem um progresso de antes das contas (${nome ? `treinador ${nome}, ` : ''}${pokemons} Pokémon). Quer levá-lo para esta conta?`),

@@ -1,0 +1,210 @@
+0	La Ability del portador no puede ser cambiada, anulada ni ignorada por ningún efecto.
+1	Sube 1 nivel el Sp. Atk del portador si recibe un ataque de tipo <T>. Un solo uso.
+2	Si lo lleva Dialga, sus ataques de tipo Steel y <T> tienen 1.2x de potencia.
+3	Sube 1 nivel la Speed del portador si le afecta Intimidate. Un solo uso.
+4	Recupera 1/3 del HP máximo con 1/4 o menos; confunde si la Nature baja Sp. Def. Un solo uso.
+5	El portador es inmune a los ataques de tipo <T>. Revienta cuando el portador recibe un golpe.
+6	Sube 1 nivel la Sp. Def del portador con 1/4 del HP máximo o menos. Un solo uso.
+7	Cura al portador si está congelado. Un solo uso.
+8	La Sp. Def del portador es 1.5x, pero solo puede elegir movimientos que hagan daño.
+9	Hace evolucionar a Charcadet a Armarouge al usarlo.
+10	Reduce a la mitad el daño de un ataque supereficaz de tipo <T>. Un solo uso.
+11	Hace evolucionar a Milcery a Alcremie si lo lleva y gira.
+12	Una gran pepita de oro puro con un brillo lustroso.
+13	El portador gana 1.3x de HP con drenaje/Aqua Ring/Ingrain/Leech Seed/Strength Sap.
+14	Los movimientos de atrapar del portador quitan 1/6 del HP máximo por turno en vez de 1/8.
+15	Los ataques de tipo <T> del portador tienen 1.2x de potencia.
+16	Cada turno, si el portador es de tipo <T>, recupera 1/16 del HP máximo; si no, pierde 1/8.
+17	Si el portador falla por precisión, su Speed sube 2 niveles. Un solo uso.
+18	Activa las Abilities Protosynthesis o Quark Drive. Un solo uso.
+19	Se usa en el Hyper Training. Uno de los atributos del Pokémon se calcula con IV 31.
+20	La precisión de los ataques contra el portador es 0.9x.
+21	Sube 1 nivel el Attack del portador si recibe un ataque de tipo <T>. Un solo uso.
+22	El portador se cura si está paralizado. Un solo uso.
+23	El portador se despierta si está dormido. Un solo uso.
+24	Reduce a la mitad el daño de un ataque de tipo <T>. Un solo uso.
+25	Hace evolucionar a Sinistea-Antique a Polteageist-Antique al usarlo.
+26	El Attack del portador es 1.5x, pero solo puede elegir el primer movimiento que ejecute.
+27	La Speed del portador es 1.5x, pero solo puede elegir el primer movimiento que ejecute.
+28	El Sp. Atk del portador es 1.5x, pero solo puede elegir el primer movimiento que ejecute.
+29	Impide que otros Pokémon bajen los atributos del portador.
+30	Ogerpon-Cornerstone: ataques con 1.2x de potencia; al terastalizar gana Embody Aspect.
+31	Al portador no le afecta el efecto secundario del ataque de otro Pokémon.
+32	Hace evolucionar a Sinistea a Polteageist al usarlo.
+33	El portador actúa primero en su nivel de prioridad con 1/4 del HP máximo o menos. Un solo uso.
+34	El Rain Dance del portador dura 8 turnos en vez de 5.
+35	Hace evolucionar a ciertas especies de Pokémon al usarlo.
+36	Si el portador queda enamorado, el otro Pokémon también queda enamorado.
+37	Los ataques de tipo <T> del portador tienen 1.2x de potencia. Judgment es de tipo <T>.
+38	Hace evolucionar a Seadra a Kingdra al intercambiarlo.
+39	Hace evolucionar a Porygon2 a Porygon-Z al intercambiarlo.
+40	Si el portador sobrevive a un golpe, cambia de inmediato por un aliado elegido. Un solo uso.
+41	Si bajan los atributos del portador, cambia por un aliado elegido. Un solo uso.
+42	Hace evolucionar a Electabuzz a Electivire al intercambiarlo.
+43	Si el terreno es Electric Terrain, sube 1 nivel la Defense del portador. Un solo uso.
+44	Recupera 1/4 del HP máximo después de recibir un movimiento supereficaz. Un solo uso.
+45	Si la especie del portador puede evolucionar, su Defense y Sp. Def son 1.5x.
+46	Los ataques supereficaces del portador hacen 1.2x de daño.
+47	Recupera 1/3 del HP máximo con 1/4 o menos; confunde si la Nature baja Attack. Un solo uso.
+48	Al final de cada turno, este objeto intenta quemar al portador.
+49	El peso del portador se reduce a la mitad.
+50	El portador tiene un 10% de probabilidad de sobrevivir con 1 HP a un ataque que lo debilitaría.
+51	Si el HP del portador está al máximo, sobrevive con 1 HP a un ataque que lo debilitaría. Un solo uso.
+52	Hace evolucionar a Galarian Slowpoke a Galarian Slowbro al usarlo.
+53	Hace evolucionar a Galarian Slowpoke a Galarian Slowking al usarlo.
+54	Sube 1 nivel la Defense del portador con 1/4 del HP máximo o menos. Un solo uso.
+55	Se usa en el Hyper Training. Todos los atributos del Pokémon se calculan con IV 31.
+56	Si el terreno es Grassy Terrain, sube 1 nivel la Defense del portador. Un solo uso.
+57	El portador no puede comerla. Sin efecto al comerla con Bug Bite o Pluck.
+58	Los movimientos de atrapar del portador siempre duran 7 turnos.
+59	Si lo lleva Giratina, sus ataques de tipo Ghost y <T> tienen 1.2x de potencia.
+60	Ogerpon-Hearthflame: ataques con 1.2x de potencia; al terastalizar gana Embody Aspect.
+61	El Sunny Day del portador dura 8 turnos en vez de 5.
+62	Al entrar, al portador no le afectan las trampas de su lado del campo.
+63	Recupera 1/3 del HP máximo con 1/4 o menos; confunde si la Nature baja Defense. Un solo uso.
+64	El Snowscape del portador dura 8 turnos en vez de 5.
+65	El portador queda en el suelo, con la Speed a la mitad. Si es de tipo <T>, recibe daño neutro de Ground.
+66	Si el portador recibe un movimiento físico, el atacante pierde 1/8 de su HP máximo. Un solo uso.
+67	Sube 1 nivel la Defense del portador después de recibir un ataque físico. Un solo uso.
+68	Los ataques del portador que no hacen retroceder ganan un 10% de probabilidad de hacerlo.
+69	El portador actúa último en su nivel de prioridad.
+70	El portador gana el efecto de Focus Energy con 1/4 del HP máximo o menos. Un solo uso.
+71	Al final de cada turno, el portador recupera 1/16 de su HP máximo.
+72	Recupera 10 PP del primer movimiento del portador que llegue a 0 PP. Un solo uso.
+73	Sube 1 nivel el Attack del portador con 1/4 del HP máximo o menos. Un solo uso.
+74	Los ataques del portador hacen 1.3x de daño, y pierde 1/10 de su HP máximo después de atacar.
+75	Si lo lleva Pikachu, su Attack y su Sp. Atk se duplican.
+76	Aurora Veil, Light Screen o Reflect del portador duran 8 turnos en vez de 5.
+77	Los movimientos del portador que golpean 2-5 veces golpean 4-5; Population Bomb golpea 4-10 veces.
+78	El portador se cura si tiene un problema de estado o está confuso. Un solo uso.
+79	Sube 1 nivel la Sp. Def del portador si recibe un ataque de tipo <T>. Un solo uso.
+80	Si lo lleva Palkia, sus ataques de tipo Water y <T> tienen 1.2x de potencia.
+81	Hace evolucionar a Magmar a Magmortar al intercambiarlo.
+82	Recupera 1/3 del HP máximo con 1/4 o menos; confunde si la Nature baja Speed. Un solo uso.
+83	Hace evolucionar a Charcadet a Ceruledge al usarlo.
+84	Sube 1 nivel la Sp. Def del portador después de recibir un ataque especial. Un solo uso.
+85	Hace evolucionar a Poltchageist-Artisan a Sinistcha-Masterpiece al usarlo.
+86	Cura al portador de Attract, Disable, Encore, Heal Block, Taunt y Torment. Un solo uso.
+87	Hace evolucionar a Duraludon a Archaludon al usarlo.
+88	Aumenta el daño de los movimientos usados en turnos seguidos. Máximo 2x tras 5 turnos.
+89	El siguiente movimiento del portador tiene 1.2x de precisión con 1/4 del HP máximo o menos. Un solo uso.
+90	Cuando un Pokémon rival sube un atributo, el portador lo copia. Un solo uso.
+91	Si el terreno es Misty Terrain, sube 1 nivel la Sp. Def del portador. Un solo uso.
+92	Los ataques físicos del portador tienen 1.1x de potencia.
+93	El primer ataque de tipo <T> del portador que acierte tendrá 1.3x de potencia. Un solo uso.
+94	Recupera 10 HP con 1/2 del HP máximo o menos. Un solo uso.
+95	Hace evolucionar a Happiny a Chansey si lo lleva y sube de nivel de día.
+96	Cura al portador si está envenenado. Un solo uso.
+97	Cura al portador si está confuso. Un solo uso.
+98	Sube 1 nivel el Sp. Atk del portador con 1/4 del HP máximo o menos. Un solo uso.
+99	La Speed del portador se reduce a la mitad. La Ability Klutz no ignora este efecto.
+100	Los movimientos de dos turnos del portador se completan en uno (salvo Sky Drop). Un solo uso.
+101	Aunque esta pluma es hermosa, es una pluma común y no tiene efecto.
+102	Hace evolucionar a Feebas a Milotic al intercambiarlo.
+103	Los movimientos del portador están protegidos de los efectos adversos del contacto, salvo Pickpocket.
+104	Hace evolucionar a Rhydon a Rhyperior al intercambiarlo.
+105	Si el terreno es Psychic Terrain, sube 1 nivel la Sp. Def del portador. Un solo uso.
+106	Los ataques de puño del portador tienen 1.1x de potencia y no hacen contacto.
+107	Cada turno, el portador tiene un 20% de probabilidad de actuar primero en su nivel de prioridad.
+108	Sin uso competitivo, salvo con Fling.
+109	Cura al portador si está quemado. Un solo uso.
+110	El índice de golpe crítico del portador sube 1 nivel.
+111	Hace evolucionar a Dusclops a Dusknoir al intercambiarlo.
+112	Si el portador sobrevive a un golpe, el atacante es obligado a cambiar por un aliado al azar. Un solo uso.
+113	Se anulan las inmunidades de tipo que el portador tiene solo por sus tipos.
+114	Si el portador recibe un movimiento de contacto, el atacante pierde 1/6 de su HP máximo.
+115	Si Trick Room está activo, la Speed del portador baja 1 nivel. Un solo uso.
+116	Si el portador recibe un movimiento especial, el atacante pierde 1/8 de su HP máximo. Un solo uso.
+117	Si lo lleva Zamazenta, este objeto cambia su forma a Crowned Shield.
+118	Si lo lleva Zacian, este objeto cambia su forma a Crowned Sword.
+119	El portador es inmune a los movimientos de polvo y al daño de Sandstorm o Hail.
+120	Sube 1 nivel la Speed del portador con 1/4 del HP máximo o menos. Un solo uso.
+121	Ningún efecto puede impedir que el portador elija cambiar.
+122	Después de atacar, el portador recupera en HP 1/8 del daño hecho a otros Pokémon.
+123	Recupera 1/4 del HP máximo con 1/2 o menos. Un solo uso.
+124	El Sandstorm del portador dura 8 turnos en vez de 5.
+125	Si lo lleva Latias/Latios, sus movimientos de tipo Dragon y <T> tienen 1.2x de potencia.
+126	Sube 2 niveles un atributo al azar con 1/4 del HP máximo o menos (no precisión/evasión). Un solo uso.
+127	Cada turno, el portador pierde 1/8 del HP máximo. Un atacante que haga contacto puede recibirlo.
+128	Hace evolucionar a Applin a Appletun al usarlo.
+129	Hace evolucionar a Applin a Dipplin al usarlo.
+130	Hace evolucionar a Applin a Flapple al usarlo.
+131	<T>/Grassy/Misty/Psychic Terrain del portador dura 8 turnos en vez de 5.
+132	Sube 1 nivel el Sp. Atk del portador después de usar un movimiento de sonido. Un solo uso.
+133	Al final de cada turno, este objeto intenta envenenar gravemente al portador.
+134	Hace evolucionar a Poltchageist a Sinistcha al usarlo.
+135	Hace evolucionar a Porygon a Porygon2 al intercambiarlo.
+136	El portador ignora los efectos de la lluvia y del sol.
+137	Si el portador recibe un golpe supereficaz, sube 2 niveles Attack y Sp. Atk. Un solo uso.
+138	Ogerpon-Wellspring: ataques con 1.2x de potencia; al terastalizar gana Embody Aspect.
+139	Devuelve a 0 todos los atributos bajados cuando alguno es menor que 0. Un solo uso.
+140	La precisión de los ataques del portador es 1.1x.
+141	Recupera 1/3 del HP máximo con 1/4 o menos; confunde si la Nature baja Sp. Atk. Un solo uso.
+142	Los ataques especiales del portador tienen 1.1x de potencia.
+143	La precisión de los ataques del portador es 1.2x si actúa después de su objetivo.
+144	Índice de golpe crítico muy alto.
+145	El usuario recupera el 50% del daño causado.
+146	Suele atacar primero.
+147	10% de probabilidad de bajar 1 nivel la Sp. Def del rival o rivales.
+148	Sube 2 niveles la Defense del usuario.
+149	La potencia es igual al Z-Power del movimiento base.
+150	100% de probabilidad de bajar 2 niveles la Sp. Def del objetivo.
+151	La potencia se duplica si el usuario no lleva objeto.
+152	Sube 2 niveles un atributo al azar del usuario o de un aliado.
+153	Este movimiento no comprueba la precisión.
+154	Índice de golpe crítico alto.
+155	El objetivo ataca justo después del usuario.
+156	Sube 2 niveles la Speed del usuario.
+157	Índice de golpe crítico alto. Golpea a los rivales adyacentes.
+158	30% de probabilidad de hacer retroceder al objetivo.
+159	Confunde al 100% al objetivo que subió un atributo este turno.
+160	El usuario y el aliado cambian de posición; usarlo de nuevo puede fallar.
+161	Sube 2 niveles la Sp. Def del usuario.
+162	Impide que el objetivo cambie.
+163	10% de probabilidad de subir 1 nivel todos los atributos (no precisión/evasión).
+164	100% de probabilidad de bajar 1 nivel la Sp. Def del objetivo.
+165	El usuario recupera 1/16 del HP máximo por turno.
+166	100% de probabilidad de subir 1 nivel la Speed del usuario.
+167	Sin efecto adicional.
+168	Baja 1 nivel la Defense y la Sp. Def del usuario.
+169	Golpea 2-5 veces en un turno.
+170	Cura todos los problemas de estado del equipo del usuario.
+171	Sube 1 nivel la Sp. Def de un aliado.
+172	Usa un movimiento al azar que conozca un miembro del equipo.
+173	La potencia se duplica si el objetivo recibió daño este turno.
+174	Sin efecto adicional. Golpea a los rivales adyacentes.
+175	Un objetivo del género opuesto queda enamorado.
+176	Morpeko: Electric; Hangry: Dark; 100% +1 Speed.
+177	10% de probabilidad de bajar 1 nivel el Attack del objetivo.
+178	Durante 5 turnos, el daño a los aliados se reduce a la mitad. Solo con nieve.
+179	Sube 2 niveles la Speed del usuario; el usuario pierde 100 kg.
+180	La potencia se duplica si el objetivo dañó al usuario.
+181	30% de confusión. El usuario pierde el 50% del HP máximo si falla.
+182	Baja 1 nivel el Attack del objetivo.
+183	Protege de los movimientos. Contacto: envenena.
+184	50% de envenenar. 2x de potencia si el objetivo ya está envenenado.
+185	El usuario cambia y pasa los cambios de atributos y más.
+186	Quema a quien haga contacto con el usuario antes de que actúe.
+187	Todos los aliados sanos ayudan a dañar al objetivo.
+188	No se puede elegir hasta que el usuario coma una Berry.
+189	El usuario pierde el 50% del HP máximo. Sube el Attack al máximo.
+190	El usuario pasa el objeto que lleva al objetivo.
+191	Espera 2 turnos; hace el doble del daño recibido.
+192	Atrapa y daña al objetivo durante 4-5 turnos.
+193	100% de probabilidad de bajar 1 nivel el Attack del objetivo.
+194	El usuario no puede actuar el turno siguiente.
+195	Índice de golpe crítico alto. 10% de probabilidad de quemar.
+196	30% de bajar 1 nivel la Speed del rival o rivales. Con lluvia no falla.
+197	10% de probabilidad de congelar al rival o rivales. No falla con nieve.
+198	No se puede elegir el turno después de usarlo.
+199	20% de probabilidad de quemar al objetivo.
+200	Usa la Defense del usuario como Attack en el cálculo del daño.
+201	30% de probabilidad de paralizar al objetivo.
+202	La potencia se duplica si el usuario actúa antes que el objetivo.
+203	20% de probabilidad de paralizar al objetivo.
+204	10% de probabilidad de hacer retroceder al objetivo.
+205	Golpea 2 veces en un turno.
+206	Sin efecto adicional. Golpea a los Pokémon adyacentes.
+207	Salta en el turno 1. Golpea en el turno 2. 30% de paralizar.
+208	Tiene un 33% de daño de retroceso.
+209	100% de probabilidad de bajar 1 nivel el Attack del rival o rivales.

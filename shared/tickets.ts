@@ -4,6 +4,7 @@
 import { Dex } from '@pkmn/sim';
 import { ITENS } from './itens';
 import { TIPOS_TERA } from './tera';
+import { CORES_DOS_APRICORNS, TIPOS_DAS_ENERGIAS, idApricorn, idEnergia } from './materiais';
 import { cubosDaEra, idSkin } from './itensCustom';
 
 export type Raridade = 'comum' | 'raro' | 'epico' | 'passado' | 'futuro' | 'lendario' | 'mitico';
@@ -24,7 +25,7 @@ export const RARIDADES: { id: Raridade; nome: string }[] = [
 export const CHANCE_TICKET_POR_BATALHA = 1 / 1000;
 
 /** Grupos de "item aleatório": sorteia um item do grupo na hora de abrir (todos com a mesma chance). */
-export type GrupoAleatorio = 'terashard' | 'bola' | 'placa';
+export type GrupoAleatorio = 'terashard' | 'bola' | 'placa' | 'fruta' | 'apricorn' | 'energia';
 
 /** Um prêmio: item (id da bolsa), item aleatório de um grupo, silver, gold, dias de VIP ou Pokémon. */
 export type Premio =
@@ -57,12 +58,19 @@ export interface Ticket {
 // ---------- prêmios que se repetem (planilha) ----------
 const linha = (raridade: Raridade, chance: number, ...pacote: Premio[]): LinhaPremio => ({ raridade, chance, pacote });
 /** Nível dos lendários dos tickets (o mesmo mínimo dos lendários selvagens). */
-const NIVEL_POKEMON_TICKET = 50;
+/** Nível 1 (pedido do dono): com o limite de nível pelo treinador, qualquer jogador pode usar o que tirou. */
+const NIVEL_POKEMON_TICKET = 1;
 const CHANCE_SHINY_TICKET = 0.05;
 const pokemon = (especie: number, ivMinimo = 15): Premio => ({ tipo: 'pokemon', especie, nivel: NIVEL_POKEMON_TICKET, chanceShiny: CHANCE_SHINY_TICKET, ivMinimo });
 const item = (id: string, quantidade = 1): Premio => ({ tipo: 'item', id, quantidade });
 
-const COMUM: LinhaPremio[] = [linha('comum', 0.7, { tipo: 'aleatorio', grupo: 'terashard', quantidade: 4 })];
+/** Comum (70% no total, dividido por igual entre os quatro; pedido do dono, no lugar das Tera Shards). */
+const COMUM: LinhaPremio[] = [
+  linha('comum', 0.175, { tipo: 'aleatorio', grupo: 'bola', quantidade: 25 }),
+  linha('comum', 0.175, { tipo: 'aleatorio', grupo: 'fruta', quantidade: 20 }),
+  linha('comum', 0.175, { tipo: 'aleatorio', grupo: 'apricorn', quantidade: 20 }),
+  linha('comum', 0.175, { tipo: 'aleatorio', grupo: 'energia', quantidade: 20 }),
+];
 const RARO: LinhaPremio[] = [
   linha('raro', 0.06, { tipo: 'gold', quantidade: 20 }),
   linha('raro', 0.06, { tipo: 'vip', dias: 1 }),
@@ -150,7 +158,10 @@ export function chancesDasRaridades(ticket: Ticket): { id: Raridade; nome: strin
 /** Itens de cada grupo aleatório. */
 export function itensDoGrupo(grupo: GrupoAleatorio): string[] {
   if (grupo === 'terashard') return TIPOS_TERA.map((t) => `terashard-${t.toLowerCase()}`);
-  if (grupo === 'bola') return Object.keys(ITENS).filter((id) => ITENS[id as keyof typeof ITENS].categoria === 'bola' && id !== 'masterball');
+  if (grupo === 'fruta') return Dex.items.all().filter((i) => i.isBerry && !i.isNonstandard).map((i) => i.id);
+  if (grupo === 'apricorn') return CORES_DOS_APRICORNS.map(idApricorn);
+  if (grupo === 'energia') return TIPOS_DAS_ENERGIAS.map(idEnergia);
+  if (grupo === 'bola') return Object.keys(ITENS).filter((id) => ITENS[id as keyof typeof ITENS].categoria === 'bola' && id !== 'masterball' && !id.endsWith('-nt'));
   return Dex.items.all().filter((i) => i.onPlate && !i.zMove).map((i) => i.id);
 }
 

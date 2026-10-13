@@ -4,9 +4,10 @@ import type { AjustesEncontro } from '../../shared/encontros';
 import { bonusVip, vipAtivo } from '../../shared/vip';
 import { bonusAtivoDaSkin } from '../../shared/skins';
 import { MULT_CHARM, charmsAtivos, multShinyDosCharms, nomeCharm } from '../../shared/charms';
-import { bonusDasConquistas } from '../../shared/conquistas';
+import { bonusDasConquistas, multTitulo } from '../../shared/conquistas';
 import { carregarSave } from './estado';
 import { conta } from './conta';
+import { bonusDaMinhaGuilda } from './cla';
 
 const CHAVE = 'jogo-claude:bonificacao';
 
@@ -34,7 +35,7 @@ export type AlvoChance = 'shiny' | 'lendario' | 'inicial';
 /** Uma fonte de bônus nas chances de encontro (aparece como selo na Pokédex). */
 export interface FonteBonus {
   /** classe do selo: bonificacao, vip, skin… */
-  id: 'bonificacao' | 'vip' | 'skin' | 'charm' | 'conquistas';
+  id: 'bonificacao' | 'vip' | 'skin' | 'charm' | 'conquistas' | 'guilda' | 'titulo';
   nome: string;
   alvo: AlvoChance;
   /** multiplicador (1,2 = +20%) */
@@ -69,6 +70,13 @@ export function fontesDeBonus(tipos?: string[]): FonteBonus[] {
     const mult = 1 + bonusDasConquistas(save).raros;
     for (const alvo of ['shiny', 'lendario', 'inicial'] as const) fontes.push({ id: 'conquistas', nome: 'Conquistas', alvo, mult });
   }
+  // título em uso: o mesmo bônus em tudo
+  if (save) for (const alvo of ['shiny', 'lendario', 'inicial'] as const) fontes.push({ id: 'titulo', nome: 'Título', alvo, mult: multTitulo(save) });
+  // nível da guilda: vale para todos os membros
+  const guilda = bonusDaMinhaGuilda();
+  fontes.push({ id: 'guilda', nome: 'Guilda', alvo: 'shiny', mult: 1 + guilda.shiny });
+  fontes.push({ id: 'guilda', nome: 'Guilda', alvo: 'lendario', mult: 1 + guilda.raros });
+  fontes.push({ id: 'guilda', nome: 'Guilda', alvo: 'inicial', mult: 1 + guilda.raros });
   // charm do tipo deste Pokémon (30 minutos); com dois tipos e dois charms, vale um só
   const charm = save && tipos ? charmsAtivos(save).find((t) => tipos.includes(t)) : undefined;
   if (charm) fontes.push({ id: 'charm', nome: nomeCharm(charm), alvo: 'shiny', mult: MULT_CHARM });
@@ -78,6 +86,9 @@ export function fontesDeBonus(tipos?: string[]): FonteBonus[] {
 /** Multiplicador total de um alvo (produto das fontes). */
 export const multiplicadorDe = (alvo: AlvoChance, fontes = fontesDeBonus()) => fontes.filter((f) => f.alvo === alvo).reduce((m, f) => m * f.mult, 1);
 
+/** Soma dos bônus de shiny do jogador (0,59 = +59%), sem a Bonificação da staff e sem o charm. */
+export const somaDoShiny = (fontes = fontesDeBonus()) => fontes.filter((f) => f.alvo === 'shiny' && f.id !== 'bonificacao' && f.id !== 'charm').reduce((s, f) => s + (f.mult - 1), 0);
+
 /** "+20%", "+100%", "−50%". */
 export const textoMult = (mult: number) => `${mult >= 1 ? '+' : '−'}${Math.round(Math.abs(mult - 1) * 100)}%`;
 
@@ -85,10 +96,15 @@ export const textoMult = (mult: number) => `${mult >= 1 ? '+' : '−'}${Math.rou
 export function comBonificacao(a: AjustesEncontro): AjustesEncontro {
   const fontes = fontesDeBonus();
   const save = carregarSave();
+  // SHINY (regra do dono): os bônus do jogador SOMAM entre si (VIP 20% + skin 10% + … = 59%, não 73%); o charm do
+  // tipo entra na mesma soma (por isso o multiplicador por tipo é "quanto falta" para chegar em soma + charm);
+  // só a Bonificação da staff multiplica por cima. Lendários, iniciais, silver e XP continuam multiplicando.
+  const daStaff = fontes.filter((f) => f.id === 'bonificacao');
+  const somaShiny = somaDoShiny(fontes);
   return {
     ...a,
-    multShinyPorTipo: save ? multShinyDosCharms(save) : {},
-    chanceShiny: Math.min(1, a.chanceShiny * multiplicadorDe('shiny', fontes)),
+    multShinyPorTipo: Object.fromEntries(Object.entries(save ? multShinyDosCharms(save) : {}).map(([tipo, mult]) => [tipo, (1 + somaShiny + (mult - 1)) / (1 + somaShiny)])),
+    chanceShiny: Math.min(1, a.chanceShiny * (1 + somaShiny) * multiplicadorDe('shiny', daStaff)),
     multLendario: a.multLendario * multiplicadorDe('lendario', fontes),
     multInicial: (a.multInicial ?? 1) * multiplicadorDe('inicial', fontes),
   };

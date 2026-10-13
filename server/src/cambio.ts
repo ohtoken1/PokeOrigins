@@ -25,7 +25,7 @@ export function trocar(conta: banco.Conta, dados: Record<string, unknown>) {
   if (operacao !== 'comprar' && operacao !== 'vender') throw new ErroConta('Operação inválida.');
   if (!Number.isSafeInteger(quantidade) || (quantidade as number) < 1) throw new ErroConta('Quantidade inválida.');
   const gold = quantidade as number;
-  if (gold > CAMBIO_MAX_POR_VEZ) throw new ErroConta(`No máximo ${CAMBIO_MAX_POR_VEZ.toLocaleString('pt-BR')} gold por vez.`);
+  if (gold > CAMBIO_MAX_POR_VEZ) throw new ErroConta(`No máximo ${CAMBIO_MAX_POR_VEZ.toLocaleString('pt-BR')} Origin Coins por vez.`);
   if (!banco.lerSave(conta.id)) throw new ErroConta('Comece sua jornada antes de usar o banco.');
   const silver = silverDaOperacao(operacao, gold);
   // sinal de cada moeda para o JOGADOR; o cofre recebe o contrário
@@ -34,13 +34,13 @@ export function trocar(conta: banco.Conta, dados: Record<string, unknown>) {
   banco.mudarSaves([conta.id], ([save]) => {
     const novoSilver = saldo(save.silver) + mudaSilver;
     const novoGold = saldo(save.gold) + mudaGold;
-    if (novoSilver < 0) throw new ErroConta('Você não tem silver suficiente.');
-    if (novoGold < 0) throw new ErroConta('Você não tem gold suficiente.');
+    if (novoSilver < 0) throw new ErroConta('Você não tem Poké Dólares suficientes.');
+    if (novoGold < 0) throw new ErroConta('Você não tem Origin Coins suficientes.');
     const guardado = banco.lerCofre();
     const cofreSilver = guardado.silver - mudaSilver;
     const cofreGold = guardado.gold - mudaGold;
-    if (cofreGold < 0) throw new ErroConta(guardado.gold ? `O banco só tem ${guardado.gold.toLocaleString('pt-BR')} gold agora.` : 'O banco está sem gold agora. Ele só tem o gold que os jogadores venderam para ele.', 409);
-    if (cofreSilver < 0) throw new ErroConta(guardado.silver ? `O banco só tem ${guardado.silver.toLocaleString('pt-BR')} silver agora.` : 'O banco está sem silver agora.', 409);
+    if (cofreGold < 0) throw new ErroConta(guardado.gold ? `O banco só tem ${guardado.gold.toLocaleString('pt-BR')} Origin Coins agora.` : 'O banco está sem Origin Coins agora. Ele só tem os Origin Coins que os jogadores venderam para ele.', 409);
+    if (cofreSilver < 0) throw new ErroConta(guardado.silver ? `O banco só tem ${guardado.silver.toLocaleString('pt-BR')} Poké Dólares agora.` : 'O banco está sem Poké Dólares agora.', 409);
     if (![novoSilver, novoGold, cofreSilver, cofreGold].every(Number.isSafeInteger)) throw new ErroConta('Valor grande demais.');
     save.silver = novoSilver;
     save.gold = novoGold;

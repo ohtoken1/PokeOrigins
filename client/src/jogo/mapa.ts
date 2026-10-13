@@ -58,6 +58,10 @@ export interface NpcMapa {
   aparencia: Aparencia;
   /** o que acontece ao clicar no nome */
   acao?: string;
+  /** sentado num banco: o tile é o do banco, sem sombra e sem as canelas; `dx`/`dy` (px) acertam o lugar no assento */
+  sentado?: boolean;
+  dx?: number;
+  dy?: number;
 }
 
 export interface Mapa {
@@ -146,8 +150,8 @@ export function gerarMapa(semente: string, paleta: Paleta): Mapa {
   // lagos retangulares (a moldura de margem do tileset só encaixa em retângulos), sem encostar
   // em caminhos nem em outros lagos; mínimo 3×3 para caber os cantos e as bordas
   for (let i = 0, tentativas = 0; i < paleta.lagos * ESCALA && tentativas < 200 * ESCALA; tentativas++) {
-    if (paleta.vulcanico || paleta.abismo) {
-      // lava e abismos são desenhados por código: podem ter forma solta (duas manchas juntas)
+    if (paleta.vulcanico || paleta.abismo || paleta.nevado) {
+      // lava, abismos e lagos congelados são desenhados por código: podem ter forma solta (duas manchas juntas)
       const [cx, cy] = [entre(8, LARGURA - 9), entre(8, ALTURA - 9)];
       if (terreno[cy][cx] !== 'chao') continue;
       const raio = 1.6 + r() * 2.2;
@@ -302,9 +306,10 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
 
       if (tipo === 'liquido') {
         const terra = (v: Terreno | null) => v !== 'liquido' && v !== null;
-        if (paleta.abismo || paleta.vulcanico) {
+        if (paleta.abismo || paleta.vulcanico || paleta.nevado) {
           const beiras: Beiras = [terra(t(x, y - 1)), terra(t(x, y + 1)), terra(t(x - 1, y)), terra(t(x + 1, y))];
           if (paleta.abismo) desenharAbismo(ctx, px, py, beiras, t(x, y - 2) !== 'liquido', r);
+          else if (paleta.nevado) desenharGelo(ctx, px, py, beiras, [terra(t(x - 1, y - 1)), terra(t(x + 1, y - 1)), terra(t(x - 1, y + 1)), terra(t(x + 1, y + 1))], r);
           else desenharLava(ctx, px, py, beiras, [terra(t(x - 1, y - 1)), terra(t(x + 1, y - 1)), terra(t(x - 1, y + 1)), terra(t(x + 1, y + 1))], r);
           continue;
         }
@@ -318,6 +323,10 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
 
       if (paleta.vulcanico) {
         desenharChaoVulcao(ctx, tipo, px, py, r, (v) => v === 'caminho' || v === null, t(x, y - 1), t(x, y + 1), t(x - 1, y), t(x + 1, y));
+        continue;
+      }
+      if (paleta.nevado) {
+        desenharChaoNeve(ctx, tipo, px, py, r, (v) => v === 'caminho' || v === null, t(x, y - 1), t(x, y + 1), t(x - 1, y), t(x + 1, y));
         continue;
       }
       if (paleta.submerso) {
@@ -410,6 +419,7 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
 
   for (const f of mapa.cidade ? [] : mapa.flores) {
     if (paleta.vulcanico) ctx.drawImage(rachaduraPronta((f.dx * 3 + f.dy) % 8), f.x * TAM, f.y * TAM);
+    else if (paleta.nevado) ctx.drawImage(cristalPronto((f.dx * 3 + f.dy) % 8), f.x * TAM, f.y * TAM);
     else if (paleta.submerso) desenharConcha(ctx, f.x * TAM, f.y * TAM, f.dx + f.dy);
     else tile(buch, FLORES[(f.dx + f.dy) % FLORES.length], f.x * TAM, f.y * TAM);
   }
@@ -423,7 +433,13 @@ export function desenharMapa(mapa: Mapa, paleta: Paleta, semente: string, tilese
   for (const g of [...mapa.grandes].sort((a, b) => a.y - b.y)) {
     const escolher = (lista: [number, number][]) => lista[(g.x * 7 + g.y * 3) % lista.length];
     if (g.rocha) tile(natureza, ROCHA_GRANDE, g.x * TAM, g.y * TAM, 2, 2);
-    else if (paleta.obstaculo === 'arvore' && paleta.arvores) {
+    else if (paleta.nevado) {
+      // pico nevado: pinheiros com neve (passam 16 px acima do espaço 2×2) e, de vez em quando, uma pedra nevada
+      if (paleta.rochas && (g.x * 5 + g.y * 3) % 6 === 0) {
+        tile(natureza, escolher(paleta.rochas), g.x * TAM, g.y * TAM, 2, 2);
+        nevarPedra(ctx, g.x * TAM, g.y * TAM);
+      } else ctx.drawImage(pinheiroPronto((g.x * 3 + g.y * 5) % 4), g.x * TAM, g.y * TAM - 16);
+    } else if (paleta.obstaculo === 'arvore' && paleta.arvores) {
       // árvore de 2×3 tiles: a copa passa 1 tile acima do espaço 2×2 que ela bloqueia
       tile(natureza, g.arvore ?? escolher(paleta.arvores), g.x * TAM, (g.y - 1) * TAM, 2, 3);
     } else if (paleta.obstaculo === 'coral') {
@@ -722,6 +738,187 @@ const conePronto = (variante: number) =>
     // fumaça
     for (const [fx, fy, fr] of [[14, 5, 2], [18, 3, 2], [15, 1, 1]]) elipse(ctx, fx, fy, fr + 1, fr, 'rgba(150,140,138,0.45)');
   });
+
+// ---------- Pico Nevado (desenhado por código) ----------
+
+const NEVE = '#eef4fa', NEVE_SOMBRA = '#d3e0ec', NEVE_BRILHO = '#ffffff', BEIRA_GELO = '#7fa3bf';
+
+/** Chão de neve com sombrinhas e brilhos; trilha de neve pisada (mais azulada); no lugar do mato, capim congelado. */
+function desenharChaoNeve(
+  ctx: Ctx, tipo: Terreno, px: number, py: number, r: () => number, ehTrilha: (v: Terreno | null) => boolean,
+  cima: Terreno | null, baixo: Terreno | null, esq: Terreno | null, dir: Terreno | null,
+) {
+  const trilha = tipo === 'caminho';
+  ctx.fillStyle = trilha ? '#c6d6e4' : NEVE;
+  ctx.fillRect(px, py, TAM, TAM);
+  for (let i = 0; i < 5; i++) {
+    ctx.fillStyle = r() < 0.55 ? (trilha ? '#b3c6d7' : NEVE_SOMBRA) : trilha ? '#d9e5ef' : NEVE_BRILHO;
+    ctx.fillRect(px + Math.floor(r() * 14), py + Math.floor(r() * 15), r() < 0.4 ? 3 : 2, 1);
+  }
+  if (trilha) {
+    // marcas de pegada
+    if (r() < 0.3) {
+      ctx.fillStyle = '#a3b9cc';
+      const [x, y] = [px + 3 + Math.floor(r() * 9), py + 3 + Math.floor(r() * 9)];
+      ctx.fillRect(x, y, 2, 3);
+    }
+    ctx.fillStyle = '#9db3c7';
+    if (!ehTrilha(cima)) ctx.fillRect(px, py, TAM, 1);
+    if (!ehTrilha(baixo)) ctx.fillRect(px, py + TAM - 1, TAM, 1);
+    if (!ehTrilha(esq)) ctx.fillRect(px, py, 1, TAM);
+    if (!ehTrilha(dir)) ctx.fillRect(px + TAM - 1, py, 1, TAM);
+    return;
+  }
+  if (tipo !== 'mato') return;
+  // capim congelado: folhas azuladas com a ponta branca, saindo de um montinho de neve
+  ctx.fillStyle = 'rgba(120,170,205,0.2)';
+  ctx.fillRect(px, py, TAM, TAM);
+  for (let k = 0; k < 4; k++) {
+    const base = px + 2 + k * 4 + Math.floor(r() * 2), altura = 6 + Math.floor(r() * 6), tomba = r() < 0.5 ? -1 : 1;
+    for (let i = 0; i < altura; i++) {
+      const x = base + (i > altura * 0.6 ? tomba : 0);
+      ctx.fillStyle = '#4f86a6';
+      ctx.fillRect(x - 1, py + TAM - 2 - i, 2, 1);
+      ctx.fillStyle = i >= altura - 2 ? NEVE_BRILHO : '#9fd0e6';
+      ctx.fillRect(x, py + TAM - 2 - i, 1, 1);
+    }
+  }
+  ctx.fillStyle = NEVE_BRILHO;
+  ctx.fillRect(px + 1, py + TAM - 2, TAM - 2, 2);
+  ctx.fillStyle = NEVE_SOMBRA;
+  ctx.fillRect(px + 2, py + TAM - 1, TAM - 5, 1);
+}
+
+/** Lago congelado: gelo azul-claro com reflexos e rachaduras; a neve da margem faz um degrau com sombra. */
+function desenharGelo(ctx: Ctx, px: number, py: number, [cima, baixo, esq, dir]: Beiras, [ce, cd, be, bd]: Beiras, r: () => number) {
+  ctx.fillStyle = '#a9dcf0';
+  ctx.fillRect(px, py, TAM, TAM);
+  // reflexos na diagonal
+  for (let i = 0; i < 2; i++) {
+    const [x, y, n] = [px + 1 + Math.floor(r() * 8), py + 4 + Math.floor(r() * 10), 3 + Math.floor(r() * 4)];
+    for (let k = 0; k < n; k++) {
+      ctx.fillStyle = '#e6f7ff';
+      ctx.fillRect(x + k, y - k, 2, 1);
+    }
+  }
+  // rachadura fininha
+  if (r() < 0.45) {
+    let [x, y] = [px + 2 + Math.floor(r() * 6), py + 2 + Math.floor(r() * 6)];
+    ctx.fillStyle = '#6fb2d2';
+    for (let i = 0; i < 7; i++) {
+      ctx.fillRect(x, y, 1, 1);
+      if (r() < 0.7) x++;
+      if (r() < 0.6) y++;
+    }
+  }
+  ctx.fillStyle = '#93cbe4';
+  for (let i = 0; i < 2; i++) ctx.fillRect(px + Math.floor(r() * 13), py + Math.floor(r() * 15), 3, 1);
+  const faixa = (x: number, y: number, w: number, h: number, cor: string) => { ctx.fillStyle = cor; ctx.fillRect(px + x, py + y, w, h); };
+  // margens: neve por cima, sombra azul embaixo dela
+  if (cima) { faixa(0, 0, TAM, 3, NEVE); faixa(0, 3, TAM, 1, BEIRA_GELO); faixa(0, 4, TAM, 1, '#8fc4de'); }
+  if (baixo) { faixa(0, TAM - 2, TAM, 2, NEVE); faixa(0, TAM - 3, TAM, 1, '#c9ecfa'); }
+  if (esq) { faixa(0, 0, 2, TAM, NEVE); faixa(2, cima ? 3 : 0, 1, TAM - (cima ? 3 : 0) - (baixo ? 2 : 0), BEIRA_GELO); }
+  if (dir) { faixa(TAM - 2, 0, 2, TAM, NEVE); faixa(TAM - 3, cima ? 3 : 0, 1, TAM - (cima ? 3 : 0) - (baixo ? 2 : 0), '#c9ecfa'); }
+  // cantos arredondados (para fora) e quinas (chão só na diagonal)
+  const canto = (x: number, sx: number, y: number, sy: number) => { for (let i = 0; i < 4; i++) faixa(sx > 0 ? x : x - (3 - i), y + i * sy, 4 - i, 1, NEVE); };
+  const quina = (x: number, y: number) => faixa(x, y, 3, 3, NEVE);
+  if (ce && !cima && !esq) quina(0, 0);
+  if (cd && !cima && !dir) quina(TAM - 3, 0);
+  if (be && !baixo && !esq) quina(0, TAM - 3);
+  if (bd && !baixo && !dir) quina(TAM - 3, TAM - 3);
+  if (cima && esq) canto(0, 1, 0, 1);
+  if (cima && dir) canto(TAM - 1, -1, 0, 1);
+  if (baixo && esq) canto(0, 1, TAM - 1, -1);
+  if (baixo && dir) canto(TAM - 1, -1, TAM - 1, -1);
+}
+
+/** Enfeite do chão (no lugar das flores). 8 formatos: cristais de gelo e montinhos de neve com um galho. */
+const cristalPronto = (variante: number) =>
+  pronto('cristal:' + variante, TAM, TAM, (ctx) => {
+    const r = aleatorioComSemente('cristal' + variante);
+    if (variante % 2 === 0) {
+      // 2 ou 3 cristais pontudos
+      const n = 2 + (variante % 4 === 0 ? 1 : 0);
+      for (let k = 0; k < n; k++) {
+        const meio = 4 + k * 4 + Math.floor(r() * 2), altura = 5 + Math.floor(r() * 5);
+        for (let i = 0; i < altura; i++) {
+          const larg = i < 2 ? 3 : Math.max(1, Math.round(((altura - i) / altura) * 3));
+          ctx.fillStyle = '#3f86b4';
+          ctx.fillRect(meio - 1 - Math.floor(larg / 2), 13 - i, larg + 2, 1);
+          ctx.fillStyle = '#8fd4f2';
+          ctx.fillRect(meio - Math.floor(larg / 2), 13 - i, larg, 1);
+          ctx.fillStyle = '#eafaff';
+          ctx.fillRect(meio - Math.floor(larg / 2), 13 - i, 1, 1);
+        }
+      }
+      ctx.fillStyle = 'rgba(110,150,185,0.35)';
+      ctx.fillRect(3, 14, 10, 1);
+    } else {
+      // montinho de neve com um galho seco
+      elipse(ctx, 8, 12, 5, 2, NEVE_SOMBRA);
+      elipse(ctx, 8, 11, 4, 2, NEVE_BRILHO);
+      ctx.fillStyle = '#5a4636';
+      const x = 6 + Math.floor(r() * 4);
+      for (let i = 0; i < 5; i++) ctx.fillRect(x + (i > 2 ? 1 : 0), 10 - i, 1, 1);
+      ctx.fillRect(x - 1, 8, 1, 1);
+      ctx.fillRect(x + 2, 6, 1, 1);
+    }
+  });
+
+/** Pinheiro coberto de neve (32 × 48: passa 16 px acima do espaço 2×2). 4 formatos. */
+const pinheiroPronto = (variante: number) =>
+  pronto('pinheiro-neve:' + variante, 32, 48, (ctx) => {
+    const r = aleatorioComSemente('pinheiro' + variante);
+    elipse(ctx, 16, 44, 12, 3, 'rgba(60,90,125,0.28)');
+    // tronco
+    ctx.fillStyle = '#3a2a20';
+    ctx.fillRect(13, 37, 6, 8);
+    ctx.fillStyle = '#6a4c36';
+    ctx.fillRect(14, 37, 2, 8);
+    // três andares de galhos, de baixo para cima (o de cima cobre o de baixo)
+    const andares: [number, number, number][] = [[22, 40, 13], [12, 30, 10 + (variante % 2)], [2, 20, 7]];
+    andares.forEach(([topo, base, meiaLargura], k) => {
+      // a neve fica na parte do andar que aparece: logo abaixo do andar de cima (ou no topo da árvore)
+      const deCima = andares[k + 1];
+      const neveDe = deCima ? deCima[1] + 2 : topo;
+      const neveAte = deCima ? neveDe + 3 + (variante % 2) : topo + 9;
+      for (let y = topo; y <= base; y++) {
+        const meia = Math.max(1, Math.round(((y - topo) / (base - topo)) * meiaLargura));
+        ctx.fillStyle = '#10302a';
+        ctx.fillRect(16 - meia - 1, y, meia * 2 + 2, 1);
+        ctx.fillStyle = '#24604a';
+        ctx.fillRect(16 - meia, y, meia * 2, 1);
+        ctx.fillStyle = '#3a8a66';
+        ctx.fillRect(16 - meia, y, Math.max(1, Math.round(meia * 0.7)), 1);
+        ctx.fillStyle = '#184436';
+        ctx.fillRect(16 + meia - Math.max(1, Math.round(meia / 3)), y, Math.max(1, Math.round(meia / 3)), 1);
+        // neve em cima do andar, com a beirada irregular
+        if (y >= neveDe && y < neveAte + (r() < 0.5 ? 1 : 0)) {
+          const m = Math.max(1, meia - (y > neveAte - 2 ? 2 + Math.floor(r() * 3) : 0));
+          ctx.fillStyle = '#f6fbff';
+          ctx.fillRect(16 - m, y, m * 2, 1);
+          ctx.fillStyle = '#c4d8ea';
+          ctx.fillRect(16 + m - Math.max(1, Math.round(m / 3)), y, Math.max(1, Math.round(m / 3)), 1);
+        }
+      }
+      // pontas dos galhos com neve
+      ctx.fillStyle = '#f6fbff';
+      for (const lado of [-1, 1]) ctx.fillRect(16 + lado * (meiaLargura - 1) - (lado > 0 ? 2 : 0), base - 1, 3, 1);
+      ctx.fillStyle = '#10302a';
+      ctx.fillRect(16 - meiaLargura - 1, base + 1, meiaLargura * 2 + 2, 1);
+    });
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(15, 1, 2, 2);
+  });
+
+/** Capa de neve em cima de uma pedra de 2×2 tiles já desenhada. */
+function nevarPedra(ctx: Ctx, x: number, y: number) {
+  elipse(ctx, x + 16, y + 9, 10, 4, '#c4d8ea');
+  elipse(ctx, x + 15, y + 7, 9, 4, '#f6fbff');
+  ctx.fillStyle = '#f6fbff';
+  ctx.fillRect(x + 6, y + 11, 3, 2);
+  ctx.fillRect(x + 20, y + 11, 2, 3);
+}
 
 // ---------- fundo do mar (desenhado por código) ----------
 

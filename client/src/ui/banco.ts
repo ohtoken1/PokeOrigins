@@ -8,9 +8,10 @@ import { adotarSaveDoServidor, salvarAgora, type Save } from '../estado';
 import { aoAvisoDoServidor } from '../online';
 import { el } from './dom';
 import { abrirJanela } from './janela';
+import { valorEmMoeda } from './moeda';
 
 const numero = (n: number) => n.toLocaleString('pt-BR');
-const moeda = (tipo: 'silver' | 'gold', valor: number) => el('span', { class: 'banco-moeda' }, el('span', { class: `icone-moeda moeda-${tipo}` }), el('strong', {}, numero(valor)), ` ${tipo}`);
+const moeda = valorEmMoeda;
 
 export function abrirBanco(save: Save, aoMudar: () => void = () => {}): void {
   let operacao: OperacaoCambio = 'comprar';
@@ -25,7 +26,7 @@ export function abrirBanco(save: Save, aoMudar: () => void = () => {}): void {
   const janela = abrirJanela('Banco', () => {
     const comprando = operacao === 'comprar';
     const maximo = () => (cofre ? maximoDoCambio(operacao, save, cofre) : 0);
-    const campo = el('input', { type: 'number', class: 'banco-campo', min: 1, step: 1, value: quantidade, disabled: ocupado, 'aria-label': 'Quantidade de gold' }) as HTMLInputElement;
+    const campo = el('input', { type: 'number', class: 'banco-campo', min: 1, step: 1, value: quantidade, disabled: ocupado, 'aria-label': 'Quantidade de Origin Coins' }) as HTMLInputElement;
     const cofreEl = el('div', { class: 'banco-saldo banco-cofre' });
     const resumo = el('div', { class: 'banco-resumo' });
     const falta = el('p', { class: 'banco-aviso' });
@@ -45,8 +46,8 @@ export function abrirBanco(save: Save, aoMudar: () => void = () => {}): void {
       const semSaldo = comprando ? save.silver < GOLD_CUSTA_SILVER : save.gold < 1;
       const semCofre = !!cofre && (comprando ? cofre.gold < 1 : cofre.silver < GOLD_VALE_SILVER);
       falta.textContent = !cofre || maximo() >= 1 ? ''
-        : semSaldo ? (comprando ? 'Você não tem silver suficiente.' : 'Você não tem gold para vender.')
-        : semCofre ? (comprando ? 'O banco está sem gold agora. Ele só tem o gold que os jogadores venderam para ele.' : 'O banco está sem silver agora.')
+        : semSaldo ? (comprando ? 'Você não tem Poké Dólares suficientes.' : 'Você não tem Origin Coins para vender.')
+        : semCofre ? (comprando ? 'O banco está sem Origin Coins agora. Ele só tem os Origin Coins que os jogadores venderam para ele.' : 'O banco está sem Poké Dólares agora.')
         : '';
       campo.max = String(Math.max(1, maximo()));
       for (const b of rapidos) b.disabled = ocupado || maximo() < 1;
@@ -79,7 +80,7 @@ export function abrirBanco(save: Save, aoMudar: () => void = () => {}): void {
         const r = await api<{ save: Save; versao: number; cofre: Cofre }>('POST', '/cambio', { operacao, quantidade: feita });
         adotarSaveDoServidor(r.save, r.versao);
         cofre = r.cofre;
-        aviso = comprando ? `Você comprou ${numero(feita)} gold.` : `Você vendeu ${numero(feita)} gold.`;
+        aviso = comprando ? `Você comprou ${numero(feita)} Origin Coins.` : `Você vendeu ${numero(feita)} Origin Coins.`;
         quantidade = 1;
         aoMudar();
       } catch (e) {
@@ -105,9 +106,9 @@ export function abrirBanco(save: Save, aoMudar: () => void = () => {}): void {
               aviso = '';
               janela.redesenhar();
             },
-          }, o === 'comprar' ? 'Comprar gold' : 'Vender gold'))),
-      el('p', { class: 'meta' }, `${comprando ? `1 gold custa ${numero(GOLD_CUSTA_SILVER)} silver` : `1 gold vale ${numero(GOLD_VALE_SILVER)} silver`}. O banco só entrega o que tem no cofre.`),
-      el('label', { class: 'banco-quantidade' }, 'Quantidade de gold', el('span', {}, campo, ...rapidos)),
+          }, o === 'comprar' ? 'Comprar Origin Coins' : 'Vender Origin Coins'))),
+      el('p', { class: 'meta' }, `${comprando ? `1 Origin Coin custa ${numero(GOLD_CUSTA_SILVER)} Poké Dólares` : `1 Origin Coin vale ${numero(GOLD_VALE_SILVER)} Poké Dólares`}. O banco só entrega o que tem no cofre.`),
+      el('label', { class: 'banco-quantidade' }, 'Quantidade de Origin Coins', el('span', {}, campo, ...rapidos)),
       resumo,
       falta,
       el('p', { class: 'banco-aviso', role: 'status' }, aviso),

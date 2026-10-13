@@ -1,5 +1,5 @@
 // Experiência, subida de nível, golpes novos e evolução depois de uma batalha.
-import { evolucaoPorAmizade } from '../amizade';
+import { evolucaoPorAmizade, evolucaoPorGolpe } from '../amizade';
 import {
   especie,
   evolucaoPorNivel,
@@ -52,9 +52,16 @@ export function ganharExperiencia(
   quantidade: number,
   nomeDe: (especieId: number) => string,
   crescimentoDe: (especieId: number) => string | null,
+  /** nível em que o Pokémon para de ganhar XP (limite pelo nível de treinador; padrão: o máximo do jogo) */
+  limite = NIVEL_MAXIMO,
 ): ResultadoProgresso {
   const r: ResultadoProgresso = { mensagens: [], golpesPendentes: [], evolucao: null };
+  const teto = Math.min(NIVEL_MAXIMO, limite);
   if (p.nivel >= NIVEL_MAXIMO) return r;
+  if (p.nivel >= teto) {
+    r.mensagens.push(`${nomeDe(p.especieId)} já está no nível máximo para o seu nível de treinador e não ganhou experiência.`);
+    return r;
+  }
 
   const nome = nomeDe(p.especieId);
   p.exp += quantidade;
@@ -65,18 +72,31 @@ export function ganharExperiencia(
   // os golpes aprendidos no caminho vêm depois dela
   const nivelAntes = p.nivel;
   const aprendidos: ResultadoProgresso = { mensagens: [], golpesPendentes: r.golpesPendentes, evolucao: null };
-  while (p.nivel < NIVEL_MAXIMO && p.exp >= expParaNivel(crescimento, p.nivel + 1)) {
+  while (p.nivel < teto && p.exp >= expParaNivel(crescimento, p.nivel + 1)) {
     mudarNivelOuEspecie(p, { nivel: p.nivel + 1 });
     for (const golpe of golpesNoNivel(p.especieId, p.nivel)) aprender(p, golpe, nome, aprendidos);
   }
   if (p.nivel > nivelAntes) r.mensagens.push(`${nome} subiu para o nível ${p.nivel}!`, ...aprendidos.mensagens);
-  if (p.nivel >= NIVEL_MAXIMO) p.exp = expParaNivel(crescimento, NIVEL_MAXIMO);
+  // no limite, o XP para ali (não fica guardado para depois)
+  if (p.nivel >= teto) p.exp = expParaNivel(crescimento, teto);
 
   // por nível; ou, se subiu de nível com amizade alta, por amizade (Golbat → Crobat, Eevee → Espeon/Umbreon…)
   // Everstone: quem segura não evolui (nome fixo aqui para não importar shared/campo.ts, que importa encontros)
-  const para = p.item === 'everstone' ? null : (evolucaoPorNivel(p.especieId, p.nivel) ?? (p.nivel > nivelAntes ? evolucaoPorAmizade(p) : null));
+  // sabendo um golpe (Lickitung com Rollout), também só ao subir de nível; vem antes da amizade (Eevee com golpe Fairy = Sylveon)
+  const para = p.item === 'everstone' ? null : (evolucaoPorNivel(p.especieId, p.nivel, undefined, p) ?? (p.nivel > nivelAntes ? (evolucaoPorGolpe(p) ?? evolucaoPorAmizade(p)) : null));
   if (para && especie(para)) r.evolucao = { de: p.especieId, para };
   return r;
+}
+
+/** Homem Suspeito: volta para o nível 1 (a experiência também); espécie, golpes, IVs e EVs continuam. */
+export function resetarNivel(p: PokemonIndividual, crescimento: string | null): void {
+  mudarNivelOuEspecie(p, { nivel: 1 });
+  p.exp = expParaNivel(crescimento, 1);
+}
+
+/** Homem Suspeito: troca a espécie sem aprender nada (voltar a evolução, separar fusão); a Ability acompanha. */
+export function voltarEspecie(p: PokemonIndividual, para: number): void {
+  mudarNivelOuEspecie(p, { especieId: para });
 }
 
 /** Aplica a evolução e devolve as mensagens dos golpes aprendidos ao evoluir. */

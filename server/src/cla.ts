@@ -18,8 +18,8 @@ const MAX_PEDIDOS_POR_CONTA = 5;
  * entregar até `XP_POR_MINUTO` em média, com uma reserva para batalhas grandes. Quem joga normalmente não chega
  * perto; quem tentar mandar números inventados fica preso a esse ritmo. Some quando as batalhas forem no servidor.
  */
-const XP_POR_MINUTO = 100_000;
-const XP_RESERVA_MAX = 500_000;
+const XP_POR_MINUTO = 10;
+const XP_RESERVA_MAX = 60;
 const reservas = new Map<number, { xp: number; em: number }>();
 
 type Cargo = 'lider' | 'vice' | 'membro';
@@ -138,7 +138,7 @@ export function criar(conta: banco.Conta, dados: Record<string, unknown>) {
   // ou as duas coisas acontecem, ou nenhuma
   banco.mudarSaves([conta.id], ([save]) => {
     const gold = typeof save.gold === 'number' && Number.isFinite(save.gold) ? save.gold : 0;
-    if (gold < PRECO_CRIAR_CLA_GOLD) throw new ErroConta(`Criar uma guilda custa ${PRECO_CRIAR_CLA_GOLD} gold.`);
+    if (gold < PRECO_CRIAR_CLA_GOLD) throw new ErroConta(`Criar uma guilda custa ${PRECO_CRIAR_CLA_GOLD} Origin Coins.`);
     save.gold = gold - PRECO_CRIAR_CLA_GOLD;
     banco.criarCla(nome, chave, JSON.stringify(bandeira), lerDescricao(dados.descricao), dados.aberto !== false, conta.id);
   });

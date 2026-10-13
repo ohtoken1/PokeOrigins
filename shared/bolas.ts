@@ -34,7 +34,9 @@ export interface EfeitoBola {
 const evoluiComMoonStone = (numero: number) =>
   (especie(numero).evos ?? []).some((nome) => Dex.items.get(Dex.species.get(nome).evoItem ?? '').id === 'moonstone');
 
-export function efeitoBola(id: string, c: ContextoCaptura): EfeitoBola {
+export function efeitoBola(idDaBolsa: string, c: ContextoCaptura): EfeitoBola {
+  // a versão NT (Kit iniciante) é a mesma bola
+  const id = idDaBolsa.replace(/-nt$/, '');
   const r = (bonus: number, ajusteTaxa = 0, garantida = false): EfeitoBola => ({ bonus, ajusteTaxa, garantida });
   switch (id) {
     case 'masterball':

@@ -10,6 +10,7 @@ import { comBonificacao, fontesDeBonus, textoMult, type AlvoChance } from '../bo
 import { ajustesAdmin } from '../ui/admin';
 import { comoEvolui } from '../../../shared/evolucoes';
 import { cuboDaEspecie, cubosDaOrigem } from '../../../shared/itensCustom';
+import { mascaraDaForma } from '../../../shared/formasPorItem';
 import { especie, golpesPorNivel } from '../../../shared/batalha/pokemon';
 import maquinas from '../../../shared/data/maquinas.json';
 import { golpesDeTutorDaEspecie } from '../../../shared/professores';
@@ -53,6 +54,8 @@ export const regiaoDoNumero = (numero: number) => REGIOES.find((r) => numero >= 
 /** Região do Pokémon: a da forma regional (Alolan Rattata → Alola) ou a do número da Pokédex. */
 const regiaoDoPokemon = (p: PokemonBase) => {
   const forma = formaRegional(p.id);
+  // forma só cadastrada (sem jeito de obter ainda) não conta para a Pokédex de nenhuma região
+  if (forma?.foraDosMapas) return undefined;
   return forma ? REGIOES.find((r) => r.id === forma.regiao) : regiaoDoNumero(p.id);
 };
 
@@ -165,13 +168,15 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
   const normais = todos.filter((q) => linhas.has(q.cadeiaEvolucao));
   const cadeia = [...normais, ...todos.filter((q) => !normais.includes(q) && cuboDaEspecie(q.id)?.origens.some((n) => normais.some((c) => c.id === n)))];
   const estagio = (q: PokemonBase): number => {
+    // formas da Ogerpon: vêm da forma Teal com a máscara (como uma evolução; pedido do dono)
+    if (mascaraDaForma(q.id)) return 1;
     const cubo = normais.includes(q) ? undefined : cuboDaEspecie(q.id);
     if (cubo) return Math.max(...cubo.origens.map((n) => normais.find((c) => c.id === n)).filter((c): c is PokemonBase => !!c).map(estagio)) + 1;
     const anterior = q.evoluiDe ? normais.find((c) => c.slug === q.evoluiDe) : undefined;
     return anterior ? estagio(anterior) + 1 : 0;
   };
   /** Como se chega nesta forma (texto embaixo do nome na linha evolutiva). */
-  const comoChega = (q: PokemonBase) => (normais.includes(q) ? comoEvolui(q) : `Usar ${cuboDaEspecie(q.id)!.nome}`);
+  const comoChega = (q: PokemonBase) => (mascaraDaForma(q.id) ? `Usar ${itemDaLoja(mascaraDaForma(q.id)!)?.nome ?? 'a máscara'}` : normais.includes(q) ? comoEvolui(q) : `Usar ${cuboDaEspecie(q.id)!.nome}`);
   const porEstagio: PokemonBase[][] = [];
   for (const q of cadeia) (porEstagio[estagio(q)] ??= []).push(q);
   // Megas da linha: entram como o último estágio (Charizard → Mega Charizard X / Y)

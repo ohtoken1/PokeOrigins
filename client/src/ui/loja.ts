@@ -4,6 +4,7 @@ import { bonusVip, vipAtivo } from '../../../shared/vip';
 import { abrirJanela } from './janela';
 import { el } from './dom';
 import { iconeItem } from './iconeItem';
+import { nomeDaMoeda } from '../../../shared/moedas';
 
 const LIMITE_LISTA = 120;
 const MAXIMO_POR_COMPRA = 999;
@@ -28,7 +29,7 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
   const abas = el('nav', { class: 'mercado-secoes' });
   const campoBusca = el('input', { type: 'search', placeholder: 'Buscar item ou golpe…', class: 'busca' });
 
-  const moeda = (item?: Pick<ItemLoja, 'moeda'>) => el('span', { class: `mercado-moeda ${item?.moeda === 'gold' ? 'gold' : ''}`, title: item?.moeda === 'gold' ? 'gold' : 'silver' });
+  const moeda = (item?: Pick<ItemLoja, 'moeda'>) => el('span', { class: `mercado-moeda ${item?.moeda === 'gold' ? 'gold' : ''}`, title: item?.moeda === 'gold' ? 'Origin Coin' : 'Poké Dólar' });
   const atualizarSaldo = () => {
     saldoSilver.textContent = numero(save.silver);
     saldoGold.textContent = numero(save.gold);
@@ -38,13 +39,13 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
   // VIP: 20% de desconto nas compras em silver (no total da compra, arredondado; Mega Stones em gold sem desconto)
   const precoFinal = (item: ItemLoja, quantos: number) =>
     item.moeda === 'gold' ? item.preco * quantos : Math.max(1, Math.round(item.preco * quantos * bonusVip(save, 'precoLoja')));
-  const textoFinal = (item: ItemLoja, quantos: number) => `${numero(precoFinal(item, quantos))} ${item.moeda ?? 'silver'}`;
+  const textoFinal = (item: ItemLoja, quantos: number) => `${numero(precoFinal(item, quantos))} ${nomeDaMoeda(item.moeda, precoFinal(item, quantos))}`;
   const comDesconto = (item: ItemLoja) => vipAtivo(save) && item.moeda !== 'gold';
 
   const comprar = (item: ItemLoja, quantos: number) => {
     const custo = precoFinal(item, quantos);
     if (carteira(item) < custo) {
-      aviso.textContent = `${item.moeda === 'gold' ? 'Gold' : 'Silver'} insuficiente para ${quantos}× ${item.nome}.`;
+      aviso.textContent = `${item.moeda === 'gold' ? 'Origin Coins insuficientes' : 'Poké Dólares insuficientes'} para ${quantos}× ${item.nome}.`;
     } else {
       if (item.moeda === 'gold') save.gold -= custo;
       else save.silver -= custo;
@@ -132,7 +133,7 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
     const termo = busca.trim().toLowerCase();
     const itens = termo
       ? CATALOGO.filter((i) => i.nome.toLowerCase().includes(termo) || i.descricao.toLowerCase().includes(termo))
-      : CATALOGO.filter((i) => i.categoria === categoria);
+      : CATALOGO.filter((i) => (i.abaDaLoja ?? i.categoria) === categoria);
     const visiveis = itens.slice(0, LIMITE_LISTA);
     vitrine.replaceChildren(
       ...visiveis.map((item) =>

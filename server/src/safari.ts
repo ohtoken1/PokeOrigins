@@ -2,6 +2,8 @@
 // gold no save guardado e abre o Safari. O sorteio dos Pokémon e as batalhas ainda são do jogo, como nos mapas.
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
+import { NIVEL_MINIMO, liberado } from '../../shared/trancas.ts';
+import { nivelTreinador } from '../../shared/treinador.ts';
 import { PRECO_ENTRADA_SAFARI_GOLD, TIPOS_SAFARI, diaDoSafari, entradasUsadas, lerSafariAberto, proximaEntrada, ticketComprado } from '../../shared/safari.ts';
 
 const saldo = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? Math.floor(v) : 0);
@@ -11,13 +13,21 @@ function resposta(contaId: number) {
   return { save: JSON.parse(guardado.dados), versao: guardado.versao, agora: Date.now() };
 }
 
+/** Tranca de nível do Safari (shared/trancas.ts), conferida no save guardado. */
+function exigirNivel(conta: banco.Conta): void {
+  const guardado = banco.lerSave(conta.id);
+  if (!guardado) throw new ErroConta('Comece sua jornada antes de entrar no Safari.');
+  const xp = (JSON.parse(guardado.dados) as Record<string, unknown>).xpTreinador;
+  if (!liberado('safari', nivelTreinador(typeof xp === 'number' && xp > 0 ? xp : 0), !!conta.admin)) throw new ErroConta(`O Safari abre no nível ${NIVEL_MINIMO.safari} de treinador.`, 403);
+}
+
 /** Compra o ticket extra de hoje (um por dia; vale só hoje). */
 export function comprar(conta: banco.Conta) {
-  if (!banco.lerSave(conta.id)) throw new ErroConta('Comece sua jornada antes de entrar no Safari.');
+  exigirNivel(conta);
   banco.mudarSaves([conta.id], ([save]) => {
     const hoje = diaDoSafari(Date.now());
     if (ticketComprado(save.safari, hoje)) throw new ErroConta('Você já comprou o ticket extra de hoje.', 409);
-    if (saldo(save.gold) < PRECO_ENTRADA_SAFARI_GOLD) throw new ErroConta('Você não tem gold suficiente para o ticket.');
+    if (saldo(save.gold) < PRECO_ENTRADA_SAFARI_GOLD) throw new ErroConta('Você não tem Origin Coins suficientes para o ticket.');
     save.gold = saldo(save.gold) - PRECO_ENTRADA_SAFARI_GOLD;
     const aberto = lerSafariAberto(save.safari);
     save.safari = { dia: hoje, usadas: entradasUsadas(save.safari, hoje), comprada: true, ...(aberto ? { aberto } : {}) };
@@ -29,7 +39,7 @@ export function comprar(conta: banco.Conta) {
 export function entrar(conta: banco.Conta, dados: Record<string, unknown>) {
   const { tipo } = dados;
   if (typeof tipo !== 'string' || !TIPOS_SAFARI.includes(tipo)) throw new ErroConta('Escolha o tipo do Safari.');
-  if (!banco.lerSave(conta.id)) throw new ErroConta('Comece sua jornada antes de entrar no Safari.');
+  exigirNivel(conta);
   banco.mudarSaves([conta.id], ([save]) => {
     const hora = Date.now();
     const hoje = diaDoSafari(hora);

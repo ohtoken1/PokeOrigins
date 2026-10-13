@@ -1,0 +1,336 @@
+681	Looking for the other trainers…	Buscando a los demás entrenadores…
+682	{0} species now · Lv. {1}–{2}	{0} especies ahora · Nv. {1}–{2}
+683	{0} region	Región de {0}
+684	Pokédex: {0} of {1} seen · {2} steps	Pokédex: {0} de {1} vistos · {2} pasos
+685	You are traveling to {0}. The maps open when the train arrives; meanwhile, enjoy the town.	Estás viajando a {0}. Los mapas se abren cuando llegue el tren; mientras tanto, disfruta de la ciudad.
+686	Poké Dollar: earned by playing	Poké Dólar: se gana jugando
+687	Poké Dollar
+688	Origin Coin: paid currency (for now, through the Admin panel)	Origin Coin: moneda de pago (por ahora, por el panel Admin)
+690	VIP: account bonuses for a while (the bonuses are still to be defined)	VIP: bonus en la cuenta durante un tiempo (los bonus todavía están por definir)
+691	active · ends on {0}	activo · termina el {0}
+692	✏️ Character	✏️ Personaje
+693	Max level!	¡Nivel máximo!
+694	Pokémon Center (heal team)	Centro Pokémon (curar equipo)
+695	Erase your progress and choose another starter?	¿Borrar tu progreso y elegir otro inicial?
+696	Start over	Empezar de nuevo
+697	Tiles: "Tuxemon Tileset" by Buch (CC-BY-SA 3.0) and the "Core Outdoor", "Core Buildings" and "Core City and Country" tilesets from the Tuxemon project by rubberduck, George_, Buch, Kelvin Shadewing, ArMM1998, Isaiah658 and others (CC-BY-SA 4.0). Data: PokéAPI. Battle: Pokémon Showdown.	Tiles: "Tuxemon Tileset" de Buch (CC-BY-SA 3.0) y los tilesets "Core Outdoor", "Core Buildings" y "Core City and Country" del proyecto Tuxemon, de rubberduck, George_, Buch, Kelvin Shadewing, ArMM1998, Isaiah658 y otros (CC-BY-SA 4.0). Datos: PokéAPI. Combate: Pokémon Showdown.
+698	~· Room {0} of {1}	~· Sala {0} de {1}
+699	Hover to see who each Pokémon is and click the one you want to face. The others will leave.	Pasa el ratón para ver quién es cada Pokémon y haz clic en el que quieras enfrentar. Los demás se irán.
+700	The exit at the top has opened: follow it to the next room.	La salida de arriba se abrió: síguela hasta la siguiente sala.
+701	Last room done! Go through the exit at the top to finish the Safari.	¡Última sala hecha! Sigue por la salida de arriba para terminar el Safari.
+702	Really leave? You won't get the entry back	¿Salir de verdad? La entrada no se devuelve
+703	← Leave the Safari	← Salir del Safari
+704	{0} Safari	Safari de {0}
+705	Loading Safari…	Cargando Safari…
+706	Your team has fainted. Heal at the Pokémon Center and come back: the Safari is kept.	Tu equipo está debilitado. Cúralo en el Centro Pokémon y vuelve: el Safari queda guardado.
+707	You have {0}	Tienes {0}
+708	You don't have any	No tienes ninguno
+709	The 8 leaders of {0}. Win to earn the badges.	Los 8 líderes de {0}. Gana para conseguir las medallas.
+710	Closed until the train arrives in {0}	Cerrado hasta que el tren llegue a {0}
+711	Face trainers and earn Poké Dollars.	Enfréntate a entrenadores y gana Poké Dólares.
+712	Tournament	Torneo
+713	Tournaments between players.	Torneos entre jugadores.
+714	Pokémon League	Liga Pokémon
+715	The final challenge of each region.	El desafío final de cada región.
+716	Drag to move	Arrastra para mover
+717	⠿ Biomes	⠿ Biomas
+718	Change biome	Cambiar de bioma
+719	Amount of Origin Coins	Cantidad de Origin Coins
+720	Exchanging…	Cambiando…
+721	Buy	Comprar
+722	Sell	Vender
+723	Max	Máximo
+724	Bank vault	Caja fuerte del banco
+725	Checking…	Consultando…
+726	You pay	Pagas
+727	You receive	Recibes
+728	You don't have enough Poké Dollars.	No tienes suficientes Poké Dólares.
+729	You don't have Origin Coins to sell.	No tienes Origin Coins para vender.
+730	The bank is out of Origin Coins right now. It only has the Origin Coins players sold to it.	El banco no tiene Origin Coins ahora. Solo tiene los Origin Coins que los jugadores le vendieron.
+731	The bank is out of Poké Dollars right now.	El banco no tiene Poké Dólares ahora.
+732	You bought {0} Origin Coins.	Compraste {0} Origin Coins.
+733	You sold {0} Origin Coins.	Vendiste {0} Origin Coins.
+734	Could not exchange right now.	No se pudo cambiar ahora.
+735	Your balance	Tu saldo
+736	Buy Origin Coins	Comprar Origin Coins
+737	Sell Origin Coins	Vender Origin Coins
+738	{0}. The bank only hands out what it has in the vault.	{0}. El banco solo entrega lo que tiene en la caja fuerte.
+739	1 Origin Coin costs {0} Poké Dollars	1 Origin Coin cuesta {0} Poké Dólares
+740	1 Origin Coin is worth {0} Poké Dollars	1 Origin Coin vale {0} Poké Dólares
+742	Shape	Forma
+743	Pattern	Patrón
+744	Main color	Color principal
+745	Second color	Segundo color
+746	Symbol	Símbolo
+747	Symbol color	Color del símbolo
+748	Play	Jugar
+749	🗺️ Maps	🗺️ Mapas
+750	🏙️ Town	🏙️ Ciudad
+751	⚔️ Trainer duels	⚔️ Duelos con entrenadores
+752	🏅 Gyms	🏅 Gimnasios
+753	My account	Mi cuenta
+754	🧑 My profile	🧑 Mi perfil
+755	🏆 Achievements	🏆 Logros
+756	🎨 My skins	🎨 Mis skins
+757	⚙️ Options	⚙️ Opciones
+758	🚪 Sign out	🚪 Cerrar sesión
+759	Community	Comunidad
+760	🔎 Search players	🔎 Buscar jugadores
+761	👥 Friends	👥 Amigos
+762	🛡️ Guild	🛡️ Gremio
+765		Volumen
+766	Turn sound on	Activar el sonido
+767	Use	Usar
+768	Equip	Equipar
+769	Teach	Enseñar
+770	Open	Abrir
+771	Hatch	Eclosionar
+772	Forgot {0}.	Olvidó {0}.
+773	{0} has already changed form and can't go back. {1} has no effect.	{0} ya cambió de forma y no vuelve atrás. {1} no tiene efecto.
+774	{0} has no effect on {1}.	{0} no tiene efecto en {1}.
+775	What? {0} is changing form!	¿Qué? ¡{0} está cambiando de forma!
+776	{0} became {1}!	¡{0} se convirtió en {1}!
+777	{0} changed into {1}!	¡{0} cambió a {1}!
+778	To use {0}, {1} must be in the team.	Para usar {0}, {1} tiene que estar en el equipo.
+779	{0} joined with {1} and became {2}!	¡{0} se unió con {1} y se convirtió en {2}!
+780	{0} only works on {1}.	{0} solo funciona en {1}.
+781	Forgot {0} ({1} can't learn it).	Olvidó {0} ({1} no lo aprende).
+782	{0} crossed time and became {1}!	¡{0} atravesó el tiempo y se convirtió en {1}!
+783	{0} evolved into {1}!	¡{0} evolucionó a {1}!
+784	{0}'s Nature is already {1}.	La Nature de {0} ya es {1}.
+785	{0}'s Nature is now {1}!	¡La Nature de {0} ahora es {1}!
+786	This item can't be equipped.	Este objeto no se puede equipar.
+787	{0} is now holding {1}.{2}	{0} ahora lleva {1}.{2}
+788	~({0} went back to the bag)	~({0} volvió a la mochila)
+789	{0}'s Tera Type is already {1}.	El Tera Type de {0} ya es {1}.
+790	You need {0} {1} (you have {2}).	Necesitas {0} {1} (tienes {2}).
+791	{0}'s Tera Type is now {1}!	¡El Tera Type de {0} ahora es {1}!
+792	{0} already knows {1}.	{0} ya conoce {1}.
+793	{0} can't learn {1}.	{0} no puede aprender {1}.
+794	{0}: join {1} with which Pokémon?	{0}: ¿unir {1} con qué Pokémon?
+795	Join {0} with {1}? The item is used up and the fusion can't be undone.	¿Unir {0} con {1}? El objeto se gasta y la fusión no tiene vuelta atrás.
+796	The fusion's IVs fall between those of the two. The fusion can't be undone.	Los IVs de la fusión quedan entre los de los dos. La fusión no tiene vuelta atrás.
+797	{0}: which form for {1}?	{0}: ¿qué forma para {1}?
+798	Change {0} into {1}? The item is used up and {2} won't go back to its previous form.	¿Cambiar {0} a {1}? El objeto se gasta y {2} no vuelve a la forma anterior.
+799	{0} {1} on which Pokémon?	¿{0} {1} en qué Pokémon?
+800	{0} {1} on {2}? The item is used up and won't come back.	¿{0} {1} en {2}? El objeto se gasta y no vuelve.
+801	The bag is empty. Buy items at the Shop.	La mochila está vacía. Compra objetos en la Tienda.
+802	Only one of this type at a time: wait for the bonus to end	Solo uno de este tipo a la vez: espera a que termine el bonus
+803	Use {0}? The bonus lasts 30 minutes and the item is used up.	¿Usar {0}? El bonus dura 30 minutos y el objeto se gasta.
+804	{0} activated: +20% shiny chance on Pokémon of that type for 30 minutes!	¡{0} activado: +20% de probabilidad de shiny en los Pokémon de ese tipo durante 30 minutos!
+805	Active · {0}	Activo · {0}
+806	Use the Pokémon Box to open one more box in the PC? The item is used up.	¿Usar el Box Pokémon para abrir una box más en el PC? El objeto se gasta.
+807	The Starter Kit is still empty. Its contents are coming soon!	El Kit de inicio todavía está vacío. ¡El contenido llega pronto!
+808	You already have all {0} PC boxes.	Ya tienes las {0} boxes del PC.
+809	New box opened in the PC! You now have {0} boxes.	¡Nueva box abierta en el PC! Ahora tienes {0} boxes.
+810	{0} Pokédex: {1} of {2} caught	Pokédex de {0}: {1} de {2} capturados
+811	VIP active · ends on {0}	VIP activo · termina el {0}
+812	no VIP	sin VIP
+813	Current region	Región actual
+814	Badges {0}/{1}: win at the Gyms	Medallas {0}/{1}: gana en los Gimnasios
+815	Maps	Mapas
+818	Write a message…	Escribe un mensaje…
+819	Send (Enter)	Enviar (Enter)
+820	Send	Enviar
+823	See {0}'s profile	Ver el perfil de {0}
+825	Back to the friends list	Volver a la lista de amigos
+826	‹ Friends	‹ Amigos
+827	~wants to be your friend.	~quiere ser tu amigo.
+828	Chat with {0}	Hablar con {0}
+829	You don't have any friends yet. Add them in Community → Friends or by clicking a player on the map.	Todavía no tienes amigos. Añádelos en Comunidad → Amigos o haciendo clic en un jugador en el mapa.
+830	You are not in a guild yet.	Todavía no estás en un gremio.
+831	Nobody from the guild has spoken yet.	Nadie del gremio ha hablado todavía.
+832	Nobody has spoken on this map yet.	Nadie ha hablado en este mapa todavía.
+833	Nobody has spoken yet. Say hi!	Nadie ha hablado todavía. ¡Di hola!
+834	Join a guild to use this chat	Entra en un gremio para usar este chat
+835	Talk to the guild {0}…	Hablar con el gremio {0}…
+836	Talk to those on this map…	Hablar con quienes están en este mapa…
+837	Talk to everyone online…	Hablar con todos los que están en línea…
+838	No connection to the server. Try again in a moment.	Sin conexión con el servidor. Inténtalo de nuevo en un momento.
+839	No	No
+840	Yes	Sí
+841	Message to {0}…	Mensaje para {0}…
+842	Message to {0}	Mensaje para {0}
+843	No messages yet. Say hi to {0}!	Todavía no hay mensajes. ¡Dile hola a {0}!
+844	Loading…	Cargando…
+845	Conversation with {0}	Conversación con {0}
+846	Let your Pokémon rest for a while.	Deja que tus Pokémon descansen un poco.
+847	Heal my Pokémon	Curar a mis Pokémon
+848	Leave	Salir
+849	Healing…	Curando…
+850	Placing the Poké Balls in the machine…	Colocando las Poké Balls en la máquina…
+851	Your Pokémon are healed!	¡Tus Pokémon están curados!
+852	Healed ✓	Curados ✓
+853	Attack	Attack
+854	Defense	Defense
+855	Sp. Atk	Sp. Atk
+856	Sp. Def	Sp. Def
+857	Speed	Speed
+858	Physical	Físico
+859	Special	Especial
+860	Burned	Quemado
+861	Paralyzed	Paralizado
+862	Asleep	Dormido
+863	Frozen	Congelado
+864	Poisoned	Envenenado
+865	Badly poisoned	Gravemente envenenado
+866	🔓 IVs by range	🔓 IVs por rango
+867	VIP players see the exact value of each IV.	Los jugadores VIP ven el valor exacto de cada IV.
+868	Not enough Poké Dollars (you have {0}).	Poké Dólares insuficientes (tienes {0}).
+869	🔒 Hidden IVs	🔒 IVs ocultos
+870	Appraise to see the exact value of each IV (you are VIP).	Evalúa para ver el valor exacto de cada IV (eres VIP).
+871	Appraise to see the range of each IV (0–5, 6–10… 26–31). VIP players see the exact value.	Evalúa para ver el rango de cada IV (0–5, 6–10… 26–31). Los jugadores VIP ven el valor exacto.
+872	Appraise IVs ·~	Evaluar IVs ·~
+873	Nature raises	La Nature aumenta
+874	Nature lowers	La Nature reduce
+875	Stat	Estadística
+877	Value	Valor
+878	IV range	Rango del IV
+879	Hidden IV	IV oculto
+880	Power {0} · Accuracy {1} · PP {2}/{3}	Potencia {0} · Precisión {1} · PP {2}/{3}
+881	📖 See in the Pokédex	📖 Ver en la Pokédex
+882	~Lv. {0} · #{1}
+884	~(catch order)	~(orden de captura)
+885	~· locked in the PC	~· bloqueado en el PC
+886	Nature	Nature
+887	~(neutral)	~(neutra)
+888	~(equip through the Bag)	~(equipa desde la Mochila)
+889	Friendship	Amistad
+890	Experience	Experiencia
+891	~({0} left to Lv. {1})	~(faltan {0} para el Nv. {1})
+892	Stats	Estadísticas
+893	Never misses	Nunca falla
+894	No additional effect.	Sin efecto adicional.
+912	Male	Macho
+913	Female	Hembra
+914	NT · Untradeable: can't be traded with other players	NT · No intercambiable: no se puede intercambiar con otros jugadores
+916	Tier {0} · sum of IVs between {1} and {2} (out of 186)	Tier {0} · suma de los IVs entre {1} y {2} (de 186)
+917	Forest	Bosque
+918	Desert	Desierto
+919	Savanna	Sabana
+920	Crag	Peñasco
+921	Volcano	Volcán
+922	Cave	Cueva
+923	Beach	Playa
+924	Seafloor	Fondo del mar
+925	River	Río
+926	Sky	Cielo
+927	Dots	Lunares
+928	Machine	Máquina
+929	Simple	Simple
+932	Checkered	Ajedrez
+934	NT · can't be traded	NT · no se puede intercambiar
+936	Close	Cerrar
+937	legendary	legendario
+938	mythical	mítico
+940	~was banned.	~fue baneado.
+942	~won a~	~ganó un premio~
+943	~prize from the {0}!	~en el {0}!
+944	~caught~	~capturó~
+945	Game notices	Avisos del juego
+946	Rare catches and notices from all players scroll by here.	Las capturas raras y los avisos de todos los jugadores pasan por aquí.
+947	Search item or move…	Buscar objeto o movimiento…
+948	{0} for {1}× {2}.	{0} para {1}× {2}.
+949	Not enough Origin Coins	Origin Coins insuficientes
+950	Not enough Poké Dollars	Poké Dólares insuficientes
+951	Bought {0}× {1} for {2}{3}.	Compraste {0}× {1} por {2}{3}.
+952	~(VIP discount)	~(descuento VIP)
+953	Choose an item.	Elige un objeto.
+954	Less	Menos
+955	More	Más
+957	Showing {0} of {1}. Use the search to find the rest.	Mostrando {0} de {1}. Usa la búsqueda para encontrar el resto.
+958	Nothing found.	No se encontró nada.
+959	Past	Pasado
+960	Future	Futuro
+961	Time Fragments	Fragmentos Temporales
+962	Not enough Time Fragments for the {0}.	Faltan Fragmentos Temporales para el {0}.
+963	Bought {0} for {1} {2}. It's in the Cubes tab of the bag.	Compraste {0} por {1} {2}. Está en la pestaña Cubos de la mochila.
+964	Balance:~	Saldo:~
+965	Each cube turns a Pokémon into its version from another era. Buy the cube and use it from the bag, like an evolution stone.	Cada cubo transforma un Pokémon en su versión de otra era. Compra el cubo y úsalo desde la mochila, como una piedra evolutiva.
+966	Use on {0}	Usar en {0}
+967	In the bag	En la mochila
+968	Sending invite…	Enviando invitación…
+969	Couldn't do it.	No se pudo.
+970	Friend	Amigo
+971	Accept friend request	Aceptar solicitud de amistad
+972	You are now friends.	Ahora sois amigos.
+973	Friend request sent.	Solicitud de amistad enviada.
+974	View profile	Ver perfil
+975	Trade	Intercambiar
+976	Challenge to a duel	Desafiar a un duelo
+978	Tier {0} (sum of IVs)	Tier {0} (suma de los IVs)
+979	{0} d
+980	{0} h
+982	Search by name…	Buscar por nombre…
+983	Search the market	Buscar en el mercado
+984	Search your Pokémon by name…	Busca tu Pokémon por nombre…
+985	Search among your Pokémon	Buscar entre tus Pokémon
+986	IVs not appraised by the seller.	IVs no evaluados por el vendedor.
+987	IVs by range: VIP players see the exact value.	IVs por rango: los jugadores VIP ven el valor exacto.
+988	Moves: {0}	Movimientos: {0}
+989	Listing removed from the market.	Anuncio retirado del mercado.
+990	Remove	Retirar
+991	Remove from the market	Retirar del mercado
+992	You bought {0}.	Compraste {0}.
+993	Confirm	Confirmar
+994	You don't have enough {0}	No tienes suficientes {0}
+997	Lv. {0} · {1} · {2}{3}
+998	~· holding {0}	~· lleva {0}
+999	Your listing · expires in {0}	Tu anuncio · vence en {0}
+1000	Seller: {0}	Vendedor: {0}
+1001	Hide details	Ocultar detalles
+1002	See details	Ver detalles
+1003	All	Todo
+1004	Fetching the listings…	Buscando los anuncios…
+1005	No listings with this filter.	Ningún anuncio con ese filtro.
+1006	Nobody has listed anything yet. Be the first, in the Sell tab.	Nadie ha anunciado nada todavía. Sé el primero en la pestaña Vender.
+1007	NT: can't be sold	NT: no se puede vender
+1008	Locked (unlock it in the PC)	Bloqueado (desbloquéalo en el PC)
+1009	1 must stay in the team	Tiene que quedar 1 en el equipo
+1010	None of your Pokémon has that name.	Ningún Pokémon tuyo con ese nombre.
+1012	List {0}	Anunciar {0}
+1013	Price	Precio
+1014	Market fee: {0}%{1}. If it sells, you receive {2} {3}.	Comisión del mercado: {0}%{1}. Si se vende, recibes {2} {3}.
+1015	~(prices below 20 pay no fee)	~(un precio menor de 20 no paga)
+1016	Listing placed on the market.	Anuncio puesto en el mercado.
+1017	You don't have items that can be sold.	No tienes objetos que se puedan vender.
+1018	You have {0} Origin Coins. Origin Coins are sold for Poké Dollars.	Tienes {0} Origin Coins. Los Origin Coins se venden por Poké Dólares.
+1019	How many Origin Coins	Cuántos Origin Coins
+1020	Amount (sold all together)	Cantidad (se vende toda junta)
+1021	Total price	Precio total
+1022	Poké Dollars
+1023	Currency	Moneda
+1024	You have {0} of {1} listings. What is listed leaves your team, PC or bag until it sells, and comes back if you remove the listing or if nobody buys it within {2} hours.	Tienes {0} de {1} anuncios. Lo anunciado sale de tu equipo, PC o mochila hasta venderse, y vuelve si retiras el anuncio o si nadie lo compra en {2} horas.
+1025	You already have the maximum number of listings	Ya tienes el máximo de anuncios
+1026	Listing…	Anunciando…
+1027	List	Anunciar
+1028	Searching…	Buscando…
+1029	You have no listings on the market.	No tienes anuncios en el mercado.
+1030	My listings{0}	Mis anuncios{0}
+1033	New	Nuevo
+1034	{0} · by {1}	{0} · por {1}
+1035	No announcements on the board for now.	Ningún anuncio en el tablón por ahora.
+1036	No connection to the server: showing the announcements that had already arrived.	Sin conexión con el servidor: se muestran los anuncios que ya habían llegado.
+1037	{0} joined your team.	{0} entró en tu equipo.
+1038	{0} was sent to the PC (Box {1}).	{0} fue enviado al PC (Box {1}).
+1039	{0} eggs hatched!{1}	¡{0} huevos eclosionaron!{1}
+1041	✨ Shiny! ✨	✨ ¡Shiny! ✨
+1042	The egg hatched!	¡El huevo eclosionó!
+1043	Lv. {0}{1}{2}
+1044	~· IVs tier {0} or higher	~· IVs tier {0} o superior
+1046	Search all boxes…	Buscar en todas las boxes…
+1047	Release Pokémon	Liberar Pokémon
+1048	Release~	¿Liberar a~
+1049	? It will leave and never come back.	? Se irá y no volverá nunca.
+1050	The item {0} goes back to the bag.	El objeto {0} vuelve a la mochila.
+1051	Release	Liberar
+1052	Release {0} Pokémon	Liberar {0} Pokémon
+1053	Release these {0} Pokémon? They will leave and never come back.	¿Liberar a estos {0} Pokémon? Se irán y no volverán nunca.
+1054	The items they were holding go back to the bag.	Los objetos que llevaban vuelven a la mochila.
+1055	Release {0}	Liberar {0}
+1056	Pokémon PC	PC de Pokémon
+1057	White	Blanco
+1058	Background of this box	Fondo de esta box
+1059	{0} Lv. {1} · {2} (click to go to it)	{0} Nv. {1} · {2} (haz clic para ir hasta él)
+1060	No Pokémon with that name in the boxes.	Ningún Pokémon con ese nombre en las boxes.
+1061	{0} (drop a Pokémon here to send it there)	{0} (suelta un Pokémon aquí para enviarlo a ella)

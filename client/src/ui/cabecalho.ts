@@ -84,8 +84,8 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
         // bônus da administração (Shiny 2x, XP 2x…), só informativo
         selosBonus(),
         el('div', { class: 'cab-grupo cab-moedas' },
-          el('span', { class: 'cab-moeda', title: 'Silver' }, el('span', { class: 'icone-moeda moeda-silver' }), el('span', { class: 'cab-valor-silver' }, save.silver.toLocaleString('pt-BR'))),
-          el('span', { class: 'cab-moeda', title: 'Gold' }, el('span', { class: 'icone-moeda moeda-gold' }), el('span', { class: 'cab-valor-gold' }, save.gold.toLocaleString('pt-BR')))),
+          el('span', { class: 'cab-moeda', title: 'Poké Dólar' }, el('span', { class: 'icone-moeda moeda-silver' }), el('span', { class: 'cab-valor-silver' }, save.silver.toLocaleString('pt-BR'))),
+          el('span', { class: 'cab-moeda', title: 'Origin Coin' }, el('span', { class: 'icone-moeda moeda-gold' }), el('span', { class: 'cab-valor-gold' }, save.gold.toLocaleString('pt-BR')))),
         // ícone só (o nome aparece ao passar o mouse)
       ),
       // atalhos fora da barra: botões hexagonais soltos, um do lado do outro

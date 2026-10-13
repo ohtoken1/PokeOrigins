@@ -7,14 +7,33 @@ const LARGURA_CASA = 92;
 const CASAS = 44;
 const ALVO = 38;
 
-/** Linha de botões "Abrir 1 / ×3 / ×5"; os que passam do que o jogador tem ficam desligados. */
+/** A última quantidade escolhida (fica marcada na próxima vez, se o jogador ainda tiver tantos). */
+let ultima = 1;
+
+/**
+ * Linha "×1 / ×3 / ×5" + o botão de abrir (pedido do dono: clicar na quantidade só ESCOLHE; quem abre é o botão
+ * "Abrir ×N", para ninguém gastar 5 de uma vez sem querer). As quantidades que passam do que o jogador tem ficam
+ * desligadas.
+ */
 export function botoesQuantidade(verbo: string, tem: number, aoEscolher: (n: number) => void): { raiz: HTMLElement; travar: (sim: boolean) => void } {
-  const botoes = QUANTIDADES_ROLETA.map(
-    (n) => el('button', { class: `botao ${n === 1 ? 'grande' : 'secundario'}`, disabled: tem < n, onclick: () => aoEscolher(n) }, n === 1 ? `${verbo} 1` : `×${n}`) as HTMLButtonElement,
-  );
+  let escolhida = QUANTIDADES_ROLETA.includes(ultima) && tem >= ultima ? ultima : 1;
+  let travado = false;
+  const abrir = el('button', { class: 'botao grande abrir-escolhido', onclick: () => aoEscolher(escolhida) }) as HTMLButtonElement;
+  const botoes = QUANTIDADES_ROLETA.map((n) => el('button', { class: 'botao secundario', onclick: () => ((escolhida = ultima = n), pintar()) }, `×${n}`) as HTMLButtonElement);
+  const pintar = () => {
+    botoes.forEach((b, i) => {
+      const n = QUANTIDADES_ROLETA[i];
+      b.disabled = travado || tem < n;
+      b.classList.toggle('ligado', n === escolhida);
+      b.setAttribute('aria-pressed', String(n === escolhida));
+    });
+    abrir.textContent = `${verbo} ×${escolhida}`;
+    abrir.disabled = travado || tem < escolhida;
+  };
+  pintar();
   return {
-    raiz: el('div', { class: 'botoes-quantidade' }, ...botoes, el('small', { class: 'meta' }, tem > 0 ? `Você tem ${tem}` : 'Você não tem nenhum')),
-    travar: (sim) => botoes.forEach((b, i) => (b.disabled = sim || tem < QUANTIDADES_ROLETA[i])),
+    raiz: el('div', { class: 'botoes-quantidade' }, ...botoes, abrir, el('small', { class: 'meta' }, tem > 0 ? `Você tem ${tem}` : 'Você não tem nenhum')),
+    travar: (sim) => ((travado = sim), pintar()),
   };
 }
 

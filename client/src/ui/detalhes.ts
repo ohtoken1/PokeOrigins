@@ -12,6 +12,7 @@ import { AMIZADE_MAXIMA, amizadeDe, textoAmizade } from '../../../shared/amizade
 import { iconeItem } from './iconeItem';
 import { formatarId, saveDoPokemon, salvar } from '../estado';
 import { vipAtivo } from '../../../shared/vip';
+import { valorEmMoeda } from './moeda';
 
 const NOMES: Record<Atributo, string> = { hp: 'HP', atk: 'Ataque', def: 'Defesa', spa: 'At. Esp.', spd: 'Def. Esp.', spe: 'Velocidade' };
 const CATEGORIAS: Record<string, string> = { Physical: 'Físico', Special: 'Especial', Status: 'Status' };
@@ -53,7 +54,7 @@ function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | 
   const pagar = () => {
     if (!save) return;
     if (save.silver < PRECO_REVELAR_IVS) {
-      aviso.textContent = `Silver insuficiente (você tem ${save.silver}).`;
+      aviso.textContent = `Poké Dólares insuficientes (você tem ${save.silver}).`;
       return;
     }
     save.silver -= PRECO_REVELAR_IVS;
@@ -70,7 +71,7 @@ function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | 
       el('strong', {}, '🔒 IVs ocultos'),
       el('small', {}, vip ? 'Avalie para ver o valor exato de cada IV (você é VIP).' : 'Avalie para ver a faixa de cada IV (0–5, 6–10… 26–31). Jogadores VIP veem o valor exato.'),
     ),
-    el('div', { class: 'botoes' }, el('button', { class: 'botao', disabled: !save, onclick: pagar }, `Avaliar IVs · ${PRECO_REVELAR_IVS} silver`)),
+    el('div', { class: 'botoes' }, el('button', { class: 'botao', disabled: !save, onclick: pagar }, 'Avaliar IVs · ', valorEmMoeda('silver', PRECO_REVELAR_IVS))),
     aviso,
   );
 }
@@ -101,7 +102,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
         el(
           'tr',
           {},
-          el('th', {}, NOMES[a], ' ', marca(a)),
+          el('th', { class: natureza.plus === a ? 'nat-sobe' : natureza.minus === a ? 'nat-desce' : '' }, NOMES[a], ' ', marca(a)),
           el('td', {}, el('span', { class: 'barrinha', style: { '--v': String(Math.min(1, base[a] / 180)) } }), String(base[a])),
           visao === 'exato'
             ? el('td', { class: p.ivs[a] === 31 ? 'perfeito' : '' }, String(p.ivs[a]))
@@ -109,7 +110,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
               ? el('td', { class: `faixa ${faixaDoIv(p.ivs[a])[0] >= 26 ? 'perfeito' : ''}`, title: 'Faixa do IV' }, faixaDoIv(p.ivs[a]).join('–'))
               : el('td', { class: 'oculto', title: 'IV oculto' }, '?'),
           el('td', {}, String(p.evs[a])),
-          el('td', { class: 'valor' }, a === 'hp' ? `${p.hp}/${max}` : String(valores[a])),
+          el('td', { class: `valor ${natureza.plus === a ? 'nat-sobe' : natureza.minus === a ? 'nat-desce' : ''}` }, a === 'hp' ? `${p.hp}/${max}` : String(valores[a])),
         ),
       ),
     ),

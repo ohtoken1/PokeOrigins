@@ -2,6 +2,7 @@
 // natureza, atributos, experiência e evolução. Os dados oficiais vêm do Pokémon Showdown.
 import { Dex } from '@pkmn/sim';
 import { especieRegional, idDaEvolucao } from '../formasRegionais';
+import { CONDICOES_DE_ATRIBUTO, CONDICOES_IGNORADAS, EVOLUCAO_SEM_LIGACAO, NIVEL_DA_EVOLUCAO_ESPECIAL } from '../evolucoesEspeciais';
 
 export type Atributo = 'hp' | 'atk' | 'def' | 'spa' | 'spd' | 'spe';
 export type Atributos = Record<Atributo, number>;
@@ -55,6 +56,10 @@ export interface PokemonIndividual {
    * o Move Reminder devolve qualquer um deles de graça (pedido do dono). Mantido por `lembrarGolpes`.
    */
   golpesAprendidos?: string[];
+  /** Fusão (DNA Splicers, N-Solarizer, Reins of Unity): o Pokémon que está dentro deste e volta ao separar. */
+  fundido?: PokemonIndividual;
+  /** Fusão: os IVs que este Pokémon tinha antes de se juntar (voltam ao separar). */
+  ivsAntesDaFusao?: Atributos;
 }
 
 /** Anota os golpes que o Pokémon sabe agora na memória dele (o que ele já soube nunca sai de lá). */
@@ -233,23 +238,41 @@ export function expGanha(expBaseDerrotado: number, nivelDerrotado: number, nivel
 
 /** Evoluções por nível que dependem só da hora ("de dia"/"à noite": Alolan Raticate, Obstagoon, Lycanroc…). */
 const CONDICOES_DE_HORA = ['during the day', 'at night'];
+/** Condições que os mapas ignoram: Lycanroc Dusk aparece solto a partir do 25, como os outros dois (pedido do dono). */
+const CONDICOES_SO_DOS_JOGOS = ['from a special Rockruff during the evening'];
 
 /**
  * Número da espécie para a qual evolui ao atingir o nível, ou null. Só evoluções por nível; as de dia/noite
  * seguem o relógio do computador (dia = 6h às 18h, como na amizade).
  */
-export function evolucaoPorNivel(numero: number, nivel: number, hora = new Date().getHours()): number | null {
+export function evolucaoPorNivel(numero: number, nivel: number, hora = new Date().getHours(), individuo?: PokemonIndividual): number | null {
   const dia = hora >= 6 && hora < 18;
-  for (const nome of especie(numero).evos ?? []) {
+  const possiveis: { id: number; genero?: string }[] = [];
+  for (const nome of [...(especie(numero).evos ?? []), ...(EVOLUCAO_SEM_LIGACAO[especie(numero).id] ?? [])]) {
     const evo = Dex.species.get(nome);
-    if (evo.evoType || evo.evoItem) continue;
-    if (evo.evoCondition && !CONDICOES_DE_HORA.includes(evo.evoCondition)) continue;
-    if (evo.evoCondition === 'during the day' && !dia) continue;
-    if (evo.evoCondition === 'at night' && dia) continue;
     const id = idDaEvolucao(numero, evo);
-    if (id !== null && evo.evoLevel && nivel >= evo.evoLevel) return id;
+    if (id === null) continue;
+    // condição especial dos jogos que aqui virou nível (pedido do dono)
+    const nosso = NIVEL_DA_EVOLUCAO_ESPECIAL[evo.id];
+    if (nosso) {
+      if (nivel >= nosso) possiveis.push({ id, genero: evo.gender });
+      continue;
+    }
+    if (evo.evoType || evo.evoItem) continue;
+    const condicao = evo.evoCondition ?? '';
+    // Tyrogue: Attack e Defense decidem qual das três
+    const porAtributo = CONDICOES_DE_ATRIBUTO[condicao];
+    if (porAtributo) {
+      if (!individuo) continue;
+      const a = atributos(individuo);
+      if (!porAtributo(a.atk, a.def)) continue;
+    } else if (condicao && !CONDICOES_DE_HORA.includes(condicao) && !CONDICOES_IGNORADAS.includes(condicao)) continue;
+    if (condicao === 'during the day' && !dia) continue;
+    if (condicao === 'at night' && dia) continue;
+    if (evo.evoLevel && nivel >= evo.evoLevel) possiveis.push({ id, genero: evo.gender });
   }
-  return null;
+  // formas de macho e de fêmea (Basculegion): vale a do gênero do Pokémon
+  return (possiveis.find((e) => e.genero && e.genero === individuo?.genero) ?? possiveis[0])?.id ?? null;
 }
 
 // ---------- criação ----------
@@ -309,6 +332,8 @@ export function nomeGolpe(id: string): string {
 export function nivelDeEvolucao(numero: number): number | null {
   const s = especie(numero);
   // nos mapas a hora não importa: Alolan Raticate (à noite) aparece a partir do 20 como o Raticate normal
-  const condicaoOk = !s.evoCondition || CONDICOES_DE_HORA.includes(s.evoCondition);
-  return !s.evoType && condicaoOk && !s.evoItem && s.evoLevel ? s.evoLevel : null;
+  if (NIVEL_DA_EVOLUCAO_ESPECIAL[s.id]) return NIVEL_DA_EVOLUCAO_ESPECIAL[s.id];
+  const condicaoOk =
+    !s.evoCondition || CONDICOES_DE_HORA.includes(s.evoCondition) || CONDICOES_SO_DOS_JOGOS.includes(s.evoCondition) || CONDICOES_IGNORADAS.includes(s.evoCondition) || s.evoCondition in CONDICOES_DE_ATRIBUTO;
+  return!s.evoType && condicaoOk && !s.evoItem && s.evoLevel ? s.evoLevel : null;
 }

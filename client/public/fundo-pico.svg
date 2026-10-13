@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice">
+  <!-- Pico Nevado: pôr do sol quente atrás de serras escuras (calor contra o branco da neve do mapa) -->
+  <defs>
+    <linearGradient id="ceu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a1830"/>
+      <stop offset="0.45" stop-color="#6a2c3c"/>
+      <stop offset="0.75" stop-color="#b8563a"/>
+      <stop offset="0.92" stop-color="#e09a4c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#ceu)"/>
+  <g fill="#ffe9c8">
+    <circle cx="160" cy="100" r="1.5" opacity="0.6"/><circle cx="460" cy="190" r="1.1" opacity="0.4"/><circle cx="700" cy="80" r="1.6" opacity="0.6"/>
+    <circle cx="1180" cy="70" r="1.4" opacity="0.5"/><circle cx="1420" cy="200" r="1" opacity="0.4"/><circle cx="1700" cy="110" r="1.5" opacity="0.5"/>
+  </g>
+  <!-- sol baixo -->
+  <circle cx="960" cy="760" r="150" fill="#ffd58a" opacity="0.55"/>
+  <circle cx="960" cy="760" r="96" fill="#ffe7b0" opacity="0.8"/>
+  <!-- nuvens finas -->
+  <path d="M120 420 C420 390 700 430 980 410 C1260 390 1560 430 1820 400 L1820 422 C1560 452 1260 414 980 432 C700 452 420 414 120 442 Z" fill="#ffc890" opacity="0.18"/>
+  <path d="M0 560 C300 540 620 580 900 556 C1240 530 1600 580 1920 548 L1920 572 C1600 604 1240 556 900 580 C620 604 300 564 0 584 Z" fill="#ffb878" opacity="0.14"/>
+  <!-- serras -->
+  <path d="M0 780 L220 560 L400 700 L640 500 L880 720 L1100 540 L1340 730 L1580 520 L1790 690 L1920 600 L1920 1080 L0 1080 Z" fill="#5a2a3a"/>
+  <path d="M220 560 L276 618 L246 626 L212 606 L186 600 Z M640 500 L706 566 L668 576 L632 556 L596 556 Z M1100 540 L1158 600 L1120 608 L1084 590 L1054 592 Z M1580 520 L1640 582 L1602 590 L1564 570 L1534 574 Z" fill="#f0c8a0" opacity="0.85"/>
+  <path d="M0 880 L200 740 L380 840 L600 700 L820 850 L1040 730 L1260 860 L1480 720 L1700 850 L1920 760 L1920 1080 L0 1080 Z" fill="#3e1e2e"/>
+  <path d="M0 980 C300 940 700 960 1060 980 C1400 1000 1700 960 1920 950 L1920 1080 L0 1080 Z" fill="#26131f"/>
+  <!-- pinheiros -->
+  <g fill="#1a0d16">
+    <path d="M200 1000 l40 -120 l40 120 z"/><path d="M290 1015 l30 -86 l30 86 z"/><path d="M380 1005 l34 -100 l34 100 z"/>
+    <path d="M1500 995 l42 -126 l42 126 z"/><path d="M1600 1012 l30 -88 l30 88 z"/><path d="M1690 1000 l36 -106 l36 106 z"/>
+  </g>
+</svg>

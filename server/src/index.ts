@@ -17,6 +17,7 @@ import * as missoes from './missoes.ts';
 import * as ranking from './ranking.ts';
 import * as entregas from './entregas.ts';
 import * as mercado from './mercado.ts';
+import * as banimentos from './banimentos.ts';
 import { avisarDaStaff, estaOnline, ligarMundo } from './mundo.ts';
 import { tituloAtivo } from '../../shared/conquistas.ts';
 import { temSkin, type ComSkins } from '../../shared/skins.ts';
@@ -79,6 +80,8 @@ const ipDe = (req: IncomingMessage) => String(req.headers['x-forwarded-for'] ?? 
 function exigirConta(req: IncomingMessage): banco.Conta {
   const conta = contaDoToken(tokenDe(req));
   if (!conta) throw new ErroConta('Sessão expirada. Entre de novo.', 401);
+  // banir já derruba as sessões; isto cobre qualquer sessão que tenha sobrado
+  banimentos.exigirSemBanimento(conta.id);
   return conta;
 }
 
@@ -94,7 +97,15 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   if (metodo === 'POST' && caminho === '/api/entrar') {
     limitar(ipDe(req));
     const c = await lerCorpo(req);
-    return responder(res, 200, await entrar(c.login, c.senha, c.manter === true));
+    const sessao = await entrar(c.login, c.senha, c.manter === true);
+    // conta banida: a senha confere, mas não entra (e lê o motivo e o prazo)
+    try {
+      banimentos.exigirSemBanimento(sessao.conta.id);
+    } catch (e) {
+      sair(sessao.token);
+      throw e;
+    }
+    return responder(res, 200, sessao);
   }
   if (metodo === 'POST' && caminho === '/api/sair') {
     const token = tokenDe(req);
@@ -278,6 +289,15 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   if (caminho === '/api/entregas' && metodo === 'GET') return responder(res, 200, entregas.pendentes(exigirConta(req)));
   if (caminho === '/api/entregas/receber' && metodo === 'POST') return responder(res, 200, entregas.receber(exigirConta(req)));
 
+  // ---- banimentos (server/src/banimentos.ts) ----
+  if (caminho === '/api/admin/banimentos' && metodo === 'GET') return responder(res, 200, banimentos.listar(exigirConta(req)));
+  if (caminho === '/api/admin/banimentos' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 201, banimentos.banir(conta, await lerCorpo(req)));
+  }
+  const rotaDesbanir = caminho.match(/^\/api\/admin\/banimentos\/([A-Za-z0-9_]{3,16})\/desbanir$/);
+  if (rotaDesbanir && metodo === 'POST') return responder(res, 200, banimentos.desbanir(exigirConta(req), rotaDesbanir[1]));
+
   // ---- ranking com todos os jogadores (server/src/ranking.ts) ----
   if (caminho === '/api/ranking' && metodo === 'GET') {
     exigirConta(req);
@@ -318,6 +338,8 @@ function perfilPublico(save: Record<string, unknown>) {
     capturados: save.capturados ?? [],
     estatisticas: save.estatisticas ?? null,
     titulo: tituloAtivo(save),
+    // selos sazonais (itens de coleção): só os ids que o jogador tem
+    selos: save.itens && typeof save.itens === 'object' ? Object.entries(save.itens as Record<string, unknown>).filter(([id, qtd]) => id.startsWith('selo-') && typeof qtd === 'number' && qtd > 0).map(([id]) => id) : [],
     // skin vestida (só se o item ainda está na bolsa); o jogo desenha o retrato com ela
     skinVisual: save.itens && typeof save.itens === 'object' && temSkin(save as unknown as ComSkins, save.skinVisual as string | null) ? save.skinVisual : null,
     mostrarTime,

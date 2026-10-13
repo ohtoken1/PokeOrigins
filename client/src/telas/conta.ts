@@ -1,5 +1,6 @@
 // Aba "Minha conta": Meu perfil (com os títulos), Conquistas e Minhas skins (Opções fica no mesmo menu, tela própria).
-import { bonusAtivoDaSkin, bonusDaSkin, temSkin, textoBonusSkin } from '../../../shared/skins';
+import { bonusAtivoDaSkin, bonusDaSkin, moverSkin, skinsNaBolsa, skinsNaColecao, temSkin, textoBonusSkin } from '../../../shared/skins';
+import { itemInegociavel } from '../../../shared/naoTrocavel';
 import { bonusDasConquistas, conquistaFeita, GRUPOS_CONQUISTA, textoRecompensa, TITULOS, tituloAtivo } from '../../../shared/conquistas';
 import { aoConcluirConquista, progressoDasConquistas } from '../conquistas';
 import type { Tela } from '../main';
@@ -9,6 +10,7 @@ import { aparenciaDoSave } from '../personagem/aparencia';
 import { LINHA_DIRECAO, montarPersonagem } from '../personagem/lpc';
 import { temArteDeSkin } from '../personagem/skinsDesenho';
 import { el } from '../ui/dom';
+import { balaoTitulo } from '../ui/titulo';
 import { iconeItem } from '../ui/iconeItem';
 import { perfilJogador } from './jogadores';
 
@@ -25,7 +27,7 @@ function achievements(save: Save): HTMLElement {
     secao.replaceChildren(
       el('p', { class: 'sub' }, `${feitas} de ${todas.length} concluídas. A recompensa chega na hora em que a conquista é concluída.`),
       el('div', { class: 'skins-total' },
-        el('span', {}, 'Silver em batalhas: ', el('strong', {}, pct(bonus.silver))),
+        el('span', {}, 'Poké Dólares em batalhas: ', el('strong', {}, pct(bonus.silver))),
         el('span', {}, 'Shiny, lendários e iniciais: ', el('strong', {}, pct(bonus.raros))),
         el('span', {}, 'Captura: ', el('strong', {}, pct(bonus.captura)))),
       ...GRUPOS_CONQUISTA.map((g) => {
@@ -56,7 +58,7 @@ function painelTitulos(save: Save, aoMudar: () => void): HTMLElement {
   const emUso = tituloAtivo(save);
   return el('section', { class: 'perfil-painel painel-titulos' },
     el('h3', {}, 'Títulos'),
-    el('p', { class: 'meta' }, 'Escolha um título para mostrar no seu perfil. Eles são liberados por conquistas.'),
+    el('p', { class: 'meta' }, 'Escolha um título para mostrar no seu perfil. Eles são liberados por conquistas. O título em uso dá o bônus dele em shiny, lendários e iniciais, Poké Dólares e XP.'),
     el('div', { class: 'lista-titulos' },
       ...TITULOS.map((t) => {
         const liberado = conquistaFeita(save, t.id);
@@ -70,7 +72,7 @@ function painelTitulos(save: Save, aoMudar: () => void): HTMLElement {
             salvar(save);
             aoMudar();
           },
-        }, el('strong', {}, t.nome), el('small', {}, liberado ? (usando ? 'Em uso' : 'Liberado') : `Conquista: ${t.conquista}`));
+        }, balaoTitulo(t.id), el('small', {},`+${Math.round(t.bonus * 100)}% de bônus · ${liberado ? (usando ? 'Em uso' : 'Liberado') : `Conquista: ${t.conquista}`}`));
       })),
     emUso ? null : el('small', { class: 'meta' }, 'Nenhum título em uso.'));
 }
@@ -113,7 +115,16 @@ function provador(save: Save): HTMLElement {
 }
 
 function conteudoSkins(save: Save, redesenhar: () => void): HTMLElement[] {
-  const minhas = TODOS_OS_ITENS.filter((i) => i.categoria === 'skins' && (save.itens[i.id] ?? 0) > 0);
+  // só as que estão na coleção (as levadas para a bolsa aparecem lá, como item)
+  const minhas = TODOS_OS_ITENS.filter((i) => i.categoria === 'skins' && skinsNaColecao(save, i.id) > 0);
+  const naBolsa = TODOS_OS_ITENS.filter((i) => i.categoria === 'skins').reduce((n, i) => n + skinsNaBolsa(save, i.id), 0);
+  const levar = (id: string) => {
+    if (!moverSkin(save, id, true)) return;
+    salvar(save);
+    // trocas e mercado conferem o save guardado no servidor (e o visual dos outros jogadores também)
+    void salvarAgora();
+    redesenhar();
+  };
   const total = bonusAtivoDaSkin(save);
   const visual = temSkin(save, save.skinVisual) && temArteDeSkin(save.skinVisual) ? save.skinVisual : null;
   const bonus = temSkin(save, save.skinBonus) ? save.skinBonus : null;
@@ -130,18 +141,23 @@ function conteudoSkins(save: Save, redesenhar: () => void): HTMLElement[] {
     el('p', { class: 'sub' }, 'Escolha uma skin para o visual e uma para o bônus: podem ser skins diferentes. O visual muda o seu personagem no mapa e na cidade (os outros jogadores também veem); só vale o bônus da skin escolhida.'),
     el('div', { class: 'skins-provador-linha' }, provador(save), el('small', { class: 'meta' }, visual ? 'É assim que você aparece no mapa.' : 'Sem skin no visual: você aparece com o seu personagem normal.')),
     el('div', { class: 'skins-total' }, el('span', {}, 'Visual: ', el('strong', {}, nomeDe(visual))), el('span', {}, 'Bônus de: ', el('strong', {}, nomeDe(bonus)))),
-    el('div', { class: 'skins-total' }, ...([['shiny', 'Shiny'], ['raros', 'Lendário, mítico, Ultra Beast e inicial'], ['silver', 'Silver em batalhas'], ['captura', 'Captura'], ['xp', 'XP']] as const).map(([k, nome]) =>
+    el('div', { class: 'skins-total' }, ...([['shiny', 'Shiny'], ['raros', 'Lendário, mítico, Ultra Beast e inicial'], ['silver', 'Poké Dólares em batalhas'], ['captura', 'Captura'], ['xp', 'XP']] as const).map(([k, nome]) =>
       el('span', {}, `${nome}: `, el('strong', {}, `+${(Math.round(total[k] * 1000) / 10).toLocaleString('pt-BR')}%`)))),
     minhas.length
       ? el('div', { class: 'grade-skins' },
           ...minhas.map((i) => el('div', { class: `cartao-skin${i.id === visual || i.id === bonus ? ' em-uso' : ''}` },
-            iconeItem(i), el('strong', {}, i.nome), el('small', {}, `×${save.itens[i.id]}`), el('small', { class: 'skin-bonus' }, textoBonusSkin(bonusDaSkin(i.id))),
+            iconeItem(i), el('strong', {}, i.nome), el('small', {}, `×${skinsNaColecao(save, i.id)}`), el('small', { class: 'skin-bonus' }, textoBonusSkin(bonusDaSkin(i.id))),
             el('div', { class: 'skin-botoes' },
               temArteDeSkin(i.id)
                 ? el('button', { class: `botao ${i.id === visual ? '' : 'secundario'}`, 'aria-pressed': String(i.id === visual), onclick: () => escolher('skinVisual', i.id) }, i.id === visual ? '✓ Visual' : 'Usar visual')
                 : el('button', { class: 'botao secundario', disabled: true, title: 'O desenho desta skin ainda não está pronto' }, 'Visual em breve'),
-              el('button', { class: `botao ${i.id === bonus ? '' : 'secundario'}`, 'aria-pressed': String(i.id === bonus), onclick: () => escolher('skinBonus', i.id) }, i.id === bonus ? '✓ Bônus' : 'Usar bônus')))))
+              el('button', { class: `botao ${i.id === bonus ? '' : 'secundario'}`, 'aria-pressed': String(i.id === bonus), onclick: () => escolher('skinBonus', i.id) }, i.id === bonus ? '✓ Bônus' : 'Usar bônus'),
+              // skin NT (conquistas, Kit iniciante) é da conta: não vai para a bolsa
+              itemInegociavel(i.id)
+                ? el('small', { class: 'meta skin-nt', title: 'Esta skin não pode ser trocada nem vendida' }, '🔒 NT')
+                : el('button', { class: 'botao secundario skin-levar', title: 'Na bolsa a skin vira um item: pode ser trocada ou vendida no Mercado negro, mas não dá visual nem bônus', onclick: () => levar(i.id) }, 'Levar para a bolsa')))))
       : el('p', { class: 'meta' }, 'Você ainda não tem nenhuma skin. Elas saem no lendário e no mítico dos tickets, de conquistas e de eventos.'),
+    naBolsa ? el('p', { class: 'meta' }, `Skins na bolsa: ${naBolsa}. Para voltar a usar, abra a bolsa e clique em Usar.`) : el('span', {}),
   ];
 }
 

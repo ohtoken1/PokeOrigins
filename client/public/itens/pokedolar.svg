@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="a" cx="36%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".45" stop-color="#c9d1dd"/>
+      <stop offset="1" stop-color="#6d7889"/>
+    </radialGradient>
+    <linearGradient id="b" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8f9aab"/>
+      <stop offset="1" stop-color="#e9eef5"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#a)" stroke="#4d5767" stroke-width="2.5"/>
+  <circle cx="32" cy="32" r="23.5" fill="url(#b)" stroke="#7a8597" stroke-width="1.5"/>
+  <!-- P com dois traços: o símbolo do dinheiro Pokémon -->
+  <g fill="#3f4857">
+    <path fill-rule="evenodd" d="M25 15h11a10 10 0 0 1 0 20h-4.5v14H25zM31.5 21v8H36a4 4 0 0 0 0-8z"/>
+    <rect x="18.5" y="37.5" width="19" height="3.6" rx="1"/>
+    <rect x="18.5" y="43" width="19" height="3.6" rx="1"/>
+  </g>
+  <path d="M12 24a22 22 0 0 1 20-14" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+</svg>

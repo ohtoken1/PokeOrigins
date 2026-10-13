@@ -24,7 +24,7 @@ export function abrirArena(navegar: Navegar): void {
         // viajando, o jogador não está em região nenhuma
         fechado: viagem ? `Fechado até o trem chegar a ${nomeDaRegiao(viagem.para)}` : undefined,
       },
-      { nome: 'Duelos com treinadores', descricao: 'Enfrente treinadores e ganhe silver.', destino: { tela: 'duelos' } },
+      { nome: 'Duelos com treinadores', descricao: 'Enfrente treinadores e ganhe Poké Dólares.', destino: { tela: 'duelos' } },
       { nome: 'Torneio', descricao: 'Torneios entre jogadores.', fechado: conteudoLiberado('torneio') ? 'Em breve' : textoTranca('torneio') },
       { nome: 'Liga Pokémon', descricao: 'O desafio final de cada região.', fechado: conteudoLiberado('liga') ? 'Em breve' : textoTranca('liga') },
     ];

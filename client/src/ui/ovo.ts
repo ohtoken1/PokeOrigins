@@ -12,7 +12,7 @@ import { iconeOvo } from './iconeItem';
 import { areaRoletas, botoesQuantidade } from './abrirVarios';
 import { ehLendario } from '../../../shared/encontros';
 import { especie } from '../../../shared/batalha/pokemon';
-import { ehParadoxo } from '../../../shared/formasRegionais';
+import { ehParadoxo, foraDosMapas } from '../../../shared/formasRegionais';
 
 /** Duração da roleta do ovo (mais lenta que a do ticket, para dar expectativa). */
 const DURACAO_ROLETA = 9000;
@@ -21,7 +21,7 @@ const DURACAO_ROLETA = 9000;
 function fundoCategoria(id: number): string {
   const p = pokemonPorId(id);
   if ((especie(id).tags ?? []).includes('Ultra Beast')) return 'fundo-ultra';
-  if (p.mitico) return 'fundo-mitico';
+  if (p.mitico) return 'fundo-pk-mitico';
   if (p.lendario) return 'fundo-lendario';
   return 'fundo-comum';
 }
@@ -72,10 +72,12 @@ function ehDeInicial(id: number, porSlug: Map<string, number>): boolean {
  */
 export function especiesDoOvo(ovo: Ovo): number[] {
   if (ovo.grupo === 'iniciais') return TODOS_INICIAIS;
-  const todos = todosOsPokemons().filter((p) => !ehParadoxo(especie(p.id).name));
-  if (ovo.grupo === 'todos') return todos.map((p) => p.id);
-  if (ovo.grupo === 'lendarios') return todos.filter((p) => ehLendario(p) && !p.evoluiDe && !especie(p.id).prevo).map((p) => p.id);
+  const todos = todosOsPokemons().filter((p) => !ehParadoxo(especie(p.id).name) && !foraDosMapas(p.id));
+  const lendarioBase = (p: (typeof todos)[number]) => ehLendario(p) && !p.evoluiDe && !especie(p.id).prevo;
+  if (ovo.grupo === 'lendarios') return todos.filter(lendarioBase).map((p) => p.id);
   const porSlug = new Map(todosOsPokemons().map((p) => [p.slug, p.id]));
+  // Misterioso (pedido do dono): de iniciais e de lendários só a forma base; os comuns vêm em qualquer forma
+  if (ovo.grupo === 'todos') return todos.filter((p) => (ehLendario(p) ? lendarioBase(p) : !ehDeInicial(p.id, porSlug) || TODOS_INICIAIS.includes(p.id))).map((p) => p.id);
   return todos.filter((p) => !ehLendario(p) && !ehDeInicial(p.id, porSlug)).map((p) => p.id);
 }
 

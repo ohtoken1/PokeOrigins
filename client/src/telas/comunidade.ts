@@ -30,7 +30,7 @@ const SECOES: Record<SecaoComunidade, { titulo: string; icone: string; texto: st
     titulo: 'Duelos com treinadores',
     icone: '',
     texto: 'Batalhas contra treinadores NPC, com times próprios.',
-    itens: ['Treinadores com times e níveis diferentes', 'Recompensas em silver e XP', 'Ganham amizade como nas batalhas selvagens'],
+    itens: ['Treinadores com times e níveis diferentes', 'Recompensas em Poké Dólares e XP', 'Ganham amizade como nas batalhas selvagens'],
   },
   ginasios: {
     titulo: 'Ginásios',

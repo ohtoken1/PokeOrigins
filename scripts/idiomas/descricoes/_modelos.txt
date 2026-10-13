@@ -1,0 +1,1047 @@
+0	Holder's Ability cannot be changed, suppressed, or ignored by any effect.
+1	Raises holder's Sp. Atk by 1 stage if hit by a <T>-type attack. Single use.
+2	If held by a Dialga, its Steel- and <T>-type attacks have 1.2x power.
+3	Raises holder's Speed by 1 stage if it gets affected by Intimidate. Single use.
+4	Restores 1/3 max HP at 1/4 max HP or less; confuses if -SpD Nature. Single use.
+5	Holder is immune to <T>-type attacks. Pops when holder is hit.
+6	Raises holder's Sp. Def by 1 stage when at 1/4 max HP or less. Single use.
+7	Holder is cured if it is frozen. Single use.
+8	Holder's Sp. Def is 1.5x, but it can only select damaging moves.
+9	Evolves Charcadet into Armarouge when used.
+10	Halves damage taken from a supereffective <T>-type attack. Single use.
+11	Evolves Milcery into Alcremie when held and spun around.
+12	A big nugget of pure gold that gives off a lustrous gleam.
+13	Holder gains 1.3x HP from draining/Aqua Ring/Ingrain/Leech Seed/Strength Sap.
+14	Holder's partial-trapping moves deal 1/6 max HP per turn instead of 1/8.
+15	Holder's <T>-type attacks have 1.2x power.
+16	Each turn, if holder is a <T> type, restores 1/16 max HP; loses 1/8 if not.
+17	If the holder misses due to accuracy, its Speed is raised by 2 stages. Single use.
+18	Activates the Protosynthesis or Quark Drive Abilities. Single use.
+19	Used for Hyper Training. One of a Pokemon's stats is calculated with an IV of 31.
+20	The accuracy of attacks against the holder is 0.9x.
+21	Raises holder's Attack by 1 if hit by an <T>-type attack. Single use.
+22	Holder cures itself if it is paralyzed. Single use.
+23	Holder wakes up if it is asleep. Single use.
+24	Halves damage taken from a <T>-type attack. Single use.
+25	Evolves Sinistea-Antique into Polteageist-Antique when used.
+26	Holder's Attack is 1.5x, but it can only select the first move it executes.
+27	Holder's Speed is 1.5x, but it can only select the first move it executes.
+28	Holder's Sp. Atk is 1.5x, but it can only select the first move it executes.
+29	Prevents other Pokemon from lowering the holder's stat stages.
+30	Ogerpon-Cornerstone: 1.2x power attacks; Terastallize to gain Embody Aspect.
+31	Holder is not affected by the secondary effect of another Pokemon's attack.
+32	Evolves Sinistea into Polteageist when used.
+33	Holder moves first in its priority bracket when at 1/4 max HP or less. Single use.
+34	Holder's use of Rain Dance lasts 8 turns instead of 5.
+35	Evolves certain species of Pokemon when used.
+36	If holder becomes infatuated, the other Pokemon also becomes infatuated.
+37	Holder's <T>-type attacks have 1.2x power. Judgment is <T> type.
+38	Evolves Seadra into Kingdra when traded.
+39	Evolves Porygon2 into Porygon-Z when traded.
+40	If holder survives a hit, it immediately switches out to a chosen ally. Single use.
+41	If the holder's stat stages are lowered, it switches to a chosen ally. Single use.
+42	Evolves Electabuzz into Electivire when traded.
+43	If the terrain is Electric Terrain, raises holder's Defense by 1 stage. Single use.
+44	Restores 1/4 max HP after holder is hit by a supereffective move. Single use.
+45	If holder's species can evolve, its Defense and Sp. Def are 1.5x.
+46	Holder's attacks that are super effective against the target do 1.2x damage.
+47	Restores 1/3 max HP at 1/4 max HP or less; confuses if -Atk Nature. Single use.
+48	At the end of every turn, this item attempts to burn the holder.
+49	Holder's weight is halved.
+50	Holder has a 10% chance to survive an attack that would KO it with 1 HP.
+51	If holder's HP is full, will survive an attack that would KO it with 1 HP. Single use.
+52	Evolves Galarian Slowpoke into Galarian Slowbro when used.
+53	Evolves Galarian Slowpoke into Galarian Slowking when used.
+54	Raises holder's Defense by 1 stage when at 1/4 max HP or less. Single use.
+55	Used for Hyper Training. All of a Pokemon's stats are calculated with an IV of 31.
+56	If the terrain is Grassy Terrain, raises holder's Defense by 1 stage. Single use.
+57	Cannot be eaten by the holder. No effect when eaten with Bug Bite or Pluck.
+58	Holder's partial-trapping moves always last 7 turns.
+59	If held by a Giratina, its Ghost- and <T>-type attacks have 1.2x power.
+60	Ogerpon-Hearthflame: 1.2x power attacks; Terastallize to gain Embody Aspect.
+61	Holder's use of Sunny Day lasts 8 turns instead of 5.
+62	When switching in, the holder is unaffected by hazards on its side of the field.
+63	Restores 1/3 max HP at 1/4 max HP or less; confuses if -Def Nature. Single use.
+64	Holder's use of Snowscape lasts 8 turns instead of 5.
+65	Holder is grounded, Speed halved. If <T> type, takes neutral Ground damage.
+66	If holder is hit by a physical move, attacker loses 1/8 of its max HP. Single use.
+67	Raises holder's Defense by 1 stage after it is hit by a physical attack. Single use.
+68	Holder's attacks without a chance to flinch gain a 10% chance to flinch.
+69	Holder moves last in its priority bracket.
+70	Holder gains the Focus Energy effect when at 1/4 max HP or less. Single use.
+71	At the end of every turn, holder restores 1/16 of its max HP.
+72	Restores 10 PP to the first of the holder's moves to reach 0 PP. Single use.
+73	Raises holder's Attack by 1 stage when at 1/4 max HP or less. Single use.
+74	Holder's attacks do 1.3x damage, and it loses 1/10 its max HP after the attack.
+75	If held by a Pikachu, its Attack and Sp. Atk are doubled.
+76	Holder's use of Aurora Veil, Light Screen, or Reflect lasts 8 turns instead of 5.
+77	Holder's moves that hit 2-5 times hit 4-5 times; Population Bomb hits 4-10 times.
+78	Holder cures itself if it has a non-volatile status or is confused. Single use.
+79	Raises holder's Sp. Def by 1 stage if hit by a <T>-type attack. Single use.
+80	If held by a Palkia, its Water- and <T>-type attacks have 1.2x power.
+81	Evolves Magmar into Magmortar when traded.
+82	Restores 1/3 max HP at 1/4 max HP or less; confuses if -Spe Nature. Single use.
+83	Evolves Charcadet into Ceruledge when used.
+84	Raises holder's Sp. Def by 1 stage after it is hit by a special attack. Single use.
+85	Evolves Poltchageist-Artisan into Sinistcha-Masterpiece when used.
+86	Cures holder of Attract, Disable, Encore, Heal Block, Taunt, Torment. Single use.
+87	Evolves Duraludon into Archaludon when used.
+88	Damage of moves used on consecutive turns is increased. Max 2x after 5 turns.
+89	Holder's next move has 1.2x accuracy when at 1/4 max HP or less. Single use.
+90	When an opposing Pokemon raises a stat stage, the holder copies it. Single use.
+91	If the terrain is Misty Terrain, raises holder's Sp. Def by 1 stage. Single use.
+92	Holder's physical attacks have 1.1x power.
+93	Holder's first successful <T>-type attack will have 1.3x power. Single use.
+94	Restores 10 HP when at 1/2 max HP or less. Single use.
+95	Evolves Happiny into Chansey when held and leveled up during the day.
+96	Holder is cured if it is poisoned. Single use.
+97	Holder is cured if it is confused. Single use.
+98	Raises holder's Sp. Atk by 1 stage when at 1/4 max HP or less. Single use.
+99	Holder's Speed is halved. The Klutz Ability does not ignore this effect.
+100	Holder's two-turn moves complete in one turn (except Sky Drop). Single use.
+101	Though this feather is beautiful, it's just a regular feather and has no effect.
+102	Evolves Feebas into Milotic when traded.
+103	Holder's moves are protected from adverse contact effects, except Pickpocket.
+104	Evolves Rhydon into Rhyperior when traded.
+105	If the terrain is Psychic Terrain, raises holder's Sp. Def by 1 stage. Single use.
+106	Holder's punch-based attacks have 1.1x power and do not make contact.
+107	Each turn, holder has a 20% chance to move first in its priority bracket.
+108	No competitive use other than when used with Fling.
+109	Holder is cured if it is burned. Single use.
+110	Holder's critical hit ratio is raised by 1 stage.
+111	Evolves Dusclops into Dusknoir when traded.
+112	If holder survives a hit, attacker is forced to switch to a random ally. Single use.
+113	The holder's type immunities granted solely by its typing are negated.
+114	If holder is hit by a contact move, the attacker loses 1/6 of its max HP.
+115	If Trick Room is active, the holder's Speed is lowered by 1 stage. Single use.
+116	If holder is hit by a special move, attacker loses 1/8 of its max HP. Single use.
+117	If held by a Zamazenta, this item changes its forme to Crowned Shield.
+118	If held by a Zacian, this item changes its forme to Crowned Sword.
+119	Holder is immune to powder moves and damage from Sandstorm or Hail.
+120	Raises holder's Speed by 1 stage when at 1/4 max HP or less. Single use.
+121	Holder cannot be prevented from choosing to switch out by any effect.
+122	After an attack, holder gains 1/8 of the damage in HP dealt to other Pokemon.
+123	Restores 1/4 max HP when at 1/2 max HP or less. Single use.
+124	Holder's use of Sandstorm lasts 8 turns instead of 5.
+125	If held by a Latias/Latios, its Dragon- and <T>-type moves have 1.2x power.
+126	Raises a random stat by 2 when at 1/4 max HP or less (not acc/eva). Single use.
+127	Each turn, holder loses 1/8 max HP. An attacker making contact can receive it.
+128	Evolves Applin into Appletun when used.
+129	Evolves Applin into Dipplin when used.
+130	Evolves Applin into Flapple when used.
+131	Holder's use of <T>/Grassy/Misty/Psychic Terrain lasts 8 turns instead of 5.
+132	Raises holder's Special Attack by 1 stage after it uses a sound move. Single use.
+133	At the end of every turn, this item attempts to badly poison the holder.
+134	Evolves Poltchageist into Sinistcha when used.
+135	Evolves Porygon into Porygon2 when traded.
+136	The holder ignores rain- and sun-based effects.
+137	If holder is hit super effectively, raises Attack, Sp. Atk by 2 stages. Single use.
+138	Ogerpon-Wellspring: 1.2x power attacks; Terastallize to gain Embody Aspect.
+139	Restores all lowered stat stages to 0 when one is less than 0. Single use.
+140	The accuracy of attacks by the holder is 1.1x.
+141	Restores 1/3 max HP at 1/4 max HP or less; confuses if -SpA Nature. Single use.
+142	Holder's special attacks have 1.1x power.
+143	The accuracy of attacks by the holder is 1.2x if it moves after its target.
+144	Very high critical hit ratio.
+145	User recovers 50% of the damage dealt.
+146	Usually goes first.
+147	10% chance to lower the foe(s) Sp. Def by 1.
+148	Raises the user's Defense by 2.
+149	Power is equal to the base move's Z-Power.
+150	100% chance to lower the target's Sp. Def by 2.
+151	Power doubles if the user has no held item.
+152	Raises a random stat of the user or an ally by 2.
+153	This move does not check accuracy.
+154	High critical hit ratio.
+155	The target makes its move right after the user.
+156	Raises the user's Speed by 2.
+157	High critical hit ratio. Hits adjacent foes.
+158	30% chance to make the target flinch.
+159	100% confuse target that had a stat rise this turn.
+160	User and ally swap positions; using again can fail.
+161	Raises the user's Sp. Def by 2.
+162	Prevents the target from switching out.
+163	10% chance to raise all stats by 1 (not acc/eva).
+164	100% chance to lower the target's Sp. Def by 1.
+165	User recovers 1/16 max HP per turn.
+166	100% chance to raise the user's Speed by 1.
+167	No additional effect.
+168	Lowers the user's Defense and Sp. Def by 1.
+169	Hits 2-5 times in one turn.
+170	Cures the user's party of all status conditions.
+171	Raises an ally's Sp. Def by 1.
+172	Uses a random move known by a team member.
+173	Power doubles if target was damaged this turn.
+174	No additional effect. Hits adjacent foes.
+175	A target of the opposite gender gets infatuated.
+176	Morpeko: Electric; Hangry: Dark; 100% +1 Spe.
+177	10% chance to lower the target's Attack by 1.
+178	For 5 turns, damage to allies halved. Snow only.
+179	Raises the user's Speed by 2; user loses 100 kg.
+180	Power doubles if user is damaged by the target.
+181	30% confusion. User loses 50% max HP if miss.
+182	Lowers the target's Attack by 1.
+183	Protects from moves. Contact: poison.
+184	50% psn. 2x power if target already poisoned.
+185	User switches, passing stat changes and more.
+186	Burns on contact with the user before it moves.
+187	All healthy allies aid in damaging the target.
+188	Cannot be selected until the user eats a Berry.
+189	User loses 50% max HP. Maximizes Attack.
+190	User passes its held item to the target.
+191	Waits 2 turns; deals double the damage taken.
+192	Traps and damages the target for 4-5 turns.
+193	100% chance to lower the target's Attack by 1.
+194	User cannot move next turn.
+195	High critical hit ratio. 10% chance to burn.
+196	30% to lower foe(s) Speed by 1. Rain: can't miss.
+197	10% chance to freeze foe(s). Can't miss in Snow.
+198	Cannot be selected the turn after it's used.
+199	20% chance to burn the target.
+200	Uses user's Def stat as Atk in damage calculation.
+201	30% chance to paralyze the target.
+202	Power doubles if user moves before the target.
+203	20% chance to paralyze the target.
+204	10% chance to make the target flinch.
+205	Hits 2 times in one turn.
+206	No additional effect. Hits adjacent Pokemon.
+207	Bounces turn 1. Hits turn 2. 30% paralyze.
+208	Has 33% recoil.
+209	100% chance to lower the foe(s) Attack by 1.
+210	Destroys screens, unless the target is immune.
+211	Power doubles if the target's HP is 50% or less.
+212	10% chance to lower the foe(s) Speed by 1.
+213	10% chance to lower the target's Speed by 1.
+214	User steals and eats the target's Berry.
+215	10% chance to lower the target's Sp. Def by 1.
+216	Raises the user's Attack and Defense by 1.
+217	100% chance lower adjacent Pkmn Speed by 1.
+218	Protects from damaging attacks. Contact: burn.
+219	100% burns a target that had a stat rise this turn.
+220	Raises the user's Sp. Atk and Sp. Def by 1.
+221	Changes user's type by terrain (default Normal).
+222	Lowers the foe(s) Sp. Atk by 2 if opposite gender.
+223	Sets a layer of Spikes on the opposing side.
+224	No competitive use.
+225	+1 SpD, user's next Electric move 2x power.
+226	70% chance to raise the user's Sp. Atk by 1.
+227	Lowers the target's Attack by 2.
+228	100% chance to confuse the target.
+229	Starts Snow. User switches out.
+230	Ignores the target's stat stage changes.
+231	User loses 50% max HP.
+232	Forces the target to switch to a random ally.
+233	Lowers the user's Defense by 1.
+234	User loses 33% of its max HP. +1 to all stats.
+235	Raises the user's Atk/Def/SpAtk/SpDef/Spe by 1.
+236	Resets all of the target's stat stages to 0.
+237	Raises an ally's Attack and Defense by 1.
+238	Raises user's Attack, Defense, accuracy by 1.
+239	Deals 1.3333x damage with supereffective hits.
+240	If hit by an attack, returns 1.5x damage.
+241	Lowers the target's Sp. Atk by 1.
+242	Confuses the target.
+243	10% chance to confuse the target.
+244	Changes user's type to match its first move.
+245	Changes user's type to resist target's last move.
+246	Uses the last move used in the battle.
+247	Nullifies the foe(s) Ability if the foe(s) move first.
+248	Raises the user's Defense and Sp. Def by 1.
+249	Raises the user's Defense by 3.
+250	Lowers the target's Speed by 2.
+251	If hit by physical attack, returns double damage.
+252	Swaps user's field effects with the opposing side.
+253	If the user has no item, it steals the target's.
+254	Protects allies from Status moves this turn.
+255	High critical hit ratio. 10% chance to poison.
+256	20% chance to lower the target's Defense by 1.
+257	50% chance to lower the target's Defense by 1.
+258	More power the more HP the target has left.
+259	Curses if <T>, else -1 Spe, +1 Atk, +1 Def.
+260	20% chance to make the target flinch.
+261	Darkrai: Causes the foe(s) to fall asleep.
+262	Raises the target's Attack and Sp. Atk by 2.
+263	Raises the user's Defense by 1.
+264	-1 evasion; ends user and target hazards/terrain.
+265	If an opponent knocks out the user, it also faints.
+266	Prevents moves from affecting the user this turn.
+267	50% chance to raise user's Defense by 2.
+268	Digs underground turn 1, strikes turn 2.
+269	50% chance to sleep, poison, or paralyze target.
+270	For 4 turns, disables the target's last move used.
+271	This move does not check accuracy. Hits foes.
+272	30% chance to paralyze adjacent Pokemon.
+273	Dives underwater turn 1, strikes turn 2.
+274	20% chance to confuse the target.
+275	User and ally's Abilities become target's Ability.
+276	Hits two turns after being used.
+277	Hits twice. 30% chance to make the target flinch.
+278	User's <T> type: typeless; must be Electric.
+279	Raises the user's evasiveness by 1.
+280	Lowers the user's Sp. Atk by 2.
+281	Ally: Crit ratio +1, or +2 if ally is <T> type.
+282	Raises the user's Attack and Speed by 1.
+283	Hits twice. Doubles: Tries to hit each foe once.
+284	Less power as user's HP decreases. Hits foe(s).
+285	Deals 40 HP of damage to the target.
+286	User recovers 75% of the damage dealt.
+287	User gains 1/2 HP inflicted. Sleeping target only.
+288	100% chance to lower the target's Speed by 1.
+289	Hits adjacent Pokemon. Double damage on Dig.
+290	Power increases when used on consecutive turns.
+291	Lowers the target's Sp. Atk by 2.
+292	Removes 3 PP from the target's last move.
+293	5 turns. Grounded: +Electric power, can't sleep.
+294	Changes the target's move to Electric this turn.
+295	More power the faster the user is than the target.
+296	Raises Sp. Atk by 1, hits turn 2. Rain: no charge.
+297	100% chance to lower the foe(s) Speed by 1.
+298	For 5 turns, the target's item has no effect.
+299	10% chance to burn the target.
+300	Target repeats its last move for its next 3 turns.
+301	Lowers the target's HP to the user's HP.
+302	User survives attacks this turn with at least 1 HP.
+303	The target's Ability changes to match the user's.
+304	100% chance to raise user Speed by 1. High crit.
+305	User on Psychic Terrain: 1.5x power, hits foes.
+306	Hits adjacent Pokemon. The user faints.
+307	Raises user's Atk, Def, SpA, SpD, and Spe by 2.
+308	Nearly always goes first.
+309	Power doubles if user is burn/poison/paralyzed.
+310	Prevents all Pokemon from switching next turn.
+311	Hits first. First turn out only. 100% flinch chance.
+312	Lowers the target's Sp. Def by 2.
+313	Always leaves the target with at least 1 HP.
+314	Nullifies Detect, Protect, and Quick/Wide Guard.
+315	Raises user's Attack by 3 if this KOes the target.
+316	Has a 30% chance this move's power is doubled.
+317	50% chance to raise the user's Sp. Atk by 1.
+318	20% chance to make the foe(s) flinch.
+319	+2 Attack, Sp. Atk, Speed for 1/2 user's max HP.
+320	Does damage equal to the user's HP. User faints.
+321	10% chance to burn. 10% chance to flinch.
+322	100% chance to lower the target's Defense by 1.
+323	Use with <T> or Water Pledge for added effect.
+324	Nearly always goes first. First turn out only.
+325	OHKOs the target. Fails if user is a lower level.
+326	More power the less HP the user has left.
+327	Damages Pokemon next to the target as well.
+328	10% chance to burn the target. Thaws user.
+329	Has 33% recoil. 10% chance to burn. Thaws user.
+330	Lowers the target's accuracy by 1.
+331	Raises the target's Sp. Atk by 1 and confuses it.
+332	Flings the user's item at the target. Power varies.
+333	User switches out after damaging the target.
+334	Heals the target by 50% of its max HP.
+335	Raises Defense by 1 of all active <T> types.
+336	Always results in a critical hit; no accuracy check.
+337	Flies up on first turn, then strikes the next turn.
+338	Combines Flying in its type effectiveness.
+339	Raises the user's critical hit ratio by 2.
+340	Fails if the user takes damage before it hits.
+341	The foes' moves target the user on the turn used.
+342	<T>, Normal hit Ghost. Evasiveness ignored.
+343	Adds Grass to the target's type(s).
+344	Uses target's Attack stat in damage calculation.
+345	10% chance to freeze. Super effective on Water.
+346	Charges turn 1. Hits turn 2. 30% paralyze.
+347	10% chance to freeze the target.
+348	Always results in a critical hit.
+349	Max 102 power at minimum Happiness.
+350	Power doubles with each hit, up to 160.
+351	Power doubles if used after Fusion Flare this turn.
+352	Power doubles if used after Fusion Bolt this turn.
+353	Nullifies the target's Ability.
+354	Raises Atk, Sp. Atk of allies with Plus/Minus by 1.
+355	Summons Psychic Terrain.
+356	Charges, then raises SpA, SpD, Spe by 2 turn 2.
+357	User takes sure-hit 2x damage until its next turn.
+358	Paralyzes the target.
+359	More power the heavier the target.
+360	Causes the target to fall asleep.
+361	User on Grassy Terrain: +1 priority.
+362	5 turns. Grounded: +Grass power, +1/16 max HP.
+363	Target: 100% -1 Def. During Gravity: 1.5x power.
+364	5 turns: no Ground immunities, 1.67x accuracy.
+365	Lowers the foe(s) Attack by 1.
+366	Raises user's Attack and Sp. Atk by 1; 2 in Sun.
+367	If the user faints, the attack used loses all its PP.
+368	Does damage equal to 3/4 target's current HP.
+369	Averages Defense and Sp. Def stats with target.
+370	Swaps Defense and Sp. Def changes with target.
+371	30% chance to poison the target.
+372	Power doubles during Bounce, Fly, and Sky Drop.
+373	More power the slower the user than the target.
+374	For 5 turns, hail crashes down.
+375	Lowers the user's Speed by 1.
+376	Eliminates all stat changes.
+377	Has 1/4 recoil.
+378	Has 1/2 recoil.
+379	For 5 turns, the foe(s) is prevented from healing.
+380	User faints. Next hurt Pokemon is fully healed.
+381	Heals the user by 50% of its max HP.
+382	Swaps all stat changes with target.
+383	More power the heavier the user than the target.
+384	10% chance to burn the foe(s).
+385	One adjacent ally's move power is 1.5x this turn.
+386	Power doubles if the target has a status ailment.
+387	Varies in type based on the user's IVs.
+388	User is hurt by 50% of its max HP if it misses.
+389	Raises the user's Attack and accuracy by 1.
+390	Raises the user's and ally's Attack by 1.
+391	30% chance to confuse target. Can't miss in rain.
+392	During Sunny Day: 1.5x damage instead of half.
+393	Bypasses protection without breaking it.
+394	Hoopa-U: Lowers user's Def by 1; breaks protect.
+395	Breaks the target's protection for this turn.
+396	Power doubles with each hit. Repeats for 5 turns.
+397	Charges turn 1. Hits turn 2. 30% burn.
+398	10% chance to freeze. 10% chance to flinch.
+399	Ends the effects of terrain.
+400	No foe can use any move known by the user.
+401	Destroys the foe(s) Berry/Gem.
+402	30% burn. 2x power if target is already statused.
+403	100% chance to burn the target.
+404	Traps/grounds user; heals 1/16 max HP per turn.
+405	The target immediately uses its last used move.
+406	Normal moves become <T> type this turn.
+407	30% chance to lower the target's Defense by 1.
+408	High critical hit ratio. Type depends on user's form.
+409	Prevents both user and target from switching out.
+410	Type varies based on the held Plate.
+411	User and allies: healed 1/4 max HP, status cured.
+412	Protects from damaging attacks. Contact: -1 Atk.
+413	1.5x damage if foe holds an item. Removes item.
+414	Until the end of the next turn, user's moves crit.
+415	2x power if the user had a stat lowered this turn.
+416	Fails unless each known move has been used.
+417	+50 power for each time a party member fainted.
+418	30% chance to burn adjacent Pokemon.
+419	50% chance to lower the target's accuracy by 1.
+420	1/8 of target's HP is restored to user every turn.
+421	Lowers the foe(s) Defense by 1.
+422	Heals the user and its allies by 1/4 their max HP.
+423	For 5 turns, special damage to allies is halved.
+424	Physical if user's Atk > Sp. Atk. Ignores Abilities.
+425	User's next move will not miss the target.
+426	For 5 turns, shields user's party from critical hits.
+427	User faints. Next hurt Pkmn is cured, max HP/PP.
+428	50% chance to lower the target's Sp. Def by 1.
+429	Bounces back certain non-damaging moves.
+430	Changes the target's type to Psychic.
+431	For 5 turns, all held items have no effect.
+432	Raises Def, Sp. Def of allies with Plus/Minus by 1.
+433	For 5 turns, the user has immunity to Ground.
+434	Hits adjacent Pokemon. Power varies; 2x on Dig.
+435	Lowers the user's Sp. Atk by 1. Hits foe(s).
+436	Damage doubles if the target used Minimize.
+437	50% chance to badly poison the target.
+438	Protects allies from damaging attacks. Turn 1 only.
+439	20% burn. Recovers 50% dmg dealt. Thaws foe(s).
+440	Base move affects power. Allies: +1 Speed.
+441	Base move affects power. Foes: -1 Sp. Def.
+442	Base move affects power. Starts Sunny Day.
+443	Base move affects power. Foes: -1 Sp. Atk.
+444	Base move affects power. Starts Rain Dance.
+445	Protects user from moves & Max Moves this turn.
+446	Base move affects power. Starts Hail.
+447	Base move affects power. Allies: +1 Attack.
+448	Base move affects power. Starts Electric Terrain.
+449	Base move affects power. Starts Psychic Terrain.
+450	Base move affects power. Allies: +1 Sp. Atk.
+451	Base move affects power. Starts Grassy Terrain.
+452	Base move affects power. Foes: -1 Defense.
+453	Base move affects power. Allies: +1 Sp. Def.
+454	Base move affects power. Starts Sandstorm.
+455	Base move affects power. Starts Misty Terrain.
+456	Base move affects power. Allies: +1 Defense.
+457	Base move affects power. Foes: -1 Speed.
+458	Base move affects power. Foes: -1 Attack.
+459	Raises the user's Attack by 1.
+460	Copies a foe at 1.5x power. User must be faster.
+461	Lowers target's Attack, Sp. Atk by 2. User faints.
+462	Ignores the Abilities of other Pokemon.
+463	10% chance to raise the user's Attack by 1.
+464	Raises user's Sp. Atk by 1 on turn 1. Hits turn 2.
+465	20% chance to raise the user's Attack by 1.
+466	Picks a random move.
+467	The last move the target used replaces this one.
+468	User loses 50% max HP. Hits adjacent Pokemon.
+469	Raises the user's evasiveness by 2.
+470	Psychic hits Dark. Evasiveness ignored.
+471	If hit by special attack, returns double damage.
+472	User uses the target's last used move against it.
+473	30% chance to lower the target's accuracy by 1.
+474	For 5 turns, protects user's party from stat drops.
+475	50% chance to lower the target's Sp. Atk by 1.
+476	User faints. User on Misty Terrain: 1.5x power.
+477	5 turns. Can't status,-Dragon power vs grounded.
+478	30% chance to lower the target's Sp. Atk by 1.
+479	Heals the user by a weather-dependent amount.
+480	Poisons foes, frees user from hazards/bind/leech.
+481	30% chance to lower the foe(s) accuracy by 1.
+482	100% chance to lower the target's accuracy by 1.
+483	For 5 turns, <T>-type attacks have 1/3 power.
+484	Type varies based on the held Memory.
+485	100% chance to lower the target's Sp. Atk by 1.
+486	100% chance to raise the user's Sp. Atk by 1.
+487	Raises the user's Sp. Atk by 2.
+488	Power and type depends on the user's Berry.
+489	Attack depends on terrain (default Tri Attack).
+490	Does damage equal to 1/2 target's current HP.
+491	40% chance to lower the target's accuracy by 1.
+492	A sleeping target is hurt by 1/4 max HP per turn.
+493	Does damage equal to the user's level.
+494	Lowers the target's Attack and Sp. Atk by 1.
+495	Raises all stats by 1 (not acc/eva). Traps user.
+496	100% chance to paralyze the target.
+497	Protects from damaging attacks. Contact: -2 Def.
+498	Traps target, lowers Def and SpD by 1 each turn.
+499	Curly|Droopy|Stretchy eaten: +1 Atk|Def|Spe.
+500	Lasts 2-3 turns. Confuses the user afterwards.
+501	No additional effect. Hits foe(s).
+502	Shares HP of user and target equally.
+503	Lowers target's Atk, Sp. Atk by 1. User switches.
+504	Power doubles if the user moves after the target.
+505	Scatters coins.
+506	All active Pokemon will faint in 3 turns.
+507	Disappears turn 1. Hits turn 2. Breaks protection.
+508	Poisons the foe(s).
+509	Poisons the target.
+510	If the target is an ally, heals 50% of its max HP.
+511	Fails if the target has no held item.
+512	Hits 10 times. Each hit can miss.
+513	If using a Fire move, target loses 1/4 max HP.
+514	10% chance to freeze the foe(s).
+515	Averages Attack and Sp. Atk stats with target.
+516	Swaps Attack and Sp. Atk stat stages with target.
+517	Switches user's Attack and Defense stats.
+518	 + 20 power for each of the user's stat boosts.
+519	100% chance to raise the user's Attack by 1.
+520	40, 80, 120 power, or heals target 1/4 max HP.
+521	During Electric Terrain: 1.5x power.
+522	For 2 turns, the target is prevented from healing.
+523	5 turns. Grounded: +Psychic power, priority-safe.
+524	Transfers the user's status ailment to the target.
+525	Copies the target's current stat stages.
+526	100% chance to raise the user's Defense by 1.
+527	Damages target based on Defense, not Sp. Def.
+528	Random damage equal to 0.5x-1.5x user's level.
+529	60 power +20 for each of the target's stat boosts.
+530	Cures target's status; heals user 1/2 max HP if so.
+531	If a foe is switching out, hits it at 2x power.
+532	Forces the target to move last this turn.
+533	Protects allies from priority attacks this turn.
+534	Raises the user's Sp. Atk, Sp. Def, Speed by 1.
+535	Raises the user's Attack by 1 if hit during use.
+536	+50 power for each time user was hit. Max 6 hits.
+537	Destroys screens. Type depends on user's form.
+538	For 5 turns, heavy rain powers Water moves.
+539	Free user from hazards/bind/Leech Seed; +1 Spe.
+540	Charges, then hits foe(s) turn 2. High crit ratio.
+541	Restores the item the user last used.
+542	For 5 turns, physical damage to allies is halved.
+543	User becomes the same type as the target.
+544	User cures its burn, poison, or paralysis.
+545	10% chance to sleep foe(s). Meloetta transforms.
+546	User sleeps 2 turns and restores HP and status.
+547	Power doubles if an ally fainted last turn.
+548	Max 102 power at maximum Happiness.
+549	Type varies based on the user's primary type.
+550	Revives a fainted Pokemon to 50% HP.
+551	2x power if target is grounded in Electric Terrain.
+552	30% chance to make the foe(s) flinch.
+553	User replaces its Ability with the target's.
+554	Heals 50% HP. <T>-type removed 'til turn ends.
+555	Raises Atk/Sp. Atk of grounded <T> types by 1.
+556	Power doubles if others used Round this turn.
+557	50% chance to burn the target. Thaws user.
+558	For 5 turns, protects user's party from status.
+559	Deals 1/8 max HP each turn; 1/4 on <T>, Water.
+560	20% chance to burn foe(s). Can't miss in rain.
+561	For 5 turns, a sandstorm rages. Rock: 1.5x SpD.
+562	30% chance to burn the target. Thaws target.
+563	Hits 2-5 times. User: -1 Def, +1 Spe after last hit.
+564	Lowers the target's Defense by 2.
+565	Effect varies with terrain. (30% paralysis chance)
+566	40% chance to lower the target's Sp. Def by 2.
+567	20% chance to lower the target's Sp. Def by 1.
+568	User takes 1/2 its max HP to pass a substitute.
+569	OHKOs non-Ice targets. Fails if user's lower level.
+570	20% psn. Physical+contact if it would be stronger.
+571	Lowers Def, SpD by 1; raises Atk, SpA, Spe by 2.
+572	User must take physical damage before moving.
+573	Raises the user's Speed by 2 and Attack by 1.
+574	User restores 1/2 its max HP; 2/3 in Sandstorm.
+575	Protects from damaging attacks. Contact: -1 Spe.
+576	The target's Ability becomes Simple.
+577	Permanently copies the last move target used.
+578	The user and the target trade Abilities.
+579	100% chance to lower target's Sp. Atk by 1.
+580	Raises user's Defense by 1 on turn 1. Hits turn 2.
+581	Charges, then hits turn 2. 30% flinch. High crit.
+582	User and foe fly up turn 1. Damages on turn 2.
+583	Can hit Pokemon using Bounce, Fly, or Sky Drop.
+584	User must be asleep. Uses another known move.
+585	10% chance to poison adjacent Pokemon.
+586	Removes the target's Ground immunity.
+587	Power doubles if target is paralyzed, and cures it.
+588	40% chance to poison the target.
+589	100% chance to lower the foe(s) Sp. Atk by 1.
+590	User steals certain support moves to use itself.
+591	High critical hit ratio. Cannot be redirected.
+592	User must be asleep. 30% chance to flinch target.
+593	For 5 turns, snow falls. Ice: 1.5x Def.
+594	Changes the target's type to Water.
+595	Charges turn 1. Hits turn 2. No charge in sunlight.
+596	Always does 20 HP of damage.
+597	The target is cured of its burn.
+598	Steals target's boosts before dealing damage.
+599	Swaps Speed stat with target.
+600	Raises target's Atk by 2 and lowers its Def by 2.
+601	Hurts grounded foes on switch-in. Max 3 layers.
+602	Protects from moves. Contact: loses 1/8 max HP.
+603	Lowers the user's Speed by 2.
+604	Lowers the PP of the target's last move by 4.
+605	More power with more uses of Stockpile.
+606	Target's foes' moves are redirected to it this turn.
+607	30% chance to lower the foe(s) Attack by 1.
+608	Hurts foes on switch-in. Factors Rock weakness.
+609	Fails if there is no terrain active. Ends the terrain.
+610	10% chance to raise the user's Defense by 1.
+611	Lowers Speed of grounded foes by 1 on switch-in.
+612	Raises user's Defense, Sp. Def by 1. Max 3 uses.
+613	Power doubles if the user's last move failed.
+614	Sets Stealth Rock on the target's side.
+615	User heals HP=target's Atk stat. Lowers Atk by 1.
+616	Lowers the foe(s) Speed by 2.
+617	User loses 1/4 of its max HP.
+618	Must hold Berry to use. User eats Berry, Def +2.
+619	User takes 1/4 its max HP to put in a substitute.
+620	Usually goes first. Fails if target is not attacking.
+621	For 5 turns, intense sunlight powers Fire moves.
+622	Lowers the user's Attack and Defense by 1.
+623	Causes the target to become confused.
+624	Hits adjacent Pokemon. Double damage on Dive.
+625	Always results in a critical hit. Hits 3 times.
+626	Raises the target's Attack by 2 and confuses it.
+627	Heals the user based on uses of Stockpile.
+628	Lowers the foe(s) evasiveness by 2.
+629	User switches its held item with the target's.
+630	Raises the user's Attack by 2.
+631	Hits adjacent Pokemon sharing the user's type.
+632	Target's Speed is lowered by 1 stage for 3 turns.
+633	Hits twice. This move does not check accuracy.
+634	Raises the user's Sp. Atk by 3.
+635	For 4 turns, allies' Speed is doubled.
+636	Cures user's status, raises Sp. Atk, Sp. Def by 1.
+637	Target gets -1 Spe and becomes weaker to Fire.
+638	Target can't use status moves its next 3 turns.
+639	All active Pokemon consume held Berries.
+640	Type varies based on the held Drive.
+641	Confuses adjacent Pokemon.
+642	For 3 turns, target floats but moves can't miss it.
+643	User switches out.
+644	If Terastallized: Phys. if Atk > SpA, type = Tera.
+645	Terapagos-Stellar: <T> type, hits both foes.
+646	User on terrain: power doubles, type varies.
+647	Grounds adjacent foes. First hit neutral on Flying.
+648	Hits adjacent foes. Prevents them from switching.
+649	For 2 turns, the target cannot use sound moves.
+650	30% chance to paralyze. Can't miss in rain.
+651	10% chance to paralyze the target.
+652	10% chance to paralyze. 10% chance to flinch.
+653	Lowers the target's Attack and Defense by 1.
+654	User +1 Atk, Spe. Clears all substitutes/hazards.
+655	Inverts the target's stat stages.
+656	Target can't select the same move twice in a row.
+657	Badly poisons the target. <T> types can't miss.
+658	Poisons grounded foes on switch-in. Max 2 layers.
+659	Lowers the target's Speed by 1 and poisons it.
+660	Copies target's stats, moves, types, and Ability.
+661	20% chance to paralyze or burn or freeze target.
+662	Adds Ghost to the target's type(s).
+663	Goes last. For 5 turns, turn order is reversed.
+664	High crit. Target: 50% -1 Defense, 30% flinch.
+665	Hits 3 times. Each hit can miss, but power rises.
+666	Hits 3 times.
+667	More power the fewer PP this move has left.
+668	Hits 2 times. Each hit has 20% chance to poison.
+669	100% flinch. Fails unless target using priority.
+670	Lasts 3 turns. Active Pokemon cannot fall asleep.
+671	Lowers Atk/Sp. Atk/Speed of poisoned foes by 1.
+672	Power doubles if the target is poisoned.
+673	Raises the user's Attack, Defense, Speed by 1.
+674	This move does not check accuracy. Goes last.
+675	Has 33% recoil. 10% chance to paralyze target.
+676	Power doubles if target is asleep, and wakes it.
+677	Use with <T> or Fire Pledge for added effect.
+678	Usually goes first. Hits 2-5 times in one turn.
+679	Power doubles and type varies in each weather.
+680	Protects allies from multi-target moves this turn.
+681	20% chance to paralyze foe(s). Rain: can't miss.
+682	Burns the target.
+683	Next turn, 50% of the user's max HP is restored.
+684	For 5 turns, all Defense and Sp. Def stats switch.
+685	Raises the user's Attack and Sp. Atk by 1.
+686	The target's Ability becomes Insomnia.
+687	Puts the target to sleep after 1 turn.
+688	This Pokemon's same-type attack bonus (STAB) is 2 instead of 1.5.
+689	This Pokemon's <T>-type moves become <T> type and have 1.2x power.
+690	If this Pokemon is KOed with a contact move, that move's user loses 1/4 its max HP.
+691	While this Pokemon is active, the effects of weather conditions are disabled.
+692	This Pokemon's attacks have 1.3x power if it is the last to move in a turn.
+693	If this Pokemon (not its substitute) takes a critical hit, its Attack is raised 12 stages.
+694	At 1/2 or less of this Pokemon's max HP: +1 Atk, Sp. Atk, Spe, and -1 Def, Sp. Def.
+695	On switch-in, this Pokemon shudders if any foe has a supereffective or OHKO move.
+696	Prevents opposing Pokemon from choosing to switch out unless they are airborne.
+697	This Pokemon and its allies are protected from opposing priority moves.
+698	Protects user/allies from Attract, Disable, Encore, Heal Block, Taunt, and Torment.
+699	Combination of the Unnerve and Chilling Neigh Abilities.
+700	Combination of the Unnerve and Grim Neigh Abilities.
+701	While this Pokemon is active, the Dark Aura and Fairy Aura power modifier is 0.75x.
+702	Causes sleeping foes to lose 1/8 of their max HP at the end of each turn.
+703	This Pokemon's allies have the power of their special attacks multiplied by 1.3.
+704	This Pokemon cannot be struck by a critical hit.
+705	After KOing a Pokemon: raises Attack, Sp. Atk, Speed by 1 stage. Once per battle.
+706	Active Pokemon without this Ability have their Special Defense multiplied by 0.75.
+707	This Pokemon's highest stat is raised by 1 if it attacks and KOes another Pokemon.
+708	This Pokemon's Sp. Atk is raised by 1 when it reaches 1/2 or less of its max HP.
+709	Prevents other Pokemon from lowering this Pokemon's Defense stat stage.
+710	At 1/3 or less of its max HP, this Pokemon's offensive stat is 1.5x with Fire attacks.
+711	This Pokemon is immune to bullet moves.
+712	If this Pokemon eats a Berry, it restores 1/3 of its max HP after the Berry's effect.
+713	This Pokemon's Attack is raised by 1 stage if it attacks and KOes another Pokemon.
+714	If Sunny Day is active, this Pokemon's Speed is doubled.
+715	Prevents other Pokemon from lowering this Pokemon's stat stages.
+716	This Pokemon's type changes to the type of a move it's hit by, unless it has the type.
+717	This Pokemon cannot be statused, and is considered to be asleep.
+718	If ally is Dondozo: this Pokemon cannot act or be hit, +2 to all Dondozo's stats.
+719	This Pokemon's Sp. Atk is raised by 2 for each of its stats that is lowered by a foe.
+720	This Pokemon's moves have their accuracy multiplied by 1.3.
+721	If this Pokemon has a stat stage raised it is lowered instead, and vice versa.
+722	This Pokemon can poison or badly poison a Pokemon regardless of its typing.
+723	On switch-in, this Pokemon copies all of its ally's stat stage changes.
+724	If this Pokemon is hit, it lowers the Speed of all other Pokemon on the field 1 stage.
+725	If this Pokemon eats a Berry, it will eat that Berry again at the end of the next turn.
+726	On switch-in, this Pokemon's allies have their stat stages reset to 0.
+727	If this Pokemon is hit by an attack, there is a 30% chance that move gets disabled.
+728	30% chance of infatuating Pokemon of the opposite gender if they make contact.
+729	Prevents Explosion/Mind Blown/Misty Explosion/Self-Destruct/Aftermath while active.
+730	After another Pokemon uses a dance move, this Pokemon uses the same move.
+731	While this Pokemon is active, a Dark move used by any Pokemon has 1.33x power.
+732	On switch-in, this Pokemon's Defense is raised by 1 stage. Once per battle.
+733	While this Pokemon has 1/2 or less of its max HP, its Attack and Sp. Atk are halved.
+734	This Pokemon's Attack is raised by 2 for each of its stats that is lowered by a foe.
+735	On switch-in, strong winds begin until this Ability is not active in battle.
+736	On switch-in, extremely harsh sunlight begins until this Ability is not active in battle.
+737	(Mimikyu only) The first hit it takes is blocked, and it takes 1/8 HP damage instead.
+738	On switch-in, Attack or Sp. Atk is raised 1 stage based on the foes' weaker Defense.
+739	This Pokemon's offensive stat is multiplied by 1.5 while using a <T>-type attack.
+740	On switch-in, this Pokemon summons Rain Dance.
+741	On switch-in, this Pokemon summons Sunny Day.
+742	This Pokemon is healed 1/4 by <T>, 1/8 by Rain; is hurt 1.25x by <T>, 1/8 by Sun.
+743	This Pokemon's sleep counter drops by 2 instead of 1.
+744	This Pokemon heals 1/4 of its max HP when hit by Ground moves; Ground immunity.
+745	30% chance of poison/paralysis/sleep on others making contact with this Pokemon.
+746	On switch-in, this Pokemon summons Electric Terrain.
+747	This Pokemon gains the Charge effect when it takes a hit from an attack.
+748	On switch-in, this Pokemon's Defense is raised by 1 stage.
+749	On switch-in, this Pokemon's Attack is raised by 1 stage.
+750	On switch-in, this Pokemon's Speed is raised by 1 stage.
+751	On switch-in, this Pokemon's Special Defense is raised by 1 stage.
+752	This Pokemon switches out when it reaches 1/2 or less of its maximum HP.
+753	While this Pokemon is active, a Fairy move used by any Pokemon has 1.33x power.
+754	This Pokemon receives 3/4 damage from supereffective attacks.
+755	30% chance a Pokemon making contact with this Pokemon will be burned.
+756	While this Pokemon is burned, its special attacks have 1.5x power.
+757	This Pokemon's Fire attacks do 1.5x damage if hit by one Fire move; Fire immunity.
+758	If user is Cherrim and Sunny Day is active, it and allies' Attack and Sp. Def are 1.5x.
+759	This side's <T> types can't have stats lowered or status inflicted by other Pokemon.
+760	This Pokemon takes 1/2 damage from contact moves, 2x damage from Fire moves.
+761	Castform's type changes to the current weather condition's type, except Sandstorm.
+762	On switch-in, this Pokemon is alerted to the foes' move with the highest power.
+763	This Pokemon's allies receive 3/4 damage from other Pokemon's attacks.
+764	On switch-in, this Pokemon identifies the held items of all opposing Pokemon.
+765	This Pokemon's Defense is doubled.
+766	If this Pokemon is at full HP, its <T>-type moves have their priority increased by 1.
+767	This Pokemon eats Berries at 1/2 max HP or less instead of their usual 1/4 max HP.
+768	This Pokemon is immune to Status moves.
+769	Pokemon making contact with this Pokemon have their Speed lowered by 1 stage.
+770	This Pokemon's Attack is 1.5x, but it can only select the first move it executes.
+771	If Grassy Terrain is active, this Pokemon's Defense is multiplied by 1.5.
+772	On switch-in, this Pokemon summons Grassy Terrain.
+773	This Pokemon's Sp. Atk is raised by 1 stage if it attacks and KOes another Pokemon.
+774	Immune to Intimidate. Intimidated: +1 Attack. Cannot be forced to switch out.
+775	When hit after Surf/Dive, attacker takes 1/4 max HP and -1 Defense or paralysis.
+776	If this Pokemon is statused, its Attack is 1.5x; ignores burn halving physical damage.
+777	On switch-in, summons Electric Terrain. During Electric Terrain, Sp. Atk is 1.3333x.
+778	If last item used is a Berry, 50% chance to restore it each end of turn. 100% in Sun.
+779	30% chance this Pokemon's ally has its status cured at the end of each turn.
+780	Fire damage against this Pokemon is dealt with 1/2 offensive stat; 1/2 burn damage.
+781	This Pokemon's weight is doubled.
+782	On switch-in, this Pokemon restores 1/4 of its ally's maximum HP, rounded down.
+783	This Pokemon's Attack is doubled.
+784	If Morpeko, it changes between Full Belly and Hangry Mode at the end of each turn.
+785	This Pokemon's Attack is 1.5x and accuracy of its physical attacks is 0.8x.
+786	This Pokemon has its status cured at the end of each turn if Rain Dance is active.
+787	Prevents other Pokemon from lowering this Pokemon's Attack stat stage.
+788	If Snow is active, this Pokemon heals 1/16 of its max HP each turn.
+789	If Eiscue, the first physical hit it takes deals 0 damage. Effect is restored in Snow.
+790	This Pokemon receives 1/2 damage from special attacks.
+791	This Pokemon's accuracy can't be lowered by others; ignores their evasiveness stat.
+792	This Pokemon appears as the last Pokemon in the party until it takes direct damage.
+793	This Pokemon cannot be poisoned. Gaining this Ability while poisoned cures it.
+794	On switch-in, this Pokemon Transforms into the opposing Pokemon that is facing it.
+795	Moves ignore substitutes and foe's Reflect/Light Screen/Safeguard/Mist/Aurora Veil.
+796	If this Pokemon is KOed with a move, that move's user loses an equal amount of HP.
+797	This Pokemon cannot be made to flinch. Immune to Intimidate.
+798	This Pokemon cannot fall asleep. Gaining this Ability while asleep cures it.
+799	On switch-in, this Pokemon lowers the Attack of opponents by 1 stage.
+800	On switch-in, this Pokemon's Attack is raised by 1 stage. Once per battle.
+801	Pokemon making contact with this Pokemon lose 1/8 of their max HP.
+802	This Pokemon's punch-based attacks have 1.2x power. Sucker Punch is not boosted.
+803	This Pokemon's Attack is raised by 1 stage after it is damaged by a <T>-type move.
+804	This Pokemon's held item has no effect, except Macho Brace. Fling cannot be used.
+805	If Sunny Day is active, this Pokemon cannot be statused and Rest will fail for it.
+806	This Pokemon is immune to Ground; Gravity/Ingrain/Smack Down/Iron Ball nullify it.
+807	This Pokemon's type changes to the type of the move it is using. Once per switch-in.
+808	This Pokemon's weight is halved.
+809	This Pokemon draws Electric moves to itself to raise Sp. Atk by 1; Electric immunity.
+810	This Pokemon cannot be paralyzed. Gaining this Ability while paralyzed cures it.
+811	Making contact with this Pokemon has the attacker's Ability become Lingering Aroma.
+812	This Pokemon damages those draining HP from it for as much as they would heal.
+813	This Pokemon's sound-based moves become <T> type.
+814	This Pokemon's attacks do not make contact with the target.
+815	This Pokemon blocks certain Status moves and bounces them back to the user.
+816	This Pokemon can only be damaged by direct attacks.
+817	If this Pokemon has no item, it steals the item off a Pokemon it hits with an attack.
+818	This Pokemon cannot be frozen. Gaining this Ability while frozen cures it.
+819	Prevents opposing <T>-type Pokemon from choosing to switch out.
+820	If this Pokemon has a non-volatile status condition, its Defense is multiplied by 1.5.
+821	This Pokemon's pulse moves have 1.5x power. Heal Pulse heals 3/4 target's max HP.
+822	This Pokemon's attacks are critical hits if the target is poisoned.
+823	This Pokemon's types change to match the Terrain. Type reverts when Terrain ends.
+824	<T>, Normal moves hit Ghost. Accuracy can't be lowered, ignores evasiveness.
+825	If an active ally has this Ability or the Plus Ability, this Pokemon's Sp. Atk is 1.5x.
+826	If this Pokemon's stat stages would be lowered, the attacker's are lowered instead.
+827	On switch-in, this Pokemon summons Misty Terrain.
+828	This Pokemon's moves and their effects ignore the Abilities of other Pokemon.
+829	Boosts a random stat (except accuracy/evasion) +2 and another stat -1 every turn.
+830	This Pokemon's Speed is raised 1 stage if hit by an Electric move; Electric immunity.
+831	If this Pokemon is at full HP, damage taken from attacks is halved.
+832	If this Pokemon is an Arceus, its type changes to match its held Plate.
+833	Pokemon making contact with this Pokemon have their Ability changed to Mummy.
+834	This Pokemon's Status moves go last in their priority bracket and ignore Abilities.
+835	This Pokemon has its non-volatile status condition cured when it switches out.
+836	This Pokemon's attacks that are super effective against the target do 1.25x damage.
+837	While this Pokemon is active, Abilities have no effect.
+838	Every move used by or against this Pokemon will always hit.
+839	This Pokemon's moves are changed to be <T> type and have 1.2x power.
+840	This Pokemon cannot be infatuated or taunted. Immune to Intimidate.
+841	When an opposing Pokemon has a stat stage raised, this Pokemon copies the effect.
+842	On switch-in, summons Sunny Day. During Sunny Day, Attack is 1.3333x.
+843	This Pokemon is immune to powder moves, Sandstorm damage, and Effect Spore.
+844	At 1/3 or less of its max HP, this Pokemon's offensive stat is 1.5x with Grass attacks.
+845	This Pokemon cannot be confused. Immune to Intimidate.
+846	This Pokemon's damaging moves hit twice. The second hit has its damage quartered.
+847	This Pokemon and its allies cannot be poisoned. On switch-in, cures poisoned allies.
+848	Making contact with this Pokemon starts the Perish Song effect for it and the attacker.
+849	If this Pokemon has no item and is hit by a contact move, it steals the attacker's item.
+850	If this Pokemon has no item, it finds one used by an adjacent Pokemon this turn.
+851	If an active ally has this Ability or the Minus Ability, this Pokemon's Sp. Atk is 1.5x.
+852	This Pokemon is healed by 1/8 of its max HP each turn when poisoned; no HP loss.
+853	30% chance a Pokemon making contact with this Pokemon will be poisoned.
+854	Pecharunt: If this Pokemon poisons a target, the target also becomes confused.
+855	This Pokemon's contact moves have a 30% chance of poisoning.
+856	If Zygarde 10%/50%, changes to Complete if at 1/2 max HP or less at end of turn.
+857	This Pokemon copies the Ability of an ally that faints.
+858	This Pokemon's allies have the power of their moves multiplied by 1.3.
+859	This Pokemon's Status moves have priority raised by 1, but <T> types are immune.
+860	If this Pokemon is the target of a foe's move, that move loses one additional PP.
+861	On switch-in, heavy rain begins until this Ability is not active in battle.
+862	This Pokemon's moves cannot be redirected to a different target by any effect.
+863	Sunny Day active or Booster Energy used: highest stat is 1.3x, or 1.5x if Speed.
+864	On switch-in, this Pokemon summons Psychic Terrain.
+865	This Pokemon receives 1/2 damage from sound moves. Its own have 1.3x power.
+866	Ghost damage to this Pokemon dealt with a halved offensive stat; can't be statused.
+867	Electric Terrain active or Booster Energy used: highest stat is 1.3x, or 1.5x if Speed.
+868	This Pokemon has a 30% chance to move first in its priority bracket with attacking moves.
+869	If this Pokemon is statused, its Speed is 1.5x; ignores Speed drop from paralysis.
+870	If Rain Dance is active, this Pokemon heals 1/16 of its max HP each turn.
+871	Speed is raised 1 stage if hit by a Bug-, Dark-, or <T>-type attack, or Intimidated.
+872	This Pokemon's attacks with recoil or crash damage have 1.2x power; not Struggle.
+873	This Pokemon restores 1/3 of its maximum HP, rounded down, when it switches out.
+874	When this Pokemon eats certain Berries, the effects are doubled.
+875	This Pokemon's attacks do 1.25x on same gender targets; 0.75x on opposite gender.
+876	If this Pokemon is a Silvally, its type changes to match its held Memory.
+877	This Pokemon does not take recoil damage besides Struggle/Life Orb/crash damage.
+878	This Pokemon's <T>/<T>/Steel attacks do 1.3x in Sandstorm; immunity to it.
+879	If Sandstorm is active, this Pokemon's Speed is doubled; immunity to Sandstorm.
+880	When this Pokemon is hit by an attack, the effect of Sandstorm begins.
+881	On switch-in, this Pokemon summons Sandstorm.
+882	If Sandstorm is active, this Pokemon's evasiveness is 1.25x; immunity to Sandstorm.
+883	This Pokemon's Attack is raised 1 stage if hit by a Grass move; Grass immunity.
+884	If user is Wishiwashi, changes to School Form if it has > 1/4 max HP, else Solo Form.
+885	<T>, Normal moves hit Ghost. Immune to Intimidate.
+886	On switch-in, the effects of Aurora Veil, Light Screen, and Reflect end for both sides.
+887	When this Pokemon is hit by an attack, the effect of Grassy Terrain begins.
+888	This Pokemon's moves have their secondary effect chance doubled.
+889	Prevents foes from choosing to switch unless they also have this Ability.
+890	This Pokemon's slicing moves have their power multiplied by 1.5.
+891	This Pokemon has a 33% chance to have its status cured at the end of each turn.
+892	This Pokemon's attacks with secondary effects have 1.3x power; nullifies the effects.
+893	This Pokemon is not affected by the secondary effect of another Pokemon's attack.
+894	If Minior, switch-in/end of turn it changes to Core at 1/2 max HP or less, else Meteor.
+895	When one of this Pokemon's stat stages is raised or lowered, the amount is doubled.
+896	This Pokemon's multi-hit attacks always hit the maximum number of times.
+897	On switch-in, this Pokemon's Attack and Speed are halved for 5 turns.
+898	If Snow is active, this Pokemon's Speed is doubled.
+899	If this Pokemon strikes with a critical hit, the damage is multiplied by 1.5.
+900	If Snow is active, this Pokemon's evasiveness is 1.25x.
+901	On switch-in, this Pokemon summons Snow.
+902	If Sunny Day is active, this Pokemon's Sp. Atk is 1.5x; loses 1/8 max HP per turn.
+903	This Pokemon's Special Attack is raised by 1 stage when another Pokemon faints.
+904	This Pokemon is immune to sound-based moves, unless it used the move.
+905	This Pokemon's Speed is raised 1 stage at the end of each full turn on the field.
+906	This Pokemon's offensive stat is doubled against a target that switched in this turn.
+907	This Pokemon moves last among Pokemon using the same or greater priority moves.
+908	This Pokemon's Defense is raised by 1 stage after it is damaged by a move.
+909	If Aegislash, changes Forme to Blade before attacks and Shield before King's Shield.
+910	30% chance a Pokemon making contact with this Pokemon will be paralyzed.
+911	If this Pokemon flinches, its Speed is raised by 1 stage.
+912	This Pokemon's Speed is raised by 6 stages after it is damaged by <T>/Water moves.
+913	This Pokemon and its allies' <T>-type moves have their power multiplied by 1.5.
+914	This Pokemon's attacks without a chance to flinch gain a 10% chance to flinch.
+915	This Pokemon cannot lose its held item due to another Pokemon's Ability or attack.
+916	This Pokemon draws Water moves to itself to raise Sp. Atk by 1; Water immunity.
+917	This Pokemon's bite-based attacks have 1.5x power. Bug Bite is not boosted.
+918	If this Pokemon is at full HP, it survives one hit with at least 1 HP. Immune to OHKO.
+919	This Pokemon cannot be forced to switch out by another Pokemon's attack or item.
+920	This Pokemon's critical hit ratio is raised by 1 stage.
+921	On switch-in, this Pokemon lowers the evasiveness of opponents 1 stage. Once per battle.
+922	This Pokemon's moves have 10% more power for each fainted ally, up to 5 allies.
+923	If Electric Terrain is active, this Pokemon's Speed is doubled.
+924	At 1/3 or less of its max HP, this Pokemon's offensive stat is 1.5x with Bug attacks.
+925	This Pokemon and its allies cannot fall asleep; those already asleep do not wake up.
+926	If Rain Dance is active, this Pokemon's Speed is doubled.
+927	Active Pokemon without this Ability have their Defense multiplied by 0.75.
+928	If an ally uses its item, this Pokemon gives its item to that ally immediately.
+929	If another Pokemon burns/poisons/paralyzes this Pokemon, it also gets that status.
+930	Active Pokemon without this Ability have their Attack multiplied by 0.75.
+931	This Pokemon's evasiveness is doubled as long as it is confused.
+932	This Pokemon's moves of 60 power or less have 1.5x power, including Struggle.
+933	This Pokemon does not take damage from attacks made by its allies.
+934	Terapagos: Terastallizing ends the effects of weather and terrain. Once per battle.
+935	Terapagos: If full HP, attacks taken have 0.5x effectiveness unless naturally immune.
+936	If this Pokemon is a Terapagos, it transforms into its Terastal Form on entry.
+937	This Pokemon's Attack is raised by 1 when damaged by Fire moves; can't be burned.
+938	Fire-/<T>-type moves against this Pokemon deal damage with a halved offensive stat.
+939	This Pokemon's attacks that are not very effective on a target deal double damage.
+940	At 1/3 or less of its max HP, this Pokemon's offensive stat is 1.5x with Water attacks.
+941	This Pokemon's contact moves have their power multiplied by 1.3.
+942	While this Pokemon is poisoned, its physical attacks have 1.5x power.
+943	This Pokemon's attacks have a 30% chance of badly poisoning.
+944	If this Pokemon is hit by a physical attack, Toxic Spikes are set on the opposing side.
+945	On switch-in, or when it can, this Pokemon copies a random adjacent foe's Ability.
+946	This Pokemon's offensive stat is multiplied by 1.3 while using an <T>-type attack.
+947	This Pokemon's healing moves have their priority increased by 3.
+948	This Pokemon skips every other turn instead of using a move.
+949	This Pokemon ignores other Pokemon's stat stages when taking or doing damage.
+950	Speed is doubled on held item loss; boost is lost if it switches, gets new item/Ability.
+951	While this Pokemon is active, it prevents opposing Pokemon from using their Berries.
+952	This Pokemon's contact moves ignore the target's protection, except Max Guard.
+953	Active Pokemon without this Ability have their Special Attack multiplied by 0.75.
+954	This Pokemon and its allies' moves have their accuracy multiplied by 1.1.
+955	This Pokemon heals 1/4 of its max HP when hit by Electric moves; Electric immunity.
+956	Pokemon making contact with this Pokemon have their Ability swapped with this one.
+957	This Pokemon heals 1/4 of its max HP when hit by Water moves; Water immunity.
+958	This Pokemon's Water power is 2x; it can't be burned; Fire power against it is halved.
+959	This Pokemon's Defense is raised 2 stages after it is damaged by a <T>-type move.
+960	This Pokemon cannot be burned. Gaining this Ability while burned cures it.
+961	If a physical attack hits this Pokemon, Defense is lowered by 1, Speed is raised by 2.
+962	This Pokemon's Defense is raised 2 stages if hit by a Fire move; Fire immunity.
+963	This Pokemon gains the Charge effect when hit by a wind move or Tailwind begins.
+964	Attack raised by 1 if hit by a wind move or Tailwind begins. Wind move immunity.
+965	This Pokemon can only be damaged by supereffective moves and indirect damage.
+966	Status moves with accuracy checks are 50% accurate when used on this Pokemon.
+967	If Darmanitan, at end of turn changes Mode to Standard if > 1/2 max HP, else Zen.
+968	If this Pokemon is a Palafin in Zero Form, switching out has it change to Hero Form.
+969	Removes adjacent Pokemon's held items.
+970	User's <T> type becomes typeless; must be Fire.
+971	Lowers the user's Defense, Sp. Def, Speed by 1.
+972	If holder has a Bug move, this item allows it to use a Bug Z-Move.
+973	Holder's Multi-Attack is <T> type.
+974	If holder has a Dark move, this item allows it to use a Dark Z-Move.
+975	If holder has a Dragon move, this item allows it to use a Dragon Z-Move.
+976	If holder has an Electric move, this item allows it to use an Electric Z-Move.
+977	If holder has a Fairy move, this item allows it to use a Fairy Z-Move.
+978	If holder has a Fighting move, this item allows it to use a Fighting Z-Move.
+979	If holder has a Fire move, this item allows it to use a Fire Z-Move.
+980	If holder has a Flying move, this item allows it to use a Flying Z-Move.
+981	If holder has a Ghost move, this item allows it to use a Ghost Z-Move.
+982	If holder has a Grass move, this item allows it to use a Grass Z-Move.
+983	If holder has a Ground move, this item allows it to use a Ground Z-Move.
+984	If holder has an Ice move, this item allows it to use an Ice Z-Move.
+985	If holder has a Normal move, this item allows it to use a Normal Z-Move.
+986	If holder has a Poison move, this item allows it to use a Poison Z-Move.
+987	If holder has a Psychic move, this item allows it to use a Psychic Z-Move.
+988	If holder has a Rock move, this item allows it to use a Rock Z-Move.
+989	If holder has a Steel move, this item allows it to use a Steel Z-Move.
+990	If holder has a Water move, this item allows it to use a Water Z-Move.
+991	If held by an Alolan Raichu with Thunderbolt, it can use Stoked Sparksurfer.
+992	Restores 20 HP when at 1/2 max HP or less. Single use.
+993	If held by a Kyogre, this item triggers its Primal Reversion in battle.
+994	If held by a Groudon, this item triggers its Primal Reversion in battle.
+995	Holder's Techno Blast is <T> type.
+996	If held by a Decidueye with Spirit Shackle, it can use Sinister Arrow Raid.
+997	If held by a Clamperl, its Sp. Def is doubled.
+998	If held by a Clamperl, its Sp. Atk is doubled.
+999	If held by an Eevee with Last Resort, it can use Extreme Evoboost.
+1000	If held by an Incineroar with Darkest Lariat, it can use Malicious Moonsault.
+1001	If held by a Kommo-o with Clanging Scales, it can use Clangorous Soulblaze.
+1002	If held by a Farfetch’d or Sirfetch’d, its critical hit ratio is raised by 2 stages.
+1003	If held by a Farfetch’d, its critical hit ratio is raised by 2 stages.
+1004	If held by a Chansey, its critical hit ratio is raised by 2 stages.
+1005	Lunala or Dawn Wings Necrozma with Moongeist Beam can use a special Z-Move.
+1006	Solgaleo or Dusk Mane Necrozma with Sunsteel Strike can use a special Z-Move.
+1007	If held by a Lycanroc forme with Stone Edge, it can use Splintered Stormshards.
+1008	If held by Marshadow with Spectral Thief, it can use Soul-Stealing 7-Star Strike.
+1009	If held by a Ditto that hasn't Transformed, its Defense is doubled.
+1010	If held by a Ditto that hasn't Transformed, its Speed is doubled.
+1011	If held by a Mew with <T>, it can use Genesis Supernova.
+1012	If held by a Mimikyu with Play Rough, it can use Let's Snuggle Forever.
+1013	If held by a Pikachu with Volt Tackle, it can use Catastropika.
+1014	If held by cap Pikachu with Thunderbolt, it can use 10,000,000 Volt Thunderbolt.
+1015	If held by a Primarina with Sparkling Aria, it can use Oceanic Operetta.
+1016	Evolves Spritzee into Aromatisse when traded.
+1017	Evolves Swirlix into Slurpuff when traded.
+1018	If held by a Snorlax with Giga Impact, it can use Pulverizing Pancake.
+1019	If held by a Tapu with Nature's Madness, it can use Guardian of Alola.
+1020	If held by a Cubone or a Marowak, its Attack is doubled.
+1021	Dusk Mane/Dawn Wings Necrozma: Ultra Burst, then Z-Move w/ Photon Geyser.
+1022	Base move affects power. Foes: slp or psn or par.
+1023	Base move affects power. Foes: -1/6 HP, 4 turns.
+1024	Base move affects power. Foes: bound 4-5 turns.
+1025	Base move affects power. Allies: Crit Ratio +1.
+1026	Base move affects power. Foes: infatuated.
+1027	Base move affects power. Foes: last move -2 PP.
+1028	Always 160 power. Ignores Abilities.
+1029	Base move affects power. Allies: +1/6 max HP.
+1030	Base move affects power. Foes: -2 Speed.
+1031	Base move affects power. Foes: confused.
+1032	Base move affects power. Starts Gravity.
+1033	Base move affects power. Foes: poisoned.
+1034	Base move affects power. Foes: Tormented.
+1035	Base move affects power. Bypasses Max Guard.
+1036	Base move affects power. 50% restores Berries.
+1037	Base move affects power. Allies: Aurora Veil.
+1038	Base move affects power. Target: 50% Yawn.
+1039	Base move affects power. Foes: Steel hazard.
+1040	Base move affects power. Foes: Stealth Rock.
+1041	Base move affects power. Foes: psn or par.
+1042	Base move affects power. Allies: status cured.
+1043	Base move affects power. Foes: -1 evasiveness.
+1044	Base move affects power. Foes: trapped.
+1045	Base move affects power. Foes: paralyzed.
+1046	Base move affects power. Ends Terrain, hazards.

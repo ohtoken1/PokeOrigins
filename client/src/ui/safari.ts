@@ -42,8 +42,8 @@ export function abrirSafari(save: Save, navegar: Navegar, aoMudar: () => void = 
         ? ''
         : el('button', {
             class: 'safari-mais', type: 'button', disabled: ocupado || semGold,
-            'aria-label': `Comprar mais 1 Ticket Safari por ${PRECO_ENTRADA_SAFARI_GOLD} gold`,
-            title: semGold ? 'Você não tem gold suficiente' : `Comprar mais 1 ticket por ${PRECO_ENTRADA_SAFARI_GOLD} gold (vale só hoje)`,
+            'aria-label': `Comprar mais 1 Ticket Safari por ${PRECO_ENTRADA_SAFARI_GOLD} Origin Coins`,
+            title: semGold ? 'Você não tem Origin Coins suficientes' : `Comprar mais 1 ticket por ${PRECO_ENTRADA_SAFARI_GOLD} Origin Coins (vale só hoje)`,
             onclick: async () => {
               if (ocupado) return;
               if (!comprando) {
@@ -68,7 +68,7 @@ export function abrirSafari(save: Save, navegar: Navegar, aoMudar: () => void = 
               ocupado = false;
               janela.redesenhar();
             },
-          }, comprando ? `Pagar ${PRECO_ENTRADA_SAFARI_GOLD} gold?` : '+'),
+          }, comprando ? `Pagar ${PRECO_ENTRADA_SAFARI_GOLD} Origin Coins?` : '+'),
     );
   };
 

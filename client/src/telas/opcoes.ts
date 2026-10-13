@@ -7,6 +7,7 @@ import { PRECO_TROCAR_NOME_GOLD } from '../../../shared/loja';
 import { aoMudarAjustesSom, ajustesSom, mudarAjustesSom } from '../sons';
 import { el } from '../ui/dom';
 import { modoDesempenho, mudarModoDesempenho } from '../desempenho';
+import { seletorDeIdioma } from '../idioma';
 
 export const telaOpcoes: Tela = (raiz, navegar) => {
   const save = carregarSave();
@@ -90,9 +91,10 @@ export const telaOpcoes: Tela = (raiz, navegar) => {
 
   tela.append(
     el('p', { class: 'sub' }, 'As mudanças são salvas sozinhas.', salvo),
+    secao('Idioma', seletorDeIdioma(), el('small', { class: 'meta' }, 'Nomes de Pokémon, golpes, itens, Abilities, Natures e tipos ficam em inglês em todos os idiomas.')),
     secao(
       'Perfil',
-      campo('Nome de treinador', nomeTreinador, `Aparece em cima do seu personagem no mapa. Para trocar (${PRECO_TROCAR_NOME_GOLD} gold), use "Mudar o visual do personagem".`),
+      campo('Nome de treinador', nomeTreinador, `Aparece em cima do seu personagem no mapa. Para trocar (${PRECO_TROCAR_NOME_GOLD} Origin Coins), use "Mudar o visual do personagem".`),
       el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'personagem' }) }, 'Mudar o visual do personagem'),
     ),
     secao(

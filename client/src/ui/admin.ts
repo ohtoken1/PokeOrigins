@@ -142,7 +142,7 @@ function conteudo(): HTMLElement[] {
         salvar(atual);
         aoMudarSave?.();
       });
-      return campo(`${moeda === 'gold' ? 'Gold' : 'Silver'} (tem ${save ? save[moeda].toLocaleString('pt-BR') : 0})`, el('div', { class: 'admin-linha' }, campoQtd, dar));
+      return campo(`${moeda === 'gold' ? 'Origin Coin' : 'Poké Dólar'} (tem ${save ? save[moeda].toLocaleString('pt-BR') : 0})`, el('div', { class: 'admin-linha' }, campoQtd, dar));
     }),
     (() => {
       const campoQtd = el('input', { type: 'number', min: 1, value: 10, disabled: !save }) as HTMLInputElement;

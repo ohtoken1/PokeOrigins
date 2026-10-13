@@ -1,10 +1,11 @@
 // Itens nossos (não existem no Showdown): skins de lendários, cubos dos Pokémon do passado/futuro e itens-chave de forma (Prison Bottle, DNA Splicers,
 // Reveal Glass, Teal Mask). Saem dos tickets. A skin escolhida como "bônus" dá bônus (shared/skins.ts);
-// os itens-chave ainda não têm uso (pedido do dono).
+// os itens-chave de forma são USADOS pela bolsa (regras em shared/formasPorItem.ts); são gastos a cada uso. As máscaras da Ogerpon são itens de evolução.
 import { TIPOS_DOS_CHARMS, idCharm, nomeCharm } from './charms';
+import { CORES_DOS_APRICORNS, TIPOS_DAS_ENERGIAS, idApricorn, idEnergia, nomeApricorn, nomeEnergia } from './materiais';
 import { BONUS_SKIN, BONUS_SKIN_SHINY, SKINS_ESPECIAIS, TEXTO_ORIGEM_SKIN, textoBonusSkin } from './skins';
 
-export type CategoriaCustom = 'skins' | 'chave' | 'cubos' | 'charms';
+export type CategoriaCustom = 'skins' | 'chave' | 'cubos' | 'charms' | 'evolucao' | 'formas' | 'materiais';
 /** De onde vem o Pokémon do cubo: do passado, do futuro ou lendário (Koraidon e Miraidon). */
 export type EraCubo = 'passado' | 'futuro' | 'lendario';
 
@@ -19,6 +20,8 @@ export interface ItemCustom {
   imagem?: string;
   /** charms: o tipo (o ícone é pintado na cor dele) */
   charm?: string;
+  /** Energies: o tipo (o ícone é uma esfera na cor dele) */
+  energia?: string;
   /** desenho provisório do ícone (itens ainda sem arte) */
   simbolo?: string;
   /** skins: de qual Pokémon (o ícone mostra ele) */
@@ -132,18 +135,34 @@ export const KIT_INICIANTE = 'kit-iniciante';
 
 export const ITENS_CUSTOM: ItemCustom[] = [
   ...SKINS_ESPECIAIS.map((s): ItemCustom => ({ id: s.id, nome: s.nome, categoria: 'skins', simbolo: s.simbolo, descricao: `${TEXTO_ORIGEM_SKIN[s.origem]}. Bônus ao escolher como skin de bônus: ${textoBonusSkin(s.bonus)}.` })),
+  // materiais de craft (o sistema de craft vem depois)
+  ...TIPOS_DAS_ENERGIAS.map((t): ItemCustom => ({ id: idEnergia(t), nome: nomeEnergia(t), categoria: 'materiais', energia: t, descricao: `Energia do tipo ${t[0].toUpperCase()}${t.slice(1)}. Às vezes fica para trás quando você derrota ou captura um Pokémon selvagem desse tipo. Material de craft.` })),
+  ...CORES_DOS_APRICORNS.map((cor): ItemCustom => ({ id: idApricorn(cor), nome: nomeApricorn(cor), categoria: 'materiais', sprite: `${cor}-apricorn`, descricao: 'Um Apricorn. Material de craft.' })),
   ...TIPOS_DOS_CHARMS.map((t): ItemCustom => ({ id: idCharm(t), nome: nomeCharm(t), categoria: 'charms', charm: t, descricao: `Amuleto raro: use para os Pokémon do tipo ${t[0].toUpperCase()}${t.slice(1)} terem 20% a mais de chance de aparecer shiny por 30 minutos. Só um deste tipo por vez.` })),
-  ...SELOS_SAZONAIS.map((s): ItemCustom => ({ id: s.id, nome: s.nome, categoria: 'chave', simbolo: '🏵️', descricao: `Selo do evento de ${s.evento}. Uso em breve.` })),
+  ...SELOS_SAZONAIS.map((s): ItemCustom => ({ id: s.id, nome: s.nome, categoria: 'chave', simbolo: '🏵️', descricao: `Selo do evento de ${s.evento}. Item de coleção: aparece no seu perfil, não na bolsa.` })),
   { id: VALE_POKE_S, nome: 'Vale Poke S', categoria: 'chave', simbolo: '🎟️', descricao: 'Procure a staff para ganhar um Pokémon à escolha S.' },
-  { id: KIT_INICIANTE, nome: 'Kit iniciante', categoria: 'chave', simbolo: '🎒', descricao: 'Um kit para quem está começando. O conteúdo ainda vai ser definido. NT: não pode ser trocado.' },
+  { id: KIT_INICIANTE, nome: 'Kit iniciante', categoria: 'chave', simbolo: '🎒', descricao: 'Um kit para quem está começando: 50 Poké Balls, 30 Great Balls, 20 Ultra Balls, 10 Potions, 7 Super Potions, 5 Hyper Potions, 7 Revives, 1 Max Revive, 20.000 Poké Dólares, uma skin sorteada (Ash, Gary, May ou Misty) e um Charm sorteado. O kit e os itens dele são NT: não podem ser trocados.' },
   ...MOEDAS_SAZONAIS.map((m): ItemCustom => ({ id: m.id, nome: m.nome, categoria: 'chave', simbolo: '🪙', descricao: `Moeda do evento de ${m.evento}. Uso em breve.` })),
   ...CUBOS.map((c): ItemCustom => ({ id: c.id, nome: c.nome, categoria: 'cubos', cubo: { especie: c.especie, era: c.era }, descricao: `Transforma ${c.origens.map((n) => NOME_ORIGEM[n]).join(' ou ')} em ${c.nome.replace('Cubo de ', '')}, um Pokémon ${TEXTO_ERA[c.era]}. Use nele como uma pedra de evolução: IVs, EVs, natureza e shiny continuam os mesmos.` })),
   ...COM_SKIN.flatMap(([especie, nome]): ItemCustom[] => [
     { id: idSkin(nome), nome: `Skin ${nome}`, categoria: 'skins', skin: { especie, shiny: false }, descricao: `Visual especial para o ${nome}. Bônus ao escolher como skin de bônus: ${textoBonusSkin(BONUS_SKIN)}.` },
     { id: idSkin(nome, true), nome: `Skin ${nome} Shiny`, categoria: 'skins', skin: { especie, shiny: true }, descricao: `Visual especial para o ${nome} shiny. Bônus ao escolher como skin de bônus: ${textoBonusSkin(BONUS_SKIN_SHINY)}.` },
   ]),
-  { id: 'prisonbottle', nome: 'Prison Bottle', categoria: 'chave', sprite: 'prison-bottle', descricao: 'Garrafa que liberta o Hoopa Unbound. Uso em breve.' },
-  { id: 'dnasplicers', nome: 'DNA Splicers', categoria: 'chave', sprite: 'dna-splicers', descricao: 'Junta o Kyurem com Reshiram ou Zekrom (White/Black Kyurem). Uso em breve.' },
-  { id: 'revealglass', nome: 'Reveal Glass', categoria: 'chave', sprite: 'reveal-glass', descricao: 'Troca Tornadus, Thundurus, Landorus e Enamorus entre as formas Incarnate e Therian. Uso em breve.' },
-  { id: 'tealmask', nome: 'Teal Mask', categoria: 'chave', imagem: 'itens/tealmask.png', descricao: 'A máscara turquesa da Ogerpon. Uso em breve.' },
+  { id: 'prisonbottle', nome: 'Prison Bottle', categoria: 'formas', sprite: 'prison-bottle', descricao: 'Muda o Hoopa para a forma Unbound. Não tem volta. É gasto no uso.' },
+  { id: 'dnasplicers', nome: 'DNA Splicers', categoria: 'formas', sprite: 'dna-splicers', descricao: 'Junta o Kyurem com o Zekrom (Black Kyurem) ou o Reshiram (White Kyurem) que estiver no time. Não tem volta. É gasto no uso.' },
+  { id: 'revealglass', nome: 'Reveal Glass', categoria: 'formas', sprite: 'reveal-glass', descricao: 'Muda Tornadus, Thundurus, Landorus e Enamorus para a forma Therian. Não tem volta. É gasto no uso.' },
+  // itens de forma dos jogos oficiais (regras em shared/formasPorItem.ts); ícones oficiais da PokéAPI e do Serebii
+  { id: 'gracidea', nome: 'Gracidea', categoria: 'formas', sprite: 'gracidea', descricao: 'Muda o Shaymin para a forma Sky. Não tem volta. É gasta no uso.' },
+  { id: 'meteorite', nome: 'Meteorite', categoria: 'formas', sprite: 'meteorite', descricao: 'Muda o Deoxys para a forma Attack, Defense ou Speed (você escolhe). Não tem volta. É gasto no uso.' },
+  { id: 'rotomcatalog', nome: 'Rotom Catalog', categoria: 'formas', imagem: 'itens/rotomcatalog.png', descricao: 'Muda o Rotom para Heat, Wash, Frost, Fan ou Mow (você escolhe). Não tem volta. É gasto no uso.' },
+  { id: 'zygardecube', nome: 'Zygarde Cube', categoria: 'formas', sprite: 'zygarde-cube', descricao: 'Muda o Zygarde 50% para a forma 10%. Não tem volta. É gasto no uso.' },
+  { id: 'nsolarizer', nome: 'N-Solarizer', categoria: 'formas', imagem: 'itens/nsolarizer.png', descricao: 'Junta o Necrozma com o Solgaleo que estiver no time (Dusk Mane). Não tem volta. É gasto no uso.' },
+  { id: 'nlunarizer', nome: 'N-Lunarizer', categoria: 'formas', imagem: 'itens/nlunarizer.png', descricao: 'Junta o Necrozma com a Lunala que estiver no time (Dawn Wings). Não tem volta. É gasto no uso.' },
+  { id: 'reinsofunity', nome: 'Reins of Unity', categoria: 'formas', imagem: 'itens/reinsofunity.png', descricao: 'Junta o Calyrex com o Glastrier (Ice Rider) ou o Spectrier (Shadow Rider) que estiver no time. Não tem volta. É gasto no uso.' },
+  { id: 'scrollofdarkness', nome: 'Scroll of Darkness', categoria: 'evolucao', imagem: 'itens/scrollofdarkness.png', descricao: 'Evolui o Kubfu para Urshifu Single Strike (Fighting/Dark). É gasto.' },
+  { id: 'scrollofwaters', nome: 'Scroll of Waters', categoria: 'evolucao', imagem: 'itens/scrollofwaters.png', descricao: 'Evolui o Kubfu para Urshifu Rapid Strike (Fighting/Water). É gasto.' },
+  // pedras nossas (pedido do dono), desenhadas no molde das pedras de evolução; fora da loja por enquanto
+  { id: 'peatblocksangrento', nome: 'Peat Block Sangrento', categoria: 'evolucao', imagem: 'itens/peatblocksangrento.svg', descricao: 'Bloco de turfa encharcado de vermelho, da cor da lua de sangue. Evolui o Ursaring para Ursaluna (Bloodmoon). É gasto.' },
+  { id: 'goldstone', nome: 'Gold Stone', categoria: 'evolucao', imagem: 'itens/goldstone.svg', descricao: 'Pedra de ouro maciço. Evolui o Gimmighoul para Gholdengo. É gasta.' },
+  { id: 'tealmask',nome: 'Teal Mask', categoria: 'evolucao', imagem: 'itens/tealmask.png', descricao: 'A máscara original da Ogerpon. Usada numa Ogerpon de outra máscara, ela volta para a forma padrão. É gasta.' },
 ];

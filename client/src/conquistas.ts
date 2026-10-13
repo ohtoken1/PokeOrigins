@@ -44,7 +44,7 @@ export const conferirConquistasLogo = (esperaMs = 400) => pedirConferencia(esper
 
 // ---- listas da Pokédex por região (montadas uma vez)
 let listas: { dex: Record<string, number[]>; comuns: Record<string, number[]> } | null = null;
-const regiaoDo = (p: PokemonBase): string | undefined => formaRegional(p.id)?.regiao ?? REGIOES.find((r) => p.id >= r.pokedex[0] && p.id <= r.pokedex[1])?.id;
+const regiaoDo = (p: PokemonBase): string | undefined => (formaRegional(p.id)?.foraDosMapas ? undefined : formaRegional(p.id)?.regiao) ?? REGIOES.find((r) => p.id >= r.pokedex[0] && p.id <= r.pokedex[1])?.id;
 /** "Comum" para a Pokédex shiny: fora lendários, míticos, Ultra Beasts e os Pokémon do passado/futuro. */
 const ehComum = (p: PokemonBase) => !ehLendario(p) && !ehParadoxo(especie(p.id).name);
 function listasDaDex() {

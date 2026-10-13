@@ -6,7 +6,7 @@ import { bonificacao } from '../bonificacao';
 import { carregarSave } from '../estado';
 import { corTipo, el } from './dom';
 
-const CURTOS: Record<ChaveBonus, string> = { silver: 'Silver', xp: 'XP', shiny: 'Shiny', lendario: 'Lendário' };
+const CURTOS: Record<ChaveBonus, string> = { silver: 'Poké Dólar', xp: 'XP', shiny: 'Shiny', lendario: 'Lendário' };
 
 /** Um selo por bônus ativo, ou null se não houver nenhum. Só informa, não é clicável. */
 export function selosBonus(): HTMLElement | null {

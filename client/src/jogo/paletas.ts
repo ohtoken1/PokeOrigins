@@ -26,6 +26,8 @@ export interface Paleta {
   vulcanico?: boolean;
   /** caverna: os "lagos" são buracos vazios (abismos), sem nada dentro */
   abismo?: boolean;
+  /** pico nevado: chão de neve, lagos congelados, capim de gelo e pinheiros com neve (desenhados por código) */
+  nevado?: boolean;
 }
 
 const ARVORES_VERDES: [number, number][] = [[48, 0], [44, 0], [50, 0], [46, 0]];
@@ -88,5 +90,17 @@ export const PALETAS: Record<string, Paleta> = {
     filtro: 'hue-rotate(115deg) saturate(0.75) brightness(0.62)',
     filtroObjetos: 'hue-rotate(200deg) saturate(0.5) brightness(0.7)',
     filtroLiquido: 'hue-rotate(40deg) saturate(0.7) brightness(0.35)',
+  },
+  // pico nevado: quase tudo desenhado por código; do tileset só as pedras, mais claras e frias
+  pico: {
+    obstaculo: 'arvore',
+    rochas: ROCHA_CINZA,
+    pedrinhas: PEDRINHAS_CINZAS,
+    copa: ['#10302a', '#24604a', '#3a8a66', '#f6fbff'],
+    lagos: 5,
+    filtro: 'saturate(0.2) brightness(1.4)',
+    filtroObjetos: 'saturate(0.35) hue-rotate(170deg) brightness(1.2)',
+    filtroLiquido: 'none',
+    nevado: true,
   },
 };

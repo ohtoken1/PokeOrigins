@@ -16,6 +16,7 @@ import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
 import { garantirTexturaLpc, OutrosJogadores, texturaDaAura } from './outrosJogadores';
 import { digitando } from '../ui/digitando';
 import { entrarNaSala, moverOnline, sairDaSalaOnline, visualOnline, type DirecaoOnline, type JogadorOnline, type VisualOnline } from '../online';
+import { tr } from '../idioma';
 
 /** Tamanho da tela do jogo em pixels (a câmera mostra 40×27 tiles ampliados 1,5×). */
 export const LARGURA_TELA = 960;
@@ -39,6 +40,8 @@ const ESCALA_DETALHE = 1 / 1.6;
 const COMPENSA_ZOOM = 2 / 1.6;
 /** Escala do personagem LPC (quadro 64×64) no mundo: 20% menor que a do desenho antigo (pedido do dono). */
 export const ESCALA_LPC = 0.5;
+/** NPC sentado: até que linha do quadro de 64 px o boneco aparece (o resto, as canelas, fica atrás do assento). */
+const CORTE_SENTADO = 54;
 /** Escala dos sprites de mapa do PMD (Pokémon que segue). */
 export const ESCALA_PMD = 0.75;
 export const DURACAO_PASSO = 160;
@@ -289,6 +292,7 @@ export class BiomaScene extends Phaser.Scene {
     }
     this.opcoes.personagem?.folhas.then((f) => this.usarPersonagemLpc(this.opcoes.personagem!.chave, f));
     if (paleta.submerso) this.efeitosSubmersos();
+    if (paleta.nevado) this.efeitosDeNeve();
 
     const camera = this.cameras.main;
     camera.setZoom(zoomEscolhido * (Number(this.game.config.width) / LARGURA_TELA)).setBounds(0, 0, this.mapa.largura * TAM, this.mapa.altura * TAM).setRoundPixels(true);
@@ -347,7 +351,7 @@ export class BiomaScene extends Phaser.Scene {
    */
   private rotulo(texto: string, x: number, y: number, cor = '#ffffff', acao?: string) {
     const t = this.add
-      .text(x, y, acao ? `${texto} ›` : texto, {
+      .text(x, y, acao ? `${tr(texto)} ›` : tr(texto), {
         fontFamily: 'system-ui, Segoe UI, sans-serif', fontSize: `${FONTE_NOME}px`, fontStyle: 'bold', color: cor,
         backgroundColor: acao ? 'rgba(13,12,10,0.86)' : 'rgba(13,12,10,0.6)', padding: { x: 14, y: 6 },
       })
@@ -445,8 +449,9 @@ export class BiomaScene extends Phaser.Scene {
   private montarNpcs() {
     const mapa = this.mapa;
     for (const n of mapa.npcs ?? []) {
-      const [nx, ny] = this.pesDoTile(n.x, n.y);
-      this.add.ellipse(nx, ny - 1, 16, 5, 0x000000, 0.28).setDepth(ny - 0.5);
+      const [px, py] = this.pesDoTile(n.x, n.y);
+      const [nx, ny] = [px + (n.dx ?? 0), py + (n.dy ?? 0)];
+      if (!n.sentado) this.add.ellipse(nx, ny - 1, 16, 5, 0x000000, 0.28).setDepth(ny - 0.5);
       this.rotulo(n.nome, nx, ny - 25, '#9fe0ff', n.acao);
       montarPersonagem(n.aparencia).then((f) => {
         if (this.mapa !== mapa || !this.sys.isActive()) return;
@@ -458,12 +463,36 @@ export class BiomaScene extends Phaser.Scene {
         }
         if (!this.anims.exists(`anim-${chave}`))
           this.anims.create({ key: `anim-${chave}`, frames: [{ key: chave, frame: 'parado-0' }, { key: chave, frame: 'parado-1' }], frameRate: 2, repeat: -1 });
-        this.add.sprite(nx, ny, chave, 'parado-0').setOrigin(0.5, 61 / 64).setScale(ESCALA_LPC).setDepth(ny).play(`anim-${chave}`);
+        const boneco = this.add.sprite(nx, ny, chave, 'parado-0').setOrigin(0.5, 61 / 64).setScale(ESCALA_LPC).setDepth(n.sentado ? py + 4 : ny).play(`anim-${chave}`);
+        // sentado: as canelas somem atrás do assento (corta a parte de baixo do quadro)
+        if (n.sentado) boneco.setCrop(0, 0, 64, CORTE_SENTADO);
       });
     }
   }
 
   /** Fundo do mar: feixes de luz balançando, bolhas subindo e o personagem azulado. */
+  /** Pico Nevado: flocos de neve caindo de lado, só em volta do que a câmera mostra. */
+  private efeitosDeNeve() {
+    if (!this.textures.exists('floco')) {
+      const floco = this.add.graphics();
+      floco.fillStyle(0xffffff, 1).fillRect(1, 0, 1, 3).fillRect(0, 1, 3, 1);
+      floco.generateTexture('floco', 3, 3);
+      floco.destroy();
+    }
+    this.add
+      .particles(0, 0, 'floco', {
+        emitZone: { type: 'random', source: new Phaser.Geom.Rectangle(-300, -230, 640, 300), quantity: 1 },
+        speedY: { min: 22, max: 46 },
+        speedX: { min: -22, max: -6 },
+        scale: { min: 0.5, max: 1.2 },
+        alpha: { start: 0.95, end: 0 },
+        lifespan: { min: 3500, max: 6500 },
+        frequency: 28,
+      })
+      .setDepth(5001)
+      .startFollow(this.jogador);
+  }
+
   private efeitosSubmersos() {
     const [w, h] = [this.mapa.largura * TAM, this.mapa.altura * TAM];
     this.jogador.setTint(0xc8e4ff);

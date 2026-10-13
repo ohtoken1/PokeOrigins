@@ -9,6 +9,7 @@ import { pokemonPorId } from './dados';
 import { adotarSaveDoServidor, carregarSave, salvarAgora, type Save } from './estado';
 import { aoAvisoDoServidor } from './online';
 import { el } from './ui/dom';
+import { nomeDaMoeda } from '../../shared/moedas';
 
 export type ListaMercado = { anuncios: AnuncioMercado[]; meus: AnuncioMercado[]; pendentes: number; agora: number };
 type ComSave = ListaMercado & { save: Save; versao: number };
@@ -20,7 +21,7 @@ const numero = (n: number) => n.toLocaleString('pt-BR');
 /** "Pikachu", "3x Potion" ou "50 gold". */
 export function nomeDoAnunciado(a: { tipo: TipoAnuncio; especieId?: number; item?: string; quantidade?: number }): string {
   if (a.tipo === 'pokemon') return a.especieId ? pokemonPorId(a.especieId).nome : 'Pokémon';
-  if (a.tipo === 'gold') return `${numero(a.quantidade ?? 0)} gold`;
+  if (a.tipo === 'gold') return `${numero(a.quantidade ?? 0)} Origin Coins`;
   return `${numero(a.quantidade ?? 1)}x ${nomeDoItem(a.item ?? '')}`;
 }
 
@@ -64,7 +65,7 @@ export function vigiarMercado(): void {
       if (!r.acertos.length || !r.save || r.versao === undefined) return;
       adotarSaveDoServidor(r.save, r.versao);
       aviso.replaceChildren(el('strong', {}, 'Mercado negro'), ...r.acertos.map((a) =>
-        el('span', {}, a.motivo === 'vendido' ? `Vendeu ${nomeDoAnunciado(a)} por ${numero(a.valor ?? 0)} ${a.moeda}` : `${nomeDoAnunciado(a)} voltou: ninguém comprou`)));
+        el('span', {}, a.motivo === 'vendido' ? `Vendeu ${nomeDoAnunciado(a)} por ${numero(a.valor ?? 0)} ${nomeDaMoeda(a.moeda, a.valor ?? 0)}` : `${nomeDoAnunciado(a)} voltou: ninguém comprou`)));
       aviso.hidden = false;
       clearTimeout(esconder);
       esconder = window.setTimeout(() => (aviso.hidden = true), 9000);

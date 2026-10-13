@@ -9,15 +9,17 @@ import { BOXES_INICIAIS, BOXES_MAXIMO, BOX_POKEMON, TAMANHO_BOX } from './pc';
 import { CHAVE_TEMPORAL, TICKETS } from './tickets';
 import { TIPOS_TERA } from './tera';
 import { ITENS_CUSTOM } from './itensCustom';
+import { MASCARAS_OGERPON } from './formasPorItem';
 import { MEGA_STONES, PRECO_MEGA_STONE_GOLD, RAYQUAZITE, megaDaPedra } from './megas';
 
 export { TIPOS_TERA };
 import { OVOS } from './ovos';
 import { nomeCategoria, nomeTipo, traduzir } from './traducao';
+import { nomeDaMoeda } from './moedas';
 
 export type CategoriaLoja =
   | 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'up' | 'mints' | 'megapedras' | 'frutas' | 'gems' | 'placas' | 'memorias' | 'zcristais' | 'lendarios'
-  | 'terashards' | 'chave' | 'charms' | 'skins' | 'cubos' | 'tm' | 'tr' | 'tickets' | 'ovos';
+  | 'terashards' | 'formas' | 'chave' | 'materiais' | 'charms' | 'skins' | 'cubos' | 'tm' | 'tr' | 'tickets' | 'ovos';
 
 /** Abas da loja. */
 export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
@@ -40,7 +42,9 @@ export const CATEGORIAS_FORA_DA_LOJA: { id: CategoriaLoja; nome: string }[] = [
   { id: 'zcristais', nome: 'Z-Crystals' },
   { id: 'lendarios', nome: 'Itens de lendários' },
   { id: 'terashards', nome: 'Tera Shards' },
+  { id: 'formas', nome: 'Itens de forma' },
   { id: 'chave', nome: 'Itens-chave' },
+  { id: 'materiais', nome: 'Materiais' },
   { id: 'charms', nome: 'Charms' },
   { id: 'skins', nome: 'Skins' },
   { id: 'cubos', nome: 'Cubos' },
@@ -62,6 +66,8 @@ export interface ItemLoja {
   golpe?: string;
   /** imagem da PokéAPI (sprites/items/<sprite>.png) para itens sem ícone no Showdown */
   sprite?: string;
+  /** aba da loja onde o item aparece, quando a categoria dele não tem aba (Rotom Catalog, de `formas`, fica em Evolução) */
+  abaDaLoja?: CategoriaLoja;
   /** endereço completo da imagem (Tera Shards, que não existem no Showdown nem na PokéAPI) */
   imagem?: string;
   /** vendido na loja? (false: só tickets/Admin) */
@@ -76,6 +82,8 @@ export interface ItemLoja {
   natureza?: string;
   /** charms: o tipo */
   charm?: string;
+  /** Energies: o tipo */
+  energia?: string;
   /** desenho provisório do ícone (itens nossos ainda sem arte) */
   simbolo?: string;
   /** cubos: de qual Pokémon e de que era (shared/itensCustom.ts) */
@@ -84,8 +92,10 @@ export interface ItemLoja {
 
 /** Moeda do jogo. */
 export const MOEDA = 'silver';
+/** Como o jogador lê as moedas (silver = Poké Dólar, gold = Origin Coin). */
+export { NOME_MOEDA, nomeDaMoeda } from './moedas';
 /** Preço com a moeda certa ("1 silver", "1 gold"). */
-export const textoPreco = (i: Pick<ItemLoja, 'preco' | 'moeda'>, quantidade = 1) => `${(i.preco * quantidade).toLocaleString('pt-BR')} ${i.moeda ?? MOEDA}`;
+export const textoPreco = (i: Pick<ItemLoja, 'preco' | 'moeda'>, quantidade = 1) => `${(i.preco * quantidade).toLocaleString('pt-BR')} ${nomeDaMoeda(i.moeda ?? MOEDA, i.preco * quantidade)}`;
 export const PRECO_PADRAO = 1;
 /** Preços específicos (id do item → preço). Vazio por enquanto: tudo custa PRECO_PADRAO. */
 /**
@@ -114,7 +124,7 @@ export const PRECOS: Record<string, number> = {
 /** Itens da loja vendidos só por GOLD (decisão do dono), com o preço. As Mega Stones também são (PRECO_MEGA_STONE_GOLD). */
 export const PRECOS_EM_GOLD: Record<string, number> = { abilitycapsule: 50, abilitypatch: 100 };
 /** Silver inicial (provisório). Silver só se ganha vencendo treinadores e ginásios; selvagens não dão (pedido do dono). */
-export const SILVER_INICIAL = 1000;
+export const SILVER_INICIAL = 0;
 /**
  * Preço em silver para avaliar os IVs de um Pokémon (provisório). Uma forma só de pagar (pedido do dono): depois de
  * avaliado, quem é VIP vê o valor exato e quem não é vê a FAIXA de cada IV.
@@ -139,6 +149,14 @@ export const DYNAMAX_BAND = 'dynamaxband';
 export const ITENS_DE_SEGURAR_NOSSOS: Record<string, string> = { [EXP_SHARE]: 'Exp. Share', [TERASTALLIZER_BAND]: 'Tera Orb', [DYNAMAX_BAND]: 'Dynamax Band', luckyegg: 'Lucky Egg', everstone: 'Everstone', amuletcoin: 'Amulet Coin', luckincense: 'Luck Incense' };
 /** Descrições nossas para itens do Showdown cujo efeito no jogo é fora da batalha (EVs). */
 const DESCRICAO_DE_CAMPO: Record<string, string> = {
+  wellspringmask: 'Usada na Ogerpon, ela vira a forma Wellspring Mask (Grass/Water). É gasta.',
+  hearthflamemask: 'Usada na Ogerpon, ela vira a forma Hearthflame Mask (Grass/Fire). É gasta.',
+  cornerstonemask: 'Usada na Ogerpon, ela vira a forma Cornerstone Mask (Grass/Rock). É gasta.',
+  // evoluções que nos jogos pedem segurar o item e subir de nível: aqui é só usar (pedido do dono)
+  razorclaw: 'Segurando, a chance de golpe crítico sobe 1 estágio. Usada em Sneasel, ele evolui para Weavile (o Hisuian Sneasel, para Sneasler); aí ela é gasta.',
+  razorfang: 'Segurando, os golpes ganham 10% de chance de fazer o alvo hesitar. Usada em Gligar, ele evolui para Gliscor; aí ela é gasta.',
+  ovalstone: 'Usada em Happiny, ele evolui para Chansey. É gasta.',
+  ...Object.fromEntries(['strawberrysweet', 'lovesweet', 'berrysweet', 'cloversweet', 'flowersweet', 'starsweet', 'ribbonsweet'].map((doce) => [doce, 'Usado em Milcery, ele evolui para Alcremie. É gasto.'])),
   machobrace: 'Segurando, o Pokémon ganha o dobro de EVs de cada Pokémon derrotado. Na batalha, a Speed cai pela metade.',
   powerweight: 'Segurando, o Pokémon ganha +8 EVs de HP por Pokémon derrotado. Na batalha, a Speed cai pela metade.',
   powerbracer: 'Segurando, o Pokémon ganha +8 EVs de Attack por Pokémon derrotado. Na batalha, a Speed cai pela metade.',
@@ -183,13 +201,15 @@ function classificarItem(i: ReturnType<typeof Dex.items.get>): CategoriaLoja | n
   if (i.zMove) return 'zcristais';
   if (i.onPlate || /plate$/.test(i.id)) return 'placas';
   if (/memory$/.test(i.id)) return 'memorias';
+  // máscaras da Ogerpon: itens de evolução de uso único (pedido do dono), fora da loja
+  if (i.id in MASCARAS_OGERPON) return 'evolucao';
   if (i.itemUser?.length && i.itemUser.every(ehLendario)) return 'lendarios';
   if (/^Evolves/.test(desc)) return 'evolucao';
   return 'batalha';
 }
 const NA_LOJA = new Set<CategoriaLoja>(['bolas', 'remedios', 'evolucao', 'batalha', 'up', 'megapedras', 'tm', 'tr']);
 /** Itens de categorias vendidas que ficam fora da loja (pedido do dono). */
-const FORA_DA_LOJA = new Set(['amuletcoin', 'luckincense', 'destinyknot', 'healpowder', 'lavacookie', 'oldgateau', 'casteliacone', 'lumiosegalette', 'shaloursable', 'bigmalasada', 'ragecandybar']);
+const FORA_DA_LOJA = new Set(['wellspringmask', 'hearthflamemask', 'cornerstonemask', 'amuletcoin', 'luckincense', 'destinyknot', 'healpowder', 'lavacookie', 'oldgateau', 'casteliacone', 'lumiosegalette', 'shaloursable', 'bigmalasada', 'ragecandybar']);
 /** Das 25 Pokébolas, a loja só vende estas (pedido do dono); as outras saem de tickets/Admin. */
 const BOLAS_NA_LOJA = new Set(['pokeball', 'greatball', 'ultraball']);
 
@@ -197,7 +217,7 @@ function montarCatalogo(): ItemLoja[] {
   const itens: ItemLoja[] = [];
   const add = (item: Omit<ItemLoja, 'preco' | 'naLoja'>) => {
     if (itens.some((i) => i.id === item.id)) return;
-    const naLoja = NA_LOJA.has(item.categoria) && !FORA_DA_LOJA.has(item.id) && (item.categoria !== 'bolas' || BOLAS_NA_LOJA.has(item.id));
+    const naLoja = NA_LOJA.has(item.categoria) && !FORA_DA_LOJA.has(item.id) && !item.id.endsWith('-nt') && (item.categoria !== 'bolas' || BOLAS_NA_LOJA.has(item.id));
     // Mega Stones custam gold (pedido do dono)
     if (item.categoria === 'megapedras') itens.push({ ...item, naLoja, moeda: 'gold', preco: PRECOS[item.id] ?? PRECO_MEGA_STONE_GOLD });
     else if (PRECOS_EM_GOLD[item.id]) itens.push({ ...item, naLoja, moeda: 'gold', preco: PRECOS_EM_GOLD[item.id] });
@@ -215,12 +235,18 @@ function montarCatalogo(): ItemLoja[] {
   }
   add({ id: CABO_DE_LIGACAO, nome: 'Linking Cord', categoria: 'evolucao', imagem: 'itens/linkingcord.png', descricao: 'Faz evoluir Pokémon que evoluem por troca (se precisar de item, ele deve estar equipado).' });
 
+  // itens de evolução do Legends: Arceus (não existem no Showdown)
+  add({ id: 'peatblock', nome: 'Peat Block', categoria: 'evolucao', imagem: 'itens/peatblock.svg', descricao: 'Bloco de turfa. Evolui o Ursaring para Ursaluna. É gasto.' });
+  add({ id: 'blackaugurite', nome: 'Black Augurite', categoria: 'evolucao', imagem: 'itens/blackaugurite.svg', descricao: 'Pedra negra e afiada. Evolui o Scyther para Kleavor. É gasta.' });
+  // pedra nossa (pedido do dono), na loja
+  add({ id: 'temporalstone', nome: 'Temporal Stone', categoria: 'evolucao', imagem: 'itens/temporalstone.svg', descricao: 'Pedra com um relógio preso dentro. Evolui Galarian Yamask, Stantler, Basculin (White-Striped), Hisuian Qwilfish, Primeape e Bisharp. É gasta.' });
+
   add({ id: EXP_SHARE, nome: 'Exp. Share', categoria: 'up', sprite: 'exp-share', descricao: 'Segurando, o Pokémon ganha XP e EVs de toda vitória ou captura, mesmo sem entrar em campo.' });
   // itens de segurar com efeito fora da batalha (shared/campo.ts); não existem no Showdown
   add({ id: 'luckyegg', nome: 'Lucky Egg', categoria: 'up', sprite: 'lucky-egg', descricao: 'Segurando, o Pokémon ganha 50% a mais de XP.' });
   add({ id: 'everstone', nome: 'Everstone', categoria: 'up', sprite: 'everstone', descricao: 'Segurando, o Pokémon não evolui por nível nem por amizade.' });
-  add({ id: 'amuletcoin', nome: 'Amulet Coin', categoria: 'batalha', sprite: 'amulet-coin', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de silver. Não acumula com o Luck Incense.' });
-  add({ id: 'luckincense', nome: 'Luck Incense', categoria: 'batalha', sprite: 'luck-incense', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de silver. Não acumula com a Amulet Coin.' });
+  add({ id: 'amuletcoin', nome: 'Amulet Coin', categoria: 'batalha', sprite: 'amulet-coin', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de Poké Dólares. Não acumula com o Luck Incense.' });
+  add({ id: 'luckincense', nome: 'Luck Incense', categoria: 'batalha', sprite: 'luck-incense', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de Poké Dólares. Não acumula com a Amulet Coin.' });
   // abre uma box nova no PC (usado pela bolsa; regras em shared/pc.ts)
   add({ id: BOX_POKEMON, nome: 'Box Pokémon', categoria: 'up', imagem: 'itens/boxpokemon.svg', descricao: `Abre mais uma box no seu PC, com ${TAMANHO_BOX} lugares. Todo treinador começa com ${BOXES_INICIAIS} boxes e pode chegar a ${BOXES_MAXIMO}.` });
   // trocam a Ability (usados pela bolsa)
@@ -272,11 +298,18 @@ function montarCatalogo(): ItemLoja[] {
   return [...itens.filter((i) => i.categoria !== 'batalha'), ...batalha];
 }
 
+/** Itens nossos (de `ITENS_CUSTOM`) que a loja vende (pedido do dono): preço, moeda e a aba onde aparecem. */
+const CUSTOM_NA_LOJA: Record<string, Pick<ItemLoja, 'preco' | 'moeda' | 'abaDaLoja'>> = {
+  rotomcatalog: { preco: 50, moeda: 'gold', abaDaLoja: 'evolucao' },
+};
+
 /** Todos os itens do jogo (Database, bolsa e Admin). */
 export const TODOS_OS_ITENS: ItemLoja[] = [
   ...montarCatalogo(),
   // itens nossos: skins e itens-chave (sem uso por enquanto)
-  ...ITENS_CUSTOM.map((i): ItemLoja => ({ ...i, preco: 0, naLoja: false })),
+  // charms NT (os do Kit iniciante): iguais aos normais, mas não entram em troca
+  ...ITENS_CUSTOM.filter((i) => i.categoria === 'charms').map((i): ItemLoja => ({ ...i, id: `${i.id}-nt`, nome: `${i.nome} (NT)`, descricao: `${i.descricao} NT: não pode ser trocado.`, preco: 0, naLoja: false })),
+  ...ITENS_CUSTOM.map((i): ItemLoja => (CUSTOM_NA_LOJA[i.id] ? { ...i, naLoja: true, ...CUSTOM_NA_LOJA[i.id] } : { ...i, preco: 0, naLoja: false })),
   ...TICKETS.map((t): ItemLoja => ({ id: t.id, nome: t.nome, categoria: 'tickets', descricao: t.descricao, preco: 0, naLoja: false, sprite: 'eon-ticket' })),
   // Chave Temporal: abre como um ticket (aba Tickets da bolsa)
   { id: CHAVE_TEMPORAL.id, nome: CHAVE_TEMPORAL.nome, categoria: 'tickets', descricao: CHAVE_TEMPORAL.descricao, preco: 0, naLoja: false, sprite: 'secret-key' },

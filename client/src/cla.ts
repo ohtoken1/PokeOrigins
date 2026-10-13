@@ -1,5 +1,5 @@
 // Clã do jogador (server/src/cla.ts): estado único, chamadas e o envio do XP ganho em batalha para o clã.
-import { NIVEL_MAX_CLA, type Bandeira } from '../../shared/cla';
+import { NIVEL_MAX_CLA, bonusDoCla, type Bandeira, type BonusCla } from '../../shared/cla';
 import { conferirConquistasLogo, definirMarcasVivas } from './conquistas';
 import { api } from './conta';
 import { aoAvisoDoServidor } from './online';
@@ -95,7 +95,10 @@ async function mandarXp(): Promise<void> {
     relogio ||= window.setTimeout(mandarXp, 5000);
   }
 }
-/** O Pokémon em campo ganhou XP numa batalha: o clã ganha o mesmo tanto. */
+/** Bônus que o nível da minha guilda dá agora (tudo 0 para quem não tem guilda). */
+export const bonusDaMinhaGuilda = (): BonusCla => bonusDoCla(estado.cla?.nivel ?? 0);
+
+/** Pontos de XP da guilda por uma ação do jogador (selvagem, Pokémon de treinador…; regras em shared/cla.ts). */
 export function darXpAoCla(xp: number): void {
   if (!estado.cla || xp <= 0) return;
   xpGuardado += Math.round(xp);

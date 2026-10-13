@@ -108,12 +108,17 @@ export function iconeCharm(tipo: string): HTMLElement {
   return el('div', { class: 'icone-charm', style: { '--cor-tipo': cor } }, img);
 }
 
+/** Ícone de Energy: uma esfera brilhando na cor do tipo, com uma centelha no meio (desenho por CSS). */
+export function iconeEnergia(tipo: string): HTMLElement {
+  return el('div', { class: 'icone-energia', style: { '--cor-tipo': corTipo(tipo) } }, el('i', {}));
+}
+
 /** Ícone de cubo: o Pokémon dentro de um cubo (âmbar = passado, ciano = futuro, laranja = lendário). */
 export function iconeCubo(especie: number, era: string): HTMLElement {
   return el('div', { class: `icone-cubo cubo-${era}` }, spritePokemon(pokemonPorId(especie), { animado: false }));
 }
 
-export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 'sprite' | 'imagem'> & { skin?: ItemLoja['skin']; cubo?: ItemLoja['cubo']; simbolo?: string; charm?: string }): HTMLElement {
+export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 'sprite' | 'imagem'> & { skin?: ItemLoja['skin']; cubo?: ItemLoja['cubo']; simbolo?: string; charm?: string; energia?: string }): HTMLElement {
   const reserva = () => el('div', { class: `icone-item ${item.id} cat-${item.categoria}` });
   if (item.categoria === 'ovos') {
     const ovo = ovoPorId(item.id);
@@ -124,6 +129,7 @@ export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 's
   if (item.skin) return iconeSkin(item.skin.especie, item.skin.shiny);
   if (item.cubo) return iconeCubo(item.cubo.especie, item.cubo.era);
   if (item.charm) return iconeCharm(item.charm);
+  if (item.energia) return iconeEnergia(item.energia);
   if (item.categoria === 'tickets') {
     const ticket = iconeTicketDoPokemon(item.id);
     if (ticket) return el('div', { class: 'icone-caixa' }, ticket);
@@ -134,7 +140,8 @@ export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 's
     return el('div', { class: 'icone-caixa' }, img);
   }
 
-  const sd = Dex.items.get(item.id);
+  // versão NT (Kit iniciante): o mesmo ícone do item normal
+  const sd = Dex.items.get(item.id.replace(/-nt$/, ''));
   if (sd.exists && sd.spritenum) {
     const n = sd.spritenum;
     return el('div', {

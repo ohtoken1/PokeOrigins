@@ -136,8 +136,8 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
   const atualizarCusto = () => {
     if (!save) return;
     const c = custo();
-    botaoSalvar.textContent = c.total ? `Salvar · ${c.total} gold` : 'Salvar';
-    textoCusto.textContent = `Trocar o nome: ${PRECO_TROCAR_NOME_GOLD} gold · mudar a aparência: ${PRECO_TROCAR_APARENCIA_GOLD} gold · você tem ${save.gold} gold`;
+    botaoSalvar.textContent = c.total ? `Salvar · ${c.total} Origin Coins` : 'Salvar';
+    textoCusto.textContent = `Trocar o nome: ${PRECO_TROCAR_NOME_GOLD} Origin Coins · mudar a aparência: ${PRECO_TROCAR_APARENCIA_GOLD} Origin Coins · você tem ${save.gold} Origin Coins`;
   };
   atualizarCusto();
   const concluir = () => {
@@ -151,7 +151,7 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
     if (save) {
       const c = custo();
       if (save.gold < c.total) {
-        avisoNome.textContent = `Gold insuficiente: precisa de ${c.total}, você tem ${save.gold}.`;
+        avisoNome.textContent = `Origin Coins insuficientes: precisa de ${c.total}, você tem ${save.gold}.`;
         return;
       }
       save.gold -= c.total;
@@ -173,7 +173,7 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
       'main',
       { class: 'tela tela-personagem' },
       el('h1', {}, save ? 'Editar personagem' : 'Crie seu treinador'),
-      el('p', { class: 'sub' }, save ? 'Mude o visual ou o nome do seu treinador (cada mudança custa gold).' : 'Escolha o visual do seu personagem. Dá para mudar depois (com gold).'),
+      el('p', { class: 'sub' }, save ? 'Mude o visual ou o nome do seu treinador (cada mudança custa Origin Coins).' : 'Escolha o visual do seu personagem. Dá para mudar depois (com Origin Coins).'),
       el(
         'div',
         { class: 'layout-personagem' },

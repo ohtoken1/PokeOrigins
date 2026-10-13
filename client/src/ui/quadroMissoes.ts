@@ -49,7 +49,7 @@ export function abrirQuadroDeMissoes(save: Save, aoMudar: () => void = () => {})
         el('li', {}, el('small', {}, 'Nature'), m.natureza),
         el('li', {}, el('small', {}, 'Qualidade'), m.qualidade)),
       el('div', { class: 'missao-rodape' },
-        el('span', { class: 'banco-moeda' }, el('span', { class: 'icone-moeda moeda-gold' }), el('strong', {}, String(recompensaDaMissao(m))), ' gold'),
+        el('span', { class: 'banco-moeda' }, el('span', { class: 'icone-moeda moeda-gold' }), el('strong', {}, String(recompensaDaMissao(m)))),
         feita ? el('span', { class: 'missao-feita', title: 'Sai do quadro no próximo sorteio' }, minha ? 'Concluída por você' : `Concluída por ${quem!.por}`) : el('small', { class: 'missao-tempo', title: 'Tempo até esta missão sair do quadro' }, `Sai em ${textoDoTempo(m.ate - agora)}`),
         !feita && tenho ? el('small', { class: 'missao-tenho' }, `Você tem ${tenho}`) : null));
   };
@@ -70,7 +70,7 @@ export function abrirQuadroDeMissoes(save: Save, aoMudar: () => void = () => {})
       const meus = candidatosDaMissao(save, m);
       return el('div', { class: 'quadro-missoes' },
         el('button', { class: 'botao secundario missao-voltar', type: 'button', onclick: () => ((aberta = null), (aviso = ''), janela.redesenhar()) }, '← Voltar ao quadro'),
-        el('p', { class: 'missao-pedido' }, el('strong', {}, pedido(m)), el('span', { class: 'banco-moeda' }, el('span', { class: 'icone-moeda moeda-gold' }), el('strong', {}, String(recompensaDaMissao(m))), ' gold')),
+        el('p', { class: 'missao-pedido' }, el('strong', {}, pedido(m)), el('span', { class: 'banco-moeda' }, el('span', { class: 'icone-moeda moeda-gold' }), el('strong', {}, String(recompensaDaMissao(m))))),
         el('p', { class: 'meta' }, meus.length
           ? 'Escolha o Pokémon que cumpre a missão (time e PC). Você não entrega: ele continua com você.'
           : `Você não tem nenhum ${pokemonPorId(m.especie).nome} no time nem no PC.`),
@@ -85,7 +85,7 @@ export function abrirQuadroDeMissoes(save: Save, aoMudar: () => void = () => {})
               if (erro) aviso = erro;
               else {
                 aoMudar();
-                aviso = `Missão concluída! +${recompensaDaMissao(m)} gold.`;
+                aviso = `Missão concluída! +${recompensaDaMissao(m)} Origin Coins.`;
                 aberta = null;
               }
               janela.redesenhar();
