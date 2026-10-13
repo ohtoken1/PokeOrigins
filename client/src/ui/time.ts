@@ -3,7 +3,7 @@ import { itemDaLoja } from '../../../shared/loja';
 import { iconeItem } from './iconeItem';
 import { expParaNivel, hpMaximo } from '../../../shared/batalha/pokemon';
 import { pokemonPorId } from '../dados';
-import { TAMANHO_MAXIMO_TIME, type PokemonDoJogador } from '../estado';
+import { TAMANHO_MAXIMO_TIME, aoSalvar, type PokemonDoJogador } from '../estado';
 import { abrirDetalhes } from './detalhes';
 import { resumoAoPassar } from './resumo';
 import { el, spritePokemon } from './dom';
@@ -62,18 +62,24 @@ export function barraXp(p: PokemonDoJogador): HTMLElement {
  * Coluna com o time do jogador para as telas de batalha fora do mapa (Duelos, Ginásios; pedido do dono): o mesmo
  * painel do mapa e da cidade. Arrastar muda a ordem (o primeiro é quem entra na batalha) e já salva.
  */
-export function colunaDoTime(time: PokemonDoJogador[], aoSalvar: () => void): HTMLElement {
+export function colunaDoTime(time: PokemonDoJogador[], salvarTime: () => void, aoMudar?: () => void): HTMLElement {
   const caixa = el('aside', { class: 'coluna-time' });
-  const desenhar = () =>
-    caixa.replaceChildren(
-      painelTime(time, () => {
-        aoSalvar();
-        desenhar();
-      }),
-    );
+  const desenhar = () => caixa.replaceChildren(painelTime(time, salvarTime));
   desenhar();
+  // o time mudou por fora (PC, bolsa, troca…): todo `salvar` redesenha a coluna e avisa a tela (`aoMudar`)
+  let entrou = false;
+  const vigia = () => {
+    if (caixa.isConnected) entrou = true;
+    else if (entrou) return void colunasVivas.delete(vigia);
+    desenhar();
+    aoMudar?.();
+  };
+  colunasVivas.add(vigia);
   return caixa;
 }
+/** Colunas de time que estão na tela (uma inscrição só no `aoSalvar`, que não tem como desinscrever). */
+const colunasVivas = new Set<() => void>();
+aoSalvar(() => [...colunasVivas].forEach((f) => f()));
 
 /**
  * Painel do time. Com `aoReordenar`, dá para arrastar um Pokémon para outra vaga e mudar a ordem

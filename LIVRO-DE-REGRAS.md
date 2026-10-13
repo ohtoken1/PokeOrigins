@@ -922,6 +922,10 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Energies e Apricorns:** ao derrotar ou capturar um Pokémon selvagem há 10% de chance de ganhar a Energy do tipo principal dele (uma para cada um dos 18 tipos). Elas e os Apricorns são materiais do futuro sistema de craft.
 - **Tickets:** o prêmio comum deixou de ser Tera Shard. Agora sai um destes, com a mesma chance: 25 de uma Pokébola aleatória, 20 de uma Berry aleatória, 20 de um Apricorn aleatório ou 20 de uma Energy aleatória. Para abrir, escolha a quantidade (×1, ×3 ou ×5) e depois clique em Abrir. O prêmio mítico aparece em vermelho.
 - **Bolsa nova:** a bolsa ganhou o mesmo desenho da loja.
+- **Resgate das conquistas:** ao concluir uma conquista aparece um aviso à esquerda da tela. A recompensa não entra mais sozinha: vá em Minha conta → Conquistas e clique em Resgatar. Bônus e títulos só passam a valer depois do resgate.
+- **Conquistas mais informativas:** parar o mouse na recompensa de uma conquista mostra os seus bônus atuais (shiny, lendários, iniciais, Poké Dólares, XP e captura); nas que dão título, mostra o título e o bônus dele.
+- **Descrição dos itens ao passar o mouse:** em qualquer tela, parar o mouse em cima de um item (ou do nome dele, quando aparece sublinhado) mostra a imagem e a descrição.
+- **Retrato do personagem:** o personagem agora aparece inteiro e centralizado no perfil e em Minhas skins, com qualquer skin.
 - **Ginásios mais difíceis:** os Pokémon do líder agora têm o nível do Pokémon mais forte do seu time (antes era a média do time).
 - **Ginásios em ordem:** agora é preciso vencer os líderes de cada região na ordem, do 1º ao 8º.
 - **Bônus de shiny somam:** os bônus de chance de shiny (VIP, skin, conquistas, guilda, título e charm) agora são somados, em vez de multiplicados um pelo outro. Com tudo no máximo: +59%, ou +79% com o charm do tipo.

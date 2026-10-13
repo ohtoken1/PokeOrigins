@@ -14,6 +14,7 @@ import { carregarSave, type PokemonDoJogador, type Save } from '../estado';
 import { abrirDetalhes } from '../ui/detalhes';
 import { el, spritePokemon } from '../ui/dom';
 import { balaoTitulo } from '../ui/titulo';
+import { enquadrarPersonagem } from '../personagem/enquadrar';
 import { abrirJanela } from '../ui/janela';
 import { api, ErroApi } from '../conta';
 import { icone } from '../ui/icones';
@@ -66,6 +67,7 @@ function retratoTreinador(save: Save, remoto = false): HTMLElement {
     ctx.imageSmoothingEnabled = false;
     if (f.aura) ctx.drawImage(f.aura, 0, LINHA_DIRECAO.baixo * 64, 64, 64, 0, 0, 64, 64);
     ctx.drawImage(f.walk, 0, LINHA_DIRECAO.baixo * 64, 64, 64, 0, 0, 64, 64);
+    enquadrarPersonagem(canvas, [f.aura, f.walk], 0, LINHA_DIRECAO.baixo * 64, 136);
   });
   return el('div', { class: 'perfil-retrato' }, canvas);
 }

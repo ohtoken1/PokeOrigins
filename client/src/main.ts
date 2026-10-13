@@ -41,6 +41,7 @@ import { vigiarQuadro } from './missoesQuadro';
 import { prepararIdioma } from './idioma';
 // o chat ouve o servidor desde a conexão (guarda as mensagens mesmo fora do mapa)
 import './ui/chat';
+import { ativarDicaDeItens } from './ui/dicaItem';
 
 export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes'; professor?: 'relembrar' | 'tutor'; daCidade?: boolean } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' } | { tela: 'cidade' } | { tela: 'safari' };
 export type Navegar = (destino: Destino) => void;
@@ -106,6 +107,7 @@ void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   }
   // conquistas: confere agora e depois de cada salvamento
   vigiarConquistas();
+  ativarDicaDeItens();
   // itens dados pela administração
   vigiarEntregas();
   vigiarMercado();

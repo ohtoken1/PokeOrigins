@@ -1,8 +1,8 @@
 // Aba "Minha conta": Meu perfil (com os títulos), Conquistas e Minhas skins (Opções fica no mesmo menu, tela própria).
 import { bonusAtivoDaSkin, bonusDaSkin, moverSkin, skinsNaBolsa, skinsNaColecao, temSkin, textoBonusSkin } from '../../../shared/skins';
 import { itemInegociavel } from '../../../shared/naoTrocavel';
-import { bonusDasConquistas, conquistaFeita, GRUPOS_CONQUISTA, textoRecompensa, TITULOS, tituloAtivo } from '../../../shared/conquistas';
-import { aoConcluirConquista, progressoDasConquistas } from '../conquistas';
+import { BONUS_DO_TITULO, bonusDasConquistas, conquistaFeita, GRUPOS_CONQUISTA, textoRecompensa, TITULOS, tituloAtivo, type Conquista } from '../../../shared/conquistas';
+import { aoConcluirConquista, progressoDasConquistas, resgatarConquista } from '../conquistas';
 import type { Tela } from '../main';
 import { TODOS_OS_ITENS } from '../../../shared/loja';
 import { carregarSave, salvar, salvarAgora, type Save } from '../estado';
@@ -11,6 +11,10 @@ import { LINHA_DIRECAO, montarPersonagem } from '../personagem/lpc';
 import { temArteDeSkin } from '../personagem/skinsDesenho';
 import { el } from '../ui/dom';
 import { balaoTitulo } from '../ui/titulo';
+import { textoDeItem } from '../ui/dicaItem';
+import { comDica, linhaDaDica } from '../ui/dica';
+import { bonusAtuais } from '../bonificacao';
+import { enquadrarPersonagem } from '../personagem/enquadrar';
 import { iconeItem } from '../ui/iconeItem';
 import { perfilJogador } from './jogadores';
 
@@ -22,10 +26,22 @@ function achievements(save: Save): HTMLElement {
   const pct = (v: number) => `+${(Math.round(v * 1000) / 10).toLocaleString('pt-BR')}%`;
   const desenhar = () => {
     const todas = progressoDasConquistas(save);
-    const feitas = todas.filter((x) => x.feita).length;
+    const feitas = todas.filter((x) => x.feita || x.aResgatar).length;
+    const esperando = todas.filter((x) => x.aResgatar);
     const bonus = bonusDasConquistas(save);
+    const resgatar = (ids: string[]) => {
+      const nomes = ids.map((id) => resgatarConquista(save, id)).filter((c) => !!c).map((c) => c!.nome);
+      if (!nomes.length) return;
+      salvar(save);
+      desenhar();
+    };
     secao.replaceChildren(
-      el('p', { class: 'sub' }, `${feitas} de ${todas.length} concluídas. A recompensa chega na hora em que a conquista é concluída.`),
+      el('p', { class: 'sub' }, `${feitas} de ${todas.length} concluídas. Ao concluir uma conquista, clique em Resgatar para receber a recompensa.`),
+      esperando.length
+        ? el('div', { class: 'conquistas-a-resgatar' },
+            el('strong', {}, esperando.length > 1 ? `${esperando.length} recompensas esperando por você!` : '1 recompensa esperando por você!'),
+            esperando.length > 1 ? el('button', { class: 'botao', onclick: () => resgatar(esperando.map((x) => x.conquista.id)) }, 'Resgatar todas') : null)
+        : '',
       el('div', { class: 'skins-total' },
         el('span', {}, 'Poké Dólares em batalhas: ', el('strong', {}, pct(bonus.silver))),
         el('span', {}, 'Shiny, lendários e iniciais: ', el('strong', {}, pct(bonus.raros))),
@@ -33,17 +49,19 @@ function achievements(save: Save): HTMLElement {
       ...GRUPOS_CONQUISTA.map((g) => {
         const doGrupo = todas.filter((x) => x.conquista.grupo === g.id);
         return el('details', { class: 'grupo-conquistas', open: true },
-          el('summary', {}, g.nome, el('small', {}, ` ${doGrupo.filter((x) => x.feita).length}/${doGrupo.length}`)),
+          el('summary', {}, g.nome, el('small', {}, ` ${doGrupo.filter((x) => x.feita || x.aResgatar).length}/${doGrupo.length}`)),
           el('div', { class: 'lista-achievements' },
-            ...doGrupo.map(({ conquista: c, valor, meta, feita }) =>
-              el('div', { class: `achievement ${feita ? 'feito' : ''}` },
-                el('span', { class: 'achievement-selo' }, feita ? '★' : ''),
+            ...doGrupo.map(({ conquista: c, valor, meta, feita, aResgatar }) =>
+              el('div', { class: `achievement ${feita ? 'feito' : ''} ${aResgatar ? 'a-resgatar' : ''}` },
+                el('span', { class: 'achievement-selo' }, feita ? '★' : aResgatar ? '🎁' : ''),
                 el('div', { class: 'achievement-texto' },
                   el('strong', {}, c.nome),
                   el('small', {}, c.descricao),
-                  el('small', { class: 'achievement-recompensa' }, `Recompensa: ${textoRecompensa(c.recompensa)}`),
+                  el('small', { class: 'achievement-recompensa' }, 'Recompensa: ', recompensaComDica(c)),
                   el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${(valor / meta) * 100}%` } }))),
-                el('span', { class: 'achievement-progresso' }, feita ? 'Concluída' : meta === 1 ? '' : `${valor.toLocaleString('pt-BR')} / ${meta.toLocaleString('pt-BR')}`)))));
+                aResgatar
+                  ? el('button', { class: 'botao achievement-resgatar', onclick: () => resgatar([c.id]) }, 'Resgatar')
+                  : el('span', { class: 'achievement-progresso' }, feita ? 'Concluída' : meta === 1 ? '' : `${valor.toLocaleString('pt-BR')} / ${meta.toLocaleString('pt-BR')}`)))));
       }),
     );
   };
@@ -51,6 +69,53 @@ function achievements(save: Save): HTMLElement {
   // concluiu alguma com a tela aberta: redesenha (para de ouvir quando a tela sai)
   const parar = aoConcluirConquista(() => (secao.isConnected ? desenhar() : parar()));
   return secao;
+}
+
+const emPorcento = (mult: number) => `+${(Math.round((mult - 1) * 1000) / 10).toLocaleString('pt-BR')}%`;
+
+/**
+ * O texto da recompensa de uma conquista, com um cartão ao passar o mouse (pedido do dono): item = imagem e
+ * descrição; bônus = os bônus que o jogador tem AGORA (todas as fontes juntas); título = o balão e o bônus dele.
+ */
+function recompensaComDica(c: Conquista): HTMLElement | string {
+  const r = c.recompensa;
+  const texto = textoRecompensa(r);
+  if (r.tipo === 'item') return textoDeItem(r.id, texto);
+  if (r.tipo === 'bonus')
+    return comDica(el('span', {}, texto), () => {
+      const b = bonusAtuais();
+      // conquista ainda não concluída: mostra "agora → com a recompensa" nas linhas que ela muda (pedido do dono)
+      const save = carregarSave();
+      const depois = save && !conquistaFeita(save, c.id) ? bonusAtuais({ alvo: r.alvo, valor: r.valor }) : null;
+      const linha = (rotulo: string, chave: keyof typeof b, muda: boolean) =>
+        linhaDaDica(rotulo, muda && depois ? `${emPorcento(b[chave])} → ${emPorcento(depois[chave])}` : emPorcento(b[chave]), muda);
+      return [
+        el('strong', {}, 'Seus bônus agora'),
+        el('div', { class: 'dica-linhas' },
+          linha('Shiny', 'shiny', r.alvo === 'raros'),
+          linha('Lendário, mítico e Ultra Beast', 'lendario', r.alvo === 'raros'),
+          linha('Inicial', 'inicial', r.alvo === 'raros'),
+          linha('Poké Dólares em batalhas', 'silver', r.alvo === 'silver'),
+          linha('XP', 'xp', false),
+          linha('Captura', 'captura', r.alvo === 'captura')),
+        depois ? null : el('small', { class: 'dica-ja-conta' }, 'Esta conquista já está concluída: o bônus dela já está na conta.'),
+        el('p', { class: 'dica-golpe-desc' }, 'Soma de tudo o que está valendo: VIP, skin, conquistas, guilda, título e eventos. O charm do tipo e os itens que o Pokémon segura entram por fora.'),
+      ];
+    });
+  if (r.tipo === 'titulo')
+    return comDica(el('span', {}, texto), () => {
+      const bonus = emPorcento(1 + (BONUS_DO_TITULO[c.id] ?? 0));
+      return [
+        balaoTitulo(c.id),
+        el('div', { class: 'dica-linhas' },
+          linhaDaDica('Shiny', bonus),
+          linhaDaDica('Lendário, mítico, Ultra Beast e inicial', bonus),
+          linhaDaDica('Poké Dólares em batalhas', bonus),
+          linhaDaDica('XP', bonus)),
+        el('p', { class: 'dica-golpe-desc' }, 'Só vale enquanto o título estiver em uso (Meu perfil). Não mexe na captura.'),
+      ];
+    });
+  return texto;
 }
 
 /** Títulos (Meu perfil): os liberados pelas conquistas; o escolhido aparece no perfil (por enquanto só lá). */
@@ -96,6 +161,7 @@ function provador(save: Save): HTMLElement {
     ctx.imageSmoothingEnabled = false;
     let quadro = 1;
     const y = LINHA_DIRECAO.baixo * 64;
+    enquadrarPersonagem(canvas, [f.aura, f.walk], 0, y, 136);
     const passo = () => {
       // a tela foi redesenhada ou fechada: para
       if (!canvas.isConnected) return clearInterval(relogio);

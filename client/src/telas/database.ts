@@ -4,6 +4,9 @@ import { Dex } from '@pkmn/sim';
 import { numeroNaDex } from '../../../shared/formasRegionais';
 import type { Tela } from '../main';
 import { CATEGORIAS_BOLSA, TODOS_OS_ITENS, nomeCategoriaItem, textoPreco } from '../../../shared/loja';
+import { SUFIXO_NT, semNt } from '../../../shared/naoTrocavel';
+
+const idsDosItens = new Set(TODOS_OS_ITENS.map((i) => i.id));
 import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
 import type { PokemonBase } from '../../../shared/tipos';
 import { ORDEM_TIERS, tierDoPokemon } from '../../../shared/tiers';
@@ -177,7 +180,8 @@ export const telaDatabase: Tela = (raiz, navegar) => {
       id: 'itens',
       nome: 'Itens',
       // TMs e TRs ficam fora (já aparecem como golpes)
-      linhas: TODOS_OS_ITENS.filter((i) => i.categoria !== 'tm' && i.categoria !== 'tr'),
+      // versão NT de item que também existe normal não entra (pedido do dono: sem duplicado); NT sem original continua
+      linhas: TODOS_OS_ITENS.filter((i) => i.categoria !== 'tm' && i.categoria !== 'tr' && !(i.id.endsWith(SUFIXO_NT) && idsDosItens.has(semNt(i.id)))),
       busca: (i) => `${i.nome} ${i.descricao} ${nomeCategoriaItem(i.categoria)}`,
       filtros: [
         { todos: 'Categorias', opcoes: CATEGORIAS_BOLSA.filter((c) => c.id !== 'tm' && c.id !== 'tr').map((c) => [c.id, c.nome]), valores: (i) => [i.categoria] },

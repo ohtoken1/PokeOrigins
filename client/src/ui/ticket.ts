@@ -86,7 +86,10 @@ function visualPremio(premio: Premio, shiny = false): { imagem: HTMLElement; nom
       } as const
     )[premio.grupo];
     const item = itemDaLoja(exemplo);
-    return { imagem: el('div', { class: 'icone-aleatorio' }, item ? iconeItem(item) : '', el('b', {}, '?')), nome, qtd: `×${premio.quantidade}` };
+    const exemploDoGrupo = item ? iconeItem(item) : null;
+    // é só um exemplo do grupo (com o "?"): não mostra o cartão daquele item
+    if (exemploDoGrupo) delete exemploDoGrupo.dataset.item;
+    return { imagem: el('div', { class: 'icone-aleatorio', title: 'O item é sorteado na hora de abrir, e você recebe a quantidade toda dele.' }, exemploDoGrupo ?? '', el('b', {}, '?')), nome, qtd: `×${premio.quantidade}` };
   }
   const item = itemDaLoja(premio.id);
   return { imagem: item ? iconeItem(item) : el('span', {}, premio.id), nome: item?.nome ?? premio.id, qtd: `×${premio.quantidade}` };
@@ -95,7 +98,8 @@ function visualPremio(premio: Premio, shiny = false): { imagem: HTMLElement; nom
 function cartaoPremio(premio: Premio, shiny: boolean, raridade: Raridade, chance?: number): HTMLElement {
   // fundo neutro (só a roleta é colorida); a raridade aparece na bolinha do título
   const v = visualPremio(premio, shiny);
-  return el('div', { class: `premio premio-${raridade}` }, v.imagem, el('strong', {}, v.nome), el('small', {}, v.qtd), chance !== undefined ? el('small', { class: 'premio-chance' }, porcentagem(chance)) : null);
+  // o cartão inteiro do prêmio mostra a descrição do item, não só o ícone
+  return el('div', { class: `premio premio-${raridade}`, ...(premio.tipo === 'item' ? { 'data-item': premio.id } : {}) }, v.imagem, el('strong', {}, v.nome), el('small', {}, v.qtd), chance !== undefined ? el('small', { class: 'premio-chance' }, porcentagem(chance)) : null);
 }
 
 /** Casinha da roleta: a imagem do prêmio no fundo da cor da raridade. */

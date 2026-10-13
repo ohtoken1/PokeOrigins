@@ -118,7 +118,16 @@ export function iconeCubo(especie: number, era: string): HTMLElement {
   return el('div', { class: `icone-cubo cubo-${era}` }, spritePokemon(pokemonPorId(especie), { animado: false }));
 }
 
-export function iconeItem(item: Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 'sprite' | 'imagem'> & { skin?: ItemLoja['skin']; cubo?: ItemLoja['cubo']; simbolo?: string; charm?: string; energia?: string }): HTMLElement {
+type ItemDoIcone = Pick<ItemLoja, 'id' | 'categoria' | 'golpe' | 'sprite' | 'imagem'> & { skin?: ItemLoja['skin']; cubo?: ItemLoja['cubo']; simbolo?: string; charm?: string; energia?: string };
+
+/** O ícone de um item. Sai marcado com `data-item` (o id): é o que faz o cartão de descrição aparecer ao passar o mouse. */
+export function iconeItem(item: ItemDoIcone): HTMLElement {
+  const icone = desenharIcone(item);
+  icone.dataset.item = item.id;
+  return icone;
+}
+
+function desenharIcone(item: ItemDoIcone): HTMLElement {
   const reserva = () => el('div', { class: `icone-item ${item.id} cat-${item.categoria}` });
   if (item.categoria === 'ovos') {
     const ovo = ovoPorId(item.id);
