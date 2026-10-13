@@ -68,10 +68,37 @@ export interface ComSkins {
   skinVisual?: string | null;
   /** skin de onde vem o bônus (id do item) */
   skinBonus?: string | null;
+  /** quantas de cada skin (das que estão em `itens`) o jogador levou para a bolsa, para trocar ou vender */
+  skinsNaBolsa?: Record<string, number>;
 }
 const SEM_BONUS: BonusSkin = b(0, 0, 0, 0, 0);
-/** A skin escolhida ainda está na coleção? (pode ter sido trocada com outro jogador) */
-export const temSkin = (s: ComSkins, id: string | null | undefined): id is string => !!id && ehSkin(id) && (s.itens[id] ?? 0) > 0;
+
+// ---- coleção x bolsa (pedido do dono): a skin mora em Minhas skins; para trocar ou vender, o jogador leva para a
+// bolsa. Na bolsa ela é só um item: não dá visual nem bônus. `itens[id]` continua sendo o total das duas.
+const inteiroDe = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0);
+/** Quantas desta skin estão na bolsa. */
+export const skinsNaBolsa = (s: ComSkins, id: string): number => (ehSkin(id) ? Math.min(inteiroDe(s.itens[id]), inteiroDe(s.skinsNaBolsa?.[id])) : 0);
+/** Quantas desta skin estão em Minhas skins (as que valem para visual e bônus). */
+export const skinsNaColecao = (s: ComSkins, id: string): number => (ehSkin(id) ? inteiroDe(s.itens[id]) - skinsNaBolsa(s, id) : 0);
+/** Quanto de um item pode sair em troca ou no mercado: skin, só o que está na bolsa; o resto, tudo. */
+export const quantidadeNegociavel = (s: ComSkins, id: string): number => (ehSkin(id) ? skinsNaBolsa(s, id) : inteiroDe(s.itens[id]));
+/** Soma (ou tira, com número negativo) skins da contagem da bolsa. Chamar DEPOIS de mudar `itens`; outros itens: nada. */
+export function contarSkinNaBolsa(s: ComSkins, id: string, quantas: number): void {
+  if (!ehSkin(id)) return;
+  const bolsa = (s.skinsNaBolsa && typeof s.skinsNaBolsa === 'object' ? s.skinsNaBolsa : (s.skinsNaBolsa = {}));
+  const novo = Math.min(inteiroDe(s.itens[id]), Math.max(0, inteiroDe(bolsa[id]) + quantas));
+  if (novo > 0) bolsa[id] = novo;
+  else delete bolsa[id];
+}
+/** Leva uma skin da coleção para a bolsa (ou traz de volta). Devolve se mudou. */
+export function moverSkin(s: ComSkins, id: string, paraBolsa: boolean): boolean {
+  if ((paraBolsa ? skinsNaColecao(s, id) : skinsNaBolsa(s, id)) < 1) return false;
+  contarSkinNaBolsa(s, id, paraBolsa ? 1 : -1);
+  return true;
+}
+
+/** A skin escolhida está na coleção? (pode ter sido trocada com outro jogador ou levada para a bolsa) */
+export const temSkin = (s: ComSkins, id: string | null | undefined): id is string => !!id && skinsNaColecao(s, id) > 0;
 /** Bônus ativo: o da skin escolhida em `skinBonus` (nada se não escolheu ou não tem mais a skin). */
 export const bonusAtivoDaSkin = (s: ComSkins): BonusSkin => (temSkin(s, s.skinBonus) ? bonusDaSkin(s.skinBonus) : SEM_BONUS);
 /** Multiplicador de um bônus (1 = sem skin de bônus). */

@@ -13,6 +13,7 @@ import { pokemonPorId, todosOsPokemons } from '../dados';
 import { carregarSave, type PokemonDoJogador, type Save } from '../estado';
 import { abrirDetalhes } from '../ui/detalhes';
 import { el, spritePokemon } from '../ui/dom';
+import { balaoTitulo } from '../ui/titulo';
 import { abrirJanela } from '../ui/janela';
 import { api, ErroApi } from '../conta';
 import { icone } from '../ui/icones';
@@ -130,7 +131,7 @@ export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: b
     el('aside', { class: 'perfil-lado' },
       retratoTreinador(save, opcoes.remoto),
       el('h2', {}, save.aparencia?.nome || 'Treinador'),
-      titulo ? el('span', { class: 'perfil-titulo', title: 'Título' }, titulo) : null,
+      titulo ? balaoTitulo(titulo) : null,
       el('span', { class: `perfil-status ${online ? 'online' : 'offline'}` }, el('span', { class: 'perfil-bolinha' }), online ? 'Online agora' : 'Offline'),
       cla ? el('div', { class: 'perfil-cla', title: `Guilda ${cla.nome} · nível ${cla.nivel}` }, desenharBandeira(cla.bandeira, 30),
         el('span', {}, el('strong', {}, cla.nome), el('small', {}, `${NOME_CARGO[cla.cargo]} · Nv. ${cla.nivel}`))) : null,

@@ -132,3 +132,7 @@
 /* Marcas da lista: Poké Ball = capturado, Ultra Ball = shiny capturado */
 .dex-marcas { display: inline-flex; align-items: center; gap: 3px; }
 .selo-fonte.fonte-conquistas { background: #ffc93c; color: #2a1d00; }
+
+.selo-fonte.fonte-guilda { background: #2f6f8f; color: #fff; }
+
+.selo-fonte.fonte-titulo { background: linear-gradient(135deg, #ffe9a3, #c9962a); color: #2a1d00; }

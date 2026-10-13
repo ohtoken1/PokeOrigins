@@ -15,6 +15,7 @@ import {
   type AcertoMercado, type AnuncioMercado, type MoedaMercado, type PokemonAnunciado, type TipoAnuncio,
 } from '../../shared/mercado.ts';
 import { itemInegociavel } from '../../shared/naoTrocavel.ts';
+import { contarSkinNaBolsa, ehSkin, quantidadeNegociavel } from '../../shared/skins.ts';
 import { faixaDoIv, tierIv } from '../../shared/tierIv.ts';
 import { liberado, NIVEL_MINIMO } from '../../shared/trancas.ts';
 import { nivelTreinador } from '../../shared/treinador.ts';
@@ -97,6 +98,8 @@ function entregar(save: SaveMin, tipo: string, g: Guardado, deOutroJogador: bool
   else if (tipo === 'item' && g.item && g.quantidade) {
     const itens = (save.itens && typeof save.itens === 'object' ? save.itens : (save.itens = {})) as Record<string, number>;
     itens[g.item] = saldo(itens[g.item]) + g.quantidade;
+    // skin comprada (ou devolvida) chega na bolsa, como item
+    contarSkinNaBolsa(save, g.item, g.quantidade);
   } else if (tipo === 'gold' && g.quantidade) save.gold = saldo(save.gold) + g.quantidade;
   else throw new ErroConta('Anúncio estragado.', 500);
 }
@@ -132,9 +135,12 @@ export function anunciar(conta: banco.Conta, dados: Record<string, unknown>) {
       const quantidade = inteiro(dados.quantidade, 1, QUANTIDADE_MAXIMA_MERCADO);
       if (!item || quantidade === null) throw new ErroConta('Anúncio inválido.');
       if (itemInegociavel(item)) throw new ErroConta('Item NT não pode ser vendido.', 409);
-      if (saldo(save.itens?.[item]) < quantidade) throw new ErroConta('Você não tem essa quantidade do item.', 409);
+      if (!save.itens || typeof save.itens !== 'object') throw new ErroConta('Você não tem essa quantidade do item.', 409);
+      // skin só se vende da bolsa (o jogador leva para lá em Minhas skins)
+      if (quantidadeNegociavel(save, item) < quantidade) throw new ErroConta(ehSkin(item) ? 'Leve a skin para a bolsa antes de vender (Minhas skins).' : 'Você não tem essa quantidade do item.', 409);
       save.itens[item] = saldo(save.itens[item]) - quantidade;
       if (save.itens[item] <= 0) delete save.itens[item];
+      contarSkinNaBolsa(save, item, -quantidade);
       guardado.item = item;
       guardado.quantidade = quantidade;
     } else {

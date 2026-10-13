@@ -2,9 +2,10 @@
 // Reveal Glass, Teal Mask). Saem dos tickets. A skin escolhida como "bônus" dá bônus (shared/skins.ts);
 // os itens-chave de forma são USADOS pela bolsa (regras em shared/formasPorItem.ts); são gastos a cada uso. As máscaras da Ogerpon são itens de evolução.
 import { TIPOS_DOS_CHARMS, idCharm, nomeCharm } from './charms';
+import { CORES_DOS_APRICORNS, TIPOS_DAS_ENERGIAS, idApricorn, idEnergia, nomeApricorn, nomeEnergia } from './materiais';
 import { BONUS_SKIN, BONUS_SKIN_SHINY, SKINS_ESPECIAIS, TEXTO_ORIGEM_SKIN, textoBonusSkin } from './skins';
 
-export type CategoriaCustom = 'skins' | 'chave' | 'cubos' | 'charms' | 'evolucao' | 'formas';
+export type CategoriaCustom = 'skins' | 'chave' | 'cubos' | 'charms' | 'evolucao' | 'formas' | 'materiais';
 /** De onde vem o Pokémon do cubo: do passado, do futuro ou lendário (Koraidon e Miraidon). */
 export type EraCubo = 'passado' | 'futuro' | 'lendario';
 
@@ -19,6 +20,8 @@ export interface ItemCustom {
   imagem?: string;
   /** charms: o tipo (o ícone é pintado na cor dele) */
   charm?: string;
+  /** Energies: o tipo (o ícone é uma esfera na cor dele) */
+  energia?: string;
   /** desenho provisório do ícone (itens ainda sem arte) */
   simbolo?: string;
   /** skins: de qual Pokémon (o ícone mostra ele) */
@@ -132,10 +135,13 @@ export const KIT_INICIANTE = 'kit-iniciante';
 
 export const ITENS_CUSTOM: ItemCustom[] = [
   ...SKINS_ESPECIAIS.map((s): ItemCustom => ({ id: s.id, nome: s.nome, categoria: 'skins', simbolo: s.simbolo, descricao: `${TEXTO_ORIGEM_SKIN[s.origem]}. Bônus ao escolher como skin de bônus: ${textoBonusSkin(s.bonus)}.` })),
+  // materiais de craft (o sistema de craft vem depois)
+  ...TIPOS_DAS_ENERGIAS.map((t): ItemCustom => ({ id: idEnergia(t), nome: nomeEnergia(t), categoria: 'materiais', energia: t, descricao: `Energia do tipo ${t[0].toUpperCase()}${t.slice(1)}. Às vezes fica para trás quando você derrota ou captura um Pokémon selvagem desse tipo. Material de craft.` })),
+  ...CORES_DOS_APRICORNS.map((cor): ItemCustom => ({ id: idApricorn(cor), nome: nomeApricorn(cor), categoria: 'materiais', sprite: `${cor}-apricorn`, descricao: 'Um Apricorn. Material de craft.' })),
   ...TIPOS_DOS_CHARMS.map((t): ItemCustom => ({ id: idCharm(t), nome: nomeCharm(t), categoria: 'charms', charm: t, descricao: `Amuleto raro: use para os Pokémon do tipo ${t[0].toUpperCase()}${t.slice(1)} terem 20% a mais de chance de aparecer shiny por 30 minutos. Só um deste tipo por vez.` })),
   ...SELOS_SAZONAIS.map((s): ItemCustom => ({ id: s.id, nome: s.nome, categoria: 'chave', simbolo: '🏵️', descricao: `Selo do evento de ${s.evento}. Item de coleção: aparece no seu perfil, não na bolsa.` })),
   { id: VALE_POKE_S, nome: 'Vale Poke S', categoria: 'chave', simbolo: '🎟️', descricao: 'Procure a staff para ganhar um Pokémon à escolha S.' },
-  { id: KIT_INICIANTE, nome: 'Kit iniciante', categoria: 'chave', simbolo: '🎒', descricao: 'Um kit para quem está começando. Usar abre o kit (o conteúdo ainda vai ser definido). NT: não pode ser trocado.' },
+  { id: KIT_INICIANTE, nome: 'Kit iniciante', categoria: 'chave', simbolo: '🎒', descricao: 'Um kit para quem está começando: 50 Poké Balls, 30 Great Balls, 20 Ultra Balls, 10 Potions, 7 Super Potions, 5 Hyper Potions, 7 Revives, 1 Max Revive, 20.000 Poké Dólares, uma skin sorteada (Ash, Gary, May ou Misty) e um Charm sorteado. O kit e os itens dele são NT: não podem ser trocados.' },
   ...MOEDAS_SAZONAIS.map((m): ItemCustom => ({ id: m.id, nome: m.nome, categoria: 'chave', simbolo: '🪙', descricao: `Moeda do evento de ${m.evento}. Uso em breve.` })),
   ...CUBOS.map((c): ItemCustom => ({ id: c.id, nome: c.nome, categoria: 'cubos', cubo: { especie: c.especie, era: c.era }, descricao: `Transforma ${c.origens.map((n) => NOME_ORIGEM[n]).join(' ou ')} em ${c.nome.replace('Cubo de ', '')}, um Pokémon ${TEXTO_ERA[c.era]}. Use nele como uma pedra de evolução: IVs, EVs, natureza e shiny continuam os mesmos.` })),
   ...COM_SKIN.flatMap(([especie, nome]): ItemCustom[] => [

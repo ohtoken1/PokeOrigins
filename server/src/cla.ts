@@ -18,8 +18,8 @@ const MAX_PEDIDOS_POR_CONTA = 5;
  * entregar até `XP_POR_MINUTO` em média, com uma reserva para batalhas grandes. Quem joga normalmente não chega
  * perto; quem tentar mandar números inventados fica preso a esse ritmo. Some quando as batalhas forem no servidor.
  */
-const XP_POR_MINUTO = 100_000;
-const XP_RESERVA_MAX = 500_000;
+const XP_POR_MINUTO = 10;
+const XP_RESERVA_MAX = 60;
 const reservas = new Map<number, { xp: number; em: number }>();
 
 type Cargo = 'lider' | 'vice' | 'membro';

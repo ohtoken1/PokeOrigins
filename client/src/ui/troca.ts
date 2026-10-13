@@ -3,6 +3,7 @@
 // quando os dois clicam. "Cancelar troca" no canto. Também: o aviso de convite recebido (Aceitar / Recusar).
 import { itemDaLoja } from '../../../shared/loja';
 import { itemInegociavel } from '../../../shared/naoTrocavel';
+import { quantidadeNegociavel } from '../../../shared/skins';
 import { nomeItemEquipado } from '../../../shared/usoItens';
 import { api, ErroApi } from '../conta';
 import { pokemonPorId } from '../dados';
@@ -228,7 +229,8 @@ export function abrirTroca(inicial: Troca): void {
 
   const seletorItem = () => {
     // itens NT (ovos NT, prêmios de conquista) não aparecem: não podem ser trocados
-    const itens = Object.entries(save.itens).filter(([id, q]) => q > (minha.itens[id] ?? 0) && !itemInegociavel(id));
+    // skins: só as que o jogador levou para a bolsa
+    const itens = Object.keys(save.itens).map((id): [string, number] => [id, quantidadeNegociavel(save, id)]).filter(([id, q]) => q > (minha.itens[id] ?? 0) && !itemInegociavel(id));
     return el('div', { class: 'troca-seletor itens' },
       itens.length ? null : el('p', { class: 'troca-vazio' }, 'Sua bolsa está vazia.'),
       ...itens.map(([id, q]) => {

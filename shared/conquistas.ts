@@ -177,10 +177,32 @@ export interface Titulo {
   nome: string;
   /** como libera (nome da conquista) */
   conquista: string;
+  /** bônus em tudo enquanto está em uso (0,01 = +1%) */
+  bonus: number;
 }
-export const TITULOS: Titulo[] = CONQUISTAS.flatMap((x) => (x.recompensa.tipo === 'titulo' ? [{ id: x.id, nome: x.recompensa.titulo, conquista: x.nome }] : []));
+/**
+ * Bônus do título EM USO (números do dono), por id da conquista: vale para shiny, raros, silver e XP de Pokémon
+ * e de treinador (captura NÃO, pedido do dono). Só o título escolhido conta; os outros liberados não somam.
+ */
+export const BONUS_DO_TITULO: Record<string, number> = {
+  'guilda-entrar': 0.01,
+  'guilda-criar': 0.03,
+  'gold-500': 0.01,
+  'gold-1000': 0.02,
+  'gold-10000': 0.03,
+  'lendario-shiny': 0.04,
+  'ticket-mitico': 0.04,
+};
+export const TITULOS: Titulo[] = CONQUISTAS.flatMap((x) => (x.recompensa.tipo === 'titulo' ? [{ id: x.id, nome: x.recompensa.titulo, conquista: x.nome, bonus: BONUS_DO_TITULO[x.id] ?? 0 }] : []));
 /** O título em uso: só vale se foi escolhido e a conquista dele está concluída. */
 export function tituloAtivo(s: ComConquistas): string | null {
   const t = typeof s.titulo === 'string' ? TITULOS.find((x) => x.id === s.titulo) : undefined;
   return t && conquistaFeita(s, t.id) ? t.nome : null;
 }
+/** Bônus do título em uso (0 sem título). */
+export function bonusDoTitulo(s: ComConquistas): number {
+  const t = typeof s.titulo === 'string' ? TITULOS.find((x) => x.id === s.titulo) : undefined;
+  return t && conquistaFeita(s, t.id) ? t.bonus : 0;
+}
+/** Multiplicador do título em uso (1 = sem título). */
+export const multTitulo = (s: ComConquistas) => 1 + bonusDoTitulo(s);

@@ -19,7 +19,8 @@ export const idCharm = (tipo: TipoCharm) => `charm-${tipo}`;
 export const nomeCharm = (tipo: TipoCharm) => `${tipo[0].toUpperCase()}${tipo.slice(1)} Charm`;
 /** O tipo do charm, ou null se o item não é um charm. */
 export function tipoDoCharm(idItem: string): TipoCharm | null {
-  const tipo = idItem.startsWith('charm-') ? idItem.slice(6) : '';
+  // "charm-fire-nt" (o do Kit iniciante) vale como o Fire Charm normal
+  const tipo = idItem.startsWith('charm-') ? idItem.slice(6).replace(/-nt$/, '') : '';
   return (TIPOS_DOS_CHARMS as readonly string[]).includes(tipo) ? (tipo as TipoCharm) : null;
 }
 
@@ -38,8 +39,9 @@ export const charmAtivo = (save: Pick<ComCharms, 'charms'>, tipo: string, agora 
 export const charmsAtivos = (save: Pick<ComCharms, 'charms'>, agora = Date.now()): TipoCharm[] => TIPOS_DOS_CHARMS.filter((t) => charmAtivo(save, t, agora));
 
 /** Usa um charm da bolsa. Devolve '' se usou, ou o motivo de não usar. */
-export function usarCharm(save: ComCharms, tipo: TipoCharm, agora = Date.now()): string {
-  const id = idCharm(tipo);
+export function usarCharm(save: ComCharms, tipo: TipoCharm, agora = Date.now(), idDoItem: string = idCharm(tipo)): string {
+  // `idDoItem`: o item que sai da bolsa (o charm normal ou a versão NT do Kit iniciante)
+  const id = idDoItem;
   if (charmAtivo(save, tipo, agora)) return `O ${nomeCharm(tipo)} já está ativo. Espere acabar para usar outro.`;
   if ((save.itens[id] ?? 0) < 1) return `Você não tem ${nomeCharm(tipo)}.`;
   save.itens[id] -= 1;

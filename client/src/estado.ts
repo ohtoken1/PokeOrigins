@@ -73,6 +73,8 @@ export interface Save {
   /** Skins (shared/skins.ts): a do visual e a do bônus são escolhas separadas. */
   skinVisual?: string | null;
   skinBonus?: string | null;
+  /** skins levadas para a bolsa para trocar ou vender (shared/skins.ts) */
+  skinsNaBolsa?: Record<string, number>;
   /** Viagem de trem em andamento (shared/viagem.ts); quem cria e encerra é o servidor. */
   viagem?: Viagem | null;
   /** Safari (shared/safari.ts): entradas usadas hoje (do servidor) e o Safari em andamento. */
@@ -239,7 +241,8 @@ function normalizar(save: Save): Save {
   save.caixa.forEach((p, i) => (p.box ??= Math.min(BOXES_MAXIMO - 1, Math.floor(i / TAMANHO_BOX))));
   garantirIds(save);
 
-  const itens: Record<string, number> = { ...ITENS_INICIAIS, ...(save.itens ?? {}) };
+  // os itens iniciais só entram em save SEM bolsa (antes eram somados a cada carga: item gasto até o fim voltava)
+  const itens: Record<string, number> = save.itens ? { ...save.itens } : { ...ITENS_INICIAIS };
   if ('pokebola' in itens) {
     itens.pokeball = itens.pokebola;
     delete itens.pokebola;

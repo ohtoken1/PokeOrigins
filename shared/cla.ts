@@ -5,12 +5,36 @@ export const VAGAS_CLA = 5;
 /** Preço para criar um clã, em gold. */
 export const PRECO_CRIAR_CLA_GOLD = 100;
 export const NIVEL_MAX_CLA = 10;
-/** XP que um Pokémon (curva média) precisa do nível 1 ao 100. */
-export const XP_POKEMON_1_AO_100 = 1_000_000;
-/** Pokémon "upados do 1 ao 100" para subir de nível: 10 × o nível do clã. */
-export const POKEMONS_POR_NIVEL_CLA = 10;
+/**
+ * XP da guilda = PONTOS por ação dos membros (regra do dono; não é mais o XP de treinador e nenhum bônus mexe nele):
+ * cada selvagem derrotado ou capturado, cada Pokémon do time de um treinador vencido (duelo ou ginásio) e cada
+ * torneio de que o membro participa.
+ */
+export const XP_CLA_POR_SELVAGEM = 1;
+export const XP_CLA_POR_POKEMON_DE_TREINADOR = 1;
+export const XP_CLA_POR_TORNEIO = 20;
+/** Curva do dono: 1.000 pontos para sair do nível 1 e mais 1.000 a cada nível (45.000 no total até o 10). */
+export const XP_CLA_POR_NIVEL = 1000;
 /** XP para o clã sair do nível `nivel` e ir ao próximo (o jogo só mostra a porcentagem). */
-export const xpParaSubirCla = (nivel: number) => POKEMONS_POR_NIVEL_CLA * nivel * XP_POKEMON_1_AO_100;
+export const xpParaSubirCla = (nivel: number) => XP_CLA_POR_NIVEL * nivel;
+
+/**
+ * Bônus que o nível da guilda dá a TODOS os membros (regra do dono): +1% a cada nível, intercalado. Níveis ímpares
+ * sobem shiny e XP (de Pokémon e de treinador); níveis pares sobem raros (lendário, mítico, Ultra Beast e inicial)
+ * e silver. No nível 10 os quatro chegam a 5%.
+ */
+export interface BonusCla {
+  shiny: number;
+  xp: number;
+  raros: number;
+  silver: number;
+}
+export function bonusDoCla(nivel: number): BonusCla {
+  const n = Math.max(0, Math.min(NIVEL_MAX_CLA, Math.floor(nivel)));
+  const impares = Math.ceil(n / 2) / 100;
+  const pares = Math.floor(n / 2) / 100;
+  return { shiny: impares, xp: impares, raros: pares, silver: pares };
+}
 
 /**
  * Missões que o clã precisa cumprir (além do XP) para sair de cada nível. O dono ainda vai definir:

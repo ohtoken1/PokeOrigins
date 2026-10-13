@@ -75,8 +75,16 @@ function visualPremio(premio: Premio, shiny = false): { imagem: HTMLElement; nom
     return { imagem: el('span', { class: `icone-moeda moeda-${premio.tipo}` }), nome: premio.tipo === 'silver' ? 'Poké Dólar' : 'Origin Coin', qtd: numero(premio.quantidade) };
   if (premio.tipo === 'vip') return { imagem: el('span', { class: 'icone-vip' }, 'VIP'), nome: 'VIP', qtd: `${premio.dias} dia${premio.dias > 1 ? 's' : ''}` };
   if (premio.tipo === 'aleatorio') {
-    const [exemplo, nome] =
-      premio.grupo === 'terashard' ? ['terashard-stellar', 'Tera Shard aleatória'] : premio.grupo === 'bola' ? ['pokeball', 'Pokébola aleatória'] : ['flameplate', 'Plate aleatória'];
+    const [exemplo, nome] = (
+      {
+        terashard: ['terashard-stellar', 'Tera Shard aleatória'],
+        bola: ['pokeball', 'Pokébola aleatória'],
+        placa: ['flameplate', 'Plate aleatória'],
+        fruta: ['oranberry', 'Berry aleatória'],
+        apricorn: ['apricorn-red', 'Apricorn aleatório'],
+        energia: ['energy-normal', 'Energy aleatória'],
+      } as const
+    )[premio.grupo];
     const item = itemDaLoja(exemplo);
     return { imagem: el('div', { class: 'icone-aleatorio' }, item ? iconeItem(item) : '', el('b', {}, '?')), nome, qtd: `×${premio.quantidade}` };
   }

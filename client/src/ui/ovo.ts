@@ -21,7 +21,7 @@ const DURACAO_ROLETA = 9000;
 function fundoCategoria(id: number): string {
   const p = pokemonPorId(id);
   if ((especie(id).tags ?? []).includes('Ultra Beast')) return 'fundo-ultra';
-  if (p.mitico) return 'fundo-mitico';
+  if (p.mitico) return 'fundo-pk-mitico';
   if (p.lendario) return 'fundo-lendario';
   return 'fundo-comum';
 }

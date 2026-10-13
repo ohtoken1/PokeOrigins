@@ -4,12 +4,14 @@ import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { SEGURAR_OU_EVOLUIR, ehEquipavel, ehItemDeHabilidade, usarItemDeHabilidade, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
 import { KIT_INICIANTE, cuboPorItem, ehSeloSazonal } from '../../../shared/itensCustom';
+import { sortearKit } from '../../../shared/kitIniciante';
 import { FUSOES, GOLPE_DA_FORMA, ehItemDeForma, ivDaFusao, jaMudouDeForma, outrasFormas, proximaForma } from '../../../shared/formasPorItem';
 import { BOXES_INICIAIS, BOXES_MAXIMO, BOX_POKEMON, numeroDeBoxes, podeAbrirBox } from '../../../shared/pc';
 import { charmAte, charmAtivo, nomeCharm, tipoDoCharm, usarCharm } from '../../../shared/charms';
 import { textoDoTempo } from '../../../shared/viagem';
 import { pokemonPorId, todosOsPokemons } from '../dados';
-import { guardarNoPC, registrarCapturado, salvar, type PokemonDoJogador, type Save } from '../estado';
+import { guardarNoPC, registrarCapturado, salvar, salvarAgora, type PokemonDoJogador, type Save } from '../estado';
+import { ehSkin, moverSkin, skinsNaBolsa } from '../../../shared/skins';
 import { abrirJanela } from './janela';
 import { confirmar } from './confirmar';
 import { corTipo, el, seloTipo, spritePokemon } from './dom';
@@ -59,6 +61,9 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
   let aba: CategoriaLoja = 'remedios';
   let modo: Modo = { tipo: 'lista' };
   let aviso = '';
+  /** Item aberto no painel da direita (id) e a rolagem da grade, para o redesenho não voltar ao topo. */
+  let escolhido: string | null = null;
+  let rolagem = 0;
   /** Golpes que ainda precisam de decisão (ex.: aprendidos ao evoluir com 4 golpes). */
   const fila: Extract<Modo, { tipo: 'esquecer' }>[] = [];
 
@@ -391,35 +396,55 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
     // lista por categoria (só mostra o que o jogador tem)
     const meus = Object.entries(save.itens)
       // selos sazonais são de coleção: aparecem no perfil, não na bolsa
+      // skins ficam em Minha conta → Minhas skins; na bolsa só as que o jogador levou para trocar ou vender
+      .map(([id, qtd]): [string, number] => [id, ehSkin(id) ? skinsNaBolsa(save, id) : qtd])
       .filter(([id, qtd]) => qtd > 0 && !ehSeloSazonal(id))
       .map(([id, qtd]) => ({ item: itemDaLoja(id), qtd }))
       .filter((x): x is { item: ItemLoja; qtd: number } => !!x.item);
-    // skins ficam em Minha conta → Minhas skins, não na bolsa
-    const comItens = CATEGORIAS.filter((c) => c.id !== 'skins' && meus.some((m) => m.item.categoria === c.id));
+    const comItens = CATEGORIAS.filter((c) => meus.some((m) => m.item.categoria === c.id));
     if (!comItens.some((c) => c.id === aba) && comItens.length) aba = comItens[0].id;
 
+    // mesmo desenho da loja (pedido do dono): seções à esquerda, os itens no meio e, à direita, o item clicado
+    const daAba = meus.filter((m) => m.item.categoria === aba);
+    const sel = daAba.find((m) => m.item.id === escolhido) ?? daAba[0];
+    const vitrine = el(
+      'div',
+      { class: 'mercado-vitrine' },
+      daAba.map(({ item, qtd }) =>
+        el(
+          'button',
+          { class: `mercado-item ${item.id === sel?.item.id ? 'escolhido' : ''}`, title: item.nome, onclick: () => ((escolhido = item.id), (rolagem = vitrine.scrollTop), (aviso = ''), refazer()) },
+          el('span', { class: 'mercado-icone' }, iconeItem(item)),
+          el('span', { class: 'mercado-nome' }, item.nome),
+          el('span', { class: 'mercado-preco' }, `×${qtd}`),
+        ),
+      ),
+      meus.length === 0 && el('p', { class: 'mercado-vazio' }, 'A bolsa está vazia. Compre itens na Loja.'),
+    );
+    requestAnimationFrame(() => (vitrine.scrollTop = rolagem));
     return el(
       'div',
-      { class: 'bolsa' },
+      { class: 'mercado bolsa-loja' },
       aviso && el('p', { class: 'aviso-bolsa' }, aviso),
       el(
-        'nav',
-        { class: 'abas abas-loja' },
-        comItens.map((c) => el('button', { class: `aba ${c.id === aba ? 'ativa' : ''}`, onclick: () => ((aba = c.id), (aviso = ''), refazer()) }, c.nome)),
-      ),
-      meus.length === 0 && el('p', { class: 'meta' }, 'A bolsa está vazia. Compre itens na Loja.'),
-      el(
-        'section',
-        {},
-        meus
-          .filter((m) => m.item.categoria === aba)
-          .map(({ item, qtd }) =>
+        'div',
+        { class: 'mercado-colunas' },
+        el(
+          'nav',
+          { class: 'mercado-secoes' },
+          comItens.map((c) => el('button', { class: `mercado-secao ${c.id === aba ? 'ativa' : ''}`, onclick: () => ((aba = c.id), (escolhido = null), (rolagem = 0), (aviso = ''), refazer()) }, c.nome)),
+        ),
+        vitrine,
+        !sel
+          ? el('aside', { class: 'mercado-painel' }, el('p', { class: 'mercado-vazio' }, 'Escolha um item.'))
+          : (({ item, qtd }) =>
             el(
-              'div',
-              { class: 'linha-item' },
-              iconeItem(item),
-              el('div', { class: 'texto' }, el('strong', {}, item.nome), el('p', {}, item.descricao)),
-              el('span', { class: 'quantidade' }, `×${qtd}`),
+              'aside',
+              { class: 'mercado-painel' },
+              el('div', { class: 'mercado-icone-grande' }, iconeItem(item)),
+              el('strong', { class: 'mercado-nome' }, item.nome),
+              el('p', { class: 'mercado-desc' }, item.descricao),
+              el('div', { class: 'mercado-total' }, el('span', {}, 'Na bolsa'), el('span', { class: 'mercado-preco' }, `×${qtd}`)),
               // charm: usa na conta (como uma poção); travado enquanto o bônus de 30 minutos daquele tipo está ativo
               (() => {
                 const tipo = tipoDoCharm(item.id);
@@ -430,7 +455,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                   title: ativo ? 'Só um deste tipo por vez: espere o bônus acabar' : '',
                   onclick: async () => {
                     if (!(await confirmar(item.nome, `Usar ${item.nome}? O bônus dura 30 minutos e o item é gasto.`))) return;
-                    const erro = usarCharm(save, tipo);
+                    const erro = usarCharm(save, tipo, Date.now(), item.id);
                     if (!erro) {
                       marcarConquista(save, 'charm');
                       salvar(save);
@@ -441,7 +466,23 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                   },
                 }, ativo ? `Ativo · ${textoDoTempo(charmAte(save, tipo) - Date.now())}` : 'Usar');
               })(),
-              acaoDe(item) &&
+              // skin na bolsa é só um item (pode ser trocada ou vendida): a única opção é usar, que a leva para Minhas skins
+              item.categoria === 'skins' &&
+                el('button', {
+                  class: 'botao',
+                  title: 'Leva a skin para Minhas skins, onde você escolhe o visual e o bônus',
+                  onclick: () => {
+                    if (moverSkin(save, item.id, false)) {
+                      salvar(save);
+                      // trocas e mercado conferem o save guardado no servidor
+                      void salvarAgora();
+                      aoMudar();
+                      aviso = `${item.nome} foi para Minhas skins.`;
+                    }
+                    refazer();
+                  },
+                }, 'Usar'),
+              item.categoria !== 'skins' && acaoDe(item) &&
                 el(
                   'button',
                   {
@@ -470,8 +511,12 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                           concluir(`${revividos.map(nome).join(', ')} ${revividos.length > 1 ? 'foram revividos' : 'foi revivido'}!`);
                         }
                       } else if (item.id === KIT_INICIANTE) {
-                        // o conteúdo ainda vai ser definido pelo dono: abrir não gasta nem entrega nada
-                        aviso = 'O Kit iniciante ainda está vazio. O conteúdo chega em breve!';
+                        // conteúdo definido pelo dono (shared/kitIniciante.ts): itens fixos + uma skin e um charm sorteados
+                        const kit = sortearKit();
+                        gastar(item.id);
+                        for (const [id, quantidade] of Object.entries(kit.itens)) save.itens[id] = (save.itens[id] ?? 0) + quantidade;
+                        save.silver += kit.silver;
+                        concluir(`Kit iniciante aberto! Você recebeu Pokébolas, remédios, ${kit.silver.toLocaleString('pt-BR')} Poké Dólares, a ${itemDaLoja(kit.skin)?.nome ?? 'skin'} e um ${itemDaLoja(kit.charm)?.nome ?? 'Charm'}.`);
                       } else if (item.id === BOX_POKEMON) {
                         // abre uma box nova no PC, sem escolher Pokémon
                         if (!podeAbrirBox(save)) aviso = `Você já tem as ${BOXES_MAXIMO} boxes do PC.`;
@@ -487,9 +532,8 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                   },
                   acaoDe(item)!,
                 ),
-            ),
-          ),
+            ))(sel),
       ),
     );
-  });
+  }, { classe: 'janela-loja' });
 }

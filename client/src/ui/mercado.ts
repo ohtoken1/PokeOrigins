@@ -5,6 +5,7 @@ import { Dex } from '@pkmn/sim';
 import { itemDaLoja } from '../../../shared/loja';
 import { MAX_ANUNCIOS_POR_JOGADOR, VALIDADE_ANUNCIO_MS, PRECO_MAXIMO_MERCADO, QUANTIDADE_MAXIMA_MERCADO, TAXA_MERCADO, taxaDaVenda, valorDoVendedor, type AnuncioMercado, type MoedaMercado, type PokemonAnunciado, type TipoAnuncio } from '../../../shared/mercado';
 import { itemInegociavel } from '../../../shared/naoTrocavel';
+import { quantidadeNegociavel } from '../../../shared/skins';
 import { ErroApi } from '../conta';
 import { pokemonPorId } from '../dados';
 import type { PokemonDoJogador, Save } from '../estado';
@@ -182,9 +183,10 @@ export function abrirMercado(save: Save, aoMudar: () => void = () => {}): void {
   const abaVender = () => {
     const meus = lista?.meus.length ?? 0;
     const cheio = (lista?.meus.length ?? 0) + (lista?.pendentes ?? 0) >= MAX_ANUNCIOS_POR_JOGADOR;
-    const itens = Object.entries(save.itens).filter(([id, q]) => q > 0 && !itemInegociavel(id)).sort((a, b) => nomeDoItem(a[0]).localeCompare(nomeDoItem(b[0])));
-    if (vendendo === 'item' && (!item || !save.itens[item])) item = itens[0]?.[0] ?? null;
-    const tem = vendendo === 'item' ? (item ? save.itens[item] ?? 0 : 0) : vendendo === 'gold' ? save.gold : 1;
+    // skins: só as que o jogador levou para a bolsa
+    const itens = Object.keys(save.itens).map((id): [string, number] => [id, quantidadeNegociavel(save, id)]).filter(([id, q]) => q > 0 && !itemInegociavel(id)).sort((a, b) => nomeDoItem(a[0]).localeCompare(nomeDoItem(b[0])));
+    if (vendendo === 'item' && (!item || !quantidadeNegociavel(save, item))) item = itens[0]?.[0] ?? null;
+    const tem = vendendo === 'item' ? (item ? quantidadeNegociavel(save, item) : 0) : vendendo === 'gold' ? save.gold : 1;
     const maximo = Math.min(tem, vendendo === 'gold' ? PRECO_MAXIMO_MERCADO : QUANTIDADE_MAXIMA_MERCADO);
     quantidade = Math.max(1, Math.min(maximo || 1, quantidade));
     if (vendendo === 'gold') moeda = 'silver';

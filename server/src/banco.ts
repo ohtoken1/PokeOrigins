@@ -543,3 +543,12 @@ export const revogarBanimentos = (contaId: number, por: string) => sqlBanimento.
 export const listarBanimentos = (limite: number) => sqlBanimento.listar.all(limite) as unknown as Banimento[];
 /** Derruba todas as sessões da conta (ela tem de entrar de novo). */
 export const apagarSessoesDaConta = (contaId: number) => void sqlBanimento.apagarSessoes.run(contaId);
+
+// ---- mudanças feitas uma vez só no banco (o número fica em PRAGMA user_version) ----
+{
+  const versao = (db.prepare('PRAGMA user_version').get() as { user_version: number }).user_version;
+  if (versao < 1) {
+    // o XP da guilda mudou de escala (era o XP de treinador, agora são pontos por ação): todas recomeçam do nível 1
+    db.exec('UPDATE clas SET nivel = 1, xp = 0; UPDATE cla_membros SET xp_dado = 0; PRAGMA user_version = 1;');
+  }
+}

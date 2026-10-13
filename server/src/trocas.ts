@@ -10,6 +10,7 @@ import { randomBytes } from 'node:crypto';
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { itemInegociavel } from '../../shared/naoTrocavel.ts';
+import { contarSkinNaBolsa, ehSkin, quantidadeNegociavel } from '../../shared/skins.ts';
 import { TAMANHO_BOX, numeroDeBoxes } from '../../shared/pc.ts';
 import { nivelMaximoPokemon, nivelTreinador } from '../../shared/treinador.ts';
 
@@ -52,7 +53,7 @@ const ofertaVazia = (): Oferta => ({ pokemons: [], itens: {}, silver: 0, gold: 0
 
 // ---- tipos mínimos do save (o resto do save não interessa aqui) ----
 export type PokemonSave = { uid?: number; especieId: number; nivel: number; shiny?: boolean; genero?: string; item?: string | null; inegociavel?: boolean; trancado?: boolean; fundido?: unknown; box?: number; [k: string]: unknown };
-export type SaveMin = { time: PokemonSave[]; caixa: PokemonSave[]; itens: Record<string, number>; silver: number; gold: number; proximoIdPokemon?: number; capturados?: number[]; vistos?: number[]; capturadosShiny?: number[]; aceitarTrocas?: boolean; xpTreinador?: number };
+export type SaveMin = { time: PokemonSave[]; caixa: PokemonSave[]; itens: Record<string, number>; silver: number; gold: number; proximoIdPokemon?: number; capturados?: number[]; vistos?: number[]; capturadosShiny?: number[]; aceitarTrocas?: boolean; xpTreinador?: number; skinsNaBolsa?: Record<string, number> };
 
 function saveDe(contaId: number): SaveMin {
   const s = banco.lerSave(contaId);
@@ -101,7 +102,8 @@ function conferirOferta(save: SaveMin, oferta: Oferta, quem: string): PokemonSav
   if (save.time.filter((p) => !oferta.pokemons.includes(p.uid ?? -1)).length < 1) throw new ErroConta(`${quem}: precisa ficar pelo menos 1 Pokémon no time.`, 409);
   for (const [item, qtd] of Object.entries(oferta.itens)) {
     if (itemInegociavel(item)) throw new ErroConta(`${quem}: item NT não pode ser trocado.`, 409);
-    if ((save.itens[item] ?? 0) < qtd) throw new ErroConta(`${quem}: não tem itens suficientes.`, 409);
+    // skin só sai da bolsa (o jogador leva para lá em Minhas skins)
+    if (quantidadeNegociavel(save, item) < qtd) throw new ErroConta(ehSkin(item) ? `${quem}: leve a skin para a bolsa antes de trocar (Minhas skins).` : `${quem}: não tem itens suficientes.`, 409);
   }
   if ((save.silver ?? 0) < oferta.silver) throw new ErroConta(`${quem}: Poké Dólares insuficientes.`, 409);
   if ((save.gold ?? 0) < oferta.gold) throw new ErroConta(`${quem}: Origin Coins insuficientes.`, 409);
@@ -258,6 +260,7 @@ function tirar(save: SaveMin, oferta: Oferta, pokemons: PokemonSave[]): void {
   for (const [item, qtd] of Object.entries(oferta.itens)) {
     save.itens[item] -= qtd;
     if (save.itens[item] <= 0) delete save.itens[item];
+    contarSkinNaBolsa(save, item, -qtd);
   }
   save.silver -= oferta.silver;
   save.gold -= oferta.gold;
@@ -300,7 +303,11 @@ export function guardarPokemon(save: SaveMin, original: PokemonSave, deOutroJoga
 
 function dar(save: SaveMin, oferta: Oferta, pokemons: PokemonSave[]): void {
   for (const original of pokemons) guardarPokemon(save, original);
-  for (const [item, qtd] of Object.entries(oferta.itens)) save.itens[item] = (save.itens[item] ?? 0) + qtd;
+  for (const [item, qtd] of Object.entries(oferta.itens)) {
+    save.itens[item] = (save.itens[item] ?? 0) + qtd;
+    // skin recebida chega na bolsa, como item: quem recebeu decide se usa
+    contarSkinNaBolsa(save, item, qtd);
+  }
   save.silver = (save.silver ?? 0) + oferta.silver;
   save.gold = (save.gold ?? 0) + oferta.gold;
 }

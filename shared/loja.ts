@@ -19,7 +19,7 @@ import { nomeDaMoeda } from './moedas';
 
 export type CategoriaLoja =
   | 'bolas' | 'remedios' | 'evolucao' | 'batalha' | 'up' | 'mints' | 'megapedras' | 'frutas' | 'gems' | 'placas' | 'memorias' | 'zcristais' | 'lendarios'
-  | 'terashards' | 'formas' | 'chave' | 'charms' | 'skins' | 'cubos' | 'tm' | 'tr' | 'tickets' | 'ovos';
+  | 'terashards' | 'formas' | 'chave' | 'materiais' | 'charms' | 'skins' | 'cubos' | 'tm' | 'tr' | 'tickets' | 'ovos';
 
 /** Abas da loja. */
 export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
@@ -44,6 +44,7 @@ export const CATEGORIAS_FORA_DA_LOJA: { id: CategoriaLoja; nome: string }[] = [
   { id: 'terashards', nome: 'Tera Shards' },
   { id: 'formas', nome: 'Itens de forma' },
   { id: 'chave', nome: 'Itens-chave' },
+  { id: 'materiais', nome: 'Materiais' },
   { id: 'charms', nome: 'Charms' },
   { id: 'skins', nome: 'Skins' },
   { id: 'cubos', nome: 'Cubos' },
@@ -81,6 +82,8 @@ export interface ItemLoja {
   natureza?: string;
   /** charms: o tipo */
   charm?: string;
+  /** Energies: o tipo */
+  energia?: string;
   /** desenho provisório do ícone (itens nossos ainda sem arte) */
   simbolo?: string;
   /** cubos: de qual Pokémon e de que era (shared/itensCustom.ts) */
@@ -121,7 +124,7 @@ export const PRECOS: Record<string, number> = {
 /** Itens da loja vendidos só por GOLD (decisão do dono), com o preço. As Mega Stones também são (PRECO_MEGA_STONE_GOLD). */
 export const PRECOS_EM_GOLD: Record<string, number> = { abilitycapsule: 50, abilitypatch: 100 };
 /** Silver inicial (provisório). Silver só se ganha vencendo treinadores e ginásios; selvagens não dão (pedido do dono). */
-export const SILVER_INICIAL = 1000;
+export const SILVER_INICIAL = 0;
 /**
  * Preço em silver para avaliar os IVs de um Pokémon (provisório). Uma forma só de pagar (pedido do dono): depois de
  * avaliado, quem é VIP vê o valor exato e quem não é vê a FAIXA de cada IV.
@@ -214,7 +217,7 @@ function montarCatalogo(): ItemLoja[] {
   const itens: ItemLoja[] = [];
   const add = (item: Omit<ItemLoja, 'preco' | 'naLoja'>) => {
     if (itens.some((i) => i.id === item.id)) return;
-    const naLoja = NA_LOJA.has(item.categoria) && !FORA_DA_LOJA.has(item.id) && (item.categoria !== 'bolas' || BOLAS_NA_LOJA.has(item.id));
+    const naLoja = NA_LOJA.has(item.categoria) && !FORA_DA_LOJA.has(item.id) && !item.id.endsWith('-nt') && (item.categoria !== 'bolas' || BOLAS_NA_LOJA.has(item.id));
     // Mega Stones custam gold (pedido do dono)
     if (item.categoria === 'megapedras') itens.push({ ...item, naLoja, moeda: 'gold', preco: PRECOS[item.id] ?? PRECO_MEGA_STONE_GOLD });
     else if (PRECOS_EM_GOLD[item.id]) itens.push({ ...item, naLoja, moeda: 'gold', preco: PRECOS_EM_GOLD[item.id] });
@@ -304,6 +307,8 @@ const CUSTOM_NA_LOJA: Record<string, Pick<ItemLoja, 'preco' | 'moeda' | 'abaDaLo
 export const TODOS_OS_ITENS: ItemLoja[] = [
   ...montarCatalogo(),
   // itens nossos: skins e itens-chave (sem uso por enquanto)
+  // charms NT (os do Kit iniciante): iguais aos normais, mas não entram em troca
+  ...ITENS_CUSTOM.filter((i) => i.categoria === 'charms').map((i): ItemLoja => ({ ...i, id: `${i.id}-nt`, nome: `${i.nome} (NT)`, descricao: `${i.descricao} NT: não pode ser trocado.`, preco: 0, naLoja: false })),
   ...ITENS_CUSTOM.map((i): ItemLoja => (CUSTOM_NA_LOJA[i.id] ? { ...i, naLoja: true, ...CUSTOM_NA_LOJA[i.id] } : { ...i, preco: 0, naLoja: false })),
   ...TICKETS.map((t): ItemLoja => ({ id: t.id, nome: t.nome, categoria: 'tickets', descricao: t.descricao, preco: 0, naLoja: false, sprite: 'eon-ticket' })),
   // Chave Temporal: abre como um ticket (aba Tickets da bolsa)
