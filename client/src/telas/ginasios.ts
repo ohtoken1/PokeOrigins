@@ -4,12 +4,13 @@ import type { Tela } from '../main';
 import { BIOMAS } from '../../../shared/biomas';
 import { RECOMPENSA_GINASIO, lideresDaRegiao, type LiderGinasio } from '../../../shared/ginasios';
 import { REGIOES } from '../../../shared/regioes';
-import { NOMES_DIFICULDADE, montarTimeNpc } from '../../../shared/treinadoresNpc';
+import { NOMES_DIFICULDADE, montarTimeNpc, nivelDoGinasio } from '../../../shared/treinadoresNpc';
 import { abrirBatalha } from '../batalha/telaBatalha';
 import { pokemonPorId } from '../dados';
 import { carregarSave, salvar } from '../estado';
 import { corTipo, el, seloTipo, spritePokemon } from '../ui/dom';
 import { imagemTreinador } from './duelos';
+import { colunaDoTime } from '../ui/time';
 import { ehAdministrador } from '../bonificacao';
 import { aoMudarViagem, viagemAtual } from '../viagem';
 
@@ -46,12 +47,18 @@ export const telaGinasios: Tela = (raiz, navegar) => {
     if (viagem) return `Você está viajando para ${nomeDe(viagem.para)}. Os ginásios abrem quando o trem chegar.`;
     return regiao === save.regiao ? '' : `Você está em ${nomeDe(save.regiao)}. Para desafiar os ginásios de ${nomeDe(regiao)}, viaje de trem até lá.`;
   };
+  /**
+   * Ginásios em ordem (pedido do dono, vale para todos, administradores inclusive): só dá para desafiar um líder
+   * depois de vencer todos os anteriores da mesma região. Devolve o líder que falta vencer antes (null = liberado).
+   */
+  const faltaAntes = (lider: LiderGinasio): LiderGinasio | null =>
+    lideresDaRegiao(lider.regiao).filter((l) => l.ordem < lider.ordem && !save.insignias!.includes(l.id)).sort((a, b) => a.ordem - b.ordem)[0] ?? null;
   const crescimentoDe = (n: number) => pokemonPorId(n).crescimento;
   const corpo = el('div', { class: 'ginasios-corpo' });
 
   const desafiar = (lider: LiderGinasio) => {
-    if (bloqueio()) return desenhar();
-    const equipe = montarTimeNpc(lider, save.time, crescimentoDe);
+    if (bloqueio() || faltaAntes(lider)) return desenhar();
+    const equipe = montarTimeNpc(lider, save.time, crescimentoDe, nivelDoGinasio(save.time));
     const jaTinha = save.insignias!.includes(lider.id);
     abrirBatalha({
       save,
@@ -90,21 +97,26 @@ export const telaGinasios: Tela = (raiz, navegar) => {
       el('div', { class: 'lista-ginasios' },
         ...lideres.map((l) => {
           const ganha = save!.insignias!.includes(l.id);
-          const equipe = montarTimeNpc(l, save!.time, crescimentoDe);
-          return el('article', { class: `cartao-ginasio ${ganha ? 'vencido' : ''}`, style: { '--cor-tipo': corTipo(l.tipo) } },
+          const equipe = montarTimeNpc(l, save!.time, crescimentoDe, nivelDoGinasio(save!.time));
+          const antes = faltaAntes(l);
+          return el('article', { class: `cartao-ginasio ${ganha ? 'vencido' : ''} ${antes ? 'trancado' : ''}`, style: { '--cor-tipo': corTipo(l.tipo) } },
             el('img', { class: 'retrato-npc', src: imagemTreinador(l.id), alt: l.nome }),
             el('div', { class: 'ginasio-texto' },
               el('small', { class: 'meta' }, `Ginásio ${l.ordem} · ${l.titulo}`),
               el('h3', {}, l.nome, ' ', seloTipo(l.tipo)),
               el('div', { class: 'ginasio-insignia' }, insigniaVisual(l, ganha), el('span', {}, ganha ? `${l.insignia} conquistada` : l.insignia)),
               el('div', { class: 'mini-time' }, ...equipe.map((p) => spritePokemon(pokemonPorId(p.especieId), { animado: false }))),
-              el('small', { class: 'meta' }, `${NOMES_DIFICULDADE[l.dificuldade]} · ${save!.insignias?.includes(l.id) ? 'recompensa já recebida' : `${RECOMPENSA_GINASIO[l.ordem - 1].toLocaleString('pt-BR')} Poké Dólares na primeira vitória`}`)),
-            el('button', { class: `botao ${ganha ? 'secundario' : ''}`, disabled: !podeLutar, title: fechado, onclick: () => desafiar(l) }, ganha ? 'Revanche' : 'Desafiar'));
+              el('small', { class: 'meta' }, `Nv. ${nivelDoGinasio(save!.time)} · ${NOMES_DIFICULDADE[l.dificuldade]} · ${save!.insignias?.includes(l.id) ? 'recompensa já recebida' : `${RECOMPENSA_GINASIO[l.ordem - 1].toLocaleString('pt-BR')} Poké Dólares na primeira vitória`}`)),
+            antes
+              ? el('button', { class: 'botao secundario', disabled: true, title: `Vença ${antes.nome} primeiro` }, `🔒 Vença ${antes.nome}`)
+              : el('button', { class: `botao ${ganha ? 'secundario' : ''}`, disabled: !podeLutar, title: fechado, onclick: () => desafiar(l) }, ganha ? 'Revanche' : 'Desafiar'));
         })),
     );
   }
   desenhar();
-  tela.append(el('p', { class: 'sub' }, 'Vença os líderes para ganhar as insígnias.'), corpo);
+  tela.append(el('div', { class: 'layout-bioma' },
+    el('section', {}, el('p', { class: 'sub' }, 'Vença os líderes em ordem para ganhar as insígnias.'), corpo),
+    colunaDoTime(save.time, () => salvar(save))));
   // o trem partiu ou chegou com a tela aberta
   return aoMudarViagem(desenhar);
 };

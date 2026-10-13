@@ -59,6 +59,23 @@ export function barraXp(p: PokemonDoJogador): HTMLElement {
 }
 
 /**
+ * Coluna com o time do jogador para as telas de batalha fora do mapa (Duelos, Ginásios; pedido do dono): o mesmo
+ * painel do mapa e da cidade. Arrastar muda a ordem (o primeiro é quem entra na batalha) e já salva.
+ */
+export function colunaDoTime(time: PokemonDoJogador[], aoSalvar: () => void): HTMLElement {
+  const caixa = el('aside', { class: 'coluna-time' });
+  const desenhar = () =>
+    caixa.replaceChildren(
+      painelTime(time, () => {
+        aoSalvar();
+        desenhar();
+      }),
+    );
+  desenhar();
+  return caixa;
+}
+
+/**
  * Painel do time. Com `aoReordenar`, dá para arrastar um Pokémon para outra vaga e mudar a ordem
  * (o primeiro é quem entra na batalha e anda atrás do jogador); a lista `time` é alterada no lugar.
  */

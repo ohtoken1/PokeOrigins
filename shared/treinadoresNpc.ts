@@ -97,6 +97,12 @@ export function nivelDoDuelo(timeDoJogador: PokemonIndividual[]): number {
   return Math.max(1, Math.min(100, Math.round(timeDoJogador.reduce((s, p) => s + p.nivel, 0) / timeDoJogador.length)));
 }
 
+/** Nível dos Pokémon dos líderes de ginásio (pedido do dono): o do Pokémon de nível MAIS ALTO do time do jogador. */
+export function nivelDoGinasio(timeDoJogador: PokemonIndividual[]): number {
+  if (!timeDoJogador.length) return 5;
+  return Math.max(1, Math.min(100, Math.max(...timeDoJogador.map((p) => p.nivel))));
+}
+
 /** Quantos Pokémon o treinador usa: o tamanho do seu time (+1 nos muito difíceis/lendários), até o time dele. */
 export function tamanhoDoTime(npc: TreinadorNpc, tamanhoDoJogador: number): number {
   return Math.min(npc.time.length, Math.max(1, tamanhoDoJogador) + (npc.dificuldade >= 4 ? 1 : 0));
@@ -114,8 +120,7 @@ export function formaNoNivel(numero: number, nivel: number): number {
 }
 
 /** Monta o time do NPC para um duelo: últimos Pokémon do time dele (os mais fortes), nível da média, IVs da dificuldade, sem EVs. */
-export function montarTimeNpc(npc: TreinadorNpc, timeDoJogador: PokemonIndividual[], crescimentoDe: (n: number) => string | null): PokemonIndividual[] {
-  const nivel = nivelDoDuelo(timeDoJogador);
+export function montarTimeNpc(npc: TreinadorNpc, timeDoJogador: PokemonIndividual[], crescimentoDe: (n: number) => string | null, nivel = nivelDoDuelo(timeDoJogador)): PokemonIndividual[] {
   const iv = IV_POR_DIFICULDADE[npc.dificuldade];
   return npc.time.slice(-tamanhoDoTime(npc, timeDoJogador.length)).map((n) => {
     const numero = formaNoNivel(n, nivel);

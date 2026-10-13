@@ -314,11 +314,15 @@ export class BiomaScene extends Phaser.Scene {
     const aoDesfocar = () => setTimeout(aoFocar);
     document.addEventListener('focusin', aoFocar);
     document.addEventListener('focusout', aoDesfocar);
+    // a captura fica ligada só com o mapa na tela (ao sair ela é desligada, ver abaixo)
+    aoFocar();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       teclado.off('keydown', aoTeclar);
       document.removeEventListener('focusin', aoFocar);
       document.removeEventListener('focusout', aoDesfocar);
-      teclado.enableGlobalCapture();
+      // fora do mapa o jogo dorme, mas o teclado dele continuava "segurando" espaço e setas na página inteira:
+      // depois de passar por um mapa, não dava para dar espaço em campos de outras telas (motivo do banimento…)
+      teclado.disableGlobalCapture();
     });
     this.entrarOnline();
     this.opcoes.aoPronto?.();

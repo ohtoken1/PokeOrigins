@@ -2449,3 +2449,11 @@ button.vaga.casa-box:hover { border-color: rgb(18 17 15 / 0.35); background: rgb
 .icone-energia { width: 32px; height: 32px; flex: none; display: grid; place-items: center; }
 .icone-energia i { position: relative; width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff 0 8%, color-mix(in srgb, var(--cor-tipo) 65%, #fff) 22%, var(--cor-tipo) 55%, color-mix(in srgb, var(--cor-tipo) 55%, #000) 100%); box-shadow: 0 0 0 2px #2a2620, 0 0 6px 1px var(--cor-tipo); }
 .icone-energia i::after { content: ''; position: absolute; inset: 5px; background: #fff; opacity: 0.92; clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); }
+
+/* ginásio que ainda não pode ser desafiado (falta vencer o anterior) */
+.cartao-ginasio.trancado { opacity: 0.6; }
+
+/* Duelos e Ginásios com o time do jogador ao lado (como no mapa) */
+.tela-duelos { max-width: 1240px; }
+.tela-ginasios { max-width: 1320px; }
+.coluna-time { position: sticky; top: 12px; }

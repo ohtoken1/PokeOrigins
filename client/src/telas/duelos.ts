@@ -6,6 +6,7 @@ import { NOMES_DIFICULDADE, RECOMPENSA_POR_POKEMON, recompensaDoDuelo, TREINADOR
 import { abrirBatalha } from '../batalha/telaBatalha';
 import { pokemonPorId } from '../dados';
 import { carregarSave, salvar } from '../estado';
+import { colunaDoTime } from '../ui/time';
 import { el, spritePokemon } from '../ui/dom';
 import { valorEmMoeda } from '../ui/moeda';
 
@@ -124,5 +125,7 @@ export const telaDuelos: Tela = (raiz, navegar) => {
   };
   desenhar();
 
-  tela.append(el('p', { class: 'sub' }, 'Um treinador é sorteado entre 50 personagens dos jogos e do anime.'), cartao);
+  tela.append(el('div', { class: 'layout-bioma' },
+    el('section', {}, el('p', { class: 'sub' }, 'Um treinador é sorteado entre 50 personagens dos jogos e do anime.'), cartao),
+    colunaDoTime(save.time, () => salvar(save))));
 };
