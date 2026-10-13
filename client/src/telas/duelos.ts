@@ -85,6 +85,10 @@ export const telaDuelos: Tela = (raiz, navegar) => {
   };
 
   const desenhar = () => {
+    // roleta girando: ela mesma redesenha no fim
+    if (sorteando) return;
+    // sempre pelo time de AGORA (o jogador pode ter mexido no PC com a tela aberta)
+    equipe = montarTimeNpc(npc, save.time, crescimentoDe);
     const recompensa = recompensaDoDuelo(npc.dificuldade, equipe.length);
     const podeLutar = save.time.some((p) => p.hp > 0);
     cartao.replaceChildren(
@@ -95,7 +99,8 @@ export const telaDuelos: Tela = (raiz, navegar) => {
       el('div', { class: 'duelo-time' },
         ...equipe.map((p) => {
           const d = pokemonPorId(p.especieId);
-          return el('div', { class: 'duelo-pokemon' }, spritePokemon(d, { animado: false }), el('small', {}, `${d.nome} · Nv. ${p.nivel}`));
+          // sem o nível (pedido do dono): ele só é decidido ao começar a batalha, pelo time que o jogador levar
+          return el('div', { class: 'duelo-pokemon' }, spritePokemon(d, { animado: false }), el('small', {}, d.nome));
         })),
       el('div', { class: 'duelo-info' }, el('strong', {}, 'Recompensa: ', valorEmMoeda('silver', recompensa)), el('small', { class: 'meta' }, ` (${RECOMPENSA_POR_POKEMON[npc.dificuldade]} por Pokémon derrotado)`)),
       el('div', { class: 'duelo-botoes' },
@@ -104,6 +109,9 @@ export const telaDuelos: Tela = (raiz, navegar) => {
           disabled: !podeLutar,
           title: podeLutar ? '' : 'Seu time está todo desmaiado: cure no Centro Pokémon',
           onclick: () => {
+            // nível, tamanho e recompensa valem os do time que está entrando AGORA (não dá mais para trocar depois)
+            equipe = montarTimeNpc(npc, save.time, crescimentoDe);
+            const recompensa = recompensaDoDuelo(npc.dificuldade, equipe.length);
             abrirBatalha({
               save,
               selvagem: equipe[0],
@@ -127,5 +135,5 @@ export const telaDuelos: Tela = (raiz, navegar) => {
 
   tela.append(el('div', { class: 'layout-bioma' },
     el('section', {}, el('p', { class: 'sub' }, 'Um treinador é sorteado entre 50 personagens dos jogos e do anime.'), cartao),
-    colunaDoTime(save.time, () => salvar(save))));
+    colunaDoTime(save.time, () => salvar(save), () => cartao.isConnected && desenhar())));
 };

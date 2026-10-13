@@ -110,5 +110,41 @@ export function comBonificacao(a: AjustesEncontro): AjustesEncontro {
   };
 }
 
+/** Total de cada bônus do jogador AGORA, como multiplicador (1,59 = +59%). As mesmas contas da batalha e dos encontros. */
+export interface BonusAtuais {
+  shiny: number;
+  lendario: number;
+  inicial: number;
+  silver: number;
+  xp: number;
+  captura: number;
+}
+/**
+ * `comMais` = como ficaria com mais um bônus de conquista (a recompensa de uma conquista ainda não concluída): os
+ * bônus das conquistas somam entre si, então o novo entra na soma delas (e, no shiny, na soma geral).
+ */
+export function bonusAtuais(comMais?: { alvo: 'silver' | 'raros' | 'captura'; valor: number }): BonusAtuais {
+  const mais = (alvo: 'silver' | 'raros' | 'captura') => (comMais?.alvo === alvo ? comMais.valor : 0);
+  const fontes = fontesDeBonus();
+  const save = carregarSave();
+  const staff = bonificacao();
+  const guilda = bonusDaMinhaGuilda();
+  const titulo = save ? multTitulo(save) : 1;
+  const skin = save ? bonusAtivoDaSkin(save) : { silver: 0, xp: 0, captura: 0 };
+  const conquistas = save ? bonusDasConquistas(save) : { silver: 0, raros: 0, captura: 0 };
+  // troca a parte das conquistas pela parte "com mais um"
+  const comMaisRaros = (mult: number) => (mult / (1 + conquistas.raros)) * (1 + conquistas.raros + mais('raros'));
+  const vip = (chave: 'silver' | 'xpPokemon' | 'captura') => (save ? bonusVip(save, chave) : 1);
+  return {
+    // shiny: os bônus do jogador somam e só a Bonificação da staff multiplica (ver comBonificacao)
+    shiny: (1 + somaDoShiny(fontes) + mais('raros')) * multiplicadorDe('shiny', fontes.filter((f) => f.id === 'bonificacao')),
+    lendario: comMaisRaros(multiplicadorDe('lendario', fontes)),
+    inicial: comMaisRaros(multiplicadorDe('inicial', fontes)),
+    silver: vip('silver') * staff.silver * (1 + skin.silver) * (1 + conquistas.silver + mais('silver')) * titulo * (1 + guilda.silver),
+    xp: vip('xpPokemon') * staff.xp * (1 + skin.xp) * titulo * (1 + guilda.xp),
+    captura: vip('captura') * (1 + skin.captura) * (1 + conquistas.captura + mais('captura')),
+  };
+}
+
 /** A conta logada é de administrador? Vem do servidor (a primeira conta criada é; outras pelo `npm run admin`). */
 export const ehAdministrador = (): boolean => !!conta()?.admin;

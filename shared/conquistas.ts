@@ -42,8 +42,10 @@ export interface Conquista {
 
 /** O que o save guarda. */
 export interface EstadoConquistas {
-  /** id da conquista → quando foi concluída (ms) */
+  /** id da conquista → quando a recompensa foi RESGATADA (ms). É o que vale para os bônus e os títulos. */
   feitas: Record<string, number>;
+  /** id da conquista → quando foi concluída (ms), esperando o jogador resgatar a recompensa na tela das conquistas */
+  aResgatar?: Record<string, number>;
   /** coisas feitas uma vez que o save não mostra sozinho (usou um cubo, mega evoluiu…) */
   marcas: Record<string, number>;
 }

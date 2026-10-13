@@ -116,7 +116,7 @@ export const telaGinasios: Tela = (raiz, navegar) => {
   desenhar();
   tela.append(el('div', { class: 'layout-bioma' },
     el('section', {}, el('p', { class: 'sub' }, 'Vença os líderes em ordem para ganhar as insígnias.'), corpo),
-    colunaDoTime(save.time, () => salvar(save))));
+    colunaDoTime(save.time, () => salvar(save), () => corpo.isConnected && desenhar())));
   // o trem partiu ou chegou com a tela aberta
   return aoMudarViagem(desenhar);
 };

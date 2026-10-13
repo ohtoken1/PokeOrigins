@@ -1,5 +1,6 @@
-// Conquistas no jogo: confere o progresso de cada uma pelo save, marca as concluídas, entrega a recompensa na
-// hora e mostra o aviso. A lista e as recompensas ficam em shared/conquistas.ts.
+// Conquistas no jogo: confere o progresso de cada uma pelo save, marca as concluídas e mostra o aviso. A recompensa
+// NÃO chega sozinha (pedido do dono): a conquista fica em `aResgatar` até o jogador clicar em Resgatar na tela das
+// conquistas; só então vai para `feitas`, que é o que vale para os bônus e os títulos. A lista e as recompensas ficam em shared/conquistas.ts.
 import { CONQUISTAS, CONQUISTAS_CONTADAS, textoRecompensa, type Conquista, type EstadoConquistas } from '../../shared/conquistas';
 import { TIPOS_DOS_CHARMS } from '../../shared/charms';
 import { ehLendario } from '../../shared/encontros';
@@ -24,6 +25,7 @@ const estadoDe = (save: Save): EstadoConquistas => {
   const e = (save.conquistas ??= { feitas: {}, marcas: {} });
   e.feitas ??= {};
   e.marcas ??= {};
+  e.aResgatar ??= {};
   return e;
 };
 
@@ -79,6 +81,7 @@ function contexto(save: Save) {
     insignias: new Set(save.insignias ?? []),
     marcas: estadoDe(save).marcas,
     feitas: estadoDe(save).feitas,
+    aResgatar: estadoDe(save).aResgatar ?? {},
     nivel: nivelTreinador(save.xpTreinador),
   };
 }
@@ -131,7 +134,7 @@ const FIXAS: Record<string, (x: Contexto) => Progresso> = {
 };
 
 function progressoCom(c: Conquista, x: Contexto): Progresso {
-  if (c.parte !== undefined) return { valor: CONQUISTAS_CONTADAS.filter((o) => x.feitas[o.id]).length, meta: Math.ceil(CONQUISTAS_CONTADAS.length * c.parte) };
+  if (c.parte !== undefined) return { valor: CONQUISTAS_CONTADAS.filter((o) => x.feitas[o.id] || x.aResgatar[o.id]).length, meta: Math.ceil(CONQUISTAS_CONTADAS.length * c.parte) };
   if (c.regiao && c.grupo === 'ginasios') {
     const lideres = lideresDaRegiao(c.regiao);
     return { valor: lideres.filter((l) => x.insignias.has(l.id)).length, meta: Math.max(1, lideres.length) };
@@ -142,13 +145,32 @@ function progressoCom(c: Conquista, x: Contexto): Progresso {
 }
 
 /** Progresso de todas as conquistas (para a tela). */
-export function progressoDasConquistas(save: Save): { conquista: Conquista; valor: number; meta: number; feita: boolean }[] {
+export function progressoDasConquistas(save: Save): { conquista: Conquista; valor: number; meta: number; feita: boolean; aResgatar: boolean }[] {
   const x = contexto(save);
   return CONQUISTAS.map((conquista) => {
+    // `feita` = recompensa resgatada; `aResgatar` = concluída, esperando o clique
     const feita = !!x.feitas[conquista.id];
+    const aResgatar = !feita && !!x.aResgatar[conquista.id];
     const p = progressoCom(conquista, x);
-    return { conquista, meta: p.meta, valor: feita ? p.meta : Math.min(p.meta, p.valor), feita };
+    return { conquista, meta: p.meta, valor: feita || aResgatar ? p.meta : Math.min(p.meta, p.valor), feita, aResgatar };
   });
+}
+
+/** Quantas conquistas estão concluídas esperando o resgate. */
+export const conquistasAResgatar = (save: Save): number => Object.keys(estadoDe(save).aResgatar ?? {}).filter((id) => !estadoDe(save).feitas[id]).length;
+
+/**
+ * Resgata a recompensa de uma conquista concluída (quem chama salva). Devolve a conquista, ou null se não havia
+ * nada para resgatar.
+ */
+export function resgatarConquista(save: Save, id: string): Conquista | null {
+  const e = estadoDe(save);
+  const c = CONQUISTAS.find((x) => x.id === id);
+  if (!c || e.feitas[id] || !e.aResgatar?.[id]) return null;
+  delete e.aResgatar[id];
+  e.feitas[id] = Date.now();
+  entregar(save, c);
+  return c;
 }
 
 function entregar(save: Save, c: Conquista): void {
@@ -159,21 +181,20 @@ function entregar(save: Save, c: Conquista): void {
   // bônus e títulos valem pela conquista estar concluída (não guardam nada a mais)
 }
 
-/** Confere tudo; devolve as conquistas concluídas agora (já com a recompensa entregue). */
+/** Confere tudo; devolve as conquistas concluídas agora (ficam esperando o resgate). */
 export function conferirConquistas(save: Save): Conquista[] {
   const novas: Conquista[] = [];
   // as de "X% das conquistas" podem fechar por causa das outras: repete até não fechar mais nada
   for (let volta = 0; volta < 5; volta++) {
     const x = contexto(save);
     const agora = CONQUISTAS.filter((c) => {
-      if (x.feitas[c.id]) return false;
+      if (x.feitas[c.id] || x.aResgatar[c.id]) return false;
       const p = progressoCom(c, x);
       return p.valor >= p.meta;
     });
     if (!agora.length) break;
     for (const c of agora) {
-      x.feitas[c.id] = Date.now();
-      entregar(save, c);
+      x.aResgatar[c.id] = Date.now();
       novas.push(c);
     }
   }
@@ -191,7 +212,8 @@ function mostrarProximo(): void {
   caixa.replaceChildren(
     el('strong', {}, lote.length > 1 ? `${lote.length} conquistas concluídas!` : 'Conquista concluída!'),
     ...lote.slice(0, 3).map((c) => el('span', {}, el('b', {}, c.nome), ` · ${textoRecompensa(c.recompensa)}`)),
-    lote.length > 3 ? el('small', {}, `e mais ${lote.length - 3}. Veja em Minha conta → Conquistas.`) : '',
+    lote.length > 3 ? el('small', {}, `e mais ${lote.length - 3}.`) : '',
+    el('small', {}, 'Resgate a recompensa em Minha conta → Conquistas.'),
   );
   caixa.hidden = false;
   setTimeout(() => {
