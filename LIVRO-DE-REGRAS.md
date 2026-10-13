@@ -922,6 +922,8 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Energies e Apricorns:** ao derrotar ou capturar um Pokémon selvagem há 10% de chance de ganhar a Energy do tipo principal dele (uma para cada um dos 18 tipos). Elas e os Apricorns são materiais do futuro sistema de craft.
 - **Tickets:** o prêmio comum deixou de ser Tera Shard. Agora sai um destes, com a mesma chance: 25 de uma Pokébola aleatória, 20 de uma Berry aleatória, 20 de um Apricorn aleatório ou 20 de uma Energy aleatória. Para abrir, escolha a quantidade (×1, ×3 ou ×5) e depois clique em Abrir. O prêmio mítico aparece em vermelho.
 - **Bolsa nova:** a bolsa ganhou o mesmo desenho da loja.
+- **Ginásios mais difíceis:** os Pokémon do líder agora têm o nível do Pokémon mais forte do seu time (antes era a média do time).
+- **Ginásios em ordem:** agora é preciso vencer os líderes de cada região na ordem, do 1º ao 8º.
 - **Bônus de shiny somam:** os bônus de chance de shiny (VIP, skin, conquistas, guilda, título e charm) agora são somados, em vez de multiplicados um pelo outro. Com tudo no máximo: +59%, ou +79% com o charm do tipo.
 - **Títulos dão bônus:** o título em uso dá um bônus em shiny, lendários e iniciais, Poké Dólares e XP (captura não): Membro de guilda e CLT 1%, Patrão 2%, Líder de guilda e Burguesia 3%, 1 em 1.000.000 e P2W 4%. Só o título escolhido conta.
 - **Títulos com balão próprio:** cada título tem a cor do tema dele e um acabamento mais bonito quanto mais difícil for.
