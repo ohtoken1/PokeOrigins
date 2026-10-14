@@ -1,6 +1,7 @@
 // Loja do Viajante do tempo (NPC da praça da cidade): vende os cubos dos Pokémon do passado e do futuro, pagos em
 // Fragmentos Temporais (`save.fragmentos`). Parecida com o Pokémarket, com abas Passado / Futuro / Lendário.
-import { CUBOS, ICONE_FRAGMENTO, NOME_FRAGMENTO, PRECO_CUBO, type Cubo, type EraCubo } from '../../../shared/itensCustom';
+import { CUBOS, ICONE_FRAGMENTO, NOME_FRAGMENTO, PRECO_CUBO, RECICLAGEM_CUBO, type Cubo, type EraCubo } from '../../../shared/itensCustom';
+import { confirmar } from './confirmar';
 import { itemDaLoja } from '../../../shared/loja';
 import { pokemonPorId } from '../dados';
 import { salvar, type Save } from '../estado';
@@ -37,9 +38,23 @@ export function abrirLojaTemporal(save: Save, aoMudar: () => void = () => {}): v
       }
       janela.redesenhar();
     };
+    // reciclagem (pedido do dono): o cubo que o jogador não quer vira Fragmentos Temporais para comprar outro
+    const desmontar = async (cubo: Cubo) => {
+      const valor = RECICLAGEM_CUBO[cubo.era];
+      if (!(save.itens[cubo.id] > 0)) return;
+      if (!(await confirmar('Desmontar cubo', `Desmontar 1 ${cubo.nome} e receber ${numero(valor)} ${plural(valor)}? Não tem volta.`))) return;
+      if (!(save.itens[cubo.id] > 0)) return;
+      save.itens[cubo.id] -= 1;
+      if (save.itens[cubo.id] <= 0) delete save.itens[cubo.id];
+      save.fragmentos = saldo() + valor;
+      salvar(save);
+      aoMudar();
+      aviso = `Desmontou ${cubo.nome} e recebeu ${numero(valor)} ${plural(valor)}.`;
+      janela.redesenhar();
+    };
     return el('div', { class: 'loja loja-temporal' },
       el('div', { class: 'topo-loja' }, el('span', { class: 'saldo' }, 'Saldo: ', iconeFragmento(), el('strong', {}, numero(saldo())), ` ${plural(saldo())}`)),
-      el('p', { class: 'meta' }, 'Cada cubo transforma um Pokémon na versão dele de outra era. Compre o cubo e use pela bolsa, como uma pedra de evolução.'),
+      el('p', { class: 'meta' }, 'Cada cubo transforma um Pokémon na versão dele de outra era. Compre o cubo e use pela bolsa, como uma pedra de evolução. Não quer um cubo que tem? Desmonte e receba Fragmentos Temporais de volta.'),
       el('nav', { class: 'abas abas-loja' },
         ...ERAS.map((e) => el('button', { class: `aba ${e.id === era ? 'ativa' : ''}`, onclick: () => ((era = e.id), (aviso = ''), janela.redesenhar()) }, e.nome))),
       el('p', { class: 'aviso-bolsa', hidden: !aviso, role: 'status' }, aviso),
@@ -54,7 +69,11 @@ export function abrirLojaTemporal(save: Save, aoMudar: () => void = () => {}): v
               el('p', {}, el('span', { class: 'origem' }, `Usar em ${cubo.origens.map((n) => pokemonPorId(n).nome).join(' ou ')}`), ` → ${pokemonPorId(cubo.especie).nome}`)),
             el('span', { class: 'quantidade', title: 'Na bolsa' }, `×${save.itens[cubo.id] ?? 0}`),
             el('span', { class: 'preco' }, iconeFragmento(), numero(preco)),
-            el('button', { class: 'botao', disabled: saldo() < preco, onclick: () => comprar(cubo) }, 'Comprar'));
+            el('div', { class: 'botoes-cubo' },
+              el('button', { class: 'botao', disabled: saldo() < preco, onclick: () => comprar(cubo) }, 'Comprar'),
+              (save.itens[cubo.id] ?? 0) > 0
+                ? el('button', { class: 'botao botao-desmontar', title: `Recebe ${numero(RECICLAGEM_CUBO[cubo.era])} ${plural(RECICLAGEM_CUBO[cubo.era])}`, onclick: () => void desmontar(cubo) }, `Desmontar (+${numero(RECICLAGEM_CUBO[cubo.era])})`)
+                : null));
         })));
   }, { classe: 'janela-loja' });
 }

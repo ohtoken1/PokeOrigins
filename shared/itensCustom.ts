@@ -108,8 +108,10 @@ export const cubosDaOrigem = (especie: number): Cubo[] => CUBOS.filter((c) => c.
 /** Moeda da loja do Viajante do tempo (`save.fragmentos`). */
 export const NOME_FRAGMENTO = 'Fragmento Temporal';
 export const ICONE_FRAGMENTO = 'itens/fragmento-temporal.svg';
-/** Preço de cada cubo em Fragmentos Temporais (provisório). */
-export const PRECO_CUBO: Record<EraCubo, number> = { passado: 1, futuro: 1, lendario: 1 };
+/** Preço de cada cubo em Fragmentos Temporais (pedido do dono: 10 todos). */
+export const PRECO_CUBO: Record<EraCubo, number> = { passado: 10, futuro: 10, lendario: 10 };
+/** Quanto o Viajante do tempo devolve ao desmontar um cubo que o jogador não quer (metade do preço). */
+export const RECICLAGEM_CUBO: Record<EraCubo, number> = { passado: 5, futuro: 5, lendario: 5 };
 
 /** Moedas dos eventos sazonais (ainda sem imagem e sem uso: o dono vai desenhar). */
 export const MOEDAS_SAZONAIS: { id: string; nome: string; evento: string }[] = [

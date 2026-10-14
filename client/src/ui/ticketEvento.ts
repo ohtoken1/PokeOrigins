@@ -18,29 +18,42 @@ function tom(cor: string, f: number): string {
 }
 
 /**
- * Tickets de PRÊMIO (os que se abrem na bolsa): o mesmo bilhete, na cor do Pokémon e com a inicial dele (pedido do
- * dono: Kyogre = K azul, Groudon = G vermelho). id do ticket → [letra, cor do bilhete, cor da faixa].
+ * Ícone das ORBS (os antigos tickets de prêmio; pedido do dono, modelo escolhido na prévia `previa-orbs.html`): orbe de
+ * vidro na cor do Pokémon, com o sprite dele dentro, numa base dourada. id do item → [número na Pokédex, cor do vidro].
+ * Orb nova: acrescentar aqui. Devolve null se o item não tem orbe (a Chave Temporal usa a chave).
  */
-const TICKETS_DE_POKEMON: Record<string, [string, string, string]> = {
-  'ticket-kyogre': ['K', '#3f7fe0', '#b3262b'],
-  'ticket-groudon': ['G', '#d8453a', '#3a3a44'],
-  'ticket-giratina': ['G', '#8f889c', '#a8222a'],
-  'ticket-hoopa': ['H', '#d06fb4', '#6a3f8f'],
-  'ticket-dialga': ['D', '#5d8fc8', '#27457a'],
-  'ticket-palkia': ['P', '#e2aed2', '#8a4f86'],
-  'ticket-arceus': ['A', '#f1ede0', '#b98f22'],
-  'ticket-therian': ['T', '#e08a3a', '#3f7f45'],
-  'ticket-kyurem': ['K', '#aecbd9', '#4a5560'],
-  'ticket-zacian': ['Z', '#45aee0', '#b8324f'],
-  'ticket-zamazenta': ['Z', '#d24a4a', '#2f4f9a'],
-  'ticket-ogerpon': ['O', '#58ad62', '#2d6b3a'],
+const ORBS: Record<string, [number, string]> = {
+  'ticket-kyogre': [382, '#2f6fd6'],
+  'ticket-groudon': [383, '#c8322b'],
+  'ticket-giratina': [487, '#6f6584'],
+  'ticket-hoopa': [720, '#b0569a'],
+  'ticket-dialga': [483, '#4a74b8'],
+  'ticket-palkia': [484, '#c98bbd'],
+  'ticket-arceus': [493, '#d6c48a'],
+  'ticket-therian': [645, '#d27a35'],
+  'ticket-kyurem': [646, '#6f97ad'],
+  'ticket-zacian': [888, '#3f9fd2'],
+  'ticket-zamazenta': [889, '#c94545'],
+  'ticket-ogerpon': [1017, '#4e9d58'],
 };
-/** Ícone do ticket de prêmio, ou null se o ticket não tem desenho próprio (a Chave Temporal usa a chave). */
+const SPRITE_ORB = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 export function iconeTicketDoPokemon(id: string, largura = 30): HTMLElement | null {
-  const v = TICKETS_DE_POKEMON[id];
+  const v = ORBS[id];
   if (!v) return null;
-  const [letra, cor, faixa] = v;
-  return iconeTicketEvento(letra, '', [faixa, tom(faixa, -0.4), tom(faixa, -0.55)], largura, [tom(cor, 0.35), cor, tom(cor, -0.25), tom(cor, -0.65)]);
+  const [numero, cor] = v;
+  const n = proximoId++;
+  const caixa = el('span', { class: 'icone-orb', role: 'img', style: { width: `${largura}px`, height: `${largura}px` } });
+  caixa.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%" aria-hidden="true"><defs>
+  <radialGradient id="orb-v-${n}" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="${tom(cor, 0.55)}" stop-opacity=".9"/><stop offset=".6" stop-color="${cor}" stop-opacity=".75"/><stop offset="1" stop-color="${tom(cor, -0.55)}"/></radialGradient>
+  <linearGradient id="orb-b-${n}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6d77a"/><stop offset=".5" stop-color="#e9b949"/><stop offset="1" stop-color="#8a5f14"/></linearGradient>
+  <clipPath id="orb-c-${n}"><circle cx="32" cy="28" r="21"/></clipPath></defs>
+  <path d="M18 50h28l4 9H14z" fill="url(#orb-b-${n})" stroke="#5a3d0c" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M20 48h24v4H20z" fill="#c98f24" stroke="#5a3d0c" stroke-width="1.2"/>
+  <circle cx="32" cy="28" r="22" fill="url(#orb-v-${n})" stroke="${tom(cor, -0.55)}" stroke-width="2"/>
+  <image href="${SPRITE_ORB}/${numero}.png" x="6" y="3" width="52" height="52" clip-path="url(#orb-c-${n})" style="image-rendering: pixelated"/>
+  <circle cx="32" cy="28" r="21" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.5"/>
+  <ellipse cx="23" cy="16" rx="7" ry="3.6" fill="#fff" opacity=".6" transform="rotate(-30 23 16)"/></svg>`;
+  return caixa;
 }
 
 let proximoId = 0;

@@ -1,5 +1,5 @@
 import { Dex } from '@pkmn/sim';
-import { ATRIBUTOS, EV_MAX_TOTAL, atributos, especie, expParaNivel, hpMaximo, ppMaximo, type Atributo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { ATRIBUTOS, EV_MAX_TOTAL, atributos, especie, expParaNivel, hpMaximo, power, ppMaximo, type Atributo, type Atributos, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { nomeItemEquipado } from '../../../shared/usoItens';
 import { traduzir } from '../../../shared/traducao';
 import { pokemonPorId } from '../dados';
@@ -88,6 +88,14 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
   const totalEvs = ATRIBUTOS.reduce((s, a) => s + p.evs[a], 0);
   const totalBase = ATRIBUTOS.reduce((s, a) => s + base[a], 0);
   const visao = visaoDosIvs(p);
+  // Power: exato para quem vê os IVs exatos; faixa (com o menor e o maior IV da faixa) para quem vê a faixa; '?'
+  // antes da avaliação (senão ele entregaria os IVs escondidos)
+  const comIvs = (escolher: (iv: number) => number) => power({ ...p, ivs: Object.fromEntries(ATRIBUTOS.map((a) => [a, escolher(p.ivs[a])])) as Atributos });
+  const textoPower = visao === 'exato'
+    ? power(p).toLocaleString('pt-BR')
+    : visao === 'faixa'
+      ? `${comIvs((iv) => faixaDoIv(iv)[0]).toLocaleString('pt-BR')}–${comIvs((iv) => faixaDoIv(iv)[1]).toLocaleString('pt-BR')}`
+      : '?';
 
   const marca = (a: Atributo) => (natureza.plus === a ? el('span', { class: 'sobe', title: 'Natureza aumenta' }, '▲') : natureza.minus === a ? el('span', { class: 'desce', title: 'Natureza diminui' }, '▼') : null);
 
@@ -118,7 +126,8 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
           ? String(ATRIBUTOS.reduce((s, a) => s + p.ivs[a], 0))
           : visao === 'faixa'
             ? ATRIBUTOS.map((a) => faixaDoIv(p.ivs[a])).reduce(([x, y], [a, b]) => [x + a, y + b], [0, 0]).join('–')
-            : '?'), el('td', {}, `${totalEvs}/${EV_MAX_TOTAL}`), el('td'))),
+            : '?'), el('td', {}, `${totalEvs}/${EV_MAX_TOTAL}`), el('td')),
+      el('tr', { class: 'linha-power' }, el('th', { title: 'Soma dos 6 atributos finais (com nível, IVs, EVs e Nature). Quanto maior, mais forte.' }, '⚡ Power'), el('td', { colspan: '3' }), el('td', { class: 'valor' }, textoPower))),
   );
 
   const golpes = el(
