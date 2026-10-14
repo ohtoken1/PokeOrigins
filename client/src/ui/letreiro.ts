@@ -40,7 +40,7 @@ function item(a: Aviso): HTMLElement {
   if (a.tipo === 'staff') return el('span', { class: 'letreiro-item staff' }, el('strong', {}, 'Staff: '), a.texto);
   if (a.tipo === 'premio')
     return el('span', { class: `letreiro-item ${a.raridade}` }, '🎟️ ', el('strong', {}, a.jogador), ' tirou um prêmio ',
-      el('strong', { class: 'letreiro-pokemon' }, a.raridade === 'mitico' ? 'mítico' : 'lendário'), ` no ${a.ticket}!`);
+      el('strong', { class: 'letreiro-pokemon' }, a.raridade === 'mitico' ? 'mítico' : 'lendário'), ` na ${a.ticket}!`);
   const categoria = a.categoria ? NOME_CATEGORIA[a.categoria] : null;
   return el('span', { class: `letreiro-item ${a.shiny ? 'shiny' : a.categoria ?? ''}` },
     a.shiny ? '★ ' : '◆ ', el('strong', {}, a.jogador), ' capturou ', el('strong', { class: 'letreiro-pokemon' }, nomeDaEspecie(a.especieId)),

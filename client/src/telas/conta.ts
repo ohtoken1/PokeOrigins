@@ -222,7 +222,7 @@ function conteudoSkins(save: Save, redesenhar: () => void): HTMLElement[] {
               itemInegociavel(i.id)
                 ? el('small', { class: 'meta skin-nt', title: 'Esta skin não pode ser trocada nem vendida' }, '🔒 NT')
                 : el('button', { class: 'botao secundario skin-levar', title: 'Na bolsa a skin vira um item: pode ser trocada ou vendida no Mercado negro, mas não dá visual nem bônus', onclick: () => levar(i.id) }, 'Levar para a bolsa')))))
-      : el('p', { class: 'meta' }, 'Você ainda não tem nenhuma skin. Elas saem no lendário e no mítico dos tickets, de conquistas e de eventos.'),
+      : el('p', { class: 'meta' }, 'Você ainda não tem nenhuma skin. Elas saem no lendário e no mítico das Orbs, de conquistas e de eventos.'),
     naBolsa ? el('p', { class: 'meta' }, `Skins na bolsa: ${naBolsa}. Para voltar a usar, abra a bolsa e clique em Usar.`) : el('span', {}),
   ];
 }

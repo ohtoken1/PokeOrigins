@@ -98,7 +98,7 @@ const padrao = (id: string, nome: string, descricao: string, ...lendario: Premio
 /** Ticket do lendário: no lendário (0,9%) o próprio Pokémon, o item dele e a skin; no mítico (0,1%) a skin shiny. */
 const deLendario = (nome: string, especie: number, itemId: string): Ticket => ({
   id: `ticket-${nome.toLowerCase()}`,
-  nome: `Ticket de ${nome}`,
+  nome: `Orb de ${nome}`,
   descricao: `Abra para sortear um prêmio. No lendário: ${nome} (IVs 15+, 5% de chance de shiny), o item dele ou a skin. No mítico: a skin shiny.`,
   premios: [
     ...COMUM, ...RARO, ...EPICO,
@@ -116,16 +116,16 @@ export const TICKETS: Ticket[] = [
   deLendario('Palkia', 484, 'lustrousglobe'),
   {
     id: 'ticket-arceus',
-    nome: 'Ticket de Arceus',
+    nome: 'Orb de Arceus',
     descricao: 'Abra para sortear um prêmio. No épico: uma Plate aleatória. No lendário: Arceus (IVs 10+, 5% de chance de shiny).',
     premios: [...COMUM, ...RARO, linha('epico', 0.05, { tipo: 'aleatorio', grupo: 'placa', quantidade: 1 }), linha('lendario', 0.01, pokemon(493, 10))],
   },
-  padrao('ticket-therian', 'Ticket Therian', 'Abra para sortear um prêmio. No lendário: Landorus, Thundurus, Tornadus ou Enamorus (IVs 15+, 5% de chance de shiny) ou a Reveal Glass.',
+  padrao('ticket-therian', 'Orb Therian', 'Abra para sortear um prêmio. No lendário: Landorus, Thundurus, Tornadus ou Enamorus (IVs 15+, 5% de chance de shiny) ou a Reveal Glass.',
     pokemon(645), pokemon(642), pokemon(641), pokemon(905), item('revealglass')),
   deLendario('Kyurem', 646, 'dnasplicers'),
   deLendario('Zacian', 888, 'rustedsword'),
   deLendario('Zamazenta', 889, 'rustedshield'),
-  padrao('ticket-ogerpon', 'Ticket de Ogerpon', 'Abra para sortear um prêmio. No lendário: Ogerpon (IVs 15+, 5% de chance de shiny) ou uma das 4 máscaras.',
+  padrao('ticket-ogerpon', 'Orb de Ogerpon', 'Abra para sortear um prêmio. No lendário: Ogerpon (IVs 15+, 5% de chance de shiny) ou uma das 4 máscaras.',
     pokemon(1017), item('tealmask'), item('hearthflamemask'), item('wellspringmask'), item('cornerstonemask')),
 ];
 

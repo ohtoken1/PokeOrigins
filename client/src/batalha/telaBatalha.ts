@@ -998,7 +998,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       const ticket = sortearTicketDaBatalha();
       if (ticket) {
         save.itens[ticket.id] = (save.itens[ticket.id] ?? 0) + 1;
-        await dizer(`Que sorte! Você encontrou um ${ticket.nome}! (está na Bolsa)`);
+        await dizer(`Que sorte! Você encontrou: ${ticket.nome}! (está na Bolsa)`);
       }
     }
     if (resultado === 'derrota') {

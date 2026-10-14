@@ -195,6 +195,16 @@ export function faixaVelocidade(p: BaseDeAtributos): [number, number] {
   return [com(0), com(31)];
 }
 
+/**
+ * POWER do Pokémon (pedido do dono, para ranquear os melhores e os piores): a soma dos 6 atributos finais (HP
+ * máximo, Attack, Defense, Sp. Atk, Sp. Def, Speed), já com nível, IVs, EVs e Nature. Forma de agora (Mega só na
+ * batalha, então não entra).
+ */
+export function power(p: BaseDeAtributos): number {
+  const v = atributos(p);
+  return ATRIBUTOS.reduce((s, a) => s + v[a], 0);
+}
+
 export function hpMaximo(p: BaseDeAtributos): number {
   return atributos(p).hp;
 }

@@ -177,7 +177,7 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
         roletas.girar(todos.map((x) => casaRoleta(x.pacote, x.raridade)), 5000, () => {
           const nome = raridades.find((x) => x.id === r.raridade)?.nome ?? '';
           resultado.replaceChildren(
-            el('p', { class: 'ticket-raridade' }, bolinha(r.raridade), n > 1 ? `${n} ${ehChave ? 'chaves usadas' : 'tickets abertos'} · o melhor: ${nome}!` : `${nome}!`),
+            el('p', { class: 'ticket-raridade' }, bolinha(r.raridade), n > 1 ? `${n} ${ehChave ? 'chaves usadas' : 'Orbs abertas'} · o melhor: ${nome}!` : `${nome}!`),
             el('div', { class: 'premios' }, ...todos.flatMap((x) => x.pacote.map((p, k) => cartaoPremio(p, x.shiny[k], x.raridade)))),
             el('div', { class: 'frases-premio' }, ...frases.map((f) => el('small', {}, f))),
           );

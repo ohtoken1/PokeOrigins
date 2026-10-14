@@ -48,7 +48,7 @@ export const CATEGORIAS_FORA_DA_LOJA: { id: CategoriaLoja; nome: string }[] = [
   { id: 'charms', nome: 'Charms' },
   { id: 'skins', nome: 'Skins' },
   { id: 'cubos', nome: 'Cubos' },
-  { id: 'tickets', nome: 'Tickets' },
+  { id: 'tickets', nome: 'Orbs' },
   { id: 'ovos', nome: 'Ovos' },
 ];
 /** Abas da bolsa e filtros da Database: todas. */

@@ -2481,3 +2481,14 @@ button.vaga.casa-box:hover { border-color: rgb(18 17 15 / 0.35); background: rgb
 .conquistas-a-resgatar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--destaque); background: rgb(233 185 73 / 0.12); }
 .aviso-conquista { animation: aviso-conquista-entra 0.35s ease-out; }
 @keyframes aviso-conquista-entra { from { transform: translateX(-30px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Orbs (antigos tickets de prêmio): orbe de vidro com o Pokémon dentro */
+.icone-orb { display: inline-block; }
+.icone-orb svg { display: block; }
+
+/* Viajante do tempo: desmontar cubo */
+.loja-temporal .botoes-cubo { display: flex; flex-direction: column; gap: 4px; align-items: stretch; }
+.loja-temporal .botao-desmontar { font-size: 0.78rem; padding: 4px 8px; white-space: nowrap; }
+
+/* Power do Pokémon (soma dos atributos finais) na ficha */
+.tabela-atributos .linha-power th, .tabela-atributos .linha-power td.valor { color: var(--destaque); font-weight: 800; }
