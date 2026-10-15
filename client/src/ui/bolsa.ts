@@ -5,13 +5,15 @@ import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, item
 import { SEGURAR_OU_EVOLUIR, ehEquipavel, ehItemDeHabilidade, usarItemDeHabilidade, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
 import { KIT_INICIANTE, cuboPorItem, ehSeloSazonal } from '../../../shared/itensCustom';
 import { sortearKit } from '../../../shared/kitIniciante';
+import { PASSE_PREMIUM } from '../../../shared/passeTemporadas';
+import { ativarPremium } from '../passe';
 import { FUSOES, GOLPE_DA_FORMA, ehItemDeForma, ivDaFusao, jaMudouDeForma, outrasFormas, proximaForma } from '../../../shared/formasPorItem';
 import { BOXES_INICIAIS, BOXES_MAXIMO, BOX_POKEMON, numeroDeBoxes, podeAbrirBox } from '../../../shared/pc';
 import { charmAte, charmAtivo, nomeCharm, tipoDoCharm, usarCharm } from '../../../shared/charms';
 import { textoDoTempo } from '../../../shared/viagem';
 import { pokemonPorId, todosOsPokemons } from '../dados';
 import { guardarNoPC, registrarCapturado, salvar, salvarAgora, type PokemonDoJogador, type Save } from '../estado';
-import { ehSkin, moverSkin, skinsNaBolsa } from '../../../shared/skins';
+import { ehSkin, moverSkin, quantidadeNt, skinsNaBolsa } from '../../../shared/skins';
 import { abrirJanela } from './janela';
 import { confirmar } from './confirmar';
 import { corTipo, el, seloTipo, spritePokemon } from './dom';
@@ -47,7 +49,7 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
 /** O botão do item: pela categoria; na aba Up, Ability Capsule e Ability Patch são de usar. */
 /** Itens que são gastos ao usar num Pokémon e não voltam: perguntam "tem certeza?" (pedido do dono). */
 const PEDE_CONFIRMACAO = (item: ItemLoja) => ['evolucao', 'cubos', 'mints', 'terashards', 'tm', 'tr', 'formas'].includes(item.categoria) || ehItemDeHabilidade(item.id);
-const acaoDe = (item: ItemLoja) => (ehItemDeHabilidade(item.id) || item.id === BOX_POKEMON || item.id === KIT_INICIANTE || ehItemDeForma(item.id) ? 'Usar' : ACAO[item.categoria]);
+const acaoDe = (item: ItemLoja) => (ehItemDeHabilidade(item.id) || item.id === BOX_POKEMON || item.id === KIT_INICIANTE || item.id === PASSE_PREMIUM || ehItemDeForma(item.id) ? 'Usar' : ACAO[item.categoria]);
 
 type Modo =
   | { tipo: 'lista' }
@@ -444,7 +446,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
               el('div', { class: 'mercado-icone-grande' }, iconeItem(item)),
               el('strong', { class: 'mercado-nome' }, item.nome),
               el('p', { class: 'mercado-desc' }, item.descricao),
-              el('div', { class: 'mercado-total' }, el('span', {}, 'Na bolsa'), el('span', { class: 'mercado-preco' }, `×${qtd}`)),
+              el('div', { class: 'mercado-total' }, el('span', {}, 'Na bolsa'), el('span', { class: 'mercado-preco' }, `×${qtd}`, quantidadeNt(save, item.id) ? el('small', { class: 'qtd-nt', title: 'NT: não pode ser trocado nem vendido' }, ` (${quantidadeNt(save, item.id)} NT)`) : null)),
               // charm: usa na conta (como uma poção); travado enquanto o bônus de 30 minutos daquele tipo está ativo
               (() => {
                 const tipo = tipoDoCharm(item.id);
@@ -517,6 +519,13 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                         for (const [id, quantidade] of Object.entries(kit.itens)) save.itens[id] = (save.itens[id] ?? 0) + quantidade;
                         save.silver += kit.silver;
                         concluir(`Kit iniciante aberto! Você recebeu Pokébolas, remédios, ${kit.silver.toLocaleString('pt-BR')} Poké Dólares, a ${itemDaLoja(kit.skin)?.nome ?? 'skin'} e um ${itemDaLoja(kit.charm)?.nome ?? 'Charm'}.`);
+                      } else if (item.id === PASSE_PREMIUM) {
+                        // libera a trilha premium da temporada em vigor (o item só é gasto se liberou)
+                        const r = ativarPremium(save);
+                        if (r.ok) {
+                          gastar(item.id);
+                          concluir(r.texto);
+                        } else aviso = r.texto;
                       } else if (item.id === BOX_POKEMON) {
                         // abre uma box nova no PC, sem escolher Pokémon
                         if (!podeAbrirBox(save)) aviso = `Você já tem as ${BOXES_MAXIMO} boxes do PC.`;

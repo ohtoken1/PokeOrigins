@@ -4,6 +4,8 @@
 // (server/src/safari.ts). Este arquivo não importa nada (o servidor também usa).
 
 /** Quantas salas tem um Safari e quantos Pokémon andam em cada uma. */
+/** Soma mínima dos IVs dos Pokémon do Safari: tier A ou melhor (pedido do dono; shared/tierIv.ts, A = 120+). */
+export const IVS_MINIMOS_SAFARI = 120;
 export const SALAS_SAFARI = 3;
 export const POKEMON_POR_SALA = 10;
 /**

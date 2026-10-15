@@ -97,6 +97,7 @@ function conferirOferta(save: SaveMin, oferta: Oferta, quem: string): PokemonSav
     if (p.inegociavel) throw new ErroConta(`${quem}: Pokémon NT não pode ser trocado.`, 409);
     if (p.trancado) throw new ErroConta(`${quem}: Pokémon trancado não pode ser trocado (destranque no PC).`, 409);
     if (p.fundido) throw new ErroConta(`${quem}: separe a fusão antes de trocar esse Pokémon.`, 409);
+    if (p.ovo) throw new ErroConta(`${quem}: ovos não podem ser trocados.`, 409);
     return p;
   });
   if (save.time.filter((p) => !oferta.pokemons.includes(p.uid ?? -1)).length < 1) throw new ErroConta(`${quem}: precisa ficar pelo menos 1 Pokémon no time.`, 409);

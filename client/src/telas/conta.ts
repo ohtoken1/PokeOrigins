@@ -1,7 +1,7 @@
 // Aba "Minha conta": Meu perfil (com os títulos), Conquistas e Minhas skins (Opções fica no mesmo menu, tela própria).
 import { bonusAtivoDaSkin, bonusDaSkin, moverSkin, skinsNaBolsa, skinsNaColecao, temSkin, textoBonusSkin } from '../../../shared/skins';
 import { itemInegociavel } from '../../../shared/naoTrocavel';
-import { BONUS_DO_TITULO, bonusDasConquistas, conquistaFeita, GRUPOS_CONQUISTA, textoRecompensa, TITULOS, tituloAtivo, type Conquista } from '../../../shared/conquistas';
+import { BONUS_DO_TITULO, bonusDasConquistas, conquistaFeita, GRUPOS_CONQUISTA, textoRecompensa, TITULOS, tituloAtivo, tituloLiberado, type Conquista } from '../../../shared/conquistas';
 import { aoConcluirConquista, progressoDasConquistas, resgatarConquista } from '../conquistas';
 import type { Tela } from '../main';
 import { TODOS_OS_ITENS } from '../../../shared/loja';
@@ -123,21 +123,21 @@ function painelTitulos(save: Save, aoMudar: () => void): HTMLElement {
   const emUso = tituloAtivo(save);
   return el('section', { class: 'perfil-painel painel-titulos' },
     el('h3', {}, 'Títulos'),
-    el('p', { class: 'meta' }, 'Escolha um título para mostrar no seu perfil. Eles são liberados por conquistas. O título em uso dá o bônus dele em shiny, lendários e iniciais, Poké Dólares e XP.'),
+    el('p', { class: 'meta' }, 'Escolha um título para mostrar no seu perfil. Eles são liberados por conquistas e pelo passe de batalha. O título em uso dá o bônus dele em shiny, lendários e iniciais, Poké Dólares e XP.'),
     el('div', { class: 'lista-titulos' },
       ...TITULOS.map((t) => {
-        const liberado = conquistaFeita(save, t.id);
+        const liberado = tituloLiberado(save, t.id);
         const usando = liberado && save.titulo === t.id;
         return el('button', {
           class: `titulo-opcao${usando ? ' em-uso' : ''}`, disabled: !liberado, 'aria-pressed': String(usando),
-          title: liberado ? (usando ? 'Clique para tirar' : 'Clique para usar') : `Conclua a conquista "${t.conquista}"`,
+          title: liberado ? (usando ? 'Clique para tirar' : 'Clique para usar') : t.origem ?? `Conclua a conquista "${t.conquista}"`,
           onclick: () => {
             // clicar de novo no que está em uso tira
             save.titulo = usando ? null : t.id;
             salvar(save);
             aoMudar();
           },
-        }, balaoTitulo(t.id), el('small', {},`+${Math.round(t.bonus * 100)}% de bônus · ${liberado ? (usando ? 'Em uso' : 'Liberado') : `Conquista: ${t.conquista}`}`));
+        }, balaoTitulo(t.id), el('small', {},`+${Math.round(t.bonus * 100)}% de bônus · ${liberado ? (usando ? 'Em uso' : 'Liberado') : t.origem ?? `Conquista: ${t.conquista}`}`));
       })),
     emUso ? null : el('small', { class: 'meta' }, 'Nenhum título em uso.'));
 }

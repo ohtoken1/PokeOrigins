@@ -8,6 +8,8 @@ import { ehLendario } from '../../shared/encontros';
 import { pokemonPorId } from './dados';
 import type { Aparencia } from './personagem/lpc';
 import type { EstadoPasse } from '../../shared/passe';
+import type { Canteiro } from '../../shared/craft';
+import type { CasalCreche } from '../../shared/breeding';
 import type { Viagem } from '../../shared/viagem';
 import type { EstadoSafari } from '../../shared/safari';
 import type { EstadoQuadro } from '../../shared/missoesQuadro';
@@ -19,6 +21,8 @@ export type PokemonDoJogador = PokemonIndividual & {
   box?: number;
   /** De onde veio, quando não foi capturado: ovo, ticket ou troca com outro jogador (as conquistas olham isso). */
   origem?: 'ovo' | 'ticket' | 'troca';
+  /** Ovo da creche que ainda não chocou (fica no PC; não luta, não troca; o choco vem depois). */
+  ovo?: { desde: number; passos?: number };
 };
 
 export interface Save {
@@ -75,6 +79,8 @@ export interface Save {
   skinBonus?: string | null;
   /** skins levadas para a bolsa para trocar ou vender (shared/skins.ts) */
   skinsNaBolsa?: Record<string, number>;
+  /** unidades NT de itens sem versão "-nt" (prêmios grátis do passe; shared/skins.ts quantidadeNt) */
+  itensNt?: Record<string, number>;
   /** Viagem de trem em andamento (shared/viagem.ts); quem cria e encerra é o servidor. */
   viagem?: Viagem | null;
   /** Safari (shared/safari.ts): entradas usadas hoje (do servidor) e o Safari em andamento. */
@@ -95,6 +101,14 @@ export interface Save {
   proximoIdPokemon?: number;
   /** Passe de batalha: XP e missões do dia (client/src/passe.ts). */
   passe?: EstadoPasse;
+  /** Canteiros do NPC de craft (um por nível de treinador; shared/craft.ts). */
+  canteiros?: Canteiro[];
+  /** Creche (breeding): casais guardados e ciclos de ovo (client/src/creche.ts). */
+  /** Expedição (client/src/expedicao.ts): os Pokémon ficam aqui até a volta */
+  expedicao?: { pokemons: PokemonDoJogador[]; inicio: number; fim: number; horas: number; faixa: number; power: number };
+  creche?: { casais: CasalCreche<PokemonDoJogador>[]; chocando?: { pokemon: PokemonDoJogador; pronto: number }[] };
+  /** títulos liberados fora das conquistas (passe de batalha…), ids de TITULOS_EXTRAS */
+  titulosGanhos?: string[];
   /** Quando virou treinador (ms). No MMO = data do cadastro da conta. */
   criadoEm?: number;
 }

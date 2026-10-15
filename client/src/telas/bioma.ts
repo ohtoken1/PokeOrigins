@@ -1,4 +1,8 @@
 import { comBonificacao } from '../bonificacao';
+import { tabelaComOutbreak } from '../outbreak';
+import { botaoDoNinho } from '../ninho';
+import { registrarNaCaptura } from '../ui/eventos';
+import { passoDosOvos } from '../creche';
 import { numeroNaDex } from '../../../shared/formasRegionais';
 import type { Tela } from '../main';
 import { aplicarLiderNoSelvagem, sortearEncontroComLider } from '../../../shared/campo';
@@ -147,6 +151,24 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     },
   }, '%');
   areaJogo.append(botaoChances, painelChances);
+  // Ninho (client/src/ninho.ts): botão no canto quando o ninho está neste mapa; a batalha é como a de um treinador (sem captura)
+  const ninho = botaoDoNinho(save, regiao.id, bioma.id, () => cena(), (equipe, nome, aoFim) => {
+    fugirDoEncontro();
+    emBatalha = true;
+    atualizarPausa();
+    abrirBatalha({
+      save, bioma, selvagem: equipe[0],
+      treinador: { nome: `Ninho de ${nome}`, titulo: 'Ninho', equipe, recompensa: 0, mensagemInicio: `Um ${nome} furioso saltou do ninho!` },
+      aoTerminar: (resultado) => {
+        aoFim(resultado === 'vitoria');
+        if (resultado === 'derrota') return navegar({ tela: 'regiao' });
+        atualizarTime();
+        emBatalha = false;
+        atualizarPausa();
+      },
+    });
+  }, () => atualizarTime());
+  areaJogo.append(ninho.elemento);
   const chat = montarChat();
   // o teto dos encontros agora é escolhido na aba Opções (barra do topo)
   raiz.append(
@@ -191,6 +213,8 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       // andar com um encontro aberto = fugir dele
       fugirDoEncontro();
       save.passos++;
+      // ovos do PC chocam com 1.000 passos (client/src/creche.ts)
+      passoDosOvos(save);
       atualizarContador();
       salvar(save);
     },
@@ -204,7 +228,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       // a habilidade do primeiro do time muda o sorteio (Static, Pressure, Intimidate…; shared/campo.ts)
       const lider = save.time[0];
       const encontro =
-        ajustes.especie !== null ? encontroForcado(pokemonPorId(ajustes.especie), faixaAtual(), ajustes) : sortearEncontroComLider(tabela, faixaAtual(), lider, ajustes);
+        ajustes.especie !== null ? encontroForcado(pokemonPorId(ajustes.especie), faixaAtual(), ajustes) : sortearEncontroComLider(tabelaComOutbreak(tabela, regiao.id, bioma.id), faixaAtual(), lider, ajustes);
       // Intimidate / Keen Eye afastaram um selvagem fraco: neste passo não aparece nada
       if (!encontro) return;
       if (!save.vistos.includes(encontro.pokemon.id)) save.vistos.push(encontro.pokemon.id);
@@ -229,6 +253,8 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
             selvagem,
             aoTerminar: (resultado) => {
               if (resultado === 'derrota') return navegar({ tela: 'regiao' });
+              // Evento de captura: o servidor confere a captura no save guardado
+              if (resultado === 'captura') void registrarNaCaptura(selvagem);
               atualizarTime();
               atualizarContador();
               emBatalha = false;
@@ -267,6 +293,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   });
 
   return () => {
+    ninho.parar();
     delete document.body.dataset.fundo;
     pararDeOuvirAdmin();
     pararDeOuvirJanelas();

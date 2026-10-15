@@ -63,7 +63,7 @@ export const missoesNoQuadro = (agora = Date.now()): MissaoQuadro[] =>
   });
 
 /** Os Pokémon do jogador (time e PC) da espécie que a missão pede. */
-export const candidatosDaMissao = (save: Save, m: MissaoQuadro): PokemonDoJogador[] => [...save.time, ...save.caixa].filter((p) => p.especieId === m.especie);
+export const candidatosDaMissao = (save: Save, m: MissaoQuadro): PokemonDoJogador[] => [...save.time, ...save.caixa].filter((p) => p.especieId === m.especie && !p.ovo);
 
 /**
  * O jogador apresenta um Pokémon dele no quadro (não entrega: continua com ele). O servidor confere no save

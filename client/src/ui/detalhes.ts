@@ -1,4 +1,5 @@
 import { Dex } from '@pkmn/sim';
+import { SPRITE_OVO } from '../creche';
 import { ATRIBUTOS, EV_MAX_TOTAL, atributos, especie, expParaNivel, hpMaximo, power, ppMaximo, type Atributo, type Atributos, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { nomeItemEquipado } from '../../../shared/usoItens';
 import { traduzir } from '../../../shared/traducao';
@@ -27,7 +28,7 @@ export function medidorAmizade(valor: number): HTMLElement {
 
 /** Ficha completa do Pokémon: atributos (base, IV, EV, valor final), natureza, habilidade e golpes. */
 export function abrirDetalhes(p: PokemonIndividual): void {
-  abrirJanela(pokemonPorId(p.especieId).nome, () => fichaPokemon(p), { classe: 'janela-detalhes' });
+  abrirJanela((p as { ovo?: unknown }).ovo ? 'Ovo' : pokemonPorId(p.especieId).nome, () => fichaPokemon(p), { classe: 'janela-detalhes' });
 }
 
 /**
@@ -77,6 +78,9 @@ function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | 
 }
 
 export function fichaPokemon(p: PokemonIndividual): HTMLElement {
+  // ovo da creche: só o ovo (quem está dentro, os IVs e os golpes aparecem ao chocar)
+  if ((p as { ovo?: unknown }).ovo)
+    return el('div', { class: 'ficha ficha-ovo' }, el('img', { class: 'ovo-ficha', src: SPRITE_OVO, alt: 'Ovo' }), el('h3', {}, 'Ovo'), el('p', { class: 'meta' }, 'Veio do Daycare. Ainda não chocou: o que está dentro é surpresa. Ovos não lutam, então ficam no PC. Chocam com 1.000 passos no mapa, ou a moça do Daycare choca para você.'));
   const dados = pokemonPorId(p.especieId);
   const natureza = Dex.natures.get(p.natureza);
   const habilidade = Dex.abilities.get(p.habilidade);

@@ -6,7 +6,7 @@
 // (jogo/cidadeDesenhos.ts e jogo/cidadePecas.ts). Por enquanto tudo é só visual (pedido do dono).
 import { TAM, aleatorioComSemente, type InfoCidade, type Mapa, type NpcMapa, type ObjetoMapa, type Terreno } from './mapa';
 import { APARENCIA_PADRAO } from '../personagem/lpc';
-import { ESTATUA_FONTE, QUADROS_ARENA, QUADROS_FONTE, RECORTE_MART, TAM_ARENA, TAM_FONTE, TAM_POSTE, desenharArena, desenharFonte, desenharMart, desenharPoste, estatuaDePedra } from './cidadeDesenhos';
+import { ESTATUA_FONTE, QUADROS_ARENA, QUADROS_FONTE, RECORTE_MART, TAM_ARENA, TAM_FONTE, TAM_GAIOLA, TAM_POSTE, desenharArena, desenharGaiolaFrente, desenharGaiolaFundo, desenharFonte, desenharMart, desenharPoste, estatuaDePedra } from './cidadeDesenhos';
 import { TAM_BARRACA, TAM_CORREIO, desenharBandeirolas, desenharBarraca, desenharCaixaCorreio, desenharCercaBranca, desenharCercaMadeira, desenharCercaViva } from './cidadePecas';
 import { CASAS_DOS_NPCS, RECORTE_BANCO, desenharBanco } from './cidadeCasas';
 import { dentroDoLago, hash2, ruido, ruidoFractal, type FormaLago } from './ruido';
@@ -87,6 +87,9 @@ export const PECAS: Record<string, Peca> = {
   maquinaAzul: { folha: 'outdoor', x: 272, y: 816, w: 16, h: 32, solidas: 1 },
   maquinaVerde: { folha: 'outdoor', x: 288, y: 816, w: 16, h: 32, solidas: 1 },
   poste: { ...TAM_POSTE, desenhar: () => [desenharPoste()], solidas: 1 },
+  // gaiola do boss (eventos): fundo atrás do boss, frente sempre por cima dele
+  gaiolaFundo: { ...TAM_GAIOLA, desenhar: () => [desenharGaiolaFundo()], solidas: 6 },
+  gaiolaFrente: { ...TAM_GAIOLA, desenhar: () => [desenharGaiolaFrente()], solidas: 0, alto: true },
   caixaCorreio: { ...TAM_CORREIO, desenhar: () => [desenharCaixaCorreio()], solidas: 1 },
   ...Object.fromEntries(ARBUSTOS.map(([x, y], i) => [`arbusto${i}`, { folha: 'outdoor', x, y, w: 16, h: 16, solidas: 1 } satisfies Peca])),
   ...Object.fromEntries(
@@ -131,10 +134,16 @@ const APARENCIA_VIAJANTE = { ...APARENCIA_PADRAO, pele: 'light', cabelo: 'swoop'
 const APARENCIA_GUILDAS = { ...APARENCIA_PADRAO, pele: 'brown', cabelo: 'shorthawk', corCabelo: 'ginger', camiseta: 'maroon', calca: 'brown', tenis: 'black', estampa: 'nenhuma' as const, cinto: true };
 /** Evento sazonal: roupa festiva, cabelo rosa. */
 const APARENCIA_SAZONAL = { ...APARENCIA_PADRAO, corpo: 'fem' as const, pele: 'light', cabelo: 'ponytail', corCabelo: 'pink', camiseta: 'yellow', calca: 'orange', tenis: 'white', estampa: 'nenhuma' as const, cinto: false };
+/** Eventos (Cofre e Loteria): moça da feira, de roupa vermelha e dourada. */
+const APARENCIA_EVENTOS = { ...APARENCIA_PADRAO, corpo: 'fem' as const, pele: 'bronze', cabelo: 'ponytail', corCabelo: 'blonde', camiseta: 'red', calca: 'black', tenis: 'white', estampa: 'nenhuma' as const, cinto: false };
 /** Homem Suspeito: roupa escura, sentado no banco do campo de flores. */
 const APARENCIA_SUSPEITO = { ...APARENCIA_PADRAO, pele: 'olive', cabelo: 'unkempt', corCabelo: 'black', camiseta: 'gray', calca: 'black', tenis: 'gray', estampa: 'nenhuma' as const, cinto: false };
 /** Safari: guia de roupa cáqui e verde. */
 const APARENCIA_SAFARI = { ...APARENCIA_PADRAO, pele: 'bronze', cabelo: 'buzzcut', corCabelo: 'dark_brown', camiseta: 'tan', calca: 'forest', tenis: 'brown', estampa: 'nenhuma' as const, cinto: true };
+/** Artesã (craft): jardineira de avental verde, na horta do leste. */
+const APARENCIA_ARTESA = { ...APARENCIA_PADRAO, corpo: 'fem' as const, pele: 'brown', cabelo: 'ponytail', corCabelo: 'ginger', camiseta: 'green', calca: 'brown', tenis: 'brown', estampa: 'nenhuma' as const, cinto: false };
+/** Creche (breeding): cuidadora de rosa, na frente da creche do Safari. */
+const APARENCIA_CRECHE = { ...APARENCIA_PADRAO, corpo: 'fem' as const, pele: 'light', cabelo: 'bob', corCabelo: 'blonde', camiseta: 'pink', calca: 'white', tenis: 'pink', estampa: 'nenhuma' as const, cinto: false };
 /** Mercado negro: todo de preto. */
 const APARENCIA_MERCADO_NEGRO = { ...APARENCIA_PADRAO, corpo: 'fem' as const, pele: 'taupe', cabelo: 'bob', corCabelo: 'purple', camiseta: 'black', calca: 'black', tenis: 'black', estampa: 'nenhuma' as const, cinto: false };
 const APARENCIA_TUTOR = { ...APARENCIA_PROFESSOR, corpo: 'fem' as const, pele: 'light', cabelo: 'ponytail', corCabelo: 'dark_brown', camiseta: 'teal', calca: 'navy' };
@@ -447,7 +456,10 @@ export function gerarMapaCidade(): Mapa {
   colocar('cercaBrancaV1', cercados[0].x1 + 0.5, baseSul + 1);
   colocar('cercaBrancaV1', cercados[1].x0 + 0.5, baseSul + 1);
   for (const c of cercados) marcar(c.x0, c.y0, c.x1 - c.x0 + 1, c.y1 - c.y0 + 1);
-  colocar('cafe', anel.x0 + 12.5, 68);
+  // gaiola do boss no lugar do café (pedido do dono): o Pokémon do Boss global/da guilda aparece dentro dela
+  colocar('gaiolaFundo', anel.x0 + 12.5, 68, 'Boss', 'boss');
+  colocar('gaiolaFrente', anel.x0 + 12.5, 68);
+  info.gaiola = { x: (anel.x0 + 12.5) * TAM, y: 68 * TAM - 30 };
   casa('casaMadeira2', anel.x0 + 19.5, 68);
   casa('casaVinho', espelho(anel.x0 + 12.5), 68);
   casa('casaVermelha', espelho(anel.x0 + 19.5), 68);
@@ -494,6 +506,12 @@ export function gerarMapaCidade(): Mapa {
     { x: (portaMercadoNegro?.[0] ?? cx + 16) - 1, y: baseSul, nome: 'Mercado negro', aparencia: APARENCIA_MERCADO_NEGRO, acao: 'mercadonegro' },
     // Safari: 3 salas com Pokémon de um tipo andando (telas/safari.ts)
     { x: (portaSafari?.[1] ?? anel.x0 + 10) + 1, y: baseSul, nome: 'Safari', aparencia: APARENCIA_SAFARI, acao: 'safari' },
+    // Daycare (breeding, ui/creche.ts): do outro lado da porta da creche do Safari (pedido do dono; o nome é Daycare)
+    { x: (portaSafari?.[0] ?? anel.x0 + 8) - 1, y: baseSul, nome: 'Daycare', aparencia: APARENCIA_CRECHE, acao: 'creche' },
+    // Eventos (Cofre e Loteria, ui/eventos.ts): na frente da barraca do meio da feira do oeste (pedido do dono)
+    { x: Math.floor(feira[1]), y: cy - 3, nome: 'Eventos', aparencia: APARENCIA_EVENTOS, acao: 'eventos' },
+    // Artesã (craft de Pokébolas e Charms + canteiros, ui/craft.ts): dentro da horta grande do leste, no portão (pedido do dono)
+    { x: Math.floor(espelhoX(horta.x0, horta.w) + horta.w / 2), y: horta.y0, nome: 'Artesã', aparencia: APARENCIA_ARTESA, acao: 'craft' },
   ];
   for (const n of npcs) {
     bloqueado[n.y][n.x] = true;

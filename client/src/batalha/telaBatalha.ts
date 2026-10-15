@@ -69,8 +69,10 @@ export interface OpcoesBatalha {
   selvagem: PokemonIndividual;
   bioma: Bioma;
   /** Duelo contra treinador NPC (sem captura nem fuga; recompensa em silver ao vencer). */
-  treinador?: { nome: string; titulo: string; equipe: PokemonIndividual[]; recompensa: number; imagem?: string; mensagemVitoria?: string; duelo?: boolean };
+  treinador?: { nome: string; titulo: string; equipe: PokemonIndividual[]; recompensa: number; imagem?: string; mensagemVitoria?: string; duelo?: boolean; /** frase do começo no lugar de "Fulano, título, quer batalhar!" (Ninho) */ mensagemInicio?: string };
   aoTerminar(resultado: ResultadoBatalha): void;
+  /** Boss (eventos): HP infinito, acaba em `turnos`; no fim, `aoDano` recebe o dano total causado. */
+  boss?: { turnos: number; aoDano(dano: number): void };
 }
 
 const hex = (cor: number) => `#${cor.toString(16).padStart(6, '0')}`;
@@ -180,7 +182,7 @@ function sortearFundo(biomaId: string): string | null {
   return lista ? `batalha/${lista[Math.floor(Math.random() * lista.length)]}` : null;
 }
 
-export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTerminar }: OpcoesBatalha): void {
+export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTerminar, boss }: OpcoesBatalha): void {
   // tema de batalha (selvagem ou treinador); volta para a música de fundo no fim
   tocarMusica('batalha');
   /** Quem está em campo do outro lado (num duelo, muda quando o treinador troca). */
@@ -196,6 +198,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     Math.random,
     treinador ? { nome: treinador.nome, equipe: treinador.equipe, nomesEquipe: treinador.equipe.map((p) => nomeDe(p.especieId)) } : null,
   );
+
+  if (boss) batalha.modoBoss(boss.turnos);
 
   // ---------- montagem da tela ----------
   const modo3D = usarSprites3D();
@@ -1007,6 +1011,11 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       curarTime(save);
     }
 
+    if (boss) {
+      const dano = batalha.danoNoBoss;
+      await dizer(`${batalha.turnosAcabaram ? 'Acabaram os turnos! ' : ''}Você causou ${dano.toLocaleString('pt-BR')} de dano no boss.`);
+      boss.aoDano(dano);
+    }
     salvar(save);
     fundo.remove();
     tocarMusica('fundo');
@@ -1015,7 +1024,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
 
   // ---------- início ----------
   (async () => {
-    if (treinador) await dizer(`${treinador.nome}, ${treinador.titulo}, quer batalhar!`);
+    if (treinador) await dizer(treinador.mensagemInicio ?? `${treinador.nome}, ${treinador.titulo}, quer batalhar!`);
     void tocarGrito(selvagem.especieId);
     await animarEntrada(spriteSelvagem);
     await dizer(treinador ? `${treinador.nome} enviou ${dadosSelvagem.nome}!` : `Um ${dadosSelvagem.nome} selvagem apareceu!`);

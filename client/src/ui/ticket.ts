@@ -11,6 +11,7 @@ import {
   type ResultadoTicket,
 } from '../../../shared/tickets';
 import { itemDaLoja } from '../../../shared/loja';
+import { TITULOS } from '../../../shared/conquistas';
 import { sortearIvs } from '../../../shared/ovos';
 import { IV_MIN_SHINY, hpMaximo } from '../../../shared/batalha/pokemon';
 import { adicionarVip } from '../../../shared/vip';
@@ -29,14 +30,17 @@ const PESO_RARIDADE: Record<Raridade, number> = { comum: 0, raro: 1, epico: 2, p
 const numero = (n: number) => n.toLocaleString('pt-BR');
 const porcentagem = (c: number) => `${numero(Math.round(c * 10000) / 100)}%`;
 
-/** Entrega os prêmios no save; devolve uma frase por prêmio. */
-function entregar(save: Save, r: ResultadoTicket): string[] {
+/** Entrega os prêmios no save; devolve uma frase por prêmio (também usada pelo passe de batalha). */
+export function entregar(save: Save, r: ResultadoTicket, opcoes: { nt?: boolean } = {}): string[] {
   return r.pacote.map((premio, i) => {
     if (premio.tipo === 'item') {
-      save.itens[premio.id] = (save.itens[premio.id] ?? 0) + premio.quantidade;
-      const item = itemDaLoja(premio.id);
+      // NT (trilha grátis do passe): a versão "-nt" do item, se existir; senão conta em `itensNt`
+      const id = opcoes.nt && itemDaLoja(`${premio.id}-nt`) ? `${premio.id}-nt` : premio.id;
+      save.itens[id] = (save.itens[id] ?? 0) + premio.quantidade;
+      if (opcoes.nt && id === premio.id) (save.itensNt ??= {})[id] = (save.itensNt[id] ?? 0) + premio.quantidade;
+      const item = itemDaLoja(id);
       // skins vão para Minha conta → Minhas skins
-      return `${item?.nome ?? premio.id} ×${premio.quantidade} foi para ${item?.categoria === 'skins' ? 'Minhas skins' : 'a bolsa'}.`;
+      return `${item?.nome ?? id} ×${premio.quantidade}${opcoes.nt && id === premio.id ? ' (NT)' : ''} foi para ${item?.categoria === 'skins' ? 'Minhas skins' : 'a bolsa'}.`;
     }
     if (premio.tipo === 'silver') {
       save.silver += premio.quantidade;
@@ -50,11 +54,16 @@ function entregar(save: Save, r: ResultadoTicket): string[] {
       adicionarVip(save, premio.dias);
       return `+${premio.dias} dia${premio.dias > 1 ? 's' : ''} de VIP na sua conta.`;
     }
+    if (premio.tipo === 'titulo') {
+      save.titulosGanhos = [...new Set([...(save.titulosGanhos ?? []), premio.id])];
+      return `Título "${TITULOS.find((t) => t.id === premio.id)?.nome ?? premio.id}" liberado (Minha conta → Meu perfil).`;
+    }
     const p = novoPokemon(premio.especie, premio.nivel, r.shiny[i]);
     // IVs mínimos do ticket (ex.: 15+); shiny continua com 15+ no mínimo
     p.ivs = sortearIvs(0, Math.max(premio.ivMinimo, r.shiny[i] ? IV_MIN_SHINY : 0));
     p.hp = hpMaximo(p);
     p.origem = 'ticket';
+    if (opcoes.nt) p.inegociavel = true;
     registrarCapturado(save, premio.especie, r.shiny[i]);
     const nome = `${pokemonPorId(premio.especie).nome}${r.shiny[i] ? ' ✨' : ''}`;
     if (save.time.length < TAMANHO_MAXIMO_TIME) {
@@ -65,8 +74,8 @@ function entregar(save: Save, r: ResultadoTicket): string[] {
   });
 }
 
-/** Imagem e textos de um prêmio (serve para a roleta e para os cartões). */
-function visualPremio(premio: Premio, shiny = false): { imagem: HTMLElement; nome: string; qtd: string } {
+/** Imagem e textos de um prêmio (serve para a roleta, os cartões e o passe de batalha). */
+export function visualPremio(premio: Premio, shiny = false): { imagem: HTMLElement; nome: string; qtd: string } {
   if (premio.tipo === 'pokemon') {
     const dados = pokemonPorId(premio.especie);
     return { imagem: spritePokemon(dados, { shiny, animado: false }), nome: `${dados.nome}${shiny ? ' ✨' : ''}`, qtd: `Nv. ${premio.nivel} · IVs ${premio.ivMinimo}+` };
@@ -74,6 +83,7 @@ function visualPremio(premio: Premio, shiny = false): { imagem: HTMLElement; nom
   if (premio.tipo === 'silver' || premio.tipo === 'gold')
     return { imagem: el('span', { class: `icone-moeda moeda-${premio.tipo}` }), nome: premio.tipo === 'silver' ? 'Poké Dólar' : 'Origin Coin', qtd: numero(premio.quantidade) };
   if (premio.tipo === 'vip') return { imagem: el('span', { class: 'icone-vip' }, 'VIP'), nome: 'VIP', qtd: `${premio.dias} dia${premio.dias > 1 ? 's' : ''}` };
+  if (premio.tipo === 'titulo') return { imagem: el('span', { class: 'icone-titulo', 'aria-hidden': 'true' }, '🏷️'), nome: `Título ${TITULOS.find((t) => t.id === premio.id)?.nome ?? premio.id}`, qtd: 'Título' };
   if (premio.tipo === 'aleatorio') {
     const [exemplo, nome] = (
       {
@@ -83,6 +93,7 @@ function visualPremio(premio: Premio, shiny = false): { imagem: HTMLElement; nom
         fruta: ['oranberry', 'Berry aleatória'],
         apricorn: ['apricorn-red', 'Apricorn aleatório'],
         energia: ['energy-normal', 'Energy aleatória'],
+        charm: ['charm-fire', 'Charm aleatório'],
       } as const
     )[premio.grupo];
     const item = itemDaLoja(exemplo);

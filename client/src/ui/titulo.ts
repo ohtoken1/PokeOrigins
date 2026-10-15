@@ -19,6 +19,7 @@ const VISUAIS: Record<string, VisualTitulo> = {
   'gold-10000': { tema: 'riqueza', grau: 4, simbolo: '💎' },
   'lendario-shiny': { tema: 'shiny', grau: 4, simbolo: '✨' },
   'ticket-mitico': { tema: 'mitico', grau: 4, simbolo: '🎰' },
+  'passe-nov26': { tema: 'riqueza', grau: 3, simbolo: '🎫' },
 };
 const PADRAO: VisualTitulo = { tema: 'riqueza', grau: 2, simbolo: '🏅' };
 

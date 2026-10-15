@@ -9,7 +9,8 @@ type Aviso =
   | { id: number; quando: number; tipo: 'captura'; jogador: string; especieId: number; shiny: boolean; categoria: string | null }
   | { id: number; quando: number; tipo: 'premio'; jogador: string; raridade: string; ticket: string }
   | { id: number; quando: number; tipo: 'staff'; texto: string }
-  | { id: number; quando: number; tipo: 'banido'; jogador: string };
+  | { id: number; quando: number; tipo: 'banido'; jogador: string }
+  | { id: number; quando: number; tipo: 'evento'; texto: string };
 
 /** Quanto tempo um aviso continua passando. */
 const DURACAO_AVISO_MS = 30 * 60 * 1000;
@@ -37,6 +38,7 @@ function nomeDaEspecie(id: number): string {
 
 function item(a: Aviso): HTMLElement {
   if (a.tipo === 'banido') return el('span', { class: 'letreiro-item banido' }, '⛔ ', el('strong', {}, a.jogador), ' foi banido.');
+  if (a.tipo === 'evento') return el('span', { class: 'letreiro-item staff' }, a.texto);
   if (a.tipo === 'staff') return el('span', { class: 'letreiro-item staff' }, el('strong', {}, 'Staff: '), a.texto);
   if (a.tipo === 'premio')
     return el('span', { class: `letreiro-item ${a.raridade}` }, '🎟️ ', el('strong', {}, a.jogador), ' tirou um prêmio ',

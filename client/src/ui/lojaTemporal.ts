@@ -1,8 +1,9 @@
 // Loja do Viajante do tempo (NPC da praça da cidade): vende os cubos dos Pokémon do passado e do futuro, pagos em
 // Fragmentos Temporais (`save.fragmentos`). Parecida com o Pokémarket, com abas Passado / Futuro / Lendário.
-import { CUBOS, ICONE_FRAGMENTO, NOME_FRAGMENTO, PRECO_CUBO, RECICLAGEM_CUBO, type Cubo, type EraCubo } from '../../../shared/itensCustom';
+import { CUBOS, ICONE_FRAGMENTO, NOME_FRAGMENTO, PRECO_CHAVE_TEMPORAL, PRECO_CUBO, RECICLAGEM_CUBO, type Cubo, type EraCubo } from '../../../shared/itensCustom';
 import { confirmar } from './confirmar';
 import { itemDaLoja } from '../../../shared/loja';
+import { CHAVE_TEMPORAL } from '../../../shared/tickets';
 import { pokemonPorId } from '../dados';
 import { salvar, type Save } from '../estado';
 import { el } from './dom';
@@ -26,6 +27,18 @@ export function abrirLojaTemporal(save: Save, aoMudar: () => void = () => {}): v
   const saldo = () => save.fragmentos ?? 0;
 
   const janela = abrirJanela('Viajante do tempo', () => {
+    const comprarChave = () => {
+      if (saldo() < PRECO_CHAVE_TEMPORAL) aviso = 'Faltam Fragmentos Temporais para a Chave Temporal.';
+      else {
+        save.fragmentos = saldo() - PRECO_CHAVE_TEMPORAL;
+        save.itens[CHAVE_TEMPORAL.id] = (save.itens[CHAVE_TEMPORAL.id] ?? 0) + 1;
+        salvar(save);
+        aoMudar();
+        aviso = `Comprou a Chave Temporal por ${numero(PRECO_CHAVE_TEMPORAL)} ${plural(PRECO_CHAVE_TEMPORAL)}. Ela está na aba Orbs da bolsa.`;
+      }
+      janela.redesenhar();
+    };
+    const chave = itemDaLoja(CHAVE_TEMPORAL.id);
     const comprar = (cubo: Cubo) => {
       const preco = PRECO_CUBO[cubo.era];
       if (saldo() < preco) aviso = `Faltam Fragmentos Temporais para o ${cubo.nome}.`;
@@ -55,6 +68,13 @@ export function abrirLojaTemporal(save: Save, aoMudar: () => void = () => {}): v
     return el('div', { class: 'loja loja-temporal' },
       el('div', { class: 'topo-loja' }, el('span', { class: 'saldo' }, 'Saldo: ', iconeFragmento(), el('strong', {}, numero(saldo())), ` ${plural(saldo())}`)),
       el('p', { class: 'meta' }, 'Cada cubo transforma um Pokémon na versão dele de outra era. Compre o cubo e use pela bolsa, como uma pedra de evolução. Não quer um cubo que tem? Desmonte e receba Fragmentos Temporais de volta.'),
+      el('div', { class: 'lista-loja' },
+        el('div', { class: 'linha-item' },
+          chave ? iconeItem(chave) : '',
+          el('div', { class: 'texto' }, el('strong', {}, 'Chave Temporal'), el('p', {}, 'Abre e sorteia um cubo do passado ou do futuro (1% de Koraidon ou Miraidon).')),
+          el('span', { class: 'quantidade', title: 'Na bolsa' }, `×${save.itens[CHAVE_TEMPORAL.id] ?? 0}`),
+          el('span', { class: 'preco' }, iconeFragmento(), numero(PRECO_CHAVE_TEMPORAL)),
+          el('div', { class: 'botoes-cubo' }, el('button', { class: 'botao', disabled: saldo() < PRECO_CHAVE_TEMPORAL, onclick: comprarChave }, 'Comprar')))),
       el('nav', { class: 'abas abas-loja' },
         ...ERAS.map((e) => el('button', { class: `aba ${e.id === era ? 'ativa' : ''}`, onclick: () => ((era = e.id), (aviso = ''), janela.redesenhar()) }, e.nome))),
       el('p', { class: 'aviso-bolsa', hidden: !aviso, role: 'status' }, aviso),

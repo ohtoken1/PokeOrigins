@@ -142,7 +142,7 @@ export const conquistaPorId = (id: string): Conquista | undefined => CONQUISTAS.
 /** As que contam para "conclua X% das conquistas" (todas menos as da própria coleção). */
 export const CONQUISTAS_CONTADAS = CONQUISTAS.filter((x) => x.parte === undefined);
 
-type ComConquistas = { conquistas?: Partial<EstadoConquistas> | null; titulo?: unknown };
+type ComConquistas = { conquistas?: Partial<EstadoConquistas> | null; titulo?: unknown; titulosGanhos?: unknown };
 const feitasDe = (s: ComConquistas): Record<string, number> => (s.conquistas && typeof s.conquistas === 'object' && s.conquistas.feitas && typeof s.conquistas.feitas === 'object' ? s.conquistas.feitas : {});
 export const conquistaFeita = (s: ComConquistas, id: string): boolean => !!feitasDe(s)[id];
 
@@ -181,6 +181,8 @@ export interface Titulo {
   conquista: string;
   /** bônus em tudo enquanto está em uso (0,01 = +1%) */
   bonus: number;
+  /** títulos que não vêm de conquista: como se consegue */
+  origem?: string;
 }
 /**
  * Bônus do título EM USO (números do dono), por id da conquista: vale para shiny, raros, silver e XP de Pokémon
@@ -195,16 +197,28 @@ export const BONUS_DO_TITULO: Record<string, number> = {
   'lendario-shiny': 0.04,
   'ticket-mitico': 0.04,
 };
-export const TITULOS: Titulo[] = CONQUISTAS.flatMap((x) => (x.recompensa.tipo === 'titulo' ? [{ id: x.id, nome: x.recompensa.titulo, conquista: x.nome, bonus: BONUS_DO_TITULO[x.id] ?? 0 }] : []));
-/** O título em uso: só vale se foi escolhido e a conquista dele está concluída. */
+/**
+ * Títulos que NÃO vêm de conquista (passe de batalha…): liberados por `save.titulosGanhos` (lista de ids).
+ * `origem` = como o jogador consegue (aparece no título trancado).
+ */
+export const TITULOS_EXTRAS: Titulo[] = [
+  { id: 'passe-nov26', nome: 'Passe Premium Nov/26', conquista: '', origem: 'Passe de batalha de novembro/2026 (premium)', bonus: 0 },
+];
+export const TITULOS: Titulo[] = [
+  ...CONQUISTAS.flatMap((x) => (x.recompensa.tipo === 'titulo' ? [{ id: x.id, nome: x.recompensa.titulo, conquista: x.nome, bonus: BONUS_DO_TITULO[x.id] ?? 0 }] : [])),
+  ...TITULOS_EXTRAS,
+];
+/** O jogador já liberou este título (pela conquista ou por outro caminho)? */
+export const tituloLiberado = (s: ComConquistas, id: string): boolean => conquistaFeita(s, id) || (Array.isArray(s.titulosGanhos) && s.titulosGanhos.includes(id));
+/** O título em uso: só vale se foi escolhido e está liberado. */
 export function tituloAtivo(s: ComConquistas): string | null {
   const t = typeof s.titulo === 'string' ? TITULOS.find((x) => x.id === s.titulo) : undefined;
-  return t && conquistaFeita(s, t.id) ? t.nome : null;
+  return t && tituloLiberado(s, t.id) ? t.nome : null;
 }
 /** Bônus do título em uso (0 sem título). */
 export function bonusDoTitulo(s: ComConquistas): number {
   const t = typeof s.titulo === 'string' ? TITULOS.find((x) => x.id === s.titulo) : undefined;
-  return t && conquistaFeita(s, t.id) ? t.bonus : 0;
+  return t && tituloLiberado(s, t.id) ? t.bonus : 0;
 }
 /** Multiplicador do título em uso (1 = sem título). */
 export const multTitulo = (s: ComConquistas) => 1 + bonusDoTitulo(s);

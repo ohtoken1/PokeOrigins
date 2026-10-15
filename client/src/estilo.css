@@ -2492,3 +2492,115 @@ button.vaga.casa-box:hover { border-color: rgb(18 17 15 / 0.35); background: rgb
 
 /* Power do Pokémon (soma dos atributos finais) na ficha */
 .tabela-atributos .linha-power th, .tabela-atributos .linha-power td.valor { color: var(--destaque); font-weight: 800; }
+
+/* Passe de batalha com recompensas (telas/inicio.ts): imagem sem nome, cartão ao passar o mouse, clicar resgata */
+button.passe-casa { position: relative; padding: 2px; color: inherit; font: inherit; cursor: default; overflow: hidden; }
+.passe-casa img, .passe-casa .sprite, .passe-casa canvas { max-width: 50px; max-height: 46px; object-fit: contain; }
+.passe-casa .icone-moeda { width: 28px; height: 28px; }
+.passe-casa .icone-titulo { font-size: 1.6rem; }
+.passe-casa .passe-qtd { position: absolute; right: 3px; bottom: 1px; font-size: 0.66rem; font-weight: 800; color: var(--texto); text-shadow: 0 1px 2px #000; }
+.passe-casa .passe-marca { position: absolute; left: 3px; top: 1px; font-size: 0.75rem; }
+.passe-casa.estado-pronto { cursor: pointer; border-color: var(--destaque); box-shadow: 0 0 10px rgb(233 185 73 / 0.55); animation: passe-pronto 1.6s ease-in-out infinite; }
+.passe-casa.estado-pronto:hover { background: rgb(233 185 73 / 0.25); }
+@keyframes passe-pronto { 50% { box-shadow: 0 0 3px rgb(233 185 73 / 0.3); } }
+.passe-casa.estado-resgatado > :not(.passe-marca) { opacity: 0.35; filter: grayscale(0.6); }
+.passe-casa.estado-trancado > :not(.passe-marca), .passe-casa.estado-longe > :not(.passe-marca) { opacity: 0.8; }
+.passe-coluna.alcancada .passe-nivel { color: var(--destaque); }
+.passe-aviso { margin: 6px 0; }
+
+/* Artesã (ui/craft.ts): Pokébolas, Charms e canteiros */
+.craft-lista, .craft-canteiros { display: flex; flex-direction: column; gap: 8px; }
+.craft-ingredientes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 3px; font-size: 0.8rem; }
+.craft-ingrediente { display: inline-flex; align-items: center; gap: 3px; font-variant-numeric: tabular-nums; }
+.craft-ingrediente.falta { color: #e27b6b; }
+.craft-ingrediente .icone-item, .craft-ingrediente .icone-png, .craft-ingrediente .icone-sd { transform: scale(0.8); }
+.craft-qtd { width: 58px; }
+.craft-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.craft-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; }
+.canteiro { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 6px; border-radius: 12px; border: 1px solid var(--borda); background: linear-gradient(180deg, rgb(255 255 255 / 0.04), rgb(96 64 34 / 0.35)); }
+.canteiro small { color: var(--texto-2); font-size: 0.7rem; }
+.canteiro .botao { padding: 4px 10px; font-size: 0.78rem; }
+.canteiro-terra { width: 42px; height: 26px; border-radius: 50%; background: radial-gradient(#6b4a2b, #3e2a17); }
+.canteiro-barra { width: 100%; height: 6px; margin: 0; }
+.canteiro.pronto { border-color: var(--destaque); box-shadow: 0 0 8px rgb(233 185 73 / 0.45); }
+.canteiro.seco { border-color: #5a7fa8; }
+.canteiro-estado { font-weight: 700; }
+.craft-tranca { font-weight: 700; }
+
+/* Creche (ui/creche.ts) */
+.creche-casais, .creche-escolha { display: flex; flex-direction: column; gap: 10px; }
+.creche-casal { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px; border-radius: 14px; border: 1px solid var(--borda); background: rgb(255 255 255 / 0.03); }
+.creche-casal.com-ovo { border-color: var(--destaque); box-shadow: 0 0 10px rgb(233 185 73 / 0.4); }
+.creche-par { display: flex; align-items: center; gap: 6px; }
+.creche-coracao { color: #e2557a; font-size: 1.2rem; }
+.creche-info { display: flex; flex-direction: column; gap: 4px; }
+.creche-ovo { color: var(--destaque); }
+.creche-acoes { display: flex; flex-wrap: wrap; gap: 6px; }
+.creche-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; max-height: 50vh; overflow-y: auto; }
+.creche-pokemon { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px; border-radius: 10px; border: 1px solid var(--borda); background: rgb(255 255 255 / 0.04); color: inherit; font: inherit; }
+button.creche-pokemon { cursor: pointer; }
+button.creche-pokemon:hover { border-color: var(--destaque); }
+.creche-pokemon img { width: 64px; height: 64px; object-fit: contain; image-rendering: pixelated; }
+.creche-pokemon small { color: var(--texto-2); font-size: 0.7rem; }
+
+/* ovo da creche no PC e na ficha */
+.casa-ovo { width: 40px; height: 40px; transform: scale(1.5); object-fit: contain; image-rendering: pixelated; }
+.ficha-ovo { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 12px; }
+.ovo-ficha { width: 96px; height: 96px; image-rendering: pixelated; }
+.creche-chocar { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--borda); }
+.creche-chocar h3 { margin: 0; font-size: 1rem; }
+.creche-ovos { display: flex; flex-direction: column; gap: 6px; }
+.creche-ovo-linha { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.creche-ovo-linha .casa-ovo { transform: none; width: 32px; height: 32px; }
+.creche-ovo-linha .botao { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; }
+.qtd-nt { color: var(--texto-2); font-weight: 600; }
+
+/* Outbreak (client/src/outbreak.ts): mesmo selo da viagem, uma linha abaixo */
+.avisos-eventos { position: fixed; left: 12px; bottom: 12px; z-index: 2050; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+.avisos-eventos .aviso-viagem { position: static; }
+.aviso-outbreak { border-color: #e0703a; }
+.aviso-outbreak strong { color: #ff9a5c; }
+
+/* Eventos: Cofre e Loteria (ui/eventos.ts) */
+.janela-eventos .janela-corpo { max-width: 560px; }
+.evento-bloco { padding: 12px 14px; margin-bottom: 12px; border-radius: 12px; background: rgb(26 24 21 / 0.6); border: 1px solid var(--borda); }
+.evento-bloco h3 { margin: 0 0 6px; color: var(--destaque); }
+.evento-compra { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
+.evento-compra input { width: 120px; }
+.eventos-staff input[type=text] { width: 320px; }
+.cofre-tentativa { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.cofre-roletas { display: flex; gap: 14px; }
+.cofre-roleta { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.cofre-roleta strong { font-size: 2.4rem; width: 56px; text-align: center; padding: 4px 0; border-radius: 10px; background: var(--fundo); border: 1px solid var(--destaque); font-variant-numeric: tabular-nums; }
+.janela-eventos .janela-corpo { max-width: 640px; }
+.expedicao-time { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.expedicao-time img { width: 56px; height: 56px; }
+.expedicao-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 6px; max-height: 260px; overflow-y: auto; margin: 6px 0; }
+.expedicao-pokemon { display: flex; flex-direction: column; align-items: center; padding: 4px; border-radius: 10px; background: var(--painel-2); border: 1px solid var(--borda); color: var(--texto); cursor: pointer; }
+.expedicao-pokemon img { width: 48px; height: 48px; }
+.expedicao-pokemon.escolhido { background: var(--dourado); color: var(--texto-no-dourado); }
+.evento-ranking { margin: 4px 0 0; padding-left: 22px; }
+/* Ninho (client/src/ninho.ts) */
+.aviso-ninho { border-color: #7fbf5a; }
+.aviso-ninho strong { color: #a6e07f; }
+.botao-ninho { position: absolute; left: 10px; top: 10px; z-index: 5; padding: 6px 12px; border-radius: 999px; background: rgb(18 17 15 / 0.9); border: 1px solid #a6e07f; color: #dff5cf; font-weight: 600; cursor: pointer; }
+.botao-ninho:hover:not(:disabled) { background: var(--dourado); color: var(--texto-no-dourado); }
+.botao-ninho:disabled { opacity: 0.7; cursor: not-allowed; }
+.botao-ninho[hidden] { display: none; }
+/* Roleta (ui/roleta.ts) */
+.roleta { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; justify-content: center; }
+.roleta-palco { position: relative; width: 240px; height: 240px; }
+.roleta-seta { position: absolute; left: 50%; top: -14px; transform: translateX(-50%); z-index: 2; color: var(--destaque); font-size: 1.6rem; }
+.roleta-roda { width: 240px; height: 240px; border-radius: 50%; border: 4px solid var(--destaque); position: relative; transition: transform 4s cubic-bezier(0.15, 0.85, 0.2, 1); }
+.roleta-numero { position: absolute; left: 50%; top: 50%; width: 20px; margin: -10px 0 0 -10px; text-align: center; font-weight: 700; color: #fff; text-shadow: 0 1px 2px #000; transform-origin: 10px 10px; }
+.roleta-lista { margin: 0; padding-left: 22px; font-size: 0.9rem; }
+.roleta-lista li { margin: 2px 0; }
+.roleta-lista small { color: var(--texto-2); }
+.roleta-cor { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }
+.roleta-resultado { width: 100%; text-align: center; font-size: 1.2rem; color: var(--destaque); font-weight: 700; margin: 0; }
+
+/* relógio de Brasília na barra do topo (ui/relogio.ts) */
+.relogio-topo { margin-left: auto; margin-right: 10px; font-size: 0.85rem; color: var(--texto-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.eventos-lista { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.evento-linha { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 10px; border-radius: 10px; background: rgb(26 24 21 / 0.6); border: 1px solid var(--borda); }
+.janela-boss .janela-corpo { max-width: 560px; }

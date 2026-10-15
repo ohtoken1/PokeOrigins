@@ -33,6 +33,8 @@ export interface InfoCidade {
   moradores: { x: number; y: number; raio: number }[];
   /** Pokémon soltos pela cidade (espécie, tile de casa, raio; raio 0 = parado) */
   pokemons: { especie: number; x: number; y: number; raio: number }[];
+  /** meio do chão da gaiola do boss (px; Boss global/da guilda aparece aqui) */
+  gaiola?: { x: number; y: number };
   /** postes (pixels do topo da lanterna) para a luz à noite */
   luzes: { x: number; y: number }[];
 }
