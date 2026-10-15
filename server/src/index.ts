@@ -18,6 +18,7 @@ import * as ranking from './ranking.ts';
 import * as entregas from './entregas.ts';
 import * as mercado from './mercado.ts';
 import * as banimentos from './banimentos.ts';
+import * as eventos from './eventos.ts';
 import { avisarDaStaff, estaOnline, ligarMundo } from './mundo.ts';
 import { tituloAtivo } from '../../shared/conquistas.ts';
 import { temSkin, type ComSkins } from '../../shared/skins.ts';
@@ -240,6 +241,31 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   if (caminho === '/api/safari/entrar' && metodo === 'POST') {
     const conta = exigirConta(req);
     return responder(res, 200, safari.entrar(conta, await lerCorpo(req)));
+  }
+
+  // ---- eventos: Cofre e Loteria (server/src/eventos.ts) ----
+  if (caminho === '/api/eventos' && metodo === 'GET') return responder(res, 200, eventos.estado(exigirConta(req)));
+  if (caminho === '/api/eventos/cofre/tentar' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, eventos.tentarCofre(conta, await lerCorpo(req)));
+  }
+  if (caminho === '/api/eventos/cofre/abrir' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, eventos.abrirCofre(conta, await lerCorpo(req)));
+  }
+  if (caminho === '/api/eventos/cofre/fechar' && metodo === 'POST') return responder(res, 200, eventos.fecharCofre(exigirConta(req)));
+  if (caminho === '/api/eventos/loteria/comprar' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, eventos.comprarBilhetes(conta, await lerCorpo(req)));
+  }
+  for (const [rota, f] of [['/api/eventos/ninho/entrar', eventos.entrarNoNinho], ['/api/eventos/ninho/resultado', eventos.resultadoDoNinho], ['/api/eventos/captura/iniciar', eventos.iniciarCaptura], ['/api/eventos/captura/registrar', eventos.registrarCaptura], ['/api/eventos/ligar', eventos.ligarEvento], ['/api/eventos/boss/iniciar', eventos.iniciarBoss], ['/api/eventos/boss/encerrar', eventos.encerrarBoss], ['/api/eventos/boss/entrar', eventos.entrarNoBoss], ['/api/eventos/boss/resultado', eventos.resultadoDoBoss]] as const)
+    if (caminho === rota && metodo === 'POST') {
+      const conta = exigirConta(req);
+      return responder(res, 200, f(conta, await lerCorpo(req)));
+    }
+  if (caminho === '/api/eventos/loteria/abastecer' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, eventos.abastecerLoteria(conta, await lerCorpo(req)));
   }
 
   // ---- anúncios da staff, lidos no mural da cidade (server/src/anuncios.ts) ----

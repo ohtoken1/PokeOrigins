@@ -84,7 +84,8 @@ export type AvisoLetreiro =
   | { id: number; quando: number; tipo: 'captura'; jogador: string; especieId: number; shiny: boolean; categoria: string | null }
   | { id: number; quando: number; tipo: 'premio'; jogador: string; raridade: string; ticket: string }
   | { id: number; quando: number; tipo: 'staff'; texto: string }
-  | { id: number; quando: number; tipo: 'banido'; jogador: string };
+  | { id: number; quando: number; tipo: 'banido'; jogador: string }
+  | { id: number; quando: number; tipo: 'evento'; texto: string };
 const letreiro: AvisoLetreiro[] = [];
 const ultimoAvisoDeCaptura = new Map<number, number>();
 let proximoAviso = 1;
@@ -100,6 +101,9 @@ export function derrubar(contaId: number): void {
 }
 /** Aviso de banimento para todos (server/src/banimentos.ts). */
 export const avisarBanimento = (jogador: string) => porNoLetreiro({ id: proximoAviso++, quando: Date.now(), tipo: 'banido', jogador });
+
+/** Aviso de um evento do jogo (Cofre, Loteria…), escrito pelo próprio servidor. */
+export const avisarEvento = (texto: string) => porNoLetreiro({ id: proximoAviso++, quando: Date.now(), tipo: 'evento', texto });
 
 /** Aviso escrito pela staff (Administração → Anúncios → Publicar aviso). Devolve o texto que foi para a barra. */
 export function avisarDaStaff(bruto: unknown): string {

@@ -266,11 +266,49 @@ export class BatalhaSelvagem {
     return this.lerEventos();
   }
 
+  // ---------- Boss (eventos): HP "infinito" e limite de turnos ----------
+  private hpBoss = 0;
+  private limiteTurnos = 0;
+  /** dano direto acumulado e o último HP visto no log (queimadura, veneno e outros "[from]" não contam: tiram % da vida enorme) */
+  private danoBoss = 0;
+  private hpVistoBoss = 0;
+  private lidasBoss = 0;
+  /** Liga o modo boss (antes de `iniciar`): o adversário ganha uma vida enorme no simulador e a luta acaba no turno `turnos`. */
+  modoBoss(turnos: number): void {
+    const b = this.objetosAdv[0];
+    this.hpBoss = 9_999_999;
+    b.maxhp = b.baseMaxhp = b.hp = this.hpBoss;
+    this.hpVistoBoss = this.hpBoss;
+    this.limiteTurnos = turnos;
+  }
+  private contarDanoNoBoss(): void {
+    const linhas = this.batalha.log;
+    for (; this.lidasBoss < linhas.length; this.lidasBoss++) {
+      const l = linhas[this.lidasBoss];
+      const m = /^\|-(damage|heal|sethp)\|p2a: [^|]*\|(\d+)\//.exec(l);
+      if (!m) continue;
+      const hp = Number(m[2]);
+      if (m[1] === 'damage' && !l.includes('[from]')) this.danoBoss += Math.max(0, this.hpVistoBoss - hp);
+      this.hpVistoBoss = hp;
+    }
+  }
+  /** Dano total causado no boss até agora. */
+  get danoNoBoss(): number {
+    if (!this.hpBoss) return 0;
+    this.contarDanoNoBoss();
+    return this.danoBoss;
+  }
+  /** No modo boss: passou do último turno. */
+  get turnosAcabaram(): boolean {
+    return this.limiteTurnos > 0 && this.batalha.turn > this.limiteTurnos;
+  }
+
   get terminou(): boolean {
-    return this.batalha.ended;
+    return this.batalha.ended || this.turnosAcabaram;
   }
 
   get vencedor(): Lado | null {
+    if (this.turnosAcabaram && !this.batalha.ended) return 'jogador';
     if (!this.batalha.ended) return null;
     return this.batalha.winner === 'Jogador' ? 'jogador' : 'selvagem';
   }
@@ -281,7 +319,7 @@ export class BatalhaSelvagem {
   }
 
   pedido(): Pedido {
-    if (this.batalha.ended) return { tipo: 'fim' };
+    if (this.batalha.ended || this.turnosAcabaram) return { tipo: 'fim' };
     const req = this.batalha.p1.activeRequest as any;
     if (req?.forceSwitch) return { tipo: 'troca' };
     const ativo = req.active[0];

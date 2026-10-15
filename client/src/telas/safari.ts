@@ -7,6 +7,9 @@ import { nomeTipo } from '../../../shared/traducao';
 import { abrirBatalha } from '../batalha/telaBatalha';
 import { pokemonPorId } from '../dados';
 import { carregarSave, novoPokemon, salvar, usarSave } from '../estado';
+import { sortearIvs } from '../../../shared/ovos';
+import { IV_MIN_SHINY, hpMaximo } from '../../../shared/batalha/pokemon';
+import { IVS_MINIMOS_SAFARI } from '../../../shared/safari';
 import type { BiomaScene, OpcoesBioma } from '../jogo/BiomaScene';
 import { mostrarJogo } from '../jogo/jogoUnico';
 import type { Tela } from '../main';
@@ -126,6 +129,9 @@ export const telaSafari: Tela = (raiz, navegar) => {
         cena()?.escolherNoSafari();
         atualizarTextos();
         const selvagem = novoPokemon(sorteado.id, sorteado.nivel, sorteado.shiny);
+        // só Pokémon tier A ou melhor no Safari (pedido do dono): soma dos IVs 120+; shiny continua com 15+ em cada
+        selvagem.ivs = sortearIvs(IVS_MINIMOS_SAFARI, sorteado.shiny ? IV_MIN_SHINY : 0);
+        selvagem.hp = hpMaximo(selvagem);
         // Synchronize (Nature) e Cute Charm (gênero) do primeiro do time valem como nos mapas
         aplicarLiderNoSelvagem(selvagem, save.time[0]);
         emBatalha = true;

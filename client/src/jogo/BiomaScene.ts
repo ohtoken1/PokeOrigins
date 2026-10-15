@@ -12,7 +12,7 @@ import { PAUSA_MINIMA_ENCONTRO_MS } from '../../../shared/encontros';
 import { desenharPersonagem, type Direcao, type Quadro } from './personagem';
 import { montarPersonagem, type FolhasPersonagem } from '../personagem/lpc';
 import { BrilhoShiny, BrilhoSkin } from './brilhoSkin';
-import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
+import { DIRECAO_PMD, carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
 import { garantirTexturaLpc, OutrosJogadores, texturaDaAura } from './outrosJogadores';
 import { digitando } from '../ui/digitando';
 import { entrarNaSala, moverOnline, sairDaSalaOnline, visualOnline, type DirecaoOnline, type JogadorOnline, type VisualOnline } from '../online';
@@ -128,6 +128,12 @@ const DIRECOES_POR_TECLA: Record<string, [number, number]> = {
 /** Mapa visto de cima, andando de quadrado em quadrado (setas ou WASD), com a câmera seguindo. */
 export class BiomaScene extends Phaser.Scene {
   private mapa!: Mapa;
+  /** Ninho (client/src/ninho.ts): o pedido fica guardado e é desenhado quando o mapa estiver pronto. */
+  private ninhoPedido: { especie: number; semente: string; aoClicar: () => void } | null = null;
+  private ninhoObjetos: Phaser.GameObjects.GameObject[] = [];
+  /** Boss (client/src/boss.ts): o Pokémon furioso andando dentro da gaiola da cidade, com o tempo em cima. */
+  private bossPedido: { especie: number; fim: number; aoClicar: () => void } | null = null;
+  private bossObjetos: Phaser.GameObjects.GameObject[] = [];
   private jogador!: Phaser.GameObjects.Image;
   /** o seguidor é um container (anda de tile em tile) com a imagem dentro (balança parado no lugar) */
   private seguidor!: Phaser.GameObjects.Container;
@@ -185,6 +191,8 @@ export class BiomaScene extends Phaser.Scene {
    * num bioma chama init de novo com as opções daquele bioma, e o estado volta ao inicial.
    */
   init(opcoes: OpcoesBioma) {
+    this.ninhoObjetos = [];
+    this.bossObjetos = [];
     this.opcoes = opcoes;
     this.dadosSeguidor = opcoes.seguidor;
     this.rastro = [];
@@ -325,7 +333,135 @@ export class BiomaScene extends Phaser.Scene {
       teclado.disableGlobalCapture();
     });
     this.entrarOnline();
+    this.mostrarNinho(this.ninhoPedido);
+    this.mostrarBoss(this.bossPedido);
     this.opcoes.aoPronto?.();
+  }
+
+  /**
+   * Mostra o ninho no mapa (null tira): um ninho de gravetos num tile livre sorteado pela semente (perdeu → semente
+   * nova → outro lugar), com o Pokémon em cima balançando. Clicar no ninho chama `aoClicar`.
+   */
+  /** Mostra (null tira) o boss na gaiola da cidade: sprite de andar do PMD maior, aura roxa e o tempo que falta em cima. */
+  mostrarBoss(pedido: { especie: number; fim: number; aoClicar: () => void } | null): void {
+    const mesmo = pedido && this.bossPedido && pedido.especie === this.bossPedido.especie && pedido.fim === this.bossPedido.fim && this.bossObjetos.length;
+    this.bossPedido = pedido;
+    const gaiola = this.mapa?.cidade?.gaiola;
+    if (!gaiola || !this.sys.isActive() || mesmo) return;
+    this.bossObjetos.forEach((o) => o.destroy());
+    this.bossObjetos = [];
+    if (!pedido) return;
+    const { x, y } = gaiola;
+    // na frente do chão da gaiola (que vai até a linha de baixo dela) e atrás das grades (peça alta, sempre por cima)
+    const fundo = y + 34;
+    const camada = y + 36;
+    // aura roxa no chão, pulsando
+    const aura = this.add.ellipse(x, y + 2, 70, 22, 0x9b30ff, 0.45).setDepth(fundo).setBlendMode(Phaser.BlendModes.ADD);
+    const aura2 = this.add.ellipse(x, y - 14, 60, 60, 0x7a1fd6, 0.22).setDepth(fundo).setBlendMode(Phaser.BlendModes.ADD);
+    this.tweens.add({ targets: [aura, aura2], alpha: 0.12, scale: 1.15, duration: 800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    const zona = this.add.zone(x, y - 20, 110, 70).setInteractive({ useHandCursor: true }).setDepth(fundo);
+    zona.on('pointerdown', () => this.bossPedido?.aoClicar());
+    // tempo que falta, em cima da gaiola
+    const tempo = this.add.text(x, y - 44, '', { fontFamily: 'monospace', fontSize: '28px', color: '#e6c7ff', stroke: '#2a0a3d', strokeThickness: 6 }).setOrigin(0.5, 1).setScale(0.3).setDepth(100002);
+    const contar = () => {
+      const s = Math.max(0, Math.ceil((pedido.fim - Date.now()) / 1000));
+      tempo.setText(`${Math.floor(s / 3600)}:${String(Math.floor((s % 3600) / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`);
+    };
+    contar();
+    const relogio = this.time.addEvent({ delay: 1000, loop: true, callback: contar });
+    this.bossObjetos.push(aura, aura2, zona, tempo, relogio as unknown as Phaser.GameObjects.GameObject);
+    const roxo = (s: Phaser.GameObjects.Sprite) => {
+      s.setTint(0xe3c4ff);
+      (s as unknown as { preFX?: { addGlow(cor: number, forca: number, interna: number, so: boolean): void } }).preFX?.addGlow(0xa040ff, 4, 0, false);
+    };
+    carregarPmd(this, pedido.especie, false).then((pmd) => {
+      if (!this.sys.isActive() || this.bossPedido !== pedido) return;
+      if (!pmd) {
+        // sem sprite de mapa: a imagem de batalha, maior, balançando
+        const chave = `boss-img-${pedido.especie}`;
+        const usar = () => {
+          if (!this.sys.isActive() || this.bossPedido !== pedido) return;
+          const s = this.add.sprite(x, y, chave).setOrigin(0.5, 0.85).setScale(0.8).setDepth(camada);
+          roxo(s);
+          this.tweens.add({ targets: s, y: y - 3, duration: 500, yoyo: true, repeat: -1 });
+          this.bossObjetos.push(s);
+        };
+        if (this.textures.exists(chave)) return usar();
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => (this.textures.exists(chave) || this.textures.addImage(chave, img), usar());
+        img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pedido.especie}.png`;
+        return;
+      }
+      // anda de um lado para o outro dentro da gaiola, maior que o normal (furioso)
+      const s = this.add.sprite(x - 30, y, `${pmd.prefixo}-Walk`).setOrigin(0.5, pmd.origemWalk).setScale(ESCALA_PMD * 1.9).setDepth(camada);
+      roxo(s);
+      s.play(`${pmd.prefixo}-walk-${DIRECAO_PMD.direita}`);
+      this.tweens.add({
+        targets: s, x: x + 30, duration: 2600, yoyo: true, repeat: -1,
+        onYoyo: () => s.play(`${pmd.prefixo}-walk-${DIRECAO_PMD.esquerda}`),
+        onRepeat: () => s.play(`${pmd.prefixo}-walk-${DIRECAO_PMD.direita}`),
+      });
+      this.bossObjetos.push(s);
+    });
+  }
+
+  mostrarNinho(pedido: { especie: number; semente: string; aoClicar: () => void } | null): void {
+    const mesmo = pedido && this.ninhoPedido && pedido.semente === this.ninhoPedido.semente && this.ninhoObjetos.length;
+    this.ninhoPedido = pedido;
+    if (!this.mapa || !this.sys.isActive() || mesmo) return;
+    this.ninhoObjetos.forEach((o) => o.destroy());
+    this.ninhoObjetos = [];
+    if (!pedido) return;
+    let h = 0;
+    for (const c of pedido.semente) h = (Math.imul(h, 31) + c.charCodeAt(0)) | 0;
+    const proximo = () => ((h = (Math.imul(h ^ (h >>> 15), 2246822507) + 0x9e3779b9) | 0) >>> 0) / 4294967296;
+    let tx = this.mapa.inicio.x;
+    let ty = this.mapa.inicio.y;
+    for (let i = 0; i < 400; i++) {
+      const x = 2 + Math.floor(proximo() * (this.mapa.largura - 4));
+      const y = 2 + Math.floor(proximo() * (this.mapa.altura - 4));
+      if (!this.mapa.bloqueado[y][x] && Math.abs(x - this.mapa.inicio.x) + Math.abs(y - this.mapa.inicio.y) > 6) {
+        tx = x;
+        ty = y;
+        break;
+      }
+    }
+    const px = tx * TAM + TAM / 2;
+    const py = ty * TAM + TAM - 3;
+    // ninho de gravetos: base escura, borda clara e uns gravetos atravessados
+    const g = this.add.graphics().setDepth(py - 1);
+    g.fillStyle(0x000000, 0.28).fillEllipse(px, py + 1, 30, 9);
+    g.fillStyle(0x5a3b1e, 1).fillEllipse(px, py - 2, 26, 11);
+    g.fillStyle(0x3b2412, 1).fillEllipse(px, py - 3, 18, 6);
+    g.lineStyle(1, 0x9a6b3a, 1);
+    for (let i = 0; i < 9; i++) {
+      const a = (i / 9) * Math.PI * 2;
+      g.lineBetween(px + Math.cos(a) * 9, py - 2 + Math.sin(a) * 3.5, px + Math.cos(a + 0.9) * 13, py - 2 + Math.sin(a + 0.9) * 5);
+    }
+    // brilho no chão para chamar a atenção
+    const brilho = this.add.ellipse(px, py - 2, 34, 13, 0xffe08a, 0.25).setDepth(py - 2).setBlendMode(Phaser.BlendModes.ADD);
+    this.tweens.add({ targets: brilho, alpha: 0.05, duration: 900, yoyo: true, repeat: -1 });
+    const zona = this.add.zone(px, py - 14, 34, 38).setInteractive({ useHandCursor: true }).setDepth(py);
+    zona.on('pointerdown', () => this.ninhoPedido?.aoClicar());
+    this.ninhoObjetos.push(g, brilho, zona);
+    // o Pokémon do ninho: a imagem de batalha (carregada fora do loader do Phaser), em cima do ninho
+    const chave = `ninho-img-${pedido.especie}`;
+    const usar = () => {
+      if (!this.sys.isActive() || this.ninhoPedido !== pedido) return;
+      this.textures.get(chave).setFilter(Phaser.Textures.FilterMode.LINEAR);
+      const s = this.add.sprite(px, py - 3, chave).setOrigin(0.5, 0.85).setScale(0.5).setDepth(py);
+      this.tweens.add({ targets: s, y: py - 5, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      this.ninhoObjetos.push(s);
+    };
+    if (this.textures.exists(chave)) return usar();
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      if (!this.textures.exists(chave)) this.textures.addImage(chave, img);
+      usar();
+    };
+    img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pedido.especie}.png`;
   }
 
   /** Textura (e quadro) de uma peça da cidade; peças com vários quadros ganham a animação `anim-<peça>`. */

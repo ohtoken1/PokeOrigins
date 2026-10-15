@@ -1,4 +1,5 @@
 import { nomeItemEquipado } from '../../../shared/usoItens';
+import { SPRITE_OVO } from '../creche';
 import { pokemonPorId } from '../dados';
 import { treinadorParaUsar } from '../../../shared/treinador';
 import { podeUsar, textoDoLimite } from '../limiteNivel';
@@ -44,7 +45,8 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
   const avaliado = (p: PokemonDoJogador) => !!(p.ivsFaixa || p.ivsRevelados);
   const somaIvs = (p: PokemonDoJogador) => Object.values(p.ivs).reduce((s, v) => s + v, 0);
   const noTime = (p: PokemonDoJogador) => save.time.includes(p);
-  const nome = (p: PokemonDoJogador) => pokemonPorId(p.especieId).nome;
+  // ovo da creche: não revela quem está dentro
+  const nome = (p: PokemonDoJogador) => (p.ovo ? 'Ovo' : pokemonPorId(p.especieId).nome);
 
   /** Tira o Pokémon de onde estiver (time ou PC). */
   const remover = (p: PokemonDoJogador) => {
@@ -218,8 +220,8 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
         const c = el(
           'button',
           { class: `vaga casa-box ${legenda ? 'casa-resultado' : ''} ${classes(p)}`, ...atributos },
-          spriteMapa(p.especieId, p.shiny),
-          p.shiny ? el('span', { class: 'casa-estrela', title: 'Shiny' }, '★') : null,
+          p.ovo ? el('img', { class: 'casa-ovo', src: SPRITE_OVO, alt: 'Ovo' }) : spriteMapa(p.especieId, p.shiny),
+          p.shiny && !p.ovo ? el('span', { class: 'casa-estrela', title: 'Shiny' }, '★') : null,
           p.trancado ? cadeado('casa-trancado') : null,
           legenda ? el('small', {}, legenda) : null,
         );
@@ -358,7 +360,7 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
                 title: !podeUsar(save, p) ? textoDoLimite(p) : save.time.length >= TAMANHO_MAXIMO_TIME ? 'Time cheio' : '',
                 onclick: () => (colocarNoTime(p, save.time.length), mudou(), refazer()),
               },
-              podeUsar(save, p) ? 'Levar para o time' : `🔒 Treinador nível ${treinadorParaUsar(p.nivel)}`,
+              p.ovo ? '🥚 Ovo não luta' : podeUsar(save, p) ? 'Levar para o time' : `🔒 Treinador nível ${treinadorParaUsar(p.nivel)}`,
             ),
           );
           const destino = el(
@@ -442,7 +444,7 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
                 ];
               })()
             : p
-              ? [el('strong', {}, `${nome(p)}${p.shiny ? ' ★' : ''} Nv. ${p.nivel}`), seloTier(p), ...acoes]
+              ? [el('strong', {}, p.ovo ? '🥚 Ovo' : `${nome(p)}${p.shiny ? ' ★' : ''} Nv. ${p.nivel}`), p.ovo ? null : seloTier(p), ...acoes]
               : el('span', { class: 'meta' }, 'Clique num Pokémon para ver as opções, arraste para mover, ou segure o clique para marcar vários e soltar juntos.'),
         ),
       );

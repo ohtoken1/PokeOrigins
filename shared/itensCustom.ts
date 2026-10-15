@@ -108,10 +108,12 @@ export const cubosDaOrigem = (especie: number): Cubo[] => CUBOS.filter((c) => c.
 /** Moeda da loja do Viajante do tempo (`save.fragmentos`). */
 export const NOME_FRAGMENTO = 'Fragmento Temporal';
 export const ICONE_FRAGMENTO = 'itens/fragmento-temporal.svg';
-/** Preço de cada cubo em Fragmentos Temporais (pedido do dono: 10 todos). */
-export const PRECO_CUBO: Record<EraCubo, number> = { passado: 10, futuro: 10, lendario: 10 };
+/** Preço de cada cubo em Fragmentos Temporais (pedido do dono: 25; Koraidon e Miraidon 100). */
+export const PRECO_CUBO: Record<EraCubo, number> = { passado: 25, futuro: 25, lendario: 100 };
 /** Quanto o Viajante do tempo devolve ao desmontar um cubo que o jogador não quer (metade do preço). */
-export const RECICLAGEM_CUBO: Record<EraCubo, number> = { passado: 5, futuro: 5, lendario: 5 };
+/** A Chave Temporal também é vendida pelo Viajante (pedido do dono). */
+export const PRECO_CHAVE_TEMPORAL = 10;
+export const RECICLAGEM_CUBO: Record<EraCubo, number> = { passado: 12, futuro: 12, lendario: 50 };
 
 /** Moedas dos eventos sazonais (ainda sem imagem e sem uso: o dono vai desenhar). */
 export const MOEDAS_SAZONAIS: { id: string; nome: string; evento: string }[] = [
@@ -143,6 +145,7 @@ export const ITENS_CUSTOM: ItemCustom[] = [
   ...TIPOS_DOS_CHARMS.map((t): ItemCustom => ({ id: idCharm(t), nome: nomeCharm(t), categoria: 'charms', charm: t, descricao: `Amuleto raro: use para os Pokémon do tipo ${t[0].toUpperCase()}${t.slice(1)} terem 20% a mais de chance de aparecer shiny por 30 minutos. Só um deste tipo por vez.` })),
   ...SELOS_SAZONAIS.map((s): ItemCustom => ({ id: s.id, nome: s.nome, categoria: 'chave', simbolo: '🏵️', descricao: `Selo do evento de ${s.evento}. Item de coleção: aparece no seu perfil, não na bolsa.` })),
   { id: VALE_POKE_S, nome: 'Vale Poke S', categoria: 'chave', simbolo: '🎟️', descricao: 'Procure a staff para ganhar um Pokémon à escolha S.' },
+  { id: 'passe-premium', nome: 'Passe Premium', categoria: 'chave', simbolo: '👑', descricao: 'Libera a trilha premium do passe de batalha da temporada em vigor. Use pela bolsa.' },
   { id: KIT_INICIANTE, nome: 'Kit iniciante', categoria: 'chave', simbolo: '🎒', descricao: 'Um kit para quem está começando: 50 Poké Balls, 30 Great Balls, 20 Ultra Balls, 10 Potions, 7 Super Potions, 5 Hyper Potions, 7 Revives, 1 Max Revive, 20.000 Poké Dólares, uma skin sorteada (Ash, Gary, May ou Misty) e um Charm sorteado. O kit e os itens dele são NT: não podem ser trocados.' },
   ...MOEDAS_SAZONAIS.map((m): ItemCustom => ({ id: m.id, nome: m.nome, categoria: 'chave', simbolo: '🪙', descricao: `Moeda do evento de ${m.evento}. Uso em breve.` })),
   ...CUBOS.map((c): ItemCustom => ({ id: c.id, nome: c.nome, categoria: 'cubos', cubo: { especie: c.especie, era: c.era }, descricao: `Transforma ${c.origens.map((n) => NOME_ORIGEM[n]).join(' ou ')} em ${c.nome.replace('Cubo de ', '')}, um Pokémon ${TEXTO_ERA[c.era]}. Use nele como uma pedra de evolução: IVs, EVs, natureza e shiny continuam os mesmos.` })),

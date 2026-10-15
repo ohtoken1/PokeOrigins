@@ -8,7 +8,10 @@ import { abrirJanela } from '../ui/janela';
 import { pokemonPorId } from '../dados';
 import { TAMANHO_MAXIMO_TIME, carregarSave, salvar, type PokemonDoJogador, type Save } from '../estado';
 import { NIVEIS_PASSE, XP_POR_MISSAO, XP_POR_NIVEL_PASSE, missaoCompleta, nivelPasse } from '../../../shared/passe';
-import { ondeMissao, passeDeHoje, textoMissao } from '../passe';
+import { estadoDaCasa, ondeMissao, passeDeHoje, resgatarDoPasse, textoMissao, type Trilha } from '../passe';
+import { temporadaAtual, type TemporadaPasse } from '../../../shared/passeTemporadas';
+import { visualPremio } from '../ui/ticket';
+import { comDica } from '../ui/dica';
 import { tornarArrastavel } from '../ui/arrastar';
 import { abrirDetalhes } from '../ui/detalhes';
 import { el, seloGenero, selosTipos, spritePokemon } from '../ui/dom';
@@ -54,28 +57,73 @@ function abrirMissoes(save: Save): void {
     ), { classe: 'janela-missoes' });
 }
 
-/** Passe de batalha: XP só das missões diárias; recompensas ainda vão ser definidas. */
+/** Imagem da recompensa (sem nome; pedido do dono) com o cartão de nome e descrição ao passar o mouse. */
+function casaDoPasse(save: Save, temporada: TemporadaPasse, trilha: Trilha, nivel: number, aoResgatar: (frases: string[]) => void): HTMLElement {
+  const premio = temporada[trilha][nivel - 1];
+  const v = visualPremio(premio);
+  // o cartão é o da casa inteira: tira o do ícone do item para não aparecerem dois
+  v.imagem.querySelectorAll<HTMLElement>('[data-item]').forEach((x) => delete x.dataset.item);
+  delete v.imagem.dataset.item;
+  const estado = estadoDaCasa(save, trilha, nivel);
+  const qtd = premio.tipo === 'item' || premio.tipo === 'aleatorio' ? premio.quantidade : 0;
+  // Poké Dólares e Origin Coins: o valor no canto (pedido do dono), curto (50.000 = 50 mil)
+  const valor = premio.tipo === 'silver' || premio.tipo === 'gold' ? (premio.quantidade >= 1000 ? `${(premio.quantidade / 1000).toLocaleString('pt-BR')} mil` : premio.quantidade.toLocaleString('pt-BR')) : '';
+  const casa = el('button', {
+    class: `passe-casa ${trilha} estado-${estado}`, type: 'button', disabled: estado !== 'pronto',
+    onclick: () => {
+      const frases = resgatarDoPasse(save, temporada, trilha, nivel);
+      if (frases) aoResgatar(frases);
+    },
+  }, v.imagem, qtd > 1 ? el('small', { class: 'passe-qtd' }, `×${qtd}`) : valor ? el('small', { class: 'passe-qtd' }, valor) : null, estado === 'resgatado' ? el('span', { class: 'passe-marca' }, '✓') : estado === 'trancado' ? el('span', { class: 'passe-marca' }, '🔒') : null);
+  return comDica(casa, () => {
+    const descricao = premio.tipo === 'item' ? itemDaLoja(premio.id)?.descricao : premio.tipo === 'aleatorio' ? 'O item é sorteado na hora de resgatar, e você recebe a quantidade toda dele.' : premio.tipo === 'pokemon' ? `Nível ${premio.nivel}, IVs sorteados, ${Math.round(premio.chanceShiny * 100)}% de chance de shiny.` : premio.tipo === 'titulo' ? 'Título para mostrar no seu perfil (Minha conta → Meu perfil).' : null;
+    const situacao = { resgatado: 'Já resgatado.', pronto: 'Clique para resgatar.', trancado: 'Trilha premium: libere com o item Passe Premium.', longe: `Chegue ao nível ${nivel} do passe.` }[estado];
+    const nt = trilha === 'gratis' && premio.tipo !== 'silver' && premio.tipo !== 'gold';
+    return [el('strong', {}, v.nome), v.qtd ? el('small', {}, v.qtd) : null, descricao ? el('p', { class: 'dica-golpe-desc' }, descricao) : null, nt ? el('small', { class: 'meta' }, '🔒 NT: não pode ser trocado nem vendido.') : null, el('small', { class: 'meta' }, situacao)];
+  });
+}
+
+/** Passe de batalha: XP só das missões diárias; recompensas da temporada (shared/passeTemporadas.ts). */
 function passeDeBatalha(save: Save): HTMLElement {
+  const caixa = el('section', { class: 'passe-batalha' });
+  let aviso = '';
+  const desenhar = () => caixa.replaceChildren(...conteudoDoPasse(save, aviso, (frases) => {
+    salvar(save);
+    aviso = frases.join(' ');
+    desenhar();
+  }).filter((x): x is HTMLElement => !!x));
+  desenhar();
+  return caixa;
+}
+
+function conteudoDoPasse(save: Save, aviso: string, aoResgatar: (frases: string[]) => void): (HTMLElement | null)[] {
   const passe = passeDeHoje(save);
+  const temporada = temporadaAtual();
   const nivel = nivelPasse(passe.xp);
   const noNivel = nivel >= NIVEIS_PASSE ? XP_POR_NIVEL_PASSE : passe.xp - nivel * XP_POR_NIVEL_PASSE;
   const feitasHoje = passe.missoes.filter(missaoCompleta).length;
-  const casa = (n: number, premium: boolean) =>
-    el('div', { class: `passe-casa ${premium ? 'premium' : 'gratis'} ${n <= nivel ? 'alcancada' : ''}`, title: 'Recompensa a definir' }, el('span', { class: 'passe-cadeado' }, '?'));
-  return el(
-    'section',
-    { class: 'passe-batalha' },
+  const casa = (n: number, trilha: Trilha) =>
+    temporada ? casaDoPasse(save, temporada, trilha, n, aoResgatar) : el('div', { class: `passe-casa ${trilha}`, title: 'Recompensa a definir' }, el('span', { class: 'passe-cadeado' }, '?'));
+  // tudo o que já dá para resgatar, de uma vez
+  const prontos = temporada ? (['gratis', 'premium'] as Trilha[]).flatMap((t) => Array.from({ length: NIVEIS_PASSE }, (_, i) => i + 1).filter((n) => estadoDaCasa(save, t, n) === 'pronto').map((n) => [t, n] as const)) : [];
+  const fim = temporada ? new Date(temporada.fim - 1).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }) : '';
+  return [
     el('div', { class: 'passe-topo' },
-      el('div', {}, el('h2', {}, 'Passe de batalha'), el('small', { class: 'meta' }, 'Temporada 1 · recompensas em breve')),
-      el('div', { class: 'passe-acoes' }, el('button', { class: 'botao secundario', onclick: () => abrirMissoes(save) }, `Missões ${feitasHoje}/${passe.missoes.length}`))),
+      el('div', {}, el('h2', {}, temporada?.nome ?? 'Passe de batalha'), el('small', { class: 'meta' }, temporada ? `Termina em ${fim} · ${passe.premium ? '👑 Premium liberado' : 'Premium: use o item Passe Premium'}` : 'Nenhuma temporada em andamento')),
+      el('div', { class: 'passe-acoes' },
+        prontos.length && temporada
+          ? el('button', { class: 'botao', onclick: () => aoResgatar(prontos.flatMap(([t, n]) => resgatarDoPasse(save, temporada, t, n) ?? [])) }, `Resgatar tudo (${prontos.length})`)
+          : null,
+        el('button', { class: 'botao secundario', onclick: () => abrirMissoes(save) }, `Missões ${feitasHoje}/${passe.missoes.length}`))),
+    aviso ? el('p', { class: 'aviso-bolsa passe-aviso', role: 'status' }, aviso) : null,
     el('div', { class: 'passe-progresso' },
       el('small', {}, `Nível ${nivel} de ${NIVEIS_PASSE}`),
       el('div', { class: 'barra-exp barra-passe' }, el('div', { class: 'preenchido', style: { width: `${(noNivel / XP_POR_NIVEL_PASSE) * 100}%` } }), el('span', {}, nivel >= NIVEIS_PASSE ? 'Completo!' : `${noNivel} / ${XP_POR_NIVEL_PASSE} XP`))),
     el('div', { class: 'passe-trilha' },
       el('div', { class: 'passe-rotulos' }, el('small', {}, 'Grátis'), el('small', {}, 'Premium')),
       ...Array.from({ length: NIVEIS_PASSE }, (_, i) =>
-        el('div', { class: 'passe-coluna' }, el('small', { class: 'passe-nivel' }, String(i + 1)), casa(i + 1, false), casa(i + 1, true)))),
-  );
+        el('div', { class: `passe-coluna ${i + 1 <= nivel ? 'alcancada' : ''}` }, el('small', { class: 'passe-nivel' }, String(i + 1)), casa(i + 1, 'gratis'), casa(i + 1, 'premium')))),
+  ];
 }
 
 export const telaInicio: Tela = (raiz, navegar) => {

@@ -552,3 +552,35 @@ export const apagarSessoesDaConta = (contaId: number) => void sqlBanimento.apaga
     db.exec('UPDATE clas SET nivel = 1, xp = 0; UPDATE cla_membros SET xp_dado = 0; PRAGMA user_version = 1;');
   }
 }
+
+// ---- eventos (server/src/cofre.ts, server/src/loteria.ts): estado de cada evento em JSON + bilhetes da loteria ----
+db.exec(`
+  CREATE TABLE IF NOT EXISTS eventos_estado (
+    chave TEXT PRIMARY KEY,
+    dados TEXT NOT NULL
+  );
+  CREATE TABLE IF NOT EXISTS loteria_bilhetes (
+    dia TEXT NOT NULL,
+    numero INTEGER NOT NULL,
+    conta_id INTEGER NOT NULL,
+    comprado_em INTEGER NOT NULL,
+    PRIMARY KEY (dia, numero)
+  );
+`);
+const sqlEventos = {
+  ler: db.prepare('SELECT dados FROM eventos_estado WHERE chave = ?'),
+  gravar: db.prepare('INSERT INTO eventos_estado (chave, dados) VALUES (?, ?) ON CONFLICT(chave) DO UPDATE SET dados = excluded.dados'),
+  bilhetesDaConta: db.prepare('SELECT numero FROM loteria_bilhetes WHERE dia = ? AND conta_id = ? ORDER BY comprado_em'),
+  bilhete: db.prepare('SELECT conta_id FROM loteria_bilhetes WHERE dia = ? AND numero = ?'),
+  vendidos: db.prepare('SELECT COUNT(*) AS n FROM loteria_bilhetes WHERE dia = ?'),
+  criarBilhete: db.prepare('INSERT INTO loteria_bilhetes (dia, numero, conta_id, comprado_em) VALUES (?, ?, ?, ?)'),
+};
+export function lerEvento<T>(chave: string): T | null {
+  const linha = sqlEventos.ler.get(chave) as { dados: string } | undefined;
+  return linha ? (JSON.parse(linha.dados) as T) : null;
+}
+export const gravarEvento = (chave: string, valor: unknown) => void sqlEventos.gravar.run(chave, JSON.stringify(valor));
+export const bilhetesDaConta = (dia: string, contaId: number) => (sqlEventos.bilhetesDaConta.all(dia, contaId) as { numero: number }[]).map((b) => b.numero);
+export const donoDoBilhete = (dia: string, numero: number) => (sqlEventos.bilhete.get(dia, numero) as { conta_id: number } | undefined)?.conta_id ?? null;
+export const bilhetesVendidos = (dia: string) => (sqlEventos.vendidos.get(dia) as { n: number }).n;
+export const criarBilhete = (dia: string, numero: number, contaId: number) => void sqlEventos.criarBilhete.run(dia, numero, contaId, Date.now());

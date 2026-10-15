@@ -8,6 +8,7 @@ import type { Destino, Navegar } from '../main';
 import { carregarSave } from '../estado';
 import { sairDaConta } from '../conta';
 import { el } from './dom';
+import { relogioBrasilia } from './relogio';
 import { pintarDeslizante } from './deslizante';
 
 /** `acao`: em vez de navegar, faz outra coisa (ex.: sair da conta). */
@@ -158,6 +159,7 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
         { class: 'barra-topo-conteudo' },
         el('img', { class: 'marca', src: '/logo/origens-antigas-barra.svg', alt: 'PokeOrigins' }),
         el('div', { class: 'abas-topo' }, ...botoes.map((b) => b.raiz)),
+        relogioBrasilia(),
         controlesSom(),
       ),
     ),

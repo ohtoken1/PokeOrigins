@@ -34,8 +34,12 @@ import { vigiarAmigos } from './amigos';
 import { vigiarCla } from './cla';
 import { vigiarAnuncios } from './anuncios';
 import { aoMudarViagem, vigiarViagem } from './viagem';
+import { vigiarOutbreak } from './outbreak';
+import { vigiarNinho } from './ninho';
+import { vigiarBoss } from './boss';
 import { vigiarConquistas } from './conquistas';
 import { vigiarEntregas } from './entregas';
+import { vigiarCreche } from './creche';
 import { vigiarMercado } from './mercado';
 import { vigiarQuadro } from './missoesQuadro';
 import { prepararIdioma } from './idioma';
@@ -100,6 +104,9 @@ void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   vigiarAnuncios();
   // trem: contagem no canto e, ao partir/chegar, o cabeçalho (região) e a tela dos mapas se atualizam
   vigiarViagem();
+  vigiarOutbreak();
+  vigiarNinho();
+  vigiarBoss();
   // limite de nível pelo treinador: quem estava no time acima do limite (save de antes da regra) vai para o PC
   {
     const s = carregarSave();
@@ -110,6 +117,7 @@ void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   ativarDicaDeItens();
   // itens dados pela administração
   vigiarEntregas();
+  vigiarCreche();
   vigiarMercado();
   vigiarQuadro();
   aoMudarViagem(() => (destinoAtual.tela === 'regiao' ? navegar(destinoAtual) : atualizarCabecalho?.(destinoAtual)));

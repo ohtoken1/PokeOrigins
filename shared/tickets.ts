@@ -6,6 +6,7 @@ import { ITENS } from './itens';
 import { TIPOS_TERA } from './tera';
 import { CORES_DOS_APRICORNS, TIPOS_DAS_ENERGIAS, idApricorn, idEnergia } from './materiais';
 import { cubosDaEra, idSkin } from './itensCustom';
+import { TIPOS_DOS_CHARMS, idCharm } from './charms';
 
 export type Raridade = 'comum' | 'raro' | 'epico' | 'passado' | 'futuro' | 'lendario' | 'mitico';
 
@@ -25,7 +26,7 @@ export const RARIDADES: { id: Raridade; nome: string }[] = [
 export const CHANCE_TICKET_POR_BATALHA = 1 / 1000;
 
 /** Grupos de "item aleatório": sorteia um item do grupo na hora de abrir (todos com a mesma chance). */
-export type GrupoAleatorio = 'terashard' | 'bola' | 'placa' | 'fruta' | 'apricorn' | 'energia';
+export type GrupoAleatorio = 'terashard' | 'bola' | 'placa' | 'fruta' | 'apricorn' | 'energia' | 'charm';
 
 /** Um prêmio: item (id da bolsa), item aleatório de um grupo, silver, gold, dias de VIP ou Pokémon. */
 export type Premio =
@@ -34,6 +35,8 @@ export type Premio =
   | { tipo: 'silver'; quantidade: number }
   | { tipo: 'gold'; quantidade: number }
   | { tipo: 'vip'; dias: number }
+  /** título (id em TITULOS de shared/conquistas.ts, os que não vêm de conquista) */
+  | { tipo: 'titulo'; id: string }
   /** `ivMinimo`: cada IV vem entre ele e 31 (ex.: 15+) */
   | { tipo: 'pokemon'; especie: number; nivel: number; chanceShiny: number; ivMinimo: number };
 
@@ -161,6 +164,7 @@ export function itensDoGrupo(grupo: GrupoAleatorio): string[] {
   if (grupo === 'fruta') return Dex.items.all().filter((i) => i.isBerry && !i.isNonstandard).map((i) => i.id);
   if (grupo === 'apricorn') return CORES_DOS_APRICORNS.map(idApricorn);
   if (grupo === 'energia') return TIPOS_DAS_ENERGIAS.map(idEnergia);
+  if (grupo === 'charm') return TIPOS_DOS_CHARMS.map(idCharm);
   if (grupo === 'bola') return Object.keys(ITENS).filter((id) => ITENS[id as keyof typeof ITENS].categoria === 'bola' && id !== 'masterball' && !id.endsWith('-nt'));
   return Dex.items.all().filter((i) => i.onPlate && !i.zMove).map((i) => i.id);
 }

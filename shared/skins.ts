@@ -24,7 +24,7 @@ export const BONUS_SKIN: BonusSkin = b(0.07, 0.05, 0.07, 0.05, 0.07);
 /** Skin de lendário shiny (mítico dos tickets próprios). */
 export const BONUS_SKIN_SHINY: BonusSkin = b(0.1, 0.07, 0.1, 0.05, 0.1);
 
-export type OrigemSkin = 'conquistas' | 'sazonal' | 'inicial';
+export type OrigemSkin = 'conquistas' | 'sazonal' | 'inicial' | 'passe';
 export interface SkinEspecial {
   /** id do item (`skin-<nome>`) */
   id: string;
@@ -38,6 +38,7 @@ export const TEXTO_ORIGEM_SKIN: Record<OrigemSkin, string> = {
   conquistas: 'Prêmio de conquista (NT: não pode ser trocada)',
   sazonal: 'Evento sazonal',
   inicial: 'Skin inicial',
+  passe: 'Prêmio do passe de batalha (premium)',
 };
 
 /** Skins que não são de lendário. As "iniciais" ficam só cadastradas até a criação de personagem ser refeita. */
@@ -51,6 +52,8 @@ export const SKINS_ESPECIAIS: SkinEspecial[] = [
   { id: 'skin-pascoa', nome: 'Skin de Páscoa', simbolo: '🐰', origem: 'sazonal', bonus: b(0.04, 0.03, 0, 0.02, 0.03) },
   { id: 'skin-namorados', nome: 'Skin de Dia dos Namorados', simbolo: '💘', origem: 'sazonal', bonus: b(0.05, 0.04, 0.03, 0.03, 0.03) },
   { id: 'skin-aniversario', nome: 'Skin de Aniversário', simbolo: '🎂', origem: 'sazonal', bonus: b(0.07, 0.05, 0.07, 0.05, 0.1) },
+  // bônus provisório (o dono ainda não definiu): o mesmo das skins de conquista
+  { id: 'skin-passe-nov26', nome: 'Skin Passe Nov/26', simbolo: '🎫', origem: 'passe', bonus: b(0.01, 0.01, 0.03, 0.01, 0.03) },
   { id: 'skin-ash', nome: 'Skin Ash', simbolo: '🧢', origem: 'inicial', bonus: b(0.01, 0.01, 0.01, 0.01, 0.01) },
   { id: 'skin-gary', nome: 'Skin Gary', simbolo: '🧢', origem: 'inicial', bonus: b(0.01, 0.01, 0.01, 0.01, 0.01) },
   { id: 'skin-may', nome: 'Skin May', simbolo: '🧢', origem: 'inicial', bonus: b(0.01, 0.01, 0.01, 0.01, 0.01) },
@@ -70,6 +73,11 @@ export interface ComSkins {
   skinBonus?: string | null;
   /** quantas de cada skin (das que estão em `itens`) o jogador levou para a bolsa, para trocar ou vender */
   skinsNaBolsa?: Record<string, number>;
+  /**
+   * Quantas unidades de cada item são NT sem ter um id "-nt" próprio (prêmios da trilha grátis do passe: Berries,
+   * Apricorns, Energies…). Saem do que pode ser trocado/vendido; o resto do jogo usa o total de `itens`.
+   */
+  itensNt?: Record<string, number>;
 }
 const SEM_BONUS: BonusSkin = b(0, 0, 0, 0, 0);
 
@@ -80,8 +88,10 @@ const inteiroDe = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ?
 export const skinsNaBolsa = (s: ComSkins, id: string): number => (ehSkin(id) ? Math.min(inteiroDe(s.itens[id]), inteiroDe(s.skinsNaBolsa?.[id])) : 0);
 /** Quantas desta skin estão em Minhas skins (as que valem para visual e bônus). */
 export const skinsNaColecao = (s: ComSkins, id: string): number => (ehSkin(id) ? inteiroDe(s.itens[id]) - skinsNaBolsa(s, id) : 0);
-/** Quanto de um item pode sair em troca ou no mercado: skin, só o que está na bolsa; o resto, tudo. */
-export const quantidadeNegociavel = (s: ComSkins, id: string): number => (ehSkin(id) ? skinsNaBolsa(s, id) : inteiroDe(s.itens[id]));
+/** Quantas unidades deste item são NT pela contagem `itensNt` (nunca mais que o total). */
+export const quantidadeNt = (s: ComSkins, id: string): number => Math.min(inteiroDe(s.itens[id]), inteiroDe(s.itensNt?.[id]));
+/** Quanto de um item pode sair em troca ou no mercado: skin, só o que está na bolsa; o resto, o total menos as NT. */
+export const quantidadeNegociavel = (s: ComSkins, id: string): number => (ehSkin(id) ? skinsNaBolsa(s, id) : inteiroDe(s.itens[id]) - quantidadeNt(s, id));
 /** Soma (ou tira, com número negativo) skins da contagem da bolsa. Chamar DEPOIS de mudar `itens`; outros itens: nada. */
 export function contarSkinNaBolsa(s: ComSkins, id: string, quantas: number): void {
   if (!ehSkin(id)) return;

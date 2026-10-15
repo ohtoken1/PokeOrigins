@@ -6,11 +6,14 @@ import { ErroConta } from './contas.ts';
 import { avisar } from './mundo.ts';
 import { guardarPokemon, type PokemonSave, type SaveMin } from './trocas.ts';
 
+/** Entregas que vão para um saldo do save, não para a bolsa (prêmios de eventos). */
+const SALDOS: Record<string, string> = { silver: 'silver', gold: 'gold', fragmentos: 'fragmentos', 'pontos-guilda': 'pontosGuilda' };
+
 /** Limites de um pedido. */
 const QUANTIDADE_MAX = 9999;
 const PENDENTES_MAX = 200;
 
-const lerNome = (v: unknown) => (typeof v === 'string' ? v.replace(/\p{Cc}|\p{Cf}/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 60) : '');
+export const lerNome = (v: unknown) => (typeof v === 'string' ? v.replace(/\p{Cc}|\p{Cf}/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 60) : '');
 
 /** A administração manda um item para um jogador. */
 export function darItem(conta: banco.Conta, dados: Record<string, unknown>) {
@@ -37,7 +40,7 @@ const texto = (v: unknown, formato: RegExp): v is string => typeof v === 'string
  * Confere o Pokémon montado em Administração → Dar Pokémon e devolve só os campos conhecidos. O servidor não tem
  * os dados das espécies (isso é do jogo): aqui só se garante o formato e os limites (IV 0–31, EV 252/510…).
  */
-function lerPokemon(v: unknown): PokemonSave {
+export function lerPokemon(v: unknown): PokemonSave {
   const invalido = () => new ErroConta('Pokémon inválido.');
   if (!v || typeof v !== 'object') throw invalido();
   const p = v as Record<string, unknown>;
@@ -96,6 +99,14 @@ export function receber(conta: banco.Conta) {
     const lista = banco.entregasDaConta(conta.id);
     const itens = (save.itens && typeof save.itens === 'object' ? save.itens : (save.itens = {})) as Record<string, unknown>;
     for (const e of lista) {
+      // Poké Dólares e Origin Coins (prêmios de eventos): vão para o saldo, não para a bolsa
+      const saldo = SALDOS[e.item];
+      if (saldo) {
+        const atual = save[saldo];
+        save[saldo] = (typeof atual === 'number' && Number.isFinite(atual) ? atual : 0) + e.quantidade;
+        banco.apagarEntrega(e.id);
+        continue;
+      }
       const tem = typeof itens[e.item] === 'number' && Number.isFinite(itens[e.item]) ? Math.max(0, Math.floor(itens[e.item] as number)) : 0;
       itens[e.item] = tem + e.quantidade;
       banco.apagarEntrega(e.id);

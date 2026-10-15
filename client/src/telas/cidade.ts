@@ -4,6 +4,10 @@
 // e o minimapa no canto mostra onde fica cada um. Clicar no nome abre direto; clicar no minimapa faz o personagem andar
 // sozinho até o lugar (a função abre quando ele chega); a saída do sul abre os mapas da região; andar com as teclas no meio do caminho cancela. Usa o mesmo jogo (Phaser) dos biomas, com o mapa da cidade e sem encontros.
 import { textoTranca } from '../../../shared/trancas';
+import { abrirEventos } from '../ui/eventos';
+import { abrirBoss, aoMudarBoss, bossAtual } from '../boss';
+import { abrirBatalha } from '../batalha/telaBatalha';
+import { TURNOS_BOSS } from '../../../shared/eventosRegras';
 import { conteudoLiberado } from '../trancas';
 import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
@@ -22,6 +26,10 @@ import { abrirArena } from '../ui/arena';
 import { abrirQuadroDeMissoes } from '../ui/quadroMissoes';
 import { abrirLojaTemporal } from '../ui/lojaTemporal';
 import { abrirSuspeito } from '../ui/suspeito';
+import { abrirCraft } from '../ui/craft';
+import { abrirCreche } from '../ui/creche';
+import { passoDosOvos } from '../creche';
+let passosSemSalvar = 0;
 import { viagemAtual } from '../viagem';
 import { REGIOES } from '../../../shared/regioes';
 import { abrirProfessores } from './golpes';
@@ -82,6 +90,14 @@ export const telaCidade: Tela = (raiz, navegar) => {
     seguidor: save.time[0] ? { especie: save.time[0].especieId, shiny: save.time[0].shiny } : null,
     // na cidade não há encontros
     aoPisar: () => {
+      // ovos do PC chocam com 1.000 passos: salva ao chocar e a cada 25 passos (a cidade não salvava a cada passo)
+      if (save && save.caixa.some((p) => p.ovo)) {
+        passosSemSalvar++;
+        if (passoDosOvos(save) || passosSemSalvar >= 25) {
+          passosSemSalvar = 0;
+          salvar(save);
+        }
+      }
       // saída do sul: chegou nela, abre os mapas da região (pedido do dono)
       const info = cena()?.infoMinimapa();
       if (info?.mapa.saida && info.jogador.y >= info.mapa.saida.y) usarLocal('mapas');
@@ -97,6 +113,14 @@ export const telaCidade: Tela = (raiz, navegar) => {
   };
   const jogo = mostrarJogo(areaJogo, opcoes);
   cena = jogo.cena;
+  // Boss (client/src/boss.ts): o Pokémon furioso na gaiola enquanto o evento dura
+  const desenharBoss = () => {
+    const b = bossAtual();
+    cena()?.mostrarBoss(b ? { especie: b.especieId, fim: b.fim, aoClicar: () => usarLocal('boss') } : null);
+  };
+  const pararBoss = aoMudarBoss(desenharBoss);
+  const relogioBoss = window.setInterval(desenharBoss, 15_000);
+  window.setTimeout(desenharBoss, 1500);
 
   // aviso curto em cima do jogo ("Seus Pokémon foram curados!")
   const aviso = el('div', { class: 'cidade-aviso', role: 'status' });
@@ -144,6 +168,23 @@ export const telaCidade: Tela = (raiz, navegar) => {
     // quem já está num Safari aberto continua; para entrar num novo vale a tranca
     else if (acao === 'safari' && !conteudoLiberado('safari') && !save!.safari?.aberto) avisar(`Safari: ${textoTranca('safari')}.`);
     else if (acao === 'safari') abrirSafari(save!, navegar, () => atualizarTime());
+    else if (acao === 'craft') abrirCraft(save!, () => atualizarTime());
+    else if (acao === 'creche') abrirCreche(save!, () => atualizarTime());
+    // NPC Eventos (feira do oeste): Cofre e Loteria (ui/eventos.ts)
+    else if (acao === 'eventos') abrirEventos(save!, () => atualizarTime());
+    else if (acao === 'boss')
+      abrirBoss(save!, (boss, nome, aoFim) => {
+        cena()?.pausar(true);
+        abrirBatalha({
+          save: save!, bioma: biomaPorId('caverna'), selvagem: boss,
+          treinador: { nome, titulo: 'Boss', equipe: [boss], recompensa: 0, mensagemInicio: `${nome} ruge furioso dentro da gaiola!` },
+          boss: { turnos: TURNOS_BOSS, aoDano: aoFim },
+          aoTerminar: () => {
+            cena()?.pausar(false);
+            atualizarTime();
+          },
+        });
+      });
     // evento sazonal: o NPC fica fechado enquanto a staff não liga nenhum (ainda não há eventos sazonais)
     else if (acao === 'sazonal') avisar('🔒 Nenhum evento sazonal ativo no momento.');
     else avisar(`${EM_BREVE[acao] ?? 'Este lugar'}: em breve.`);
@@ -154,6 +195,8 @@ export const telaCidade: Tela = (raiz, navegar) => {
   const pararDeOuvirJanelas = aoMudarJanelas((aberta) => cena()?.pausar(aberta));
 
   return () => {
+    pararBoss();
+    clearInterval(relogioBoss);
     pararDeOuvirJanelas();
     minimapa.parar();
     chat.parar();

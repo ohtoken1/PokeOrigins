@@ -35,6 +35,12 @@ export interface EstadoPasse {
   missoes: Missao[];
   /** VERSAO_MISSOES de quando as missões foram sorteadas. */
   versao?: number;
+  /** temporada deste progresso (shared/passeTemporadas.ts); mudou = XP e resgates zerados */
+  temporada?: string;
+  /** trilha premium liberada nesta temporada (item Passe Premium) */
+  premium?: boolean;
+  /** níveis já resgatados em cada trilha */
+  resgatados?: { gratis: number[]; premium: number[] };
 }
 
 export const missaoCompleta = (m: Missao) => m.feito >= m.alvo;

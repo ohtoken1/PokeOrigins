@@ -16,6 +16,8 @@ export function resumoPokemon(
   p: PokemonIndividual,
   opcoes: { abilityConhecida: boolean; completo?: boolean; emBatalha?: Record<'atk' | 'def' | 'spa' | 'spd' | 'spe', { valor: number; estagio: number; semEstagio?: number }> | null },
 ): HTMLElement[] {
+  // ovo da creche: não mostra quem está dentro (choca depois)
+  if ((p as { ovo?: unknown }).ovo) return [el('div', { class: 'resumo-titulo' }, el('strong', {}, '🥚 Ovo')), el('small', { class: 'meta' }, `Veio do Daycare. Ainda não chocou: o que está dentro é surpresa. Passos: ${(p as { ovo?: { passos?: number } }).ovo?.passos ?? 0}/1.000.`)];
   const dados = pokemonPorId(p.especieId);
   const natureza = Dex.natures.get(p.natureza);
   const efeito = natureza.plus && natureza.minus ? `+${NOMES_ATRIBUTOS[natureza.plus]} −${NOMES_ATRIBUTOS[natureza.minus]}` : 'neutra';

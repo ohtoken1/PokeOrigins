@@ -321,3 +321,51 @@ export function desenharMart(predios: CanvasImageSource): HTMLCanvasElement {
   pokebola(ctx, 73, 37, 9, '#2f6fd8', '#123a7a');
   return c;
 }
+
+/** Gaiola do boss (pedido do dono, no lugar do café): 8 × 6 tiles. O fundo (chão e grades de trás) fica atrás do boss,
+ * a frente (grades e moldura) fica sempre por cima dele. */
+export const TAM_GAIOLA = { w: 128, h: 96 };
+const FERRO = '#2a2730';
+const FERRO_CLARO = '#5b5566';
+const DOURADO = '#c99a2e';
+export function desenharGaiolaFundo(): HTMLCanvasElement {
+  const [c, ctx] = novoCanvas(TAM_GAIOLA.w, TAM_GAIOLA.h);
+  // base de pedra e chão de lajes escuras
+  ret(ctx, '#3b3a3f', 2, 30, 124, 64);
+  for (let y = 32; y < 92; y += 10) for (let x = 4 + ((y / 10) % 2) * 6; x < 122; x += 12) ret(ctx, '#46454b', x, y, 10, 8);
+  ret(ctx, '#26252a', 2, 90, 124, 6);
+  // parede de trás: grades finas
+  ret(ctx, FERRO, 6, 10, 116, 4);
+  for (let x = 10; x < 120; x += 9) ret(ctx, '#3a3542', x, 12, 2, 22);
+  return c;
+}
+export function desenharGaiolaFrente(): HTMLCanvasElement {
+  const [c, ctx] = novoCanvas(TAM_GAIOLA.w, TAM_GAIOLA.h);
+  // moldura de cima com rebites dourados
+  ret(ctx, FERRO, 0, 2, 128, 8);
+  ret(ctx, FERRO_CLARO, 0, 2, 128, 2);
+  for (let x = 6; x < 124; x += 14) ret(ctx, DOURADO, x, 5, 2, 2);
+  // grades da frente
+  for (let x = 4; x < 126; x += 10) {
+    ret(ctx, FERRO, x, 10, 3, 80);
+    ret(ctx, FERRO_CLARO, x, 10, 1, 80);
+    ret(ctx, DOURADO, x, 8, 3, 2);
+  }
+  // trilho de baixo e postes dos cantos
+  ret(ctx, FERRO, 0, 86, 128, 6);
+  ret(ctx, FERRO_CLARO, 0, 86, 128, 1);
+  ret(ctx, FERRO, 0, 0, 6, 94);
+  ret(ctx, FERRO, 122, 0, 6, 94);
+  ret(ctx, DOURADO, 1, 0, 4, 3);
+  ret(ctx, DOURADO, 123, 0, 4, 3);
+  // cadeado no meio
+  ret(ctx, '#8a6a1c', 59, 56, 10, 10);
+  ret(ctx, DOURADO, 60, 57, 8, 8);
+  ret(ctx, FERRO, 63, 60, 2, 3);
+  ctx.strokeStyle = '#b8b8c0';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(64, 56, 3, Math.PI, 0);
+  ctx.stroke();
+  return c;
+}

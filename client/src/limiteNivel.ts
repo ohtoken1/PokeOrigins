@@ -7,7 +7,7 @@ import { guardarNoPC, type PokemonDoJogador, type Save } from './estado';
 /** Até que nível este jogador pode usar um Pokémon agora. */
 export const tetoDoJogador = (save: Save): number => (ehAdministrador() ? 100 : nivelMaximoPokemon(nivelTreinador(save.xpTreinador)));
 /** Este Pokémon pode entrar no time? */
-export const podeUsar = (save: Save, p: { nivel: number }): boolean => p.nivel <= tetoDoJogador(save);
+export const podeUsar = (save: Save, p: { nivel: number; ovo?: unknown }): boolean => !p.ovo && p.nivel <= tetoDoJogador(save);
 /** "Requer treinador nível 4" (para o Pokémon que ainda não pode ser usado). */
 export const textoDoLimite = (p: { nivel: number }): string => `Requer treinador nível ${treinadorParaUsar(p.nivel)} para usar um Pokémon de nível ${p.nivel}`;
 
