@@ -6,6 +6,7 @@ import { traduzir } from '../../../shared/traducao';
 import { pokemonPorId } from '../dados';
 import { abrirJanela } from './janela';
 import { irPara } from './navegacao';
+import { seloTierDaEspecie } from './tierDoJogo';
 import { el, seloGenero, seloNT, seloTier, seloTipo, selosTipos, spritePokemon } from './dom';
 import { barraHp } from './time';
 import { PRECO_REVELAR_IVS, faixaDoIv, itemDaLoja } from '../../../shared/loja';
@@ -170,7 +171,7 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
         'div',
         { class: 'resumo' },
         el('h3', {}, dados.nome, seloGenero(p.genero), p.shiny ? ' ✨' : '', el('small', {}, ` Nv. ${p.nivel} · #${dados.id}`), seloTier(p), seloNT(p)),
-        selosTipos(dados),
+        el('div', { class: 'dex-tipos-tier' }, selosTipos(dados), seloTierDaEspecie(p.especieId)),
         el('div', { class: 'hp' }, barraHp(p.hp, max), el('small', {}, `HP ${p.hp}/${max}${p.status ? ` · ${STATUS[p.status] ?? p.status}` : ''}`)),
         el('dl', {},
           el('dt', {}, 'ID'),

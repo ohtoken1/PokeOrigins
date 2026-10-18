@@ -2857,3 +2857,18 @@ button.creche-pokemon:hover { border-color: var(--destaque); }
 .atalhos-lista dd { margin: 0; }
 .atalhos kbd { display: inline-block; min-width: 28px; padding: 2px 8px; text-align: center; border-radius: 6px; background: var(--painel-2); border: 1px solid var(--borda); border-bottom-width: 3px; font: 700 0.85rem/1.4 inherit; }
 .atalhos .meta { grid-column: 1 / -1; margin: 0; }
+/* convite do Discord na barra do topo (canto direito) */
+.botao-discord { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #5865f2; box-shadow: 0 2px 6px rgb(0 0 0 / 0.4); transition: transform 0.12s, background 0.12s; flex: none; }
+.botao-discord:hover { background: #4752c4; transform: translateY(-1px) scale(1.06); }
+.botao-discord img { width: 20px; height: 20px; }
+/* Pokédex: selo da tier do jogo ao lado dos tipos */
+.dex-tipos-tier { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.selo-tier-jogo { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: 800; font-size: 0.8rem; letter-spacing: 0.04em; color: #fff; background: #555; border: 2px solid rgb(255 255 255 / 0.35); box-shadow: 0 1px 3px rgb(0 0 0 / 0.4); }
+.selo-tier-jogo.tier-uber { background: linear-gradient(135deg, #7a1fa2, #c2185b); }
+.selo-tier-jogo.tier-ou { background: linear-gradient(135deg, #b8860b, #e9b949); color: #1a1405; }
+.selo-tier-jogo.tier-uu { background: #1f6fb2; }
+.selo-tier-jogo.tier-ru { background: #2e8b57; }
+.selo-tier-jogo.tier-nu { background: #6b7280; }
+.selo-tier-jogo.tier-nfe { background: #8a6d3b; }
+.selo-tier-jogo.tier-lc { background: #4a7c8c; }
+.selo-tier-jogo.provisoria { border-style: dashed; opacity: 0.85; }

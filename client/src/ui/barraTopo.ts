@@ -162,6 +162,9 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
         el('div', { class: 'abas-topo' }, ...botoes.map((b) => b.raiz)),
         relogioBrasilia(),
         controlesSom(),
+        // convite do Discord da comunidade (pedido do dono)
+        el('a', { class: 'botao-discord', href: 'https://discord.gg/zqkXC8Hddu', target: '_blank', rel: 'noopener', title: 'Entre no nosso Discord', 'aria-label': 'Discord do PokeOrigins' },
+          el('img', { src: 'discord.svg', alt: '' })),
       ),
     ),
   );

@@ -5,6 +5,7 @@
 // (Rayquazite, pedra nossa: nos jogos ele megaevolui só sabendo Dragon Ascent; pedido do dono).
 import { Dex } from '@pkmn/sim';
 import { arquivoSpriteForma } from './formas';
+import { tierDaFormaMega } from './tiers';
 
 /** Rayquazite: Mega Stone nossa, colocada nos dados do Showdown igual às outras (o simulador megaevolui com ela). */
 export const RAYQUAZITE = 'rayquazite';
@@ -83,9 +84,7 @@ export const MEGA_STONES = new Set(MEGAS.map((m) => m.pedra));
 /** Mega que a pedra faz (a pedra só serve para uma espécie). */
 export const megaDaPedra = (pedra: string) => MEGAS.find((m) => m.pedra === pedra);
 
-/** Tier da Mega (Smogon: National Dex; as de Legends: Z-A ainda não têm). */
+/** Tier da Mega (shared/tiers.ts: definida pela staff, senão a sugestão provisória da National Dex). */
 export function tierDaMega(m: Mega): string {
-  const s = Dex.species.get(m.forma);
-  const tier = s.tier === 'Illegal' ? s.natDexTier : s.tier;
-  return !tier || tier === 'Illegal' ? '—' : tier.replace(/[()]/g, '');
+  return tierDaFormaMega(m.forma, Dex.species.get(m.forma));
 }

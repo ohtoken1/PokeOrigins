@@ -9,7 +9,7 @@ import { SUFIXO_NT, semNt } from '../../../shared/naoTrocavel';
 const idsDosItens = new Set(TODOS_OS_ITENS.map((i) => i.id));
 import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
 import type { PokemonBase } from '../../../shared/tipos';
-import { ORDEM_TIERS, tierDoPokemon } from '../../../shared/tiers';
+import { ORDEM_TIERS, tierDoPokemon, tierMegaProvisoria, tierProvisoria } from '../../../shared/tiers';
 import { todosOsPokemons } from '../dados';
 import { REGIOES } from '../../../shared/regioes';
 import { CATEGORIAS_POKEMON, categoriasDoPokemon } from '../../../shared/categorias';
@@ -171,7 +171,7 @@ export const telaDatabase: Tela = (raiz, navegar) => {
         { titulo: '', celula: (p) => spritePokemon(p, { animado: false }), classe: 'db-sprite' },
         { titulo: 'Nome', celula: (p) => (p.mega ? el('span', { class: 'db-nome-mega' }, el('img', { src: 'batalha/mega-evolucao.svg', alt: '' }), p.nome) : p.nome), ordem: (p) => p.nome },
         { titulo: 'Tipos', celula: (p) => selosTipos(p), ordem: (p) => p.tipos.join() },
-        { titulo: 'Tier', celula: (p) => el('span', { class: 'db-tier' }, tierDaLinha(p)), ordem: (p) => posicaoTier(tierDaLinha(p)) },
+        { titulo: 'Tier', celula: (p) => (p.mega ? tierMegaProvisoria(p.mega.forma) : tierProvisoria(p.id)) ? el('span', { class: 'db-tier', title: 'Provisória: sugestão da National Dex até a staff definir' }, `${tierDaLinha(p)}*`) : el('span', { class: 'db-tier' }, tierDaLinha(p)), ordem: (p) => posicaoTier(tierDaLinha(p)) },
         ...ATRIBUTOS.map(([a, nome]): Coluna<LinhaPokemon> => ({ titulo: nome, celula: (p) => String(p.stats[a]), ordem: (p) => p.stats[a], classe: 'num' })),
         { titulo: 'Total', celula: (p) => el('strong', {}, String(total(p))), ordem: total, classe: 'num' },
       ],
