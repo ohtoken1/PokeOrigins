@@ -21,6 +21,10 @@ interface Sala {
   prazo: number;
   tipo: 'amistoso' | 'torneio';
   aoFim?: (vencedor: number | null) => void;
+  /** Tudo o que cada lado já viu (começo + turnos): quem recarrega a página volta para a batalha com isto. */
+  historico: [unknown[], unknown[]];
+  /** Dados fixos da mensagem `pvp-inicio` de cada lado (adversário, título, time da batalha). */
+  abertura: [Record<string, unknown>, Record<string, unknown>];
 }
 const salas = new Map<number, Sala>();
 const salaDaConta = new Map<number, Sala>();
@@ -53,6 +57,7 @@ const timeVisivel = (time: Record<string, unknown>[]) =>
 
 /** Manda a cada lado os eventos novos e a "foto" dele. */
 function enviarTurno(sala: Sala, eventos: [unknown[], unknown[]]): void {
+  for (const lado of [0, 1] as const) sala.historico[lado].push(...eventos[lado]);
   for (const lado of [0, 1] as const)
     avisar(sala.contas[lado], { t: 'pvp-turno', id: sala.id, eventos: eventos[lado], foto: sala.batalha.foto(lado), prazo: sala.prazo - FOLGA_ANIMACAO_MS, tempo: TEMPO_TURNO_PVP_MS });
 }
@@ -74,12 +79,16 @@ export function criarBatalha(a: banco.Conta, b: banco.Conta, opcoes: { tipo: Sal
   const ja = jogadorDe(a);
   const jb = jogadorDe(b);
   const batalha = novaBatalhaPvp(ja, jb, opcoes.regras ?? [], opcoes.mecanicas);
-  const sala: Sala = { id: proximaSala++, batalha, contas: [a.id, b.id], nomes: [ja.nome, jb.nome], prazo: Date.now() + TEMPO_TURNO_PVP_MS + FOLGA_ANIMACAO_MS, tipo: opcoes.tipo, aoFim: opcoes.aoFim };
+  const sala: Sala = { id: proximaSala++, batalha, contas: [a.id, b.id], nomes: [ja.nome, jb.nome], prazo: Date.now() + TEMPO_TURNO_PVP_MS + FOLGA_ANIMACAO_MS, tipo: opcoes.tipo, aoFim: opcoes.aoFim, historico: [[], []], abertura: [{}, {}] };
   salas.set(sala.id, sala);
   salaDaConta.set(a.id, sala).set(b.id, sala);
   const inicio = batalha.iniciar();
-  for (const [lado, outro] of [[0, 1], [1, 0]] as const)
-    avisar(sala.contas[lado], { t: 'pvp-inicio', id: sala.id, eventos: inicio[lado], foto: batalha.foto(lado), prazo: sala.prazo - FOLGA_ANIMACAO_MS, tempo: TEMPO_TURNO_PVP_MS, tipo: sala.tipo, titulo: opcoes.titulo ?? 'Duelo', adversario: { nome: sala.nomes[outro], time: timeVisivel([ja, jb][outro].time) }, nomes: [ja, jb][lado].nomes });
+  for (const [lado, outro] of [[0, 1], [1, 0]] as const) {
+    sala.historico[lado].push(...inicio[lado]);
+    // meuTime: o time com que o lado está lutando (a ordem precisa casar com a do servidor, mesmo que o save mude)
+    sala.abertura[lado] = { tipo: sala.tipo, titulo: opcoes.titulo ?? 'Duelo', adversario: { nome: sala.nomes[outro], time: timeVisivel([ja, jb][outro].time) }, nomes: [ja, jb][lado].nomes, meuTime: [ja, jb][lado].time };
+    avisar(sala.contas[lado], { t: 'pvp-inicio', id: sala.id, eventos: inicio[lado], foto: batalha.foto(lado), prazo: sala.prazo - FOLGA_ANIMACAO_MS, tempo: TEMPO_TURNO_PVP_MS, ...sala.abertura[lado] });
+  }
   return sala.id;
 }
 
@@ -116,6 +125,17 @@ export function desistir(conta: banco.Conta, dados: Record<string, unknown>) {
   sala.batalha.desistir(sala.contas[0] === conta.id ? 0 : 1);
   depoisDaEscolha(sala);
   return { ok: true };
+}
+
+/**
+ * Batalha em andamento da conta (o jogo pergunta ao abrir: recarregou a página no meio de uma partida). Mesmo
+ * formato do `pvp-inicio`, com TODOS os eventos que o lado já viu; a tela toca tudo depressa e volta ao turno.
+ */
+export function atual(conta: banco.Conta) {
+  const sala = salaDaConta.get(conta.id);
+  if (!sala) return { batalha: null };
+  const lado = sala.contas[0] === conta.id ? 0 : 1;
+  return { batalha: { id: sala.id, eventos: sala.historico[lado], foto: sala.batalha.foto(lado), prazo: sala.prazo - FOLGA_ANIMACAO_MS, tempo: TEMPO_TURNO_PVP_MS, retomada: true, ...sala.abertura[lado] } };
 }
 
 /** A conta está numa batalha PvP agora? */

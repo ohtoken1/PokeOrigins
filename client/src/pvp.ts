@@ -58,13 +58,14 @@ function mostrarConvite(nome: string, usuario: string, ate: number): void {
   document.body.append(cartao);
 }
 
-function comecar(msg: TurnoPvp & { titulo?: string; adversario: { nome: string; time: PokemonIndividual[] } }): void {
+function comecar(msg: TurnoPvp & { titulo?: string; adversario: { nome: string; time: PokemonIndividual[] }; meuTime?: PokemonIndividual[] }): void {
   const save = carregarSave();
-  if (!save) return;
+  if (!save || batalhas.has(msg.id)) return;
   const remota = new BatalhaRemota(msg.id, msg);
   batalhas.set(msg.id, remota);
   // cópia curada do time (o servidor também cura): nada da batalha volta para o save
-  const time = structuredClone(save.time).filter((p) => !p.ovo);
+  // (o time que o servidor usou, na mesma ordem: o save pode ter mudado depois que a batalha começou)
+  const time = structuredClone(msg.meuTime ?? save.time.filter((p) => !p.ovo));
   time.forEach((p) => curar(p));
   const equipe = msg.adversario.time;
   // o servidor não manda o HP do outro (só em porcentagem, nos eventos): a barra começa cheia
@@ -80,6 +81,16 @@ function comecar(msg: TurnoPvp & { titulo?: string; adversario: { nome: string; 
   });
 }
 
+/** Recarregou a página no meio de uma batalha: o servidor manda tudo o que já aconteceu e a tela volta ao turno. */
+async function retomar(): Promise<void> {
+  try {
+    const r = await api<{ batalha: (TurnoPvp & { adversario: { nome: string; time: PokemonIndividual[] } }) | null }>('GET', '/pvp/atual');
+    if (r.batalha) comecar(r.batalha);
+  } catch {
+    // sem conexão: o servidor encerra pelo tempo, como antes
+  }
+}
+
 let ligado = false;
 export function vigiarPvp(): void {
   if (ligado) return;
@@ -90,4 +101,5 @@ export function vigiarPvp(): void {
     else if (msg.t === 'pvp-inicio') comecar(msg as never);
     else if (msg.t === 'pvp-turno') batalhas.get(Number(msg.id))?.receber(msg as never);
   });
+  void retomar();
 }

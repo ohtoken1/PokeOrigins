@@ -14,16 +14,18 @@ import { secaoDarPokemon } from './adminPokemon';
 import { secaoBanimentos } from './adminBanimentos';
 import { secaoLiga } from './adminLiga';
 import { secaoTorneio } from './adminTorneio';
+import { secaoCorreio } from './adminCorreio';
 import { iconeItem } from '../ui/iconeItem';
 import { el } from '../ui/dom';
 import { cartaoAnuncio } from '../ui/mural';
 import { confirmar } from '../ui/confirmar';
 
-export type SecaoAdministracao = 'itens' | 'pokemon' | 'liga' | 'torneio' | 'banimentos' | 'log' | 'eventos' | 'anuncios';
+export type SecaoAdministracao = 'correio' | 'itens' | 'pokemon' | 'liga' | 'torneio' | 'banimentos' | 'log' | 'eventos' | 'anuncios';
 
 export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBreve?: string }[] = [
   // só eventos que a staff ativa direto (pedido do dono); a Bonificação mora aqui
   { id: 'eventos', nome: 'Eventos' },
+  { id: 'correio', nome: 'Correio' },
   { id: 'itens', nome: 'Dar item' },
   { id: 'pokemon', nome: 'Dar Pokémon' },
   { id: 'liga', nome: 'Liga' },
@@ -152,7 +154,7 @@ function secaoItens(): { elemento: HTMLElement; parar: () => void } {
     aviso.textContent = '';
     try {
       const r = await darItemAoJogador(usuario, item.id, item.nome, quantidade);
-      aviso.textContent = `${quantidade}x ${item.nome} enviado para ${r.usuario}. Chega na hora se ele estiver online; senão, quando ele entrar.`;
+      aviso.textContent = `${quantidade}x ${item.nome} enviado para o Correio de ${r.usuario}.`;
     } catch (e) {
       aviso.textContent = e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.';
     }
@@ -161,7 +163,7 @@ function secaoItens(): { elemento: HTMLElement; parar: () => void } {
   return {
     parar: () => clearTimeout(relogio),
     elemento: el('section', { class: 'bonus-secao' },
-      el('p', { class: 'sub' }, 'Manda um item do jogo para um jogador. Ele recebe um aviso e o item vai para a bolsa (skins vão para Minhas skins).'),
+      el('p', { class: 'sub' }, 'Manda um item do jogo para um jogador. Chega no Correio dele e vai para a bolsa quando ele resgatar (skins vão para Minhas skins).'),
       listaItens, listaJogadores,
       el('div', { class: 'cla-formulario admin-dar-item' },
         el('label', { class: 'cla-campo' }, 'Item', campoItem),
@@ -184,7 +186,7 @@ export const telaAdministracao = (secaoInicial: SecaoAdministracao): Tela => (ra
   let secao = secaoInicial;
   const corpo = el('div', { class: 'admin-corpo' });
   // montada uma vez só (redesenhar a tela não apaga o que a pessoa está escrevendo)
-  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : secao === 'pokemon' ? secaoDarPokemon() : secao === 'banimentos' ? secaoBanimentos() : secao === 'liga' ? secaoLiga() : secao === 'torneio' ? secaoTorneio() : null;
+  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : secao === 'correio' ? secaoCorreio() : secao === 'pokemon' ? secaoDarPokemon() : secao === 'banimentos' ? secaoBanimentos() : secao === 'liga' ? secaoLiga() : secao === 'torneio' ? secaoTorneio() : null;
 
   const linhaBonus = (chave: ChaveBonus) => {
     const atual = bonificacao()[chave];

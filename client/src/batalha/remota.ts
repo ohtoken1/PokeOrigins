@@ -5,7 +5,8 @@ import type { EventoBatalha, Pedido } from '../../../shared/batalha/motor';
 import type { FotoPvp } from '../../../shared/batalha/pvp';
 import { api } from '../conta';
 
-export interface TurnoPvp { id: number; eventos: EventoBatalha[]; foto: FotoPvp; prazo: number; tempo: number }
+/** `retomada`: a página foi recarregada no meio da batalha; `eventos` traz tudo desde o começo. */
+export interface TurnoPvp { id: number; eventos: EventoBatalha[]; foto: FotoPvp; prazo: number; tempo: number; retomada?: boolean }
 
 export class BatalhaRemota {
   private foto: FotoPvp;
@@ -61,6 +62,10 @@ export class BatalhaRemota {
   // ---- o que a tela de batalha usa ----
   iniciar(): EventoBatalha[] {
     return this.inicio.eventos;
+  }
+  /** Voltando para a batalha depois de recarregar: a tela toca o que já aconteceu sem animações. */
+  get retomada(): boolean {
+    return !!this.inicio.retomada;
   }
   usarGolpe(indice: number, especial: 'z' | 'tera' | 'mega' | 'dynamax' | null = null): Promise<EventoBatalha[]> {
     return this.mandar('/pvp/escolha', { escolha: { tipo: 'golpe', indice, especial } });

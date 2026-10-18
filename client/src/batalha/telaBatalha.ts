@@ -4,6 +4,7 @@ import { bonusVip } from '../../../shared/vip';
 import { AMIZADE_POR_BATALHA, ganharAmizade } from '../../../shared/amizade';
 import { trocarSpriteForma } from '../ui/formas';
 import { tocarGrito, tocarMusica } from '../sons';
+import { digitando } from '../ui/digitando';
 import { arquivoSpriteForma } from '../../../shared/formas';
 import { megaPorForma } from '../../../shared/megas';
 import type { Bioma } from '../../../shared/biomas';
@@ -348,8 +349,10 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
   painel.addEventListener('click', (e) => {
     if (!(e.target as HTMLElement).closest('button')) pular?.();
   });
+  /** Volta para a batalha PvP depois de recarregar: toca o que já aconteceu sem esperas, animações nem sons. */
+  let rapido = false;
   const esperar = (ms: number) =>
-    new Promise<void>((resolver) => {
+    rapido ? Promise.resolve() : new Promise<void>((resolver) => {
       const fim = () => {
         clearTimeout(timer);
         pular = null;
@@ -358,6 +361,35 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       const timer = setTimeout(fim, ms);
       pular = fim;
     });
+  // atalhos de teclado da batalha (pedido do dono): F Lutar, 1–4 golpe, B Bolsa, Q Pokémon, R Fugir/Desistir,
+  // Espaço passa a mensagem. Clicam o botão que está na tela, então valem as mesmas regras (botão apagado não faz nada).
+  const atalhosDaBatalha = (e: KeyboardEvent) => {
+    if (e.ctrlKey || e.altKey || e.metaKey || e.repeat || digitando() || document.querySelector('.janela-fundo')) return;
+    const clicar = (seletor: string) => {
+      // dentro de um submenu (golpes, bolsa): volta ao menu principal antes
+      if (!acoes.querySelector(seletor)) acoes.querySelector<HTMLButtonElement>('.voltar')?.click();
+      const b = acoes.querySelector<HTMLButtonElement>(seletor);
+      if (b && !b.disabled) b.click();
+      return !!b;
+    };
+    const tecla = e.key.toLowerCase();
+    if (tecla === ' ') {
+      if (!pular) return;
+      e.preventDefault();
+      pular();
+    } else if (tecla === 'f') clicar('.lutar');
+    else if (tecla === 'b') clicar('.bolsa');
+    else if (tecla === 'q') clicar('.pokemon');
+    else if (tecla === 'r') clicar('.fugir');
+    else if (/^[1-4]$/.test(tecla)) {
+      // no menu principal, o número já abre os golpes e escolhe
+      if (!acoes.querySelector('.golpe')) clicar('.lutar');
+      const golpe = acoes.querySelectorAll<HTMLButtonElement>('.golpe')[Number(tecla) - 1];
+      if (golpe && !golpe.disabled) golpe.click();
+    }
+  };
+  window.addEventListener('keydown', atalhosDaBatalha);
+
   /** true enquanto os eventos do simulador tocam (eles já vão para o chat pelo `registro`). */
   let tocandoEventos = false;
   const dizer = (texto: string) => {
@@ -430,6 +462,14 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
   }
 
   // ---------- reprodução dos eventos do simulador ----------
+  // no modo rápido, as animações terminam na hora (ficam no quadro final) e nada toca
+  const gritar = (numero: number, grave = false) => (rapido ? undefined : tocarGrito(numero, grave));
+  const animar = async (alvo: HTMLElement, f: (x: HTMLElement) => Promise<unknown>) => {
+    const p = f(alvo);
+    if (rapido) for (const a of alvo.getAnimations()) a.finish();
+    await p;
+  };
+  const transformar: typeof animarTransformacao = (l, alvo, trocar, opcoes) => (rapido ? Promise.resolve(trocar()) : animarTransformacao(l, alvo, trocar, opcoes));
   async function reproduzir(eventos: EventoBatalha[]) {
     tocandoEventos = true;
     try {
@@ -475,8 +515,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
             infoSelvagem.definir(selvagem);
             infoSelvagem.hp(ev.hp, ev.hpMax);
             if (ev.texto) mensagem.textContent = ev.texto;
-            void tocarGrito(selvagem.especieId);
-            await animarEntrada(spriteSelvagem);
+            void gritar(selvagem.especieId);
+            await animar(spriteSelvagem, animarEntrada);
             await esperar(300);
           }
           if (ev.lado === 'jogador') {
@@ -485,8 +525,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
             trocarSpriteForma(spriteJogador as HTMLImageElement, ev.forma, { shiny: save.time[ev.indice].shiny, costas: true });
             infoJogador.hp(ev.hp, ev.hpMax);
             if (ev.texto) mensagem.textContent = ev.texto;
-            void tocarGrito(save.time[ev.indice].especieId);
-            await animarEntrada(spriteJogador);
+            void gritar(save.time[ev.indice].especieId);
+            await animar(spriteJogador, animarEntrada);
             await esperar(400);
           }
           break;
@@ -495,7 +535,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           // o golpe do adversário aparece na hora no resumo aberto
           if (ev.lado === 'selvagem') desenharResumoAdversario();
           await esperar(350);
-          await animarGolpeOriginal(arena, sprite(ev.lado), ev.alvo && ev.alvo !== ev.lado ? sprite(ev.alvo) : null, ev.golpe, ev.tipoGolpe, ev.categoria, sprite(ev.lado === 'jogador' ? 'selvagem' : 'jogador'));
+          if (!rapido) await animarGolpeOriginal(arena, sprite(ev.lado), ev.alvo && ev.alvo !== ev.lado ? sprite(ev.alvo) : null, ev.golpe, ev.tipoGolpe, ev.categoria, sprite(ev.lado === 'jogador' ? 'selvagem' : 'jogador'));
           break;
         case 'hp': {
           info(ev.lado).hp(ev.hp, ev.hpMax);
@@ -538,8 +578,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         case 'desmaio':
           if (ev.lado === 'selvagem' && treinador) marcarDesmaioNoTime(adversarioNaTela);
           // grito mais grave ao desmaiar, como nos jogos
-          void tocarGrito(ev.lado === 'jogador' ? save.time[batalha.ativo].especieId : selvagem.especieId, true);
-          await animarDesmaio(sprite(ev.lado));
+          void gritar(ev.lado === 'jogador' ? save.time[batalha.ativo].especieId : selvagem.especieId, true);
+          await animar(sprite(ev.lado), animarDesmaio);
           tirarDynamaxDaImagem(sprite(ev.lado));
           await dizer(ev.texto);
           break;
@@ -554,14 +594,14 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           const alvo = sprite(ev.lado) as HTMLImageElement;
           if (ev.lado === 'jogador') marcarConquista(save, 'mega');
           mensagem.textContent = `${ev.lado === 'jogador' ? nomeDe(save.time[batalha.ativo].especieId) : nomeDe(selvagem.especieId)} está reagindo à Mega Stone!`;
-          await animarTransformacao(lugar(ev.lado), alvo, () => trocarSpriteForma(alvo, ev.forma, { shiny: ev.lado === 'jogador' ? save.time[batalha.ativo].shiny : selvagem.shiny, costas: ev.lado === 'jogador' }), {
+          await transformar(lugar(ev.lado), alvo, () => trocarSpriteForma(alvo, ev.forma, { shiny: ev.lado === 'jogador' ? save.time[batalha.ativo].shiny : selvagem.shiny, costas: ev.lado === 'jogador' }), {
             cores: ['#f08300', '#aacf52', '#00b9ef', '#e74291'],
             simbolo: el('img', { class: 'simbolo-transf', src: 'batalha/mega-evolucao.svg', alt: '' }),
           });
           alvo.classList.add('megaevoluido');
           // grito da Mega (a PokéAPI tem o som de cada Mega pelo mesmo número do sprite)
           const arquivoMega = arquivoSpriteForma(ev.forma);
-          if (arquivoMega && /^\d+$/.test(arquivoMega)) void tocarGrito(Number(arquivoMega));
+          if (arquivoMega && /^\d+$/.test(arquivoMega)) void gritar(Number(arquivoMega));
           info(ev.lado).renomear(megaPorForma(ev.forma)?.nome ?? ev.forma);
           await dizer(ev.texto);
           break;
@@ -571,7 +611,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           const alvo = sprite(ev.lado) as HTMLImageElement;
           if (ev.lado === 'jogador') marcarConquista(save, 'dynamax');
           spriteAntesDoDynamax[ev.lado] = alvo.src;
-          await animarTransformacao(
+          await transformar(
             lugar(ev.lado),
             alvo,
             () => {
@@ -583,7 +623,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
             },
             { cores: CORES_DYNAMAX, grande: true },
           );
-          void tocarGrito(ev.lado === 'jogador' ? save.time[batalha.ativo].especieId : selvagem.especieId, true);
+          void gritar(ev.lado === 'jogador' ? save.time[batalha.ativo].especieId : selvagem.especieId, true);
           await dizer(ev.texto);
           break;
         }
@@ -592,7 +632,10 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           const antes = spriteAntesDoDynamax[ev.lado];
           spriteAntesDoDynamax[ev.lado] = null;
           // a aura vermelha volta fechando e o Pokémon encolhe (só se ele ainda está gigante na tela)
-          if (alvo.classList.contains('dinamaxado'))
+          if (rapido) {
+            tirarDynamaxDaImagem(alvo);
+            if (antes && alvo.src !== antes) alvo.src = antes;
+          } else if (alvo.classList.contains('dinamaxado'))
             await animarFimDynamax(
               lugar(ev.lado),
               alvo,
@@ -611,7 +654,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           const trocar = () => trocarSpriteForma(alvo, ev.forma, { shiny: ev.lado === 'jogador' ? save.time[batalha.ativo].shiny : selvagem.shiny, costas: ev.lado === 'jogador' });
           const primal = /-Primal$/.test(ev.forma);
           const groudon = ev.forma.startsWith('Groudon');
-          await animarTransformacao(lugar(ev.lado), alvo, trocar, primal
+          await transformar(lugar(ev.lado), alvo, trocar, primal
             ? { cores: [groudon ? '#ff4a1c' : '#2f8cff'], simbolo: el('span', { class: `simbolo-primal ${groudon ? 'omega' : 'alpha'}` }, groudon ? 'Ω' : 'α') }
             : { cores: [corTipo(Dex.species.get(ev.forma).types[0] ?? 'Normal')], rapida: true });
           if (ev.texto) await dizer(ev.texto);
@@ -977,6 +1020,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     }
     if (!pvp) salvar(save);
     fundo.remove();
+    window.removeEventListener('keydown', atalhosDaBatalha);
     tocarMusica('fundo');
     aoTerminar(resultado);
   }
@@ -1112,11 +1156,17 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
 
   // ---------- início ----------
   (async () => {
+    // voltou para a batalha PvP (recarregou a página): passa por tudo depressa
+    rapido = !!pvp?.retomada;
     if (treinador) await dizer(treinador.mensagemInicio ?? `${treinador.nome}, ${treinador.titulo}, quer batalhar!`);
-    void tocarGrito(selvagem.especieId);
-    await animarEntrada(spriteSelvagem);
+    void gritar(selvagem.especieId);
+    await animar(spriteSelvagem, animarEntrada);
     await dizer(treinador ? `${treinador.nome} enviou ${dadosSelvagem.nome}!` : `Um ${dadosSelvagem.nome} selvagem apareceu!`);
     await reproduzir(batalha.iniciar());
+    if (rapido) {
+      rapido = false;
+      await dizer('Você voltou para a batalha!');
+    }
     menuPrincipal();
   })();
 }

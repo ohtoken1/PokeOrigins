@@ -2688,3 +2688,172 @@ button.creche-pokemon:hover { border-color: var(--destaque); }
 .dica-pokemon { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .dica-pokemon img { width: 96px; height: 96px; object-fit: contain; image-rendering: pixelated; }
 .aviso-outbreak, .aviso-ninho { pointer-events: auto; }
+
+/* ---------- Correio (ui/correio.ts): lista à esquerda, carta aberta à direita ---------- */
+.selo-correio {
+  position: absolute; top: -4px; right: -6px; z-index: 2; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px;
+  background: #d63b3b; color: #fff; border: 2px solid #f2f2f2; font-size: 0.68rem; font-weight: 800; line-height: 14px; text-align: center;
+}
+.janela.janela-correio { width: min(860px, 100%); }
+.correio { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 14px; min-height: 360px; }
+.correio-lado { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.correio-acoes { display: flex; gap: 6px; flex-wrap: wrap; }
+.correio-acoes .botao { padding: 6px 10px; font-size: 0.82rem; }
+.correio-lista { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; max-height: 52vh; padding-right: 2px; }
+.correio-vazio { color: var(--texto-2); }
+.correio-linha {
+  display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 8px 10px; border-radius: 10px; cursor: pointer;
+  background: var(--painel-2); border: 1px solid var(--borda); color: var(--texto-2); font: inherit;
+}
+.correio-linha strong { color: var(--texto); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.correio-linha small { font-size: 0.75rem; }
+.correio-linha-topo { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; }
+.correio-linha.nao-lida { border-color: var(--destaque); }
+.correio-linha.nao-lida strong { font-weight: 800; }
+.correio-linha.nao-lida .correio-linha-topo::before { content: ''; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--destaque); order: -1; }
+.correio-linha:hover, .correio-linha.ativa { background: rgb(233 185 73 / 0.16); }
+.correio-linha.ativa { box-shadow: inset 3px 0 0 var(--destaque); }
+.correio-carta { display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 12px; background: var(--painel-2); border: 1px solid var(--borda); min-width: 0; }
+.correio-carta.vazia { align-items: center; justify-content: center; color: var(--texto-2); }
+.correio-carta h3 { margin: 0; }
+.correio-de { color: var(--texto-2); }
+.correio-texto { margin: 4px 0; white-space: pre-wrap; line-height: 1.45; overflow-wrap: anywhere; }
+.correio-anexos h4 { margin: 6px 0; font-size: 0.9rem; }
+.correio-anexos-lista { display: flex; flex-wrap: wrap; gap: 8px; }
+.correio-anexos-lista.resgatados { opacity: 0.55; }
+.correio-anexo {
+  display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 10px;
+  background: rgb(0 0 0 / 0.25); border: 1px solid var(--borda); font-size: 0.85rem;
+}
+.correio-anexo img:not(.icone-png) { width: 40px; height: 40px; object-fit: contain; image-rendering: pixelated; }
+.correio-anexo .icone-caixa .icone-png { width: 28px; height: 28px; }
+.correio-simbolo { font-size: 1.4rem; }
+.correio-botoes { display: flex; gap: 8px; margin-top: auto; padding-top: 6px; }
+@media (max-width: 640px) {
+  .correio { grid-template-columns: 1fr; }
+  .correio-lista { max-height: 30vh; }
+}
+/* Administração → Correio */
+.admin-correio textarea { resize: vertical; min-height: 110px; font: inherit; }
+.adm-correio-todos { flex-direction: row; align-items: center; gap: 8px; }
+.adm-correio-anexar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.admin-correio .correio-anexo .botao { padding: 0 6px; min-height: 0; font-size: 0.75rem; }
+
+/* ---------- Temas dos eventos (ui/temaEvento.ts) ----------
+   Cada tema define --t1 (fundo escuro), --t2 (cor principal), --t3 (brilho) e --desenho (padrão do fundo). */
+.tema-torneio { --t1: #3a1d08; --t2: #e9b949; --t3: #fff1b8;
+  --desenho: repeating-linear-gradient(90deg, transparent 0 46px, rgb(233 185 73 / 0.18) 46px 48px), repeating-linear-gradient(0deg, transparent 0 22px, rgb(233 185 73 / 0.12) 22px 24px), radial-gradient(circle at 85% 30%, rgb(255 210 90 / 0.35), transparent 55%); }
+.tema-liga { --t1: #22103f; --t2: #a47cf0; --t3: #f6e7a8;
+  --desenho: radial-gradient(circle, rgb(246 231 168 / 0.35) 1px, transparent 1.6px) 0 0 / 18px 18px, radial-gradient(circle at 80% 20%, rgb(164 124 240 / 0.45), transparent 60%); }
+.tema-nightmare { --t1: #160505; --t2: #c0392b; --t3: #ff9a8a;
+  --desenho: repeating-linear-gradient(115deg, transparent 0 30px, rgb(192 57 43 / 0.16) 30px 31px), radial-gradient(ellipse at 20% 110%, rgb(192 57 43 / 0.55), transparent 60%), radial-gradient(ellipse at 90% -10%, rgb(80 0 0 / 0.7), transparent 60%); }
+.tema-boss { --t1: #1d0b24; --t2: #d0457a; --t3: #ffb3d0;
+  --desenho: repeating-linear-gradient(-60deg, transparent 0 26px, rgb(208 69 122 / 0.22) 26px 29px, transparent 29px 34px, rgb(208 69 122 / 0.16) 34px 36px, transparent 36px 70px), radial-gradient(circle at 85% 50%, rgb(150 40 200 / 0.45), transparent 60%); }
+.tema-outbreak { --t1: #3a0f02; --t2: #ff7a1a; --t3: #ffd27a;
+  --desenho: radial-gradient(circle, rgb(255 190 80 / 0.55) 1px, transparent 2px) 0 0 / 23px 31px, radial-gradient(ellipse at 50% 130%, rgb(255 90 20 / 0.6), transparent 65%); }
+.tema-ninho { --t1: #2b1a0c; --t2: #c98b4a; --t3: #ffe2b0;
+  --desenho: repeating-linear-gradient(35deg, transparent 0 14px, rgb(201 139 74 / 0.2) 14px 16px), repeating-linear-gradient(-28deg, transparent 0 19px, rgb(140 90 40 / 0.25) 19px 21px), radial-gradient(circle at 85% 60%, rgb(255 210 140 / 0.3), transparent 55%); }
+.tema-captura { --t1: #2a0a0a; --t2: #e8483f; --t3: #ffffff;
+  --desenho: repeating-radial-gradient(circle at 86% 50%, transparent 0 14px, rgb(255 255 255 / 0.13) 14px 16px), linear-gradient(transparent 49%, rgb(255 255 255 / 0.12) 49% 51%, transparent 51%); }
+.tema-cofre { --t1: #0f1a24; --t2: #7fb2d6; --t3: #e4f2ff;
+  --desenho: radial-gradient(circle, rgb(228 242 255 / 0.4) 1.4px, transparent 2px) 6px 6px / 24px 24px, repeating-radial-gradient(circle at 86% 50%, transparent 0 9px, rgb(127 178 214 / 0.2) 9px 11px), linear-gradient(135deg, rgb(255 255 255 / 0.08), transparent 60%); }
+.tema-loteria { --t1: #062114; --t2: #2fbf71; --t3: #ffe27a;
+  --desenho: radial-gradient(circle, rgb(255 226 122 / 0.45) 3px, transparent 4px) 0 0 / 34px 34px, radial-gradient(circle, rgb(47 191 113 / 0.35) 2px, transparent 3px) 17px 17px / 34px 34px; }
+.tema-expedicao { --t1: #1c2410; --t2: #b5c46a; --t3: #f3e7c0;
+  --desenho: repeating-radial-gradient(ellipse at 20% 70%, transparent 0 12px, rgb(243 231 192 / 0.14) 12px 13px), repeating-radial-gradient(ellipse at 85% 20%, transparent 0 10px, rgb(181 196 106 / 0.18) 10px 11px); }
+.tema-safari { --t1: #122412; --t2: #7cc46a; --t3: #e8f5c8;
+  --desenho: repeating-linear-gradient(70deg, transparent 0 18px, rgb(124 196 106 / 0.18) 18px 20px), radial-gradient(circle at 85% 40%, rgb(232 245 200 / 0.25), transparent 55%); }
+
+.evento-banner {
+  position: relative; overflow: hidden; display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 14px;
+  background: linear-gradient(120deg, var(--t1), color-mix(in srgb, var(--t1) 70%, var(--t2))); border: 1px solid color-mix(in srgb, var(--t2) 60%, transparent);
+  box-shadow: inset 0 0 30px rgb(0 0 0 / 0.45), 0 6px 18px rgb(0 0 0 / 0.35); color: #fff; isolation: isolate;
+}
+.evento-banner-desenho { position: absolute; inset: 0; z-index: -1; background: var(--desenho); pointer-events: none; }
+.evento-banner::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgb(0 0 0 / 0.25), transparent 55%); pointer-events: none; }
+.evento-emblema {
+  flex: none; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; font-size: 2.1rem;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--t2) 55%, #fff), var(--t1) 75%);
+  border: 2px solid var(--t2); box-shadow: 0 0 18px color-mix(in srgb, var(--t2) 70%, transparent), inset 0 -4px 10px rgb(0 0 0 / 0.4);
+}
+.evento-banner-texto { flex: 1; min-width: 0; }
+.evento-banner-texto small { display: block; color: var(--t3); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.68rem; font-weight: 700; opacity: 0.9; }
+.evento-banner-texto h3 { margin: 2px 0; font-size: 1.35rem; color: #fff; text-shadow: 0 2px 0 rgb(0 0 0 / 0.5), 0 0 14px color-mix(in srgb, var(--t2) 60%, transparent); }
+.evento-banner-texto p { margin: 0; color: rgb(255 255 255 / 0.85); font-size: 0.86rem; }
+.evento-selo { flex: none; align-self: flex-start; padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.05em; background: rgb(0 0 0 / 0.45); border: 1px solid rgb(255 255 255 / 0.25); color: #ddd; }
+.evento-selo.ativo { background: #1f9d55; border-color: #7ef0ad; color: #fff; animation: selo-ao-vivo 1.6s ease-in-out infinite; }
+.evento-selo.espera { background: color-mix(in srgb, var(--t2) 35%, #000); border-color: var(--t2); color: var(--t3); }
+@keyframes selo-ao-vivo { 50% { box-shadow: 0 0 0 4px rgb(126 240 173 / 0.25); } }
+@media (prefers-reduced-motion: reduce) { .evento-selo.ativo { animation: none; } }
+
+/* janela inteira no tema do evento */
+.janela.janela-tematica { border-color: color-mix(in srgb, var(--t2) 70%, var(--borda)); box-shadow: 0 30px 60px rgb(0 0 0 / 0.5), 0 0 40px color-mix(in srgb, var(--t2) 22%, transparent); }
+.janela.janela-tematica > header { background: linear-gradient(90deg, color-mix(in srgb, var(--t1) 85%, transparent), transparent); border-bottom-color: color-mix(in srgb, var(--t2) 50%, var(--borda)); border-radius: 14px 14px 0 0; }
+.janela.janela-tematica > header h2 { color: var(--t3); }
+.janela-tematica .evento-banner { margin-bottom: 12px; }
+.janela-tematica .evento-bloco, .janela-tematica .liga-cartao { border-color: color-mix(in srgb, var(--t2) 40%, var(--borda)); }
+.janela-tematica .evento-bloco h3, .janela-tematica h4 { color: var(--t3); }
+.liga-cartao.tema-liga, .liga-cartao.tema-nightmare { padding: 0; overflow: hidden; }
+.liga-cartao .evento-banner { border-radius: 0; border: none; margin: 0 0 8px; }
+.liga-cartao > :not(.evento-banner) { margin-left: 12px; margin-right: 12px; }
+.liga-cartao > :last-child { margin-bottom: 12px; }
+
+/* ---------- Janela de Eventos (NPC Eventos): abas temáticas ---------- */
+.janela.janela-eventos { width: min(900px, 100%); }
+.janela-eventos .janela-corpo { max-width: none; }
+.eventos-abas-layout { display: grid; grid-template-columns: 190px 1fr; gap: 14px; }
+.eventos-abas { display: flex; flex-direction: column; gap: 6px; }
+.evento-aba {
+  position: relative; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; cursor: pointer; text-align: left; font: inherit;
+  color: var(--texto); background: linear-gradient(90deg, color-mix(in srgb, var(--t1) 80%, transparent), var(--painel-2)); border: 1px solid color-mix(in srgb, var(--t2) 35%, var(--borda));
+}
+.evento-aba .evento-aba-emblema { font-size: 1.25rem; }
+.evento-aba:hover { border-color: var(--t2); }
+.evento-aba.ativa { border-color: var(--t2); box-shadow: inset 3px 0 0 var(--t2), 0 0 14px color-mix(in srgb, var(--t2) 35%, transparent); background: linear-gradient(90deg, color-mix(in srgb, var(--t2) 30%, var(--t1)), var(--painel-2)); }
+.evento-aba-ponto { margin-left: auto; width: 9px; height: 9px; border-radius: 50%; background: #1f9d55; box-shadow: 0 0 0 3px rgb(31 157 85 / 0.25); }
+.evento-aba-conteudo .evento-bloco { background: rgb(0 0 0 / 0.25); }
+@media (max-width: 680px) {
+  .eventos-abas-layout { grid-template-columns: 1fr; }
+  .eventos-abas { flex-direction: row; overflow-x: auto; }
+  .evento-aba { flex: none; }
+}
+
+/* ---------- Comunidade → Eventos (telas/eventosInfo.ts) ---------- */
+.tela-eventos-info { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+.tela-eventos-info h2 { margin: 0 0 8px; }
+.eventos-relogio { color: var(--texto-2); margin: 0; }
+.eventos-ativos { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.eventos-ativos .evento-banner { min-height: 96px; }
+.eventos-nenhum { color: var(--texto-2); }
+.eventos-agenda { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.eventos-agenda li { display: grid; grid-template-columns: 170px 1.8rem 1fr auto; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 10px; background: var(--painel-2); border: 1px solid var(--borda); border-left: 4px solid var(--t2); }
+.eventos-agenda li.passou { opacity: 0.45; }
+.eventos-agenda li.agora { background: linear-gradient(90deg, color-mix(in srgb, var(--t2) 28%, var(--painel-2)), var(--painel-2)); }
+.eventos-agenda li.proximo { box-shadow: 0 0 0 1px var(--destaque); }
+.eventos-agenda .hora { font-variant-numeric: tabular-nums; font-weight: 700; }
+.eventos-agenda .estado { font-size: 0.75rem; color: var(--texto-2); }
+.eventos-agenda li.agora .estado { color: #7ef0ad; font-weight: 700; }
+.eventos-agenda li.proximo .estado { color: var(--destaque); font-weight: 700; }
+.eventos-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.evento-cartao { display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; background: var(--painel-2); border: 1px solid color-mix(in srgb, var(--t2) 40%, var(--borda)); }
+.evento-cartao .evento-banner { border-radius: 0; border: none; box-shadow: none; }
+.evento-cartao dl { margin: 0; padding: 10px 14px 12px; display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; font-size: 0.86rem; }
+.evento-cartao dt { color: var(--t3); font-weight: 700; }
+.evento-cartao dd { margin: 0; color: var(--texto); }
+.evento-cartao .evento-guia { margin: auto 14px 12px; font-size: 0.78rem; color: var(--texto-2); }
+@media (max-width: 640px) {
+  .eventos-agenda li { grid-template-columns: 70px 1.5rem 1fr; }
+  .eventos-agenda .estado { grid-column: 3; }
+  .evento-emblema { width: 52px; height: 52px; font-size: 1.7rem; }
+}
+@media (max-width: 640px) {
+  .evento-banner { padding-top: 30px; }
+  .evento-selo { position: absolute; top: 8px; right: 8px; }
+}
+/* F1: lista de atalhos de teclado (atalhos.ts) */
+.atalhos { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.atalhos h3 { margin: 0 0 8px; }
+.atalhos-lista { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0; align-items: center; }
+.atalhos-lista dd { margin: 0; }
+.atalhos kbd { display: inline-block; min-width: 28px; padding: 2px 8px; text-align: center; border-radius: 6px; background: var(--painel-2); border: 1px solid var(--borda); border-bottom-width: 3px; font: 700 0.85rem/1.4 inherit; }
+.atalhos .meta { grid-column: 1 / -1; margin: 0; }

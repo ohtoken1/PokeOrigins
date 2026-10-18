@@ -4,10 +4,11 @@ import type { Tela } from '../main';
 import { el } from '../ui/dom';
 import { telaAmigos } from './amigos';
 import { telaCla } from './cla';
+import { telaEventosInfo } from './eventosInfo';
 
-export type SecaoComunidade = 'amigos' | 'cla' | 'continentes' | 'duelos' | 'ginasios';
+export type SecaoComunidade = 'amigos' | 'cla' | 'eventos' | 'continentes' | 'duelos' | 'ginasios';
 
-const SECOES: Record<SecaoComunidade, { titulo: string; icone: string; texto: string; itens: string[] }> = {
+const SECOES: Record<Exclude<SecaoComunidade, 'eventos'>, { titulo: string; icone: string; texto: string; itens: string[] }> = {
   amigos: {
     titulo: 'Amigos',
     icone: '👥',
@@ -40,7 +41,7 @@ const SECOES: Record<SecaoComunidade, { titulo: string; icone: string; texto: st
   },
 };
 
-export const telaComunidade = (secao: SecaoComunidade): Tela => secao === 'amigos' ? telaAmigos : secao === 'cla' ? telaCla : (raiz) => {
+export const telaComunidade = (secao: SecaoComunidade): Tela => secao === 'amigos' ? telaAmigos : secao === 'cla' ? telaCla : secao === 'eventos' ? telaEventosInfo : (raiz) => {
   const s = SECOES[secao];
   raiz.append(
     el(

@@ -1,6 +1,6 @@
 // Cabeçalho fixo embaixo da barra do topo, em todas as telas (menos as que precisam do espaço: criação do
 // personagem e roleta do inicial; no mapa do bioma ele aparece, pedido do dono). Mostra nome, VIP, XP de treinador, região, Pokédex da região,
-// insígnias, silver/gold e atalhos (Centro Pokémon, Pokémarket, Bolsa, PC, Mapas).
+// insígnias, silver/gold e atalhos (Centro Pokémon, Pokémarket, Bolsa, PC, Correio, Mapas).
 import { ehAdministrador } from '../bonificacao';
 import { lideresDaRegiao } from '../../../shared/ginasios';
 import { insigniaVisual } from '../telas/ginasios';
@@ -11,6 +11,8 @@ import { progressoTreinador } from '../../../shared/treinador';
 import { tempoRestanteVip, vipAtivo } from '../../../shared/vip';
 import { aoSalvar, carregarSave } from '../estado';
 import { abrirCura } from './cura';
+import { aoMudarCorreio, cartasNovas } from '../correio';
+import { abrirCorreio } from './correio';
 import { abrirBolsa } from './bolsa';
 import { el } from './dom';
 import { iconePokedex } from './barraTopo';
@@ -97,12 +99,24 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
           ehAdministrador() ? atalho('loja', 'Pokémarket', () => abrirLoja(save, aoMudar)) : null,
           atalho('mochila', 'Bolsa', () => abrirBolsa(save, aoMudar)),
           atalho('computador', 'PC', () => abrirPC(save, aoMudar)),
+          // Correio: prêmios de eventos, presentes da staff e avisos (o número = cartas novas ou com anexo)
+          seloDoCorreio(el('button', { class: 'atalho-hex atalho-correio', title: 'Correio', 'aria-label': 'Correio', onclick: abrirCorreio }, icone('carta'))),
           // Mapas: jogadores saem pela saída do sul da cidade; para eles o atalho leva à cidade
           ehAdministrador() ? atalho('mapa', 'Mapas', () => navegar({ tela: 'regiao' })) : atalho('mapa', 'Cidade', () => navegar({ tela: 'cidade' })),
           aviso),
       letreiro,
     );
   }
+
+  /** Número de cartas novas (ou com anexo para resgatar) em cima do envelope. */
+  function seloDoCorreio(botao = raiz.querySelector<HTMLElement>('.atalho-correio')): HTMLElement | null {
+    if (!botao) return null;
+    botao.querySelector('.selo-correio')?.remove();
+    const novas = cartasNovas();
+    if (novas) botao.append(el('span', { class: 'selo-correio' }, novas > 99 ? '99+' : String(novas)));
+    return botao;
+  }
+  aoMudarCorreio(() => void seloDoCorreio());
 
   // gastou ou ganhou silver/gold (ficha, loja, bolsa, admin…): a carteira muda na hora, sem esperar trocar de tela
   aoSalvar((save) => {

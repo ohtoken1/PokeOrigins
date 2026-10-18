@@ -10,6 +10,7 @@ import { type Save } from './estado';
 import { aoAvisoDoServidor } from './online';
 import { confirmar } from './ui/confirmar';
 import { el, spritePokemon } from './ui/dom';
+import { bannerEvento, classeTematica } from './ui/temaEvento';
 import { abrirJanela } from './ui/janela';
 import { avisar } from './ui/avisos';
 
@@ -70,10 +71,15 @@ export function abrirBoss(save: Save, lutar: (boss: PokemonIndividual, nome: str
   let aviso = '';
   const janela = abrirJanela('Boss', () => {
     const b = estado;
-    if (!b) return el('p', { class: 'meta' }, 'A gaiola está vazia. Fique de olho nos avisos!');
+    if (!b) return el('div', { class: 'boss-janela' }, bannerEvento('boss', { selo: { texto: 'Gaiola vazia', estado: 'fechado' } }), el('p', { class: 'meta' }, 'A gaiola está vazia. Fique de olho nos avisos!'));
     const ativo = !!bossAtual();
     const min = Math.max(0, Math.ceil((b.fim - Date.now()) / 60_000));
     return el('div', { class: 'boss-janela' },
+      bannerEvento('boss', {
+        titulo: b.tipo === 'global' ? 'Boss global' : 'Boss da guilda',
+        subtitulo: b.nome,
+        selo: ativo ? { texto: `● AO VIVO · ${min} min`, estado: 'ativo' } : { texto: 'Terminou', estado: 'fechado' },
+      }),
       el('p', { class: 'aviso-bolsa', hidden: !aviso, role: 'status' }, aviso),
       el('div', { class: 'expedicao-time' }, spritePokemon(pokemonPorId(b.especieId), { animado: false }),
         el('div', {}, el('strong', {}, `${b.tipo === 'global' ? '👹 Boss global' : '🛡️ Boss da guilda'}: ${b.nome}`),
@@ -108,6 +114,6 @@ export function abrirBoss(save: Save, lutar: (boss: PokemonIndividual, nome: str
       el('ol', { class: 'evento-ranking' }, ...b.ranking.map((r) => el('li', {}, `${r.nome}${r.guilda ? ` [${r.guilda}]` : ''} — ${numero(r.dano)}`))),
       b.tipo === 'guilda' ? el('h3', {}, 'Guildas') : '',
       b.tipo === 'guilda' ? el('ol', { class: 'evento-ranking' }, ...b.guildas.map((g) => el('li', {}, `${g.nome} — ${numero(g.dano)}`))) : '');
-  }, { classe: 'janela-boss' });
+  }, { classe: `janela-boss ${classeTematica('boss')}` });
   const parar = aoMudarBoss(() => (document.querySelector('.janela-boss') ? janela.redesenhar() : parar()));
 }

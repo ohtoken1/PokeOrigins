@@ -4,6 +4,7 @@
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { avisar, avisarEvento, avisarTodos, estaOnline } from './mundo.ts';
+import * as correio from './correio.ts';
 import { criarBatalha, emBatalha } from './pvp.ts';
 import { itemAleatorio, nomeDoItem, problemasDoTimeNoTorneio } from './motorDoJogo.ts';
 import { NIVEL_MINIMO, liberado } from '../../shared/trancas.ts';
@@ -80,7 +81,7 @@ function novoTorneio(horario: number, tipo: EstadoTorneio['tipo'], agora: number
 }
 
 function devolverEntradas(t: EstadoTorneio): void {
-  for (const i of t.inscritos) banco.criarEntrega(i.contaId, 'silver', 'Torneio cancelado: entrada devolvida', ENTRADA_TORNEIO, 'torneio');
+  for (const i of t.inscritos) correio.enviar(i.contaId, 'Torneio cancelado', 'O Torneio foi cancelado. Aqui está a sua entrada de volta.', [correio.anexoItem('silver', 'Poké Dólares', ENTRADA_TORNEIO)], 'torneio');
 }
 
 const embaralhar = <T>(lista: T[]) => {
@@ -195,24 +196,25 @@ function premiar(t: EstadoTorneio): void {
   const nome = (c: number) => t.inscritos.find((i) => i.contaId === c)?.nome ?? '?';
   podio.forEach((contaId, i) => {
     const p = PREMIOS_TORNEIO[i];
-    banco.criarEntrega(contaId, 'silver', `Torneio: ${i + 1}º lugar`, p.silver, 'torneio');
-    if (p.gold) banco.criarEntrega(contaId, 'gold', `Torneio: ${i + 1}º lugar`, p.gold, 'torneio');
-    banco.criarEntrega(contaId, ['medalha-ouro', 'medalha-prata', 'medalha-bronze'][i], `Medalha de ${['ouro', 'prata', 'bronze'][i]} do Torneio`, 1, 'torneio');
-    if (!p.roleta) return;
-    // a roleta é sorteada aqui; o jogo do campeão só gira até a fatia
-    const fatia = sortearFatia(ROLETA_TORNEIO);
-    const id = ROLETA_TORNEIO[fatia].id;
-    if (id === 'silver') banco.criarEntrega(contaId, 'silver', 'Roleta do Torneio', 50_000, 'torneio');
-    else if (id === 'fragmentos') banco.criarEntrega(contaId, 'fragmentos', 'Roleta do Torneio: Fragmentos Temporais', 3, 'torneio');
-    else {
-      const item = id === 'mint' || id === 'charm' || id === 'orb' ? itemAleatorio(id) : id;
-      banco.criarEntrega(contaId, item, `Roleta do Torneio: ${nomeDoItem(item)}`, 1, 'torneio');
-    }
-    avisar(contaId, { t: 'torneio-roleta', fatia });
+    const anexos = [correio.anexoItem('silver', 'Poké Dólares', p.silver)];
+    if (p.gold) anexos.push(correio.anexoItem('gold', 'Origin Coins', p.gold));
+    anexos.push(correio.anexoItem(['medalha-ouro', 'medalha-prata', 'medalha-bronze'][i], `Medalha de ${['ouro', 'prata', 'bronze'][i]} do Torneio`, 1));
+    if (p.roleta) anexos.push(premioDaRoleta(contaId));
+    correio.enviar(contaId, `Torneio: ${i + 1}º lugar`, `Parabéns! Você ficou em ${i + 1}º lugar no Torneio.`, anexos, 'torneio');
   });
-  for (const c of podio) avisar(c, { t: 'entrega' });
   gravar(t);
   avisarEvento(`🏆 ${nome(podio[0])} venceu o Torneio! 2º: ${nome(podio[1])} · 3º: ${nome(podio[2])}`);
+}
+
+/** Roleta do Torneio: sorteada aqui; o jogo do campeão só gira até a fatia. O prêmio vai junto na carta do 1º lugar. */
+function premioDaRoleta(contaId: number): correio.Anexo {
+  const fatia = sortearFatia(ROLETA_TORNEIO);
+  const id = ROLETA_TORNEIO[fatia].id;
+  avisar(contaId, { t: 'torneio-roleta', fatia });
+  if (id === 'silver') return correio.anexoItem('silver', 'Roleta do Torneio: Poké Dólares', 50_000);
+  if (id === 'fragmentos') return correio.anexoItem('fragmentos', 'Roleta do Torneio: Fragmentos Temporais', 3);
+  const item = id === 'mint' || id === 'charm' || id === 'orb' ? itemAleatorio(id) : id;
+  return correio.anexoItem(item, `Roleta do Torneio: ${nomeDoItem(item)}`, 1);
 }
 
 // ---------- relógio do torneio ----------
@@ -367,7 +369,6 @@ export function cancelar(conta: banco.Conta) {
   const t = ler();
   if (!t || t.fase === 'fim' || t.fase === 'cancelado') throw new ErroConta('Não há torneio em andamento.', 409);
   devolverEntradas(t);
-  for (const i of t.inscritos) avisar(i.contaId, { t: 'entrega' });
   t.fase = 'cancelado';
   gravar(t);
   avisarEvento('🏆 O Torneio foi cancelado pela staff. As entradas foram devolvidas.');

@@ -21,6 +21,8 @@ import { ninhoAtual, type EstadoNinhoServidor } from '../ninho';
 import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons } from '../dados';
 import { salvar, type PokemonDoJogador } from '../estado';
 import { spritePokemon } from './dom';
+import { EVENTOS, bannerEvento, type EstadoSelo } from './temaEvento';
+import { HORA_SORTEIO, INTERVALO_NINHO_MS, agoraEmBrasilia, slotDoNinho } from '../../../shared/eventosRegras';
 
 interface EstadoEventos {
   boss: { tipo: string; nome: string; fim: number; ativo: boolean; resultado: string | null } | null;
@@ -81,7 +83,28 @@ const tempo = (ms: number) => {
   return min >= 60 ? `${Math.floor(min / 60)} h ${String(min % 60).padStart(2, '0')} min` : `${min} min`;
 };
 
-export function abrirEventos(save: Save, aoMudar: () => void = () => {}): void {
+type AbaEvento = 'expedicao' | 'ninho' | 'captura' | 'cofre' | 'loteria';
+const ABAS: AbaEvento[] = ['expedicao', 'ninho', 'captura', 'cofre', 'loteria'];
+const ROTULO_ABA: Record<AbaEvento, string> = { expedicao: 'Expedição', ninho: 'Ninho', captura: 'Captura', cofre: 'Cofre', loteria: 'Loteria' };
+const CHAVE_ABA = 'jogo-claude:aba-eventos';
+const guardarAba = (aba: AbaEvento) => {
+  try {
+    localStorage.setItem(CHAVE_ABA, aba);
+  } catch {
+    // sem armazenamento: abre na primeira aba
+  }
+};
+const abaGuardada = (): AbaEvento => {
+  try {
+    const a = localStorage.getItem(CHAVE_ABA) as AbaEvento | null;
+    return a && ABAS.includes(a) ? a : 'expedicao';
+  } catch {
+    return 'expedicao';
+  }
+};
+
+export function abrirEventos(save: Save, aoMudar: () => void = () => {}, abaInicial?: AbaEvento): void {
+  let aba: AbaEvento = abaInicial ?? abaGuardada();
   let estado: EstadoEventos | null = null;
   let escolhendo = false;
   const escolhidos = new Set<PokemonDoJogador>();
@@ -92,7 +115,6 @@ export function abrirEventos(save: Save, aoMudar: () => void = () => {}): void {
 
   const secaoCofre = (c: EstadoEventos['cofre']) =>
     el('section', { class: 'evento-bloco' },
-      el('h3', {}, '🔐 Cofre PokeOrigins'),
       c?.aberto
         ? el('div', {},
             el('p', {}, 'Prêmio: ', el('strong', {}, c.premio)),
@@ -118,7 +140,6 @@ export function abrirEventos(save: Save, aoMudar: () => void = () => {}): void {
       janela.redesenhar();
     };
     return el('section', { class: 'evento-bloco' },
-      el('h3', {}, '🎰 Loteria PokeOrigins'),
       el('p', {}, 'Prêmio acumulado: ', valorEmMoeda('silver', l.pote)),
       el('p', { class: 'meta' }, `Bilhete de ${numero(PRECO_BILHETE)} com um número de 5 dígitos. Vendas até as 20h; o sorteio sai às 20h05 (Brasília). Ninguém acertou? O prêmio acumula. Máximo de ${BILHETES_POR_JOGADOR} bilhetes por dia.`),
       l.ultimo ? el('p', { class: 'meta' }, `Último sorteio: ${formatarBilhete(l.ultimo.numero)} — ${l.ultimo.vencedor ? `${l.ultimo.vencedor} ganhou ${numero(l.ultimo.premio)}!` : 'ninguém acertou.'}`) : null,
@@ -134,7 +155,7 @@ export function abrirEventos(save: Save, aoMudar: () => void = () => {}): void {
 
   const secaoExpedicao = () => {
     const e = save.expedicao;
-    const bloco = (...filhos: (HTMLElement | string | null)[]) => el('section', { class: 'evento-bloco' }, el('h3', {}, '🧭 Expedição'), ...filhos.filter((x): x is HTMLElement | string => x !== null));
+    const bloco = (...filhos: (HTMLElement | string | null)[]) => el('section', { class: 'evento-bloco' }, ...filhos.filter((x): x is HTMLElement | string => x !== null));
     if (e) {
       const volta = e.fim - Date.now();
       return bloco(
@@ -174,7 +195,6 @@ export function abrirEventos(save: Save, aoMudar: () => void = () => {}): void {
 
   const secaoCaptura = (c: EstadoEventos['captura']) =>
     el('section', { class: 'evento-bloco' },
-      el('h3', {}, '🎯 Evento de captura'),
       c?.ativo
         ? el('div', {},
             el('div', { class: 'expedicao-time' }, spritePokemon(pokemonPorId(c.especieId), { animado: false }), el('strong', {}, c.nome)),
@@ -186,17 +206,58 @@ export function abrirEventos(save: Save, aoMudar: () => void = () => {}): void {
   const secaoNinho = () => {
     const n = ninhoAtual();
     return el('section', { class: 'evento-bloco' },
-      el('h3', {}, '🪺 Ninho'),
       n
         ? el('p', {}, `Há um ninho de ${n.nome} em ${REGIOES.find((r) => r.id === n.regiao)?.nome} · ${n.bioma.nome}. Some em ${tempo(n.servidor.fim - Date.now())}. Vá até o mapa e clique em "Enfrentar o ninho".`)
         : el('p', { class: 'meta' }, 'Nenhum ninho agora. Um novo aparece a cada 20 minutos.'));
   };
 
-  const janela = abrirJanela('Eventos', () =>
-    el('div', { class: 'eventos' },
-      el('p', { class: 'aviso-bolsa', hidden: !aviso, role: 'status' }, aviso),
-      estado ? el('div', {}, secaoExpedicao(), secaoNinho(), secaoCaptura(estado.captura), secaoCofre(estado.cofre), secaoLoteria(estado.loteria)) : el('p', { class: 'meta' }, 'Carregando…')),
-  { classe: 'janela-eventos' });
+  /** Situação de cada aba (selo do banner e bolinha verde na aba). */
+  const selos = (e: EstadoEventos): Record<AbaEvento, { texto: string; estado: EstadoSelo }> => {
+    const agora = Date.now();
+    const exp = save.expedicao;
+    const ninho = ninhoAtual();
+    const proximoNinho = new Date((slotDoNinho(agora) + 1) * INTERVALO_NINHO_MS).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+    return {
+      expedicao: exp ? (exp.fim > agora ? { texto: `Volta em ${tempo(exp.fim - agora)}`, estado: 'espera' } : { texto: 'Voltou!', estado: 'ativo' }) : { texto: 'Sempre aberta', estado: 'espera' },
+      ninho: ninho ? { texto: '● AO VIVO', estado: 'ativo' } : { texto: `Próximo às ${proximoNinho}`, estado: 'espera' },
+      captura: e.captura?.ativo ? { texto: '● AO VIVO', estado: 'ativo' } : { texto: 'Quando a staff ligar', estado: 'fechado' },
+      cofre: e.cofre?.aberto ? { texto: '● AO VIVO', estado: 'ativo' } : { texto: 'Trancado', estado: 'fechado' },
+      loteria: e.loteria.pausada ? { texto: 'Pausada', estado: 'fechado' } : e.loteria.vendendo ? { texto: 'Vendas abertas', estado: 'ativo' } : agoraEmBrasilia(agora).minutos < HORA_SORTEIO.hora * 60 + HORA_SORTEIO.minuto ? { texto: 'Sorteio às 20h05', estado: 'espera' } : { texto: 'Vendas amanhã', estado: 'espera' },
+    };
+  };
+  const conteudoDa = (e: EstadoEventos): Record<AbaEvento, () => HTMLElement> => ({
+    expedicao: secaoExpedicao, ninho: secaoNinho, captura: () => secaoCaptura(e.captura), cofre: () => secaoCofre(e.cofre), loteria: () => secaoLoteria(e.loteria),
+  });
+
+  const janela = abrirJanela('Eventos', () => {
+    if (!estado) return el('p', { class: 'meta' }, aviso || 'Carregando…');
+    const s = selos(estado);
+    // a janela inteira pega o tema da aba aberta
+    queueMicrotask(() => {
+      const j = document.querySelector('.janela-eventos');
+      if (!j) return;
+      for (const c of [...j.classList]) if (c.startsWith('tema-')) j.classList.remove(c);
+      j.classList.add('janela-tematica', `tema-${aba}`);
+    });
+    return el('div', { class: 'eventos-abas-layout' },
+      el('nav', { class: 'eventos-abas', 'aria-label': 'Eventos' },
+        ...ABAS.map((id) => el('button', {
+          class: `evento-aba tema-${id} ${id === aba ? 'ativa' : ''}`, type: 'button',
+          onclick: () => {
+            aba = id;
+            aviso = '';
+            guardarAba(id);
+            janela.redesenhar();
+          },
+        }, el('span', { class: 'evento-aba-emblema', 'aria-hidden': 'true' }, EVENTOS[id].emblema), el('span', {}, ROTULO_ABA[id]),
+        s[id].estado === 'ativo' ? el('span', { class: 'evento-aba-ponto', title: 'Acontecendo agora' }) : ''))),
+      el('div', { class: `evento-aba-conteudo tema-${aba}` },
+        bannerEvento(aba, { subtitulo: EVENTOS[aba].quando, selo: s[aba] }),
+        el('p', { class: 'aviso-bolsa', hidden: !aviso, role: 'status' }, aviso),
+        conteudoDa(estado)[aba]()));
+  }, { classe: 'janela-eventos' });
+  // o tempo dos selos (volta da expedição, próximo ninho) anda sozinho
+  const relogio = setInterval(() => (document.querySelector('.janela-eventos') ? janela.redesenhar() : clearInterval(relogio)), 30_000);
   void carregar();
   const parar = aoAvisoDoServidor((msg) => {
     if (msg.t !== 'eventos') return;
