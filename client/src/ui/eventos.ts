@@ -233,11 +233,11 @@ export function painelEventosStaff(): HTMLElement {
     return el('div', {}, abas, lista,
       el('div', { class: 'evento-compra' }, campo, qtd,
         el('button', {
-          class: 'botao', onclick: () => {
+          class: 'botao', onclick: async () => {
             const i = achado();
             const quantidade = Math.round(Number(qtd.value));
             if (!i) return ((aviso = 'Escolha um item da lista.'), void desenhar());
-            if (!confirm(`Trancar ${quantidade}x ${i.nome} no cofre?`)) return;
+            if (!(await confirmar('Confirmar', `Trancar ${quantidade}x ${i.nome} no cofre?`))) return;
             void enviar('/eventos/cofre/abrir', { tipo: 'item', item: i.id, quantidade, nome: quantidade > 1 ? `${quantidade}x ${i.nome}` : i.nome });
           },
         }, 'Trancar no cofre')),
@@ -261,7 +261,7 @@ export function painelEventosStaff(): HTMLElement {
       }
       void desenhar();
     };
-    const ligar = (evento: string, texto: string) => el('button', { class: 'botao', onclick: () => confirm(`${texto}?`) && void enviar('/eventos/ligar', { evento }) }, texto);
+    const ligar = (evento: string, texto: string) => el('button', { class: 'botao', onclick: async () => (await confirmar('Confirmar', `${texto}?`)) && void enviar('/eventos/ligar', { evento }) }, texto);
     const linha = (nome: string, acao: HTMLElement | string) => el('div', { class: 'evento-linha' }, el('strong', {}, nome), typeof acao === 'string' ? el('small', { class: 'meta' }, acao) : acao);
     const partes: (HTMLElement | null)[] = [
       el('h2', {}, 'Ligar eventos agora (testes)'),
@@ -271,17 +271,13 @@ export function painelEventosStaff(): HTMLElement {
         linha('🎰 Loteria', ligar('loteria', 'Sortear agora')),
         linha('🎯 Evento de captura', 'mais abaixo'),
         linha('🔐 Cofre', 'mais abaixo'),
-        linha('🧭 Expedição', 'sempre aberta (NPC Eventos)'),
-        linha('🦒 Safari', 'sempre aberto (NPC Safari)'),
-        linha('📋 Quadro de missões', 'sempre aberto'),
         linha('👹 Boss global', 'mais abaixo'),
         linha('🛡️ Boss da guilda', 'mais abaixo'),
-        linha('🏆 Torneio', 'em breve'),
-        linha('⚔️ PvP ranqueado', 'em breve'),
-        linha('👑 Liga Pokémon', 'em breve')),
+        linha('🏆 Torneio', 'aba Torneio'),
+        linha('👑 Liga Pokémon', 'times na aba Liga')),
       el('h2', {}, 'Boss (gaiola da cidade)'),
       e?.boss?.ativo
-        ? el('p', {}, `Na gaiola: ${e.boss.nome} (${e.boss.tipo === 'global' ? 'global' : 'da guilda'}), termina em ${tempo(e.boss.fim - Date.now())}. `, el('button', { class: 'botao secundario', onclick: () => confirm('Encerrar o boss agora e entregar os prêmios?') && void enviar('/eventos/boss/encerrar', {}) }, 'Encerrar agora'))
+        ? el('p', {}, `Na gaiola: ${e.boss.nome} (${e.boss.tipo === 'global' ? 'global' : 'da guilda'}), termina em ${tempo(e.boss.fim - Date.now())}. `, el('button', { class: 'botao secundario', onclick: async () => (await confirmar('Confirmar', 'Encerrar o boss agora e entregar os prêmios?')) && void enviar('/eventos/boss/encerrar', {}) }, 'Encerrar agora'))
         : el('div', {},
             e?.boss?.resultado ? el('p', { class: 'meta' }, `Último: ${e.boss.nome} — ${e.boss.resultado}`) : '',
             el('nav', { class: 'admin-abas' }, ...(['global', 'guilda'] as const).map((k) => el('button', { class: `aba ${k === tipoBoss ? 'ativa' : ''}`, type: 'button', onclick: () => ((tipoBoss = k), void desenhar()) }, k === 'global' ? 'Boss global' : 'Boss da guilda'))),
@@ -297,11 +293,11 @@ export function painelEventosStaff(): HTMLElement {
       e?.captura?.ativo
         ? el('p', {}, `Em andamento: ${e.captura.nome} (até a meia-noite).`)
         : el('button', {
-            class: 'botao', onclick: () => {
+            class: 'botao', onclick: async () => {
               // só espécies comuns que aparecem soltas em algum mapa
               const lista = REGIOES.filter((r) => r.disponivel).flatMap((r) => BIOMAS.flatMap((b) => montarTabela(b, pokemonsDaRegiao(r.id), [], todosOsPokemons()).filter((x) => x.grupo === null).map((x) => x.pokemon)));
               const p = lista[Math.floor(Math.random() * lista.length)];
-              if (!confirm(`Começar o Evento de captura com ${p.nome}? Vai até a meia-noite.`)) return;
+              if (!(await confirmar('Confirmar', `Começar o Evento de captura com ${p.nome}? Vai até a meia-noite.`))) return;
               void enviar('/eventos/captura/iniciar', { especieId: p.id, nome: p.nome });
             },
           }, 'Sortear espécie e começar'),

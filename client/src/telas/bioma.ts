@@ -23,7 +23,7 @@ import { el, selosTipos, spritePokemon } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
 import { botaoIcone, botoesMenus } from '../ui/menus';
 import { mostrarEncontro } from '../ui/popupEncontro';
-import { painelTime } from '../ui/time';
+import { acompanharTime, painelTime } from '../ui/time';
 import { atalhosBiomas } from '../ui/atalhosBiomas';
 import { aparenciaDoSave } from '../personagem/aparencia';
 import { montarPersonagem } from '../personagem/lpc';
@@ -61,6 +61,8 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     cena()?.definirSeguidor(save.time[0] ? { especie: save.time[0].especieId, shiny: save.time[0].shiny } : null);
   };
   atualizarTime();
+  // o time mudou por fora (PC, bolsa…): aparece na hora
+  acompanharTime(caixaTime, atualizarTime);
 
   // todos os Pokémon que moram neste bioma: com % só quem pode aparecer na faixa de nível atual;
   // os de outras faixas mostram o nível, e os que só vêm por evolução (pedra/troca/amizade) mostram como
@@ -158,7 +160,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     atualizarPausa();
     abrirBatalha({
       save, bioma, selvagem: equipe[0],
-      treinador: { nome: `Ninho de ${nome}`, titulo: 'Ninho', equipe, recompensa: 0, mensagemInicio: `Um ${nome} furioso saltou do ninho!` },
+      treinador: { nome: `Ninho de ${nome}`, titulo: 'Ninho', equipe, recompensa: 0, mensagemInicio: `Um ${nome} furioso saltou do ninho!`, avisoFuga: 'Os Poké Dólares pagos para entrar no ninho NÃO serão devolvidos.' },
       aoTerminar: (resultado) => {
         aoFim(resultado === 'vitoria');
         if (resultado === 'derrota') return navegar({ tela: 'regiao' });

@@ -7,7 +7,10 @@ import { avisar } from './mundo.ts';
 import { guardarPokemon, type PokemonSave, type SaveMin } from './trocas.ts';
 
 /** Entregas que vão para um saldo do save, não para a bolsa (prêmios de eventos). */
-const SALDOS: Record<string, string> = { silver: 'silver', gold: 'gold', fragmentos: 'fragmentos', 'pontos-guilda': 'pontosGuilda' };
+const SALDOS: Record<string, string> = { silver: 'silver', gold: 'gold', fragmentos: 'fragmentos', 'pontos-guilda': 'pontosGuilda', 'league-coins': 'leagueCoins', 'league-coins-nightmare': 'leagueCoinsNightmare' };
+
+/** Medalhas de torneio (entregues como item, vão para save.estatisticas). */
+const MEDALHAS: Record<string, string> = { 'medalha-ouro': 'medalhasOuro', 'medalha-prata': 'medalhasPrata', 'medalha-bronze': 'medalhasBronze' };
 
 /** Limites de um pedido. */
 const QUANTIDADE_MAX = 9999;
@@ -40,7 +43,7 @@ const texto = (v: unknown, formato: RegExp): v is string => typeof v === 'string
  * Confere o Pokémon montado em Administração → Dar Pokémon e devolve só os campos conhecidos. O servidor não tem
  * os dados das espécies (isso é do jogo): aqui só se garante o formato e os limites (IV 0–31, EV 252/510…).
  */
-export function lerPokemon(v: unknown): PokemonSave {
+export function lerPokemon(v: unknown, nivelMaximo = 100): PokemonSave {
   const invalido = () => new ErroConta('Pokémon inválido.');
   if (!v || typeof v !== 'object') throw invalido();
   const p = v as Record<string, unknown>;
@@ -61,7 +64,7 @@ export function lerPokemon(v: unknown): PokemonSave {
     return { id: o.id, pp: o.pp };
   });
   if (new Set(lidos.map((g) => g.id)).size !== lidos.length) throw new ErroConta('Golpe repetido.');
-  if (!inteiro(p.especieId, 1, 99999) || !inteiro(p.nivel, 1, 100) || !inteiro(p.exp, 0, 10_000_000) || !inteiro(p.hp, 1, 999)) throw invalido();
+  if (!inteiro(p.especieId, 1, 99999) || !inteiro(p.nivel, 1, nivelMaximo) || !inteiro(p.exp, 0, 100_000_000) || !inteiro(p.hp, 1, 9999)) throw invalido();
   if (!texto(p.natureza, /^[A-Za-z]{3,12}$/) || !texto(p.habilidade, /^[A-Za-z0-9' .()-]{1,40}$/) || !texto(p.genero, /^[MFN]$/)) throw invalido();
   if (p.teraTipo !== undefined && !texto(p.teraTipo, /^[A-Za-z]{3,10}$/)) throw invalido();
   return {
@@ -100,6 +103,15 @@ export function receber(conta: banco.Conta) {
     const itens = (save.itens && typeof save.itens === 'object' ? save.itens : (save.itens = {})) as Record<string, unknown>;
     for (const e of lista) {
       // Poké Dólares e Origin Coins (prêmios de eventos): vão para o saldo, não para a bolsa
+      // medalhas de torneio: contam no perfil e no ranking (save.estatisticas)
+      const medalha = MEDALHAS[e.item];
+      if (medalha) {
+        const est = (save.estatisticas && typeof save.estatisticas === 'object' ? save.estatisticas : (save.estatisticas = {})) as Record<string, unknown>;
+        const atual = est[medalha];
+        est[medalha] = (typeof atual === 'number' && Number.isFinite(atual) ? atual : 0) + e.quantidade;
+        banco.apagarEntrega(e.id);
+        continue;
+      }
       const saldo = SALDOS[e.item];
       if (saldo) {
         const atual = save[saldo];

@@ -77,6 +77,20 @@ export function colunaDoTime(time: PokemonDoJogador[], salvarTime: () => void, a
   colunasVivas.add(vigia);
   return caixa;
 }
+/**
+ * Redesenha o time de uma tela sempre que o save muda (Pokémon posto no time pelo PC, bolsa, troca…). Para sozinho
+ * quando `caixa` sai da página. Usado pelos mapas, cidade, região, Safari e Início (a coluna dos Duelos já faz isso).
+ */
+export function acompanharTime(caixa: HTMLElement, redesenhar: () => void): void {
+  let entrou = false;
+  const vigia = () => {
+    if (caixa.isConnected) entrou = true;
+    else if (entrou) return void colunasVivas.delete(vigia);
+    else return;
+    redesenhar();
+  };
+  colunasVivas.add(vigia);
+}
 /** Colunas de time que estão na tela (uma inscrição só no `aoSalvar`, que não tem como desinscrever). */
 const colunasVivas = new Set<() => void>();
 aoSalvar(() => [...colunasVivas].forEach((f) => f()));

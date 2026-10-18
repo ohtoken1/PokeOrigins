@@ -17,6 +17,7 @@ import { el } from '../ui/dom';
 import { abrirJanela } from '../ui/janela';
 import { abrirPerfilDe } from './jogadores';
 import { valorEmMoeda } from '../ui/moeda';
+import { confirmar } from '../ui/confirmar';
 
 const mensagemDe = (e: unknown) => (e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.');
 const pct = (v: number) => `+${Math.round(v * 100)}%`;
@@ -84,8 +85,8 @@ export const telaCla: Tela = (raiz) => {
       return [
         lider && m.cargo === 'membro' ? botao('Tornar vice-líder', () => void fazer(mudarCargoNoCla(m.usuario, 'vice'))) : null,
         lider && m.cargo === 'vice' ? botao('Tornar membro', () => void fazer(mudarCargoNoCla(m.usuario, 'membro'))) : null,
-        lider ? botao('Passar liderança', () => confirm(`Passar a liderança da guilda para ${m.nome}? Você vira vice-líder.`) && void fazer(mudarCargoNoCla(m.usuario, 'lider'))) : null,
-        gestor && (lider || m.cargo === 'membro') ? botao('Expulsar', () => confirm(`Expulsar ${m.nome} da guilda?`) && void fazer(expulsarDoCla(m.usuario)), 'perigo') : null,
+        lider ? botao('Passar liderança', async () => (await confirmar('Confirmar', `Passar a liderança da guilda para ${m.nome}? Você vira vice-líder.`)) && void fazer(mudarCargoNoCla(m.usuario, 'lider'))) : null,
+        gestor && (lider || m.cargo === 'membro') ? botao('Expulsar', async () => (await confirmar('Confirmar', `Expulsar ${m.nome} da guilda?`)) && void fazer(expulsarDoCla(m.usuario)), 'perigo') : null,
       ];
     };
     const editar = () => {
@@ -114,11 +115,11 @@ export const telaCla: Tela = (raiz) => {
       aviso,
       el('div', { class: 'cla-rodape' },
         lider ? botao('Editar bandeira e descrição', editar) : null,
-        botao('Sair da guilda', () => {
+        botao('Sair da guilda', async () => {
           const sozinho = c.membros.length === 1;
           const texto = sozinho ? 'Você é o único membro: ao sair, a guilda é apagada. Sair mesmo assim?'
             : lider ? 'Ao sair, a liderança passa para o vice-líder (ou o membro mais antigo). Sair da guilda?' : 'Sair da guilda?';
-          if (confirm(texto)) void fazer(sairDoCla());
+          if ((await confirmar('Confirmar', texto))) void fazer(sairDoCla());
         }, 'perigo'))));
   };
 
@@ -139,7 +140,7 @@ export const telaCla: Tela = (raiz) => {
     const n = limparNomeCla(nome.value);
     if (!NOME_CLA_VALIDO.test(n)) return void (aviso.textContent = 'Nome da guilda: de 3 a 16 letras ou números.');
     if ((carregarSave()?.gold ?? 0) < PRECO_CRIAR_CLA_GOLD) return void (aviso.textContent = `Criar uma guilda custa ${PRECO_CRIAR_CLA_GOLD} Origin Coins.`);
-    if (!confirm(`Criar a guilda "${n}" por ${PRECO_CRIAR_CLA_GOLD} Origin Coins?`)) return;
+    if (!(await confirmar('Confirmar', `Criar a guilda "${n}" por ${PRECO_CRIAR_CLA_GOLD} Origin Coins?`))) return;
     criando = true;
     await fazer((async () => {
       // o servidor cobra o gold no save guardado: salva antes e pega o save de volta depois

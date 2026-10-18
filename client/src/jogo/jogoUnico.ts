@@ -59,3 +59,9 @@ export function mostrarJogo(area: HTMLElement, opcoes: OpcoesBioma): { cena: () 
     },
   };
 }
+
+/** Pausa (ou volta) o mapa que estiver na tela, seja qual for a tela (batalha PvP que começa de fora). */
+export function pausarMapaAtual(pausado: boolean): void {
+  const c = jogo?.scene.getScene('bioma') as BiomaScene | null | undefined;
+  if (c?.sys.isActive()) c.pausar(pausado);
+}

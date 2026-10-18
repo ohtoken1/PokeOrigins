@@ -15,6 +15,7 @@ import {
 import { iconeItem } from './iconeItem';
 import { el, spritePokemon } from './dom';
 import { abrirJanela, type Janela } from './janela';
+import { avisar } from './avisos';
 
 const ATUALIZAR_MS = 1000;
 const VIGIAR_CONVITES_MS = 4000;
@@ -49,7 +50,7 @@ export function vigiarTrocas(): void {
           const t = await responderConvite(convite.id, aceitar);
           if (aceitar) abrirTroca(t);
         } catch (e) {
-          alert(e instanceof ErroApi ? e.message : 'Não foi possível responder ao convite.');
+          avisar(e instanceof ErroApi ? e.message : 'Não foi possível responder ao convite.', 'erro');
         }
       };
       aviso.replaceChildren(

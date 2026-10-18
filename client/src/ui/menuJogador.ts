@@ -6,6 +6,7 @@ import { abrirPerfilDe } from '../telas/jogadores';
 import { convidarParaTroca, trocasDisponiveis } from '../trocas';
 import { el } from './dom';
 import { abrirTroca } from './troca';
+import { desafiarParaDuelo } from '../pvp';
 
 let aberto: HTMLElement | null = null;
 
@@ -49,7 +50,10 @@ export function abrirMenuJogador(j: JogadorOnline, evento: MouseEvent): void {
     opcao('Ver perfil', () => (fechar(), void abrirPerfilDe(j.usuario))),
     opcaoAmigo,
     opcao('Trocar', trocasDisponiveis() ? () => void trocar() : null, 'Em breve'),
-    opcao('Desafiar para duelo', null, 'Em breve'),
+    opcao('Desafiar para duelo', () => {
+      aviso.textContent = 'Enviando desafio…';
+      desafiarParaDuelo(j.usuario).then(() => void (aviso.textContent = 'Desafio enviado! Esperando a resposta.'), (e) => void (aviso.textContent = e instanceof ErroApi ? e.message : 'Não foi possível desafiar.'));
+    }),
     aviso);
   document.body.append(menu);
   aberto = menu;

@@ -11,6 +11,7 @@ import { aoAvisoDoServidor } from './online';
 import { confirmar } from './ui/confirmar';
 import { el, spritePokemon } from './ui/dom';
 import { abrirJanela } from './ui/janela';
+import { avisar } from './ui/avisos';
 
 export interface EstadoBoss {
   tipo: 'global' | 'guilda';
@@ -92,7 +93,7 @@ export function abrirBoss(save: Save, lutar: (boss: PokemonIndividual, nome: str
                   try {
                     await api('POST', '/eventos/boss/resultado', { dano });
                   } catch (e) {
-                    alert(e instanceof ErroApi ? e.message : 'Sem conexão: o dano não foi registrado.');
+                    avisar(e instanceof ErroApi ? e.message : 'Sem conexão: o dano não foi registrado.', 'erro');
                   }
                   void atualizar();
                 });

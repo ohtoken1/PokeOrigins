@@ -20,7 +20,7 @@ import { montarChat } from '../ui/chat';
 import { el } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
 import { botoesMenus } from '../ui/menus';
-import { painelTime } from '../ui/time';
+import { acompanharTime, painelTime } from '../ui/time';
 
 export const telaSafari: Tela = (raiz, navegar) => {
   const save = carregarSave();
@@ -43,6 +43,8 @@ export const telaSafari: Tela = (raiz, navegar) => {
     cena()?.definirSeguidor(save.time[0] ? { especie: save.time[0].especieId, shiny: save.time[0].shiny } : null);
   };
   atualizarTime();
+  // o time mudou por fora (PC, bolsa…): aparece na hora
+  acompanharTime(caixaTime, atualizarTime);
 
   const subtitulo = el('small', {});
   const dica = el('p', { class: 'dica' });

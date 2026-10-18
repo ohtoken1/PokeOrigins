@@ -2588,19 +2588,103 @@ button.creche-pokemon:hover { border-color: var(--destaque); }
 .botao-ninho:disabled { opacity: 0.7; cursor: not-allowed; }
 .botao-ninho[hidden] { display: none; }
 /* Roleta (ui/roleta.ts) */
-.roleta { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; justify-content: center; }
-.roleta-palco { position: relative; width: 240px; height: 240px; }
-.roleta-seta { position: absolute; left: 50%; top: -14px; transform: translateX(-50%); z-index: 2; color: var(--destaque); font-size: 1.6rem; }
-.roleta-roda { width: 240px; height: 240px; border-radius: 50%; border: 4px solid var(--destaque); position: relative; transition: transform 4s cubic-bezier(0.15, 0.85, 0.2, 1); }
-.roleta-numero { position: absolute; left: 50%; top: 50%; width: 20px; margin: -10px 0 0 -10px; text-align: center; font-weight: 700; color: #fff; text-shadow: 0 1px 2px #000; transform-origin: 10px 10px; }
-.roleta-lista { margin: 0; padding-left: 22px; font-size: 0.9rem; }
-.roleta-lista li { margin: 2px 0; }
-.roleta-lista small { color: var(--texto-2); }
-.roleta-cor { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }
-.roleta-resultado { width: 100%; text-align: center; font-size: 1.2rem; color: var(--destaque); font-weight: 700; margin: 0; }
 
 /* relógio de Brasília na barra do topo (ui/relogio.ts) */
 .relogio-topo { margin-left: auto; margin-right: 10px; font-size: 0.85rem; color: var(--texto-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .eventos-lista { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
 .evento-linha { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 10px; border-radius: 10px; background: rgb(26 24 21 / 0.6); border: 1px solid var(--borda); }
 .janela-boss .janela-corpo { max-width: 560px; }
+
+/* Liga Pokémon (ui/liga.ts) e Administração → Liga (telas/adminLiga.ts) */
+.liga-cartoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.liga-cartao { background: var(--painel-2); border: 1px solid var(--borda); border-radius: 10px; padding: 12px; }
+.liga-cartao.liga-nightmare { border-color: #8e2b2b; box-shadow: inset 0 0 18px rgba(142, 43, 43, 0.35); }
+.liga-etapas-jogador { display: flex; flex-wrap: wrap; gap: 4px; list-style: none; padding: 0; margin: 8px 0; }
+.liga-etapas-jogador li { font-size: 12px; padding: 2px 6px; border-radius: 6px; background: var(--painel); color: var(--texto-2); }
+.liga-etapas-jogador li.vencida { color: var(--texto); text-decoration: line-through; opacity: 0.7; }
+.liga-etapas-jogador li.atual { background: var(--dourado); color: var(--texto-no-dourado); }
+.liga-etapas, .liga-nome { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.liga-time { list-style: none; padding: 0; display: grid; gap: 4px; }
+.liga-time li { display: flex; align-items: center; gap: 8px; background: var(--painel-2); border-radius: 8px; padding: 4px 8px; }
+.liga-time li img { width: 48px; height: 48px; object-fit: contain; image-rendering: pixelated; }
+.liga-time li span { flex: 1; }
+
+/* PvP (client/src/pvp.ts e a tela de batalha) */
+.aviso-pvp { position: fixed; right: 16px; bottom: 16px; z-index: 60; max-width: 320px; display: flex; flex-direction: column; gap: 6px; background: var(--painel); border: 1px solid var(--destaque); border-radius: 10px; padding: 12px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5); }
+.aviso-pvp small, .aviso-pvp span { color: var(--texto-2); }
+.aviso-pvp-botoes { display: flex; gap: 8px; }
+.relogio-pvp { align-self: center; font-weight: 700; padding: 4px 10px; border-radius: 8px; background: var(--painel-2); color: var(--texto); }
+.relogio-pvp.acabando { background: #8e2b2b; color: #fff; }
+
+/* Torneio (ui/torneio.ts e telas/adminTorneio.ts) */
+.janela.janela-torneio { width: min(720px, 100%); }
+.torneio-regras { margin: 6px 0; padding-left: 20px; font-size: 0.9rem; }
+.torneio-problemas { color: #ff8a80; font-size: 0.85rem; padding-left: 20px; }
+.torneio-chave { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+.torneio-chave section { min-width: 150px; display: flex; flex-direction: column; gap: 6px; }
+.torneio-chave h4 { margin: 0; font-size: 0.85rem; color: var(--destaque); }
+.torneio-partida { display: flex; flex-direction: column; background: var(--painel-2); border: 1px solid var(--borda); border-radius: 8px; padding: 4px 8px; font-size: 0.85rem; }
+.torneio-partida .ganhou { font-weight: 700; color: var(--destaque); }
+.torneio-partida .perdeu { opacity: 0.5; text-decoration: line-through; }
+.admin-torneio-campos { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+
+/* Avisos e dicas do jogo (ui/avisos.ts): no lugar das janelas e dicas do navegador */
+.avisos-jogo { position: fixed; top: 84px; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; width: min(440px, calc(100% - 32px)); }
+.aviso-jogo { pointer-events: auto; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 14px; border-radius: 12px; background: var(--painel); color: var(--texto); border: 1px solid var(--borda); border-left: 4px solid var(--destaque); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55); font-size: 0.92rem; animation: aviso-entra 0.25s ease-out; }
+.aviso-jogo.aviso-erro { border-left-color: #e05a4f; }
+.aviso-jogo.aviso-ok { border-left-color: #4fbf7a; }
+.aviso-jogo.saindo { opacity: 0; transform: translateY(-6px); transition: opacity 0.25s, transform 0.25s; }
+.aviso-jogo-icone { font-size: 1.1rem; }
+@keyframes aviso-entra { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+.dica-jogo { position: fixed; z-index: 10001; max-width: 280px; padding: 6px 10px; border-radius: 8px; background: var(--painel); color: var(--texto); border: 1px solid var(--borda); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); font-size: 0.8rem; line-height: 1.35; pointer-events: none; white-space: pre-line; }
+
+/* Roleta de prêmios (ui/roleta.ts): aro escuro com luzes, seta vermelha, ícones nas fatias e o botão Girar no meio */
+.janela.janela-roleta { width: min(720px, 100%); }
+.giro { display: flex; flex-wrap: wrap; gap: 20px 28px; align-items: center; justify-content: center; }
+.giro-palco { position: relative; width: 340px; height: 340px; display: grid; place-items: center; }
+.giro-aro { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, #2b241b 62%, #14110d 63%, #3a2f20 70%, #14110d 100%); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 0 3px #5a4a23; display: grid; place-items: center; }
+.giro-lampada { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #ffe9a8; box-shadow: 0 0 8px #ffd56a; animation: giro-pisca 1s infinite; }
+.giro-lampada.par { animation-delay: 0.5s; }
+.girando .giro-lampada { animation-duration: 0.25s; }
+@keyframes giro-pisca { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+.giro-roda { position: relative; width: 280px; height: 280px; border-radius: 50%; border: 5px solid #f5efe0; box-shadow: 0 0 0 3px #14110d, inset 0 0 30px rgba(0, 0, 0, 0.45); transition: transform 5s cubic-bezier(0.12, 0.8, 0.18, 1); }
+.giro-divisa { position: absolute; left: calc(50% - 1px); top: 0; width: 2px; height: 50%; transform-origin: bottom center; background: rgba(255, 255, 255, 0.55); }
+.giro-casa { position: absolute; inset: 0; pointer-events: none; }
+.giro-casa .giro-icone { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); }
+.giro-icone { position: relative; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, 0.85); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45); }
+.giro-icone > * { max-width: 30px; max-height: 30px; }
+.giro-icone img { max-width: 28px; max-height: 28px; image-rendering: pixelated; }
+.giro-interrogacao { position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; background: #14110d; color: #ffe9a8; font-weight: 800; font-size: 12px; border: 2px solid #f5efe0; }
+.giro-casa.ganhou .giro-icone { background: #fff; box-shadow: 0 0 0 3px #fff, 0 0 18px 6px #ffe9a8; }
+/* seta: triângulo vermelho com contorno escuro, apontando para baixo, em cima da roda */
+.giro-seta { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 16px solid transparent; border-right: 16px solid transparent; border-top: 30px solid #e23b3b; filter: drop-shadow(0 0 0 #14110d) drop-shadow(0 2px 0 #14110d) drop-shadow(0 3px 4px rgba(0, 0, 0, 0.6)); z-index: 3; }
+.girando .giro-seta { animation: giro-seta 0.12s infinite alternate; }
+@keyframes giro-seta { from { transform: translateX(-50%) rotate(-6deg); } to { transform: translateX(-50%) rotate(6deg); } }
+.giro-botao { position: absolute; z-index: 4; width: 78px; height: 78px; border-radius: 50%; border: 4px solid #14110d; background: radial-gradient(circle at 35% 30%, #fff 0%, #f3e6c4 55%, #d9c79a 100%); color: #8e1f1f; font-weight: 900; font-size: 0.95rem; letter-spacing: 1px; cursor: pointer; box-shadow: 0 0 0 3px #f5efe0, 0 6px 14px rgba(0, 0, 0, 0.55); transition: transform 0.15s; }
+.giro-botao:hover:not(:disabled) { transform: scale(1.07); }
+.giro-botao:disabled { cursor: default; }
+.giro-lado { min-width: 230px; }
+.giro-lado h4 { margin: 0 0 6px; }
+.giro-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 0.88rem; }
+.giro-lista li { display: flex; align-items: center; gap: 8px; padding: 3px 6px; border-radius: 8px; }
+.giro-lista li.ganhou { background: var(--dourado); color: var(--texto-no-dourado); }
+.giro-lista .giro-icone { width: 28px; height: 28px; }
+.giro-lista .giro-icone > *, .giro-lista .giro-icone img { max-width: 22px; max-height: 22px; }
+.giro-lista .giro-interrogacao { width: 14px; height: 14px; font-size: 10px; }
+.giro-nome { flex: 1; }
+.giro-lista small { color: var(--texto-2); }
+.giro-lista li.ganhou small { color: inherit; }
+.giro-cor { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.giro-resultado { width: 100%; text-align: center; font-size: 1.25rem; color: var(--destaque); font-weight: 800; margin: 0; }
+@media (max-width: 420px) { .giro-palco { transform: scale(0.85); margin: -20px; } }
+.torneio-premios p { margin: 4px 0; }
+.torneio-premios ul { margin: 2px 0 8px; padding-left: 4px; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.torneio-time { font-weight: 700; padding: 6px 10px; border-radius: 8px; }
+.torneio-time.bom { background: rgba(79, 191, 122, 0.15); color: #8fe0ad; }
+.torneio-time.ruim { background: rgba(224, 90, 79, 0.15); color: #ff8a80; }
+
+/* nome do Pokémon nos selos do Outbreak e do Ninho: passar o mouse mostra a imagem */
+.nome-com-imagem { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+.dica-pokemon { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.dica-pokemon img { width: 96px; height: 96px; object-fit: contain; image-rendering: pixelated; }
+.aviso-outbreak, .aviso-ninho { pointer-events: auto; }

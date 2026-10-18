@@ -4,7 +4,8 @@ import { BIOMAS, type Bioma } from '../../shared/biomas';
 import { montarTabela, type EntradaTabela } from '../../shared/encontros';
 import { REGIOES } from '../../shared/regioes';
 import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons } from './dados';
-import { el } from './ui/dom';
+import { el, spritePokemon } from './ui/dom';
+import { comDica } from './ui/dica';
 
 /** Horas de Brasília em que começa um Outbreak. */
 export const HORAS_OUTBREAK = [15, 21];
@@ -12,6 +13,11 @@ export const DURACAO_OUTBREAK_MS = 60 * 60 * 1000;
 /** Parte dos encontros do mapa que vira a espécie do Outbreak. */
 export const CHANCE_OUTBREAK = 0.5;
 const BRASILIA_MS = -3 * 60 * 60 * 1000;
+
+/** Nome do Pokémon nos selos de evento: passar o mouse mostra a imagem dele (pedido do dono). */
+export function nomeComImagem(especieId: number, nome: string): HTMLElement {
+  return comDica(el('span', { class: 'nome-com-imagem' }, nome), () => [el('div', { class: 'dica-pokemon' }, spritePokemon(pokemonPorId(especieId), { palco: true }), el('strong', {}, nome))]);
+}
 
 export interface Outbreak {
   regiao: string;
@@ -100,7 +106,7 @@ export function vigiarOutbreak(): void {
     if (!o) return;
     const min = Math.max(1, Math.ceil((o.fim - Date.now()) / 60_000));
     const regiao = REGIOES.find((r) => r.id === o.regiao)?.nome ?? o.regiao;
-    selo!.replaceChildren(el('strong', {}, `🔥 Outbreak de ${o.nome}`), el('span', {}, `${regiao} · ${o.bioma.nome} · termina em ${min} min`));
+    selo!.replaceChildren(el('strong', {}, '🔥 Outbreak de ', nomeComImagem(o.linha, o.nome)), el('span', {}, `${regiao} · ${o.bioma.nome} · termina em ${min} min`));
   };
   redesenharSelo = desenhar;
   desenhar();

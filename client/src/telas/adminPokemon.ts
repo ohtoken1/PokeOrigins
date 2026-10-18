@@ -9,6 +9,7 @@ import { todosOsPokemons } from '../dados';
 import { darPokemonAoJogador } from '../entregas';
 import { novoPokemon } from '../estado';
 import { el, spritePokemon } from '../ui/dom';
+import { confirmar } from '../ui/confirmar';
 
 const ROTULOS: Record<Atributo, string> = { hp: 'HP', atk: 'Attack', def: 'Defense', spa: 'Sp. Atk', spd: 'Sp. Def', spe: 'Speed' };
 
@@ -29,8 +30,9 @@ function golpesDaEspecie(especieId: number): { id: string; nome: string; ovo: bo
  * Editor de Pokémon da staff. Sem opções: Administração → Dar Pokémon (escolhe o jogador). Com `destino`: o Pokémon
  * montado vai para outro lugar (o Cofre, em ui/eventos.ts) e o campo do jogador some.
  */
-export function secaoDarPokemon(destino?: { botao: string; enviar: (p: PokemonIndividual, nome: string) => Promise<string> }): { elemento: HTMLElement; parar: () => void } {
+export function secaoDarPokemon(destino?: { botao: string; enviar: (p: PokemonIndividual, nome: string) => Promise<string>; nivelMaximo?: number }): { elemento: HTMLElement; parar: () => void } {
   const todos = todosOsPokemons();
+  const nivelMax = destino?.nivelMaximo ?? 100;
   const campo = (atributos: Record<string, unknown>) => el('input', { class: 'db-busca', ...atributos }) as HTMLInputElement;
   const numero = (minimo: number, maximo: number, valor: number, rotulo: string) => campo({ type: 'number', min: minimo, max: maximo, step: 1, value: valor, 'aria-label': rotulo });
   const escolha = (rotulo: string) => el('select', { class: 'db-busca', 'aria-label': rotulo }) as HTMLSelectElement;
@@ -39,7 +41,7 @@ export function secaoDarPokemon(destino?: { botao: string; enviar: (p: PokemonIn
   const listaPokemon = el('datalist', { id: 'adm-pokemons' }, ...todos.map((p) => el('option', { value: p.nome })));
   const listaJogadores = el('datalist', { id: 'adm-jogadores-pokemon' });
   const campoPokemon = campo({ type: 'text', list: 'adm-pokemons', placeholder: 'Nome do Pokémon', 'aria-label': 'Nome do Pokémon', autocomplete: 'off' });
-  const campoNivel = numero(1, 100, 50, 'Nível');
+  const campoNivel = numero(1, nivelMax, 50, 'Nível');
   const campoShiny = campo({ type: 'checkbox', 'aria-label': 'Shiny' });
   const campoNT = campo({ type: 'checkbox', 'aria-label': 'NT (inegociável)' });
   const campoNature = escolha('Nature');
@@ -68,7 +70,7 @@ export function secaoDarPokemon(destino?: { botao: string; enviar: (p: PokemonIn
     campoAbility.replaceChildren(...(['0', '1', 'H'] as const).filter((c) => s.abilities[c]).map((c) => el('option', { value: s.abilities[c]! }, c === 'H' ? `${s.abilities[c]} (Hidden Ability)` : s.abilities[c]!)));
     campoTera.replaceChildren(el('option', { value: '' }, `Padrão (${s.types[0]})`), ...TIPOS_TERA.map((t) => el('option', { value: t }, t)));
     const lista = golpesDaEspecie(base.id);
-    const iniciais = golpesIniciais(base.id, lido(campoNivel, 1, 100)).map((g) => g.id);
+    const iniciais = golpesIniciais(base.id, lido(campoNivel, 1, nivelMax)).map((g) => g.id);
     golpes.forEach((g, i) => g.replaceChildren(
       el('option', { value: '' }, '— nenhum —'),
       ...lista.map((m) => el('option', { value: m.id, selected: m.id === iniciais[i] }, m.ovo ? `${m.nome} (Egg Move)` : m.nome))));
@@ -126,7 +128,7 @@ export function secaoDarPokemon(destino?: { botao: string; enviar: (p: PokemonIn
     if (Object.values(ev).reduce((s, n) => s + n, 0) > EV_MAX_TOTAL) return void (aviso.textContent = `Os EVs somam no máximo ${EV_MAX_TOTAL}.`);
     if (!usuario && !destino) return void (aviso.textContent = 'Diga para qual jogador vai.');
 
-    const nivel = lido(campoNivel, 1, 100);
+    const nivel = lido(campoNivel, 1, nivelMax);
     const shiny = campoShiny.checked;
     // o molde dá o que não se escolhe aqui (gênero, experiência do nível); o resto é o que está no formulário
     const p: PokemonIndividual = { ...novoPokemon(base.id, nivel, shiny), shiny, natureza: campoNature.value, habilidade: campoAbility.value, ivs: valores(ivs, 31), evs: ev, golpes: escolhidos.map((id) => ({ id, pp: ppMaximo(id) })) };
@@ -134,7 +136,7 @@ export function secaoDarPokemon(destino?: { botao: string; enviar: (p: PokemonIn
     if (campoNT.checked) p.inegociavel = true;
     p.hp = hpMaximo(p);
     const nome = `${base.nome}${shiny ? ' shiny' : ''} Nv. ${nivel}`;
-    if (!confirm(destino ? `${destino.botao}: ${nome}?` : `Dar ${nome} para ${usuario}?`)) return;
+    if (!(await confirmar('Confirmar', destino ? `${destino.botao}: ${nome}?` : `Dar ${nome} para ${usuario}?`))) return;
     enviando = true;
     aviso.textContent = '';
     try {

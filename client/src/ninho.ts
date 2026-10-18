@@ -20,7 +20,8 @@ import { aoAvisoDoServidor } from './online';
 import { confirmar } from './ui/confirmar';
 import { el } from './ui/dom';
 import { girarRoleta } from './ui/roleta';
-import { caixaDeAvisos, definirOutbreakForcado } from './outbreak';
+import { caixaDeAvisos, definirOutbreakForcado, nomeComImagem } from './outbreak';
+import { avisar } from './ui/avisos';
 
 export interface EstadoNinhoServidor { slot: number; inicio: number | null; derrotas: number; ativo: boolean; fim: number; ocupado: boolean; meu: boolean; derrotado: { nome: string; especie: string } | null }
 export interface Ninho { regiao: string; bioma: Bioma; especieId: number; nome: string; lendario: boolean }
@@ -85,7 +86,7 @@ export function vigiarNinho(): void {
     selo!.hidden = !n;
     if (!n) return;
     const min = Math.max(1, Math.ceil((n.servidor.fim - Date.now()) / 60_000));
-    selo!.replaceChildren(el('strong', {}, `🪺 Ninho de ${n.nome}`), el('span', {}, `${REGIOES.find((r) => r.id === n.regiao)?.nome} · ${n.bioma.nome} · some em ${min} min`));
+    selo!.replaceChildren(el('strong', {}, '🪺 Ninho de ', nomeComImagem(n.especieId, n.nome)), el('span', {}, `${REGIOES.find((r) => r.id === n.regiao)?.nome} · ${n.bioma.nome} · some em ${min} min`));
   };
   ouvintes.add(desenhar);
   aoAvisoDoServidor((msg) => msg.t === 'eventos' && void atualizar());
@@ -140,7 +141,7 @@ export function botaoDoNinho(save: Save, regiao: string, bioma: string, cena: ()
       adotarSaveDoServidor(r.save, r.versao);
       aoMudar();
     } catch (e) {
-      alert(e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.');
+      avisar(e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.', 'erro');
       return;
     }
     lutar([pokemonDoNinho(n)], n.nome, async (venceu) => {
@@ -156,12 +157,12 @@ export function botaoDoNinho(save: Save, regiao: string, bioma: string, cena: ()
           registrarCapturado(save, n.especieId, false);
           if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(p);
           else guardarNoPC(save, p);
-          alert(`Sorte grande! O ${n.nome} do ninho quis ir com você!`);
+          avisar(`Sorte grande! O ${n.nome} do ninho quis ir com você!`, 'ok');
         }
         salvar(save);
         aoMudar();
       } catch (e) {
-        alert(e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.');
+        avisar(e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.', 'erro');
       }
       await atualizar();
     });

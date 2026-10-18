@@ -28,6 +28,8 @@ import { bonusDaMinhaGuilda, darXpAoCla } from '../cla';
 import { XP_CLA_POR_POKEMON_DE_TREINADOR, XP_CLA_POR_SELVAGEM } from '../../../shared/cla';
 import { marcarConquista } from '../conquistas';
 import { semNt } from '../../../shared/naoTrocavel';
+import type { BatalhaRemota } from './remota';
+import { confirmar } from '../ui/confirmar';
 
 const CORES_DYNAMAX = ['#c4003a', '#ff3d6e', '#7a0030', '#ff8fb0'];
 /**
@@ -69,10 +71,15 @@ export interface OpcoesBatalha {
   selvagem: PokemonIndividual;
   bioma: Bioma;
   /** Duelo contra treinador NPC (sem captura nem fuga; recompensa em silver ao vencer). */
-  treinador?: { nome: string; titulo: string; equipe: PokemonIndividual[]; recompensa: number; imagem?: string; mensagemVitoria?: string; duelo?: boolean; /** frase do começo no lugar de "Fulano, título, quer batalhar!" (Ninho) */ mensagemInicio?: string };
+  treinador?: { nome: string; titulo: string; equipe: PokemonIndividual[]; recompensa: number; imagem?: string; mensagemVitoria?: string; duelo?: boolean; /** frase do começo no lugar de "Fulano, título, quer batalhar!" (Ninho) */ mensagemInicio?: string; /** o que se perde ao fugir (a tela pergunta antes): Poké Dólares do Ninho, vaga da Liga… */ avisoFuga?: string };
   aoTerminar(resultado: ResultadoBatalha): void;
   /** Boss (eventos): HP infinito, acaba em `turnos`; no fim, `aoDano` recebe o dano total causado. */
   boss?: { turnos: number; aoDano(dano: number): void };
+  /**
+   * PvP: a batalha é calculada no servidor (client/src/batalha/remota.ts). O `treinador` é o outro jogador (time só
+   * com o que dá para ver) e `save` traz uma CÓPIA curada do time: nada da batalha volta para o save.
+   */
+  pvp?: BatalhaRemota;
 }
 
 const hex = (cor: number) => `#${cor.toString(16).padStart(6, '0')}`;
@@ -182,14 +189,16 @@ function sortearFundo(biomaId: string): string | null {
   return lista ? `batalha/${lista[Math.floor(Math.random() * lista.length)]}` : null;
 }
 
-export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTerminar, boss }: OpcoesBatalha): void {
+export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTerminar, boss, pvp }: OpcoesBatalha): void {
   // tema de batalha (selvagem ou treinador); volta para a música de fundo no fim
   tocarMusica('batalha');
   /** Quem está em campo do outro lado (num duelo, muda quando o treinador troca). */
   let selvagem = primeiro;
   let dadosSelvagem = pokemonPorId(selvagem.especieId);
   const imagemFundo = sortearFundo(bioma.id);
-  const batalha = new BatalhaSelvagem(
+  // no PvP quem responde é o servidor; o objeto remoto tem as mesmas funções que a tela usa (as ações devolvem
+  // uma promessa, por isso `executar` espera o resultado)
+  const batalha: BatalhaSelvagem = pvp ? (pvp as unknown as BatalhaSelvagem) : new BatalhaSelvagem(
     save.time,
     save.time.map((p) => nomeDe(p.especieId)),
     selvagem,
@@ -636,14 +645,26 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     const pedido = batalha.pedido();
     if (pedido.tipo === 'fim') return finalizar(batalha.vencedor === 'jogador' ? 'vitoria' : 'derrota');
     if (pedido.tipo === 'troca') return menuPokemon(true);
+    if (pedido.tipo === 'espera') {
+      mensagem.textContent = 'Esperando o outro jogador…';
+      return acoes.replaceChildren();
+    }
 
     atualizarCampo();
     mensagem.textContent = `O que ${nomeDe(save.time[batalha.ativo].especieId)} vai fazer?`;
+    if (pvp)
+      return acoes.replaceChildren(
+        botao([el('span', { class: 'emote' }, '⚔️'), 'Lutar'] as never, () => menuGolpes(), { class: 'botao grande lutar' }),
+        botao([el('span', { class: 'emote' }, '🔄'), 'Pokémon'] as never, () => menuPokemon(false), { class: 'botao grande pokemon', disabled: !pedido.podeTrocar }),
+        botao([el('span', { class: 'emote' }, '🏳️'), 'Desistir'] as never, desistirPvp, { class: 'botao grande fugir' }),
+        relogioPvp(),
+      );
     acoes.replaceChildren(
       botao([el('span', { class: 'emote' }, '⚔️'), 'Lutar'] as never, () => menuGolpes(), { class: 'botao grande lutar' }),
       botao([el('span', { class: 'emote' }, '🎒'), 'Bolsa'] as never, menuBolsa, { class: 'botao grande bolsa' }),
       botao([el('span', { class: 'emote' }, '🔄'), 'Pokémon'] as never, () => menuPokemon(false), { class: 'botao grande pokemon', disabled: !pedido.podeTrocar }),
-      botao([el('span', { class: 'emote' }, '🏃'), 'Fugir'] as never, tentarFugir, { class: 'botao grande fugir', disabled: !pedido.podeFugir }),
+      // contra treinador, ninho, boss e Liga também dá para fugir, mas pergunta antes (conta como derrota)
+      botao([el('span', { class: 'emote' }, '🏃'), 'Fugir'] as never, treinador ? fugirDoTreinador : tentarFugir, { class: 'botao grande fugir', disabled: !treinador && !pedido.podeFugir }),
     );
   }
 
@@ -652,6 +673,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     const pedido = batalha.pedido();
     if (pedido.tipo !== 'acao') return menuPrincipal();
     const z = pedido.zGolpes;
+    const relogio = pvp ? relogioPvp() : '';
     const usarZ = modo === 'z';
     // Dynamax ligado (ou já em Dynamax): os golpes aparecem como os Max Moves em que viram
     const usarMax = pedido.dinamaxado || modo === 'dynamax';
@@ -703,6 +725,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           })
         : '',
       botao('← Voltar', menuPrincipal, { class: 'botao secundario voltar' }),
+      relogio,
     );
   }
 
@@ -769,14 +792,52 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         );
       }),
       ...(obrigatorio ? [] : [botao('← Voltar', menuPrincipal, { class: 'botao secundario voltar' })]),
+      pvp ? relogioPvp() : '',
     );
   }
 
+  // ---------- PvP: relógio do turno e desistência ----------
+  let pararRelogio: (() => void) | null = null;
+  /** Segundos para escolher (o servidor tira o jogador que deixar acabar). */
+  function relogioPvp(): HTMLElement {
+    pararRelogio?.();
+    const caixa = el('span', { class: 'relogio-pvp', role: 'timer' });
+    const tique = () => {
+      const s = Math.max(0, Math.ceil((pvp!.prazo - Date.now()) / 1000));
+      caixa.textContent = `⏱ ${s} s`;
+      caixa.classList.toggle('acabando', s <= 10);
+    };
+    tique();
+    const t = setInterval(tique, 250);
+    pararRelogio = () => clearInterval(t);
+    return caixa;
+  }
+  async function desistirPvp() {
+    if (!(await confirmar('Desistir', 'Desistir desta batalha? Você perde na hora.'))) return;
+    await executar(() => pvp!.desistir() as never);
+  }
+  // turno que chegou sem a tela estar esperando (o outro desistiu ou o tempo acabou)
+  if (pvp)
+    pvp.aoTurnoSolto = (eventos) => {
+      pararRelogio?.();
+      acoes.replaceChildren();
+      void reproduzir(eventos).then(menuPrincipal);
+    };
+
   // ---------- ações ----------
-  async function executar(acao: () => EventoBatalha[]) {
+  async function executar(acao: () => EventoBatalha[] | Promise<EventoBatalha[]>) {
     acoes.replaceChildren();
+    pararRelogio?.();
     turno++;
-    await reproduzir(acao());
+    const resultado = acao();
+    if (resultado instanceof Promise) {
+      mensagem.textContent = 'Esperando o outro jogador…';
+      try {
+        await reproduzir(await resultado);
+      } catch (erro) {
+        await dizer(erro instanceof Error ? erro.message : 'Sem conexão com o servidor.');
+      }
+    } else await reproduzir(resultado);
     menuPrincipal();
   }
 
@@ -823,6 +884,14 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     }
     await dizer(FRASES_FALHA[tremidas]);
     await executar(() => eventos);
+  }
+
+  async function fugirDoTreinador() {
+    const perda = treinador?.avisoFuga ?? 'Você não ganha a recompensa desta batalha.';
+    if (!(await confirmar('Fugir da batalha', `Fugir conta como derrota. ${perda} Fugir mesmo assim?`))) return;
+    acoes.replaceChildren();
+    await dizer('Você fugiu da batalha!');
+    return finalizar('fuga');
   }
 
   async function tentarFugir() {
@@ -896,7 +965,30 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
   let turno = 1;
   let curarAoCapturar = false;
 
+  /** Fim da batalha. Aconteça o que acontecer no meio (um erro em XP, missões, avisos…), a tela SEMPRE fecha: antes ela ficava presa e só o F5 resolvia. */
+  let finalizada = false;
   async function finalizar(resultado: ResultadoBatalha) {
+    if (finalizada) return;
+    finalizada = true;
+    try {
+      await fimDaBatalha(resultado);
+    } catch (erro) {
+      console.error('Erro no fim da batalha', erro);
+    }
+    if (!pvp) salvar(save);
+    fundo.remove();
+    tocarMusica('fundo');
+    aoTerminar(resultado);
+  }
+
+  async function fimDaBatalha(resultado: ResultadoBatalha) {
+    // PvP: só o resultado (nada de XP, prêmios ou cura; o time da batalha era uma cópia)
+    if (pvp) {
+      pararRelogio?.();
+      if (!pvp.vencedor) await dizer('Os dois deixaram o tempo acabar: ninguém venceu.');
+      else await dizer(resultado === 'vitoria' ? `Você venceu ${treinador?.nome}!` : `${treinador?.nome} venceu a batalha.`);
+      return;
+    }
     acoes.replaceChildren();
     batalha.sincronizar();
     // amizade: +AMIZADE_POR_BATALHA para quem entrou em campo (antes do XP: pode evoluir por amizade ao subir)
@@ -1016,10 +1108,6 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       await dizer(`${batalha.turnosAcabaram ? 'Acabaram os turnos! ' : ''}Você causou ${dano.toLocaleString('pt-BR')} de dano no boss.`);
       boss.aoDano(dano);
     }
-    salvar(save);
-    fundo.remove();
-    tocarMusica('fundo');
-    aoTerminar(resultado);
   }
 
   // ---------- início ----------
