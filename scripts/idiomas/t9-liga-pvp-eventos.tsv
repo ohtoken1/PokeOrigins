@@ -1,0 +1,344 @@
+# Liga, PvP, Torneio, eventos (Cofre, Loteria, Expedição, Ninho, Boss, Evento de captura), craft, Daycare e mensagens do servidor (17/10/2026).
+# As telas da staff (Administração, painel de eventos da staff) continuam só em português.
+Esperando o outro jogador…	Waiting for the other player…	Esperando al otro jugador…
+Desistir	Forfeit	Rendirse
+Desistir desta batalha? Você perde na hora.	Forfeit this battle? You lose right away.	¿Rendirte en esta batalla? Pierdes al instante.
+Você não ganha a recompensa desta batalha.	You won't get this battle's reward.	No recibirás la recompensa de esta batalla.
+Fugir da batalha	Run from battle	Huir de la batalla
+Fugir conta como derrota. {0} Fugir mesmo assim?	Running counts as a loss. {0} Run anyway?	Huir cuenta como derrota. {0} ¿Huir de todos modos?
+Você fugiu da batalha!	You ran from the battle!	¡Huiste de la batalla!
+Os dois deixaram o tempo acabar: ninguém venceu.	Both players ran out of time: nobody won.	Los dos dejaron que se acabara el tiempo: nadie ganó.
+{0} venceu a batalha.	{0} won the battle.	{0} ganó la batalla.
+{0}Você causou {1} de dano no boss.	{0}You dealt {1} damage to the boss.	{0}Causaste {1} de daño al jefe.
+Acabaram os turnos!~	Out of turns!~	¡Se acabaron los turnos!~
+Você voltou para a batalha!	You're back in the battle!	¡Volviste a la batalla!
+A gaiola está vazia. Fique de olho nos avisos!	The cage is empty. Keep an eye on the announcements!	La jaula está vacía. ¡Atento a los avisos!
+👹 Boss global	👹 Global Boss	👹 Jefe global
+🛡️ Boss da guilda	🛡️ Guild Boss	🛡️ Jefe del gremio
+Termina em {0} min. HP infinito: cada treinador luta uma vez, por até {1} turnos, e o dano conta para o ranking{2}. Golpes que tiram porcentagem da vida ou dano fixo são proibidos.	Ends in {0} min. Infinite HP: each trainer fights once, for up to {1} turns, and the damage counts for the ranking{2}. Moves that deal percentage or fixed damage are banned.	Termina en {0} min. PS infinitos: cada entrenador lucha una vez, hasta {1} turnos, y el daño cuenta para el ranking{2}. Se prohíben los movimientos que quitan un porcentaje de vida o daño fijo.
+~da sua guilda	~of your guild	~de tu gremio
+Terminou. {0}	It's over. {0}	Terminó. {0}
+Golpes proibidos no seu time: {0}. Troque antes de lutar.	Banned moves on your team: {0}. Change them before fighting.	Movimientos prohibidos en tu equipo: {0}. Cámbialos antes de luchar.
+Enfrentar o {0}? Você só pode lutar UMA vez contra este boss.	Challenge {0}? You can only fight this boss ONCE.	¿Enfrentar a {0}? Solo puedes luchar UNA vez contra este jefe.
+Sem conexão: o dano não foi registrado.	No connection: the damage was not recorded.	Sin conexión: el daño no se registró.
+Enfrentar	Challenge	Enfrentar
+Seu dano: {0}	Your damage: {0}	Tu daño: {0}
+Ranking de dano	Damage ranking	Ranking de daño
+Nasceu: {0}. {1} no seu PC.	Hatched: {0}. {1} in your PC.	Nació: {0}. {1} en tu PC.
+Estão	They're	Están
+Está	It's	Está
+Já há uma expedição em andamento.	There is already an expedition underway.	Ya hay una expedición en curso.
+Duração inválida.	Invalid duration.	Duración no válida.
+Escolha de 1 a {0} Pokémon.	Choose 1 to {0} Pokémon.	Elige de 1 a {0} Pokémon.
+Deixe pelo menos um Pokémon no time.	Leave at least one Pokémon on your team.	Deja al menos un Pokémon en el equipo.
+Poké Dólares insuficientes.	Not enough Poké Dollars.	Poké Dólares insuficientes.
+Branca	White	Blanca
+Madeira	Wood	Madera
+Eventos	Events	Eventos
+Salão da guilda	Guild hall	Salón del gremio
+Creche Pokémon	Pokémon Daycare	Guardería Pokémon
+Entrada do esgoto	Sewer entrance	Entrada de la alcantarilla
+🪺 Ninho de~	🪺 Nest of~	🪺 Nido de~
+{0} · {1} · some em {2} min	{0} · {1} · gone in {2} min	{0} · {1} · desaparece en {2} min
+🪺 {0} (outro treinador está lutando)	🪺 {0} (another trainer is fighting)	🪺 {0} (otro entrenador está luchando)
+🪺 Há um ninho de {0} neste mapa!	🪺 There's a {0} nest on this map!	🪺 ¡Hay un nido de {0} en este mapa!
+Ninho	Nest	Nido
+Pagar {0} Poké Dólares para enfrentar o {1} nível {2}? Ele não pode ser capturado. Vencendo: {3} + a roleta do Ninho{4}.	Pay {0} Poké Dollars to fight the level {2} {1}? It can't be caught. If you win: {3} + the Nest wheel{4}.	¿Pagar {0} Poké Dólares para enfrentar a {1} de nivel {2}? No se puede capturar. Si ganas: {3} + la ruleta del Nido{4}.
+~e {0}% de chance de ganhar o {1}	~and a {0}% chance to get {1}	~y un {0}% de probabilidad de ganar a {1}
+Roleta do Ninho	Nest wheel	Ruleta del Nido
+Sorte grande! O {0} do ninho quis ir com você!	Jackpot! The nest's {0} wants to come with you!	¡Qué suerte! ¡El {0} del nido quiso irse contigo!
+🔥 Outbreak de~	🔥 Outbreak of~	🔥 Brote de~
+{0} · {1} · termina em {2} min	{0} · {1} · ends in {2} min	{0} · {1} · termina en {2} min
+⚔️ {0} desafiou você para um duelo!	⚔️ {0} challenged you to a duel!	⚔️ ¡{0} te desafió a un duelo!
+Os dois lutam com o time de agora, curado. Nada muda no seu save.	Both fight with their current team, fully healed. Nothing changes in your save.	Los dos luchan con su equipo actual, curado. Nada cambia en tu partida.
+Expira em {0} s	Expires in {0} s	Expira en {0} s
+Duelo	Duel	Duelo
+{0} contra {1}!	{0} vs. {1}!	¡{0} contra {1}!
+{0} recusou o duelo.	{0} declined the duel.	{0} rechazó el duelo.
+Ninho de {0}	{0} Nest	Nido de {0}
+Um {0} furioso saltou do ninho!	A furious {0} leaped out of the nest!	¡Un {0} furioso saltó del nido!
+Os Poké Dólares pagos para entrar no ninho NÃO serão devolvidos.	The Poké Dollars paid to enter the nest will NOT be refunded.	Los Poké Dólares pagados para entrar al nido NO se devolverán.
+Você fica fora da Liga até a semana que vem.	You're out of the League until next week.	Quedas fuera de la Liga hasta la próxima semana.
+{0} ruge furioso dentro da gaiola!	{0} roars furiously inside the cage!	¡{0} ruge furioso dentro de la jaula!
+Vale o dano que você já causou, mas você não poderá enfrentar este boss de novo.	The damage you already dealt counts, but you won't be able to fight this boss again.	El daño que ya causaste cuenta, pero no podrás enfrentar a este jefe otra vez.
+XP de Pokémon e de treinador	Pokémon and trainer XP	EXP de Pokémon y de entrenador
+Aparição de lendários e iniciais	Legendary and starter appearance	Aparición de legendarios e iniciales
+Você não ganha nada desta batalha.	You get nothing from this battle.	No ganas nada en esta batalla.
+Você não ganha a {0} nem a recompensa.	You don't get the {0} or the reward.	No ganas la {0} ni la recompensa.
+👑 Premium liberado	👑 Premium unlocked	👑 Premium desbloqueado
+Premium: use o item Passe Premium	Premium: use the Premium Pass item	Premium: usa el objeto Pase Premium
+Termina em {0} · {1}	Ends in {0} · {1}	Termina en {0} · {1}
+Mata-mata de 16 jogadores, às 12h30 e 18h30.	16-player knockout, at 12:30 and 18:30.	Eliminatoria de 16 jugadores, a las 12:30 y 18:30.
+Elite 4 + Campeão e a Liga Nightmare, com um treinador de cada tipo.	Elite 4 + Champion, and the Nightmare League, with one trainer of each type.	Alto Mando + Campeón y la Liga Nightmare, con un entrenador de cada tipo.
+Cada Charm gasta {0} Berries do tipo, {1} Energies do tipo e {2} Poké Dólares. {3}	Each Charm costs {0} Berries of the type, {1} Energies of the type and {2} Poké Dollars. {3}	Cada Charm cuesta {0} Berries del tipo, {1} Energies del tipo y {2} Poké Dólares. {3}
+Criou {0} {1}! {2} na bolsa.	Crafted {0} {1}! {2} in the bag.	¡Creaste {0} {1}! {2} en la mochila.
+Comprar {0} semente{1} de {2} por {3} Poké Dólares e plantar? A semente não volta na colheita.	Buy {0} {2} seed(s) for {3} Poké Dollars and plant them? The seed doesn't come back at harvest.	¿Comprar {0} semilla(s) de {2} por {3} Poké Dólares y plantar? La semilla no vuelve en la cosecha.
+Regou {0} canteiro{1}.	Watered {0} plot(s).	Regaste {0} parcela(s).
+Você tem {0} canteiro{1} (um por nível de treinador). Cada semente custa {2} Poké Dólares e não volta na colheita. {3} Berry: {4} por canteiro; Apricorn: {5}.	You have {0} plot(s) (one per trainer level). Each seed costs {2} Poké Dollars and doesn't come back at harvest. {3} Berry: {4} per plot; Apricorn: {5}.	Tienes {0} parcela(s) (una por nivel de entrenador). Cada semilla cuesta {2} Poké Dólares y no vuelve en la cosecha. {3} Berry: {4} por parcela; Apricorn: {5}.
+A cada {0}{1} o casal tem {2}% de chance de fazer um ovo. Saiu ovo: retire para o próximo ciclo começar. O ovo vai para o PC. Vagas: {3}/{4}{5}.	Every {0}{1} the pair has a {2}% chance of making an egg. Got an egg? Collect it so the next cycle can start. The egg goes to the PC. Slots: {3}/{4}{5}.	Cada {0}{1} la pareja tiene un {2}% de probabilidad de hacer un huevo. ¿Salió un huevo? Retíralo para que empiece el siguiente ciclo. El huevo va al PC. Plazas: {3}/{4}{5}.
+~(VIP: 2 casais)	~(VIP: 2 pairs)	~(VIP: 2 parejas)
+Retirar {0} e {1} do Daycare?{2}	Take {0} and {1} out of the Daycare?{2}	¿Retirar a {0} y {1} de la Guardería?{2}
+~O ovo pronto vai junto para o PC.	~The ready egg goes to the PC too.	~El huevo listo también va al PC.
+~O ciclo em andamento se perde.	~The current cycle is lost.	~Se pierde el ciclo en curso.
+Nasceu: {0}! Foi para o seu {1}.	Hatched: {0}! It went to your {1}.	¡Nació: {0}! Fue a tu {1}.
+Não foi possível falar com o servidor.	Could not reach the server.	No se pudo conectar con el servidor.
+Cofre PokeOrigins	PokeOrigins Vault	Caja fuerte PokeOrigins
+Gire as roletas (setas ou rodinha do mouse) e confirme.	Spin the dials (arrows or mouse wheel) and confirm.	Gira las ruedas (flechas o rueda del ratón) y confirma.
+Descer	Down	Bajar
+🔓 A senha {0} abriu o cofre! Prêmio: {1}. Ele já está chegando para você.	🔓 The code {0} opened the vault! Prize: {1}. It's on its way to you.	🔓 ¡La clave {0} abrió la caja fuerte! Premio: {1}. Ya está llegando.
+🔒 {0} não é a senha. Tente de novo!	🔒 {0} is not the code. Try again!	🔒 {0} no es la clave. ¡Inténtalo de nuevo!
+🔐 Cofre PokeOrigins	🔐 PokeOrigins Vault	🔐 Caja fuerte PokeOrigins
+Prêmio:~	Prize:~	Premio:~
+Senha de {0} dígitos. Quem acertar primeiro leva. {1} tentativas até agora.	{0}-digit code. First to guess it wins. {1} attempts so far.	Clave de {0} dígitos. Quien acierte primero se lo lleva. {1} intentos hasta ahora.
+Tentar abrir	Try to open	Intentar abrir
+O último cofre foi aberto por {0} (prêmio: {1}).	The last vault was opened by {0} (prize: {1}).	La última caja fuerte la abrió {0} (premio: {1}).
+Nenhum cofre trancado agora. Fique de olho nos avisos!	No vault locked right now. Keep an eye on the announcements!	No hay ninguna caja fuerte cerrada ahora. ¡Atento a los avisos!
+Loteria	Lottery	Lotería
+Comprar {0} bilhete(s) por {1} Poké Dólares?	Buy {0} ticket(s) for {1} Poké Dollars?	¿Comprar {0} boleto(s) por {1} Poké Dólares?
+Comprou {0} bilhete(s). Boa sorte!	Bought {0} ticket(s). Good luck!	Compraste {0} boleto(s). ¡Buena suerte!
+🎰 Loteria PokeOrigins	🎰 PokeOrigins Lottery	🎰 Lotería PokeOrigins
+Prêmio acumulado:~	Jackpot:~	Bote acumulado:~
+Bilhete de {0} com um número de 5 dígitos. Vendas até as 20h; o sorteio sai às 20h05 (Brasília). Ninguém acertou? O prêmio acumula. Máximo de {1} bilhetes por dia.	{0} tickets with a 5-digit number. Sales until 20:00; the draw is at 20:05 (Brasília). Nobody won? The prize rolls over. Up to {1} tickets per day.	Boleto de {0} con un número de 5 dígitos. Ventas hasta las 20:00; el sorteo es a las 20:05 (Brasilia). ¿Nadie acertó? El premio se acumula. Máximo de {1} boletos por día.
+Último sorteio: {0} — {1}	Last draw: {0} — {1}	Último sorteo: {0} — {1}
+{0} ganhou {1}!	{0} won {1}!	¡{0} ganó {1}!
+ninguém acertou.	nobody won.	nadie acertó.
+Alguém ganhou este mês! A Loteria volta em {0}.	Someone won this month! The Lottery returns on {0}.	¡Alguien ganó este mes! La Lotería vuelve el {0}.
+As vendas de hoje fecharam. Espere o sorteio das 20h05.	Today's sales are closed. Wait for the 20:05 draw.	Las ventas de hoy cerraron. Espera el sorteo de las 20:05.
+Comprar bilhetes	Buy tickets	Comprar boletos
+Seus bilhetes de hoje ({0}/{1}): {2}	Your tickets today ({0}/{1}): {2}	Tus boletos de hoy ({0}/{1}): {2}
+🧭 Expedição	🧭 Expedition	🧭 Expedición
+Power {0} · faixa {1} · {2} h	Power {0} · tier {1} · {2} h	Power {0} · rango {1} · {2} h
+Voltam em {0}.	Back in {0}.	Vuelven en {0}.
+A expedição voltou! {0}	The expedition is back! {0}	¡La expedición volvió! {0}
+Buscar a expedição	Collect the expedition	Recoger la expedición
+Mande até {0} Pokémon por 1, 3 ou 6 horas. Eles ficam fora do time e do PC e voltam com Berries, Apricorns, Pokébolas, remédios, Energies e, com sorte, um item raro (tudo NT). Quanto maior o Power somado, melhor. Entrada: {1}.	Send up to {0} Pokémon for 1, 3 or 6 hours. They leave your team and PC and come back with Berries, Apricorns, Poké Balls, medicine, Energies and, with luck, a rare item (all NT). The higher the total Power, the better. Entry: {1}.	Envía hasta {0} Pokémon por 1, 3 o 6 horas. Salen del equipo y del PC y vuelven con Berries, Apricorns, Poké Balls, medicinas, Energies y, con suerte, un objeto raro (todo NT). Cuanto mayor sea el Power total, mejor. Entrada: {1}.
+Montar expedição	Set up expedition	Preparar expedición
+Escolhidos {0}/{1} · Power {2} · faixa {3} de {4}	Chosen {0}/{1} · Power {2} · tier {3} of {4}	Elegidos {0}/{1} · Power {2} · rango {3} de {4}
+Expedição	Expedition	Expedición
+Mandar {0} Pokémon por {1} h? Custa {2} Poké Dólares e eles só voltam no fim.	Send {0} Pokémon for {1} h? It costs {2} Poké Dollars and they only come back at the end.	¿Enviar {0} Pokémon por {1} h? Cuesta {2} Poké Dólares y solo vuelven al final.
+Expedição a caminho!	Expedition on its way!	¡Expedición en camino!
+Partir	Depart	Partir
+🎯 Evento de captura	🎯 Capture event	🎯 Evento de captura
+Capture o {0} em batalha nos mapas (não valem ovo, troca, Safari ou Orb). A maior soma de IVs até a meia-noite leva 1 Ovo Lendário + {1} Poké Dólares + {2} Origin Coins. Empate: quem capturou primeiro. Termina em {3}.	Catch {0} in battle on the maps (eggs, trades, Safari and Orbs don't count). The highest IV total by midnight wins 1 Legendary Egg + {1} Poké Dollars + {2} Origin Coins. Tie: whoever caught it first. Ends in {3}.	Captura a {0} en combate en los mapas (no valen huevo, intercambio, Safari ni Orb). La mayor suma de IVs hasta la medianoche gana 1 Huevo Legendario + {1} Poké Dólares + {2} Origin Coins. Empate: quien lo capturó primero. Termina en {3}.
+Sua melhor: {0}	Your best: {0}	Tu mejor: {0}
+O último evento ({0}) foi vencido por {1}, com {2} de IVs.	The last event ({0}) was won by {1}, with {2} IVs.	El último evento ({0}) lo ganó {1}, con {2} de IVs.
+Nenhum evento de captura agora.	No capture event right now.	Ningún evento de captura ahora.
+🪺 Ninho	🪺 Nest	🪺 Nido
+Há um ninho de {0} em {1} · {2}. Some em {3}. Vá até o mapa e clique em "Enfrentar o ninho".	There's a {0} nest in {1} · {2}. Gone in {3}. Go to the map and click "Fight the nest".	Hay un nido de {0} en {1} · {2}. Desaparece en {3}. Ve al mapa y haz clic en "Enfrentar el nido".
+Nenhum ninho agora. Um novo aparece a cada 20 minutos.	No nest right now. A new one appears every 20 minutes.	Ningún nido ahora. Aparece uno nuevo cada 20 minutos.
+Começar a {0}? São {1} batalhas seguidas, sem curar o time entre elas. Se perder, só tenta de novo na semana que vem.	Start the {0}? It's {1} battles in a row, with no healing between them. If you lose, you can only try again next week.	¿Empezar la {0}? Son {1} combates seguidos, sin curar el equipo entre ellos. Si pierdes, solo puedes intentarlo de nuevo la semana que viene.
+Sem conexão: o resultado não foi registrado.	No connection: the result was not recorded.	Sin conexión: el resultado no se registró.
+A staff ainda está preparando os times.	The staff is still preparing the teams.	El staff todavía está preparando los equipos.
+🏆 Você venceu esta semana!	🏆 You won this week!	🏆 ¡Ganaste esta semana!
+Derrotado nesta semana. Volte na semana que vem.	Defeated this week. Come back next week.	Derrotado esta semana. Vuelve la semana que viene.
+Próxima batalha: {0}	Next battle: {0}	Próximo combate: {0}
+Uma tentativa por semana.	One attempt per week.	Un intento por semana.
+Próxima batalha	Next battle	Próximo combate
+O time não é curado entre as batalhas: use a bolsa entre uma e outra. A semana vira {0}.	Your team is not healed between battles: use your bag in between. The week resets {0}.	El equipo no se cura entre combates: usa la mochila entre uno y otro. La semana cambia {0}.
+Suas moedas: {0} League Coins · {1} League Coins Nightmare (a loja vem depois).	Your coins: {0} League Coins · {1} Nightmare League Coins (the shop comes later).	Tus monedas: {0} League Coins · {1} League Coins Nightmare (la tienda llegará después).
+Total (VIP −20%)	Total (VIP −20%)	Total (VIP −20%)
+Faltam Fragmentos Temporais para a Chave Temporal.	Not enough Time Fragments for the Time Key.	Faltan Fragmentos Temporales para la Llave Temporal.
+Comprou a Chave Temporal por {0} {1}. Ela está na aba Orbs da bolsa.	Bought the Time Key for {0} {1}. It's in the Orbs tab of your bag.	Compraste la Llave Temporal por {0} {1}. Está en la pestaña Orbs de la mochila.
+Abre e sorteia um cubo do passado ou do futuro (1% de Koraidon ou Miraidon).	Opens and draws a past or future cube (1% Koraidon or Miraidon).	Se abre y sortea un cubo del pasado o del futuro (1% de Koraidon o Miraidon).
+Enviando desafio…	Sending challenge…	Enviando desafío…
+Desafio enviado! Esperando a resposta.	Challenge sent! Waiting for an answer.	¡Desafío enviado! Esperando la respuesta.
+Não foi possível desafiar.	Could not send the challenge.	No se pudo desafiar.
+{0} d	{0} d	{0} d
+Horário de Brasília (relógio do servidor)	Brasília time (server clock)	Hora de Brasilia (reloj del servidor)
+Pegar prêmio	Collect prize	Recoger premio
+Você ganhou: {0}!	You won: {0}!	¡Ganaste: {0}!
+Prêmios e chances	Prizes and chances	Premios y probabilidades
+{0} ×{1}{2} foi para {3}.	{0} ×{1}{2} went to {3}.	{0} ×{1}{2} fue a {3}.
+Orbs abertas	Opened Orbs	Orbs abiertas
+Próximo torneio: {0} ({1}). A inscrição abre 10 minutos antes.	Next tournament: {0} ({1}). Sign-ups open 10 minutes before.	Próximo torneo: {0} ({1}). La inscripción abre 10 minutos antes.
+Inscrições abertas: {0}/{1}. Fecham em {2} min.	Sign-ups open: {0}/{1}. Closing in {2} min.	Inscripciones abiertas: {0}/{1}. Cierran en {2} min.
+Inscrições fechadas. A disputa começa em {0} min.	Sign-ups closed. The tournament starts in {0} min.	Inscripciones cerradas. El torneo empieza en {0} min.
+Próxima rodada ({0}) em {1} min.	Next round ({0}) in {1} min.	Próxima ronda ({0}) en {1} min.
+Em disputa: {0}.	Now playing: {0}.	En juego: {0}.
+Último torneio: 🥇 {0} · 🥈 {1} · 🥉 {2}	Last tournament: 🥇 {0} · 🥈 {1} · 🥉 {2}	Último torneo: 🥇 {0} · 🥈 {1} · 🥉 {2}
+Entrada:~	Entry:~	Entrada:~
+Prêmios:	Prizes:	Premios:
+🥇 1º lugar: 150.000 Poké Dólares + 15 Origin Coins + Roleta do Torneio	🥇 1st place: 150,000 Poké Dollars + 15 Origin Coins + Tournament wheel	🥇 1.er lugar: 150.000 Poké Dólares + 15 Origin Coins + Ruleta del Torneo
+🥈 2º lugar: 100.000 Poké Dólares + 10 Origin Coins	🥈 2nd place: 100,000 Poké Dollars + 10 Origin Coins	🥈 2.º lugar: 100.000 Poké Dólares + 10 Origin Coins
+🥉 3º lugar: 50.000 Poké Dólares	🥉 3rd place: 50,000 Poké Dollars	🥉 3.er lugar: 50.000 Poké Dólares
+As partidas abrem sozinhas na hora: fique com o jogo aberto. Quem não estiver online (ou estiver com o time fora das regras) perde por W.O.	Matches open on their own when it's time: keep the game open. Anyone offline (or with a team outside the rules) loses by forfeit.	Las partidas se abren solas a su hora: deja el juego abierto. Quien no esté conectado (o tenga el equipo fuera de las reglas) pierde por W.O.
+Sair do torneio? A entrada é devolvida.	Leave the tournament? Your entry fee is refunded.	¿Salir del torneo? Se devuelve la entrada.
+Sair do torneio	Leave the tournament	Salir del torneo
+Inscrever-se no torneio? A entrada é de 10.000 Poké Dólares.	Sign up for the tournament? The entry fee is 10,000 Poké Dollars.	¿Inscribirte en el torneo? La entrada cuesta 10.000 Poké Dólares.
+Inscrever-se	Sign up	Inscribirse
+Atenção: seu time atual está fora das regras ({0}). Arrume antes da sua partida, senão perde por W.O.	Warning: your current team breaks the rules ({0}). Fix it before your match or you lose by forfeit.	Atención: tu equipo actual está fuera de las reglas ({0}). Arréglalo antes de tu partida o perderás por W.O.
+❌ Seu time de agora está fora das regras deste torneio.	❌ Your current team breaks this tournament's rules.	❌ Tu equipo actual está fuera de las reglas de este torneo.
+✅ Seu time de agora está dentro das regras deste torneio.	✅ Your current team follows this tournament's rules.	✅ Tu equipo actual cumple las reglas de este torneo.
+Inscritos ({0})	Signed up ({0})	Inscritos ({0})
+🏆 Roleta do Torneio	🏆 Tournament wheel	🏆 Ruleta del Torneo
+é um ovo	is an egg	es un huevo
+é NT	is NT	es NT
+lendários, míticos, Ultra Beasts e Paradoxos não cruzam	legendaries, mythicals, Ultra Beasts and Paradoxes can't breed	los legendarios, singulares, Ultraentes y Paradojas no se crían
+esta espécie não cruza	this species can't breed	esta especie no se cría
+Energia do tipo {0}{1}. Às vezes fica para trás quando você derrota ou captura um Pokémon selvagem desse tipo. Material de craft.	{0}{1}-type energy. Sometimes left behind when you defeat or catch a wild Pokémon of that type. Crafting material.	Energía de tipo {0}{1}. A veces queda atrás cuando derrotas o capturas un Pokémon salvaje de ese tipo. Material de crafteo.
+Liga Pokémon Nightmare	Nightmare Pokémon League	Liga Pokémon Nightmare
+50.000 Poké Dólares	50,000 Poké Dollars	50.000 Poké Dólares
+Mint aleatória	Random Mint	Mint aleatoria
+Ovo Comum S	Common Egg S	Huevo Común S
+Orb aleatória	Random Orb	Orb aleatoria
+3 Fragmentos Temporais	3 Time Fragments	3 Fragmentos Temporales
+Peat Block Sangrento	Bloody Peat Block	Peat Block Sangriento
+Passe {0}: precisa de {1} prêmios em cada trilha	Pass {0}: needs {1} prizes on each track	Pase {0}: necesita {1} premios en cada camino
+{0}: até {1}	{0}: up to {1}	{0}: hasta {1}
+Tier: {0}{1}	Tier: {0}{1}	Tier: {0}{1}
+~(vale tudo)	~(anything goes)	~(vale todo)
+~(só Pokémon do {0} para baixo)	~(only Pokémon from {0} down)	~(solo Pokémon de {0} para abajo)
+Mecânicas: {0}	Mechanics: {0}	Mecánicas: {0}
+Times de 6, sem espécie nem item repetido, Sleep Clause, melhor de 1, 60 s por turno.	Teams of 6, no repeated species or items, Sleep Clause, best of 1, 60 s per turn.	Equipos de 6, sin especie ni objeto repetido, Sleep Clause, al mejor de 1, 60 s por turno.
+Oitavas de final	Round of 16	Octavos de final
+Quartas de final	Quarterfinals	Cuartos de final
+Semifinais	Semifinals	Semifinales
+Final e disputa de 3º lugar	Final and 3rd place match	Final y partido por el 3.er lugar
+O time precisa ter {0} Pokémon (sem ovos).	The team needs {0} Pokémon (no eggs).	El equipo necesita {0} Pokémon (sin huevos).
+Espécie repetida: {0}.	Repeated species: {0}.	Especie repetida: {0}.
+Item repetido: {0}.	Repeated item: {0}.	Objeto repetido: {0}.
+{0} é forte demais para o {1} (tier {2}).	{0} is too strong for {1} (tier {2}).	{0} es demasiado fuerte para {1} (tier {2}).
+A {0} é forte demais para o {1}.	{0} is too strong for {1}.	{0} es demasiado fuerte para {1}.
+{0} são proibidos neste torneio.	{0} are banned in this tournament.	{0} están prohibidos en este torneo.
+No máximo {0} {1} neste torneio.	At most {0} {1} in this tournament.	Como máximo {0} {1} en este torneo.
+Esta conta está banida {0}. Motivo: {1}	This account is banned {0}. Reason: {1}	Esta cuenta está baneada {0}. Motivo: {1}
+até {0} (horário de Brasília)	until {0} (Brasília time)	hasta {0} (hora de Brasilia)
+um prêmio misterioso	a mystery prize	un premio misterioso
+🔐 O Cofre PokeOrigins está trancado com um prêmio dentro: {0}! Descubra a senha de {1} dígitos.	🔐 The PokeOrigins Vault is locked with a prize inside: {0}! Find the {1}-digit code.	🔐 ¡La caja fuerte PokeOrigins está cerrada con un premio dentro: {0}! Descubre la clave de {1} dígitos.
+Senha inválida.	Invalid code.	Clave no válida.
+Calma! Espere um instante antes de tentar de novo.	Easy! Wait a moment before trying again.	¡Calma! Espera un momento antes de intentarlo otra vez.
+Tarde demais: {0} já abriu o cofre.	Too late: {0} already opened the vault.	Demasiado tarde: {0} ya abrió la caja fuerte.
+Não há cofre para abrir agora.	There's no vault to open right now.	No hay ninguna caja fuerte que abrir ahora.
+🔓 {0} abriu o Cofre PokeOrigins (senha {1}) e levou: {2}!	🔓 {0} opened the PokeOrigins Vault (code {1}) and got: {2}!	🔓 ¡{0} abrió la caja fuerte PokeOrigins (clave {1}) y se llevó: {2}!
+🎰 Loteria: saiu o número {0} e ninguém acertou. O prêmio acumulou: {1} Poké Dólares!	🎰 Lottery: the number {0} was drawn and nobody won. The jackpot is now {1} Poké Dollars!	🎰 Lotería: salió el número {0} y nadie acertó. ¡El bote se acumuló: {1} Poké Dólares!
+Alguém	Someone	Alguien
+Poké Dólares (prêmio da Loteria)	Poké Dollars (Lottery prize)	Poké Dólares (premio de la Lotería)
+🎰 {0} ganhou a Loteria com o número {1} e levou {2} Poké Dólares! A Loteria volta no dia 1º do próximo mês.	🎰 {0} won the Lottery with the number {1} and got {2} Poké Dollars! The Lottery returns on the 1st of next month.	🎰 ¡{0} ganó la Lotería con el número {1} y se llevó {2} Poké Dólares! La Lotería vuelve el día 1 del próximo mes.
+A Loteria volta no dia 1º do próximo mês.	The Lottery returns on the 1st of next month.	La Lotería vuelve el día 1 del próximo mes.
+As vendas de hoje já fecharam (até as 20h).	Today's sales are already closed (until 20:00).	Las ventas de hoy ya cerraron (hasta las 20:00).
+Cada jogador compra no máximo {0} bilhetes por dia (você tem {1}).	Each player can buy at most {0} tickets per day (you have {1}).	Cada jugador compra como máximo {0} boletos por día (tienes {1}).
+Os números de hoje acabaram.	Today's numbers are sold out.	Los números de hoy se agotaron.
+Valor inválido.	Invalid amount.	Valor no válido.
+Este ninho já sumiu.	This nest is already gone.	Este nido ya desapareció.
+Outro treinador está enfrentando este ninho agora.	Another trainer is fighting this nest right now.	Otro entrenador está enfrentando este nido ahora.
+Ninho inválido.	Invalid nest.	Nido no válido.
+Você não está enfrentando este ninho.	You are not fighting this nest.	No estás enfrentando este nido.
+🪺 {0} derrotou o ninho de {1}!	🪺 {0} defeated the {1} nest!	🪺 ¡{0} derrotó el nido de {1}!
+Espécie inválida.	Invalid species.	Especie no válida.
+🎯 Evento de captura: quem capturar o {0} com a maior soma de IVs até a meia-noite leva o prêmio!	🎯 Capture event: whoever catches {0} with the highest IV total by midnight wins the prize!	🎯 Evento de captura: ¡quien capture a {0} con la mayor suma de IVs hasta la medianoche gana el premio!
+Ovo Lendário (Evento de captura)	Legendary Egg (Capture event)	Huevo Legendario (Evento de captura)
+Poké Dólares (Evento de captura)	Poké Dollars (Capture event)	Poké Dólares (Evento de captura)
+Origin Coins (Evento de captura)	Origin Coins (Capture event)	Origin Coins (Evento de captura)
+🎯 {0} venceu o Evento de captura com um {1} de {2} de IVs!	🎯 {0} won the Capture event with a {1} with {2} IVs!	🎯 ¡{0} ganó el Evento de captura con un {1} de {2} de IVs!
+🎯 O Evento de captura do {0} terminou sem capturas.	🎯 The {0} Capture event ended with no catches.	🎯 El Evento de captura de {0} terminó sin capturas.
+🔥 Um Outbreak começou agora! Veja no canto da tela onde ele está.	🔥 An Outbreak just started! Check the corner of the screen to see where.	🔥 ¡Acaba de empezar un Brote! Mira en la esquina de la pantalla dónde está.
+🪺 Um ninho apareceu! Veja no canto da tela onde ele está.	🪺 A nest appeared! Check the corner of the screen to see where.	🪺 ¡Apareció un nido! Mira en la esquina de la pantalla dónde está.
+👹 Boss global: {0} está furioso na gaiola da cidade! Cada treinador pode enfrentá-lo uma vez nas próximas 2 horas.	👹 Global Boss: {0} is raging in the city cage! Each trainer can fight it once in the next 2 hours.	👹 Jefe global: ¡{0} está furioso en la jaula de la ciudad! Cada entrenador puede enfrentarlo una vez en las próximas 2 horas.
+🛡️ Boss da guilda: {0} está na gaiola da cidade! O dano dos membros soma para a guilda (2 horas).	🛡️ Guild Boss: {0} is in the city cage! Members' damage adds up for the guild (2 hours).	🛡️ Jefe del gremio: ¡{0} está en la jaula de la ciudad! El daño de los miembros suma para el gremio (2 horas).
+Não há boss na gaiola agora.	There's no boss in the cage right now.	No hay ningún jefe en la jaula ahora.
+Você já enfrentou este boss.	You already fought this boss.	Ya enfrentaste a este jefe.
+O Boss da guilda é só para quem está numa guilda.	The Guild Boss is only for guild members.	El Jefe del gremio es solo para quien está en un gremio.
+Você não está enfrentando este boss.	You are not fighting this boss.	No estás enfrentando a este jefe.
+{0} (Boss global, {1}º lugar)	{0} (Global Boss, place {1})	{0} (Jefe global, puesto {1})
+Pontos de guilda (Boss da guilda, {0}º lugar)	Guild points (Guild Boss, place {0})	Puntos de gremio (Jefe del gremio, puesto {0})
+{0} {1} terminou! {2}	{0} {1} is over! {2}	¡{0} {1} terminó! {2}
+Ninguém causou dano.	Nobody dealt damage.	Nadie causó daño.
+Liga inválida.	Invalid League.	Liga no válida.
+Comece sua jornada antes de entrar na Liga.	Start your journey before entering the League.	Empieza tu aventura antes de entrar en la Liga.
+A Liga abre no nível {0} de treinador.	The League opens at trainer level {0}.	La Liga se abre en el nivel {0} de entrenador.
+Esta Liga ainda está sendo preparada pela staff.	This League is still being prepared by the staff.	El staff todavía está preparando esta Liga.
+Você saiu no meio da última batalha e foi eliminado. Tente de novo na semana que vem.	You left in the middle of the last battle and were eliminated. Try again next week.	Saliste en medio del último combate y quedaste eliminado. Inténtalo de nuevo la semana que viene.
+Você já venceu esta Liga nesta semana.	You already won this League this week.	Ya ganaste esta Liga esta semana.
+Você foi derrotado nesta semana. Tente de novo na semana que vem.	You were defeated this week. Try again next week.	Fuiste derrotado esta semana. Inténtalo de nuevo la semana que viene.
+Você não está numa batalha da Liga.	You are not in a League battle.	No estás en un combate de la Liga.
+{0}: Poké Dólares	{0}: Poké Dollars	{0}: Poké Dólares
+🏆 {0} venceu a {1}!	🏆 {0} won the {1}!	🏆 ¡{0} ganó la {1}!
+Conta banida	Account banned	Cuenta baneada
+Sem sessão	No session	Sin sesión
+Sem Pokémon no time.	No Pokémon on the team.	No hay Pokémon en el equipo.
+Um dos jogadores já está numa batalha.	One of the players is already in a battle.	Uno de los jugadores ya está en un combate.
+Escolha inválida.	Invalid choice.	Elección no válida.
+Você não está nesta batalha.	You are not in this battle.	No estás en este combate.
+Este jogador não está online.	This player is not online.	Este jugador no está conectado.
+Você já está numa batalha.	You are already in a battle.	Ya estás en un combate.
+Este jogador já está numa batalha.	This player is already in a battle.	Este jugador ya está en un combate.
+Este jogador não aceita desafios.	This player doesn't accept challenges.	Este jugador no acepta desafíos.
+O desafio não vale mais.	The challenge is no longer valid.	El desafío ya no es válido.
+Quem desafiou já saiu do jogo.	The challenger already left the game.	Quien desafió ya salió del juego.
+O Safari abre no nível {0} de treinador.	The Safari opens at trainer level {0}.	El Safari se abre en el nivel {0} de entrenador.
+Torneio cancelado: entrada devolvida	Tournament canceled: entry fee refunded	Torneo cancelado: entrada devuelta
+Torneio: seu time está fora das regras ({0}). Arrume em até {1} min, senão você perde por W.O.	Tournament: your team breaks the rules ({0}). Fix it within {1} min or you lose by forfeit.	Torneo: tu equipo está fuera de las reglas ({0}). Arréglalo en {1} min o perderás por W.O.
+time fora das regras: {0}	team outside the rules: {0}	equipo fuera de las reglas: {0}
+Torneio: seu adversário não pôde jogar (W.O.). Você avança!	Tournament: your opponent couldn't play (forfeit). You advance!	Torneo: tu rival no pudo jugar (W.O.). ¡Avanzas!
+Torneio: você perdeu por W.O. ({0}).	Tournament: you lost by forfeit ({0}).	Torneo: perdiste por W.O. ({0}).
+Final do Torneio	Tournament final	Final del Torneo
+Disputa de 3º lugar	3rd place match	Partido por el 3.er lugar
+Torneio · {0}	Tournament · {0}	Torneo · {0}
+🏆 Torneio: começaram {0}!	🏆 Tournament: {0} have started!	🏆 Torneo: ¡empezaron {0}!
+a final e a disputa de 3º lugar	the final and the 3rd place match	la final y el partido por el 3.er lugar
+Torneio: {0}º lugar	Tournament: place {0}	Torneo: puesto {0}
+Medalha de {0} do Torneio	Tournament {0} medal	Medalla de {0} del Torneo
+Roleta do Torneio	Tournament wheel	Ruleta del Torneo
+Roleta do Torneio: Fragmentos Temporais	Tournament wheel: Time Fragments	Ruleta del Torneo: Fragmentos Temporales
+Roleta do Torneio: {0}	Tournament wheel: {0}	Ruleta del Torneo: {0}
+🏆 {0} venceu o Torneio! 2º: {1} · 3º: {2}	🏆 {0} won the Tournament! 2nd: {1} · 3rd: {2}	🏆 ¡{0} ganó el Torneo! 2.º: {1} · 3.º: {2}
+🏆 Inscrições abertas para o Torneio das {0}! Vá à Arena da cidade.	🏆 Sign-ups open for the {0} Tournament! Go to the city Arena.	🏆 ¡Inscripciones abiertas para el Torneo de las {0}! Ve a la Arena de la ciudad.
+🏆 Torneio: faltam {0} inscritos. A inscrição foi estendida por 5 minutos!	🏆 Tournament: {0} more players needed. Sign-ups extended by 5 minutes!	🏆 Torneo: faltan {0} inscritos. ¡La inscripción se amplió 5 minutos!
+🏆 O Torneio foi cancelado: não completou 16 inscritos. As entradas foram devolvidas.	🏆 The Tournament was canceled: it didn't reach 16 players. Entry fees were refunded.	🏆 El Torneo se canceló: no llegó a 16 inscritos. Se devolvieron las entradas.
+🏆 Torneio: as 16 vagas foram preenchidas! A disputa começa em breve.	🏆 Tournament: all 16 spots are filled! It starts soon.	🏆 Torneo: ¡se llenaron las 16 plazas! Empieza pronto.
+O Torneio abre no nível {0} de treinador.	The Tournament opens at trainer level {0}.	El Torneo se abre en el nivel {0} de entrenador.
+A inscrição não está aberta.	Sign-ups are not open.	La inscripción no está abierta.
+Você já está inscrito.	You are already signed up.	Ya estás inscrito.
+As 16 vagas já foram preenchidas.	All 16 spots are already filled.	Las 16 plazas ya están llenas.
+Seu time não vale para este torneio: {0}	Your team isn't valid for this tournament: {0}	Tu equipo no vale para este torneo: {0}
+Você não tem Poké Dólares suficientes para a entrada.	You don't have enough Poké Dollars for the entry fee.	No tienes suficientes Poké Dólares para la entrada.
+Você não está inscrito numa inscrição aberta.	You are not signed up for an open tournament.	No estás inscrito en un torneo abierto.
+🏆 A staff abriu as inscrições de um Torneio! Vá à Arena da cidade.	🏆 The staff opened sign-ups for a Tournament! Go to the city Arena.	🏆 ¡El staff abrió las inscripciones de un Torneo! Ve a la Arena de la ciudad.
+🏆 O Torneio foi cancelado pela staff. As entradas foram devolvidas.	🏆 The Tournament was canceled by the staff. Entry fees were refunded.	🏆 El staff canceló el Torneo. Se devolvieron las entradas.
+{0}: leve a skin para a bolsa antes de trocar (Minhas skins).	{0}: move the skin to your bag before trading (My skins).	{0}: lleva la skin a la mochila antes de intercambiar (Mis skins).
+# Correio (17/10/2026)
+✉️ Correio	✉️ Mail	✉️ Correo
+Correio	Mail	Correo
+Staff PokeOrigins	PokeOrigins Staff	Staff de PokeOrigins
+Loteria PokeOrigins	PokeOrigins Lottery	Lotería PokeOrigins
+Evento de captura	Capture event	Evento de captura
+Termine a batalha antes de resgatar.	Finish the battle before claiming.	Termina el combate antes de recoger.
+Você resgatou: {0}.	You claimed: {0}.	Recogiste: {0}.
+Tem anexo para resgatar	Has attachments to claim	Tiene adjuntos para recoger
+Escolha uma carta na lista.	Pick a letter from the list.	Elige una carta de la lista.
+Anexos (já resgatados)	Attachments (already claimed)	Adjuntos (ya recogidos)
+Anexos	Attachments	Adjuntos
+De: {0} · {1}	From: {0} · {1}	De: {0} · {1}
+🎁 Resgatar	🎁 Claim	🎁 Recoger
+Apagar carta	Delete letter	Borrar carta
+Apagar esta carta?	Delete this letter?	¿Borrar esta carta?
+🗑️ Apagar	🗑️ Delete	🗑️ Borrar
+Resgatar tudo ({0})	Claim all ({0})	Recoger todo ({0})
+Apagar lidas	Delete read	Borrar leídas
+Apagar {0} carta(s) lida(s)? Cartas com anexo para resgatar ficam.	Delete {0} read letter(s)? Letters with attachments to claim are kept.	¿Borrar {0} carta(s) leída(s)? Las cartas con adjuntos por recoger se quedan.
+Nenhuma carta por enquanto.	No letters yet.	Ninguna carta por ahora.
+Carta não encontrada.	Letter not found.	Carta no encontrada.
+Comece sua jornada antes de resgatar.	Start your journey before claiming.	Empieza tu aventura antes de recoger.
+Não há nada para resgatar.	There's nothing to claim.	No hay nada que recoger.
+Resgate os anexos antes de apagar a carta.	Claim the attachments before deleting the letter.	Recoge los adjuntos antes de borrar la carta.
+Presente da staff	Gift from the staff	Regalo del staff
+A administração mandou um presente para você.	The staff sent you a gift.	El staff te envió un regalo.
+A administração mandou um Pokémon para você.	The staff sent you a Pokémon.	El staff te envió un Pokémon.
+Você descobriu a senha {0} e abriu o cofre! Aqui está o prêmio.	You found the code {0} and opened the vault! Here's your prize.	¡Descubriste la clave {0} y abriste la caja fuerte! Aquí está el premio.
+Seu bilhete {0} foi sorteado! Aqui está o prêmio.	Your ticket {0} was drawn! Here's your prize.	¡Tu boleto {0} salió sorteado! Aquí está el premio.
+Você venceu o Evento de captura com {0} de IVs! Aqui está o prêmio.	You won the Capture event with {0} IVs! Here's your prize.	¡Ganaste el Evento de captura con {0} de IVs! Aquí está el premio.
+Você ficou em {0}º lugar no ranking de dano do Boss global!	You placed {0} in the Global Boss damage ranking!	¡Quedaste en el puesto {0} del ranking de daño del Jefe global!
+Sua guilda ficou em {0}º lugar no ranking de dano do Boss da guilda!	Your guild placed {0} in the Guild Boss damage ranking!	¡Tu gremio quedó en el puesto {0} del ranking de daño del Jefe del gremio!
+Parabéns! Você venceu a {0}. Aqui está o prêmio.	Congratulations! You won the {0}. Here's your prize.	¡Felicidades! Ganaste la {0}. Aquí está el premio.
+Torneio cancelado	Tournament canceled	Torneo cancelado
+O Torneio foi cancelado. Aqui está a sua entrada de volta.	The Tournament was canceled. Here's your entry fee back.	El Torneo se canceló. Aquí tienes tu entrada de vuelta.
+Parabéns! Você ficou em {0}º lugar no Torneio.	Congratulations! You placed {0} in the Tournament.	¡Felicidades! Quedaste en el puesto {0} del Torneo.
+Roleta do Torneio: Poké Dólares	Tournament wheel: Poké Dollars	Ruleta del Torneo: Poké Dólares
+Boss global	Global Boss	Jefe global
+Boss da guilda	Guild Boss	Jefe del gremio
+Pontos de guilda	Guild points	Puntos de gremio
+Medalha de ouro do Torneio	Tournament gold medal	Medalla de oro del Torneo
+Medalha de prata do Torneio	Tournament silver medal	Medalla de plata del Torneo
+Medalha de bronze do Torneio	Tournament bronze medal	Medalla de bronce del Torneo
+Ovo Lendário	Legendary Egg	Huevo Legendario
+Você recebeu da administração	You received from the staff	Recibiste del staff

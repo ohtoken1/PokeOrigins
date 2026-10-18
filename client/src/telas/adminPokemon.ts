@@ -143,7 +143,7 @@ export function secaoDarPokemon(destino?: { botao: string; enviar: (p: PokemonIn
       if (destino) aviso.textContent = await destino.enviar(p, nome);
       else {
       const r = await darPokemonAoJogador(usuario, p, nome);
-      aviso.textContent = `${nome} enviado para ${r.usuario}. Chega na hora se ele estiver online; senão, quando ele entrar.`;
+      aviso.textContent = `${nome} enviado para o Correio de ${r.usuario}.`;
       }
     } catch (e) {
       aviso.textContent = e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.';
@@ -158,7 +158,7 @@ export function secaoDarPokemon(destino?: { botao: string; enviar: (p: PokemonIn
   return {
     parar: () => clearTimeout(relogio),
     elemento: el('section', { class: 'bonus-secao' },
-      destino ? null : el('p', { class: 'sub' }, 'Monta um Pokémon e manda para um jogador. Ele recebe um aviso; o Pokémon vai para o time ou, se o time está cheio, para o PC, e já chega com os IVs avaliados.'),
+      destino ? null : el('p', { class: 'sub' }, 'Monta um Pokémon e manda para um jogador. Chega no Correio dele; ao resgatar, o Pokémon vai para o time ou, se o time está cheio, para o PC, e já chega com os IVs avaliados.'),
       listaPokemon, listaJogadores,
       el('div', { class: 'cla-formulario adm-pk' },
         el('label', { class: 'cla-campo' }, 'Pokémon', campoPokemon),

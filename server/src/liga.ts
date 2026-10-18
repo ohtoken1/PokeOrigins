@@ -3,6 +3,7 @@
 // As batalhas ainda são calculadas no navegador (como Ninho e Boss): o servidor só confere a ordem e a semana.
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
+import * as correio from './correio.ts';
 import { avisarEvento } from './mundo.ts';
 import { lerNome, lerPokemon } from './entregas.ts';
 import { NIVEL_MINIMO, liberado } from '../../shared/trancas.ts';
@@ -101,8 +102,8 @@ export function resultado(conta: banco.Conta, dados: Record<string, unknown>, ag
   else if (++meu.etapa >= ETAPAS_LIGA[liga].length) {
     meu.estado = 'venceu';
     const premio = PREMIO_LIGA[liga];
-    banco.criarEntrega(conta.id, 'silver', `${NOME_LIGA[liga]}: Poké Dólares`, premio.silver, 'liga');
-    banco.criarEntrega(conta.id, premio.moeda, `${NOME_LIGA[liga]}: ${premio.nomeMoeda}`, premio.quantidade, 'liga');
+    correio.enviar(conta.id, NOME_LIGA[liga], `Parabéns! Você venceu a ${NOME_LIGA[liga]}. Aqui está o prêmio.`,
+      [correio.anexoItem('silver', 'Poké Dólares', premio.silver), correio.anexoItem(premio.moeda, premio.nomeMoeda, premio.quantidade)], 'liga');
     avisarEvento(`🏆 ${nomeDe(conta)} venceu a ${NOME_LIGA[liga]}!`);
   }
   banco.gravarEvento('liga-progresso', p);

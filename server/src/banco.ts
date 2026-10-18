@@ -584,3 +584,51 @@ export const bilhetesDaConta = (dia: string, contaId: number) => (sqlEventos.bil
 export const donoDoBilhete = (dia: string, numero: number) => (sqlEventos.bilhete.get(dia, numero) as { conta_id: number } | undefined)?.conta_id ?? null;
 export const bilhetesVendidos = (dia: string) => (sqlEventos.vendidos.get(dia) as { n: number }).n;
 export const criarBilhete = (dia: string, numero: number, contaId: number) => void sqlEventos.criarBilhete.run(dia, numero, contaId, Date.now());
+
+// ---- correio: uma caixa por conta (server/src/correio.ts) ----
+// Cada carta pode trazer anexos (itens, moedas, Pokémon) em JSON; o jogador resgata quando quiser.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS correio (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    conta_id INTEGER NOT NULL REFERENCES contas(id) ON DELETE CASCADE,
+    titulo TEXT NOT NULL,
+    texto TEXT NOT NULL,
+    de TEXT NOT NULL,
+    anexos TEXT NOT NULL DEFAULT '[]',
+    criado_em INTEGER NOT NULL,
+    lida INTEGER NOT NULL DEFAULT 0,
+    resgatada INTEGER NOT NULL DEFAULT 0
+  );
+  CREATE INDEX IF NOT EXISTS correio_conta ON correio (conta_id, id);
+`);
+export interface Carta {
+  id: number;
+  titulo: string;
+  texto: string;
+  de: string;
+  anexos: string;
+  criado_em: number;
+  lida: number;
+  resgatada: number;
+}
+const sqlCorreio = {
+  criar: db.prepare('INSERT INTO correio (conta_id, titulo, texto, de, anexos, criado_em) VALUES (?, ?, ?, ?, ?, ?)'),
+  daConta: db.prepare('SELECT id, titulo, texto, de, anexos, criado_em, lida, resgatada FROM correio WHERE conta_id = ? ORDER BY id DESC'),
+  uma: db.prepare('SELECT id, titulo, texto, de, anexos, criado_em, lida, resgatada FROM correio WHERE id = ? AND conta_id = ?'),
+  lida: db.prepare('UPDATE correio SET lida = 1 WHERE id = ? AND conta_id = ?'),
+  resgatada: db.prepare('UPDATE correio SET resgatada = 1, lida = 1 WHERE id = ? AND conta_id = ?'),
+  apagar: db.prepare('DELETE FROM correio WHERE id = ? AND conta_id = ?'),
+  contar: db.prepare('SELECT COUNT(*) AS n FROM correio WHERE conta_id = ?'),
+  // as mais velhas que já não guardam nada (lidas, sem anexo esperando)
+  apagarVelhas: db.prepare("DELETE FROM correio WHERE id IN (SELECT id FROM correio WHERE conta_id = ? AND lida = 1 AND (resgatada = 1 OR anexos = '[]') ORDER BY id LIMIT ?)"),
+  contasComSave: db.prepare('SELECT conta_id AS id FROM saves'),
+};
+export const criarCarta = (contaId: number, titulo: string, texto: string, de: string, anexos: string) => void sqlCorreio.criar.run(contaId, titulo, texto, de, anexos, Date.now());
+export const cartasDaConta = (contaId: number) => sqlCorreio.daConta.all(contaId) as unknown as Carta[];
+export const cartaDaConta = (id: number, contaId: number) => sqlCorreio.uma.get(id, contaId) as Carta | undefined;
+export const marcarCartaLida = (id: number, contaId: number) => void sqlCorreio.lida.run(id, contaId);
+export const marcarCartaResgatada = (id: number, contaId: number) => void sqlCorreio.resgatada.run(id, contaId);
+export const apagarCarta = (id: number, contaId: number) => sqlCorreio.apagar.run(id, contaId).changes > 0;
+export const quantasCartas = (contaId: number) => (sqlCorreio.contar.get(contaId) as { n: number }).n;
+export const apagarCartasVelhas = (contaId: number, quantas: number) => void sqlCorreio.apagarVelhas.run(contaId, quantas);
+export const contasComSave = () => (sqlCorreio.contasComSave.all() as { id: number }[]).map((c) => c.id);

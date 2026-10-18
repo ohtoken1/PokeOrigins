@@ -48,11 +48,12 @@ const ABAS: Aba[] = [
   {
     nome: 'Comunidade',
     menu: true,
-    telas: ['amigos', 'cla', 'jogadores', 'ranking', 'database'],
+    telas: ['amigos', 'cla', 'eventos', 'jogadores', 'ranking', 'database'],
     itens: [
       { nome: '🔎 Buscar jogadores', destino: () => ({ tela: 'jogadores' }) },
       { nome: '👥 Amigos', destino: () => ({ tela: 'comunidade', secao: 'amigos' }) },
       { nome: '🛡️ Guilda', destino: () => ({ tela: 'comunidade', secao: 'cla' }) },
+      { nome: '📅 Eventos', destino: () => ({ tela: 'comunidade', secao: 'eventos' }) },
       { nome: '📊 Ranking', destino: () => ({ tela: 'ranking' }) },
       { nome: '📚 Database', destino: () => ({ tela: 'database' }) },
     ],

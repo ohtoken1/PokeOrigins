@@ -15,6 +15,7 @@ import * as viagem from './viagem.ts';
 import * as safari from './safari.ts';
 import * as missoes from './missoes.ts';
 import * as ranking from './ranking.ts';
+import * as correio from './correio.ts';
 import * as entregas from './entregas.ts';
 import * as mercado from './mercado.ts';
 import * as banimentos from './banimentos.ts';
@@ -258,6 +259,7 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     }
 
   // ---- PvP (server/src/pvp.ts): batalhas calculadas no servidor ----
+  if (caminho === '/api/pvp/atual' && metodo === 'GET') return responder(res, 200, pvp.atual(exigirConta(req)));
   for (const [rota, f] of [['/api/pvp/desafiar', pvp.desafiar], ['/api/pvp/responder', pvp.responder], ['/api/pvp/escolha', pvp.escolher], ['/api/pvp/desistir', pvp.desistir]] as const)
     if (caminho === rota && metodo === 'POST') {
       const conta = exigirConta(req);
@@ -342,6 +344,13 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     const conta = exigirConta(req);
     return responder(res, 201, entregas.darPokemon(conta, await lerCorpo(req)));
   }
+  // ---- correio: uma caixa por conta (server/src/correio.ts) ----
+  if (caminho === '/api/correio' && metodo === 'GET') return responder(res, 200, correio.listar(exigirConta(req)));
+  for (const [rota, f] of [['/api/correio/ler', correio.ler], ['/api/correio/resgatar', correio.resgatar], ['/api/correio/apagar', correio.apagar], ['/api/admin/correio', correio.enviarDaStaff]] as const)
+    if (caminho === rota && metodo === 'POST') {
+      const conta = exigirConta(req);
+      return responder(res, 200, f(conta, await lerCorpo(req)));
+    }
   if (caminho === '/api/entregas' && metodo === 'GET') return responder(res, 200, entregas.pendentes(exigirConta(req)));
   if (caminho === '/api/entregas/receber' && metodo === 'POST') return responder(res, 200, entregas.receber(exigirConta(req)));
 

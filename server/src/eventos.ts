@@ -4,6 +4,7 @@ import { randomInt } from 'node:crypto';
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { avisar, avisarEvento, avisarTodos } from './mundo.ts';
+import * as correio from './correio.ts';
 import { lerNome, lerPokemon } from './entregas.ts';
 import {
   BILHETES_POR_JOGADOR, DIGITOS_COFRE, FECHA_VENDAS, HORA_SORTEIO, INTERVALO_TENTATIVA_COFRE_MS, NUMEROS_LOTERIA, PARTE_DO_POTE, POTE_INICIAL,
@@ -96,14 +97,13 @@ export function tentarCofre(conta: banco.Conta, dados: Record<string, unknown>) 
     c.aberto = false;
     c.vencedor = { nome: nomeDe(conta), usuario: conta.usuario, quando: agora };
     banco.gravarEvento('cofre', c);
-    // o prêmio chega como as entregas da staff (na hora, se o jogo está aberto)
-    if (c.conteudo.tipo === 'item') banco.criarEntrega(conta.id, c.conteudo.item, c.premio, c.conteudo.quantidade, 'cofre');
-    else banco.criarEntregaPokemon(conta.id, c.conteudo.dados, c.premio, 'cofre');
+    // o prêmio chega pelo correio
+    correio.enviar(conta.id, 'Cofre PokeOrigins', `Você descobriu a senha ${c.senha} e abriu o cofre! Aqui está o prêmio.`,
+      [c.conteudo.tipo === 'item' ? correio.anexoItem(c.conteudo.item, c.premio, c.conteudo.quantidade) : { tipo: 'pokemon', nome: c.premio, dados: JSON.parse(c.conteudo.dados) }], 'cofre');
     avisarEvento(`🔓 ${c.vencedor.nome} abriu o Cofre PokeOrigins (senha ${c.senha}) e levou: ${c.premio}!`);
     return { acertou: true as const, premio: c.premio };
   });
   if (resultado.acertou) {
-    avisar(conta.id, { t: 'entrega' });
     mudou();
   }
   return resultado;
@@ -142,7 +142,7 @@ export function conferirSorteio(agora = Date.now(), forcar = false): void {
       avisarEvento(`🎰 Loteria: saiu o número ${formatarBilhete(numero)} e ninguém acertou. O prêmio acumulou: ${l.pote.toLocaleString('pt-BR')} Poké Dólares!`);
     } else {
       const nome = nomeDe(banco.contaPorId(dono) ?? { id: dono, usuario: 'Alguém' });
-      if (l.pote > 0) banco.criarEntrega(dono, 'silver', 'Poké Dólares (prêmio da Loteria)', l.pote, 'loteria');
+      if (l.pote > 0) correio.enviar(dono, 'Loteria PokeOrigins', `Seu bilhete ${formatarBilhete(numero)} foi sorteado! Aqui está o prêmio.`, [correio.anexoItem('silver', 'Poké Dólares', l.pote)], 'loteria');
       l.ultimo = { dia, numero, vencedor: nome, premio: l.pote };
       avisarEvento(`🎰 ${nome} ganhou a Loteria com o número ${formatarBilhete(numero)} e levou ${l.pote.toLocaleString('pt-BR')} Poké Dólares! A Loteria volta no dia 1º do próximo mês.`);
       l.pote = POTE_INICIAL;
@@ -150,7 +150,6 @@ export function conferirSorteio(agora = Date.now(), forcar = false): void {
     }
     banco.gravarEvento('loteria', l);
   });
-  if (dono !== null) avisar(dono, { t: 'entrega' });
   mudou();
 }
 setInterval(() => conferirSorteio(), 30_000).unref();
@@ -350,14 +349,15 @@ export function conferirCaptura(agora = Date.now()): void {
     c.premiado = true;
     if (primeiro) {
       c.vencedor = { nome: primeiro.nome, soma: primeiro.soma };
-      banco.criarEntrega(primeiro.contaId, PREMIO_CAPTURA.item, 'Ovo Lendário (Evento de captura)', 1, 'captura');
-      banco.criarEntrega(primeiro.contaId, 'silver', 'Poké Dólares (Evento de captura)', PREMIO_CAPTURA.silver, 'captura');
-      banco.criarEntrega(primeiro.contaId, 'gold', 'Origin Coins (Evento de captura)', PREMIO_CAPTURA.gold, 'captura');
+      correio.enviar(primeiro.contaId, 'Evento de captura', `Você venceu o Evento de captura com ${primeiro.soma} de IVs! Aqui está o prêmio.`, [
+        correio.anexoItem(PREMIO_CAPTURA.item, 'Ovo Lendário', 1),
+        correio.anexoItem('silver', 'Poké Dólares', PREMIO_CAPTURA.silver),
+        correio.anexoItem('gold', 'Origin Coins', PREMIO_CAPTURA.gold),
+      ], 'captura');
     }
     banco.gravarEvento('captura', c);
   });
   if (primeiro) {
-    avisar(primeiro.contaId, { t: 'entrega' });
     avisarEvento(`🎯 ${primeiro.nome} venceu o Evento de captura com um ${c.nome} de ${primeiro.soma} de IVs!`);
   } else avisarEvento(`🎯 O Evento de captura do ${c.nome} terminou sem capturas.`);
   mudou();
@@ -481,23 +481,20 @@ export function conferirBoss(agora = Date.now()): void {
   const b = boss();
   if (!b || b.premiado || agora < b.fim) return;
   const frases: string[] = [];
-  const avisados = new Set<number>();
   banco.transacao(() => {
     b.premiado = true;
     if (b.tipo === 'global') {
       rankingBoss(b).slice(0, 3).forEach((r, i) => {
         if (r.dano <= 0) return;
         const p = PREMIOS_BOSS_GLOBAL[i];
-        banco.criarEntrega(r.contaId, p.item, `${p.nome} (Boss global, ${i + 1}º lugar)`, p.quantidade, 'boss');
-        avisados.add(r.contaId);
+        correio.enviar(r.contaId, 'Boss global', `Você ficou em ${i + 1}º lugar no ranking de dano do Boss global!`, [correio.anexoItem(p.item, p.nome, p.quantidade)], 'boss');
         frases.push(`${i + 1}º ${r.nome}`);
       });
     } else {
       rankingGuildas(b).slice(0, 3).forEach((g, i) => {
         if (g.dano <= 0) return;
         for (const id of g.membros) {
-          banco.criarEntrega(id, 'pontos-guilda', `Pontos de guilda (Boss da guilda, ${i + 1}º lugar)`, PONTOS_GUILDA_BOSS, 'boss');
-          avisados.add(id);
+          correio.enviar(id, 'Boss da guilda', `Sua guilda ficou em ${i + 1}º lugar no ranking de dano do Boss da guilda!`, [correio.anexoItem('pontos-guilda', 'Pontos de guilda', PONTOS_GUILDA_BOSS)], 'boss');
         }
         frases.push(`${i + 1}º ${g.nome}`);
       });
@@ -505,7 +502,6 @@ export function conferirBoss(agora = Date.now()): void {
     b.resultado = frases.join(' · ');
     banco.gravarEvento('boss', b);
   });
-  for (const id of avisados) avisar(id, { t: 'entrega' });
   avisarEvento(`${b.tipo === 'global' ? '👹 Boss global' : '🛡️ Boss da guilda'} ${b.nome} terminou! ${frases.length ? frases.join(' · ') : 'Ninguém causou dano.'}`);
   mudou();
 }

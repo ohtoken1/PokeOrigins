@@ -3,7 +3,7 @@
 // save de quem está jogando não é trocado por baixo dele. Futuramente estas linhas também alimentam o Log.
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
-import { avisar } from './mundo.ts';
+import * as correio from './correio.ts';
 import { guardarPokemon, type PokemonSave, type SaveMin } from './trocas.ts';
 
 /** Entregas que vão para um saldo do save, não para a bolsa (prêmios de eventos). */
@@ -14,7 +14,6 @@ const MEDALHAS: Record<string, string> = { 'medalha-ouro': 'medalhasOuro', 'meda
 
 /** Limites de um pedido. */
 const QUANTIDADE_MAX = 9999;
-const PENDENTES_MAX = 200;
 
 export const lerNome = (v: unknown) => (typeof v === 'string' ? v.replace(/\p{Cc}|\p{Cf}/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 60) : '');
 
@@ -28,10 +27,8 @@ export function darItem(conta: banco.Conta, dados: Record<string, unknown>) {
   if (!/^[a-z0-9-]{1,60}$/.test(item)) throw new ErroConta('Item inválido.');
   const quantidade = dados.quantidade;
   if (typeof quantidade !== 'number' || !Number.isSafeInteger(quantidade) || quantidade < 1 || quantidade > QUANTIDADE_MAX) throw new ErroConta(`A quantidade vai de 1 a ${QUANTIDADE_MAX}.`);
-  if (banco.entregasDaConta(para.id).length >= PENDENTES_MAX) throw new ErroConta('Este jogador já tem entregas demais esperando.', 409);
-  banco.criarEntrega(para.id, item, lerNome(dados.nome) || item, quantidade, conta.usuario);
-  // quem está com o jogo aberto vem buscar agora
-  avisar(para.id, { t: 'entrega' });
+  // chega pelo correio (o jogador resgata quando quiser)
+  correio.enviar(para.id, 'Presente da staff', 'A administração mandou um presente para você.', [correio.anexoItem(item, lerNome(dados.nome) || item, quantidade)], 'staff');
   return { usuario: para.usuario };
 }
 
@@ -85,14 +82,30 @@ export function darPokemon(conta: banco.Conta, dados: Record<string, unknown>) {
   if (!para) throw new ErroConta('Jogador não encontrado.', 404);
   if (!banco.lerSave(para.id)) throw new ErroConta('Este jogador ainda não começou o jogo.', 409);
   const pokemon = lerPokemon(dados.pokemon);
-  if (banco.entregasPokemonDaConta(para.id).length >= PENDENTES_MAX) throw new ErroConta('Este jogador já tem entregas demais esperando.', 409);
-  banco.criarEntregaPokemon(para.id, JSON.stringify(pokemon), lerNome(dados.nome) || 'Pokémon', conta.usuario);
-  avisar(para.id, { t: 'entrega' });
+  correio.enviar(para.id, 'Presente da staff', 'A administração mandou um Pokémon para você.', [{ tipo: 'pokemon', nome: lerNome(dados.nome) || 'Pokémon', dados: pokemon }], 'staff');
   return { usuario: para.usuario };
 }
 
 /** Quantas entregas esperam por este jogador. */
 export const pendentes = (conta: banco.Conta) => ({ pendentes: banco.entregasDaConta(conta.id).length + banco.entregasPokemonDaConta(conta.id).length });
+
+/**
+ * Põe um item no save: Poké Dólares, Origin Coins etc. vão para o saldo; medalhas de torneio para save.estatisticas
+ * (perfil e ranking); o resto para a bolsa. Usado aqui e no correio (server/src/correio.ts).
+ */
+export function aplicarItem(save: Record<string, unknown>, item: string, quantidade: number): void {
+  const somar = (dono: Record<string, unknown>, chave: string) => {
+    const atual = dono[chave];
+    dono[chave] = (typeof atual === 'number' && Number.isFinite(atual) ? Math.max(0, atual) : 0) + quantidade;
+  };
+  const medalha = MEDALHAS[item];
+  if (medalha) return somar((save.estatisticas && typeof save.estatisticas === 'object' ? save.estatisticas : (save.estatisticas = {})) as Record<string, unknown>, medalha);
+  const saldo = SALDOS[item];
+  if (saldo) return somar(save, saldo);
+  const itens = (save.itens && typeof save.itens === 'object' ? save.itens : (save.itens = {})) as Record<string, unknown>;
+  if (typeof itens[item] === 'number') itens[item] = Math.floor(itens[item] as number);
+  somar(itens, item);
+}
 
 /** O jogo veio buscar: põe os itens no save guardado e apaga as entregas (tudo numa mudança só). */
 export function receber(conta: banco.Conta) {
@@ -100,27 +113,8 @@ export function receber(conta: banco.Conta) {
   let entregues: { nome: string; quantidade: number }[] = [];
   banco.mudarSaves([conta.id], ([save]) => {
     const lista = banco.entregasDaConta(conta.id);
-    const itens = (save.itens && typeof save.itens === 'object' ? save.itens : (save.itens = {})) as Record<string, unknown>;
     for (const e of lista) {
-      // Poké Dólares e Origin Coins (prêmios de eventos): vão para o saldo, não para a bolsa
-      // medalhas de torneio: contam no perfil e no ranking (save.estatisticas)
-      const medalha = MEDALHAS[e.item];
-      if (medalha) {
-        const est = (save.estatisticas && typeof save.estatisticas === 'object' ? save.estatisticas : (save.estatisticas = {})) as Record<string, unknown>;
-        const atual = est[medalha];
-        est[medalha] = (typeof atual === 'number' && Number.isFinite(atual) ? atual : 0) + e.quantidade;
-        banco.apagarEntrega(e.id);
-        continue;
-      }
-      const saldo = SALDOS[e.item];
-      if (saldo) {
-        const atual = save[saldo];
-        save[saldo] = (typeof atual === 'number' && Number.isFinite(atual) ? atual : 0) + e.quantidade;
-        banco.apagarEntrega(e.id);
-        continue;
-      }
-      const tem = typeof itens[e.item] === 'number' && Number.isFinite(itens[e.item]) ? Math.max(0, Math.floor(itens[e.item] as number)) : 0;
-      itens[e.item] = tem + e.quantidade;
+      aplicarItem(save, e.item, e.quantidade);
       banco.apagarEntrega(e.id);
     }
     entregues = lista.map((e) => ({ nome: e.nome, quantidade: e.quantidade }));

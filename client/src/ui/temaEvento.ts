@@ -1,0 +1,118 @@
+// Visual temático de cada evento (pedido do dono: "uma abinha mais bonitinha, com a temática do evento"). Cada evento
+// tem cores, emblema e um desenho de fundo próprios (CSS em `.tema-<id>`), usados no banner do topo das janelas
+// (Torneio, Liga, Boss, Eventos) e nos cartões de Comunidade → Eventos. O catálogo também mora aqui.
+import { NIVEL_MINIMO, type ConteudoTrancado } from '../../../shared/trancas';
+import { PRECO_BILHETE, PRECO_NINHO, PRECO_NINHO_VIP, POTE_INICIAL, PREMIO_CAPTURA, NIVEL_NINHO, PREMIO_NINHO } from '../../../shared/eventosRegras';
+import { ENTRADA_TORNEIO } from '../../../shared/torneioRegras';
+import { PREMIO_LIGA } from '../../../shared/liga';
+import { el } from './dom';
+
+export type IdEvento = 'torneio' | 'liga' | 'nightmare' | 'boss' | 'outbreak' | 'ninho' | 'captura' | 'cofre' | 'loteria' | 'expedicao' | 'safari';
+
+export interface InfoEvento {
+  nome: string;
+  emblema: string;
+  /** frase curta em cima do título do banner */
+  lema: string;
+  onde: string;
+  quando: string;
+  descricao: string;
+  premios: string;
+  tranca?: ConteudoTrancado;
+}
+
+const n = (x: number) => x.toLocaleString('pt-BR');
+
+/** Todos os eventos, na ordem da lista de Comunidade → Eventos. */
+export const EVENTOS: Record<IdEvento, InfoEvento> = {
+  torneio: {
+    nome: 'Torneio', emblema: '🏆', lema: 'Mata-mata de 16 treinadores', onde: 'Arena da cidade',
+    quando: 'Todo dia às 12h30 (regras sorteadas) e às 18h30 (regras da staff). A inscrição abre 10 minutos antes.',
+    descricao: `Melhor de 1, 60 s por turno, batalhas calculadas no servidor. Entrada de ${n(ENTRADA_TORNEIO)} Poké Dólares.`,
+    premios: '1º: 150.000 Poké Dólares + 15 Origin Coins + Roleta do Torneio · 2º: 100.000 + 10 Origin Coins · 3º: 50.000',
+    tranca: 'torneio',
+  },
+  liga: {
+    nome: 'Liga Pokémon', emblema: '👑', lema: 'Elite 4 + Campeão', onde: 'Arena da cidade',
+    quando: 'Uma tentativa por semana. A semana vira na segunda-feira, 00h00.',
+    descricao: 'Cinco batalhas seguidas, sem curar o time entre elas (a bolsa vale entre uma e outra).',
+    premios: `${n(PREMIO_LIGA.normal.silver)} Poké Dólares + ${PREMIO_LIGA.normal.quantidade} League Coins`,
+    tranca: 'liga',
+  },
+  nightmare: {
+    nome: 'Liga Pokémon Nightmare', emblema: '💀', lema: 'Um mestre de cada tipo', onde: 'Arena da cidade',
+    quando: 'Uma tentativa por semana. A semana vira na segunda-feira, 00h00.',
+    descricao: '18 treinadores seguidos, um de cada tipo, com Pokémon até o nível 200. Sem curar entre as batalhas.',
+    premios: `${n(PREMIO_LIGA.nightmare.silver)} Poké Dólares + ${PREMIO_LIGA.nightmare.quantidade} League Coins Nightmare`,
+    tranca: 'liga',
+  },
+  boss: {
+    nome: 'Boss', emblema: '👹', lema: 'A fera da gaiola', onde: 'Gaiola da cidade',
+    quando: 'Quando a staff liga. Fica 2 horas na gaiola.',
+    descricao: 'Boss global e Boss da guilda: HP infinito, cada treinador luta uma vez, por até 50 turnos, e o dano vale para o ranking.',
+    premios: 'Global, top 3: Chave Temporal / 5 / 2 Fragmentos Temporais · Guilda: Pontos de guilda para quem lutou',
+  },
+  outbreak: {
+    nome: 'Outbreak', emblema: '🔥', lema: 'Uma espécie toma conta do mapa', onde: 'Mapas (o aviso no canto da tela mostra qual)',
+    quando: 'Todo dia às 15h e às 21h, por 1 hora.',
+    descricao: 'Uma espécie comum aparece em metade dos encontros de um mapa de uma região.',
+    premios: 'Muito mais chances de achar aquela espécie shiny ou com IVs altos',
+  },
+  ninho: {
+    nome: 'Ninho', emblema: '🪺', lema: 'Um gigante protege o ninho', onde: 'Mapas (o aviso no canto da tela mostra qual)',
+    quando: 'Um novo a cada 20 minutos. Fica 10 minutos (+5 por derrota).',
+    descricao: `Pokémon nível ${NIVEL_NINHO} que não pode ser capturado. Entrada de ${n(PRECO_NINHO)} Poké Dólares (VIP ${n(PRECO_NINHO_VIP)}).`,
+    premios: `${n(PREMIO_NINHO)} Poké Dólares + Roleta do Ninho · ninho de lendário: 5% de ganhar o Pokémon`,
+  },
+  captura: {
+    nome: 'Evento de captura', emblema: '🎯', lema: 'A melhor captura do dia', onde: 'Mapas',
+    quando: 'Quando a staff liga. Vai até a meia-noite.',
+    descricao: 'Capture a espécie sorteada em batalha: ganha quem tiver a maior soma de IVs.',
+    premios: `Ovo Lendário + ${n(PREMIO_CAPTURA.silver)} Poké Dólares + ${PREMIO_CAPTURA.gold} Origin Coins`,
+  },
+  cofre: {
+    nome: 'Cofre PokeOrigins', emblema: '🔐', lema: 'Quem descobre a senha leva', onde: 'NPC Eventos (feira do oeste)',
+    quando: 'Quando a staff tranca um prêmio.',
+    descricao: 'Senha de 3 dígitos. Quem acertar primeiro leva o prêmio.',
+    premios: 'O prêmio que a staff colocou no cofre',
+  },
+  loteria: {
+    nome: 'Loteria PokeOrigins', emblema: '🎰', lema: 'O prêmio acumula', onde: 'NPC Eventos (feira do oeste)',
+    quando: 'Vendas até as 20h; o sorteio sai às 20h05.',
+    descricao: `Bilhete de ${n(PRECO_BILHETE)} com um número de 5 dígitos. Metade vai para o prêmio; ninguém acertou, acumula.`,
+    premios: `O prêmio acumulado (começa em ${n(POTE_INICIAL)} Poké Dólares)`,
+  },
+  expedicao: {
+    nome: 'Expedição', emblema: '🧭', lema: 'Seus Pokémon exploram por você', onde: 'NPC Eventos (feira do oeste)',
+    quando: 'Sempre aberta: 1, 3 ou 6 horas.',
+    descricao: 'Mande até 6 Pokémon. Quanto maior o Power somado, melhores os achados.',
+    premios: 'Berries, Apricorns, Pokébolas, remédios, Energies e, com sorte, um item raro (tudo NT)',
+  },
+  safari: {
+    nome: 'Safari', emblema: '🌿', lema: 'Três salas, só Pokémon fortes', onde: 'NPC Safari da cidade',
+    quando: 'Todo dia: 1 Ticket Safari grátis (VIP: 2) e mais 1 para comprar.',
+    descricao: '3 salas com 10 Pokémon do tipo que você escolher, todos tier A ou melhor, com raros 10× mais comuns.',
+    premios: 'Pokémon com IVs altos e mais chance de shiny e lendários',
+    tranca: 'safari',
+  },
+};
+
+export const textoTrancaDoEvento = (e: InfoEvento) => (e.tranca ? `Treinador nível ${NIVEL_MINIMO[e.tranca]}+` : 'Sem nível mínimo');
+
+export type EstadoSelo = 'ativo' | 'espera' | 'fechado';
+
+/** Banner do topo de um evento: fundo temático, emblema grande, lema, título e um selo (Ao vivo / horário). */
+export function bannerEvento(id: IdEvento, opcoes: { titulo?: string; subtitulo?: string | HTMLElement; selo?: { texto: string; estado: EstadoSelo } } = {}): HTMLElement {
+  const e = EVENTOS[id];
+  return el('header', { class: `evento-banner tema-${id}` },
+    el('span', { class: 'evento-banner-desenho', 'aria-hidden': 'true' }),
+    el('span', { class: 'evento-emblema', 'aria-hidden': 'true' }, e.emblema),
+    el('div', { class: 'evento-banner-texto' },
+      el('small', {}, e.lema),
+      el('h3', {}, opcoes.titulo ?? e.nome),
+      opcoes.subtitulo ? el('p', {}, opcoes.subtitulo) : ''),
+    opcoes.selo ? el('span', { class: `evento-selo ${opcoes.selo.estado}` }, opcoes.selo.texto) : '');
+}
+
+/** Classes da janela de um evento (borda, barra do título e destaques na cor do tema). */
+export const classeTematica = (id: IdEvento) => `janela-tematica tema-${id}`;

@@ -8,6 +8,7 @@ import { adotarSaveDoServidor, carregarSave, salvarAgora, type Save } from '../e
 import { aoAvisoDoServidor } from '../online';
 import { confirmar } from './confirmar';
 import { el } from './dom';
+import { bannerEvento, classeTematica } from './temaEvento';
 import { abrirJanela } from './janela';
 import { girarRoleta } from './roleta';
 import { valorEmMoeda } from './moeda';
@@ -64,8 +65,11 @@ export function abrirTorneio(): void {
       : t.rodadaComecaEm ? `Próxima rodada (${NOMES_RODADAS[t.rodada]}) em ${minutos(t.rodadaComecaEm)} min.`
       : `Em disputa: ${NOMES_RODADAS[t.rodada]}.`;
     return el('div', { class: 'torneio-janela' },
+      bannerEvento('torneio', {
+        subtitulo: situacao,
+        selo: !ativo ? { texto: `Próximo às ${hora(dados.proximo.horario)}`, estado: 'espera' } : t.fase === 'inscricao' ? { texto: 'Inscrições abertas', estado: 'ativo' } : { texto: '● AO VIVO', estado: 'ativo' },
+      }),
       el('p', { class: 'aviso-bolsa', hidden: !aviso, role: 'status' }, aviso),
-      el('p', {}, situacao),
       t && !ativo && t.podio ? el('p', { class: 'meta' }, `Último torneio: 🥇 ${t.podio[0]} · 🥈 ${t.podio[1]} · 🥉 ${t.podio[2]}`) : '',
       ativo ? el('ul', { class: 'torneio-regras' }, ...textoDasRegras(t.regras).map((r) => el('li', {}, r))) : '',
       el('div', { class: 'torneio-premios' },
@@ -87,7 +91,7 @@ export function abrirTorneio(): void {
       ativo && save ? el('p', { class: problemas.length ? 'torneio-time ruim' : 'torneio-time bom' }, problemas.length ? '❌ Seu time de agora está fora das regras deste torneio.' : '✅ Seu time de agora está dentro das regras deste torneio.') : '',
       ativo && t.inscritos.length ? el('details', {}, el('summary', {}, `Inscritos (${t.inscritos.length})`), el('p', { class: 'meta' }, t.inscritos.join(', '))) : '',
       t && t.chave.length ? el('div', { class: 'torneio-chave' }, ...t.chave.map((r, i) => el('section', {}, el('h4', {}, NOMES_RODADAS[i]), ...r.map(partida)))) : '');
-  }, { classe: 'janela-torneio', aoFechar: () => (parar(), clearInterval(relogio)) });
+  }, { classe: `janela-torneio ${classeTematica('torneio')}`, aoFechar: () => (parar(), clearInterval(relogio)) });
   const parar = aoAvisoDoServidor((msg) => msg.t === 'torneio' && void carregar());
   const relogio = setInterval(() => janela.redesenhar(), 20_000);
   void carregar();

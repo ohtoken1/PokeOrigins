@@ -7,6 +7,7 @@ import { api, ErroApi } from '../conta';
 import type { Save } from '../estado';
 import { confirmar } from './confirmar';
 import { el } from './dom';
+import { bannerEvento, classeTematica } from './temaEvento';
 import { abrirJanela } from './janela';
 import { valorEmMoeda } from './moeda';
 import { avisar } from './avisos';
@@ -52,8 +53,14 @@ export function abrirLiga(save: Save, lutar: Lutar): void {
       : l.estado === 'perdeu' ? 'Derrotado nesta semana. Volte na semana que vem.'
       : l.estado === 'jogando' ? `Próxima batalha: ${l.etapas[l.etapa]}`
       : 'Uma tentativa por semana.';
-    return el('section', { class: `liga-cartao liga-${l.liga}` },
-      el('h3', {}, l.nome),
+    const tema = l.liga === 'normal' ? 'liga' : 'nightmare';
+    const selo = !l.pronta ? { texto: 'Em preparação', estado: 'fechado' as const }
+      : l.estado === 'venceu' ? { texto: '🏆 Vencida', estado: 'ativo' as const }
+      : l.estado === 'perdeu' ? { texto: 'Semana que vem', estado: 'fechado' as const }
+      : l.estado === 'jogando' ? { texto: `Etapa ${l.etapa + 1}/${l.etapas.length}`, estado: 'ativo' as const }
+      : { texto: 'Aberta', estado: 'espera' as const };
+    return el('section', { class: `liga-cartao liga-${l.liga} tema-${tema}` },
+      bannerEvento(tema, { titulo: l.nome, selo }),
       el('ol', { class: 'liga-etapas-jogador' }, ...l.etapas.map((nome, i) =>
         el('li', { class: i < l.etapa || l.estado === 'venceu' ? 'vencida' : i === l.etapa && l.estado === 'jogando' ? 'atual' : '' }, nome))),
       el('p', { class: 'meta' }, 'Prêmio: ', valorEmMoeda('silver', l.premio.silver), ` + ${l.premio.quantidade} ${l.premio.nomeMoeda}`),
@@ -70,6 +77,6 @@ export function abrirLiga(save: Save, lutar: Lutar): void {
       el('p', { class: 'meta' }, `O time não é curado entre as batalhas: use a bolsa entre uma e outra. A semana vira ${quando(dados.viraEm)}.`),
       el('p', { class: 'meta' }, `Suas moedas: ${save.leagueCoins ?? 0} League Coins · ${save.leagueCoinsNightmare ?? 0} League Coins Nightmare (a loja vem depois).`),
       el('div', { class: 'liga-cartoes' }, ...dados.ligas.map(cartao)));
-  }, { classe: 'janela-liga' });
+  }, { classe: `janela-liga ${classeTematica('liga')}` });
   void carregar();
 }
