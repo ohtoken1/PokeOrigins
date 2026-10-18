@@ -1,33 +1,73 @@
-// Roleta de prêmios (Ninho e, depois, Torneio). Pedido do dono: todas as fatias do mesmo tamanho na roda e as chances
-// reais escritas ao lado. O resultado já vem sorteado (pelo servidor); a roda só gira até ele.
+// Roleta de prêmios (Ninho e Torneio). Pedido do dono: fatias do mesmo tamanho, a imagem do item em cada fatia
+// ("?" nos aleatórios), as chances reais ao lado e o botão Girar no meio. O resultado já vem sorteado pelo
+// servidor; a roda só gira até ele.
+import { itemDaLoja } from '../../../shared/loja';
+import { TICKETS } from '../../../shared/tickets';
 import { el } from './dom';
+import { iconeCharm, iconeItem } from './iconeItem';
 import { abrirJanela } from './janela';
 
-const CORES = ['#e9b949', '#5a4a23', '#c0392b', '#2a78d6', '#1baf7a', '#8e44ad', '#e67e22', '#16a085', '#d35400', '#7f8c8d'];
+// cores fortes, alternando claro/escuro para as fatias vizinhas não se misturarem
+const CORES = ['#b83a3a', '#2f5f9e', '#2f8a5b', '#7b3fa0', '#c06a1f', '#1f7f86', '#9e2f63', '#4b5f2a', '#8a6a1a', '#3d3d8f'];
 const pct = (c: number) => `${(Math.round(c * 1000) / 10).toLocaleString('pt-BR')}%`;
+/** Fatias de prêmio "aleatório" (Mint, Charm, Orb): mostram um exemplo com "?" por cima. */
+const ALEATORIOS = new Set(['mint', 'charm', 'orb']);
 
-export function girarRoleta(titulo: string, fatias: { nome: string; chance: number }[], escolhida: number): Promise<void> {
+function imagem(src: string): HTMLElement {
+  return el('div', { class: 'icone-caixa' }, el('img', { class: 'icone-png', src, alt: '' }));
+}
+/** Ícone de cada prêmio das roletas (ids de ROLETA_NINHO / ROLETA_TORNEIO). */
+function iconeDaFatia(id: string): HTMLElement {
+  const item = (x: string) => {
+    const i = itemDaLoja(x);
+    return i ? iconeItem(i) : el('span', {}, '🎁');
+  };
+  const icone = id === 'silver' ? imagem('itens/pokedolar.svg')
+    : id === 'fragmentos' ? imagem('itens/fragmento-temporal.svg')
+    : id === 'mint' ? item('adamantmint')
+    : id === 'charm' ? iconeCharm('fire')
+    : id === 'orb' ? item(TICKETS[0].id)
+    : item(id);
+  return el('div', { class: 'giro-icone' }, icone, ALEATORIOS.has(id) ? el('span', { class: 'giro-interrogacao' }, '?') : '');
+}
+
+export function girarRoleta(titulo: string, fatias: { id: string; nome: string; chance: number }[], escolhida: number): Promise<void> {
   return new Promise((resolver) => {
     const n = fatias.length;
     const passo = 360 / n;
-    const gradiente = fatias.map((_, i) => `${CORES[i % CORES.length]} ${i * passo}deg ${(i + 1) * passo}deg`).join(', ');
-    const roda = el('div', { class: 'roleta-roda', style: `background: conic-gradient(${gradiente})` },
-      ...fatias.map((_, i) => el('span', { class: 'roleta-numero', style: `transform: rotate(${(i + 0.5) * passo}deg) translateY(-92px)` }, String(i + 1))));
-    const resultado = el('p', { class: 'roleta-resultado', hidden: true });
-    const botao = el('button', { class: 'botao', hidden: true, onclick: () => janela.fechar() }, 'Pegar prêmio');
-    const janela = abrirJanela(titulo, () =>
-      el('div', { class: 'roleta' },
-        el('div', { class: 'roleta-palco' }, el('div', { class: 'roleta-seta' }, '▼'), roda),
-        el('ol', { class: 'roleta-lista' }, ...fatias.map((f, i) => el('li', {}, el('span', { class: 'roleta-cor', style: `background: ${CORES[i % CORES.length]}` }), `${f.nome} `, el('small', {}, pct(f.chance))))),
-        resultado, botao),
-    { classe: 'janela-roleta', aoFechar: () => resolver() });
-    // várias voltas e para com o meio da fatia escolhida embaixo da seta
-    const voltas = 5 * 360 + (360 - (escolhida + 0.5) * passo);
-    requestAnimationFrame(() => requestAnimationFrame(() => (roda.style.transform = `rotate(${voltas}deg)`)));
-    setTimeout(() => {
-      resultado.hidden = false;
-      resultado.textContent = `🎉 ${fatias[escolhida].nome}!`;
-      botao.hidden = false;
-    }, 4300);
+    const cor = (i: number) => CORES[i % CORES.length];
+    const gradiente = fatias.map((_, i) => `${cor(i)} ${i * passo}deg ${(i + 1) * passo}deg`).join(', ');
+    const roda = el('div', { class: 'giro-roda', style: `background: conic-gradient(${gradiente})` },
+      ...fatias.map((_, i) => el('div', { class: 'giro-divisa', style: `transform: rotate(${i * passo}deg)` })),
+      ...fatias.map((f, i) => el('div', { class: 'giro-casa', 'data-i': i, style: `transform: rotate(${(i + 0.5) * passo}deg)` }, iconeDaFatia(f.id))));
+    const lampadas = Array.from({ length: 20 }, (_, i) => el('span', { class: `giro-lampada ${i % 2 ? 'par' : ''}`, style: `transform: rotate(${i * 18}deg) translateY(-158px)` }));
+    const resultado = el('p', { class: 'giro-resultado', hidden: true });
+    const pegar = el('button', { class: 'botao', hidden: true, onclick: () => janela.fechar() }, 'Pegar prêmio');
+    const girar = el('button', { class: 'giro-botao', type: 'button', onclick: () => comecar() }, 'GIRAR') as HTMLButtonElement;
+    const lista = el('ol', { class: 'giro-lista' }, ...fatias.map((f, i) =>
+      el('li', { 'data-i': i }, el('span', { class: 'giro-cor', style: `background: ${cor(i)}` }), iconeDaFatia(f.id), el('span', { class: 'giro-nome' }, f.nome), el('small', {}, pct(f.chance)))));
+    const palco = el('div', { class: 'giro-palco' }, el('div', { class: 'giro-aro' }, ...lampadas), roda, el('div', { class: 'giro-seta' }), girar);
+
+    function comecar() {
+      girar.disabled = true;
+      girar.textContent = '…';
+      palco.classList.add('girando');
+      // várias voltas e para com o meio da fatia escolhida embaixo da seta (um pouco fora do centro, mais natural)
+      const desvio = (Math.random() - 0.5) * passo * 0.5;
+      roda.style.transform = `rotate(${6 * 360 + (360 - (escolhida + 0.5) * passo) + desvio}deg)`;
+      setTimeout(() => {
+        palco.classList.remove('girando');
+        palco.classList.add('parou');
+        roda.querySelector(`.giro-casa[data-i="${escolhida}"]`)?.classList.add('ganhou');
+        lista.querySelector(`li[data-i="${escolhida}"]`)?.classList.add('ganhou');
+        girar.textContent = '🎉';
+        resultado.hidden = false;
+        resultado.textContent = `Você ganhou: ${fatias[escolhida].nome}!`;
+        pegar.hidden = false;
+      }, 5200);
+    }
+
+    const janela = abrirJanela(titulo, () => el('div', { class: 'giro' }, palco, el('div', { class: 'giro-lado' }, el('h4', {}, 'Prêmios e chances'), lista), resultado, pegar),
+      { classe: 'janela-roleta', aoFechar: () => resolver() });
   });
 }

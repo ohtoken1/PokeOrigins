@@ -12,17 +12,22 @@ import { TODOS_OS_ITENS, nomeCategoriaItem } from '../../../shared/loja';
 import { darItemAoJogador } from '../entregas';
 import { secaoDarPokemon } from './adminPokemon';
 import { secaoBanimentos } from './adminBanimentos';
+import { secaoLiga } from './adminLiga';
+import { secaoTorneio } from './adminTorneio';
 import { iconeItem } from '../ui/iconeItem';
 import { el } from '../ui/dom';
 import { cartaoAnuncio } from '../ui/mural';
+import { confirmar } from '../ui/confirmar';
 
-export type SecaoAdministracao = 'itens' | 'pokemon' | 'banimentos' | 'log' | 'eventos' | 'anuncios';
+export type SecaoAdministracao = 'itens' | 'pokemon' | 'liga' | 'torneio' | 'banimentos' | 'log' | 'eventos' | 'anuncios';
 
 export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBreve?: string }[] = [
   // só eventos que a staff ativa direto (pedido do dono); a Bonificação mora aqui
   { id: 'eventos', nome: 'Eventos' },
   { id: 'itens', nome: 'Dar item' },
   { id: 'pokemon', nome: 'Dar Pokémon' },
+  { id: 'liga', nome: 'Liga' },
+  { id: 'torneio', nome: 'Torneio' },
   { id: 'banimentos', nome: 'Banimentos' },
   {
     id: 'log',
@@ -81,7 +86,7 @@ function secaoAnuncios(): { elemento: HTMLElement; parar: () => void } {
     const lista = anuncios();
     publicados.replaceChildren(...(lista.length
       ? lista.map((a) => cartaoAnuncio(a, false,
-          el('button', { class: 'botao perigo', onclick: () => confirm(`Apagar o anúncio "${a.titulo}"?`) && void apagarAnuncio(a.id).then(() => void (aviso.textContent = 'Anúncio apagado.'), erro) }, 'Apagar')))
+          el('button', { class: 'botao perigo', onclick: async () => (await confirmar('Confirmar', `Apagar o anúncio "${a.titulo}"?`)) && void apagarAnuncio(a.id).then(() => void (aviso.textContent = 'Anúncio apagado.'), erro) }, 'Apagar')))
       : [el('p', { class: 'meta' }, 'Nenhum anúncio publicado.')]));
   };
   const parar = aoMudarAnuncios(desenhar);
@@ -142,7 +147,7 @@ function secaoItens(): { elemento: HTMLElement; parar: () => void } {
     if (!item) return void (aviso.textContent = 'Escolha um item da lista.');
     if (!(quantidade >= 1 && quantidade <= 9999)) return void (aviso.textContent = 'A quantidade vai de 1 a 9999.');
     if (!usuario) return void (aviso.textContent = 'Diga para qual jogador vai.');
-    if (!confirm(`Dar ${quantidade}x ${item.nome} para ${usuario}?`)) return;
+    if (!(await confirmar('Confirmar', `Dar ${quantidade}x ${item.nome} para ${usuario}?`))) return;
     enviando = true;
     aviso.textContent = '';
     try {
@@ -179,7 +184,7 @@ export const telaAdministracao = (secaoInicial: SecaoAdministracao): Tela => (ra
   let secao = secaoInicial;
   const corpo = el('div', { class: 'admin-corpo' });
   // montada uma vez só (redesenhar a tela não apaga o que a pessoa está escrevendo)
-  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : secao === 'pokemon' ? secaoDarPokemon() : secao === 'banimentos' ? secaoBanimentos() : null;
+  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : secao === 'pokemon' ? secaoDarPokemon() : secao === 'banimentos' ? secaoBanimentos() : secao === 'liga' ? secaoLiga() : secao === 'torneio' ? secaoTorneio() : null;
 
   const linhaBonus = (chave: ChaveBonus) => {
     const atual = bonificacao()[chave];

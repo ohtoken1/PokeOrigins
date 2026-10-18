@@ -16,7 +16,7 @@ import { tornarArrastavel } from '../ui/arrastar';
 import { abrirDetalhes } from '../ui/detalhes';
 import { el, seloGenero, selosTipos, spritePokemon } from '../ui/dom';
 import { iconeItem } from '../ui/iconeItem';
-import { barraHp } from '../ui/time';
+import { acompanharTime, barraHp } from '../ui/time';
 
 function pedestal(p: PokemonDoJogador, posicao: number): HTMLElement {
   const dados = pokemonPorId(p.especieId);
@@ -159,6 +159,8 @@ export const telaInicio: Tela = (raiz, navegar) => {
       }),
     );
   desenharFila();
+  // o time mudou pelo PC ou pela bolsa: aparece na hora
+  acompanharTime(fila, desenharFila);
   tela.append(
     el('h1', {}, 'Início'),
     el('p', { class: 'sub' }, `Olá, ${nome}!`),

@@ -69,6 +69,8 @@ export type Pedido =
   /** `dynamax` = pode usar Dynamax agora (segurando a Dynamax Band; 'gigantamax' se a espécie tem a forma). `dinamaxado` = está em Dynamax (os golpes são os `max`). */
   | { tipo: 'acao'; golpes: OpcaoGolpe[]; podeTrocar: boolean; podeFugir: boolean; zGolpes: (string | null)[] | null; tera: string | null; mega: boolean; dynamax: 'dynamax' | 'gigantamax' | null; dinamaxado: boolean }
   | { tipo: 'troca' }
+  /** PvP: a vez é do outro jogador (ele está escolhendo, ou eu já escolhi). */
+  | { tipo: 'espera' }
   | { tipo: 'fim' };
 
 type PokemonSim = Battle['p1']['pokemon'][number];
@@ -143,7 +145,7 @@ function textoCondicaoLado(id: string, nome: string, lado: Lado, ativa: boolean)
   return (ativa ? comeco[id] : fim[id]) ?? (ativa ? `${nome} começou ${onde}!` : `${nome} acabou ${onde}.`);
 }
 
-function conjuntoShowdown(p: PokemonIndividual, nome: string) {
+export function conjuntoShowdown(p: PokemonIndividual, nome: string) {
   return {
     name: nome,
     // formas que dependem do item (Giratina-Origin, Arceus-Fire…): o simulador não troca sozinho
@@ -216,7 +218,7 @@ export class BatalhaSelvagem {
    * atual (Mega), sem efeitos de item/ability. `estagio` = −6 a +6; `semEstagio` = o valor antes dos estágios (para mostrar "70 → 140").
    */
   atributosEmCampo(): Record<'atk' | 'def' | 'spa' | 'spd' | 'spe', { valor: number; estagio: number; semEstagio: number }> | null {
-    const sim = this.batalha.p1.active[0];
+    const sim = this.eu.active[0];
     if (!sim || sim.fainted) return null;
     const ler = (a: 'atk' | 'def' | 'spa' | 'spd' | 'spe') => ({ valor: sim.getStat(a, false, true), estagio: sim.boosts[a] ?? 0, semEstagio: sim.getStat(a, true, true) });
     return { atk: ler('atk'), def: ler('def'), spa: ler('spa'), spd: ler('spd'), spe: ler('spe') };
@@ -224,8 +226,16 @@ export class BatalhaSelvagem {
 
   /** Posição (no time do adversário) de quem está em campo do outro lado. */
   get adversarioAtivo(): number {
-    const ativo = this.batalha.p2.active[0];
+    const ativo = this.ele.active[0];
     return ativo ? Math.max(0, this.objetosAdv.indexOf(ativo)) : 0;
+  }
+  /** Lado de quem olha a batalha ('p1' fora do PvP). */
+  private meuLado: 'p1' | 'p2' = 'p1';
+  private get eu() {
+    return this.batalha[this.meuLado];
+  }
+  private get ele() {
+    return this.batalha[this.meuLado === 'p1' ? 'p2' : 'p1'];
   }
   private tentativasFuga = 0;
   private ignorarRecarga = false;
@@ -240,22 +250,32 @@ export class BatalhaSelvagem {
     private aleatorio: () => number = Math.random,
     /** Duelo contra treinador NPC: o time dele (o `selvagem` é o primeiro) e os nomes. Sem captura nem fuga. */
     readonly treinador: { nome: string; equipe: PokemonIndividual[]; nomesEquipe: string[] } | null = null,
+    /**
+     * PvP (shared/batalha/pvp.ts): a batalha já existe com os dois jogadores e esta é a VISÃO de um dos lados
+     * (`lado`): o "jogador" é ele e o "selvagem" é o outro jogador. Não cria batalha nem escolhe pelo adversário.
+     */
+    readonly pvp: { batalha: Battle; lado: 'p1' | 'p2' } | null = null,
   ) {
     this.indices = time.map((_, i) => i).filter((i) => time[i].hp > 0);
     if (this.indices.length === 0) throw new Error('Nenhum Pokémon em condições de lutar');
 
-    this.batalha = new Battle({ formatid: 'gen9customgame' as never });
-    this.batalha.setPlayer('p1', { name: 'Jogador', team: this.indices.map((i) => conjuntoShowdown(time[i], `P${i}`)) as never });
     this.adversarios = treinador ? treinador.equipe : [selvagem];
-    this.batalha.setPlayer('p2', { name: treinador ? treinador.nome : 'Selvagem', team: this.adversarios.map((p, k) => conjuntoShowdown(p, `S${k}`)) as never });
-    // Dynamax: o simulador só libera na 8ª geração; religamos para o jogador (a Dynamax Band é conferida em `pedido`).
-    // Treinadores, líderes e selvagens não usam.
-    const ladoJogador = this.batalha.p1;
-    ladoJogador.dynamaxUsed = false;
-    ladoJogador.canDynamaxNow = () => !ladoJogador.dynamaxUsed;
-    this.objetos = this.batalha.p1.pokemon.slice();
+    if (pvp) {
+      this.batalha = pvp.batalha;
+      this.meuLado = pvp.lado;
+    } else {
+      this.batalha = new Battle({ formatid: 'gen9customgame' as never });
+      this.batalha.setPlayer('p1', { name: 'Jogador', team: this.indices.map((i) => conjuntoShowdown(time[i], `P${i}`)) as never });
+      this.batalha.setPlayer('p2', { name: treinador ? treinador.nome : 'Selvagem', team: this.adversarios.map((p, k) => conjuntoShowdown(p, `S${k}`)) as never });
+      // Dynamax: o simulador só libera na 8ª geração; religamos para o jogador (a Dynamax Band é conferida em `pedido`).
+      // Treinadores, líderes e selvagens não usam. (No PvP quem religa para os dois é a BatalhaPvp.)
+      const ladoJogador = this.eu;
+      ladoJogador.dynamaxUsed = false;
+      ladoJogador.canDynamaxNow = () => !ladoJogador.dynamaxUsed;
+    }
+    this.objetos = this.eu.pokemon.slice();
     this.objetos.forEach((sim, k) => aplicarEstado(sim, time[this.indices[k]]));
-    this.objetosAdv = this.batalha.p2.pokemon.slice();
+    this.objetosAdv = this.ele.pokemon.slice();
     this.objetosAdv.forEach((sim, k) => aplicarEstado(sim, this.adversarios[k]));
   }
 
@@ -310,17 +330,19 @@ export class BatalhaSelvagem {
   get vencedor(): Lado | null {
     if (this.turnosAcabaram && !this.batalha.ended) return 'jogador';
     if (!this.batalha.ended) return null;
-    return this.batalha.winner === 'Jogador' ? 'jogador' : 'selvagem';
+    return this.batalha.winner === this.eu.name ? 'jogador' : 'selvagem';
   }
 
   /** Posição no time do Pokémon do jogador que está em campo. */
   get ativo(): number {
-    return this.indices[this.objetos.indexOf(this.batalha.p1.active[0])];
+    return this.indices[this.objetos.indexOf(this.eu.active[0])];
   }
 
   pedido(): Pedido {
     if (this.batalha.ended || this.turnosAcabaram) return { tipo: 'fim' };
-    const req = this.batalha.p1.activeRequest as any;
+    const req = this.eu.activeRequest as any;
+    // PvP: esperando o outro jogador (ou eu já escolhi neste turno)
+    if (!req || req.wait || (this.pvp && this.eu.isChoiceDone())) return { tipo: 'espera' };
     if (req?.forceSwitch) return { tipo: 'troca' };
     const ativo = req.active[0];
     const maximos = ativo.maxMoves?.maxMoves as { move: string; disabled?: boolean }[] | undefined;
@@ -347,16 +369,16 @@ export class BatalhaSelvagem {
     const tera = comBanda && typeof ativo.canTerastallize === 'string' ? (ativo.canTerastallize as string) : null;
     // contra treinador não dá para fugir
     // Mega só com Mega Stone (sem o atalho do Rayquaza por Dragon Ascent: pedido do dono)
-    const mega = !!ativo.canMegaEvo && !!this.batalha.p1.active[0]?.getItem().megaStone;
+    const mega = !!ativo.canMegaEvo && !!this.eu.active[0]?.getItem().megaStone;
     // Dynamax só segurando a Dynamax Band, uma vez por batalha
-    const dinamaxado = !!this.batalha.p1.active[0]?.volatiles['dynamax'];
+    const dinamaxado = !!this.eu.active[0]?.volatiles['dynamax'];
     const dynamax = this.time[this.ativo]?.item === DYNAMAX_BAND && ativo.canDynamax && maximos ? (ativo.maxMoves.gigantamax ? 'gigantamax' : 'dynamax') : null;
     return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso && !this.treinador, zGolpes, tera, mega, dynamax, dinamaxado };
   }
 
   /** Posições no time dos Pokémon que podem entrar no lugar do atual. */
   reservasSaudaveis(): number[] {
-    const ativo = this.batalha.p1.active[0];
+    const ativo = this.eu.active[0];
     return this.objetos.filter((o) => o !== ativo && !o.fainted && o.hp > 0).map((o) => this.indices[this.objetos.indexOf(o)]);
   }
 
@@ -366,8 +388,22 @@ export class BatalhaSelvagem {
    * Cada um: uma vez por batalha.
    */
   usarGolpe(indice: number, especial: 'z' | 'tera' | 'mega' | 'dynamax' | null = null): EventoBatalha[] {
+    return this.jogar(this.comandoGolpe(indice, especial));
+  }
+
+  /** Texto da escolha no formato do Showdown (o PvP manda isso para o servidor conferir). */
+  comandoGolpe(indice: number, especial: 'z' | 'tera' | 'mega' | 'dynamax' | null = null): string {
     const sufixo = { z: ' zmove', tera: ' terastallize', mega: ' mega', dynamax: ' dynamax' };
-    return this.jogar(`move ${indice}${especial ? sufixo[especial] : ''}`);
+    return `move ${indice}${especial ? sufixo[especial] : ''}`;
+  }
+  comandoTroca(posicaoNoTime: number): string {
+    const obj = this.objetos[this.indices.indexOf(posicaoNoTime)];
+    return `switch ${this.eu.pokemon.indexOf(obj) + 1}`;
+  }
+
+  /** PvP: os eventos novos do log, vistos deste lado (quem faz as escolhas é a BatalhaPvp). */
+  eventosNovos(): EventoBatalha[] {
+    return this.lerEventos();
   }
 
   /** Clima e terreno em campo agora, com os turnos que faltam (null = não acaba sozinho, ex.: clima Primal). */
@@ -384,8 +420,7 @@ export class BatalhaSelvagem {
   }
 
   trocar(posicaoNoTime: number): EventoBatalha[] {
-    const obj = this.objetos[this.indices.indexOf(posicaoNoTime)];
-    return this.jogar(`switch ${this.batalha.p1.pokemon.indexOf(obj) + 1}`);
+    return this.jogar(this.comandoTroca(posicaoNoTime));
   }
 
   /**
@@ -396,7 +431,7 @@ export class BatalhaSelvagem {
   /** `bonusExtra` multiplica a chance (VIP: 1,05 = +5% em cima da chance normal). */
   arremessarBola(bola: EfeitoBola, bonusExtra = 1): { capturou: boolean; tremidas: number; chance: number; eventos: EventoBatalha[] } {
     if (bola.garantida) return { capturou: true, tremidas: 3, chance: 1, eventos: [] };
-    const alvo = this.batalha.p2.active[0];
+    const alvo = this.ele.active[0];
     const bonusBola = bola.bonus;
     const taxa = Math.max(1, Math.min(255, this.taxaCaptura + bola.ajusteTaxa));
     const bonusStatus = alvo.status === 'slp' || alvo.status === 'frz' ? 2.5 : alvo.status ? 1.5 : 1;
@@ -443,13 +478,13 @@ export class BatalhaSelvagem {
       sim.fainted = false;
       sim.faintQueued = false;
       sim.status = '' as never;
-      this.batalha.p1.pokemonLeft++;
+      this.eu.pokemonLeft++;
     } else if (!efeito.status && sim.status) {
       sim.setStatus('');
     }
     sim.hp = efeito.hp;
     const eventos: EventoBatalha[] = [];
-    if (sim === this.batalha.p1.active[0]) {
+    if (sim === this.eu.active[0]) {
       eventos.push({ tipo: 'hp', lado: 'jogador', hp: sim.hp, hpMax: sim.maxhp }, { tipo: 'status', lado: 'jogador', status: sim.status || null });
     }
     return { mensagem: efeito.mensagem, eventos: [...eventos, ...this.turnoGratisDoSelvagem()] };
@@ -457,17 +492,17 @@ export class BatalhaSelvagem {
 
   /** Status atual do selvagem (para a Dream Ball). */
   get statusSelvagem(): string | null {
-    return this.batalha.p2.active[0]?.status || null;
+    return this.ele.active[0]?.status || null;
   }
 
   /** Fórmula de fuga da 3ª/4ª geração. Se falhar, o selvagem ataca de graça. */
   fugir(): { fugiu: boolean; eventos: EventoBatalha[] } {
     this.tentativasFuga++;
-    const A = this.batalha.p1.active[0].getStat('spe');
-    const B = this.batalha.p2.active[0].getStat('spe');
+    const A = this.eu.active[0].getStat('spe');
+    const B = this.ele.active[0].getStat('spe');
     const chance = Math.floor((A * 128) / Math.max(1, B)) + 30 * this.tentativasFuga;
     // Run Away: fuga garantida (a habilidade do Pokémon em campo)
-    if (this.batalha.p1.active[0].hasAbility('runaway')) return { fugiu: true, eventos: [] };
+    if (this.eu.active[0].hasAbility('runaway')) return { fugiu: true, eventos: [] };
     if (A >= B || Math.floor(this.aleatorio() * 256) < chance) return { fugiu: true, eventos: [] };
     return { fugiu: false, eventos: this.turnoGratisDoSelvagem() };
   }
@@ -493,19 +528,19 @@ export class BatalhaSelvagem {
 
   /** O jogador perde a vez (usou item ou falhou ao fugir): reaproveita a "recarga" do Hyper Beam. */
   private turnoGratisDoSelvagem(): EventoBatalha[] {
-    this.batalha.p1.active[0].addVolatile('mustrecharge');
+    this.eu.active[0].addVolatile('mustrecharge');
     this.ignorarRecarga = true;
     return this.jogar('move 1');
   }
 
   private jogar(escolha: string): EventoBatalha[] {
     this.escolherSelvagem();
-    if (!this.batalha.choose('p1', escolha)) throw new Error(`Escolha inválida: ${escolha}`);
+    if (!this.batalha.choose(this.meuLado, escolha)) throw new Error(`Escolha inválida: ${escolha}`);
     return this.lerEventos();
   }
 
   private escolherSelvagem() {
-    const lado = this.batalha.p2;
+    const lado = this.ele;
     if (lado.requestState === 'switch') return this.trocarAdversario();
     if (lado.requestState !== 'move') return;
     const golpes = ((lado.activeRequest as any).active[0].moves as any[])
@@ -515,7 +550,7 @@ export class BatalhaSelvagem {
     // treinador NPC: na maioria das vezes usa o golpe que mais machuca (tipo, STAB e poder)
     if (this.treinador && golpes.length && this.aleatorio() < 0.75) {
       const atacante = lado.active[0];
-      const alvo = this.batalha.p1.active[0];
+      const alvo = this.eu.active[0];
       const forca = (id: string) => {
         const g = Dex.moves.get(id);
         if (g.category === 'Status' || !alvo) return 15;
@@ -529,7 +564,7 @@ export class BatalhaSelvagem {
 
   /** O treinador NPC manda o próximo Pokémon (na ordem do time) quando o atual desmaia. */
   private trocarAdversario() {
-    const lado = this.batalha.p2;
+    const lado = this.ele;
     const proximo = lado.pokemon.findIndex((p) => !p.fainted && !p.isActive);
     if (proximo >= 0) this.batalha.choose('p2', `switch ${proximo + 1}`);
   }
@@ -539,26 +574,26 @@ export class BatalhaSelvagem {
     this.lidas = this.batalha.log.length;
     const eventos = this.interpretar(linhas);
     // só o treinador precisa trocar (o Pokémon dele desmaiou): ele troca sozinho e a batalha segue
-    while (!this.batalha.ended && this.batalha.p2.requestState === 'switch' && this.batalha.p1.requestState !== 'switch') {
+    while (!this.pvp && !this.batalha.ended && this.ele.requestState === 'switch' && this.eu.requestState !== 'switch') {
       this.trocarAdversario();
       const mais = this.batalha.log.slice(this.lidas);
       this.lidas = this.batalha.log.length;
       if (!mais.length) break;
       eventos.push(...this.interpretar(mais));
     }
-    const ativo = this.batalha.p1.active[0];
+    const ativo = this.eu.active[0];
     if (ativo && !ativo.fainted) this.participantes.add(this.ativo);
     return eventos;
   }
 
   private lado(ident: string): Lado {
-    return ident.startsWith('p1') ? 'jogador' : 'selvagem';
+    return ident.startsWith(this.meuLado) ? 'jogador' : 'selvagem';
   }
 
   private nome(ident: string): string {
     if (!ident) return '';
     const apelido = ident.split(': ')[1] ?? '';
-    if (ident.startsWith('p2')) return this.treinador ? `${this.treinador.nomesEquipe[Number(apelido.slice(1))] ?? apelido} de ${this.treinador.nome}` : `${this.nomeSelvagem} selvagem`;
+    if (!ident.startsWith(this.meuLado)) return this.treinador ? `${this.treinador.nomesEquipe[Number(apelido.slice(1))] ?? apelido} de ${this.treinador.nome}` : `${this.nomeSelvagem} selvagem`;
     return this.nomes[Number(apelido.slice(1))] ?? apelido;
   }
 
@@ -569,12 +604,13 @@ export class BatalhaSelvagem {
   habilidadeSelvagemRevelada = false;
 
   private revelaHabilidadeSelvagem(comando: string, args: string[], de: string | undefined): boolean {
-    if (comando === '-ability') return args[0]?.startsWith('p2') ?? false;
+    const doOutro = (x: string | undefined) => !!x && /^p[12]/.test(x) && !x.startsWith(this.meuLado);
+    if (comando === '-ability') return doOutro(args[0]);
     const deAbility = de?.startsWith('ability:') || args[1]?.startsWith('ability:');
     if (!deAbility) return false;
     // "[of] p2a: X" diz de quem é a ability; sem ele, é de quem aparece na linha
     const dono = args.find((a) => a.startsWith('[of]'))?.slice(4).trim() ?? args[0];
-    return dono?.startsWith('p2') ?? false;
+    return doOutro(dono);
   }
 
   /** HP de cada lado (para calcular o dano de cada golpe). */
@@ -594,9 +630,10 @@ export class BatalhaSelvagem {
     const porcento = (n: number) => `${(Math.round(n * 10) / 10).toLocaleString('pt-BR')}%`;
     for (let i = 0; i < linhas.length; i++) {
       let linha = linhas[i];
-      // "|split|p1" vem antes de duas versões da mesma linha (secreta e pública): fica a secreta
+      // "|split|p1" vem antes de duas versões da mesma linha (secreta e pública): a secreta (HP exato) só para o dono
+      // daquele lado; no PvP o outro jogador lê a pública (HP em porcentagem)
       if (linha.startsWith('|split|')) {
-        linha = linhas[i + 1];
+        linha = linha.slice(7) === this.meuLado ? linhas[i + 1] : linhas[i + 2];
         i += 2;
       }
       if (!linha?.startsWith('|')) continue;
@@ -828,7 +865,7 @@ export class BatalhaSelvagem {
           const efeito = args[1].replace(/^move: /, '');
           if (efeito === 'Dynamax') {
             const lado = this.lado(args[0]);
-            const sim = lado === 'jogador' ? this.batalha.p1.active[0] : this.batalha.p2.active[0];
+            const sim = lado === 'jogador' ? this.eu.active[0] : this.ele.active[0];
             const giga = args[2] === 'Gmax';
             eventos.push({ tipo: 'dynamax', lado, forma: giga && sim ? `${sim.species.name}-Gmax` : null, texto: giga ? `${quem} ficou gigante: Gigantamax!` : `${quem} ficou gigante: Dynamax!` });
           } else if (efeito === 'confusion') eventos.push({ tipo: 'mensagem', texto: `${quem} ficou confuso!` });
@@ -850,7 +887,7 @@ export class BatalhaSelvagem {
           eventos.push({ tipo: 'mensagem', texto: `${quem} está se preparando!` });
           break;
         case 'win':
-          eventos.push({ tipo: 'fim', vencedor: args[0] === 'Jogador' ? 'jogador' : 'selvagem' });
+          eventos.push({ tipo: 'fim', vencedor: args[0] === this.eu.name ? 'jogador' : 'selvagem' });
           break;
       }
     }

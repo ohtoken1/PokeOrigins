@@ -12,7 +12,8 @@ import { ehAdministrador } from '../bonificacao';
 import { viagemAtual } from '../viagem';
 import { botoesMenus } from '../ui/menus';
 import { el, spritePokemon } from '../ui/dom';
-import { painelTime } from '../ui/time';
+import { acompanharTime, painelTime } from '../ui/time';
+import { confirmar } from '../ui/confirmar';
 
 const hex = (cor: number) => `#${cor.toString(16).padStart(6, '0')}`;
 
@@ -23,6 +24,11 @@ export const telaRegiao: Tela = (raiz, navegar) => {
   const regiao = regiaoPorId(save.regiao);
   const pokemons = pokemonsDaRegiao(regiao.id);
   const treinador = progressoTreinador(save.xpTreinador);
+  // time ao lado: acompanha o PC e a bolsa (aparece na hora)
+  const caixaTime = el('div', {});
+  const desenharTime = () => caixaTime.replaceChildren(painelTime(save.time, () => salvar(save)));
+  desenharTime();
+  acompanharTime(caixaTime, desenharTime);
 
   // trocar de região pelas abas é só para administradores: jogadores viajam de trem (estação da cidade)
   const admin = ehAdministrador();
@@ -109,10 +115,7 @@ export const telaRegiao: Tela = (raiz, navegar) => {
             el('small', {}, treinador.necessario ? `${treinador.atual.toLocaleString('pt-BR')} / ${treinador.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo!'),
             el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${treinador.necessario ? (treinador.atual / treinador.necessario) * 100 : 100}%` } })),
           ),
-          painelTime(save.time, () => {
-            salvar(save);
-            navegar({ tela: 'regiao' });
-          }),
+          caixaTime,
           el(
             'button',
             {
@@ -130,8 +133,8 @@ export const telaRegiao: Tela = (raiz, navegar) => {
             'button',
             {
               class: 'botao secundario',
-              onclick: () => {
-                if (confirm('Apagar seu progresso e escolher outro inicial?')) {
+              onclick: async () => {
+                if ((await confirmar('Confirmar', 'Apagar seu progresso e escolher outro inicial?'))) {
                   apagarSave();
                   navegar({ tela: 'inicial' });
                 }

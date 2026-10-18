@@ -44,6 +44,9 @@ export interface Save {
   gold: number;
   /** Fragmentos Temporais: moeda da loja do Viajante do tempo (por enquanto o Admin dá). */
   fragmentos?: number;
+  /** moedas da Liga (shared/liga.ts), recebidas por entrega; a loja delas vem depois */
+  leagueCoins?: number;
+  leagueCoinsNightmare?: number;
   passos: number;
   /** XP total do treinador (o nível sai de shared/treinador.ts). */
   xpTreinador: number;

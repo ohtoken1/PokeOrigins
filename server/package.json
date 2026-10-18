@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch --disable-warning=ExperimentalWarning src/index.ts",
-    "start": "node --disable-warning=ExperimentalWarning src/index.ts",
-    "admin": "node --disable-warning=ExperimentalWarning src/admin.ts",
+    "dev": "node --watch --experimental-transform-types --import ./src/importarShared.mjs --disable-warning=ExperimentalWarning src/index.ts",
+    "start": "node --experimental-transform-types --import ./src/importarShared.mjs --disable-warning=ExperimentalWarning src/index.ts",
+    "admin": "node --experimental-transform-types --import ./src/importarShared.mjs --disable-warning=ExperimentalWarning src/admin.ts",
     "checar": "tsc --noEmit -p ."
   },
   "devDependencies": {
@@ -13,6 +13,7 @@
     "@types/ws": "^8.18.2"
   },
   "dependencies": {
-    "ws": "^8.22.0"
+    "ws": "^8.22.0",
+    "@pkmn/sim": "^0.10.11"
   }
 }

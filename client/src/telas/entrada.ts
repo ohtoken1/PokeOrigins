@@ -4,6 +4,7 @@ import { buscarConta, cadastrar, entrar, ErroApi, type Conta } from '../conta';
 import { arquivarSaveAntigo, iniciarSaveDaConta, salvar, saveAntigoDoNavegador, type Save } from '../estado';
 import { el } from '../ui/dom';
 import { seletorDeIdioma } from '../idioma';
+import { confirmar } from '../ui/confirmar';
 
 /** Resolve quando há uma conta logada e o save dela já está em memória. */
 export async function garantirConta(raiz: HTMLElement): Promise<Conta> {
@@ -140,8 +141,8 @@ function oferecerSaveAntigo(raiz: HTMLElement): Promise<void> {
       arquivarSaveAntigo();
       pronto();
     });
-    zero.addEventListener('click', () => {
-      if (!confirm('Começar do zero nesta conta? O progresso antigo continua guardado neste navegador.')) return;
+    zero.addEventListener('click', async () => {
+      if (!(await confirmar('Confirmar', 'Começar do zero nesta conta? O progresso antigo continua guardado neste navegador.'))) return;
       pronto();
     });
     raiz.replaceChildren(

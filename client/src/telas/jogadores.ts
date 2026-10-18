@@ -21,6 +21,7 @@ import { icone } from '../ui/icones';
 import { desenharBandeira } from '../ui/bandeira';
 import { meuCla, NOME_CARGO, type Cargo, type ResumoCla } from '../cla';
 import { tituloAtivo } from '../../../shared/conquistas';
+import { avisar } from '../ui/avisos';
 
 /** Perfil de outro jogador como o servidor manda (server/src/index.ts → perfilPublico): só o que é público. */
 export interface PerfilPublico {
@@ -43,7 +44,7 @@ export async function abrirPerfilDe(usuario: string): Promise<void> {
     const r = await api<PerfilPublico>('GET', `/jogadores/${encodeURIComponent(usuario)}`);
     abrirJanela(`Perfil de ${r.perfil.aparencia?.nome || r.usuario}`, () => perfilRemoto(r), { classe: 'janela-perfil' });
   } catch (e) {
-    alert(e instanceof ErroApi ? e.message : 'Não foi possível abrir o perfil.');
+    avisar(e instanceof ErroApi ? e.message : 'Não foi possível abrir o perfil.', 'erro');
   }
 }
 

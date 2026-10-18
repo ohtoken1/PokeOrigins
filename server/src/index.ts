@@ -19,6 +19,9 @@ import * as entregas from './entregas.ts';
 import * as mercado from './mercado.ts';
 import * as banimentos from './banimentos.ts';
 import * as eventos from './eventos.ts';
+import * as liga from './liga.ts';
+import * as pvp from './pvp.ts';
+import * as torneio from './torneio.ts';
 import { avisarDaStaff, estaOnline, ligarMundo } from './mundo.ts';
 import { tituloAtivo } from '../../shared/conquistas.ts';
 import { temSkin, type ComSkins } from '../../shared/skins.ts';
@@ -242,6 +245,33 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     const conta = exigirConta(req);
     return responder(res, 200, safari.entrar(conta, await lerCorpo(req)));
   }
+
+  // ---- Torneio (server/src/torneio.ts) ----
+  if (caminho === '/api/torneio' && metodo === 'GET') return responder(res, 200, torneio.estado(exigirConta(req)));
+  if (caminho === '/api/admin/torneio' && metodo === 'GET') return responder(res, 200, torneio.regrasDaStaffParaFora(exigirConta(req)));
+  for (const [rota, f] of [['/api/torneio/inscrever', torneio.inscrever], ['/api/torneio/sair', torneio.sair], ['/api/admin/torneio/cancelar', torneio.cancelar]] as const)
+    if (caminho === rota && metodo === 'POST') return responder(res, 200, f(exigirConta(req)));
+  for (const [rota, f] of [['/api/admin/torneio', torneio.salvarRegras], ['/api/admin/torneio/abrir', torneio.abrirAgora]] as const)
+    if (caminho === rota && metodo === 'POST') {
+      const conta = exigirConta(req);
+      return responder(res, 200, f(conta, await lerCorpo(req)));
+    }
+
+  // ---- PvP (server/src/pvp.ts): batalhas calculadas no servidor ----
+  for (const [rota, f] of [['/api/pvp/desafiar', pvp.desafiar], ['/api/pvp/responder', pvp.responder], ['/api/pvp/escolha', pvp.escolher], ['/api/pvp/desistir', pvp.desistir]] as const)
+    if (caminho === rota && metodo === 'POST') {
+      const conta = exigirConta(req);
+      return responder(res, 200, f(conta, await lerCorpo(req)));
+    }
+
+  // ---- Liga Pokémon (server/src/liga.ts) ----
+  if (caminho === '/api/liga' && metodo === 'GET') return responder(res, 200, liga.estado(exigirConta(req)));
+  if (caminho === '/api/admin/liga' && metodo === 'GET') return responder(res, 200, liga.timesDaStaff(exigirConta(req)));
+  for (const [rota, f] of [['/api/liga/entrar', liga.entrar], ['/api/liga/resultado', liga.resultado], ['/api/admin/liga', liga.gravarTime]] as const)
+    if (caminho === rota && metodo === 'POST') {
+      const conta = exigirConta(req);
+      return responder(res, 200, f(conta, await lerCorpo(req)));
+    }
 
   // ---- eventos: Cofre e Loteria (server/src/eventos.ts) ----
   if (caminho === '/api/eventos' && metodo === 'GET') return responder(res, 200, eventos.estado(exigirConta(req)));

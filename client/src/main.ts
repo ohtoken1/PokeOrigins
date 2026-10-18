@@ -38,6 +38,9 @@ import { vigiarOutbreak } from './outbreak';
 import { vigiarNinho } from './ninho';
 import { vigiarBoss } from './boss';
 import { vigiarConquistas } from './conquistas';
+import { vigiarPvp } from './pvp';
+import { ativarDicasDoJogo, avisar } from './ui/avisos';
+import { vigiarTorneio } from './ui/torneio';
 import { vigiarEntregas } from './entregas';
 import { vigiarCreche } from './creche';
 import { vigiarMercado } from './mercado';
@@ -88,6 +91,9 @@ const navegar: Navegar = (destino) => {
 ativarDeslizantes();
 // primeiro a conta (tela de entrada); só depois o jogo monta barra, cabeçalho e painel
 // o idioma vem antes de tudo: a tela de entrada já aparece traduzida
+// avisos e dicas no visual do jogo (nada de janela do navegador); alert esquecido também vira aviso
+ativarDicasDoJogo();
+window.alert = (texto?: unknown) => avisar(String(texto ?? ''));
 void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   if (conta.admin) montarPainelAdmin(() => navegar(destinoAtual));
   marcarAba = montarBarraTopo(navegar);
@@ -117,6 +123,8 @@ void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   ativarDicaDeItens();
   // itens dados pela administração
   vigiarEntregas();
+  vigiarPvp();
+  vigiarTorneio();
   vigiarCreche();
   vigiarMercado();
   vigiarQuadro();

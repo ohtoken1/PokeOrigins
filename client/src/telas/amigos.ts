@@ -6,6 +6,7 @@ import type { Tela } from '../main';
 import { abrirConversa } from '../ui/conversa';
 import { el } from '../ui/dom';
 import { abrirPerfilDe } from './jogadores';
+import { confirmar } from '../ui/confirmar';
 
 const bolinha = (online: boolean) => el('span', { class: `perfil-bolinha ${online ? 'online' : 'offline'}`, title: online ? 'Online' : 'Offline' });
 const quem = (p: { nome: string | null; usuario: string }) => el('span', { class: 'amigo-quem' }, el('strong', {}, p.nome || p.usuario), el('small', {}, `@${p.usuario}`));
@@ -47,7 +48,7 @@ export const telaAmigos: Tela = (raiz) => {
         ? el('div', { class: 'amigos-lista' }, ...meus.map((a) => linha(a, a.online,
             botao('Perfil', () => void abrirPerfilDe(a.usuario)),
             el('button', { class: 'botao', onclick: () => abrirConversa(a.usuario, a.nome) }, 'Mensagem', a.naoLidas ? el('span', { class: 'amigo-nao-lidas' }, String(a.naoLidas)) : null),
-            botao('Remover', () => confirm(`Desfazer a amizade com ${a.nome}? A conversa de vocês também é apagada.`) && fazer(removerAmigo(a.usuario)), 'perigo'))))
+            botao('Remover', async () => (await confirmar('Confirmar', `Desfazer a amizade com ${a.nome}? A conversa de vocês também é apagada.`)) && fazer(removerAmigo(a.usuario)), 'perigo'))))
         : el('p', { class: 'meta' }, 'Você ainda não tem amigos. Busque um treinador pelo nome aqui em cima e envie um pedido.')));
     buscar(true);
   };

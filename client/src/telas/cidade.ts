@@ -23,6 +23,7 @@ import { abrirMural } from '../ui/mural';
 import { abrirSafari } from '../ui/safari';
 import { abrirEstacao } from '../ui/trem';
 import { abrirArena } from '../ui/arena';
+import { abrirLiga } from '../ui/liga';
 import { abrirQuadroDeMissoes } from '../ui/quadroMissoes';
 import { abrirLojaTemporal } from '../ui/lojaTemporal';
 import { abrirSuspeito } from '../ui/suspeito';
@@ -38,7 +39,7 @@ import { abrirMenuJogador } from '../ui/menuJogador';
 import { montarChat } from '../ui/chat';
 import { el } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
-import { painelTime } from '../ui/time';
+import { acompanharTime, painelTime } from '../ui/time';
 import { aparenciaDoSave } from '../personagem/aparencia';
 import { montarPersonagem } from '../personagem/lpc';
 
@@ -62,6 +63,8 @@ export const telaCidade: Tela = (raiz, navegar) => {
     cena()?.definirSeguidor(save.time[0] ? { especie: save.time[0].especieId, shiny: save.time[0].shiny } : null);
   };
   atualizarTime();
+  // o time mudou por fora (PC, bolsa…): aparece na hora
+  acompanharTime(caixaTime, atualizarTime);
 
   const areaJogo = el('div', { class: 'area-jogo' });
   const chat = montarChat();
@@ -154,7 +157,20 @@ export const telaCidade: Tela = (raiz, navegar) => {
       saindo = true;
       navegar({ tela: 'regiao' });
     }
-    else if (acao === 'arena') abrirArena(navegar);
+    else if (acao === 'arena')
+      abrirArena(navegar, () =>
+        abrirLiga(save!, (equipe, nome, titulo, aoFim) => {
+          cena()?.pausar(true);
+          abrirBatalha({
+            save: save!, bioma: biomaPorId('torre'), selvagem: equipe[0],
+            treinador: { nome, titulo, equipe, recompensa: 0, avisoFuga: 'Você fica fora da Liga até a semana que vem.' },
+            aoTerminar: (r) => {
+              cena()?.pausar(false);
+              atualizarTime();
+              aoFim(r === 'vitoria');
+            },
+          });
+        }));
     else if (acao === 'banco' && !ehAdministrador()) avisar('Banco: fechado por enquanto.');
     else if (acao === 'banco') abrirBanco(save!, () => atualizarTime());
     else if (acao === 'mural') abrirMural();
@@ -177,7 +193,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
         cena()?.pausar(true);
         abrirBatalha({
           save: save!, bioma: biomaPorId('caverna'), selvagem: boss,
-          treinador: { nome, titulo: 'Boss', equipe: [boss], recompensa: 0, mensagemInicio: `${nome} ruge furioso dentro da gaiola!` },
+          treinador: { nome, titulo: 'Boss', equipe: [boss], recompensa: 0, mensagemInicio: `${nome} ruge furioso dentro da gaiola!`, avisoFuga: 'Vale o dano que você já causou, mas você não poderá enfrentar este boss de novo.' },
           boss: { turnos: TURNOS_BOSS, aoDano: aoFim },
           aoTerminar: () => {
             cena()?.pausar(false);

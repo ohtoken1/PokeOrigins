@@ -72,6 +72,7 @@ export const telaGinasios: Tela = (raiz, navegar) => {
         recompensa: jaTinha ? 0 : RECOMPENSA_GINASIO[lider.ordem - 1],
         imagem: imagemTreinador(lider.id),
         mensagemVitoria: jaTinha ? undefined : `Você ganhou a ${lider.insignia}!`,
+        avisoFuga: jaTinha ? 'Você não ganha nada desta batalha.' : `Você não ganha a ${lider.insignia} nem a recompensa.`,
       },
       aoTerminar: (resultado) => {
         if (resultado === 'vitoria' && !save.insignias!.includes(lider.id)) save.insignias!.push(lider.id);
