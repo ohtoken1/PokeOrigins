@@ -23,6 +23,8 @@ import { carregarSave } from '../estado';
 import { pokedexRevelada } from '../ui/admin';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { megasDaEspecie, tierDaMega, type Mega } from '../../../shared/megas';
+import { tierDoPokemon, tierMegaProvisoria, tierProvisoria } from '../../../shared/tiers';
+import { seloTierDoJogo } from '../ui/tierDoJogo';
 import { itemDaLoja, textoPreco } from '../../../shared/loja';
 import { megaComoPokemon } from '../ui/formas';
 import { iconeItem } from '../ui/iconeItem';
@@ -328,7 +330,8 @@ ${traduzir(g.shortDesc || g.desc)}`, style: { borderLeftColor: corTipo(g.type) }
       el('div', {}, palco, el('div', { class: 'dex-botoes' }, alternar('shiny', '✨ Shiny'), alternar('costas', 'Costas'))),
       el('div', { class: 'dex-resumo' },
         titulo,
-        selosTipos(p),
+        // tier do jogo em destaque, ao lado dos tipos (pedido do dono)
+        el('div', { class: 'dex-tipos-tier' }, selosTipos(p), seloTierDoJogo(tierDoPokemon(p.id), tierProvisoria(p.id))),
         linha('Altura', `${(p.altura / 10).toLocaleString('pt-BR')} m`),
         linha('Peso', `${(p.peso / 10).toLocaleString('pt-BR')} kg`),
         linha('Gênero', genero),
@@ -411,11 +414,10 @@ function fichaMega(m: Mega, base: PokemonBase, abrir: Abrir): HTMLElement {
           el('span', { class: 'dex-selo mega' }, el('img', { src: 'batalha/mega-evolucao.svg', alt: '' }), 'Mega'),
           m.nova ? el('span', { class: 'dex-selo' }, 'Legends: Z-A') : null,
         ),
-        selosTipos(p),
+        el('div', { class: 'dex-tipos-tier' }, selosTipos(p), seloTierDoJogo(tierDaMega(m), tierMegaProvisoria(m.forma))),
         linha('Forma normal', el('button', { class: 'botao secundario dex-voltar-base', onclick: () => abrir(base.id) }, `← ${base.nome}`)),
         linha('Como megaevoluir', textoRequisitoMega(m)),
         pedra ? linha('Mega Stone', el('span', { class: 'dex-pedra' }, iconeItem(pedra), pedra.nome, el('small', {}, ` · loja: ${textoPreco(pedra)}`))) : null,
-        linha('Tier', tierDaMega(m)),
         linha('Na batalha', 'Uma vez por batalha, pelo botão Mega Evolução; volta ao normal no fim da batalha.'),
         outras.length ? linha('Outras Megas', el('span', {}, ...outras.map((o) => el('button', { class: 'botao secundario', onclick: () => abrir(base.id, o.forma) }, o.nome)))) : null,
       ),
