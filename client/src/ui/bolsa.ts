@@ -1,9 +1,10 @@
 import { ATRIBUTOS, IV_MIN_SHINY, especie, golpesIniciais, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { evoluir, trocarGolpe } from '../../../shared/batalha/progresso';
 import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
+import { iconeTicketDoPokemon } from './ticketEvento';
 import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { SEGURAR_OU_EVOLUIR, ehEquipavel, ehItemDeHabilidade, usarItemDeHabilidade, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
-import { CHANCE_SHINY_CUBO_LENDARIO, IV_MINIMO_CUBO_LENDARIO, KIT_INICIANTE, NIVEL_CUBO_LENDARIO, cuboPorItem, ehSeloSazonal } from '../../../shared/itensCustom';
+import { seletorDeOrb, CHANCE_SHINY_CUBO_LENDARIO, IV_MINIMO_CUBO_LENDARIO, KIT_INICIANTE, NIVEL_CUBO_LENDARIO, cuboPorItem, ehSeloSazonal } from '../../../shared/itensCustom';
 
 /** Cubo que gera o Pokémon sem precisar de um de origem (Koraidon, Miraidon). */
 const cuboQueGera = (id: string) => { const c = cuboPorItem(id); return c && !c.origens.length ? c : undefined; };
@@ -53,12 +54,13 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
 /** O botão do item: pela categoria; na aba Up, Ability Capsule e Ability Patch são de usar. */
 /** Itens que são gastos ao usar num Pokémon e não voltam: perguntam "tem certeza?" (pedido do dono). */
 const PEDE_CONFIRMACAO = (item: ItemLoja) => ['evolucao', 'cubos', 'mints', 'terashards', 'tm', 'tr', 'formas'].includes(item.categoria) || ehItemDeHabilidade(item.id);
-const acaoDe = (item: ItemLoja) => (ehItemDeHabilidade(item.id) || cuboQueGera(item.id) || item.id === BOX_POKEMON || item.id === KIT_INICIANTE || item.id === PASSE_PREMIUM || ehItemDeForma(item.id) ? 'Usar' : ACAO[item.categoria]);
+const acaoDe = (item: ItemLoja) => (seletorDeOrb(item.id) || ehItemDeHabilidade(item.id) || cuboQueGera(item.id) || item.id === BOX_POKEMON || item.id === KIT_INICIANTE || item.id === PASSE_PREMIUM || ehItemDeForma(item.id) ? 'Usar' : ACAO[item.categoria]);
 
 type Modo =
   | { tipo: 'lista' }
   | { tipo: 'alvo'; item: ItemLoja }
   | { tipo: 'forma'; item: ItemLoja; p: PokemonIndividual; opcoes: number[] }
+  | { tipo: 'orb'; item: ItemLoja; orbs: string[] }
   | { tipo: 'parceiro'; item: ItemLoja; p: PokemonIndividual; parceiros: PokemonIndividual[] }
   | { tipo: 'esquecer'; p: PokemonIndividual; golpe: string; aoAprender: () => void; aoDesistir: () => void };
 
@@ -323,6 +325,34 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
       );
     }
 
+    if (modo.tipo === 'orb') {
+      // Seletor de Orb (pedido do dono): escolhe a Orb da lista; com mais de um seletor, escolhe também quantos usar
+      const m = modo;
+      const tem = save.itens[m.item.id] ?? 0;
+      const campoQtd = el('input', { type: 'number', class: 'db-busca seletor-quantidade', min: '1', max: String(tem), value: '1', 'aria-label': 'Quantidade' }) as HTMLInputElement;
+      const quantos = () => Math.min(tem, Math.max(1, Math.floor(Number(campoQtd.value) || 1)));
+      return el('div', { class: 'bolsa' },
+        el('p', {}, `${m.item.nome}: escolha a Orb que você quer.`),
+        tem > 1 ? el('label', { class: 'seletor-qtd' }, `Quantos usar (você tem ${tem}): `, campoQtd) : '',
+        el('div', { class: 'escolha-forma' },
+          m.orbs.map((orb) => {
+            const nomeOrb = itemDaLoja(orb)?.nome ?? orb;
+            return el('button', {
+              class: 'botao secundario',
+              onclick: async () => {
+                const n = quantos();
+                if (!(await confirmar(m.item.nome, `Trocar ${n} ${m.item.nome} por ${n} ${nomeOrb}? Os seletores são gastos.`))) return;
+                if ((save.itens[m.item.id] ?? 0) < n) return;
+                for (let i = 0; i < n; i++) gastar(m.item.id);
+                save.itens[orb] = (save.itens[orb] ?? 0) + n;
+                concluir(`Você recebeu ${n} ${nomeOrb}!`);
+                refazer();
+              },
+            }, iconeTicketDoPokemon(orb, 44) ?? '', el('strong', {}, nomeOrb));
+          })),
+        el('button', { class: 'botao', onclick: () => ((modo = { tipo: 'lista' }), refazer()) }, 'Cancelar'));
+    }
+
     if (modo.tipo === 'forma') {
       // mais de uma forma possível (Deoxys, Rotom…): o jogador escolhe qual (pedido do dono)
       const m = modo;
@@ -496,7 +526,10 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                     onclick: async () => {
                       aviso = '';
                       if (item.id === BOX_POKEMON && podeAbrirBox(save) && !(await confirmar(item.nome, 'Usar o Box Pokémon para abrir mais uma box no PC? O item é gasto.'))) return;
-                      if (item.categoria === 'ovos') {
+                      if (seletorDeOrb(item.id)) {
+                        modo = { tipo: 'orb', item, orbs: seletorDeOrb(item.id)!.orbs };
+                        refazer();
+                      } else if (item.categoria === 'ovos') {
                         abrirJanelaOvo(save, item.id, () => {
                           aoMudar();
                           refazer();

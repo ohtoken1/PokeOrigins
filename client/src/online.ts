@@ -105,7 +105,7 @@ export function conectarOnline(): void {
     if (msg.t === 'chat') return ouvintesChat.forEach((o) => o.mensagem(msg as unknown as MensagemChat));
     if (msg.t === 'chat-historico') return ouvintesChat.forEach((o) => o.historico(msg.canal as CanalChat, msg.lista as MensagemChat[]));
     if (msg.t === 'chat-erro') return ouvintesChat.forEach((o) => o.erro(msg.canal as CanalChat, msg.texto as string));
-    if (msg.t === 'amigos' || msg.t === 'privado' || msg.t === 'cla' || msg.t === 'anuncios' || msg.t === 'cofre' || msg.t === 'entrega' || msg.t === 'correio' || msg.t === 'mercado' || msg.t === 'missoes' || msg.t === 'mercado-acerto' || msg.t === 'letreiro' || msg.t === 'eventos' || msg.t === 'letreiro-historico' || (typeof msg.t === 'string' && (msg.t.startsWith('pvp-') || msg.t.startsWith('torneio')))) return ouvintesAviso.forEach((f) => f(msg));
+    if (msg.t === 'amigos' || msg.t === 'privado' || msg.t === 'cla' || msg.t === 'anuncios' || msg.t === 'cofre' || msg.t === 'entrega' || msg.t === 'correio' || msg.t === 'recompensas' || msg.t === 'mercado' || msg.t === 'missoes' || msg.t === 'mercado-acerto' || msg.t === 'letreiro' || msg.t === 'eventos' || msg.t === 'letreiro-historico' || (typeof msg.t === 'string' && (msg.t.startsWith('pvp-') || msg.t.startsWith('torneio')))) return ouvintesAviso.forEach((f) => f(msg));
     const ouvinte = salaAtual?.ouvinte;
     if (!ouvinte) return;
     if (msg.t === 'jogadores' && msg.sala === salaAtual!.sala) ouvinte.todos(msg.lista as JogadorOnline[]);

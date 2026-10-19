@@ -49,3 +49,23 @@ export const goldDoPacote = (p: { reais: number; bonus?: number }) => Math.round
 
 /** O pagamento ainda não existe (a conta no serviço de pagamento é com a equipe). */
 export const DOACOES_LIGADAS = false;
+
+/**
+ * Termos de doação (rascunho nosso, pedido do dono; vale passar por um advogado/contador antes de ligar o pagamento).
+ * O jogador precisa marcar "Li e aceito" antes de doar. Mudou o texto: subir `VERSAO_TERMOS_DOACAO`.
+ */
+export const VERSAO_TERMOS_DOACAO = 1;
+export const TERMOS_DOACAO: { titulo: string; texto: string }[] = [
+  { titulo: '1. O que é a doação', texto: 'O PokeOrigins é um jogo gratuito feito por fãs. A doação é voluntária e ajuda a pagar o servidor e o desenvolvimento. Ninguém é obrigado a doar para jogar.' },
+  { titulo: '2. Itens virtuais', texto: 'Como agradecimento, a conta recebe itens virtuais (Origin Coins, dias de VIP, pacotes e prêmios). Eles existem só dentro do jogo, não têm valor em dinheiro, não podem ser trocados por dinheiro real e pertencem à conta que recebeu.' },
+  { titulo: '3. Entrega', texto: 'Os itens chegam pelo Correio do jogo depois que o serviço de pagamento confirma o pagamento. O Pix costuma confirmar em minutos; o cartão pode levar mais tempo. Se algo não chegar em até 24 horas, fale com a equipe pelo Discord.' },
+  { titulo: '4. Reembolso', texto: 'Por se tratar de itens digitais entregues na hora, a doação não é reembolsável depois que os itens chegam à conta, salvo quando a lei exigir. Pedir estorno ou contestar o pagamento depois de receber os itens pode levar ao banimento da conta.' },
+  { titulo: '5. Fases de teste (Beta)', texto: 'Enquanto o jogo estiver em Beta, o progresso pode ser apagado (wipe). A equipe vai avisar antes e dizer como ficam os itens de doação em cada caso.' },
+  { titulo: '6. Mudanças no jogo', texto: 'O jogo pode mudar: preços, bônus, prêmios e sistemas podem ser ajustados para manter o equilíbrio. O PokeOrigins também pode ser pausado ou encerrado, e nesse caso os itens virtuais deixam de existir.' },
+  { titulo: '7. Pacotes e limites', texto: 'Os Pacotes Fundador só podem ser adquiridos uma vez por conta. Os dias de VIP se somam aos que a conta já tem. A doação acumulada volta a zero a cada 3 meses.' },
+  { titulo: '8. Menores de idade', texto: 'Quem tem menos de 18 anos só pode doar com a autorização dos pais ou responsáveis.' },
+  { titulo: '9. Contas e regras', texto: 'Contas banidas por quebrar as regras do jogo não recebem de volta o valor doado nem os itens.' },
+  { titulo: '10. Pagamento e dados', texto: 'O pagamento é feito por um serviço de pagamento externo. O PokeOrigins não vê nem guarda os dados do seu cartão ou da sua conta bancária.' },
+  { titulo: '11. Código de criador', texto: 'Usar o código de um criador parceiro não muda o que você recebe: parte do valor ajuda quem divulga o jogo.' },
+  { titulo: '12. Marcas', texto: 'O PokeOrigins é um projeto de fãs, sem ligação com a Nintendo, a Game Freak, a Creatures ou a The Pokémon Company. A doação apoia o projeto, e não compra nenhum direito sobre marcas ou personagens.' },
+];

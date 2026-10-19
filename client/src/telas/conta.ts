@@ -17,12 +17,18 @@ import { bonusAtuais } from '../bonificacao';
 import { enquadrarPersonagem } from '../personagem/enquadrar';
 import { iconeItem } from '../ui/iconeItem';
 import { perfilJogador } from './jogadores';
-import { pacoteJaComprado, PACOTES_FUNDADOR, PACOTES_VIP, DOACAO_MAXIMA, DOACAO_MINIMA, DOACOES_LIGADAS, goldDoPacote, GOLD_POR_REAL, PACOTES_DOACAO } from '../../../shared/doacao';
+import { TERMOS_DOACAO, pacoteJaComprado, PACOTES_FUNDADOR, PACOTES_VIP, DOACAO_MAXIMA, DOACAO_MINIMA, DOACOES_LIGADAS, goldDoPacote, GOLD_POR_REAL, PACOTES_DOACAO } from '../../../shared/doacao';
 import { valorEmMoeda } from '../ui/moeda';
 import { avisar } from '../ui/avisos';
+import { confirmar } from '../ui/confirmar';
 import { api, ErroApi } from '../conta';
+import { abrirJanela } from '../ui/janela';
+import { conteudoLiberado } from '../trancas';
+import { textoTranca } from '../../../shared/trancas';
+import { DIAS_LOGIN, DIAS_LOGIN_TRINTA, METAS_DOACAO, PREMIOS_LOGIN, PREMIOS_LOGIN_TRINTA, RECUPERACOES_VIP, type EstadoRecompensas, type PremioRecompensa } from '../../../shared/recompensas';
+import { aoMudarRecompensas, buscarRecompensas, estadoRecompensas, recuperarDia } from '../recompensas';
 
-export type SecaoConta = 'perfil' | 'achievements' | 'skins' | 'doacao';
+export type SecaoConta = 'perfil' | 'achievements' | 'skins' | 'doacao' | 'recompensas';
 
 /** Conquistas: resumo dos bônus ganhos e a lista por grupo, com o progresso e a recompensa de cada uma. */
 function achievements(save: Save): HTMLElement {
@@ -231,6 +237,129 @@ function conteudoSkins(save: Save, redesenhar: () => void): HTMLElement[] {
   ];
 }
 
+// ---- Recompensas: login de boas-vindas (7 dias) e login dos 30 dias; a doação acumulada fica na página de Doação (server/src/recompensas.ts decide) ----
+const dataHora = (ms: number) => new Date(ms).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+const listaPremios = (premios: PremioRecompensa[]) =>
+  el('div', { class: 'recompensa-premios' }, ...premios.map((x) => {
+    const item = TODOS_OS_ITENS.find((i) => i.id === x.id);
+    const icone = item ? iconeItem(item) : x.id === 'silver' || x.id === 'gold' ? el('span', { class: `icone-moeda moeda-${x.id}` }) : x.id === 'mint' || x.id === 'charm' ? el('span', { class: 'icone-simbolo' }, '🎲') : '';
+    return el('span', { class: 'recompensa-premio' }, icone, textoDeItem(x.id, `${x.quantidade > 1 ? `${x.quantidade.toLocaleString('pt-BR')}× ` : ''}${x.nome}`));
+  }));
+
+/** Login de boas-vindas: uma casinha por dia em que o jogador entrou (✔), a de hoje destacada e a próxima. */
+function gradeDeLogin(premios: PremioRecompensa[][], dia: number, hoje: boolean): HTMLElement {
+  return el('div', { class: 'recompensas-grade' },
+    ...premios.map((p, i) => {
+      const n = i + 1;
+      const recebido = n <= dia;
+      const estado = recebido ? (hoje && n === dia ? 'recebido hoje' : 'recebido') : n === dia + 1 ? 'proximo' : '';
+      return el('div', { class: `recompensa-dia ${estado}` },
+        el('small', { class: 'recompensa-numero' }, recebido ? `✔ Dia ${n}` : `Dia ${n}`),
+        listaPremios(p));
+    }));
+}
+
+/** Janela que abre no primeiro login do dia com prêmio de boas-vindas (pedido do dono): os 7 prêmios e o dia atual. */
+export function janelaDoLogin(dia: number): void {
+  abrirJanela(`🎁 Login de boas-vindas: dia ${dia} de ${DIAS_LOGIN}`, () => el('div', { class: 'janela-login' },
+    el('p', { class: 'sub' }, `Obrigado por entrar hoje! Nos ${DIAS_LOGIN} primeiros dias da sua conta, cada dia em que você entra anda uma casinha. O prêmio de hoje já está no seu Correio (NT).`),
+    gradeDeLogin(PREMIOS_LOGIN, dia, true)), { classe: 'janela-login-diario' });
+}
+
+/** Login dos 30 dias: cada dia do calendário tem o seu prêmio; pego ✔, perdido ✖ (VIP recupera), hoje e os que vêm. */
+function gradeDosTrinta(t: EstadoRecompensas['trinta']): HTMLElement {
+  const hoje = t.diaAtual ?? 0;
+  const restam = RECUPERACOES_VIP - t.recuperacoes;
+  const recuperar = async (dia: number) => {
+    if (!(await confirmar('Recuperar prêmio', `Usar 1 das suas ${restam} recuperações VIP para pegar o prêmio do dia ${dia}?`))) return;
+    try {
+      await recuperarDia(dia);
+      avisar(`Prêmio do dia ${dia} recuperado! Ele chegou no Correio.`, 'ok');
+    } catch (e) {
+      avisar(e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.', 'erro');
+    }
+  };
+  return el('div', { class: 'recompensas-grade' },
+    ...PREMIOS_LOGIN_TRINTA.map((p, i) => {
+      const n = i + 1;
+      const pego = t.pegos.includes(n);
+      const perdido = !pego && n < hoje;
+      const estado = pego ? (n === hoje ? 'recebido hoje' : 'recebido') : perdido ? 'perdido' : n === hoje ? 'proximo' : '';
+      return el('div', { class: `recompensa-dia ${estado}` },
+        el('small', { class: 'recompensa-numero' }, pego ? `✔ Dia ${n}` : perdido ? `✖ Dia ${n}: perdido` : n === hoje ? `Dia ${n}: hoje` : `Dia ${n}`),
+        listaPremios(p),
+        perdido && t.vip && restam > 0 ? el('button', { class: 'botao recompensa-recuperar', onclick: () => recuperar(n) }, 'Recuperar (VIP)') : '');
+    }));
+}
+
+/** Explicação do Login dos 30 dias com a contagem: que dia é hoje, quantos pegou/perdeu e as recuperações do VIP. */
+function explicacaoDosTrinta(t: EstadoRecompensas['trinta']): HTMLElement {
+  const hoje = t.diaAtual ?? 0;
+  const perdidos = Array.from({ length: Math.max(0, hoje - 1) }, (_, i) => i + 1).filter((n) => !t.pegos.includes(n)).length;
+  const restam = RECUPERACOES_VIP - t.recuperacoes;
+  return el('div', { class: 'recompensa-explicacao' },
+    el('div', { class: 'recompensa-contagem' },
+      el('span', {}, 'Hoje é o ', el('strong', {}, `dia ${hoje} de ${DIAS_LOGIN_TRINTA}`)),
+      el('span', {}, 'Prêmios pegos: ', el('strong', {}, String(t.pegos.length))),
+      el('span', {}, 'Perdidos: ', el('strong', {}, String(perdidos))),
+      el('span', {}, 'Recuperações VIP: ', el('strong', {}, `${restam} de ${RECUPERACOES_VIP}`))),
+    el('p', {}, `Nos ${DIAS_LOGIN_TRINTA} primeiros dias do servidor, cada dia tem o seu prêmio. Entrou no jogo naquele dia, o prêmio é seu e chega pelo Correio. Não entrou, o prêmio daquele dia é perdido (exemplo: entrou no dia 1, faltou no dia 2 e voltou no dia 3 = pega os prêmios 1 e 3).`),
+    el('p', {}, t.vip
+      ? `⭐ Você é VIP: pode recuperar até ${RECUPERACOES_VIP} prêmios de dias que perdeu (botão "Recuperar" no dia perdido).`
+      : `⭐ Jogadores VIP podem recuperar até ${RECUPERACOES_VIP} prêmios de dias perdidos.`),
+    el('small', { class: 'meta' }, `Todos os prêmios são NT. Depois do dia ${DIAS_LOGIN_TRINTA}, este login acaba.`));
+}
+
+/** Doação acumulada do trimestre: barra até a próxima meta, aviso do reset e a lista de metas. Também na página de Doação. */
+function blocoDoacaoAcumulada(r: EstadoRecompensas | null): HTMLElement {
+  if (!r) return el('p', { class: 'meta' }, 'Carregando…');
+  const d = r.doacao;
+  const proxima = METAS_DOACAO.find((m) => d.gold < m.gold);
+  const anterior = [...METAS_DOACAO].reverse().find((m) => d.gold >= m.gold)?.gold ?? 0;
+  const faltamDias = Math.max(0, Math.ceil((d.fim - Date.now()) / 86_400_000));
+  return el('div', { class: 'doacao-acumulada' },
+    el('p', { class: 'doacao-reset' }, `⏳ O acumulado zera a cada 3 meses. Este período termina em ${new Date(d.fim - 1).toLocaleDateString('pt-BR')} (${faltamDias === 1 ? 'falta 1 dia' : `faltam ${faltamDias} dias`}); depois disso, todos começam do zero e as metas podem ser ganhas de novo.`),
+    el('p', {}, 'Doado neste período: ', valorEmMoeda('gold', d.gold)),
+    proxima
+      ? el('div', {},
+          el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${((d.gold - anterior) / (proxima.gold - anterior)) * 100}%` } })),
+          el('small', { class: 'meta' }, `Próxima meta: ${proxima.gold.toLocaleString('pt-BR')} (faltam ${(proxima.gold - d.gold).toLocaleString('pt-BR')} Origin Coins)`))
+      : el('p', { class: 'meta' }, '🏆 Você alcançou todas as metas deste período. Obrigado!'),
+    el('div', { class: 'recompensas-grade metas' },
+      ...METAS_DOACAO.map((m) => {
+        const ganhou = d.metas.includes(m.gold) || d.gold >= m.gold;
+        return el('div', { class: `recompensa-dia ${ganhou ? 'recebido' : m === proxima ? 'proximo' : ''}` },
+          el('small', { class: 'recompensa-numero' }, `${ganhou ? '✔ ' : ''}${m.gold.toLocaleString('pt-BR')}`),
+          listaPremios(m.premios));
+      })),
+    el('small', { class: 'meta' }, 'Cada doação soma as Origin Coins doadas (sem o bônus dos pacotes). O prêmio chega pelo Correio assim que você passa da meta.'));
+}
+
+function recompensas(): HTMLElement {
+  const secao = el('section', { class: 'conta-secao recompensas' });
+  const desenhar = () => {
+    const r = estadoRecompensas();
+    if (!r) return void secao.replaceChildren(el('p', { class: 'meta' }, 'Carregando…'));
+    const partes: (HTMLElement | string)[] = [];
+    // trava de nível: mostra o aviso no topo da seção (o servidor não dá o prêmio abaixo dela)
+    const tranca = (c: 'loginBoasVindas' | 'loginTrinta') => (conteudoLiberado(c) ? '' : el('p', { class: 'recompensa-quebrou' }, textoTranca(c)));
+    if (r.trinta.diaAtual !== null)
+      partes.push(el('h2', {}, `📅 Login dos ${DIAS_LOGIN_TRINTA} dias`), tranca('loginTrinta'), explicacaoDosTrinta(r.trinta), gradeDosTrinta(r.trinta));
+    if (r.login.fim !== null)
+      partes.push(
+        el('h2', {}, `🎁 Login de boas-vindas (${DIAS_LOGIN} dias)`),
+        tranca('loginBoasVindas'),
+        el('p', { class: 'sub' }, `Nos ${DIAS_LOGIN} primeiros dias da sua conta, cada dia em que você entra no jogo anda uma casinha e ganha o prêmio dela. Todos são NT e chegam pelo Correio. Termina em ${dataHora(r.login.fim)}.`),
+        gradeDeLogin(PREMIOS_LOGIN, r.login.dia, r.login.hoje));
+    if (!partes.length) partes.push(el('p', { class: 'meta' }, 'Nenhum login com prêmio acontecendo agora.'));
+    secao.replaceChildren(...partes);
+  };
+  desenhar();
+  void buscarRecompensas().catch(() => {});
+  const parar = aoMudarRecompensas(() => (secao.isConnected ? desenhar() : parar()));
+  return secao;
+}
+
 /** Página de doação: pacotes fixos com bônus e valor livre (R$ 1 = 10). O pagamento ainda não está ligado (`DOACOES_LIGADAS`). */
 function doacao(save: Save): HTMLElement {
   const reais = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -253,11 +382,34 @@ function doacao(save: Save): HTMLElement {
     }
   };
   campoCodigo.addEventListener('input', () => (campoCodigo.value = campoCodigo.value.toUpperCase().replace(/[^A-Z0-9]/g, '')));
-  const doar = (_valor: number) => (void codigoCriador, DOACOES_LIGADAS ? null : avisar('As doações ainda não estão abertas. Em breve!', 'info'));
+  /** Janela de confirmação (pedido do dono): resumo, forma de pagamento (ainda desligada) e o aceite dos termos. */
+  const doar = (valor: number, titulo = 'Doação', linhas: (string | HTMLElement)[] = []) => {
+    let aceito = false;
+    abrirJanela('💛 Confirmar doação', (janela) => {
+      const botao = el('button', { class: 'botao doacao-confirmar', disabled: !aceito || !DOACOES_LIGADAS,
+        onclick: () => avisar('As doações ainda não estão abertas. Em breve!', 'info') }, `Doar ${reais(valor)}`);
+      const caixa = el('input', { type: 'checkbox', checked: aceito, onchange: (e: Event) => ((aceito = (e.target as HTMLInputElement).checked), janela.redesenhar()) });
+      return el('div', { class: 'doacao-checkout' },
+        el('div', { class: 'doacao-resumo' },
+          el('strong', {}, titulo),
+          el('span', { class: 'doacao-resumo-valor' }, reais(valor)),
+          linhas.length ? el('ul', { class: 'doacao-conteudo' }, ...linhas.map((l) => el('li', {}, l))) : '',
+          codigoCriador ? el('small', {}, `🎥 Apoiando o código ${codigoCriador}`) : ''),
+        el('h3', {}, 'Forma de pagamento'),
+        el('div', { class: 'doacao-formas' },
+          el('button', { class: 'botao secundario', disabled: true }, '⚡ Pix ', el('small', {}, '(em breve)')),
+          el('button', { class: 'botao secundario', disabled: true }, '💳 Cartão ', el('small', {}, '(em breve)'))),
+        el('h3', {}, 'Termos de doação'),
+        el('div', { class: 'doacao-termos' }, ...TERMOS_DOACAO.map((t) => el('p', {}, el('strong', {}, t.titulo), el('br'), t.texto))),
+        el('label', { class: 'doacao-aceite' }, caixa, ' Li e aceito os Termos de doação'),
+        botao,
+        DOACOES_LIGADAS ? '' : el('small', { class: 'meta' }, 'Os pagamentos ainda não estão abertos. Em breve!'));
+    }, { classe: 'janela-doacao' });
+  };
   // valor livre
   const campo = el('input', { type: 'number', min: String(DOACAO_MINIMA), max: String(DOACAO_MAXIMA), step: '1', value: '15', class: 'doacao-campo' }) as HTMLInputElement;
   const recebe = el('strong', { class: 'doacao-gold' });
-  const botaoLivre = el('button', { class: 'botao', onclick: () => doar(valorLivre()) }) as HTMLButtonElement;
+  const botaoLivre = el('button', { class: 'botao', onclick: () => doar(valorLivre(), 'Outro valor', [valorEmMoeda('gold', goldDoPacote({ reais: valorLivre() }))]) }) as HTMLButtonElement;
   const valorLivre = () => Math.floor(Number(campo.value) || 0);
   const atualizar = () => {
     const v = valorLivre();
@@ -268,7 +420,10 @@ function doacao(save: Save): HTMLElement {
   };
   campo.addEventListener('input', atualizar);
   atualizar();
-  return el('section', { class: 'conta-secao doacao' },
+  const acumulada = el('div', {}, blocoDoacaoAcumulada(estadoRecompensas()));
+  const pararAcumulada = aoMudarRecompensas(() => (acumulada.isConnected || pacotes.isConnected ? acumulada.replaceChildren(blocoDoacaoAcumulada(estadoRecompensas())) : pararAcumulada()));
+  void buscarRecompensas().catch(() => {});
+  const pacotes = el('div', { class: 'doacao-aba-pacotes' },
     el('p', { class: 'sub' }, `O PokeOrigins é grátis. Quem quiser ajudar a manter o servidor no ar pode fazer uma doação e recebe Origin Coins como agradecimento (R$ 1 = ${GOLD_POR_REAL} Origin Coins).`),
     el('div', { class: 'doacao-criador' },
       el('strong', {}, '🎥 Apoie um criador de conteúdo'),
@@ -283,7 +438,7 @@ function doacao(save: Save): HTMLElement {
         el('strong', { class: 'doacao-gold' }, valorEmMoeda('gold', goldDoPacote(p))),
         p.bonus ? el('small', { class: 'doacao-base' }, `${goldDoPacote({ reais: p.reais }).toLocaleString('pt-BR')} + ${(goldDoPacote(p) - goldDoPacote({ reais: p.reais })).toLocaleString('pt-BR')} de bônus`) : el('small', { class: 'doacao-base' }, ' '),
         el('span', { class: 'doacao-vip' }, `+ ${p.vipDias} ${p.vipDias === 1 ? 'dia' : 'dias'} de VIP`),
-        el('button', { class: 'botao', onclick: () => doar(p.reais) }, `Doar ${reais(p.reais)}`)))),
+        el('button', { class: 'botao', onclick: () => doar(p.reais, `Pacote de ${reais(p.reais)}`, [valorEmMoeda('gold', goldDoPacote(p)), `${p.vipDias} ${p.vipDias === 1 ? 'dia' : 'dias'} de VIP`]) }, `Doar ${reais(p.reais)}`)))),
     el('h2', {}, 'Pacotes Fundador'),
     el('div', { class: 'doacao-pacotes' },
       ...PACOTES_FUNDADOR.map((p) => el('div', { class: `doacao-pacote doacao-fundador ${p.id}` },
@@ -300,24 +455,35 @@ function doacao(save: Save): HTMLElement {
         el('small', { class: 'doacao-limite' }, 'Limite: 1 por conta'),
         pacoteJaComprado(save, p.id)
           ? el('button', { class: 'botao', disabled: true }, '✔ Já adquirido')
-          : el('button', { class: 'botao', onclick: () => doar(p.reais) }, `Doar ${reais(p.reais)}`)))),
+          : el('button', { class: 'botao', onclick: () => doar(p.reais, p.nome, [valorEmMoeda('gold', p.gold), `${p.vipDias} dias de VIP`, `Título: ${p.nome}`, ...p.itens.map((i) => `${i.quantidade}× ${TODOS_OS_ITENS.find((x) => x.id === i.id)?.nome ?? i.id}`)]) }, `Doar ${reais(p.reais)}`)))),
     el('h2', {}, 'Pacotes VIP'),
     el('div', { class: 'doacao-pacotes' },
       ...PACOTES_VIP.map((p) => el('div', { class: 'doacao-pacote' },
         el('span', { class: 'selo-vip-doacao' }, 'VIP'),
         el('strong', { class: 'doacao-gold' }, p.nome),
         el('span', { class: 'doacao-vip' }, `${p.vipDias} dias de VIP`),
-        el('button', { class: 'botao', onclick: () => doar(p.reais) }, `Doar ${reais(p.reais)}`)))),
+        el('button', { class: 'botao', onclick: () => doar(p.reais, p.nome, [`${p.vipDias} dias de VIP`]) }, `Doar ${reais(p.reais)}`)))),
     el('h2', {}, 'Outro valor'),
     el('div', { class: 'doacao-livre' },
       el('label', {}, 'R$ ', campo),
       el('span', {}, '→'), recebe, botaoLivre),
     el('p', { class: 'sub doacao-nota' }, 'As Origin Coins chegam pelo Correio depois que o pagamento for confirmado.'));
+  // abas (pedido do dono): os pacotes numa, a doação acumulada em outra
+  const corpo = el('div', {});
+  const abas = el('nav', { class: 'admin-abas doacao-abas' });
+  const mostrar = (qual: 'pacotes' | 'acumulada') => {
+    abas.replaceChildren(
+      el('button', { class: `aba ${qual === 'pacotes' ? 'ativa' : ''}`, type: 'button', onclick: () => mostrar('pacotes') }, '💛 Pacotes'),
+      el('button', { class: `aba ${qual === 'acumulada' ? 'ativa' : ''}`, type: 'button', onclick: () => mostrar('acumulada') }, '🏆 Doação acumulada'));
+    corpo.replaceChildren(qual === 'pacotes' ? pacotes : acumulada);
+  };
+  mostrar('pacotes');
+  return el('section', { class: 'conta-secao doacao' }, abas, corpo);
 }
 
 export const telaConta = (secao: SecaoConta): Tela => (raiz, navegar) => {
   const save = carregarSave();
-  const titulos: Record<SecaoConta, string> = { perfil: 'Meu perfil', achievements: 'Conquistas', skins: 'Minhas skins', doacao: 'Doação' };
+  const titulos: Record<SecaoConta, string> = { perfil: 'Meu perfil', achievements: 'Conquistas', skins: 'Minhas skins', doacao: 'Doação', recompensas: 'Recompensas' };
   const tela = el('main', { class: 'tela tela-conta' }, el('h1', {}, titulos[secao]));
   raiz.append(tela);
   if (!save) {
@@ -328,9 +494,10 @@ export const telaConta = (secao: SecaoConta): Tela => (raiz, navegar) => {
     const corpo = el('div', { class: 'conta-perfil' });
     const desenhar = () => corpo.replaceChildren(perfilJogador(save), painelTitulos(save, desenhar));
     desenhar();
-    tela.append(corpo, el('div', { class: 'conta-botoes' }, el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'personagem' }) }, 'Editar personagem')));
+    tela.append(corpo);
   }
   else if (secao === 'achievements') tela.append(achievements(save));
   else if (secao === 'doacao') tela.append(doacao(save));
+  else if (secao === 'recompensas') tela.append(recompensas());
   else tela.append(skins(save));
 };

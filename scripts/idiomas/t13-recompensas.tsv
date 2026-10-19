@@ -1,0 +1,46 @@
+# Recompensas de login e doação acumulada (19/10/2026).
+Doação acumulada	Accumulated donation	Donación acumulada
+✔ Dia {0}	✔ Day {0}	✔ Día {0}
+Dia {0}	Day {0}	Día {0}
+⏳ O acumulado zera a cada 3 meses. Este período termina em {0} ({1}); depois disso, todos começam do zero e as metas podem ser ganhas de novo.	⏳ The total resets every 3 months. This period ends on {0} ({1}); after that, everyone starts from zero and the goals can be earned again.	⏳ El acumulado se reinicia cada 3 meses. Este período termina el {0} ({1}); después, todos empiezan de cero y las metas se pueden ganar de nuevo.
+falta 1 dia	1 day left	falta 1 día
+faltam {0} dias	{0} days left	faltan {0} días
+Doado neste período:~	Donated this period:~	Donado en este período:~
+Próxima meta: {0} (faltam {1} Origin Coins)	Next goal: {0} ({1} Origin Coins to go)	Próxima meta: {0} (faltan {1} Origin Coins)
+🏆 Você alcançou todas as metas deste período. Obrigado!	🏆 You reached every goal this period. Thank you!	🏆 Alcanzaste todas las metas de este período. ¡Gracias!
+Cada doação soma as Origin Coins doadas (sem o bônus dos pacotes). O prêmio chega pelo Correio assim que você passa da meta.	Each donation adds the Origin Coins donated (without the package bonus). The reward arrives in your Mail as soon as you pass the goal.	Cada donación suma las Origin Coins donadas (sin el bono de los paquetes). El premio llega al Correo en cuanto superas la meta.
+💛 Doação acumulada	💛 Accumulated donation	💛 Donación acumulada
+🏆 Doação acumulada	🏆 Accumulated donation	🏆 Donación acumulada
+Recompensas	Rewards	Recompensas
+🎁 Recompensas	🎁 Rewards	🎁 Recompensas
+🎁 Login de boas-vindas: o prêmio do dia {0} chegou no Correio!	🎁 Welcome login: the day {0} reward arrived in your Mail!	🎁 Inicio de sesión de bienvenida: ¡el premio del día {0} llegó al Correo!
+📅 Login dos 30 dias: o prêmio do dia {0} chegou no Correio!	📅 30-day login: the day {0} reward arrived in your Mail!	📅 Inicio de sesión de 30 días: ¡el premio del día {0} llegó al Correo!
+Recuperar prêmio	Recover reward	Recuperar premio
+Usar 1 das suas {0} recuperações VIP para pegar o prêmio do dia {1}?	Use 1 of your {0} VIP recoveries to get the day {1} reward?	¿Usar 1 de tus {0} recuperaciones VIP para obtener el premio del día {1}?
+Prêmio do dia {0} recuperado! Ele chegou no Correio.	Day {0} reward recovered! It arrived in your Mail.	¡Premio del día {0} recuperado! Llegó al Correo.
+✖ Dia {0}: perdido	✖ Day {0}: missed	✖ Día {0}: perdido
+Dia {0}: hoje	Day {0}: today	Día {0}: hoy
+Recuperar (VIP)	Recover (VIP)	Recuperar (VIP)
+Hoje é o~	Today is~	Hoy es el~
+dia {0} de {1}	day {0} of {1}	día {0} de {1}
+Prêmios pegos:~	Rewards collected:~	Premios obtenidos:~
+Perdidos:~	Missed:~	Perdidos:~
+Recuperações VIP:~	VIP recoveries:~	Recuperaciones VIP:~
+Nos {0} primeiros dias do servidor, cada dia tem o seu prêmio. Entrou no jogo naquele dia, o prêmio é seu e chega pelo Correio. Não entrou, o prêmio daquele dia é perdido (exemplo: entrou no dia 1, faltou no dia 2 e voltou no dia 3 = pega os prêmios 1 e 3).	In the server's first {0} days, each day has its own reward. Log in that day and the reward is yours, sent to your Mail. Miss the day and that day's reward is lost (example: logged in on day 1, missed day 2 and came back on day 3 = you get rewards 1 and 3).	En los primeros {0} días del servidor, cada día tiene su premio. Si entras ese día, el premio es tuyo y llega al Correo. Si no entras, el premio de ese día se pierde (ejemplo: entraste el día 1, faltaste el día 2 y volviste el día 3 = obtienes los premios 1 y 3).
+⭐ Você é VIP: pode recuperar até {0} prêmios de dias que perdeu (botão "Recuperar" no dia perdido).	⭐ You are VIP: you can recover up to {0} rewards from days you missed ("Recover" button on the missed day).	⭐ Eres VIP: puedes recuperar hasta {0} premios de días que perdiste (botón "Recuperar" en el día perdido).
+⭐ Jogadores VIP podem recuperar até {0} prêmios de dias perdidos.	⭐ VIP players can recover up to {0} rewards from missed days.	⭐ Los jugadores VIP pueden recuperar hasta {0} premios de días perdidos.
+Todos os prêmios são NT. Depois do dia {0}, este login acaba.	All rewards are NT. After day {0}, this login event ends.	Todos los premios son NT. Después del día {0}, este evento termina.
+📅 Login dos {0} dias	📅 {0}-day login	📅 Inicio de sesión de {0} días
+🎁 Login de boas-vindas ({0} dias)	🎁 Welcome login ({0} days)	🎁 Inicio de sesión de bienvenida ({0} días)
+Nos {0} primeiros dias da sua conta, cada dia em que você entra no jogo anda uma casinha e ganha o prêmio dela. Todos são NT e chegam pelo Correio. Termina em {1}.	In your account's first {0} days, each day you log in moves you one square forward and gives you its reward. All are NT and arrive in your Mail. Ends on {1}.	En los primeros {0} días de tu cuenta, cada día que entras avanzas una casilla y ganas su premio. Todos son NT y llegan al Correo. Termina el {1}.
+Nenhum login com prêmio acontecendo agora.	No login rewards running right now.	No hay premios de inicio de sesión ahora.
+💛 Pacotes	💛 Packages	💛 Paquetes
+Agora você ganha prêmios só por entrar no jogo! Nos 7 primeiros dias da sua conta, cada dia em que você entra vale um prêmio, e há também o login dos 30 dias. Veja em Minha conta → Recompensas; os prêmios chegam pelo Correio.	Now you get rewards just for logging in! In your account's first 7 days, each day you log in is worth a reward, and there is also the 30-day login. See My account → Rewards; the rewards arrive in your Mail.	¡Ahora ganas premios solo por entrar al juego! En los primeros 7 días de tu cuenta, cada día que entras vale un premio, y también está el inicio de sesión de 30 días. Míralo en Mi cuenta → Recompensas; los premios llegan al Correo.
+🎁 Login de boas-vindas: dia {0} de {1}	🎁 Welcome login: day {0} of {1}	🎁 Inicio de sesión de bienvenida: día {0} de {1}
+Obrigado por entrar hoje! Nos {0} primeiros dias da sua conta, cada dia em que você entra anda uma casinha. O prêmio de hoje já está no seu Correio (NT).	Thanks for logging in today! In your account's first {0} days, each day you log in moves you one square forward. Today's reward is already in your Mail (NT).	¡Gracias por entrar hoy! En los primeros {0} días de tu cuenta, cada día que entras avanzas una casilla. El premio de hoy ya está en tu Correo (NT).
+Agora você pode trocar com outros treinadores! Clique em um jogador no mapa e escolha "Trocar": cada um monta a sua oferta de Pokémon, itens e moedas.	Now you can trade with other trainers! Click a player on the map and choose "Trade": each one builds their offer of Pokémon, items and coins.	¡Ahora puedes intercambiar con otros entrenadores! Haz clic en un jugador del mapa y elige "Intercambiar": cada uno arma su oferta de Pokémon, objetos y monedas.
+{0}: escolha a Orb que você quer.	{0}: choose the Orb you want.	{0}: elige el Orb que quieres.
+Trocar {0} {1} por {2} {3}? Os seletores são gastos.	Exchange {0} {1} for {2} {3}? The selectors are used up.	¿Cambiar {0} {1} por {2} {3}? Los selectores se gastan.
+Você recebeu {0} {1}!	You received {0} {1}!	¡Recibiste {0} {1}!
+Quantos usar (você tem {0}):~	How many to use (you have {0}):~	Cuántos usar (tienes {0}):~
+Use pela bolsa e escolha 1 Orb entre: {0}.	Use it from the bag and choose 1 Orb among: {0}.	Úsalo desde la bolsa y elige 1 Orb entre: {0}.

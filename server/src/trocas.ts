@@ -13,6 +13,7 @@ import { itemInegociavel } from '../../shared/naoTrocavel.ts';
 import { contarSkinNaBolsa, ehSkin, quantidadeNegociavel } from '../../shared/skins.ts';
 import { TAMANHO_BOX, numeroDeBoxes } from '../../shared/pc.ts';
 import { nivelMaximoPokemon, nivelTreinador } from '../../shared/treinador.ts';
+import { NIVEL_MINIMO, liberado } from '../../shared/trancas.ts';
 
 /** Mesmo do jogo (client/src/estado.ts). */
 const TAMANHO_MAXIMO_TIME = 6;
@@ -158,7 +159,10 @@ export function convidar(de: banco.Conta, usuario: unknown) {
   const para = banco.contaPorUsuario(usuario.trim());
   if (!para) throw new ErroConta('Jogador não encontrado.', 404);
   if (para.id === de.id) throw new ErroConta('Você não pode trocar com você mesmo.');
-  saveDe(de.id);
+  // trava de nível (shared/trancas.ts): os DOIS precisam ter o nível
+  const nivelDe = (c: banco.Conta) => nivelTreinador(Math.max(0, Number(saveDe(c.id).xpTreinador) || 0));
+  if (!liberado('troca', nivelDe(de), !!de.admin)) throw new ErroConta(`As trocas abrem no nível ${NIVEL_MINIMO.troca} de treinador.`, 403);
+  if (!liberado('troca', nivelDe(para), !!para.admin)) throw new ErroConta(`${para.usuario} ainda não tem o nível ${NIVEL_MINIMO.troca} de treinador para trocar.`, 403);
   if (saveDe(para.id).aceitarTrocas === false) throw new ErroConta(`${para.usuario} não está aceitando trocas.`, 403);
   if (ativaDe(de.id)) throw new ErroConta('Você já está numa troca.', 409);
   if (ativaDe(para.id)) throw new ErroConta(`${para.usuario} já está numa troca.`, 409);

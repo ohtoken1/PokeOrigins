@@ -5,7 +5,7 @@ import { TIPOS_DOS_CHARMS, idCharm, nomeCharm } from './charms';
 import { CORES_DOS_APRICORNS, TIPOS_DAS_ENERGIAS, idApricorn, idEnergia, nomeApricorn, nomeEnergia } from './materiais';
 import { BONUS_SKIN, BONUS_SKIN_SHINY, SKINS_ESPECIAIS, TEXTO_ORIGEM_SKIN, textoBonusSkin } from './skins';
 
-export type CategoriaCustom = 'skins' | 'chave' | 'cubos' | 'charms' | 'evolucao' | 'formas' | 'materiais';
+export type CategoriaCustom = 'skins' | 'chave' | 'cubos' | 'charms' | 'evolucao' | 'formas' | 'materiais' | 'tickets';
 /** De onde vem o Pokémon do cubo: do passado, do futuro ou lendário (Koraidon e Miraidon). */
 export type EraCubo = 'passado' | 'futuro' | 'lendario';
 
@@ -138,7 +138,19 @@ export const ehSeloSazonal = (id: string) => id.startsWith('selo-');
 export const VALE_POKE_S = 'vale-poke-s';
 export const KIT_INICIANTE = 'kit-iniciante';
 
+/**
+ * Seletores de Orb (pedido do dono): usados pela bolsa, o jogador ESCOLHE uma das Orbs da lista e ganha 1 dela.
+ * Não existem seletor nem Orb NT (pedido do dono). Novos seletores: acrescentar aqui (ids das Orbs = `ticket-<nome>`).
+ */
+export const SELETORES_ORB: { id: string; nome: string; orbs: string[] }[] = [
+  { id: 'seletor-orb-1', nome: 'Seletor de Orb 1', orbs: ['ticket-giratina', 'ticket-dialga', 'ticket-palkia'] },
+  { id: 'seletor-orb-2', nome: 'Seletor de Orb 2', orbs: ['ticket-kyogre', 'ticket-groudon'] },
+  { id: 'seletor-orb-3', nome: 'Seletor de Orb 3', orbs: ['ticket-kyogre', 'ticket-groudon', 'ticket-giratina', 'ticket-hoopa', 'ticket-dialga', 'ticket-palkia', 'ticket-therian', 'ticket-kyurem', 'ticket-zacian', 'ticket-zamazenta', 'ticket-ogerpon'] },
+];
+export const seletorDeOrb = (id: string) => SELETORES_ORB.find((s) => s.id === id);
+
 export const ITENS_CUSTOM: ItemCustom[] = [
+  ...SELETORES_ORB.map((s): ItemCustom => ({ id: s.id, nome: s.nome, categoria: 'tickets', simbolo: '🔮', descricao: `Use pela bolsa e escolha 1 Orb entre: ${s.orbs.map((o) => o.slice(7).replace(/^./, (c) => c.toUpperCase())).join(', ')}.` })),
   ...SKINS_ESPECIAIS.map((s): ItemCustom => ({ id: s.id, nome: s.nome, categoria: 'skins', simbolo: s.simbolo, descricao: `${TEXTO_ORIGEM_SKIN[s.origem]}. Bônus ao escolher como skin de bônus: ${textoBonusSkin(s.bonus)}.` })),
   // materiais de craft (o sistema de craft vem depois)
   ...TIPOS_DAS_ENERGIAS.map((t): ItemCustom => ({ id: idEnergia(t), nome: nomeEnergia(t), categoria: 'materiais', energia: t, descricao: `Energia do tipo ${t[0].toUpperCase()}${t.slice(1)}. Às vezes fica para trás quando você derrota ou captura um Pokémon selvagem desse tipo. Material de craft.` })),

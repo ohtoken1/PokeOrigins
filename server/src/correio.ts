@@ -8,7 +8,8 @@ import { aplicarItem, lerNome, lerPokemon } from './entregas.ts';
 import { avisar } from './mundo.ts';
 import { guardarPokemon, type PokemonSave, type SaveMin } from './trocas.ts';
 
-export type Anexo = { tipo: 'item'; item: string; nome: string; quantidade: number } | { tipo: 'pokemon'; nome: string; dados: PokemonSave };
+/** `nt` = o item chega NT (não pode ser trocado nem vendido): conta em `save.itensNt` se não for uma versão "-nt". */
+export type Anexo = { tipo: 'item'; item: string; nome: string; quantidade: number; nt?: true } | { tipo: 'pokemon'; nome: string; dados: PokemonSave };
 
 /** Cartas guardadas por conta: passando disso, as mais velhas já lidas e sem nada para resgatar são apagadas. */
 const CARTAS_MAX = 200;
@@ -18,7 +19,7 @@ const ANEXOS_MAX = 10;
 const QUANTIDADE_MAX = 999_999_999;
 
 /** Anexo de item (ou saldo: silver, gold, fragmentos, league-coins…; medalhas de torneio). */
-export const anexoItem = (item: string, nome: string, quantidade: number): Anexo => ({ tipo: 'item', item, nome, quantidade });
+export const anexoItem = (item: string, nome: string, quantidade: number, nt = false): Anexo => ({ tipo: 'item', item, nome, quantidade, ...(nt ? { nt: true as const } : {}) });
 
 /** Põe uma carta na caixa da conta e avisa o jogo dela (se estiver aberto). `de` = quem mandou (staff, liga, torneio…). */
 export function enviar(contaId: number, titulo: string, texto: string, anexos: Anexo[] = [], de = 'sistema'): void {
@@ -68,7 +69,13 @@ export function resgatar(conta: banco.Conta, dados: Record<string, unknown>) {
     // da mais velha para a mais nova (a ordem em que chegaram)
     for (const c of [...cartas].reverse()) {
       for (const a of JSON.parse(c.anexos) as Anexo[]) {
-        if (a.tipo === 'item') aplicarItem(save, a.item, a.quantidade);
+        if (a.tipo === 'item') {
+          aplicarItem(save, a.item, a.quantidade);
+          if (a.nt && !a.item.endsWith('-nt')) {
+            const nt = (save.itensNt && typeof save.itensNt === 'object' ? save.itensNt : (save.itensNt = {})) as Record<string, number>;
+            nt[a.item] = (Number.isSafeInteger(nt[a.item]) ? nt[a.item] : 0) + a.quantidade;
+          }
+        }
         // Pokémon: time se couber, senão a primeira box com espaço (PC cheio = erro e nada muda)
         else guardarPokemon(save as unknown as SaveMin, a.dados, false);
         recebidos.push({ nome: a.nome, quantidade: a.tipo === 'item' ? a.quantidade : 1 });

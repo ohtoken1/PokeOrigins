@@ -72,6 +72,7 @@ const NORMAIS: Ovo[] = [
   ovo('lendarios', 'S+'),
   ovo('iniciais'),
   ovo('iniciais', 'A'),
+  ovo('iniciais', 'S'),
 ];
 
 export const OVOS: Ovo[] = [

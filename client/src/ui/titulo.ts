@@ -5,7 +5,7 @@ import { el } from './dom';
 
 /** Tema = a cor; grau = o acabamento (1 liso, 2 degradê, 3 com brilho em volta, 4 com reflexo passando). */
 interface VisualTitulo {
-  tema: 'guilda' | 'riqueza' | 'shiny' | 'mitico';
+  tema: 'guilda' | 'riqueza' | 'shiny' | 'mitico' | 'palkia' | 'dialga' | 'giratina';
   grau: 1 | 2 | 3 | 4;
   simbolo: string;
 }
@@ -20,6 +20,10 @@ const VISUAIS: Record<string, VisualTitulo> = {
   'lendario-shiny': { tema: 'shiny', grau: 4, simbolo: '✨' },
   'ticket-mitico': { tema: 'mitico', grau: 4, simbolo: '🎰' },
   'passe-nov26': { tema: 'riqueza', grau: 3, simbolo: '🎫' },
+  // pacotes Founder (pedido do dono): nas cores de cada lendário, com o acabamento mais alto
+  'fundador-palkia': { tema: 'palkia', grau: 4, simbolo: '🌌' },
+  'fundador-dialga': { tema: 'dialga', grau: 4, simbolo: '⏳' },
+  'fundador-giratina': { tema: 'giratina', grau: 4, simbolo: '🌑' },
 };
 const PADRAO: VisualTitulo = { tema: 'riqueza', grau: 2, simbolo: '🏅' };
 

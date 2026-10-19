@@ -4,6 +4,8 @@ import { ErroApi } from '../conta';
 import type { JogadorOnline } from '../online';
 import { abrirPerfilDe } from '../telas/jogadores';
 import { convidarParaTroca, trocasDisponiveis } from '../trocas';
+import { conteudoLiberado } from '../trancas';
+import { textoTranca } from '../../../shared/trancas';
 import { el } from './dom';
 import { abrirTroca } from './troca';
 import { desafiarParaDuelo } from '../pvp';
@@ -49,7 +51,7 @@ export function abrirMenuJogador(j: JogadorOnline, evento: MouseEvent): void {
     el('header', {}, el('strong', {}, j.nome), el('small', {}, `@${j.usuario}`)),
     opcao('Ver perfil', () => (fechar(), void abrirPerfilDe(j.usuario))),
     opcaoAmigo,
-    opcao('Trocar', trocasDisponiveis() ? () => void trocar() : null, 'Em breve'),
+    opcao('Trocar', trocasDisponiveis() && conteudoLiberado('troca') ? () => void trocar() : null, trocasDisponiveis() ? textoTranca('troca') : 'Em breve'),
     opcao('Desafiar para duelo', () => {
       aviso.textContent = 'Enviando desafio…';
       desafiarParaDuelo(j.usuario).then(() => void (aviso.textContent = 'Desafio enviado! Esperando a resposta.'), (e) => void (aviso.textContent = e instanceof ErroApi ? e.message : 'Não foi possível desafiar.'));

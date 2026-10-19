@@ -113,14 +113,14 @@ export const GUIA: GrupoGuia[] = [
         '• Move Tutor: ensina golpes de tutor.',
         'Cada golpe custa 5.000 Poké Dólares.',
       ] },
-      { id: 'trocas', emoji: '🔄', titulo: 'Trocas', texto: [
+      { id: 'trocas', trancas: [{ conteudo: 'troca' }], emoji: '🔄', titulo: 'Trocas', texto: [
         'Clique em outro jogador no mapa e escolha "Trocar". Cada um monta a oferta (Pokémon, itens e moedas) e confirma.',
         '• Confirmar é definitivo: depois só dá para Trocar ou Cancelar.',
         '• Pokémon NT, trancados e ovos não podem ser trocados. Você fica sempre com pelo menos 1 Pokémon no time.',
         '• O servidor confere tudo antes de fazer a troca.',
       ] },
       { id: 'mercado', trancas: [{ conteudo: 'mercadoNegro' }], emoji: '🕶️', titulo: 'Mercado negro', texto: [
-        'NPC da cidade onde os jogadores anunciam Pokémon, itens e Origin Coins à venda. Abre no treinador nível 3.',
+        'NPC da cidade onde os jogadores anunciam Pokémon, itens e Origin Coins à venda. Abre no treinador nível 7.',
         '• O vendedor escolhe o preço em Poké Dólares ou Origin Coins.',
         '• Taxa de 5% sobre a venda. Até 10 anúncios por jogador, cada um vale 1 dia.',
         '• O comprador só vê tier e IVs do que já foi avaliado.',
@@ -165,9 +165,9 @@ export const GUIA: GrupoGuia[] = [
         '• Retirar o casal antes do fim do ciclo perde o ciclo em andamento.',
       ] },
       { id: 'craft', trancas: [{ conteudo: 'canteiros', rotulo: 'Canteiros' }, { conteudo: 'craftBola', rotulo: 'Pokébolas' }, { conteudo: 'craftCharm', rotulo: 'Charms' }], emoji: '🔨', titulo: 'Artesã: craft e canteiros', texto: [
-        '• Pokébolas (treinador 7): 2 Apricorns + Poké Dólares viram Pokébolas especiais.',
+        '• Pokébolas (treinador 5): 2 Apricorns + Poké Dólares viram Pokébolas especiais.',
         '• Charms (treinador 15): Berries + Energies + Poké Dólares viram um Charm.',
-        '• Canteiros (treinador 5): plante Berries e Apricorns. Regue para crescer; sem água o crescimento para, mas nada morre.',
+        '• Canteiros (treinador 4): plante Berries e Apricorns. Regue para crescer; sem água o crescimento para, mas nada morre.',
       ] },
       { id: 'suspeito', trancas: [{ conteudo: 'suspeito' }], emoji: '🕵️', titulo: 'Homem Suspeito', texto: [
         'NPC sentado no campo de flores da cidade (treinador 9). Por Poké Dólares, ele reseta EVs, reseta o nível, desfaz a evolução ou separa Pokémon fundidos.',

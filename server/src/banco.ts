@@ -695,3 +695,52 @@ export const parceriaPorCodigo = (codigo: string) => sqlParceria.uma.get(codigo)
 export const listarParcerias = (desde: number) => sqlParceria.listar.all(desde) as unknown as Parceria[];
 export const registrarDoacaoParceria = (codigo: string, contaId: number | null, centavos: number) => void sqlParceria.doar.run(codigo, contaId, centavos, Date.now());
 export const registrarRepasseParceria = (codigo: string, centavos: number, por: string) => void sqlParceria.repassar.run(codigo, centavos, Date.now(), por);
+
+// ---- recompensas de login e doação acumulada (server/src/recompensas.ts) ----
+// `recompensas_progresso`: progresso de cada conta em cada login (`evento` = 'login' | 'trinta'; `dados` em JSON). `doacoes_acumuladas`: cada doação confirmada (em
+// Origin Coins), nunca apagada; o acumulado é a soma do trimestre. `doacao_metas`: metas já premiadas por trimestre.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS recompensas_progresso (
+    conta_id INTEGER NOT NULL REFERENCES contas(id) ON DELETE CASCADE,
+    evento TEXT NOT NULL,
+    dados TEXT NOT NULL,
+    PRIMARY KEY (conta_id, evento)
+  );
+  CREATE TABLE IF NOT EXISTS doacoes_acumuladas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    conta_id INTEGER NOT NULL REFERENCES contas(id) ON DELETE CASCADE,
+    gold INTEGER NOT NULL,
+    quando INTEGER NOT NULL,
+    origem TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS doacoes_acumuladas_conta ON doacoes_acumuladas (conta_id, quando);
+  CREATE TABLE IF NOT EXISTS doacao_metas (
+    conta_id INTEGER NOT NULL REFERENCES contas(id) ON DELETE CASCADE,
+    trimestre TEXT NOT NULL,
+    gold INTEGER NOT NULL,
+    quando INTEGER NOT NULL,
+    PRIMARY KEY (conta_id, trimestre, gold)
+  );
+`);
+const sqlRecompensas = {
+  progresso: db.prepare('SELECT dados FROM recompensas_progresso WHERE conta_id = ? AND evento = ?'),
+  gravarProgresso: db.prepare(`INSERT INTO recompensas_progresso (conta_id, evento, dados) VALUES (?, ?, ?)
+    ON CONFLICT(conta_id, evento) DO UPDATE SET dados = excluded.dados`),
+  primeiraConta: db.prepare('SELECT MIN(criada_em) AS quando FROM contas'),
+  doar: db.prepare('INSERT INTO doacoes_acumuladas (conta_id, gold, quando, origem) VALUES (?, ?, ?, ?)'),
+  somaDoacoes: db.prepare('SELECT COALESCE(SUM(gold), 0) AS gold FROM doacoes_acumuladas WHERE conta_id = ? AND quando >= ? AND quando < ?'),
+  metas: db.prepare('SELECT gold FROM doacao_metas WHERE conta_id = ? AND trimestre = ?'),
+  marcarMeta: db.prepare('INSERT OR IGNORE INTO doacao_metas (conta_id, trimestre, gold, quando) VALUES (?, ?, ?, ?)'),
+};
+export function progressoRecompensa<T>(contaId: number, evento: string): T | null {
+  const linha = sqlRecompensas.progresso.get(contaId, evento) as { dados: string } | undefined;
+  return linha ? (JSON.parse(linha.dados) as T) : null;
+}
+export const gravarProgressoRecompensa = (contaId: number, evento: string, dados: unknown) => void sqlRecompensas.gravarProgresso.run(contaId, evento, JSON.stringify(dados));
+/** Quando a primeira conta do servidor foi criada (o "primeiro dia do servidor"); null = nenhuma conta ainda. */
+export const primeiraContaCriadaEm = () => (sqlRecompensas.primeiraConta.get() as { quando: number | null }).quando;
+export const registrarDoacaoAcumulada = (contaId: number, gold: number, origem: string) => void sqlRecompensas.doar.run(contaId, gold, Date.now(), origem);
+export const doadoNoPeriodo = (contaId: number, inicio: number, fim: number) => (sqlRecompensas.somaDoacoes.get(contaId, inicio, fim) as { gold: number }).gold;
+export const metasPremiadas = (contaId: number, trimestre: string) => (sqlRecompensas.metas.all(contaId, trimestre) as { gold: number }[]).map((m) => m.gold);
+/** Marca a meta como premiada; devolve false se já estava (dois pedidos juntos não premiam duas vezes). */
+export const marcarMetaPremiada = (contaId: number, trimestre: string, gold: number) => sqlRecompensas.marcarMeta.run(contaId, trimestre, gold, Date.now()).changes > 0;
