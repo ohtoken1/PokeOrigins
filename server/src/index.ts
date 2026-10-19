@@ -20,6 +20,7 @@ import * as entregas from './entregas.ts';
 import * as mercado from './mercado.ts';
 import * as banimentos from './banimentos.ts';
 import * as parcerias from './parcerias.ts';
+import * as recompensas from './recompensas.ts';
 import * as eventos from './eventos.ts';
 import * as liga from './liga.ts';
 import * as pvp from './pvp.ts';
@@ -373,6 +374,17 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   if (rotaCodigo && metodo === 'GET') {
     exigirConta(req);
     return responder(res, 200, parcerias.conferir(rotaCodigo[1]));
+  }
+  // ---- recompensas de login e doação acumulada (server/src/recompensas.ts) ----
+  if (caminho === '/api/recompensas' && metodo === 'GET') return responder(res, 200, recompensas.estado(exigirConta(req)));
+  if (caminho === '/api/recompensas/login' && metodo === 'POST') return responder(res, 200, recompensas.registrarLogin(exigirConta(req)));
+  if (caminho === '/api/recompensas/recuperar' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, recompensas.recuperar(conta, await lerCorpo(req)));
+  }
+  if (caminho === '/api/admin/recompensas/doacao' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, recompensas.doacaoManual(conta, await lerCorpo(req)));
   }
   // ---- banimentos (server/src/banimentos.ts) ----
   if (caminho === '/api/admin/banimentos' && metodo === 'GET') return responder(res, 200, banimentos.listar(exigirConta(req)));

@@ -40,6 +40,7 @@ import { vigiarBoss } from './boss';
 import { vigiarConquistas } from './conquistas';
 import { vigiarPvp } from './pvp';
 import { vigiarCorreio } from './correio';
+import { vigiarRecompensas } from './recompensas';
 import { ativarAtalhos } from './atalhos';
 import { ativarDicasDoJogo, avisar } from './ui/avisos';
 import { vigiarTorneio } from './ui/torneio';
@@ -128,6 +129,7 @@ void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   vigiarEntregas();
   vigiarPvp();
   vigiarCorreio();
+  vigiarRecompensas();
   // atalhos de teclado (I Bolsa, P PC, X Pokédex… F1 mostra todos)
   ativarAtalhos(navegar, () => destinoAtual);
   vigiarTorneio();

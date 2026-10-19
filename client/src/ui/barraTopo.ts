@@ -29,7 +29,7 @@ function iconeGuia(): HTMLElement {
 }
 
 /** Link do grupo do WhatsApp. Vazio = ainda não existe (o botão avisa "em breve"). */
-const LINK_WHATSAPP = '';
+const LINK_WHATSAPP = 'https://chat.whatsapp.com/JSaPynYUewEHZLl06t0XVH';
 import { pintarDeslizante } from './deslizante';
 
 /** `acao`: em vez de navegar, faz outra coisa (ex.: sair da conta). */
@@ -57,11 +57,12 @@ const ABAS: Aba[] = [
   {
     nome: 'Minha conta',
     menu: true,
-    telas: ['conta-perfil', 'conta-achievements', 'conta-skins', 'opcoes'],
+    telas: ['conta-perfil', 'conta-achievements', 'conta-skins', 'conta-recompensas', 'conta-doacao', 'opcoes'],
     itens: [
       { nome: '🧑 Meu perfil', destino: () => ({ tela: 'conta', secao: 'perfil' }) },
       { nome: '🏆 Conquistas', destino: () => ({ tela: 'conta', secao: 'achievements' }) },
       { nome: '🎨 Minhas skins', destino: () => ({ tela: 'conta', secao: 'skins' }) },
+      { nome: '🎁 Recompensas', destino: () => ({ tela: 'conta', secao: 'recompensas' }) },
       { nome: '💛 Doação', destino: () => ({ tela: 'conta', secao: 'doacao' }) },
       { nome: '⚙️ Opções', destino: () => ({ tela: 'opcoes' }) },
       { nome: '🚪 Sair da conta', destino: () => ({ tela: 'inicio' }), acao: () => void sairDaConta() },

@@ -6,6 +6,10 @@ import { podeUsar, textoDoLimite } from '../limiteNivel';
 import { numeroDeBoxes, TAMANHO_BOX, TAMANHO_MAXIMO_TIME, TAMANHO_NOME_BOX, nomeDaBox, pokemonsDaBox, salvar, type PokemonDoJogador, type Save } from '../estado';
 import { tornarArrastavel } from './arrastar';
 import { fichaPokemon } from './detalhes';
+import { precoAvaliarIvs } from '../../../shared/loja';
+import { vipAtivo } from '../../../shared/vip';
+import { valorEmMoeda } from './moeda';
+import { avisar } from './avisos';
 import { abrirJanela } from './janela';
 import { el, seloTier, spritePokemon } from './dom';
 import { FUNDOS_BOX, estiloDoFundo, fundoDaBox, type FundoBox } from './fundosBox';
@@ -331,6 +335,20 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
       const p = selecionado;
       if (p) {
         acoes.push(el('button', { class: 'botao secundario', onclick: () => ((verFicha = !verFicha), refazer()) }, verFicha ? 'Esconder ficha' : 'Ver ficha'));
+        // avaliar os IVs direto do PC (pedido do dono), o mesmo da ficha: só aparece em quem ainda não foi avaliado
+        if (!p.ovo && !p.ivsRevelados && !p.ivsFaixa) {
+          const preco = precoAvaliarIvs(vipAtivo(save));
+          acoes.push(el('button', {
+            class: 'botao secundario',
+            onclick: () => {
+              if (save.silver < preco) return avisar(`Poké Dólares insuficientes (você tem ${save.silver.toLocaleString('pt-BR')}).`, 'erro');
+              save.silver -= preco;
+              p.ivsFaixa = true;
+              mudou();
+              refazer();
+            },
+          }, 'Avaliar IVs · ', valorEmMoeda('silver', preco)));
+        }
         if (p.item) {
           const item = p.item;
           acoes.push(

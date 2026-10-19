@@ -2164,6 +2164,13 @@ button.missao-quadro:disabled { cursor: default; }
 .balao-titulo.grau-4 { color: var(--tinta); background: linear-gradient(120deg, var(--t2), var(--t1) 35%, var(--t3) 65%, var(--t2)); border: 2px solid #fff; padding: 4px 14px; font-size: 0.88rem; letter-spacing: 0.02em; box-shadow: 0 0 14px var(--t3), 0 0 4px #fff, inset 0 1px 0 rgb(255 255 255 / 0.7); }
 .balao-titulo.grau-4::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.75) 50%, transparent 65%); transform: translateX(-120%); animation: balao-reflexo 3.2s ease-in-out infinite; pointer-events: none; }
 .balao-titulo.tema-shiny.grau-4 { background: linear-gradient(120deg, #ffd1f0, #fff6c9 30%, #b9f3ff 60%, #d9c2ff); }
+/* Founder: Palkia (pérola, rosa e lilás), Dialga (aço azul e diamante), Giratina (dourado, preto e vermelho) */
+.balao-titulo.tema-palkia { --t1: #fbe3f1; --t2: #b56fae; --t3: #e9a3d4; --tinta: #3a1238; }
+.balao-titulo.tema-palkia.grau-4 { background: linear-gradient(120deg, #9d6fc8, #f6d2ea 30%, #fff7fc 50%, #e7a6d7 72%, #b56fae); box-shadow: 0 0 14px #e9a3d4, 0 0 4px #fff, inset 0 1px 0 rgb(255 255 255 / 0.8); }
+.balao-titulo.tema-dialga { --t1: #d9ecff; --t2: #2f5aa8; --t3: #7fd8ff; --tinta: #fff; }
+.balao-titulo.tema-dialga.grau-4 { background: linear-gradient(120deg, #1f3f7a, #3e6fc4 30%, #9fd6ff 52%, #5a8ad0 72%, #24467f); border-color: #cfeaff; text-shadow: 0 1px 2px rgb(0 0 0 / 0.5); box-shadow: 0 0 14px #7fd8ff, 0 0 4px #fff, inset 0 1px 0 rgb(255 255 255 / 0.6); }
+.balao-titulo.tema-giratina { --t1: #f6d58a; --t2: #c8323a; --t3: #f2c14e; --tinta: #fff3d6; }
+.balao-titulo.tema-giratina.grau-4 { background: linear-gradient(120deg, #1b1a20, #3a2a2e 25%, #c8323a 48%, #2a2228 70%, #141318); border-color: #f2c14e; color: #ffe7a8; text-shadow: 0 1px 2px #000; box-shadow: 0 0 14px #c8323a, 0 0 5px #f2c14e, inset 0 1px 0 rgb(242 193 78 / 0.6); }
 @keyframes balao-reflexo { 0%, 55% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
 @media (prefers-reduced-motion: reduce) { .balao-titulo.grau-4::after { animation: none; } }
 .titulo-opcao:disabled .balao-titulo { filter: grayscale(0.85); box-shadow: none; }
@@ -2981,3 +2988,38 @@ button.creche-pokemon:hover { border-color: var(--destaque); }
 .doacao-codigo { flex: 1 1 200px; max-width: 320px; text-transform: uppercase; }
 .doacao-codigo-status.ok { color: #9fe0a8; }
 .doacao-codigo-status.erro { color: #f0a0a0; }
+
+/* Recompensas de login e doação acumulada (Minha conta → Recompensas, telas/conta.ts) */
+.recompensas-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin: 10px 0 18px; }
+.recompensas-grade.metas { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+.recompensa-dia { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; background: var(--painel); border: 1px solid var(--borda); border-radius: 10px; }
+.recompensa-dia.recebido { opacity: .55; }
+.recompensa-dia.hoje { opacity: 1; border-color: #5fbf6a; box-shadow: 0 0 0 1px #5fbf6a inset; }
+.recompensa-dia.proximo { border-color: var(--destaque); box-shadow: 0 0 10px rgba(233, 185, 73, .35); }
+.recompensa-numero { font-weight: 700; color: var(--destaque); }
+.recompensa-dia.recebido .recompensa-numero { color: #5fbf6a; }
+.recompensa-premios { display: flex; flex-direction: column; gap: 4px; }
+.recompensa-premio { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.recompensa-premio img, .recompensa-premio .icone-item { width: 24px; height: 24px; flex: none; }
+.recompensa-dia.perdido { opacity: .7; border-style: dashed; }
+.recompensa-dia.perdido .recompensa-numero { color: #ff8a80; }
+.recompensa-recuperar { margin-top: auto; padding: 4px 8px; font-size: 12px; }
+.recompensa-explicacao { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; background: var(--painel); border: 1px solid var(--borda); border-radius: 12px; }
+.recompensa-explicacao p { margin: 0; }
+.recompensa-contagem { display: flex; flex-wrap: wrap; gap: 8px 18px; padding-bottom: 6px; border-bottom: 1px solid var(--borda); }
+.recompensa-contagem strong { color: var(--destaque); }
+.doacao-acumulada { display: flex; flex-direction: column; gap: 8px; padding: 14px; background: var(--painel); border: 1px solid var(--borda); border-radius: 12px; }
+.doacao-reset { margin: 0; padding: 8px 12px; border-radius: 8px; background: rgba(233, 185, 73, .12); border: 1px solid var(--borda); color: var(--destaque); font-weight: 600; }
+.doacao-abas { margin-bottom: 14px; }
+.janela-login-diario .recompensas-grade { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+/* Confirmação da doação (telas/conta.ts) */
+.janela-doacao { max-width: 560px; }
+.doacao-checkout { display: flex; flex-direction: column; gap: 10px; }
+.doacao-checkout h3 { margin: 6px 0 0; }
+.doacao-resumo { display: flex; flex-direction: column; gap: 4px; padding: 12px; background: var(--painel); border: 1px solid var(--borda); border-radius: 10px; }
+.doacao-resumo-valor { font-size: 22px; font-weight: 700; color: var(--destaque); }
+.doacao-formas { display: flex; gap: 8px; flex-wrap: wrap; }
+.doacao-termos { max-height: 220px; overflow-y: auto; padding: 10px 12px; background: var(--painel); border: 1px solid var(--borda); border-radius: 10px; font-size: 13px; }
+.doacao-termos p { margin: 0 0 8px; }
+.doacao-aceite { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.doacao-confirmar { align-self: flex-start; }

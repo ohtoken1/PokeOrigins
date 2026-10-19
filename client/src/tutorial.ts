@@ -12,10 +12,12 @@ interface Licao {
   conteudo: ConteudoTrancado;
   /** o que o Professor fala (depois da frase do nível) */
   fala: string;
-  guia: { grupo: string; topico: string };
+  guia?: { grupo: string; topico: string };
 }
 
 const LICOES: Licao[] = [
+  { conteudo: 'troca', guia: { grupo: 'sistemas', topico: 'trocas' }, fala: 'Agora você pode trocar com outros treinadores! Clique em um jogador no mapa e escolha "Trocar": cada um monta a sua oferta de Pokémon, itens e moedas.' },
+  { conteudo: 'loginBoasVindas', fala: 'Agora você ganha prêmios só por entrar no jogo! Nos 7 primeiros dias da sua conta, cada dia em que você entra vale um prêmio, e há também o login dos 30 dias. Veja em Minha conta → Recompensas; os prêmios chegam pelo Correio.' },
   { conteudo: 'mercadoNegro', guia: { grupo: 'sistemas', topico: 'mercado' }, fala: 'Agora você pode usar o Mercado negro da cidade! Lá os treinadores anunciam Pokémon, itens e Origin Coins, e você pode comprar ou vender os seus.' },
   { conteudo: 'canteiros', guia: { grupo: 'sistemas', topico: 'craft' }, fala: 'A Artesã da horta liberou os canteiros para você! Plante Berries e Apricorns, regue e colha depois.' },
   { conteudo: 'craftBola', guia: { grupo: 'sistemas', topico: 'craft' }, fala: 'Agora a Artesã também faz Pokébolas especiais para você, usando Apricorns.' },

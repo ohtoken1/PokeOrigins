@@ -3,6 +3,7 @@
 // Mural da cidade) funcionam; o Log fica "em breve".
 import type { Tela } from '../main';
 import { painelEventosStaff } from '../ui/eventos';
+import { painelRecompensasStaff } from './adminRecompensas';
 import { NOMES_BONUS, VALORES_BONUS, textoBonus, type ChaveBonus } from '../../../shared/bonificacao';
 import { bonificacao, definirBonus, ehAdministrador } from '../bonificacao';
 import { ANUNCIO_TEXTO_MAX, ANUNCIO_TITULO_MAX, AVISO_MAX } from '../../../shared/anuncios';
@@ -224,6 +225,7 @@ export const telaAdministracao = (secaoInicial: SecaoAdministracao): Tela => (ra
               : null,
             el('small', { class: 'meta' }, 'Por enquanto fica guardado só neste navegador; com o servidor, vai valer para todo mundo.'),
             painelEventosStaff(),
+            painelRecompensasStaff(),
           ),
     );
   }
