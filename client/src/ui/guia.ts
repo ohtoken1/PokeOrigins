@@ -117,7 +117,7 @@ export function abrirGuia(destino?: { grupo: string; topico: string }): void {
         voltar(grupo.nome, () => ((topico = null), janela.redesenhar())),
         el('h3', { class: 'guia-titulo' }, `${topico.emoji} ${topico.titulo}`),
         topico.trancas ? el('div', { class: 'guia-trancas' }, ...topico.trancas.map((t) =>
-          el('span', { class: 'guia-tranca' }, `🔒 ${t.rotulo ? `${t.rotulo}: r` : 'R'}equer treinador nível ${NIVEL_MINIMO[t.conteudo]}`))) : '',
+          el('span', { class: 'guia-tranca' }, t.rotulo ? `🔒 ${t.rotulo}: requer treinador nível ${NIVEL_MINIMO[t.conteudo]}` : `🔒 Requer treinador nível ${NIVEL_MINIMO[t.conteudo]}`))) : '',
         FIGURAS[`${grupo.id}/${topico.id}`] ? el('div', { class: 'guia-figuras' }, ...FIGURAS[`${grupo.id}/${topico.id}`]()) : '',
         el('div', { class: 'guia-texto' }, ...blocos));
     }

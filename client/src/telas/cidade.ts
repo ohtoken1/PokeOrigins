@@ -75,7 +75,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
         el('h1', {}, 'Cidade'),
       ),
       el('div', { class: 'layout-bioma' },
-        el('section', {}, areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. Aqui não aparecem Pokémon selvagens. Clique no nome de um lugar que está na tela para usar na hora, ou no minimapa para o seu personagem andar até lá: Centro Pokémon, Pokémarket, Banco, Mural de anúncios, Move Reminder, Move Tutor… Na estação de trem você viaja para outra região; a saída do sul leva aos mapas.')),
+        el('section', {}, areaJogo),
         el('aside', {}, caixaTime, chat.elemento),
       ),
     ),

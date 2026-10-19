@@ -26,7 +26,7 @@ export const GUIA: GrupoGuia[] = [
     id: 'comeco', nome: 'Primeiros passos', emoji: '🌱', descricao: 'O básico para começar a jornada.',
     topicos: [
       { id: 'inicio', emoji: '🥚', titulo: 'Começo da jornada', texto: [
-        'Toda conta nova ganha um Ovo de Inicial: uma roleta sorteia o seu inicial entre os 27 de todas as regiões, e depois você escolhe em qual região começar.',
+        'Toda conta nova ganha um Ovo de Inicial: ao abrir, ele choca um dos 27 iniciais de todas as regiões, sorteado com a mesma chance, e depois você escolhe em qual região começar.',
         'O inicial vem com IVs altos e é NT (não negociável): não pode ser trocado nem vendido.',
         'Você também começa com um Kit iniciante na Bolsa. Abra-o para receber Pokébolas, remédios, Poké Dólares, uma skin e um Charm.',
       ] },

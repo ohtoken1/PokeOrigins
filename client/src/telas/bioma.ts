@@ -187,7 +187,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       el(
         'div',
         { class: 'layout-bioma' },
-        el('section', {}, atalhosBiomas(bioma.id, (id) => navegar({ tela: 'bioma', biomaId: id })), areaJogo, el('p', { class: 'dica' }, 'Ande com as setas ou W A S D. A cada passo aparece um Pokémon: Enter para lutar, ou continue andando para fugir.')),
+        el('section', {}, atalhosBiomas(bioma.id, (id) => navegar({ tela: 'bioma', biomaId: id })), areaJogo),
         el('aside', {}, caixaTime, chat.elemento),
       ),
     ),
