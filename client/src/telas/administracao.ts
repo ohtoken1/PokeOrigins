@@ -12,6 +12,7 @@ import { TODOS_OS_ITENS, nomeCategoriaItem } from '../../../shared/loja';
 import { darItemAoJogador } from '../entregas';
 import { secaoDarPokemon } from './adminPokemon';
 import { secaoBanimentos } from './adminBanimentos';
+import { secaoParcerias } from './adminParcerias';
 import { secaoLiga } from './adminLiga';
 import { secaoTorneio } from './adminTorneio';
 import { secaoCorreio } from './adminCorreio';
@@ -20,7 +21,7 @@ import { el } from '../ui/dom';
 import { cartaoAnuncio } from '../ui/mural';
 import { confirmar } from '../ui/confirmar';
 
-export type SecaoAdministracao = 'correio' | 'itens' | 'pokemon' | 'liga' | 'torneio' | 'banimentos' | 'log' | 'eventos' | 'anuncios';
+export type SecaoAdministracao = 'correio' | 'itens' | 'pokemon' | 'liga' | 'torneio' | 'banimentos' | 'parceria' | 'log' | 'eventos' | 'anuncios';
 
 export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBreve?: string }[] = [
   // só eventos que a staff ativa direto (pedido do dono); a Bonificação mora aqui
@@ -31,6 +32,7 @@ export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBre
   { id: 'liga', nome: 'Liga' },
   { id: 'torneio', nome: 'Torneio' },
   { id: 'banimentos', nome: 'Banimentos' },
+  { id: 'parceria', nome: 'Parceria' },
   {
     id: 'log',
     nome: 'Log',
@@ -186,7 +188,7 @@ export const telaAdministracao = (secaoInicial: SecaoAdministracao): Tela => (ra
   let secao = secaoInicial;
   const corpo = el('div', { class: 'admin-corpo' });
   // montada uma vez só (redesenhar a tela não apaga o que a pessoa está escrevendo)
-  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : secao === 'correio' ? secaoCorreio() : secao === 'pokemon' ? secaoDarPokemon() : secao === 'banimentos' ? secaoBanimentos() : secao === 'liga' ? secaoLiga() : secao === 'torneio' ? secaoTorneio() : null;
+  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : secao === 'correio' ? secaoCorreio() : secao === 'pokemon' ? secaoDarPokemon() : secao === 'banimentos' ? secaoBanimentos() : secao === 'parceria' ? secaoParcerias() : secao === 'liga' ? secaoLiga() : secao === 'torneio' ? secaoTorneio() : null;
 
   const linhaBonus = (chave: ChaveBonus) => {
     const atual = bonificacao()[chave];

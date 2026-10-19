@@ -20,6 +20,7 @@ import { perfilJogador } from './jogadores';
 import { pacoteJaComprado, PACOTES_FUNDADOR, PACOTES_VIP, DOACAO_MAXIMA, DOACAO_MINIMA, DOACOES_LIGADAS, goldDoPacote, GOLD_POR_REAL, PACOTES_DOACAO } from '../../../shared/doacao';
 import { valorEmMoeda } from '../ui/moeda';
 import { avisar } from '../ui/avisos';
+import { api, ErroApi } from '../conta';
 
 export type SecaoConta = 'perfil' | 'achievements' | 'skins' | 'doacao';
 
@@ -233,7 +234,26 @@ function conteudoSkins(save: Save, redesenhar: () => void): HTMLElement[] {
 /** Página de doação: pacotes fixos com bônus e valor livre (R$ 1 = 10). O pagamento ainda não está ligado (`DOACOES_LIGADAS`). */
 function doacao(save: Save): HTMLElement {
   const reais = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  const doar = (_valor: number) => DOACOES_LIGADAS ? null : avisar('As doações ainda não estão abertas. Em breve!', 'info');
+  // código de criador (parceria): conferido no servidor; quando o pagamento for ligado, vai junto com a doação
+  let codigoCriador: string | null = null;
+  const campoCodigo = el('input', { type: 'text', class: 'db-busca doacao-codigo', maxlength: 20, placeholder: 'Código de criador (opcional)', 'aria-label': 'Código de criador', autocomplete: 'off' }) as HTMLInputElement;
+  const statusCodigo = el('small', { class: 'doacao-codigo-status', role: 'status' });
+  const aplicarCodigo = async () => {
+    const valor = campoCodigo.value.trim().toUpperCase();
+    codigoCriador = null;
+    if (!valor) return void (statusCodigo.textContent = '');
+    try {
+      const r = await api<{ codigo: string; criador: string }>('GET', `/parcerias/${encodeURIComponent(valor)}`);
+      codigoCriador = r.codigo;
+      statusCodigo.textContent = `✅ Apoiando ${r.criador}`;
+      statusCodigo.className = 'doacao-codigo-status ok';
+    } catch (e) {
+      statusCodigo.textContent = e instanceof ErroApi ? `❌ ${e.message}` : '❌ Sem conexão com o servidor.';
+      statusCodigo.className = 'doacao-codigo-status erro';
+    }
+  };
+  campoCodigo.addEventListener('input', () => (campoCodigo.value = campoCodigo.value.toUpperCase().replace(/[^A-Z0-9]/g, '')));
+  const doar = (_valor: number) => (void codigoCriador, DOACOES_LIGADAS ? null : avisar('As doações ainda não estão abertas. Em breve!', 'info'));
   // valor livre
   const campo = el('input', { type: 'number', min: String(DOACAO_MINIMA), max: String(DOACAO_MAXIMA), step: '1', value: '15', class: 'doacao-campo' }) as HTMLInputElement;
   const recebe = el('strong', { class: 'doacao-gold' });
@@ -250,6 +270,11 @@ function doacao(save: Save): HTMLElement {
   atualizar();
   return el('section', { class: 'conta-secao doacao' },
     el('p', { class: 'sub' }, `O PokeOrigins é grátis. Quem quiser ajudar a manter o servidor no ar pode fazer uma doação e recebe Origin Coins como agradecimento (R$ 1 = ${GOLD_POR_REAL} Origin Coins).`),
+    el('div', { class: 'doacao-criador' },
+      el('strong', {}, '🎥 Apoie um criador de conteúdo'),
+      el('small', {}, 'Tem o código de um streamer ou criador parceiro? Digite aqui: parte da sua doação ajuda quem divulga o PokeOrigins.'),
+      el('div', { class: 'doacao-criador-linha' }, campoCodigo, el('button', { class: 'botao', onclick: aplicarCodigo }, 'Aplicar')),
+      statusCodigo),
     el('h2', {}, 'Pacotes'),
     el('div', { class: 'doacao-pacotes' },
       ...PACOTES_DOACAO.map((p) => el('div', { class: 'doacao-pacote' },

@@ -632,3 +632,66 @@ export const apagarCarta = (id: number, contaId: number) => sqlCorreio.apagar.ru
 export const quantasCartas = (contaId: number) => (sqlCorreio.contar.get(contaId) as { n: number }).n;
 export const apagarCartasVelhas = (contaId: number, quantas: number) => void sqlCorreio.apagarVelhas.run(contaId, quantas);
 export const contasComSave = () => (sqlCorreio.contasComSave.all() as { id: number }[]).map((c) => c.id);
+
+// ---- parcerias com criadores de conteúdo (server/src/parcerias.ts): códigos, doações feitas com eles e repasses ----
+// Nada é apagado: código descadastrado só fica inativo (o histórico de doações e repasses continua).
+db.exec(`
+  CREATE TABLE IF NOT EXISTS parcerias (
+    codigo TEXT PRIMARY KEY,
+    criador TEXT NOT NULL,
+    ativo INTEGER NOT NULL DEFAULT 1,
+    criado_em INTEGER NOT NULL,
+    por TEXT NOT NULL
+  );
+  CREATE TABLE IF NOT EXISTS parceria_doacoes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    codigo TEXT NOT NULL REFERENCES parcerias(codigo),
+    conta_id INTEGER,
+    centavos INTEGER NOT NULL CHECK (centavos > 0),
+    quando INTEGER NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS parceria_doacoes_codigo ON parceria_doacoes (codigo, quando);
+  CREATE TABLE IF NOT EXISTS parceria_repasses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    codigo TEXT NOT NULL REFERENCES parcerias(codigo),
+    centavos INTEGER NOT NULL CHECK (centavos > 0),
+    feito_em INTEGER NOT NULL,
+    por TEXT NOT NULL
+  );
+`);
+export interface Parceria {
+  codigo: string;
+  criador: string;
+  ativo: number;
+  criado_em: number;
+  /** soma de todas as doações com o código (centavos) */
+  doado: number;
+  /** soma das doações desde `desde` (centavos) */
+  doadoNoPeriodo: number;
+  /** quantas doações usaram o código */
+  usos: number;
+  /** soma dos repasses já feitos (centavos) */
+  repassado: number;
+  ultimoRepasse: number | null;
+}
+const sqlParceria = {
+  criar: db.prepare('INSERT INTO parcerias (codigo, criador, ativo, criado_em, por) VALUES (?, ?, 1, ?, ?)'),
+  ativar: db.prepare('UPDATE parcerias SET ativo = ? WHERE codigo = ?'),
+  uma: db.prepare('SELECT codigo, criador, ativo FROM parcerias WHERE codigo = ?'),
+  listar: db.prepare(`
+    SELECT p.codigo, p.criador, p.ativo, p.criado_em,
+      COALESCE((SELECT SUM(centavos) FROM parceria_doacoes d WHERE d.codigo = p.codigo), 0) AS doado,
+      COALESCE((SELECT SUM(centavos) FROM parceria_doacoes d WHERE d.codigo = p.codigo AND d.quando >= ?), 0) AS doadoNoPeriodo,
+      (SELECT COUNT(*) FROM parceria_doacoes d WHERE d.codigo = p.codigo) AS usos,
+      COALESCE((SELECT SUM(centavos) FROM parceria_repasses r WHERE r.codigo = p.codigo), 0) AS repassado,
+      (SELECT MAX(feito_em) FROM parceria_repasses r WHERE r.codigo = p.codigo) AS ultimoRepasse
+    FROM parcerias p ORDER BY p.ativo DESC, p.criado_em DESC`),
+  doar: db.prepare('INSERT INTO parceria_doacoes (codigo, conta_id, centavos, quando) VALUES (?, ?, ?, ?)'),
+  repassar: db.prepare('INSERT INTO parceria_repasses (codigo, centavos, feito_em, por) VALUES (?, ?, ?, ?)'),
+};
+export const criarParceria = (codigo: string, criador: string, por: string) => void sqlParceria.criar.run(codigo, criador, Date.now(), por);
+export const ativarParceria = (codigo: string, ativo: boolean) => sqlParceria.ativar.run(ativo ? 1 : 0, codigo).changes > 0;
+export const parceriaPorCodigo = (codigo: string) => sqlParceria.uma.get(codigo) as { codigo: string; criador: string; ativo: number } | undefined;
+export const listarParcerias = (desde: number) => sqlParceria.listar.all(desde) as unknown as Parceria[];
+export const registrarDoacaoParceria = (codigo: string, contaId: number | null, centavos: number) => void sqlParceria.doar.run(codigo, contaId, centavos, Date.now());
+export const registrarRepasseParceria = (codigo: string, centavos: number, por: string) => void sqlParceria.repassar.run(codigo, centavos, Date.now(), por);

@@ -19,6 +19,7 @@ import * as correio from './correio.ts';
 import * as entregas from './entregas.ts';
 import * as mercado from './mercado.ts';
 import * as banimentos from './banimentos.ts';
+import * as parcerias from './parcerias.ts';
 import * as eventos from './eventos.ts';
 import * as liga from './liga.ts';
 import * as pvp from './pvp.ts';
@@ -356,6 +357,23 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   if (caminho === '/api/entregas' && metodo === 'GET') return responder(res, 200, entregas.pendentes(exigirConta(req)));
   if (caminho === '/api/entregas/receber' && metodo === 'POST') return responder(res, 200, entregas.receber(exigirConta(req)));
 
+  // ---- parcerias com criadores de conteúdo (server/src/parcerias.ts) ----
+  if (caminho === '/api/admin/parcerias' && metodo === 'GET') return responder(res, 200, parcerias.listar(exigirConta(req)));
+  if (caminho === '/api/admin/parcerias' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 201, parcerias.cadastrar(conta, await lerCorpo(req)));
+  }
+  const rotaParceria = caminho.match(/^\/api\/admin\/parcerias\/([A-Za-z0-9]{3,20})\/(descadastrar|recadastrar|repasse)$/);
+  if (rotaParceria && metodo === 'POST') {
+    const conta = exigirConta(req);
+    const [, codigo, acao] = rotaParceria;
+    return responder(res, 200, acao === 'repasse' ? parcerias.repassar(conta, codigo) : parcerias.ativar(conta, codigo, acao === 'recadastrar'));
+  }
+  const rotaCodigo = caminho.match(/^\/api\/parcerias\/([A-Za-z0-9]{1,30})$/);
+  if (rotaCodigo && metodo === 'GET') {
+    exigirConta(req);
+    return responder(res, 200, parcerias.conferir(rotaCodigo[1]));
+  }
   // ---- banimentos (server/src/banimentos.ts) ----
   if (caminho === '/api/admin/banimentos' && metodo === 'GET') return responder(res, 200, banimentos.listar(exigirConta(req)));
   if (caminho === '/api/admin/banimentos' && metodo === 'POST') {
