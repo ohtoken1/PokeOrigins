@@ -17,8 +17,11 @@ import { bonusAtuais } from '../bonificacao';
 import { enquadrarPersonagem } from '../personagem/enquadrar';
 import { iconeItem } from '../ui/iconeItem';
 import { perfilJogador } from './jogadores';
+import { pacoteJaComprado, PACOTES_FUNDADOR, PACOTES_VIP, DOACAO_MAXIMA, DOACAO_MINIMA, DOACOES_LIGADAS, goldDoPacote, GOLD_POR_REAL, PACOTES_DOACAO } from '../../../shared/doacao';
+import { valorEmMoeda } from '../ui/moeda';
+import { avisar } from '../ui/avisos';
 
-export type SecaoConta = 'perfil' | 'achievements' | 'skins';
+export type SecaoConta = 'perfil' | 'achievements' | 'skins' | 'doacao';
 
 /** Conquistas: resumo dos bônus ganhos e a lista por grupo, com o progresso e a recompensa de cada uma. */
 function achievements(save: Save): HTMLElement {
@@ -227,9 +230,69 @@ function conteudoSkins(save: Save, redesenhar: () => void): HTMLElement[] {
   ];
 }
 
+/** Página de doação: pacotes fixos com bônus e valor livre (R$ 1 = 10). O pagamento ainda não está ligado (`DOACOES_LIGADAS`). */
+function doacao(save: Save): HTMLElement {
+  const reais = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const doar = (_valor: number) => DOACOES_LIGADAS ? null : avisar('As doações ainda não estão abertas. Em breve!', 'info');
+  // valor livre
+  const campo = el('input', { type: 'number', min: String(DOACAO_MINIMA), max: String(DOACAO_MAXIMA), step: '1', value: '15', class: 'doacao-campo' }) as HTMLInputElement;
+  const recebe = el('strong', { class: 'doacao-gold' });
+  const botaoLivre = el('button', { class: 'botao', onclick: () => doar(valorLivre()) }) as HTMLButtonElement;
+  const valorLivre = () => Math.floor(Number(campo.value) || 0);
+  const atualizar = () => {
+    const v = valorLivre();
+    const ok = v >= DOACAO_MINIMA && v <= DOACAO_MAXIMA;
+    recebe.replaceChildren(valorEmMoeda('gold', ok ? goldDoPacote({ reais: v }) : 0));
+    botaoLivre.disabled = !ok;
+    botaoLivre.textContent = ok ? `Doar ${reais(v)}` : `De ${reais(DOACAO_MINIMA)} a ${reais(DOACAO_MAXIMA)}`;
+  };
+  campo.addEventListener('input', atualizar);
+  atualizar();
+  return el('section', { class: 'conta-secao doacao' },
+    el('p', { class: 'sub' }, `O PokeOrigins é grátis. Quem quiser ajudar a manter o servidor no ar pode fazer uma doação e recebe Origin Coins como agradecimento (R$ 1 = ${GOLD_POR_REAL} Origin Coins).`),
+    el('h2', {}, 'Pacotes'),
+    el('div', { class: 'doacao-pacotes' },
+      ...PACOTES_DOACAO.map((p) => el('div', { class: 'doacao-pacote' },
+        p.bonus ? el('span', { class: 'doacao-bonus' }, `+${Math.round(p.bonus * 100)}% de bônus`) : '',
+        el('span', { class: 'doacao-moeda' }),
+        el('strong', { class: 'doacao-gold' }, valorEmMoeda('gold', goldDoPacote(p))),
+        p.bonus ? el('small', { class: 'doacao-base' }, `${goldDoPacote({ reais: p.reais }).toLocaleString('pt-BR')} + ${(goldDoPacote(p) - goldDoPacote({ reais: p.reais })).toLocaleString('pt-BR')} de bônus`) : el('small', { class: 'doacao-base' }, ' '),
+        el('span', { class: 'doacao-vip' }, `+ ${p.vipDias} ${p.vipDias === 1 ? 'dia' : 'dias'} de VIP`),
+        el('button', { class: 'botao', onclick: () => doar(p.reais) }, `Doar ${reais(p.reais)}`)))),
+    el('h2', {}, 'Pacotes Fundador'),
+    el('div', { class: 'doacao-pacotes' },
+      ...PACOTES_FUNDADOR.map((p) => el('div', { class: `doacao-pacote doacao-fundador ${p.id}` },
+        el('img', { class: 'doacao-fundador-img', src: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.numero}.png`, alt: p.nome }),
+        el('strong', { class: 'doacao-gold' }, p.nome),
+        el('ul', { class: 'doacao-conteudo' },
+          el('li', {}, valorEmMoeda('gold', p.gold)),
+          el('li', {}, `${p.vipDias} dias de VIP`),
+          el('li', {}, `Título: ${p.nome}`),
+          ...p.itens.map((i) => {
+            const item = TODOS_OS_ITENS.find((x) => x.id === i.id);
+            return el('li', {}, item ? iconeItem(item) : '', textoDeItem(i.id, `${i.quantidade}× ${item?.nome ?? i.id}`));
+          })),
+        el('small', { class: 'doacao-limite' }, 'Limite: 1 por conta'),
+        pacoteJaComprado(save, p.id)
+          ? el('button', { class: 'botao', disabled: true }, '✔ Já adquirido')
+          : el('button', { class: 'botao', onclick: () => doar(p.reais) }, `Doar ${reais(p.reais)}`)))),
+    el('h2', {}, 'Pacotes VIP'),
+    el('div', { class: 'doacao-pacotes' },
+      ...PACOTES_VIP.map((p) => el('div', { class: 'doacao-pacote' },
+        el('span', { class: 'selo-vip-doacao' }, 'VIP'),
+        el('strong', { class: 'doacao-gold' }, p.nome),
+        el('span', { class: 'doacao-vip' }, `${p.vipDias} dias de VIP`),
+        el('button', { class: 'botao', onclick: () => doar(p.reais) }, `Doar ${reais(p.reais)}`)))),
+    el('h2', {}, 'Outro valor'),
+    el('div', { class: 'doacao-livre' },
+      el('label', {}, 'R$ ', campo),
+      el('span', {}, '→'), recebe, botaoLivre),
+    el('p', { class: 'sub doacao-nota' }, 'As Origin Coins chegam pelo Correio depois que o pagamento for confirmado.'));
+}
+
 export const telaConta = (secao: SecaoConta): Tela => (raiz, navegar) => {
   const save = carregarSave();
-  const titulos: Record<SecaoConta, string> = { perfil: 'Meu perfil', achievements: 'Conquistas', skins: 'Minhas skins' };
+  const titulos: Record<SecaoConta, string> = { perfil: 'Meu perfil', achievements: 'Conquistas', skins: 'Minhas skins', doacao: 'Doação' };
   const tela = el('main', { class: 'tela tela-conta' }, el('h1', {}, titulos[secao]));
   raiz.append(tela);
   if (!save) {
@@ -243,5 +306,6 @@ export const telaConta = (secao: SecaoConta): Tela => (raiz, navegar) => {
     tela.append(corpo, el('div', { class: 'conta-botoes' }, el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'personagem' }) }, 'Editar personagem')));
   }
   else if (secao === 'achievements') tela.append(achievements(save));
+  else if (secao === 'doacao') tela.append(doacao(save));
   else tela.append(skins(save));
 };

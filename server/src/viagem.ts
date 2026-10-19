@@ -4,7 +4,7 @@
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { REGIOES } from '../../shared/regioes.ts';
-import { lerViagem, precoDoTicket, tempoDaViagemMs, textoDoTempo, trechosEntre } from '../../shared/viagem.ts';
+import { GOLPES_DE_VIAGEM, quemSabeGolpe, lerViagem, precoDoTicket, tempoDaViagemMs, textoDoTempo, trechosEntre } from '../../shared/viagem.ts';
 
 const ORDEM = REGIOES.map((r) => r.id);
 const saldo = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? Math.floor(v) : 0);
@@ -38,7 +38,8 @@ export const agora = () => ({ agora: Date.now() });
 
 export function comprar(conta: banco.Conta, dados: Record<string, unknown>) {
   const { destino, moeda } = dados;
-  if (moeda !== 'silver') throw new ErroConta('O ticket do trem é pago em Poké Dólares.');
+  const golpe = GOLPES_DE_VIAGEM.find((g) => g === moeda);
+  if (moeda !== 'silver' && !golpe) throw new ErroConta('O ticket do trem é pago em Poké Dólares.');
   const regiao = REGIOES.find((r) => r.id === destino);
   if (!regiao || !regiao.disponivel) throw new ErroConta('Região inválida.');
   if (!banco.lerSave(conta.id)) throw new ErroConta('Comece sua jornada antes de viajar.');
@@ -53,8 +54,13 @@ export function comprar(conta: banco.Conta, dados: Record<string, unknown>) {
     // VIP vale na hora da compra (o prazo ainda vem do save)
     const vip = typeof save.vipAte === 'number' && save.vipAte > hora;
     const preco = precoDoTicket(trechosEntre(ORDEM, de, regiao.id), vip);
-    if (saldo(save[moeda]) < preco) throw new ErroConta('Você não tem Poké Dólares suficientes para o ticket.');
-    save[moeda] = saldo(save[moeda]) - preco;
+    if (golpe) {
+      // Fly/Surf: de graça, mesmo tempo do trem; o Pokémon tem de estar no time do save guardado
+      if (!quemSabeGolpe(save.time, golpe)) throw new ErroConta(`Nenhum Pokémon do seu time sabe ${golpe === 'fly' ? 'Fly' : 'Surf'}.`);
+    } else {
+      if (saldo(save.silver) < preco) throw new ErroConta('Você não tem Poké Dólares suficientes para o ticket.');
+      save.silver = saldo(save.silver) - preco;
+    }
     save.viagem = { de, para: regiao.id, saiuEm: hora, chegaEm: hora + tempoDaViagemMs(ORDEM, de, regiao.id, vip) };
   });
   return resposta(conta.id);

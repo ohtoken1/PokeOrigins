@@ -2,6 +2,7 @@
 // Camadas do LPC + detalhes Pokémon (estampa, Pokébolas no cinto) em lpc.ts. Cada sexo tem a sua lista de cabelos.
 import type { Tela } from '../main';
 import { carregarSave, salvar } from '../estado';
+import { falarProfessor } from '../tutorial';
 import { PRECO_TROCAR_APARENCIA_GOLD, PRECO_TROCAR_NOME_GOLD } from '../../../shared/loja';
 import {
   APARENCIA_PADRAO, CABELOS, CORES_CABELO, CORES_ROUPA, ESTAMPAS, PELES, cabelosDoSexo, carregarPaletas, montarPersonagem,
@@ -186,5 +187,12 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
       el('small', { class: 'creditos-lpc' }, 'Personagem: Universal LPC Spritesheet Character Generator — artistas em lpc/CREDITOS-LPC.csv (CC-BY-SA 3.0 / GPL 3.0 / OGA-BY 3.0). Boné, estampas e Pokébolas: desenho próprio.'),
     ),
   );
+  // tutorial (pedido do dono): o Professor Carvalho recebe quem está criando o personagem
+  if (!save)
+    void falarProfessor([
+      'Olá! Eu sou o Professor Carvalho. Seja muito bem-vindo ao PokeOrigins!',
+      'Primeiro, vamos criar o seu treinador. Escolha a aparência dele e o nome que todos os outros jogadores vão ver no mapa.',
+      `Escolha com cuidado: depois dá para mudar, mas custa Origin Coins (${PRECO_TROCAR_NOME_GOLD} para trocar o nome e ${PRECO_TROCAR_APARENCIA_GOLD} para mudar a aparência).`,
+    ], 'Vamos lá!');
   return () => clearInterval(relogio);
 };

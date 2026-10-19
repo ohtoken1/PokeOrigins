@@ -222,7 +222,9 @@ function ficha(p: PokemonBase, todos: PokemonBase[], encontros: ReturnType<typeo
   const comoAparece = onde
     ? `Solto · Nv. ${p.lendario || p.mitico ? `${Math.max(NIVEL_LENDARIO, onde.entrada.nivelMin)}+ (raro)` : `${onde.entrada.nivelMin}–${onde.entrada.nivelMax}`}`
     : cuboDaEspecie(p.id)
-      ? `Só com o ${cuboDaEspecie(p.id)!.nome}, usado em ${cuboDaEspecie(p.id)!.origens.map((n) => todos.find((q) => q.id === n)?.nome ?? n).join(' ou ')}`
+      ? cuboDaEspecie(p.id)!.origens.length
+        ? `Só com o ${cuboDaEspecie(p.id)!.nome}, usado em ${cuboDaEspecie(p.id)!.origens.map((n) => todos.find((q) => q.id === n)?.nome ?? n).join(' ou ')}`
+        : `Só com o ${cuboDaEspecie(p.id)!.nome} (usado pela bolsa, gera o Pokémon)`
       : `Só evoluindo · ${comoEvolui(p)}`;
   // chances com o nível de treinador atual (e os bônus/ajustes que valem no jogo agora)
   const saveAtual = carregarSave();

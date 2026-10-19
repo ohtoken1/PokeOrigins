@@ -1,10 +1,11 @@
 // Estação de trem da cidade: compra o ticket (silver ou gold) e escolhe a região. Quanto mais longe na ordem das
 // regiões, mais a viagem demora. Quem cobra e conta o tempo é o servidor (client/src/viagem.ts).
 import { REGIOES } from '../../../shared/regioes';
-import { precoDoTicket, tempoDaViagemMs, textoDoTempo, trechosEntre } from '../../../shared/viagem';
+import { GOLPES_DE_VIAGEM, quemSabeGolpe, type MoedaTicket, precoDoTicket, tempoDaViagemMs, textoDoTempo, trechosEntre } from '../../../shared/viagem';
 import { vipAtivo } from '../../../shared/vip';
 import { ErroApi } from '../conta';
-import type { Save } from '../estado';
+import type { PokemonDoJogador, Save } from '../estado';
+import { pokemonPorId } from '../dados';
 import { aoMudarViagem, comprarTicket, faltaDaViagem, ORDEM_DAS_REGIOES, viagemAtual } from '../viagem';
 import { el } from './dom';
 import { abrirJanela } from './janela';
@@ -40,15 +41,15 @@ export function abrirEstacao(save: Save, aoMudar: () => void = () => {}): void {
     relogio = () => {};
     const vip = vipAtivo(save);
     const precoPara = (id: string) => precoDoTicket(trechosEntre(ORDEM_DAS_REGIOES, save.regiao, id), vip);
-    const pagar = async () => {
+    const pagar = async (forma: MoedaTicket = 'silver') => {
       if (!destino || ocupado) return;
       ocupado = true;
       aviso = '';
       janela.redesenhar();
       try {
         const para = destino;
-        await comprarTicket(para, 'silver');
-        aviso = `Boa viagem! O trem para ${nomeDaRegiao(para)} partiu.`;
+        await comprarTicket(para, forma);
+        aviso = forma === 'fly' ? `Boa viagem! Você está voando para ${nomeDaRegiao(para)}.` : forma === 'surf' ? `Boa viagem! Você está surfando para ${nomeDaRegiao(para)}.` : `Boa viagem! O trem para ${nomeDaRegiao(para)} partiu.`;
         destino = null;
         aoMudar();
       } catch (e) {
@@ -74,9 +75,14 @@ export function abrirEstacao(save: Save, aoMudar: () => void = () => {}): void {
       el('div', { class: 'trem-pagar' },
         el('small', {}, destino ? `Ticket para ${nomeDaRegiao(destino)}` : 'Escolha uma região para comprar o ticket'),
         destino
-          ? el('button', { class: 'botao', type: 'button', disabled: ocupado || save.silver < precoPara(destino), title: save.silver < precoPara(destino) ? 'Você não tem Poké Dólares suficientes' : '', onclick: pagar },
+          ? el('button', { class: 'botao', type: 'button', disabled: ocupado || save.silver < precoPara(destino), title: save.silver < precoPara(destino) ? 'Você não tem Poké Dólares suficientes' : '', onclick: () => pagar('silver') },
               'Pagar ', moeda('silver', precoPara(destino)))
-          : null));
+          : null,
+        ...(destino ? GOLPES_DE_VIAGEM : []).map((g) => {
+          const p = quemSabeGolpe<PokemonDoJogador>(save.time, g);
+          const nome = g === 'fly' ? 'Fly' : 'Surf';
+          return p ? el('button', { class: 'botao', type: 'button', disabled: ocupado, title: `De graça, no mesmo tempo do trem`, onclick: () => pagar(g) }, `Usar ${nome} (${pokemonPorId(p.especieId).nome})`) : null;
+        })));
   }, { classe: 'janela-banco', aoFechar: () => (clearInterval(tique), pararDeOuvir()) });
 
   const tique = window.setInterval(() => relogio(), 500);

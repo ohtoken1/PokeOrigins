@@ -50,6 +50,7 @@ import { vigiarQuadro } from './missoesQuadro';
 import { prepararIdioma } from './idioma';
 // o chat ouve o servidor desde a conexão (guarda as mensagens mesmo fora do mapa)
 import './ui/chat';
+import { vigiarTutorial } from './tutorial';
 import { ativarDicaDeItens } from './ui/dicaItem';
 
 export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes'; professor?: 'relembrar' | 'tutor'; daCidade?: boolean } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' } | { tela: 'cidade' } | { tela: 'safari' };
@@ -133,7 +134,8 @@ void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   vigiarCreche();
   vigiarMercado();
   vigiarQuadro();
+  vigiarTutorial();
   aoMudarViagem(() => (destinoAtual.tela === 'regiao' ? navegar(destinoAtual) : atualizarCabecalho?.(destinoAtual)));
-  // com save, o jogo abre na tela de Início (o time lado a lado)
-  navegar(carregarSave() ? { tela: 'inicio' } : { tela: 'inicial' });
+  // com save, o jogo abre na cidade (pedido do dono)
+  navegar(carregarSave() ? { tela: 'cidade' } : { tela: 'inicial' });
 });

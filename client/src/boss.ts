@@ -13,6 +13,8 @@ import { el, spritePokemon } from './ui/dom';
 import { bannerEvento, classeTematica } from './ui/temaEvento';
 import { abrirJanela } from './ui/janela';
 import { avisar } from './ui/avisos';
+import { conteudoLiberado } from './trancas';
+import { textoTranca } from '../../shared/trancas';
 
 export interface EstadoBoss {
   tipo: 'global' | 'guilda';
@@ -84,7 +86,9 @@ export function abrirBoss(save: Save, lutar: (boss: PokemonIndividual, nome: str
       el('div', { class: 'expedicao-time' }, spritePokemon(pokemonPorId(b.especieId), { animado: false }),
         el('div', {}, el('strong', {}, `${b.tipo === 'global' ? '👹 Boss global' : '🛡️ Boss da guilda'}: ${b.nome}`),
           el('p', { class: 'meta' }, ativo ? `Termina em ${min} min. HP infinito: cada treinador luta uma vez, por até ${TURNOS_BOSS} turnos, e o dano conta para o ranking${b.tipo === 'guilda' ? ' da sua guilda' : ''}. Golpes que tiram porcentagem da vida ou dano fixo são proibidos.` : `Terminou. ${b.resultado ?? ''}`))),
-      ativo && !b.jaLutei
+      ativo && !b.jaLutei && !conteudoLiberado('boss')
+        ? el('p', { class: 'meta' }, textoTranca('boss'))
+        : ativo && !b.jaLutei
         ? el('button', {
             class: 'botao', onclick: async () => {
               const proibidos = golpesProibidosNoTime(save);

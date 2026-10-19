@@ -6,6 +6,8 @@ import { ErroConta } from './contas.ts';
 import { avisar, avisarEvento, avisarTodos } from './mundo.ts';
 import * as correio from './correio.ts';
 import { lerNome, lerPokemon } from './entregas.ts';
+import { NIVEL_MINIMO, liberado } from '../../shared/trancas.ts';
+import { nivelTreinador } from '../../shared/treinador.ts';
 import {
   BILHETES_POR_JOGADOR, DIGITOS_COFRE, FECHA_VENDAS, HORA_SORTEIO, INTERVALO_TENTATIVA_COFRE_MS, NUMEROS_LOTERIA, PARTE_DO_POTE, POTE_INICIAL,
   PRECO_BILHETE, PREMIO_COFRE_MAX, agoraEmBrasilia, formatarBilhete, primeiroDoProximoMes,
@@ -458,6 +460,10 @@ export function entrarNoBoss(conta: banco.Conta) {
   const b = boss();
   if (!b || b.premiado) throw new ErroConta('Não há boss na gaiola agora.', 409);
   if (b.danos[conta.id] || b.lutando[conta.id]) throw new ErroConta('Você já enfrentou este boss.', 409);
+  // tranca de nível (pedido do dono), pelo save guardado
+  const guardado = banco.lerSave(conta.id);
+  const xp = guardado ? (JSON.parse(guardado.dados) as Record<string, unknown>).xpTreinador : 0;
+  if (!liberado('boss', nivelTreinador(typeof xp === 'number' && xp > 0 ? xp : 0), !!conta.admin)) throw new ErroConta(`O Boss abre no nível ${NIVEL_MINIMO.boss} de treinador.`, 403);
   if (b.tipo === 'guilda' && !banco.claDaConta(conta.id)) throw new ErroConta('O Boss da guilda é só para quem está numa guilda.', 409);
   b.lutando[conta.id] = Date.now();
   banco.gravarEvento('boss', b);

@@ -1,9 +1,12 @@
-import { ATRIBUTOS, especie, golpesIniciais, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { ATRIBUTOS, IV_MIN_SHINY, especie, golpesIniciais, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { evoluir, trocarGolpe } from '../../../shared/batalha/progresso';
 import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { SEGURAR_OU_EVOLUIR, ehEquipavel, ehItemDeHabilidade, usarItemDeHabilidade, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
-import { KIT_INICIANTE, cuboPorItem, ehSeloSazonal } from '../../../shared/itensCustom';
+import { CHANCE_SHINY_CUBO_LENDARIO, IV_MINIMO_CUBO_LENDARIO, KIT_INICIANTE, NIVEL_CUBO_LENDARIO, cuboPorItem, ehSeloSazonal } from '../../../shared/itensCustom';
+
+/** Cubo que gera o Pokémon sem precisar de um de origem (Koraidon, Miraidon). */
+const cuboQueGera = (id: string) => { const c = cuboPorItem(id); return c && !c.origens.length ? c : undefined; };
 import { sortearKit } from '../../../shared/kitIniciante';
 import { PASSE_PREMIUM } from '../../../shared/passeTemporadas';
 import { ativarPremium } from '../passe';
@@ -12,7 +15,8 @@ import { BOXES_INICIAIS, BOXES_MAXIMO, BOX_POKEMON, numeroDeBoxes, podeAbrirBox 
 import { charmAte, charmAtivo, nomeCharm, tipoDoCharm, usarCharm } from '../../../shared/charms';
 import { textoDoTempo } from '../../../shared/viagem';
 import { pokemonPorId, todosOsPokemons } from '../dados';
-import { guardarNoPC, registrarCapturado, salvar, salvarAgora, type PokemonDoJogador, type Save } from '../estado';
+import { TAMANHO_MAXIMO_TIME, guardarNoPC, novoPokemon, registrarCapturado, salvar, salvarAgora, type PokemonDoJogador, type Save } from '../estado';
+import { sortearIvs } from '../../../shared/ovos';
 import { ehSkin, moverSkin, quantidadeNt, skinsNaBolsa } from '../../../shared/skins';
 import { abrirJanela } from './janela';
 import { confirmar } from './confirmar';
@@ -49,7 +53,7 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
 /** O botão do item: pela categoria; na aba Up, Ability Capsule e Ability Patch são de usar. */
 /** Itens que são gastos ao usar num Pokémon e não voltam: perguntam "tem certeza?" (pedido do dono). */
 const PEDE_CONFIRMACAO = (item: ItemLoja) => ['evolucao', 'cubos', 'mints', 'terashards', 'tm', 'tr', 'formas'].includes(item.categoria) || ehItemDeHabilidade(item.id);
-const acaoDe = (item: ItemLoja) => (ehItemDeHabilidade(item.id) || item.id === BOX_POKEMON || item.id === KIT_INICIANTE || item.id === PASSE_PREMIUM || ehItemDeForma(item.id) ? 'Usar' : ACAO[item.categoria]);
+const acaoDe = (item: ItemLoja) => (ehItemDeHabilidade(item.id) || cuboQueGera(item.id) || item.id === BOX_POKEMON || item.id === KIT_INICIANTE || item.id === PASSE_PREMIUM || ehItemDeForma(item.id) ? 'Usar' : ACAO[item.categoria]);
 
 type Modo =
   | { tipo: 'lista' }
@@ -519,6 +523,22 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                         for (const [id, quantidade] of Object.entries(kit.itens)) save.itens[id] = (save.itens[id] ?? 0) + quantidade;
                         save.silver += kit.silver;
                         concluir(`Kit iniciante aberto! Você recebeu Pokébolas, remédios, ${kit.silver.toLocaleString('pt-BR')} Poké Dólares, a ${itemDaLoja(kit.skin)?.nome ?? 'skin'} e um ${itemDaLoja(kit.charm)?.nome ?? 'Charm'}.`);
+                      } else if (cuboQueGera(item.id)) {
+                        // Cubo de Koraidon/Miraidon (pedido do dono): gera o Pokémon direto, IVs de 10 a 31
+                        const cubo = cuboQueGera(item.id)!;
+                        const novo = pokemonPorId(cubo.especie).nome;
+                        if (!(await confirmar(item.nome, `Usar o ${item.nome}? Ele é gasto e gera um ${novo} nível ${NIVEL_CUBO_LENDARIO} com IVs de ${IV_MINIMO_CUBO_LENDARIO} a 31.`))) return;
+                        gastar(item.id);
+                        const shiny = Math.random() < CHANCE_SHINY_CUBO_LENDARIO;
+                        const p = novoPokemon(cubo.especie, NIVEL_CUBO_LENDARIO, shiny);
+                        p.ivs = sortearIvs(0, Math.max(IV_MINIMO_CUBO_LENDARIO, shiny ? IV_MIN_SHINY : 0));
+                        p.hp = hpMaximo(p);
+                        p.origem = 'ticket';
+                        registrarCapturado(save, cubo.especie, shiny);
+                        const nomeNovo = `${novo}${shiny ? ' ✨' : ''}`;
+                        if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(p);
+                        const onde = save.time.includes(p) ? 'entrou no seu time' : `foi para o PC (Box ${guardarNoPC(save, p) + 1})`;
+                        concluir(`O cubo se abriu e ${nomeNovo} atravessou o tempo! Ele ${onde}.`);
                       } else if (item.id === PASSE_PREMIUM) {
                         // libera a trilha premium da temporada em vigor (o item só é gasto se liberou)
                         const r = ativarPremium(save);

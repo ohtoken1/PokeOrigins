@@ -9,7 +9,7 @@ import { irPara } from './navegacao';
 import { seloTierDaEspecie } from './tierDoJogo';
 import { el, seloGenero, seloNT, seloTier, seloTipo, selosTipos, spritePokemon } from './dom';
 import { barraHp } from './time';
-import { PRECO_REVELAR_IVS, faixaDoIv, itemDaLoja } from '../../../shared/loja';
+import { precoAvaliarIvs, faixaDoIv, itemDaLoja } from '../../../shared/loja';
 import { AMIZADE_MAXIMA, amizadeDe, textoAmizade } from '../../../shared/amizade';
 import { iconeItem } from './iconeItem';
 import { formatarId, saveDoPokemon, salvar } from '../estado';
@@ -52,14 +52,15 @@ function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | 
     return el('div', { class: 'revelar-ivs' }, el('div', {}, el('strong', {}, '🔓 IVs por faixa'), el('small', {}, 'Jogadores VIP veem o valor exato de cada IV.')));
   const save = saveDoPokemon(p);
   const vip = !!save && vipAtivo(save);
+  const preco = precoAvaliarIvs(vip);
   const aviso = el('small', { class: 'aviso' }, '');
   const pagar = () => {
     if (!save) return;
-    if (save.silver < PRECO_REVELAR_IVS) {
+    if (save.silver < preco) {
       aviso.textContent = `Poké Dólares insuficientes (você tem ${save.silver}).`;
       return;
     }
-    save.silver -= PRECO_REVELAR_IVS;
+    save.silver -= preco;
     p.ivsFaixa = true;
     salvar(save);
     aoRevelar();
@@ -71,9 +72,9 @@ function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | 
       'div',
       {},
       el('strong', {}, '🔒 IVs ocultos'),
-      el('small', {}, vip ? 'Avalie para ver o valor exato de cada IV (você é VIP).' : 'Avalie para ver a faixa de cada IV (0–5, 6–10… 26–31). Jogadores VIP veem o valor exato.'),
+      el('small', {}, vip ? 'Avalie para ver o valor exato de cada IV (você é VIP: preço menor).' : 'Avalie para ver a faixa de cada IV (0–5, 6–10… 26–31). Jogadores VIP veem o valor exato.'),
     ),
-    el('div', { class: 'botoes' }, el('button', { class: 'botao', disabled: !save, onclick: pagar }, 'Avaliar IVs · ', valorEmMoeda('silver', PRECO_REVELAR_IVS))),
+    el('div', { class: 'botoes' }, el('button', { class: 'botao', disabled: !save, onclick: pagar }, 'Avaliar IVs · ', valorEmMoeda('silver', preco))),
     aviso,
   );
 }
