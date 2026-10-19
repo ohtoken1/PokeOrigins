@@ -1,15 +1,17 @@
-// Começo do jogo: um aviso "Você ganhou um Ovo de Inicial" (botão Abrir agora) leva à roleta, que sorteia o inicial entre os de TODAS as regiões (chance igual para os 27)
-// e depois o jogador escolhe a região onde começa. O resultado é guardado assim que a roleta gira, para recarregar
-// a página não virar um "sortear de novo".
+// Começo do jogo: "Você ganhou um Ovo de Inicial!" (botão Abrir agora) e o ovo choca direto no inicial, sorteado
+// entre os de TODAS as regiões (chance igual para os 27; pedido do dono: sem roleta, o sorteio é interno). Depois o
+// jogador escolhe a região onde começa. O Professor Carvalho explica cada passo (tutorial). O resultado é guardado
+// assim que o ovo abre, para recarregar a página não virar um "sortear de novo".
 import type { Tela } from '../main';
 import { REGIOES, TODOS_INICIAIS } from '../../../shared/regioes';
 import { pokemonPorId } from '../dados';
 import { novoSave, salvar } from '../estado';
-import { corTipo, el, selosTipos, spritePokemon } from '../ui/dom';
+import { el, selosTipos, spritePokemon } from '../ui/dom';
+import { falarProfessor } from '../tutorial';
+import { PRECO_POR_TRECHO } from '../../../shared/viagem';
 import { aparenciaNova, limparAparenciaNova } from './personagem';
 
 const CHAVE_SORTEIO = 'jogo-claude:sorteio-inicial';
-const LARGURA_ITEM = 96;
 /** O ovo dos jogos oficiais (sprite da PokéAPI, como os dos Pokémon). */
 const SPRITE_OVO = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/egg.png';
 
@@ -50,7 +52,7 @@ export const telaEscolhaInicial: Tela = (raiz, navegar) => {
                 } catch {
                   /* ignora */
                 }
-                navegar({ tela: 'regiao' });
+                navegar({ tela: 'cidade' });
               },
             },
             el('div', { class: 'cartao-regiao-sprites' }, ...r.iniciais.map((id) => spritePokemon(pokemonPorId(id), { animado: false }))),
@@ -61,86 +63,52 @@ export const telaEscolhaInicial: Tela = (raiz, navegar) => {
       ),
     );
 
-  // ---------- passo 1: roleta ----------
-  // faixa com várias voltas dos 27 iniciais embaralhados; o sorteado fica numa das últimas voltas
-  const ordem = [...TODOS_INICIAIS].sort(() => Math.random() - 0.5);
-  const voltas = 6;
-  const itens = Array.from({ length: voltas }, () => ordem).flat();
-  const faixa = el(
-    'div',
-    { class: 'roleta-faixa' },
-    ...itens.map((id) => el('div', { class: 'roleta-item', style: { '--cor-tipo': corTipo(pokemonPorId(id).tipos[0]) } }, spritePokemon(pokemonPorId(id), { animado: false }))),
-  );
-  const janela = el('div', { class: 'roleta' }, el('div', { class: 'roleta-marcador' }), faixa);
-  const resultado = el('div', { class: 'roleta-resultado' });
-  const botao = el('button', { class: 'botao grande' }, '🎲 Girar a roleta') as HTMLButtonElement;
-
+  // ---------- passo 1: o inicial que saiu do ovo ----------
   const mostrarResultado = (id: number) => {
     const p = pokemonPorId(id);
-    resultado.replaceChildren(
-      el('p', { class: 'sub' }, 'Seu primeiro Pokémon é…'),
-      el('div', { class: 'palco-inicial' }, spritePokemon(p, { palco: true, escala: 2 })),
-      el('h2', {}, p.nome),
-      selosTipos(p),
-      el('p', { class: 'meta' }, '🔒 NT (inegociável) · IVs 20 em todos os atributos'),
-      escolherRegiao(id),
+    tela.replaceChildren(
+      el('section', { class: 'roleta-resultado' },
+        el('p', { class: 'sub' }, 'Seu primeiro Pokémon é…'),
+        el('div', { class: 'palco-inicial' }, spritePokemon(p, { palco: true, escala: 2 })),
+        el('h2', {}, p.nome),
+        selosTipos(p),
+        el('p', { class: 'meta' }, '🔒 NT (inegociável) · IVs 20 em todos os atributos'),
+        escolherRegiao(id)),
     );
+    void falarProfessor([
+      `Que ótimo! O ${p.nome} vai ser o seu parceiro no começo da jornada.`,
+      'Agora escolha a região onde você vai começar. A região decide quais Pokémon aparecem nos mapas e quais Ginásios você enfrenta primeiro. O seu inicial vai com você para qualquer região.',
+      `Dá para mudar de região depois, pela estação de trem da cidade, mas a passagem custa Poké Dólares (${PRECO_POR_TRECHO.toLocaleString('pt-BR')} por região de distância) e a viagem leva um tempo. No começo do jogo isso pesa no bolso, então escolha com cuidado!`,
+    ], 'Escolher a região');
   };
 
-  const girar = (id: number, instantaneo = false) => {
-    botao.hidden = true;
-    const alvo = (voltas - 2) * ordem.length + ordem.indexOf(id);
-    const deslocamento = alvo * LARGURA_ITEM - (janela.clientWidth / 2 - LARGURA_ITEM / 2);
-    faixa.style.transition = instantaneo ? 'none' : 'transform 5s cubic-bezier(0.12, 0.7, 0.15, 1)';
-    faixa.style.transform = `translateX(${-deslocamento}px)`;
-    const fim = () => {
-      faixa.children[alvo]?.classList.add('sorteado');
-      mostrarResultado(id);
-    };
-    if (instantaneo) fim();
-    else setTimeout(fim, 5100);
-  };
-
-  botao.addEventListener('click', () => {
-    // chance igual para todos os iniciais
+  // ---------- passo 0: o ovo (só para quem ainda não abriu) ----------
+  const salvo = lerSorteio();
+  if (salvo !== null) return mostrarResultado(salvo); // recarregou a página: mostra o mesmo resultado
+  const ovo = el('div', { class: 'ovo-inicial' }, el('img', { src: SPRITE_OVO, alt: 'Ovo' }));
+  const abrir = el('button', { class: 'botao grande' }, 'Abrir agora') as HTMLButtonElement;
+  abrir.addEventListener('click', () => {
+    // sorteio interno, chance igual para todos os iniciais; o ovo some num clarão e o Pokémon aparece
     const id = TODOS_INICIAIS[Math.floor(Math.random() * TODOS_INICIAIS.length)];
     try {
       localStorage.setItem(CHAVE_SORTEIO, String(id));
     } catch {
       /* ignora */
     }
-    girar(id);
+    abrir.disabled = true;
+    ovo.classList.add('chocando');
+    setTimeout(() => mostrarResultado(id), 900);
   });
-
-  // ---------- passo 0: o aviso do ovo (só para quem ainda não girou a roleta) ----------
-  const salvo = lerSorteio();
-  const mostrarRoleta = () =>
-    tela.replaceChildren(
-      el('h1', {}, 'Roleta do inicial'),
-      el('p', { class: 'sub' }, `Gire para sortear seu primeiro Pokémon entre os ${TODOS_INICIAIS.length} iniciais de todas as regiões, todos com a mesma chance. Depois, escolha a região onde começar.`),
-      janela,
-      botao,
-      resultado,
-    );
-  if (salvo === null) {
-    const ovo = el('div', { class: 'ovo-inicial' }, el('img', { src: SPRITE_OVO, alt: 'Ovo' }));
-    const abrir = el('button', { class: 'botao grande' }, 'Abrir agora') as HTMLButtonElement;
-    abrir.addEventListener('click', () => {
-      // o ovo some num clarão e a roleta aparece
-      abrir.disabled = true;
-      ovo.classList.add('chocando');
-      setTimeout(mostrarRoleta, 900);
-    });
-    tela.append(
-      el('section', { class: 'aviso-ovo-inicial' },
-        el('h1', {}, 'Você ganhou um Ovo de Inicial!'),
-        el('p', { class: 'sub' }, 'Dentro dele está o seu primeiro Pokémon: um dos iniciais de todas as regiões.'),
-        el('div', { class: 'ovo-inicial-palco' }, ovo),
-        abrir),
-    );
-    return;
-  }
-  mostrarRoleta();
-  // já sorteou antes (recarregou a página): mostra o mesmo resultado
-  requestAnimationFrame(() => girar(salvo, true));
+  tela.append(
+    el('section', { class: 'aviso-ovo-inicial' },
+      el('h1', {}, 'Você ganhou um Ovo de Inicial!'),
+      el('p', { class: 'sub' }, `Dentro dele está o seu primeiro Pokémon: um dos ${TODOS_INICIAIS.length} iniciais de todas as regiões.`),
+      el('div', { class: 'ovo-inicial-palco' }, ovo),
+      abrir),
+  );
+  void falarProfessor([
+    'Agora, um presente para você: um Ovo de Inicial! Dentro dele está o Pokémon que vai te acompanhar no começo da sua jornada.',
+    `Ele é sorteado entre os ${TODOS_INICIAIS.length} iniciais de todas as regiões, de Kanto a Paldea, todos com a mesma chance. Ele vem com IVs 20 em todos os atributos e é NT: não pode ser trocado nem vendido.`,
+    'Quando estiver pronto, clique em "Abrir agora"!',
+  ], 'Entendi!');
 };

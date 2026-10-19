@@ -75,16 +75,17 @@ export const POKEMON_DOS_CUBOS: Record<EraCubo, [number, string, number[]][]> = 
     [1022, 'Iron Boulder', [639]], // Terrakion
     [1023, 'Iron Crown', [638]], // Cobalion
   ],
+  // pedido do dono: os lendários não precisam de origem, o cubo GERA o Pokémon (IVs aleatórios)
   lendario: [
-    [1007, 'Koraidon', [967]], // Cyclizar
-    [1008, 'Miraidon', [967]],
+    [1007, 'Koraidon', []],
+    [1008, 'Miraidon', []],
   ],
 };
 export const idCubo = (nome: string) => `cubo-${nome.toLowerCase().replace(/[^a-z]/g, '')}`;
 /** ids dos cubos de uma era (para a Chave Temporal). */
 export const cubosDaEra = (era: EraCubo): string[] => POKEMON_DOS_CUBOS[era].map(([, nome]) => idCubo(nome));
 /** Nomes dos Pokémon de origem (para a descrição do item). */
-const NOME_ORIGEM: Record<number, string> = { 232: 'Donphan', 39: 'Jigglypuff', 591: 'Amoonguss', 200: 'Misdreavus', 637: 'Volcarona', 82: 'Magneton', 373: 'Salamence', 245: 'Suicune', 244: 'Entei', 243: 'Raikou', 225: 'Delibird', 297: 'Hariyama', 635: 'Hydreigon', 248: 'Tyranitar', 282: 'Gardevoir', 475: 'Gallade', 640: 'Virizion', 639: 'Terrakion', 638: 'Cobalion', 967: 'Cyclizar' };
+const NOME_ORIGEM: Record<number, string> = { 232: 'Donphan', 39: 'Jigglypuff', 591: 'Amoonguss', 200: 'Misdreavus', 637: 'Volcarona', 82: 'Magneton', 373: 'Salamence', 245: 'Suicune', 244: 'Entei', 243: 'Raikou', 225: 'Delibird', 297: 'Hariyama', 635: 'Hydreigon', 248: 'Tyranitar', 282: 'Gardevoir', 475: 'Gallade', 640: 'Virizion', 639: 'Terrakion', 638: 'Cobalion' };
 const TEXTO_ERA: Record<EraCubo, string> = { passado: 'do passado', futuro: 'do futuro', lendario: 'lendário de outra era' };
 
 export interface Cubo {
@@ -94,7 +95,7 @@ export interface Cubo {
   era: EraCubo;
   /** em quem o Pokémon de origem se transforma */
   especie: number;
-  /** quem pode usar o cubo */
+  /** quem pode usar o cubo (vazio = o cubo gera o Pokémon direto: Koraidon e Miraidon) */
   origens: number[];
 }
 export const CUBOS: Cubo[] = (Object.keys(POKEMON_DOS_CUBOS) as EraCubo[]).flatMap((era) =>
@@ -148,7 +149,9 @@ export const ITENS_CUSTOM: ItemCustom[] = [
   { id: 'passe-premium', nome: 'Passe Premium', categoria: 'chave', simbolo: '👑', descricao: 'Libera a trilha premium do passe de batalha da temporada em vigor. Use pela bolsa.' },
   { id: KIT_INICIANTE, nome: 'Kit iniciante', categoria: 'chave', simbolo: '🎒', descricao: 'Um kit para quem está começando: 50 Poké Balls, 30 Great Balls, 20 Ultra Balls, 10 Potions, 7 Super Potions, 5 Hyper Potions, 7 Revives, 1 Max Revive, 20.000 Poké Dólares, uma skin sorteada (Ash, Gary, May ou Misty) e um Charm sorteado. O kit e os itens dele são NT: não podem ser trocados.' },
   ...MOEDAS_SAZONAIS.map((m): ItemCustom => ({ id: m.id, nome: m.nome, categoria: 'chave', simbolo: '🪙', descricao: `Moeda do evento de ${m.evento}. Uso em breve.` })),
-  ...CUBOS.map((c): ItemCustom => ({ id: c.id, nome: c.nome, categoria: 'cubos', cubo: { especie: c.especie, era: c.era }, descricao: `Transforma ${c.origens.map((n) => NOME_ORIGEM[n]).join(' ou ')} em ${c.nome.replace('Cubo de ', '')}, um Pokémon ${TEXTO_ERA[c.era]}. Use nele como uma pedra de evolução: IVs, EVs, natureza e shiny continuam os mesmos.` })),
+  ...CUBOS.map((c): ItemCustom => ({ id: c.id, nome: c.nome, categoria: 'cubos', cubo: { especie: c.especie, era: c.era }, descricao: !c.origens.length
+    ? `Gera um ${c.nome.replace('Cubo de ', '')}, um Pokémon ${TEXTO_ERA[c.era]}, nível 1 e com IVs de 10 a 31 em cada atributo. Use pela bolsa.`
+    : `Transforma ${c.origens.map((n) => NOME_ORIGEM[n]).join(' ou ')} em ${c.nome.replace('Cubo de ', '')}, um Pokémon ${TEXTO_ERA[c.era]}. Use nele como uma pedra de evolução: IVs, EVs, natureza e shiny continuam os mesmos.` })),
   ...COM_SKIN.flatMap(([especie, nome]): ItemCustom[] => [
     { id: idSkin(nome), nome: `Skin ${nome}`, categoria: 'skins', skin: { especie, shiny: false }, descricao: `Visual especial para o ${nome}. Bônus ao escolher como skin de bônus: ${textoBonusSkin(BONUS_SKIN)}.` },
     { id: idSkin(nome, true), nome: `Skin ${nome} Shiny`, categoria: 'skins', skin: { especie, shiny: true }, descricao: `Visual especial para o ${nome} shiny. Bônus ao escolher como skin de bônus: ${textoBonusSkin(BONUS_SKIN_SHINY)}.` },
@@ -171,3 +174,10 @@ export const ITENS_CUSTOM: ItemCustom[] = [
   { id: 'goldstone', nome: 'Gold Stone', categoria: 'evolucao', imagem: 'itens/goldstone.svg', descricao: 'Pedra de ouro maciço. Evolui o Gimmighoul para Gholdengo. É gasta.' },
   { id: 'tealmask',nome: 'Teal Mask', categoria: 'evolucao', imagem: 'itens/tealmask.png', descricao: 'A máscara original da Ogerpon. Usada numa Ogerpon de outra máscara, ela volta para a forma padrão. É gasta.' },
 ];
+
+/** Nível do Koraidon/Miraidon gerado pelo cubo (como os Pokémon de Orbs e ovos). */
+export const NIVEL_CUBO_LENDARIO = 1;
+/** IV mínimo de cada atributo do Koraidon/Miraidon gerado pelo cubo (pedido do dono: 10 a 31). */
+export const IV_MINIMO_CUBO_LENDARIO = 10;
+/** Chance de shiny do Koraidon/Miraidon gerado pelo cubo (a mesma das Orbs). */
+export const CHANCE_SHINY_CUBO_LENDARIO = 0.05;

@@ -52,8 +52,8 @@ export const SKINS_ESPECIAIS: SkinEspecial[] = [
   { id: 'skin-pascoa', nome: 'Skin de Páscoa', simbolo: '🐰', origem: 'sazonal', bonus: b(0.04, 0.03, 0, 0.02, 0.03) },
   { id: 'skin-namorados', nome: 'Skin de Dia dos Namorados', simbolo: '💘', origem: 'sazonal', bonus: b(0.05, 0.04, 0.03, 0.03, 0.03) },
   { id: 'skin-aniversario', nome: 'Skin de Aniversário', simbolo: '🎂', origem: 'sazonal', bonus: b(0.07, 0.05, 0.07, 0.05, 0.1) },
-  // bônus provisório (o dono ainda não definiu): o mesmo das skins de conquista
-  { id: 'skin-passe-nov26', nome: 'Skin Passe Nov/26', simbolo: '🎫', origem: 'passe', bonus: b(0.01, 0.01, 0.03, 0.01, 0.03) },
+  // bônus definido pelo dono (19/10/2026); a arte vem depois
+  { id: 'skin-passe-nov26', nome: 'Skin Passe Nov/26', simbolo: '🎫', origem: 'passe', bonus: b(0.02, 0.01, 0.03, 0.02, 0.03) },
   { id: 'skin-ash', nome: 'Skin Ash', simbolo: '🧢', origem: 'inicial', bonus: b(0.01, 0.01, 0.01, 0.01, 0.01) },
   { id: 'skin-gary', nome: 'Skin Gary', simbolo: '🧢', origem: 'inicial', bonus: b(0.01, 0.01, 0.01, 0.01, 0.01) },
   { id: 'skin-may', nome: 'Skin May', simbolo: '🧢', origem: 'inicial', bonus: b(0.01, 0.01, 0.01, 0.01, 0.01) },

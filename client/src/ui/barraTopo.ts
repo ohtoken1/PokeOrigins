@@ -1,6 +1,8 @@
 // Barra no topo do site: Início (o time lado a lado), Jogar (jogador comum: vai direto para a Cidade; administrador:
 // menu com Mapas, Cidade, Duelos e Ginásios), Minha conta e Comunidade (Buscar jogadores, Amigos, Guilda, Ranking,
 // Database). Cada item tem um iconezinho. Menus com setinha abrem ao clicar.
+import { avisar } from './avisos';
+import { abrirGuia } from './guia';
 import { ehAdministrador } from '../bonificacao';
 import { aoMudarAjustesSom, ajustesSom, mudarAjustesSom } from '../sons';
 import { SECOES_ADMINISTRACAO } from '../telas/administracao';
@@ -9,6 +11,25 @@ import { carregarSave } from '../estado';
 import { sairDaConta } from '../conta';
 import { el } from './dom';
 import { relogioBrasilia } from './relogio';
+
+/** Ícone do Guia: moeda de borda dourada com o miolo escuro e um "?" dourado (no estilo da Origin Coin). */
+function iconeGuia(): HTMLElement {
+  const caixa = el('span', { class: 'icone-guia', 'aria-hidden': 'true' });
+  caixa.innerHTML = `<svg viewBox="0 0 40 40" width="100%" height="100%"><defs>
+    <linearGradient id="guia-aro" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbe7a6"/><stop offset=".45" stop-color="#e9b949"/><stop offset="1" stop-color="#8a5f14"/></linearGradient>
+    <radialGradient id="guia-miolo" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#3a3226"/><stop offset="1" stop-color="#14120f"/></radialGradient>
+    <linearGradient id="guia-letra" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1c2"/><stop offset=".55" stop-color="#e9b949"/><stop offset="1" stop-color="#b8860b"/></linearGradient></defs>
+    <circle cx="20" cy="20" r="19" fill="url(#guia-aro)"/>
+    <circle cx="20" cy="20" r="15.2" fill="url(#guia-miolo)" stroke="#5a3d0c" stroke-width="1"/>
+    <circle cx="20" cy="20" r="13.4" fill="none" stroke="#e9b949" stroke-opacity=".35" stroke-width=".8" stroke-dasharray="1.6 1.6"/>
+    <path d="M15.2 15.6c0-3 2.2-5 5-5s4.9 1.8 4.9 4.5c0 2.2-1.3 3.3-2.6 4.1-1.1.7-1.6 1.2-1.6 2.4v.9h-2.9v-1.1c0-2 .9-3 2.3-3.9 1.1-.7 1.7-1.2 1.7-2.3 0-1.1-.8-1.9-1.9-1.9-1.2 0-2 .9-2 2.3z" fill="url(#guia-letra)" stroke="#5a3d0c" stroke-width=".6"/>
+    <circle cx="19.5" cy="27.2" r="1.9" fill="url(#guia-letra)" stroke="#5a3d0c" stroke-width=".6"/>
+    <ellipse cx="13.5" cy="9.5" rx="5" ry="2.2" fill="#fff" opacity=".45" transform="rotate(-35 13.5 9.5)"/></svg>`;
+  return caixa;
+}
+
+/** Link do grupo do WhatsApp. Vazio = ainda não existe (o botão avisa "em breve"). */
+const LINK_WHATSAPP = '';
 import { pintarDeslizante } from './deslizante';
 
 /** `acao`: em vez de navegar, faz outra coisa (ex.: sair da conta). */
@@ -41,6 +62,7 @@ const ABAS: Aba[] = [
       { nome: '🧑 Meu perfil', destino: () => ({ tela: 'conta', secao: 'perfil' }) },
       { nome: '🏆 Conquistas', destino: () => ({ tela: 'conta', secao: 'achievements' }) },
       { nome: '🎨 Minhas skins', destino: () => ({ tela: 'conta', secao: 'skins' }) },
+      { nome: '💛 Doação', destino: () => ({ tela: 'conta', secao: 'doacao' }) },
       { nome: '⚙️ Opções', destino: () => ({ tela: 'opcoes' }) },
       { nome: '🚪 Sair da conta', destino: () => ({ tela: 'inicio' }), acao: () => void sairDaConta() },
     ],
@@ -158,6 +180,8 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
       el(
         'div',
         { class: 'barra-topo-conteudo' },
+        // Guia do jogo: dúvidas sobre eventos e sistemas (pedido do dono)
+        el('button', { class: 'botao-guia', type: 'button', title: 'Guia do jogo: como funcionam os eventos e sistemas', 'aria-label': 'Guia do jogo', onclick: abrirGuia }, iconeGuia()),
         el('img', { class: 'marca', src: '/logo/origens-antigas-barra.svg', alt: 'PokeOrigins' }),
         el('div', { class: 'abas-topo' }, ...botoes.map((b) => b.raiz)),
         relogioBrasilia(),
@@ -165,6 +189,11 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
         // convite do Discord da comunidade (pedido do dono)
         el('a', { class: 'botao-discord', href: 'https://discord.gg/zqkXC8Hddu', target: '_blank', rel: 'noopener', title: 'Entre no nosso Discord', 'aria-label': 'Discord do PokeOrigins' },
           el('img', { src: 'discord.svg', alt: '' })),
+        // grupo do WhatsApp (pedido do dono): enquanto `LINK_WHATSAPP` estiver vazio, o botão só avisa "em breve"
+        el('a', {
+          class: 'botao-whatsapp', href: LINK_WHATSAPP || '#', target: '_blank', rel: 'noopener', title: 'Entre no nosso grupo do WhatsApp', 'aria-label': 'WhatsApp do PokeOrigins',
+          onclick: (e: Event) => { if (!LINK_WHATSAPP) { e.preventDefault(); avisar('O grupo do WhatsApp ainda não está aberto. Em breve!', 'info'); } },
+        }, el('img', { src: 'whatsapp.svg', alt: '' })),
       ),
     ),
   );

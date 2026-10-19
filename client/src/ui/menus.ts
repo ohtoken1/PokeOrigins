@@ -16,6 +16,8 @@ export function botaoIcone(nomeIcone: NomeIcone, nome: string, onclick: () => vo
  * administradores: os jogadores usam o Pokémarket indo até ele na cidade (pedido do dono).
  */
 export function botoesMenus(save: Save, aoMudar: () => void, soIcone = false): HTMLElement[] {
+  // jogador comum abre PC e Bolsa pelos atalhos do cabeçalho (pedido do dono: sem botões repetidos no mapa)
+  if (!ehAdministrador()) return [];
   const menus: [NomeIcone, string, () => void][] = [
     ['computador', 'PC', () => abrirPC(save, aoMudar)],
     ['mochila', 'Bolsa', () => abrirBolsa(save, aoMudar)],

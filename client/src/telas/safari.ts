@@ -19,7 +19,6 @@ import { biomaDoTipo, fecharSafari, guardarSafari, prepararSafari } from '../saf
 import { montarChat } from '../ui/chat';
 import { el } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
-import { botoesMenus } from '../ui/menus';
 import { acompanharTime, painelTime } from '../ui/time';
 
 export const telaSafari: Tela = (raiz, navegar) => {
@@ -83,7 +82,7 @@ export const telaSafari: Tela = (raiz, navegar) => {
   const chat = montarChat();
   raiz.append(
     el('main', { class: 'tela tela-bioma tela-safari' },
-      el('header', { class: 'barra' }, botaoSair, el('h1', {}, `Safari de ${nomeTipo(aberto.tipo)}`, subtitulo), ...botoesMenus(save, () => atualizarTime(), true)),
+      el('header', { class: 'barra' }, botaoSair, el('h1', {}, `Safari de ${nomeTipo(aberto.tipo)}`, subtitulo)),
       el('div', { class: 'layout-bioma' },
         el('section', {}, areaJogo, dica),
         el('aside', {}, caixaTime, chat.elemento))),

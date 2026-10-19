@@ -21,7 +21,7 @@ import { abrirMenuJogador } from '../ui/menuJogador';
 import { montarChat } from '../ui/chat';
 import { el, selosTipos, spritePokemon } from '../ui/dom';
 import { aoMudarJanelas } from '../ui/janela';
-import { botaoIcone, botoesMenus } from '../ui/menus';
+import { botaoIcone } from '../ui/menus';
 import { mostrarEncontro } from '../ui/popupEncontro';
 import { acompanharTime, painelTime } from '../ui/time';
 import { atalhosBiomas } from '../ui/atalhosBiomas';
@@ -182,7 +182,6 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         { class: 'barra' },
         el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'regiao' }) }, '← Voltar'),
         el('h1', {}, `${bioma.nome}`, el('small', {}, ` · ${regiao.nome}`)),
-        ...botoesMenus(save, () => atualizarTime(), true),
         contador,
       ),
       el(

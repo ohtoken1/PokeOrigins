@@ -6,11 +6,10 @@ import { BIOMAS } from '../../../shared/biomas';
 import { faixaDosEncontros, montarTabela, probabilidades } from '../../../shared/encontros';
 import { progressoTreinador } from '../../../shared/treinador';
 import { pokemonsDaRegiao, todosOsPokemons } from '../dados';
-import { apagarSave, carregarSave, curarTime, salvar, usarSave } from '../estado';
+import { apagarSave, carregarSave, salvar, usarSave } from '../estado';
 import { icone } from '../ui/icones';
 import { ehAdministrador } from '../bonificacao';
 import { viagemAtual } from '../viagem';
-import { botoesMenus } from '../ui/menus';
 import { el, spritePokemon } from '../ui/dom';
 import { acompanharTime, painelTime } from '../ui/time';
 import { confirmar } from '../ui/confirmar';
@@ -111,24 +110,14 @@ export const telaRegiao: Tela = (raiz, navegar) => {
           el(
             'div',
             { class: 'painel-treinador' },
-            el('div', { class: 'linha-treinador' }, el('strong', {}, `Treinador Nv. ${treinador.nivel}`), el('button', { class: 'botao secundario editar-personagem', title: 'Editar personagem', onclick: () => navegar({ tela: 'personagem' }) }, '✏️ Personagem')),
+            el('div', { class: 'linha-treinador' }, el('strong', {}, `Treinador Nv. ${treinador.nivel}`)),
             el('small', {}, treinador.necessario ? `${treinador.atual.toLocaleString('pt-BR')} / ${treinador.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo!'),
             el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${treinador.necessario ? (treinador.atual / treinador.necessario) * 100 : 100}%` } })),
           ),
           caixaTime,
-          el(
-            'button',
-            {
-              class: 'botao botao-com-icone',
-              onclick: () => {
-                curarTime(save);
-                navegar({ tela: 'regiao' });
-              },
-            },
-            icone('coracao'),
-            'Centro Pokémon (curar time)',
-          ),
-          el('div', { class: 'linha-botoes' }, botoesMenus(save, () => navegar({ tela: 'regiao' }))),
+          // Curar time, PC, Bolsa e Loja saíram desta tela (pedido do dono: os jogadores usam o Centro Pokémon e
+          // os atalhos do cabeçalho); "Recomeçar" ficou só para a staff (testes)
+          ...(admin ? [
           el(
             'button',
             {
@@ -142,6 +131,7 @@ export const telaRegiao: Tela = (raiz, navegar) => {
             },
             'Recomeçar',
           ),
+          ] : []),
           el(
             'p',
             { class: 'creditos' },

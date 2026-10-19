@@ -112,6 +112,10 @@ export interface Save {
   creche?: { casais: CasalCreche<PokemonDoJogador>[]; chocando?: { pokemon: PokemonDoJogador; pronto: number }[] };
   /** títulos liberados fora das conquistas (passe de batalha…), ids de TITULOS_EXTRAS */
   titulosGanhos?: string[];
+  /** Pacotes de compra única já comprados (ids de shared/doacao.ts; escrito pelo servidor). */
+  pacotesComprados?: string[];
+  /** Avisos do tutorial (Professor Carvalho) já mostrados: ids de conteúdo de shared/trancas.ts */
+  tutorialVisto?: string[];
   /** Quando virou treinador (ms). No MMO = data do cadastro da conta. */
   criadoEm?: number;
 }

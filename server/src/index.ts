@@ -140,6 +140,8 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   }
   if (metodo === 'DELETE' && caminho === '/api/save') {
     const conta = exigirConta(req);
+    // Recomeçar é só para a staff (testes; pedido do dono)
+    if (!conta.admin) return responder(res, 403, { erro: 'Só a equipe pode recomeçar a jornada.' });
     banco.apagarSave(conta.id);
     return responder(res, 200, { versao: 0 });
   }

@@ -5,7 +5,15 @@
 
 /** Preço do ticket por região de distância, em silver (decisão do dono: o trem não aceita gold). */
 export const PRECO_POR_TRECHO = 1_000;
-export type MoedaTicket = 'silver';
+/** Como paga a viagem: ticket em silver, ou Fly/Surf de um Pokémon do time (pedido do dono: de graça, mesmo tempo do trem). */
+export type MoedaTicket = 'silver' | 'fly' | 'surf';
+export const GOLPES_DE_VIAGEM = ['fly', 'surf'] as const;
+export type GolpeDeViagem = (typeof GOLPES_DE_VIAGEM)[number];
+/** Primeiro Pokémon do time que sabe o golpe (Fly ou Surf), ou null. Ovos não contam. */
+export function quemSabeGolpe<P extends { golpes?: { id?: unknown }[]; ovo?: unknown }>(time: unknown, golpe: GolpeDeViagem): P | null {
+  if (!Array.isArray(time)) return null;
+  return (time as P[]).find((p) => p && !p.ovo && Array.isArray(p.golpes) && p.golpes.some((g) => g?.id === golpe)) ?? null;
+}
 /** Tempo de viagem por região de distância (provisório): Kanto → Johto = 1 trecho, Kanto → Paldea = 8. Vai diminuir com Fly e Surf. */
 export const TEMPO_POR_TRECHO_MS = 30_000;
 /** VIP (pedido do dono): metade do tempo e metade do preço. */

@@ -202,7 +202,10 @@ export const BONUS_DO_TITULO: Record<string, number> = {
  * `origem` = como o jogador consegue (aparece no título trancado).
  */
 export const TITULOS_EXTRAS: Titulo[] = [
-  { id: 'passe-nov26', nome: 'Passe Premium Nov/26', conquista: '', origem: 'Passe de batalha de novembro/2026 (premium)', bonus: 0 },
+  { id: 'fundador-palkia', nome: 'Palkia Founder', conquista: '', origem: 'Pacote Palkia Founder', bonus: 0.02 },
+  { id: 'fundador-dialga', nome: 'Dialga Founder', conquista: '', origem: 'Pacote Dialga Founder', bonus: 0.03 },
+  { id: 'fundador-giratina', nome: 'Giratina Founder', conquista: '', origem: 'Pacote Giratina Founder', bonus: 0.04 },
+  { id: 'passe-nov26', nome: 'Passe Premium Nov/26', conquista: '', origem: 'Passe de batalha de novembro/2026 (premium)', bonus: 0.02 },
 ];
 export const TITULOS: Titulo[] = [
   ...CONQUISTAS.flatMap((x) => (x.recompensa.tipo === 'titulo' ? [{ id: x.id, nome: x.recompensa.titulo, conquista: x.nome, bonus: BONUS_DO_TITULO[x.id] ?? 0 }] : [])),
