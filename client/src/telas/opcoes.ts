@@ -1,5 +1,6 @@
 // Aba Opções (barra do topo): perfil (nome fixo; trocar fica na tela do personagem), privacidade e convites, teto dos encontros, som e desempenho.
 // Liga/desliga são interruptores (checkbox com o visual de chave: apagado à esquerda, aceso à direita).
+import { abertoComoApp, aoMudarInstalacao, ehIos, instalar, podeInstalar } from '../instalar';
 import type { Tela } from '../main';
 import { carregarSave, salvar } from '../estado';
 import { nivelMaximoEncontro, nivelTreinador } from '../../../shared/treinador';
@@ -120,6 +121,7 @@ export const telaOpcoes: Tela = (raiz, navegar) => {
       el('div', { class: 'opcoes-campo' }, el('span', {}, 'Volume geral'), controleVolume('geral'), el('small', {}, 'O mesmo controle do canto da barra do topo.')),
       linhaInterruptor(semSom, 'Silenciar o jogo', 'O mesmo botão do canto da barra do topo.'),
     ),
+    secaoInstalar(secao),
     secao(
       'Desempenho',
       el('div', { class: 'opcoes-campo' },
@@ -142,4 +144,26 @@ function interruptor(ligado: boolean, aoMudar: (ligado: boolean) => void): HTMLI
 /** Linha clicável: interruptor + texto (+ explicação embaixo). */
 function linhaInterruptor(caixa: HTMLInputElement, texto: string, ajuda?: string): HTMLElement {
   return el('label', { class: 'opcoes-check' }, caixa, el('span', { class: 'opcoes-check-texto' }, texto, ajuda ? el('small', {}, ajuda) : null));
+}
+
+/** Instalar o jogo como app (PWA): ícone na tela inicial e tela cheia. */
+function secaoInstalar(secao: (titulo: string, ...filhos: (HTMLElement | null)[]) => HTMLElement): HTMLElement {
+  const conteudo = el('div', { class: 'opcoes-campo' });
+  const desenhar = () => {
+    if (abertoComoApp()) return conteudo.replaceChildren(el('span', {}, '✅ Você está jogando pelo app instalado.'));
+    if (podeInstalar())
+      return conteudo.replaceChildren(
+        el('button', { class: 'botao', onclick: () => void instalar().then(desenhar) }, '📲 Instalar o jogo'),
+        el('small', {}, 'O PokeOrigins vai para a tela inicial do aparelho, com ícone próprio, e abre em tela cheia, sem a barra do navegador. Continua precisando de internet.'),
+      );
+    conteudo.replaceChildren(
+      el('span', {}, 'Instalar o jogo'),
+      el('small', {}, ehIos()
+        ? 'No iPhone/iPad: abra o jogo no Safari, toque em Compartilhar (o quadrado com a seta) e depois em "Adicionar à Tela de Início".'
+        : 'No celular Android: abra o menu do navegador (⋮) e toque em "Instalar app" ou "Adicionar à tela inicial". No computador (Chrome ou Edge): clique no ícone de instalar na barra de endereço.'),
+    );
+  };
+  desenhar();
+  aoMudarInstalacao(desenhar);
+  return secao('App', conteudo);
 }

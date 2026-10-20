@@ -4,9 +4,15 @@
 import type { EventoBatalha, Pedido } from '../../../shared/batalha/motor';
 import type { FotoPvp } from '../../../shared/batalha/pvp';
 import { api } from '../conta';
+import { confirmar } from '../ui/confirmar';
 
-/** `retomada`: a página foi recarregada no meio da batalha; `eventos` traz tudo desde o começo. */
-export interface TurnoPvp { id: number; eventos: EventoBatalha[]; foto: FotoPvp; prazo: number; tempo: number; retomada?: boolean }
+const NOME_ESPECIAL = { z: 'Z-Move', tera: 'Terastal', mega: 'Mega Evolução' };
+
+/**
+ * `retomada`: a página foi recarregada no meio da batalha; `eventos` traz tudo desde o começo. `umaMecanica`: só uma
+ * mecânica especial por partida (ranqueado); `mecanicaUsada` = a que já foi usada (ao voltar depois de recarregar).
+ */
+export interface TurnoPvp { id: number; eventos: EventoBatalha[]; foto: FotoPvp; prazo: number; tempo: number; retomada?: boolean; umaMecanica?: boolean; mecanicaUsada?: 'z' | 'tera' | 'mega' | null }
 
 export class BatalhaRemota {
   private foto: FotoPvp;
@@ -19,10 +25,13 @@ export class BatalhaRemota {
   /** Turno que chegou sem ninguém esperando (o outro desistiu, o tempo acabou): a tela toca e volta ao menu. */
   aoTurnoSolto: ((eventos: EventoBatalha[]) => void) | null = null;
   readonly participantes = new Set<number>();
+  /** Mecânica especial já usada nesta partida (regra "uma só" do ranqueado). */
+  private mecanicaUsada: 'z' | 'tera' | 'mega' | null;
 
   constructor(readonly id: number, private inicio: TurnoPvp) {
     this.foto = inicio.foto;
     this.tempo = inicio.tempo;
+    this.mecanicaUsada = inicio.mecanicaUsada ?? null;
     this.prazo = this.acertarPrazo(inicio.prazo);
   }
   // o prazo vem no relógio do servidor; o tempo que falta é o que importa
@@ -67,8 +76,16 @@ export class BatalhaRemota {
   get retomada(): boolean {
     return !!this.inicio.retomada;
   }
-  usarGolpe(indice: number, especial: 'z' | 'tera' | 'mega' | 'dynamax' | null = null): Promise<EventoBatalha[]> {
-    return this.mandar('/pvp/escolha', { escolha: { tipo: 'golpe', indice, especial } });
+  async usarGolpe(indice: number, especial: 'z' | 'tera' | 'mega' | 'dynamax' | null = null): Promise<EventoBatalha[]> {
+    const nova = especial && especial !== 'dynamax' ? especial : null;
+    // ranqueado: uma mecânica só; a segunda diferente perde a partida (o servidor decide; aqui só avisa antes)
+    if (this.inicio.umaMecanica && nova && this.mecanicaUsada && nova !== this.mecanicaUsada) {
+      const ok = await confirmar('Uma mecânica só', `Você já usou ${NOME_ESPECIAL[this.mecanicaUsada]} nesta partida. Usar ${NOME_ESPECIAL[nova]} também faz você PERDER a partida. Usar mesmo assim?`);
+      if (!ok) throw new Error('Escolha outro golpe.');
+    }
+    const eventos = await this.mandar('/pvp/escolha', { escolha: { tipo: 'golpe', indice, especial } });
+    if (nova) this.mecanicaUsada ??= nova;
+    return eventos;
   }
   trocar(posicao: number): Promise<EventoBatalha[]> {
     return this.mandar('/pvp/escolha', { escolha: { tipo: 'troca', posicao } });

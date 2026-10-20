@@ -15,8 +15,11 @@ import { BrilhoShiny, BrilhoSkin } from './brilhoSkin';
 import { DIRECAO_PMD, carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
 import { garantirTexturaLpc, OutrosJogadores, texturaDaAura } from './outrosJogadores';
 import { digitando } from '../ui/digitando';
+import { SeloEloNoMapa } from './eloNoMapa';
+import { aoMudarMeuElo, meuElo } from '../eloMapa';
 import { entrarNaSala, moverOnline, sairDaSalaOnline, visualOnline, type DirecaoOnline, type JogadorOnline, type VisualOnline } from '../online';
 import { tr } from '../idioma';
+import { Joystick } from './joystick';
 
 /** Tamanho da tela do jogo em pixels (a câmera mostra 40×27 tiles ampliados 1,5×). */
 export const LARGURA_TELA = 960;
@@ -148,6 +151,8 @@ export class BiomaScene extends Phaser.Scene {
   private sombraSeguidor!: Phaser.GameObjects.Ellipse;
   /** nome de treinador em cima da cabeça */
   private nomeJogador: Phaser.GameObjects.Text | null = null;
+  /** símbolo do elo do PvP ranqueado à esquerda do nome */
+  private seloElo: SeloEloNoMapa | null = null;
   private pos = { x: 0, y: 0 };
   private posSeguidor = { x: 0, y: 0 };
   private dadosSeguidor: Seguidor | null = null;
@@ -170,6 +175,8 @@ export class BiomaScene extends Phaser.Scene {
   private passos = 0;
   private pausado = false;
   private direcaoPendente: [number, number] | undefined;
+  /** joystick de toque (celular): aparece onde o dedo encosta no chão */
+  private joystick?: Joystick;
   /** Andando sozinho até um lugar (clicou no nome ou no minimapa): os passos que faltam e o que fazer ao chegar. */
   private destino: { alvo: { x: number; y: number }; rota: [number, number][]; aoChegar: () => void; desvios: number } | undefined;
   private setas!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -297,7 +304,12 @@ export class BiomaScene extends Phaser.Scene {
       // o jogo usa filtro "pixel art" (NEAREST): no texto isso deixa as letras serrilhadas, então suaviza
       this.nomeJogador.texture.setFilter(Phaser.Textures.FilterMode.LINEAR);
       this.ajustarNome();
-    }
+      const selo = new SeloEloNoMapa(this, this.nomeJogador);
+      this.seloElo = selo;
+      selo.definir(meuElo());
+      const parar = aoMudarMeuElo((e) => selo.definir(e));
+      this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => (parar(), selo.destruir(), this.seloElo === selo && (this.seloElo = null)));
+    } else this.seloElo = null;
     this.opcoes.personagem?.folhas.then((f) => this.usarPersonagemLpc(this.opcoes.personagem!.chave, f));
     if (paleta.submerso) this.efeitosSubmersos();
     if (paleta.nevado) this.efeitosDeNeve();
@@ -317,6 +329,7 @@ export class BiomaScene extends Phaser.Scene {
       if (direcao) this.direcaoPendente = direcao;
     };
     teclado.on('keydown', aoTeclar);
+    this.joystick = new Joystick(this, (d) => ((this.direcaoPendente = d), (this.destino = undefined)), () => !this.pausado && !digitando());
     // escrevendo num campo (chat): o Phaser para de "segurar" setas e espaço, senão não dá para usar no texto
     const aoFocar = () => (digitando() ? teclado.disableGlobalCapture() : teclado.enableGlobalCapture());
     const aoDesfocar = () => setTimeout(aoFocar);
@@ -707,6 +720,7 @@ export class BiomaScene extends Phaser.Scene {
   }
 
   pausar(pausado: boolean) {
+    if (pausado) this.joystick?.soltar();
     this.pausado = pausado;
   }
 
@@ -727,7 +741,8 @@ export class BiomaScene extends Phaser.Scene {
     }
     const { setas, wasd } = this;
     let direcao: [number, number] | undefined;
-    if (setas.left.isDown || wasd.A.isDown) direcao = [-1, 0];
+    if (this.joystick?.direcao) direcao = this.joystick.direcao;
+    else if (setas.left.isDown || wasd.A.isDown) direcao = [-1, 0];
     else if (setas.right.isDown || wasd.D.isDown) direcao = [1, 0];
     else if (setas.up.isDown || wasd.W.isDown) direcao = [0, -1];
     else if (setas.down.isDown || wasd.S.isDown) direcao = [0, 1];
@@ -922,6 +937,7 @@ export class BiomaScene extends Phaser.Scene {
     // nome acima da cabeça (o personagem LPC tem ~30 px de altura no mundo)
     // mesma posição do personagem (sem arredondar à parte, senão treme ao andar)
     this.nomeJogador?.setPosition(this.jogador.x, this.jogador.y - (this.lpc ? 25 : 18));
+    this.seloElo?.posicionar();
     const largura = this.pmd ? Math.max(8, this.pmd.largura * ESCALA_PMD * 0.75) : Math.max(8, this.imgSeguidor.displayWidth * 0.45);
     this.sombraSeguidor
       .setPosition(this.seguidor.x, this.seguidor.y - 1)

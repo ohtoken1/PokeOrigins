@@ -99,7 +99,8 @@ export const GUIA: GrupoGuia[] = [
         '• Em Opções você escolhe se aceita convites de duelo.',
       ] },
       { id: 'loja', emoji: '🛒', titulo: 'Pokémarket e Bolsa', texto: [
-        'O Pokémarket da cidade vende Pokébolas, remédios, itens de evolução, itens de batalha, TMs/TRs e Mega Stones. VIP paga 20% menos.',
+        'O Pokémarket da cidade vende Pokébolas, remédios, itens de evolução, itens de batalha e TMs/TRs. VIP paga 20% menos.',
+        'Loja do dia (aba do Pokémarket): 4 Mega Stones e 1 Z-Crystal sorteados todo dia à meia-noite (horário de Brasília), cada um por 300 Origin Coins. As Mega Stones também ficam nas lojas da Liga (janela da Liga Pokémon): as das Megas RU e UU na Loja da Liga (League Coins) e as das Megas OU e Ubers na Loja Nightmare (League Coins Nightmare).',
         'Na Bolsa você usa, equipa ou abre os itens. Itens de segurar vão para a batalha com o Pokémon.',
       ] },
       { id: 'pc', emoji: '💻', titulo: 'PC', texto: [
@@ -132,6 +133,7 @@ export const GUIA: GrupoGuia[] = [
         '• A guilda ganha XP quando os membros derrotam ou capturam selvagens e vencem treinadores.',
         '• Cada nível (até o 10) dá bônus para todos os membros: shiny, raros, XP e Poké Dólares.',
         '• A guilda tem chat próprio e bandeira personalizada.',
+        '• Loja da guilda (botão na tela da guilda): paga em Pontos de guilda, ganhos no Boss da guilda. A loja é a mesma para todos e troca todo mês; os limites de compra zeram no dia 1º. Tem o inicial do mês (20 pontos, 1 por mês), Mint aleatória (6, até 5), Charm aleatório (5, até 10) e packs de 10 Pokébolas da Artesã (1 ponto, até 10 de cada).',
       ] },
       { id: 'amigos', emoji: '👥', titulo: 'Amigos e chat', texto: [
         'Em Comunidade → Amigos você adiciona jogadores e conversa em particular.',
@@ -140,6 +142,12 @@ export const GUIA: GrupoGuia[] = [
       { id: 'correio', emoji: '✉️', titulo: 'Correio', texto: [
         'Prêmios de eventos, presentes e avisos da equipe chegam como cartas no envelope do cabeçalho.',
         'Os anexos só entram na sua conta quando você clica em Resgatar. Se o PC estiver cheio, nada muda até você abrir espaço.',
+      ] },
+      { id: 'login', trancas: [{ conteudo: 'loginBoasVindas', rotulo: 'Boas-vindas' }, { conteudo: 'loginTrinta', rotulo: '30 dias' }], emoji: '🎁', titulo: 'Recompensas de login', texto: [
+        'Prêmios só por entrar no jogo. Acompanhe em Minha conta → Recompensas; os prêmios chegam pelo Correio e são todos NT.',
+        '• Login de boas-vindas: nos 7 primeiros dias da sua conta, cada dia em que você entra vale o prêmio seguinte da lista.',
+        '• Login dos 30 dias: nos 30 primeiros dias do servidor, cada dia tem o seu prêmio. Entrou naquele dia, ganha; não entrou, perde.',
+        '• VIP recupera até 3 dias perdidos do login dos 30 dias.',
       ] },
       { id: 'quadro', emoji: '📋', titulo: 'Quadro de missões', texto: [
         'A cada 2 horas entram 2 missões novas, e cada uma fica 12 horas no quadro. A missão pede um Pokémon de certa espécie com Nature, IV e qualidade específicos.',
@@ -229,8 +237,8 @@ export const GUIA: GrupoGuia[] = [
       { id: 'boss', trancas: [{ conteudo: 'boss' }], emoji: '👹', titulo: 'Boss global e Boss da guilda', texto: [
         'A equipe solta um Boss nível 200 na gaiola da cidade por 2 horas. Abre no treinador nível 13. Cada jogador luta UMA vez, por até 50 turnos.',
         '• Vale o dano direto que você causar.',
-        '• Boss global: os 3 que mais causaram dano ganham prêmios.',
-        '• Boss da guilda: soma o dano por guilda; os membros das 3 melhores ganham pontos de guilda.',
+        '• Boss global: todos que lutaram ganham. 1º: Chave Temporal + 500 mil Poké Dólares + 50 Origin Coins; 2º: 5 Fragmentos Temporais + 300 mil + 30 Origin Coins; 3º: 2 Fragmentos + 200 mil + 20 Origin Coins; 4º ao 10º: 100 mil; os outros: 50 mil.',
+        '• Boss da guilda: soma o dano por guilda. Todo membro que lutou ganha 1 Ponto de guilda, mais 15 / 10 / 5 se a guilda ficou em 1º / 2º / 3º, ou mais 1 do 4º ao 10º.',
       ] },
       { id: 'torneio', trancas: [{ conteudo: 'torneio' }], emoji: '🏟️', titulo: 'Torneio', texto: [
         'Dois por dia, às 12h30 e às 18h30 (horário de Brasília). Abre no treinador nível 10.',
@@ -239,11 +247,23 @@ export const GUIA: GrupoGuia[] = [
         '• Chaveamento até a final, com disputa de 3º lugar. Batalhas no servidor.',
         '• Prêmios para os 3 primeiros, com medalhas e a Roleta do Torneio para o campeão.',
       ] },
+      { id: 'ranqueado', emoji: '⚔️', titulo: 'PvP Ranqueado', texto: [
+        'Na Arena da cidade. A fila abre duas vezes por dia, às 14h e às 21h (horário de Brasília), por 1 hora cada. Dá para jogar quantas partidas quiser nesse tempo; a batalha que começou pode passar do horário.',
+        '• Cada tier tem o seu elo: Ubers, OU, UU e RU.',
+        '• Elos: Poké Ball, Great Ball e Ultra Ball (3 divisões cada, de III até I, 100 pontos por divisão), Beast Ball (pontos corridos) e Master Ball.',
+        '• Master Ball: só 3 vagas por tier, para os 3 com mais pontos da Beast Ball. Passou os pontos de um Master, toma o lugar dele.',
+        '• A busca começa só na sua divisão e, a cada 30 segundos sem achar ninguém, abre mais uma divisão para cada lado.',
+        '• Mesma divisão: vitória +20 pontos, derrota −15. Para cada divisão que o adversário está acima de você, +2 na vitória e −2 na derrota (abaixo de você, o contrário). Empate não muda nada.',
+        '• Time de 6, sem espécie nem item repetido, Sleep Clause, 60 s por turno. Batalhas no servidor.',
+        '• Mega Evolução, Z-Move e Terastal valem, mas só UMA delas por partida: usar uma segunda diferente = derrota.',
+        'Seu elo aparece no seu perfil (escolha a tier) e em Comunidade → Ranking → PvP Ranqueado.',
+      ] },
       { id: 'liga', trancas: [{ conteudo: 'liga' }], emoji: '👑', titulo: 'Liga Pokémon', texto: [
         'Abre no treinador nível 18, na Arena. Há duas Ligas:',
-        '• Normal: Elite 4 + Campeão (5 batalhas).',
+        '• Normal: Elite 4 (4 batalhas).',
         '• Nightmare: um treinador de cada tipo (18 batalhas).',
-        'O time NÃO é curado entre as batalhas (a Bolsa pode ser usada). Uma tentativa por semana em cada Liga; a semana vira na segunda-feira. Quem vence ganha Poké Dólares e League Coins.',
+        'O desafio é feito de uma vez: seu time de 6 fica travado do começo ao fim e não é curado (só remédios entre as batalhas, na janela da Liga). As batalhas são em sequência: depois de cada vitória, a próxima começa sozinha em 3 minutos. 180 s por turno; se sair do jogo, a batalha continua e o tempo corre (acabou o tempo, perdeu).',
+        'Uma tentativa por semana em cada Liga; a semana vira na segunda-feira. Cada treinador vencido dá 1 League Coin (Nightmare: 1 League Coin Nightmare), mesmo que você perca depois; tudo chega numa carta só no fim do desafio. Vencendo todos: +6 League Coins (total 10) ou +12 League Coins Nightmare (total 30), mais Poké Dólares. As moedas compram itens nas lojas da Liga: Mega Stones, Mints, Ability Capsule/Patch, Charms, ovos, Z-Crystals e Fragmentos (Liga) e Seletores, ovos lendários, Master Ball, Chave Temporal, Destiny Knot, itens de forma e o título Mestre Nightmare (Nightmare).',
       ] },
     ],
   },

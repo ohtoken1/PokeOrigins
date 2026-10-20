@@ -182,12 +182,14 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         { class: 'barra' },
         el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'regiao' }) }, '← Voltar'),
         el('h1', {}, `${bioma.nome}`, el('small', {}, ` · ${regiao.nome}`)),
+        // no PC a caixinha flutua solta (position: fixed); no celular vira uma fileira aqui, entre o nome e o contador
+        atalhosBiomas(bioma.id, (id) => navegar({ tela: 'bioma', biomaId: id })),
         contador,
       ),
       el(
         'div',
         { class: 'layout-bioma' },
-        el('section', {}, atalhosBiomas(bioma.id, (id) => navegar({ tela: 'bioma', biomaId: id })), areaJogo),
+        el('section', {}, areaJogo),
         el('aside', {}, caixaTime, chat.elemento),
       ),
     ),

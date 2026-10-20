@@ -206,6 +206,8 @@ export const TITULOS_EXTRAS: Titulo[] = [
   { id: 'fundador-dialga', nome: 'Dialga Founder', conquista: '', origem: 'Pacote Dialga Founder', bonus: 0.03 },
   { id: 'fundador-giratina', nome: 'Giratina Founder', conquista: '', origem: 'Pacote Giratina Founder', bonus: 0.04 },
   { id: 'passe-nov26', nome: 'Passe Premium Nov/26', conquista: '', origem: 'Passe de batalha de novembro/2026 (premium)', bonus: 0.02 },
+  // comprado na Loja da Liga Nightmare (pedido do dono, 20/10/2026)
+  { id: 'mestre-nightmare', nome: 'Mestre Nightmare', conquista: '', origem: 'Loja da Liga Nightmare', bonus: 0.05 },
 ];
 export const TITULOS: Titulo[] = [
   ...CONQUISTAS.flatMap((x) => (x.recompensa.tipo === 'titulo' ? [{ id: x.id, nome: x.recompensa.titulo, conquista: x.nome, bonus: BONUS_DO_TITULO[x.id] ?? 0 }] : [])),

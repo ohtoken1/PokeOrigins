@@ -17,6 +17,7 @@ import { balaoTitulo } from '../ui/titulo';
 import { enquadrarPersonagem } from '../personagem/enquadrar';
 import { abrirJanela } from '../ui/janela';
 import { api, ErroApi } from '../conta';
+import { painelEloDoPerfil, type ElosDoJogador } from '../ui/ranqueado';
 import { icone } from '../ui/icones';
 import { desenharBandeira } from '../ui/bandeira';
 import { meuCla, NOME_CARGO, type Cargo, type ResumoCla } from '../cla';
@@ -28,6 +29,8 @@ export interface PerfilPublico {
   usuario: string;
   online: boolean;
   cla: (ResumoCla & { cargo: Cargo }) | null;
+  /** elo nos 4 formatos do PvP ranqueado */
+  ranqueado?: ElosDoJogador;
   perfil: Pick<Save, 'aparencia' | 'regiao' | 'xpTreinador' | 'criadoEm' | 'insignias' | 'vistos' | 'capturados' | 'estatisticas' | 'skinVisual'> & {
     mostrarTime: boolean;
     time: { especieId: number; nivel: number; shiny: boolean }[];
@@ -51,7 +54,7 @@ export async function abrirPerfilDe(usuario: string): Promise<void> {
 /** Perfil de outro jogador: o mesmo desenho, com o time só para ver (sem abrir a ficha) e escondido se ele quiser. */
 function perfilRemoto(r: PerfilPublico): HTMLElement {
   const save = { ...r.perfil, time: r.perfil.time } as unknown as Save;
-  return perfilJogador(save, { online: r.online, remoto: true, timeEscondido: !r.perfil.mostrarTime, cla: r.cla, titulo: r.perfil.titulo ?? null, selos: r.perfil.selos ?? [] });
+  return perfilJogador(save, { online: r.online, remoto: true, timeEscondido: !r.perfil.mostrarTime, cla: r.cla, titulo: r.perfil.titulo ?? null, selos: r.perfil.selos ?? [], ranqueado: r.ranqueado ?? null });
 }
 
 /** Medalha de torneio desenhada por código (fita + disco) com a quantidade do lado. */
@@ -106,7 +109,7 @@ function painelInsignias(save: Save): HTMLElement {
   return el('div', {}, seletor, lista);
 }
 
-export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: boolean; timeEscondido?: boolean; cla?: PerfilPublico['cla']; titulo?: string | null; selos?: string[] } = {}): HTMLElement {
+export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: boolean; timeEscondido?: boolean; cla?: PerfilPublico['cla']; titulo?: string | null; selos?: string[]; ranqueado?: ElosDoJogador | null } = {}): HTMLElement {
   const e = save.estatisticas;
   // o próprio perfil está sempre online (é quem está jogando)
   const online = opcoes.online ?? save === carregarSave();
@@ -144,8 +147,8 @@ export function perfilJogador(save: Save, opcoes: { online?: boolean; remoto?: b
       el('div', { class: 'perfil-info' },
         el('div', {}, icone('mapa'), el('span', {}, 'Região:'), regiaoPorId(save.regiao)?.nome ?? save.regiao),
         el('div', {}, icone('calendario'), el('span', {}, 'Treinador desde:'), desde)),
-      el('div', { class: 'perfil-pvp', title: 'O PvP ranqueado ainda vai ser feito' },
-        el('small', {}, 'PvP ranqueado'), el('strong', {}, 'Sem classificação'), el('span', { class: 'selo-em-breve' }, 'Em breve'))),
+      // elo do PvP ranqueado, com a escolha da tier (o meu vem do servidor; o de outro já veio no perfil)
+      painelEloDoPerfil(opcoes.remoto ? (opcoes.ranqueado ?? null) : 'meu')),
     // direita: números, medalhas, insígnias e time
     el('div', { class: 'perfil-direita' },
       el('div', { class: 'perfil-numeros' },

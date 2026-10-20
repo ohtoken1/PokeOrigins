@@ -1,5 +1,6 @@
-import { CATALOGO, CATEGORIAS, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
-import { salvar, type Save } from '../estado';
+import { CATALOGO, CATEGORIAS, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
+import { adotarSaveDoServidor, salvar, salvarAgora, type Save } from '../estado';
+import { api, ErroApi } from '../conta';
 import { bonusVip, vipAtivo } from '../../../shared/vip';
 import { abrirJanela } from './janela';
 import { el } from './dom';
@@ -12,10 +13,17 @@ const MAXIMO_POR_COMPRA = 999;
 /**
  * Loja em três colunas (modelo aprovado pelo dono): seções à esquerda, vitrine no meio (só imagem, nome e preço) e,
  * à direita, o painel do item clicado, com a descrição, a caixa de quantidade, o total e o Comprar. Com busca.
- * Paga em silver (Mega Stones em gold).
+ * Paga em silver. A aba "Loja do dia" (pedido do dono) mostra a rotação sorteada pelo servidor à meia-noite
+ * (4 Mega Stones + 1 Z-Crystal, em Origin Coins) e a compra dela é feita NO SERVIDOR (server/src/lojas.ts).
  */
+/** Dados da Loja do dia (GET /api/lojas). */
+interface LojaDoDia { doDia: { id: string; preco: number }[]; trocaEm: number; agora: number }
+const MAXIMO_DO_DIA = 99;
+type ItemDoDia = ItemLoja & { doDia?: true };
 export function abrirLoja(save: Save, aoMudar: () => void): void {
-  let categoria: CategoriaLoja = 'bolas';
+  let categoria: CategoriaLoja | 'dia' = 'dia';
+  let doDia: LojaDoDia | null = null;
+  let erroDoDia = '';
   let busca = '';
   let escolhido: ItemLoja | null = null;
   let quantidade = 1;
@@ -42,7 +50,24 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
   const textoFinal = (item: ItemLoja, quantos: number) => `${numero(precoFinal(item, quantos))} ${nomeDaMoeda(item.moeda, precoFinal(item, quantos))}`;
   const comDesconto = (item: ItemLoja) => vipAtivo(save) && item.moeda !== 'gold';
 
-  const comprar = (item: ItemLoja, quantos: number) => {
+  /** Compra da Loja do dia: o servidor confere a rotação e o saldo e devolve o save. */
+  const comprarDoDia = async (item: ItemLoja, quantos: number) => {
+    try {
+      await salvarAgora();
+      const r = await api<{ save: Save; versao: number; texto: string }>('POST', '/lojas/comprar', { loja: 'dia', item: item.id, quantidade: quantos });
+      adotarSaveDoServidor(r.save, r.versao);
+      aoMudar();
+      aviso.textContent = r.texto;
+    } catch (e) {
+      aviso.textContent = e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.';
+    }
+    aviso.hidden = false;
+    atualizarSaldo();
+    desenharPainel();
+  };
+
+  const comprar = (item: ItemDoDia, quantos: number) => {
+    if (item.doDia) return void comprarDoDia(item, quantos);
     const custo = precoFinal(item, quantos);
     if (carteira(item) < custo) {
       aviso.textContent = `${item.moeda === 'gold' ? 'Origin Coins insuficientes' : 'Poké Dólares insuficientes'} para ${quantos}× ${item.nome}.`;
@@ -61,6 +86,16 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
 
   function desenharAbas() {
     abas.replaceChildren(
+      el('button', {
+        class: `mercado-secao mercado-secao-dia ${!busca && categoria === 'dia' ? 'ativa' : ''}`,
+        onclick: () => {
+          categoria = 'dia';
+          busca = '';
+          campoBusca.value = '';
+          desenharAbas();
+          desenharVitrine(true);
+        },
+      }, '⭐ Loja do dia'),
       ...CATEGORIAS.map((c) =>
         el(
           'button',
@@ -95,7 +130,7 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
       botao.disabled = carteira(item) < precoFinal(item, quantidade);
     };
     const definir = (n: number, escrever: boolean) => {
-      quantidade = Math.min(MAXIMO_POR_COMPRA, Math.max(1, Math.floor(n) || 1));
+      quantidade = Math.min((item as ItemDoDia).doDia ? MAXIMO_DO_DIA : MAXIMO_POR_COMPRA, Math.max(1, Math.floor(n) || 1));
       if (escrever) campo.value = String(quantidade);
       atualizar();
     };
@@ -129,8 +164,32 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
   };
 
   /** A vitrine da seção (ou da busca). `trocar`: escolhe o primeiro item da lista nova. */
+  /** Os itens da rotação de hoje, com o preço em Origin Coins (o servidor manda a lista). */
+  const itensDoDia = (): ItemDoDia[] =>
+    (doDia?.doDia ?? []).flatMap(({ id, preco }) => {
+      const i = itemDaLoja(id);
+      return i ? [{ ...i, preco, moeda: 'gold' as const, doDia: true as const }] : [];
+    });
+  const textoTroca = () => {
+    if (!doDia) return erroDoDia || 'Carregando a Loja do dia…';
+    const min = Math.max(1, Math.ceil((doDia.trocaEm - doDia.agora) / 60_000));
+    return `Itens sorteados à meia-noite (horário de Brasília). Os de hoje trocam em ${Math.floor(min / 60)} h ${min % 60} min.`;
+  };
+
   function desenharVitrine(trocar: boolean) {
     const termo = busca.trim().toLowerCase();
+    if (!termo && categoria === 'dia') {
+      const lista = itensDoDia();
+      vitrine.replaceChildren(
+        el('p', { class: 'mercado-vazio mercado-dia-aviso' }, textoTroca()),
+        ...lista.map((item) =>
+          el('button', { class: 'mercado-item', 'data-id': item.id, title: item.nome, onclick: () => escolher(item) },
+            el('span', { class: 'mercado-icone' }, iconeItem(item)),
+            el('span', { class: 'mercado-nome' }, item.nome),
+            el('span', { class: 'mercado-preco' }, moeda(item), numero(item.preco)))));
+      escolher(trocar || !escolhido || !lista.some((i) => i.id === escolhido!.id) ? (lista[0] ?? null) : escolhido);
+      return;
+    }
     const itens = termo
       ? CATALOGO.filter((i) => i.nome.toLowerCase().includes(termo) || i.descricao.toLowerCase().includes(termo))
       : CATALOGO.filter((i) => (i.abaDaLoja ?? i.categoria) === categoria);
@@ -161,6 +220,9 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
   atualizarSaldo();
   desenharAbas();
   desenharVitrine(true);
+  api<LojaDoDia>('GET', '/lojas').then((r) => (doDia = r), () => (erroDoDia = 'Sem conexão com o servidor: a Loja do dia não carregou.')).finally(() => {
+    if (categoria === 'dia' && !busca) desenharVitrine(true);
+  });
   abrirJanela(
     'Loja',
     () =>

@@ -1,4 +1,4 @@
-// Administração → Liga (pedido do dono): a staff monta os times da Liga Pokémon (Elite 4 + Campeão) e da Liga Nightmare
+// Administração → Liga (pedido do dono): a staff monta os times da Liga Pokémon (Elite 4) e da Liga Nightmare
 // (um treinador por tipo) sem precisar de programador, para balancear na hora. Cada mudança já vai para o servidor
 // (server/src/liga.ts); vale para a próxima batalha que alguém começar.
 import { ETAPAS_LIGA, NIVEL_MAXIMO_LIGA, NOME_LIGA, POKEMON_POR_TIME_LIGA, type TipoLiga } from '../../../shared/liga';

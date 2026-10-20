@@ -5,7 +5,7 @@ import { TIPOS_DOS_CHARMS, idCharm, nomeCharm } from './charms';
 import { CORES_DOS_APRICORNS, TIPOS_DAS_ENERGIAS, idApricorn, idEnergia, nomeApricorn, nomeEnergia } from './materiais';
 import { BONUS_SKIN, BONUS_SKIN_SHINY, SKINS_ESPECIAIS, TEXTO_ORIGEM_SKIN, textoBonusSkin } from './skins';
 
-export type CategoriaCustom = 'skins' | 'chave' | 'cubos' | 'charms' | 'evolucao' | 'formas' | 'materiais' | 'tickets';
+export type CategoriaCustom = 'skins' | 'chave' | 'cubos' | 'charms' | 'evolucao' | 'formas' | 'materiais' | 'tickets' | 'mints';
 /** De onde vem o Pokémon do cubo: do passado, do futuro ou lendário (Koraidon e Miraidon). */
 export type EraCubo = 'passado' | 'futuro' | 'lendario';
 
@@ -148,8 +148,15 @@ export const SELETORES_ORB: { id: string; nome: string; orbs: string[] }[] = [
   { id: 'seletor-orb-3', nome: 'Seletor de Orb 3', orbs: ['ticket-kyogre', 'ticket-groudon', 'ticket-giratina', 'ticket-hoopa', 'ticket-dialga', 'ticket-palkia', 'ticket-therian', 'ticket-kyurem', 'ticket-zacian', 'ticket-zamazenta', 'ticket-ogerpon'] },
 ];
 export const seletorDeOrb = (id: string) => SELETORES_ORB.find((s) => s.id === id);
+/** Seletores de Mint e de Charm (Loja da Liga Nightmare): usados pela bolsa, o jogador escolhe 1 Mint / 1 Charm. */
+export const SELETORES_ITEM: { id: string; nome: string; categoria: 'mints' | 'charms'; descricao: string }[] = [
+  { id: 'seletor-mint', nome: 'Seletor de Mint', categoria: 'mints', descricao: 'Use pela bolsa e escolha 1 Mint (qualquer Nature).' },
+  { id: 'seletor-charm', nome: 'Seletor de Charm', categoria: 'charms', descricao: 'Use pela bolsa e escolha 1 Charm (qualquer tipo).' },
+];
+export const seletorDeItem = (id: string) => SELETORES_ITEM.find((s) => s.id === id);
 
 export const ITENS_CUSTOM: ItemCustom[] = [
+  ...SELETORES_ITEM.map((s): ItemCustom => ({ id: s.id, nome: s.nome, categoria: s.categoria, simbolo: s.categoria === 'mints' ? '🌿' : '✨', descricao: s.descricao })),
   ...SELETORES_ORB.map((s): ItemCustom => ({ id: s.id, nome: s.nome, categoria: 'tickets', simbolo: '🔮', descricao: `Use pela bolsa e escolha 1 Orb entre: ${s.orbs.map((o) => o.slice(7).replace(/^./, (c) => c.toUpperCase())).join(', ')}.` })),
   ...SKINS_ESPECIAIS.map((s): ItemCustom => ({ id: s.id, nome: s.nome, categoria: 'skins', simbolo: s.simbolo, descricao: `${TEXTO_ORIGEM_SKIN[s.origem]}. Bônus ao escolher como skin de bônus: ${textoBonusSkin(s.bonus)}.` })),
   // materiais de craft (o sistema de craft vem depois)

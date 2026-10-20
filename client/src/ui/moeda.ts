@@ -3,5 +3,9 @@
 import { nomeDaMoeda, type Moeda } from '../../../shared/moedas';
 import { el } from './dom';
 
-export const valorEmMoeda = (moeda: Moeda, valor: number): HTMLElement =>
-  el('span', { class: 'banco-moeda', title: `${valor.toLocaleString('pt-BR')} ${nomeDaMoeda(moeda, valor)}` }, el('span', { class: `icone-moeda moeda-${moeda}` }), el('strong', {}, valor.toLocaleString('pt-BR')));
+/** Moedas da Liga (saldos do save): desenho próprio, nome fixo. */
+const NOMES_LIGA: Record<string, string> = { leagueCoins: 'League Coins', leagueCoinsNightmare: 'League Coins Nightmare' };
+export type MoedaComDesenho = Moeda | 'leagueCoins' | 'leagueCoinsNightmare';
+
+export const valorEmMoeda = (moeda: MoedaComDesenho, valor: number): HTMLElement =>
+  el('span', { class: 'banco-moeda', title: `${valor.toLocaleString('pt-BR')} ${NOMES_LIGA[moeda] ?? nomeDaMoeda(moeda, valor)}` }, el('span', { class: `icone-moeda moeda-${moeda}` }), el('strong', {}, valor.toLocaleString('pt-BR')));

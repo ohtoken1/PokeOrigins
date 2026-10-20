@@ -81,8 +81,30 @@ export const PREMIOS_BOSS_GLOBAL = [
   { item: 'fragmentos', nome: 'Fragmentos Temporais', quantidade: 5 },
   { item: 'fragmentos', nome: 'Fragmentos Temporais', quantidade: 2 },
 ];
-/** pontos de guilda para cada membro que lutou, nas 3 guildas que mais causaram dano (provisório: 1 para todas) */
-export const PONTOS_GUILDA_BOSS = 1;
+/**
+ * Prêmios do Boss global por posição no dano (pedido do dono, 20/10/2026), para TODO jogador que lutou:
+ * top 3 = item acima + 500k / 300k / 200k Poké Dólares + 50 / 30 / 20 Origin Coins; 4º ao 10º = 100k; o resto = 50k.
+ */
+export const SILVER_BOSS_GLOBAL = [500_000, 300_000, 200_000];
+export const SILVER_BOSS_GLOBAL_ATE_10 = 100_000;
+export const SILVER_BOSS_GLOBAL_PARTICIPAR = 50_000;
+export const GOLD_BOSS_GLOBAL = [50, 30, 20];
+export function premiosBossGlobal(posicao: number): { item: string; nome: string; quantidade: number }[] {
+  const silver = SILVER_BOSS_GLOBAL[posicao] ?? (posicao < 10 ? SILVER_BOSS_GLOBAL_ATE_10 : SILVER_BOSS_GLOBAL_PARTICIPAR);
+  return [
+    ...(PREMIOS_BOSS_GLOBAL[posicao] ? [PREMIOS_BOSS_GLOBAL[posicao]] : []),
+    { item: 'silver', nome: 'Poké Dólares', quantidade: silver },
+    ...(GOLD_BOSS_GLOBAL[posicao] ? [{ item: 'gold', nome: 'Origin Coins', quantidade: GOLD_BOSS_GLOBAL[posicao] }] : []),
+  ];
+}
+/**
+ * Pontos de guilda do Boss da guilda (pedido do dono, 20/10/2026), para cada membro que LUTOU: 1 só por participar,
+ * mais 15 / 10 / 5 se a guilda ficou em 1º / 2º / 3º no dano somado, ou mais 1 se ficou do 4º ao 10º.
+ */
+export const PONTOS_GUILDA_PARTICIPAR = 1;
+export const PONTOS_GUILDA_PODIO = [15, 10, 5];
+export const PONTOS_GUILDA_ATE_10 = 1;
+export const pontosGuildaDaPosicao = (posicao: number) => PONTOS_GUILDA_PARTICIPAR + (PONTOS_GUILDA_PODIO[posicao] ?? (posicao < 10 ? PONTOS_GUILDA_ATE_10 : 0));
 /** Golpes proibidos contra os bosses (lista aprovada pelo dono): tiram porcentagem da vida ou dano fixo. */
 export const GOLPES_PROIBIDOS_BOSS = [
   'toxic', 'willowisp', 'toxicspikes', 'poisonpowder', 'poisongas', 'toxicthread', 'destinybond', 'superfang', 'naturesmadness', 'ruination',

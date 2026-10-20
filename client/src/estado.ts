@@ -47,6 +47,9 @@ export interface Save {
   /** moedas da Liga (shared/liga.ts), recebidas por entrega; a loja delas vem depois */
   leagueCoins?: number;
   leagueCoinsNightmare?: number;
+  /** Pontos de guilda (Boss da guilda) e compras do mês na Loja da guilda: só o servidor muda */
+  pontosGuilda?: number;
+  lojaGuilda?: { mes: string; compras: Record<string, number> };
   passos: number;
   /** XP total do treinador (o nível sai de shared/treinador.ts). */
   xpTreinador: number;
@@ -112,6 +115,8 @@ export interface Save {
   creche?: { casais: CasalCreche<PokemonDoJogador>[]; chocando?: { pokemon: PokemonDoJogador; pronto: number }[] };
   /** títulos liberados fora das conquistas (passe de batalha…), ids de TITULOS_EXTRAS */
   titulosGanhos?: string[];
+  /** Luck Incense usado: até quando vale o +20% de Poké Dólares (ms) */
+  incensoAte?: number;
   /** Pacotes de compra única já comprados (ids de shared/doacao.ts; escrito pelo servidor). */
   pacotesComprados?: string[];
   /** Avisos do tutorial (Professor Carvalho) já mostrados: ids de conteúdo de shared/trancas.ts */

@@ -28,12 +28,12 @@ export const CATEGORIAS: { id: CategoriaLoja; nome: string }[] = [
   { id: 'evolucao', nome: 'Evolução' },
   { id: 'batalha', nome: 'Itens de batalha' },
   { id: 'up', nome: 'Up' },
-  { id: 'megapedras', nome: 'Mega Stones' },
   { id: 'tm', nome: 'TMs' },
   { id: 'tr', nome: 'TRs' },
 ];
 /** Categorias fora da loja (saem de tickets e, por enquanto, do Admin). */
 export const CATEGORIAS_FORA_DA_LOJA: { id: CategoriaLoja; nome: string }[] = [
+  { id: 'megapedras', nome: 'Mega Stones' },
   { id: 'mints', nome: 'Mints' },
   { id: 'frutas', nome: 'Berries' },
   { id: 'gems', nome: 'Gems' },
@@ -122,7 +122,7 @@ export const PRECOS: Record<string, number> = {
   powerweight: 50_000, powerbracer: 50_000, powerbelt: 50_000, powerlens: 50_000, powerband: 50_000, poweranklet: 50_000,
 };
 /** Itens da loja vendidos só por GOLD (decisão do dono), com o preço. As Mega Stones também são (PRECO_MEGA_STONE_GOLD). */
-export const PRECOS_EM_GOLD: Record<string, number> = { abilitycapsule: 50, abilitypatch: 100 };
+export const PRECOS_EM_GOLD: Record<string, number> = { abilitycapsule: 50, abilitypatch: 100, amuletcoin: 100 };
 /** Silver inicial (provisório). Silver só se ganha vencendo treinadores e ginásios; selvagens não dão (pedido do dono). */
 export const SILVER_INICIAL = 0;
 /**
@@ -149,9 +149,10 @@ export const TERASTALLIZER_BAND = 'terastallizerband';
 /** Dynamax Band: item de segurar; o Dynamax ainda não existe (o simulador da 9ª geração não tem). */
 export const DYNAMAX_BAND = 'dynamaxband';
 /** Nomes dos itens de segurar que não existem no Showdown (não vão para o simulador). */
-export const ITENS_DE_SEGURAR_NOSSOS: Record<string, string> = { [EXP_SHARE]: 'Exp. Share', [TERASTALLIZER_BAND]: 'Tera Orb', [DYNAMAX_BAND]: 'Dynamax Band', luckyegg: 'Lucky Egg', everstone: 'Everstone', amuletcoin: 'Amulet Coin', luckincense: 'Luck Incense' };
+export const ITENS_DE_SEGURAR_NOSSOS: Record<string, string> = { [EXP_SHARE]: 'Exp. Share', [TERASTALLIZER_BAND]: 'Tera Orb', [DYNAMAX_BAND]: 'Dynamax Band', luckyegg: 'Lucky Egg', everstone: 'Everstone', amuletcoin: 'Amulet Coin' };
 /** Descrições nossas para itens do Showdown cujo efeito no jogo é fora da batalha (EVs). */
 const DESCRICAO_DE_CAMPO: Record<string, string> = {
+  destinyknot: 'Segurado por um dos pais na Daycare: 5 IVs do filhote vêm dos pais (o sexto é sorteado). É gasto no ovo em que for usado.',
   wellspringmask: 'Usada na Ogerpon, ela vira a forma Wellspring Mask (Grass/Water). É gasta.',
   hearthflamemask: 'Usada na Ogerpon, ela vira a forma Hearthflame Mask (Grass/Fire). É gasta.',
   cornerstonemask: 'Usada na Ogerpon, ela vira a forma Cornerstone Mask (Grass/Rock). É gasta.',
@@ -210,9 +211,10 @@ function classificarItem(i: ReturnType<typeof Dex.items.get>): CategoriaLoja | n
   if (/^Evolves/.test(desc)) return 'evolucao';
   return 'batalha';
 }
-const NA_LOJA = new Set<CategoriaLoja>(['bolas', 'remedios', 'evolucao', 'batalha', 'up', 'megapedras', 'tm', 'tr']);
+// Mega Stones fora (pedido do dono, 20/10/2026): só na Loja do dia e na Loja da Liga (shared/lojasEspeciais.ts)
+const NA_LOJA = new Set<CategoriaLoja>(['bolas', 'remedios', 'evolucao', 'batalha', 'up', 'tm', 'tr']);
 /** Itens de categorias vendidas que ficam fora da loja (pedido do dono). */
-const FORA_DA_LOJA = new Set(['wellspringmask', 'hearthflamemask', 'cornerstonemask', 'amuletcoin', 'luckincense', 'destinyknot', 'healpowder', 'lavacookie', 'oldgateau', 'casteliacone', 'lumiosegalette', 'shaloursable', 'bigmalasada', 'ragecandybar']);
+const FORA_DA_LOJA = new Set(['wellspringmask', 'hearthflamemask', 'cornerstonemask', 'luckincense', 'destinyknot', 'healpowder', 'lavacookie', 'oldgateau', 'casteliacone', 'lumiosegalette', 'shaloursable', 'bigmalasada', 'ragecandybar']);
 /** Das 25 Pokébolas, a loja só vende estas (pedido do dono); as outras saem de tickets/Admin. */
 const BOLAS_NA_LOJA = new Set(['pokeball', 'greatball', 'ultraball']);
 
@@ -248,8 +250,8 @@ function montarCatalogo(): ItemLoja[] {
   // itens de segurar com efeito fora da batalha (shared/campo.ts); não existem no Showdown
   add({ id: 'luckyegg', nome: 'Lucky Egg', categoria: 'up', sprite: 'lucky-egg', descricao: 'Segurando, o Pokémon ganha 50% a mais de XP.' });
   add({ id: 'everstone', nome: 'Everstone', categoria: 'up', sprite: 'everstone', descricao: 'Segurando, o Pokémon não evolui por nível nem por amizade.' });
-  add({ id: 'amuletcoin', nome: 'Amulet Coin', categoria: 'batalha', sprite: 'amulet-coin', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de Poké Dólares. Não acumula com o Luck Incense.' });
-  add({ id: 'luckincense', nome: 'Luck Incense', categoria: 'batalha', sprite: 'luck-incense', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de Poké Dólares. Não acumula com a Amulet Coin.' });
+  add({ id: 'amuletcoin', nome: 'Amulet Coin', categoria: 'batalha', sprite: 'amulet-coin', descricao: 'Se quem segura entrar em campo, a batalha contra treinador ou ginásio dá 20% a mais de Poké Dólares.' });
+  add({ id: 'luckincense', nome: 'Luck Incense', categoria: 'batalha', sprite: 'luck-incense', descricao: 'Use pela bolsa: por 1 hora, as batalhas contra treinadores e ginásios dão 20% a mais de Poké Dólares. É gasto no uso.' });
   // abre uma box nova no PC (usado pela bolsa; regras em shared/pc.ts)
   add({ id: BOX_POKEMON, nome: 'Box Pokémon', categoria: 'up', imagem: 'itens/boxpokemon.svg', descricao: `Abre mais uma box no seu PC, com ${TAMANHO_BOX} lugares. Todo treinador começa com ${BOXES_INICIAIS} boxes e pode chegar a ${BOXES_MAXIMO}.` });
   // trocam a Ability (usados pela bolsa)
@@ -304,6 +306,9 @@ function montarCatalogo(): ItemLoja[] {
 /** Itens nossos (de `ITENS_CUSTOM`) que a loja vende (pedido do dono): preço, moeda e a aba onde aparecem. */
 const CUSTOM_NA_LOJA: Record<string, Pick<ItemLoja, 'preco' | 'moeda' | 'abaDaLoja'>> = {
   rotomcatalog: { preco: 50, moeda: 'gold', abaDaLoja: 'evolucao' },
+  // pedido do dono (20/10/2026): como as outras pedras de evolução
+  goldstone: { preco: 30_000, abaDaLoja: 'evolucao' },
+  peatblocksangrento: { preco: 30_000, abaDaLoja: 'evolucao' },
 };
 
 /** Todos os itens do jogo (Database, bolsa e Admin). */

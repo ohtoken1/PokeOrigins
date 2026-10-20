@@ -158,19 +158,8 @@ export const telaCidade: Tela = (raiz, navegar) => {
       navegar({ tela: 'regiao' });
     }
     else if (acao === 'arena')
-      abrirArena(navegar, () =>
-        abrirLiga(save!, (equipe, nome, titulo, aoFim) => {
-          cena()?.pausar(true);
-          abrirBatalha({
-            save: save!, bioma: biomaPorId('torre'), selvagem: equipe[0],
-            treinador: { nome, titulo, equipe, recompensa: 0, avisoFuga: 'Você fica fora da Liga até a semana que vem.' },
-            aoTerminar: (r) => {
-              cena()?.pausar(false);
-              atualizarTime();
-              aoFim(r === 'vitoria');
-            },
-          });
-        }));
+      // a Liga é calculada no servidor: a batalha abre sozinha (client/src/pvp.ts) e a janela volta no fim
+      abrirArena(navegar, () => abrirLiga(save!));
     else if (acao === 'banco' && !ehAdministrador()) avisar('Banco: fechado por enquanto.');
     else if (acao === 'banco') abrirBanco(save!, () => atualizarTime());
     else if (acao === 'mural') abrirMural();

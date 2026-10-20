@@ -13,7 +13,7 @@ import {
   PRECO_BILHETE, PREMIO_COFRE_MAX, agoraEmBrasilia, formatarBilhete, primeiroDoProximoMes,
   CHANCE_LENDARIO_NINHO, DURACAO_NINHO_MS, EXTRA_POR_DERROTA_MS, INTERVALO_NINHO_MS, LUTA_NINHO_MS, PRECO_NINHO, PRECO_NINHO_VIP, PREMIO_CAPTURA, ROLETA_NINHO,
   proximaMeiaNoite, slotDoNinho, sortearFatia,
-  DANO_MAXIMO_BOSS, DURACAO_BOSS_MS, NIVEL_BOSS, PONTOS_GUILDA_BOSS, PREMIOS_BOSS_GLOBAL,
+  DANO_MAXIMO_BOSS, DURACAO_BOSS_MS, NIVEL_BOSS, pontosGuildaDaPosicao, premiosBossGlobal,
 } from '../../shared/eventosRegras.ts';
 
 /** Nome de treinador (o que os outros veem), ou o usuário. */
@@ -490,19 +490,20 @@ export function conferirBoss(agora = Date.now()): void {
   banco.transacao(() => {
     b.premiado = true;
     if (b.tipo === 'global') {
-      rankingBoss(b).slice(0, 3).forEach((r, i) => {
-        if (r.dano <= 0) return;
-        const p = PREMIOS_BOSS_GLOBAL[i];
-        correio.enviar(r.contaId, 'Boss global', `Você ficou em ${i + 1}º lugar no ranking de dano do Boss global!`, [correio.anexoItem(p.item, p.nome, p.quantidade)], 'boss');
-        frases.push(`${i + 1}º ${r.nome}`);
+      // todo mundo que lutou ganha (top 3, 4º ao 10º e participação: premiosBossGlobal)
+      rankingBoss(b).forEach((r, i) => {
+        const anexos = premiosBossGlobal(i).map((p) => correio.anexoItem(p.item, p.nome, p.quantidade));
+        correio.enviar(r.contaId, 'Boss global', i < 10 ? `Você ficou em ${i + 1}º lugar no ranking de dano do Boss global!` : `Você ficou em ${i + 1}º lugar no ranking de dano do Boss global. Obrigado por participar!`, anexos, 'boss');
+        if (i < 3 && r.dano > 0) frases.push(`${i + 1}º ${r.nome}`);
       });
     } else {
-      rankingGuildas(b).slice(0, 3).forEach((g, i) => {
-        if (g.dano <= 0) return;
+      // todo membro que lutou ganha: 1 por participar + o prêmio da posição da guilda (15/10/5 no pódio, 1 do 4º ao 10º)
+      rankingGuildas(b).forEach((g, i) => {
+        const pontos = pontosGuildaDaPosicao(i);
         for (const id of g.membros) {
-          correio.enviar(id, 'Boss da guilda', `Sua guilda ficou em ${i + 1}º lugar no ranking de dano do Boss da guilda!`, [correio.anexoItem('pontos-guilda', 'Pontos de guilda', PONTOS_GUILDA_BOSS)], 'boss');
+          correio.enviar(id, 'Boss da guilda', `Sua guilda ficou em ${i + 1}º lugar no ranking de dano do Boss da guilda. Você ganhou ${pontos} ${pontos === 1 ? 'Ponto' : 'Pontos'} de guilda (1 por participar${pontos > 1 ? ' + o prêmio da posição' : ''}).`, [correio.anexoItem('pontos-guilda', 'Pontos de guilda', pontos)], 'boss');
         }
-        frases.push(`${i + 1}º ${g.nome}`);
+        if (i < 3 && g.dano > 0) frases.push(`${i + 1}º ${g.nome}`);
       });
     }
     b.resultado = frases.join(' · ');

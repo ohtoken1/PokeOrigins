@@ -1,6 +1,7 @@
 // Comunidade → Eventos (pedido do dono): tela só informativa. Mostra o que está acontecendo agora, a agenda de hoje
 // (horário de Brasília, relógio do servidor) e a lista de todos os eventos com onde, quando e prêmios. Mais para
 // frente cada evento ganha um guia aqui.
+import { DURACAO_JANELA_MS, JANELAS_RANQUEADO, janelaRanqueado } from '../../../shared/ranqueado';
 import type { Tela } from '../main';
 import { api } from '../conta';
 import { aoAvisoDoServidor } from '../online';
@@ -58,6 +59,8 @@ export const telaEventosInfo: Tela = (raiz) => {
     const t = torneio?.torneio;
     if (t && t.fase !== 'fim' && t.fase !== 'cancelado')
       lista.push({ id: 'torneio', subtitulo: t.fase === 'inscricao' ? `Inscrições abertas na Arena: ${t.inscritos.length}/16` : t.fase === 'aguardando' ? 'Inscrições fechadas: a disputa já vai começar' : `Em disputa: ${NOMES_RODADAS[t.rodada] ?? ''}`, selo: '● AO VIVO' });
+    const r = janelaRanqueado(agora);
+    if (r.aberta) lista.push({ id: 'ranqueado', subtitulo: 'Fila aberta na Arena da cidade', selo: `● ${falta(r.fimEm! - agora)}` });
     if (eventos?.boss?.ativo) lista.push({ id: 'boss', titulo: eventos.boss.tipo === 'global' ? 'Boss global' : 'Boss da guilda', subtitulo: `${eventos.boss.nome} na gaiola da cidade`, selo: `● ${falta(eventos.boss.fim - agora)}` });
     if (eventos?.captura?.ativo) lista.push({ id: 'captura', subtitulo: `Espécie: ${eventos.captura.nome}`, selo: `● ${falta(eventos.captura.fim - agora)}` });
     if (eventos?.cofre?.aberto) lista.push({ id: 'cofre', subtitulo: `Prêmio: ${eventos.cofre.premio}`, selo: '● AO VIVO' });
@@ -80,6 +83,7 @@ export const telaEventosInfo: Tela = (raiz) => {
         itens.push({ id: 'torneio', inicio: comeca - ABRE_ANTES_MS, fim: comeca, texto: `Inscrição do Torneio das ${hora(comeca)} (${h.tipo === 'staff' ? 'regras da staff' : 'regras sorteadas'})`, amanha });
         itens.push({ id: 'torneio', inicio: comeca, fim: comeca + 1, texto: `Torneio das ${hora(comeca)}`, amanha });
       }
+      for (const j of JANELAS_RANQUEADO) itens.push({ id: 'ranqueado', inicio: as(j.hora, j.minuto), fim: as(j.hora, j.minuto) + DURACAO_JANELA_MS, texto: 'Fila do PvP Ranqueado (1 hora)', amanha });
       for (const h of HORAS_OUTBREAK) itens.push({ id: 'outbreak', inicio: as(h), fim: as(h + 1), texto: 'Outbreak (1 hora)', amanha });
       itens.push({ id: 'loteria', inicio: as(0), fim: as(FECHA_VENDAS.hora, FECHA_VENDAS.minuto), texto: 'Venda de bilhetes da Loteria', amanha, desdeMeiaNoite: true });
       itens.push({ id: 'loteria', inicio: as(HORA_SORTEIO.hora, HORA_SORTEIO.minuto), fim: as(HORA_SORTEIO.hora, HORA_SORTEIO.minuto) + 60_000, texto: 'Sorteio da Loteria', amanha });

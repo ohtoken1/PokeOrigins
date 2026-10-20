@@ -5,7 +5,7 @@ import { el } from './dom';
 
 /** Tema = a cor; grau = o acabamento (1 liso, 2 degradê, 3 com brilho em volta, 4 com reflexo passando). */
 interface VisualTitulo {
-  tema: 'guilda' | 'riqueza' | 'shiny' | 'mitico' | 'palkia' | 'dialga' | 'giratina';
+  tema: 'guilda' | 'riqueza' | 'shiny' | 'mitico' | 'palkia' | 'dialga' | 'giratina' | 'nightmare';
   grau: 1 | 2 | 3 | 4;
   simbolo: string;
 }
@@ -24,6 +24,7 @@ const VISUAIS: Record<string, VisualTitulo> = {
   'fundador-palkia': { tema: 'palkia', grau: 4, simbolo: '🌌' },
   'fundador-dialga': { tema: 'dialga', grau: 4, simbolo: '⏳' },
   'fundador-giratina': { tema: 'giratina', grau: 4, simbolo: '🌑' },
+  'mestre-nightmare': { tema: 'nightmare', grau: 4, simbolo: '💀' },
 };
 const PADRAO: VisualTitulo = { tema: 'riqueza', grau: 2, simbolo: '🏅' };
 
