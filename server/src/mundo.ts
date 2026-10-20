@@ -1,6 +1,8 @@
 // Mundo compartilhado: todos os jogadores no mesmo mapa (cidade ou bioma de uma região) se veem andando.
 // Tempo real por WebSocket (/ws). Cada mapa é uma SALA ("cidade", "kanto:grama"…); o servidor só repassa
 // posição e visual para quem está na mesma sala. Mapas exclusivos (instâncias) no futuro = salas com outro nome.
+import { eloNoMapa } from './ranqueado.ts';
+import type { EloNoMapa } from '../../shared/ranqueado.ts';
 import { AVISO_MAX } from '../../shared/anuncios.ts';
 import type { IncomingMessage, Server } from 'node:http';
 import { WebSocket, WebSocketServer } from 'ws';
@@ -25,6 +27,8 @@ type Direcao = 0 | 1 | 2 | 3;
 interface Visual {
   aparencia: Record<string, string | boolean> | null;
   seguidor: { especie: number; shiny: boolean } | null;
+  /** melhor elo do PvP ranqueado (ao lado do nome; quem decide é o servidor) */
+  elo?: EloNoMapa | null;
 }
 interface Conexao {
   ws: WebSocket;
@@ -195,6 +199,7 @@ function lerVisual(v: unknown, conta: banco.Conta): Visual {
   const skin = skinDe(conta);
   if (visual.aparencia) delete visual.aparencia.skin;
   if (skin) visual.aparencia = { ...(visual.aparencia ?? {}), skin };
+  visual.elo = eloNoMapa(conta.id);
   return visual;
 }
 
@@ -347,4 +352,12 @@ export function ligarMundo(servidor: Server): void {
       }
     }
   }, 30_000).unref();
+}
+
+/** O elo da conta mudou (fim de uma partida ranqueada): quem está na mesma sala vê o símbolo novo ao lado do nome. */
+export function atualizarElo(contaId: number): void {
+  const c = porConta.get(contaId);
+  if (!c?.conta || !c.sala) return;
+  c.visual = { ...c.visual, elo: eloNoMapa(contaId) };
+  paraSala(c.sala, { t: 'visual', id: contaId, visual: c.visual }, c);
 }

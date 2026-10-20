@@ -21,7 +21,7 @@ import { XP_POR_MISSAO, type Missao } from '../../../shared/passe';
 import { contarNasMissoes, textoMissao } from '../passe';
 import { EXP_SHARE, nomeDaMoeda } from '../../../shared/loja';
 import { multSkins } from '../../../shared/skins';
-import { evsComItem, multSilverDoTime, multXpDoItem } from '../../../shared/campo';
+import { evsComItem, multSilverDoIncenso, multSilverDoTime, multXpDoItem } from '../../../shared/campo';
 import { sortearTicketDaBatalha } from '../../../shared/tickets';
 import { nomeEnergia, sortearEnergia } from '../../../shared/materiais';
 import { curarTime, guardarNoPC, registrarCapturaNoRanking, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
@@ -275,6 +275,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
   arena.prepend(camadaTerreno);
   arena.append(camadaClima);
   const resumoFixo = el('div', { class: 'resumo-pokemon resumo-fixo', hidden: true });
+  // a ficha (250 px) fica um pouco à direita do meio da arena, mas sempre dentro da tela (celular)
+  const posicaoDaFicha = (r: DOMRect) => Math.max(8, Math.min(r.left + r.width * 0.36, window.innerWidth - 258));
   const mostrarResumo = (lugar: HTMLElement, lado: 'selvagem' | 'jogador', quem: () => PokemonIndividual | undefined) => {
     lugar.addEventListener('mouseenter', () => {
       const p = quem();
@@ -284,7 +286,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         const r = arena.getBoundingClientRect();
         if (!resumoFixo.isConnected) fundo.append(resumoFixo);
         resumoFixo.replaceChildren(...resumoPokemon(p, { abilityConhecida: true, completo: true, emBatalha: batalha.atributosEmCampo() }));
-        Object.assign(resumoFixo.style, { left: `${r.left + r.width * 0.36}px`, top: `${r.top + 8}px`, maxHeight: `${window.innerHeight - r.top - 16}px` });
+        Object.assign(resumoFixo.style, { left: `${posicaoDaFicha(r)}px`, top: `${r.top + 8}px`, maxHeight: `${window.innerHeight - r.top - 16}px` });
         resumoFixo.hidden = false;
         return;
       }
@@ -293,7 +295,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       // também flutua fora da arena (com EVs e golpes usados ele não cabe no corte da arena)
       const r = arena.getBoundingClientRect();
       if (resumo.parentElement !== fundo) fundo.append(resumo);
-      Object.assign(resumo.style, { left: `${r.left + r.width * 0.36}px`, top: `${r.top + 8}px`, maxHeight: `${window.innerHeight - r.top - 16}px` });
+      Object.assign(resumo.style, { left: `${posicaoDaFicha(r)}px`, top: `${r.top + 8}px`, maxHeight: `${window.innerHeight - r.top - 16}px` });
       resumo.hidden = false;
     });
     lugar.addEventListener('mouseleave', () => {
@@ -1091,8 +1093,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       await darXpTreinador();
       // silver só em batalhas contra treinadores e ginásios (pedido do dono): selvagem não dá
       if (treinador && treinador.recompensa > 0) {
-        // Amulet Coin / Luck Incense: +20% se quem segura entrou em campo
-        const amuleto = multSilverDoTime([...batalha.participantes].map((pos) => save.time[pos]));
+        // Amulet Coin: +20% se quem segura entrou em campo; Luck Incense usado na última hora: +20%
+        const amuleto = multSilverDoTime([...batalha.participantes].map((pos) => save.time[pos])) * multSilverDoIncenso(save);
         const silver = Math.round(treinador.recompensa * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver') * multConquistas(save, 'silver') * multTitulo(save) * (1 + bonusDaMinhaGuilda().silver) * amuleto);
         save.silver += silver;
         await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${nomeDaMoeda('silver', silver)}!`);

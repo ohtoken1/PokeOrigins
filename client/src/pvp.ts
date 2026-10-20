@@ -58,7 +58,7 @@ function mostrarConvite(nome: string, usuario: string, ate: number): void {
   document.body.append(cartao);
 }
 
-function comecar(msg: TurnoPvp & { titulo?: string; adversario: { nome: string; time: PokemonIndividual[] }; meuTime?: PokemonIndividual[] }): void {
+function comecar(msg: TurnoPvp & { tipo?: string; titulo?: string; adversario: { nome: string; time: PokemonIndividual[] }; meuTime?: PokemonIndividual[] }): void {
   const save = carregarSave();
   if (!save || batalhas.has(msg.id)) return;
   const remota = new BatalhaRemota(msg.id, msg);
@@ -66,7 +66,8 @@ function comecar(msg: TurnoPvp & { titulo?: string; adversario: { nome: string; 
   // cópia curada do time (o servidor também cura): nada da batalha volta para o save
   // (o time que o servidor usou, na mesma ordem: o save pode ter mudado depois que a batalha começou)
   const time = structuredClone(msg.meuTime ?? save.time.filter((p) => !p.ovo));
-  time.forEach((p) => curar(p));
+  // Liga: o time do desafio entra como está (o servidor não cura); no PvP, todos curados
+  if (msg.tipo !== 'liga') time.forEach((p) => curar(p));
   const equipe = msg.adversario.time;
   // o servidor não manda o HP do outro (só em porcentagem, nos eventos): a barra começa cheia
   equipe.forEach((p) => (p.hp = hpMaximo(p)));
@@ -99,6 +100,7 @@ export function vigiarPvp(): void {
     if (msg.t === 'pvp-convite') mostrarConvite(String(msg.nome), String(msg.usuario), Number(msg.ate));
     else if (msg.t === 'pvp-recusado') avisoCurto(`${String(msg.nome)} recusou o duelo.`);
     else if (msg.t === 'pvp-inicio') comecar(msg as never);
+    else if (msg.t === 'pvp-aviso') avisoCurto(String(msg.texto));
     else if (msg.t === 'pvp-turno') batalhas.get(Number(msg.id))?.receber(msg as never);
   });
   void retomar();

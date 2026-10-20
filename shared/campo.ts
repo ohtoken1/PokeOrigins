@@ -68,7 +68,7 @@ export const LUCK_INCENSE = 'luckincense';
 export const MACHO_BRACE = 'machobrace';
 /** Lucky Egg: XP do Pokémon que segura. */
 export const MULT_LUCKY_EGG = 1.5;
-/** Amulet Coin e Luck Incense (pedido do dono: +20%, não o dobro dos jogos): silver da batalha se quem segura entrou em campo. Não acumulam. */
+/** Amulet Coin (pedido do dono: +20%, não o dobro dos jogos): silver da batalha se quem segura entrou em campo. */
 export const MULT_SILVER_AMULETO = 1.2;
 /** Power Items: +8 EVs no atributo por Pokémon derrotado (como nos jogos atuais). */
 export const EVS_POWER_ITEM = 8;
@@ -83,8 +83,15 @@ export function evsComItem(p: Pick<PokemonIndividual, 'item'>, rendimento: Parti
   if (atributo) r[atributo] += EVS_POWER_ITEM;
   return r;
 }
-/** Silver da batalha: +20% se alguém que entrou em campo segura Amulet Coin ou Luck Incense. */
-export const multSilverDoTime = (participantes: Pick<PokemonIndividual, 'item'>[]) => (participantes.some((p) => p.item === AMULET_COIN || p.item === LUCK_INCENSE) ? MULT_SILVER_AMULETO : 1);
+/** Silver da batalha: +20% se alguém que entrou em campo segura Amulet Coin. */
+export const multSilverDoTime = (participantes: Pick<PokemonIndividual, 'item'>[]) => (participantes.some((p) => p.item === AMULET_COIN) ? MULT_SILVER_AMULETO : 1);
+/**
+ * Luck Incense (pedido do dono, 20/10/2026): virou consumível. Usado pela bolsa, marca `incensoAte` = agora + 1 hora;
+ * enquanto vale, as batalhas de treinador/ginásio dão +20% de silver (soma com a Amulet Coin).
+ */
+export const DURACAO_LUCK_INCENSE_MS = 60 * 60_000;
+export const MULT_SILVER_INCENSO = 1.2;
+export const multSilverDoIncenso = (s: { incensoAte?: number }, agora = Date.now()) => ((s.incensoAte ?? 0) > agora ? MULT_SILVER_INCENSO : 1);
 /** Everstone: quem segura não evolui por nível nem por amizade. */
 export const impedeEvolucao = (p: Pick<PokemonIndividual, 'item'>) => p.item === EVERSTONE;
 

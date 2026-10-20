@@ -86,7 +86,8 @@ const ABAS: Aba[] = [
     menu: true,
     soAdmin: true,
     telas: SECOES_ADMINISTRACAO.map((x) => `admin-${x.id}`),
-    itens: SECOES_ADMINISTRACAO.map((x) => ({ nome: x.nome, destino: () => ({ tela: 'administracao', secao: x.id }), emBreve: !!x.emBreve })),
+    // botão direto (pedido do dono): as seções ficam no menu da lateral da própria tela
+    itens: [{ nome: 'Administração', destino: () => ({ tela: 'administracao', secao: SECOES_ADMINISTRACAO[0].id }) }],
   },
 ];
 
@@ -176,6 +177,25 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
   document.addEventListener('click', fecharTodos);
 
 
+  // celular (pedido do dono): as abas e os botões ficam num menu que abre pelo ☰; no PC o ☰ não aparece e o
+  // `.barra-topo-menu` some do layout (display: contents), então a barra continua igual
+  const menuCelular = el('div', { class: 'barra-topo-menu' });
+  const botaoMenu = el('button', { class: 'botao-menu-celular', type: 'button', 'aria-label': 'Menu', 'aria-expanded': 'false' }, '☰');
+  const abrirMenuCelular = (abrir: boolean) => {
+    menuCelular.classList.toggle('aberto', abrir);
+    botaoMenu.textContent = abrir ? '✕' : '☰';
+    botaoMenu.setAttribute('aria-expanded', String(abrir));
+  };
+  botaoMenu.addEventListener('click', (e) => {
+    e.stopPropagation();
+    abrirMenuCelular(!menuCelular.classList.contains('aberto'));
+  });
+  // escolheu um destino (item de menu ou aba direta): fecha o menu do celular
+  menuCelular.addEventListener('click', (e) => {
+    if ((e.target as Element).closest('.menu-topo button, .aba-topo:not(.aba-menu), a')) abrirMenuCelular(false);
+  });
+  document.addEventListener('click', (e) => !menuCelular.contains(e.target as Node) && abrirMenuCelular(false));
+
   document.body.prepend(
     el('nav', { class: 'barra-topo' },
       el(
@@ -184,6 +204,12 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
         // Guia do jogo: dúvidas sobre eventos e sistemas (pedido do dono)
         el('button', { class: 'botao-guia', type: 'button', title: 'Guia do jogo: como funcionam os eventos e sistemas', 'aria-label': 'Guia do jogo', onclick: abrirGuia }, iconeGuia()),
         el('img', { class: 'marca', src: '/logo/origens-antigas-barra.svg', alt: 'PokeOrigins' }),
+        botaoMenu,
+        menuCelular,
+      ),
+    ),
+  );
+  menuCelular.append(
         el('div', { class: 'abas-topo' }, ...botoes.map((b) => b.raiz)),
         relogioBrasilia(),
         controlesSom(),
@@ -195,8 +221,6 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
           class: 'botao-whatsapp', href: LINK_WHATSAPP || '#', target: '_blank', rel: 'noopener', title: 'Entre no nosso grupo do WhatsApp', 'aria-label': 'WhatsApp do PokeOrigins',
           onclick: (e: Event) => { if (!LINK_WHATSAPP) { e.preventDefault(); avisar('O grupo do WhatsApp ainda não está aberto. Em breve!', 'info'); } },
         }, el('img', { src: 'whatsapp.svg', alt: '' })),
-      ),
-    ),
   );
   return (destino) => {
     // telas "em breve" usam a tela de comunidade com uma seção: a seção diz de qual grupo ela é

@@ -10,6 +10,7 @@ import { conteudoLiberado } from '../trancas';
 import { el } from './dom';
 import { abrirJanela } from './janela';
 import { abrirTorneio } from './torneio';
+import { abrirRanqueado } from './ranqueado';
 
 const nomeDaRegiao = (id: string) => REGIOES.find((r) => r.id === id)?.nome ?? id;
 
@@ -27,7 +28,8 @@ export function abrirArena(navegar: Navegar, abrirLiga?: () => void): void {
       },
       { nome: 'Duelos com treinadores', descricao: 'Enfrente treinadores e ganhe Poké Dólares.', destino: { tela: 'duelos' } },
       { nome: 'Torneio', descricao: 'Mata-mata de 16 jogadores, às 12h30 e 18h30.', acao: abrirTorneio, fechado: conteudoLiberado('torneio') ? undefined : textoTranca('torneio') },
-      { nome: 'Liga Pokémon', descricao: 'Elite 4 + Campeão e a Liga Nightmare, com um treinador de cada tipo.', acao: abrirLiga, fechado: !conteudoLiberado('liga') ? textoTranca('liga') : abrirLiga ? undefined : 'Em breve' },
+      { nome: 'PvP Ranqueado', descricao: 'Fila contra outros treinadores: suba da Poké Ball à Master Ball, em cada tier.', acao: () => abrirRanqueado(() => navegar({ tela: 'ranking', categoria: 'ranqueado' })) },
+      { nome: 'Liga Pokémon', descricao: 'Elite 4 e a Liga Nightmare, com um treinador de cada tipo.', acao: abrirLiga, fechado: !conteudoLiberado('liga') ? textoTranca('liga') : abrirLiga ? undefined : 'Em breve' },
     ];
     return el('div', { class: 'arena-opcoes' },
       ...opcoes.map((o) =>

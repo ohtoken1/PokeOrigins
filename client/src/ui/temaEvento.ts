@@ -4,10 +4,11 @@
 import { NIVEL_MINIMO, type ConteudoTrancado } from '../../../shared/trancas';
 import { PRECO_BILHETE, PRECO_NINHO, PRECO_NINHO_VIP, POTE_INICIAL, PREMIO_CAPTURA, NIVEL_NINHO, PREMIO_NINHO } from '../../../shared/eventosRegras';
 import { ENTRADA_TORNEIO } from '../../../shared/torneioRegras';
+import { JANELAS_RANQUEADO, PONTOS_DERROTA, PONTOS_VITORIA } from '../../../shared/ranqueado';
 import { PREMIO_LIGA } from '../../../shared/liga';
 import { el } from './dom';
 
-export type IdEvento = 'torneio' | 'liga' | 'nightmare' | 'boss' | 'outbreak' | 'ninho' | 'captura' | 'cofre' | 'loteria' | 'expedicao' | 'safari';
+export type IdEvento = 'torneio' | 'ranqueado' | 'liga' | 'nightmare' | 'boss' | 'outbreak' | 'ninho' | 'captura' | 'cofre' | 'loteria' | 'expedicao' | 'safari';
 
 export interface InfoEvento {
   nome: string;
@@ -32,25 +33,31 @@ export const EVENTOS: Record<IdEvento, InfoEvento> = {
     premios: '1º: 150.000 Poké Dólares + 15 Origin Coins + Roleta do Torneio · 2º: 100.000 + 10 Origin Coins · 3º: 50.000',
     tranca: 'torneio',
   },
+  ranqueado: {
+    nome: 'PvP Ranqueado', emblema: '⚔️', lema: 'Da Poké Ball à Master Ball', onde: 'Arena da cidade',
+    quando: `Todo dia, em dois horários de 1 hora: ${JANELAS_RANQUEADO.map((j) => `${j.hora}h${String(j.minuto).padStart(2, '0')}`).join(' e ')}.`,
+    descricao: `Fila contra outros treinadores, com um elo para cada tier (Ubers, OU, UU e RU). Vitória +${PONTOS_VITORIA} pontos, derrota −${PONTOS_DERROTA} (mais ou menos, pela distância do adversário).`,
+    premios: 'Elos: Poké Ball, Great Ball, Ultra Ball, Beast Ball e Master Ball (só 3 vagas por tier)',
+  },
   liga: {
-    nome: 'Liga Pokémon', emblema: '👑', lema: 'Elite 4 + Campeão', onde: 'Arena da cidade',
+    nome: 'Liga Pokémon', emblema: '👑', lema: 'Elite 4', onde: 'Arena da cidade',
     quando: 'Uma tentativa por semana. A semana vira na segunda-feira, 00h00.',
-    descricao: 'Cinco batalhas seguidas, sem curar o time entre elas (a bolsa vale entre uma e outra).',
-    premios: `${n(PREMIO_LIGA.normal.silver)} Poké Dólares + ${PREMIO_LIGA.normal.quantidade} League Coins`,
+    descricao: 'Quatro batalhas seguidas, sem curar o time entre elas (a bolsa vale entre uma e outra).',
+    premios: `${PREMIO_LIGA.normal.porVitoria} League Coin por vitória; vencendo os 4: +${PREMIO_LIGA.normal.bonus} (${PREMIO_LIGA.normal.quantidade} no total) + ${n(PREMIO_LIGA.normal.silver)} Poké Dólares`,
     tranca: 'liga',
   },
   nightmare: {
     nome: 'Liga Pokémon Nightmare', emblema: '💀', lema: 'Um mestre de cada tipo', onde: 'Arena da cidade',
     quando: 'Uma tentativa por semana. A semana vira na segunda-feira, 00h00.',
     descricao: '18 treinadores seguidos, um de cada tipo, com Pokémon até o nível 200. Sem curar entre as batalhas.',
-    premios: `${n(PREMIO_LIGA.nightmare.silver)} Poké Dólares + ${PREMIO_LIGA.nightmare.quantidade} League Coins Nightmare`,
+    premios: `${PREMIO_LIGA.nightmare.porVitoria} League Coin Nightmare por vitória; vencendo os 18: +${PREMIO_LIGA.nightmare.bonus} (${PREMIO_LIGA.nightmare.quantidade} no total) + ${n(PREMIO_LIGA.nightmare.silver)} Poké Dólares`,
     tranca: 'liga',
   },
   boss: {
     nome: 'Boss', emblema: '👹', lema: 'A fera da gaiola', onde: 'Gaiola da cidade',
     quando: 'Quando a staff liga. Fica 2 horas na gaiola.',
     descricao: 'Boss global e Boss da guilda: HP infinito, cada treinador luta uma vez, por até 50 turnos, e o dano vale para o ranking.',
-    premios: 'Global, top 3: Chave Temporal / 5 / 2 Fragmentos Temporais · Guilda: Pontos de guilda para quem lutou',
+    premios: 'Global: top 3 Chave Temporal / 5 / 2 Fragmentos + 500k / 300k / 200k + 50 / 30 / 20 Origin Coins, 4º–10º 100k, demais 50k · Guilda: 1 Ponto de guilda por lutar + 15 / 10 / 5 para o top 3 e +1 do 4º ao 10º',
   },
   outbreak: {
     nome: 'Outbreak', emblema: '🔥', lema: 'Uma espécie toma conta do mapa', onde: 'Mapas (o aviso no canto da tela mostra qual)',

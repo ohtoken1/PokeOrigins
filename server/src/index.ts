@@ -25,6 +25,8 @@ import * as eventos from './eventos.ts';
 import * as liga from './liga.ts';
 import * as pvp from './pvp.ts';
 import * as torneio from './torneio.ts';
+import * as ranqueado from './ranqueado.ts';
+import * as lojas from './lojas.ts';
 import { avisarDaStaff, estaOnline, ligarMundo } from './mundo.ts';
 import { tituloAtivo } from '../../shared/conquistas.ts';
 import { temSkin, type ComSkins } from '../../shared/skins.ts';
@@ -134,6 +136,7 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     viagem.protegerRegiao(conta, c.save as Record<string, unknown>, antes);
     // entradas do Safari: valem as guardadas (server/src/safari.ts)
     safari.proteger(c.save as Record<string, unknown>, antes);
+    lojas.proteger(c.save as Record<string, unknown>, antes);
     const texto = JSON.stringify(c.save);
     if (texto.length > TAMANHO_MAX_SAVE) throw new ErroConta('Save grande demais.', 413);
     const versao = banco.gravarSave(conta.id, texto, c.versao);
@@ -262,6 +265,33 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
       return responder(res, 200, f(conta, await lerCorpo(req)));
     }
 
+  // ---- lojas especiais (server/src/lojas.ts): Loja do dia e Lojas da Liga ----
+  if (caminho === '/api/lojas' && metodo === 'GET') {
+    exigirConta(req);
+    return responder(res, 200, lojas.estado());
+  }
+  if (caminho === '/api/lojas/guilda' && metodo === 'GET') return responder(res, 200, lojas.estadoGuilda(exigirConta(req)));
+  if (caminho === '/api/lojas/guilda/comprar' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, lojas.comprarGuilda(conta, await lerCorpo(req)));
+  }
+  if (caminho === '/api/lojas/comprar' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, lojas.comprar(conta, await lerCorpo(req)));
+  }
+
+  // ---- PvP ranqueado (server/src/ranqueado.ts): fila por formato, pontos e elos ----
+  if (caminho === '/api/ranqueado' && metodo === 'GET') return responder(res, 200, ranqueado.estado(exigirConta(req)));
+  if (caminho === '/api/ranqueado/ranking' && metodo === 'GET') {
+    exigirConta(req);
+    return responder(res, 200, ranqueado.ranking(new URL(req.url ?? '/', 'http://x').searchParams.get('formato')));
+  }
+  if (caminho === '/api/ranqueado/fila' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, ranqueado.entrar(conta, await lerCorpo(req)));
+  }
+  if (caminho === '/api/ranqueado/sair' && metodo === 'POST') return responder(res, 200, ranqueado.sair(exigirConta(req)));
+
   // ---- PvP (server/src/pvp.ts): batalhas calculadas no servidor ----
   if (caminho === '/api/pvp/atual' && metodo === 'GET') return responder(res, 200, pvp.atual(exigirConta(req)));
   for (const [rota, f] of [['/api/pvp/desafiar', pvp.desafiar], ['/api/pvp/responder', pvp.responder], ['/api/pvp/escolha', pvp.escolher], ['/api/pvp/desistir', pvp.desistir]] as const)
@@ -273,7 +303,7 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   // ---- Liga Pokémon (server/src/liga.ts) ----
   if (caminho === '/api/liga' && metodo === 'GET') return responder(res, 200, liga.estado(exigirConta(req)));
   if (caminho === '/api/admin/liga' && metodo === 'GET') return responder(res, 200, liga.timesDaStaff(exigirConta(req)));
-  for (const [rota, f] of [['/api/liga/entrar', liga.entrar], ['/api/liga/resultado', liga.resultado], ['/api/admin/liga', liga.gravarTime]] as const)
+  for (const [rota, f] of [['/api/liga/entrar', liga.entrar], ['/api/liga/item', liga.usarItem], ['/api/admin/liga', liga.gravarTime]] as const)
     if (caminho === rota && metodo === 'POST') {
       const conta = exigirConta(req);
       return responder(res, 200, f(conta, await lerCorpo(req)));
@@ -413,7 +443,7 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     const conta = banco.contaPorUsuario(rotaPerfil[1]);
     const save = conta && banco.lerSave(conta.id);
     if (!conta || !save) throw new ErroConta('Jogador não encontrado.', 404);
-    return responder(res, 200, { usuario: conta.usuario, online: estaOnline(conta.id), perfil: perfilPublico(JSON.parse(save.dados)), cla: cla.resumoDaConta(conta.id) });
+    return responder(res, 200, { usuario: conta.usuario, online: estaOnline(conta.id), perfil: perfilPublico(JSON.parse(save.dados)), cla: cla.resumoDaConta(conta.id), ranqueado: ranqueado.elosDaConta(conta.id) });
   }
   throw new ErroConta('Não encontrado.', 404);
 }
@@ -448,7 +478,7 @@ function perfilPublico(save: Record<string, unknown>) {
 const TIPOS: Record<string, string> = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json',
   '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.gif': 'image/gif',
-  '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.wav': 'audio/wav', '.woff2': 'font/woff2', '.ico': 'image/x-icon',
+  '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.wav': 'audio/wav', '.woff2': 'font/woff2', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json',
 };
 function entregarSite(res: ServerResponse, caminho: string): void {
   let arquivo = normalize(join(SITE, decodeURIComponent(caminho)));

@@ -1031,6 +1031,22 @@ button.vaga:hover { border-color: var(--borda); }
 .tela-ranking { max-width: 760px; margin: 0 auto; }
 .ranking-corpo { display: flex; flex-direction: column; gap: 12px; }
 .ranking-abas { display: flex; gap: 6px; flex-wrap: wrap; }
+/* Menu de abas na lateral (ui/menuLateral.ts) */
+.com-menu-lateral { display: grid; grid-template-columns: 200px 1fr; gap: 16px; align-items: start; }
+.com-menu-lateral-conteudo { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.menu-lateral { display: flex; flex-direction: column; gap: 2px; background: var(--painel); border: 1px solid var(--borda); border-radius: 12px; padding: 10px 8px; position: sticky; top: 8px; }
+.menu-lateral-grupo { color: var(--texto-2); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; margin: 10px 8px 4px; }
+.menu-lateral-grupo:first-child { margin-top: 0; }
+.menu-lateral-opcao { display: flex; align-items: center; gap: 8px; text-align: left; padding: 7px 10px; border-radius: 8px; border: 0; background: transparent; color: var(--texto); font: inherit; font-size: 0.9rem; cursor: pointer; }
+.menu-lateral-opcao:hover { background: var(--painel-2); }
+.menu-lateral-opcao.ativa { background: var(--dourado); color: var(--texto-no-dourado); font-weight: 700; }
+.menu-lateral-icone { width: 1.3em; text-align: center; flex: none; }
+@media (max-width: 700px) {
+  .com-menu-lateral { grid-template-columns: 1fr; }
+  .menu-lateral { flex-direction: row; flex-wrap: wrap; gap: 4px; background: none; border: 0; padding: 0; position: static; }
+  .menu-lateral-grupo { display: none; }
+  .menu-lateral-opcao { background: var(--painel-2); }
+}
 .ranking-descricao { margin: 0; color: var(--texto-2); font-size: 0.9rem; }
 .ranking-tabela {
   width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; border-radius: 12px; overflow: hidden;
@@ -1077,6 +1093,8 @@ button.vaga:hover { border-color: var(--borda); }
 /* Poké Dólar (silver) e Origin Coin (gold): desenhos em client/public/itens */
 .icone-moeda.moeda-silver { background: url('/itens/pokedolar.svg') center / contain no-repeat; border-radius: 0; box-shadow: none; }
 .icone-moeda.moeda-gold { background: url('/itens/origincoin.svg') center / contain no-repeat; border-radius: 0; box-shadow: none; }
+.icone-moeda.moeda-leagueCoins { background: url('/itens/leaguecoin.svg') center / contain no-repeat; border-radius: 0; box-shadow: none; }
+.icone-moeda.moeda-leagueCoinsNightmare { background: url('/itens/leaguecoinnightmare.svg') center / contain no-repeat; border-radius: 0; box-shadow: none; }
 .icone-vip {
   display: inline-grid; place-items: center; padding: 3px 7px; border-radius: 6px; font-weight: 900; font-style: italic; font-size: 0.78rem; letter-spacing: 0.04em;
   color: #2a1400; background: linear-gradient(135deg, #fff1a8, #ffc93c 45%, #ff8a1f); box-shadow: 0 0 0 1px #7a4300, 0 0 10px #ffb30066;
@@ -2169,6 +2187,8 @@ button.missao-quadro:disabled { cursor: default; }
 .balao-titulo.tema-palkia.grau-4 { background: linear-gradient(120deg, #9d6fc8, #f6d2ea 30%, #fff7fc 50%, #e7a6d7 72%, #b56fae); box-shadow: 0 0 14px #e9a3d4, 0 0 4px #fff, inset 0 1px 0 rgb(255 255 255 / 0.8); }
 .balao-titulo.tema-dialga { --t1: #d9ecff; --t2: #2f5aa8; --t3: #7fd8ff; --tinta: #fff; }
 .balao-titulo.tema-dialga.grau-4 { background: linear-gradient(120deg, #1f3f7a, #3e6fc4 30%, #9fd6ff 52%, #5a8ad0 72%, #24467f); border-color: #cfeaff; text-shadow: 0 1px 2px rgb(0 0 0 / 0.5); box-shadow: 0 0 14px #7fd8ff, 0 0 4px #fff, inset 0 1px 0 rgb(255 255 255 / 0.6); }
+.balao-titulo.tema-nightmare { --t1: #ff9a8a; --t2: #5a0a0a; --t3: #c0392b; --tinta: #fff; }
+.balao-titulo.tema-nightmare.grau-4 { background: linear-gradient(120deg, #120303, #4a0b0b 30%, #c0392b 50%, #3a0808 70%, #0d0202); border-color: #ff6b5a; color: #ffe1dc; text-shadow: 0 1px 2px #000; box-shadow: 0 0 14px #c0392b, 0 0 5px #ff6b5a, inset 0 1px 0 rgb(255 107 90 / 0.5); }
 .balao-titulo.tema-giratina { --t1: #f6d58a; --t2: #c8323a; --t3: #f2c14e; --tinta: #fff3d6; }
 .balao-titulo.tema-giratina.grau-4 { background: linear-gradient(120deg, #1b1a20, #3a2a2e 25%, #c8323a 48%, #2a2228 70%, #141318); border-color: #f2c14e; color: #ffe7a8; text-shadow: 0 1px 2px #000; box-shadow: 0 0 14px #c8323a, 0 0 5px #f2c14e, inset 0 1px 0 rgb(242 193 78 / 0.6); }
 @keyframes balao-reflexo { 0%, 55% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
@@ -2751,6 +2771,8 @@ button.creche-pokemon:hover { border-color: var(--destaque); }
    Cada tema define --t1 (fundo escuro), --t2 (cor principal), --t3 (brilho) e --desenho (padrão do fundo). */
 .tema-torneio { --t1: #3a1d08; --t2: #e9b949; --t3: #fff1b8;
   --desenho: repeating-linear-gradient(90deg, transparent 0 46px, rgb(233 185 73 / 0.18) 46px 48px), repeating-linear-gradient(0deg, transparent 0 22px, rgb(233 185 73 / 0.12) 22px 24px), radial-gradient(circle at 85% 30%, rgb(255 210 90 / 0.35), transparent 55%); }
+.tema-ranqueado { --t1: #0b1f33; --t2: #4fb3ff; --t3: #d6f0ff;
+  --desenho: repeating-linear-gradient(45deg, transparent 0 34px, rgb(79 179 255 / 0.14) 34px 36px), repeating-linear-gradient(-45deg, transparent 0 34px, rgb(255 90 90 / 0.12) 34px 36px), radial-gradient(circle at 85% 40%, rgb(79 179 255 / 0.4), transparent 60%); }
 .tema-liga { --t1: #22103f; --t2: #a47cf0; --t3: #f6e7a8;
   --desenho: radial-gradient(circle, rgb(246 231 168 / 0.35) 1px, transparent 1.6px) 0 0 / 18px 18px, radial-gradient(circle at 80% 20%, rgb(164 124 240 / 0.45), transparent 60%); }
 .tema-nightmare { --t1: #160505; --t2: #c0392b; --t3: #ff9a8a;
@@ -3023,3 +3045,130 @@ button.creche-pokemon:hover { border-color: var(--destaque); }
 .doacao-termos p { margin: 0 0 8px; }
 .doacao-aceite { display: flex; align-items: center; gap: 8px; font-weight: 600; }
 .doacao-confirmar { align-self: flex-start; }
+
+/* ---------- PvP ranqueado (ui/ranqueado.ts) ---------- */
+.janela-ranqueado .janela-corpo { max-width: 620px; }
+.ranqueado-janela { display: flex; flex-direction: column; gap: 10px; }
+.ranqueado-abas { display: flex; gap: 6px; flex-wrap: wrap; }
+.ranqueado-meio { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.ranqueado-meio .cartao-elo { flex: 1 1 240px; }
+.ranqueado-acao { flex: 1 1 220px; display: flex; flex-direction: column; gap: 6px; }
+.ranqueado-procurar { min-height: 44px; font-weight: 700; }
+.ranqueado-procurando { display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 10px; background: rgb(79 179 255 / 0.12); border: 1px solid rgb(79 179 255 / 0.5); }
+.cartao-elo { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; background: rgb(15 14 12 / 0.75); border: 1px solid var(--borda); }
+.cartao-elo.compacto { padding: 8px; gap: 8px; width: 100%; }
+.cartao-elo-texto { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.cartao-elo-texto strong { font-size: 1.1rem; }
+.cartao-elo.compacto .cartao-elo-texto strong { font-size: 0.95rem; }
+.icone-elo { image-rendering: pixelated; object-fit: contain; flex: none; }
+.elo-barra { height: 6px; }
+.cartao-elo.elo-greatball { border-color: #3b7de0; }
+.cartao-elo.elo-ultraball { border-color: #e0b93b; }
+.cartao-elo.elo-beastball { border-color: #5ab0e8; }
+.cartao-elo.elo-masterball { border-color: #a35ce0; box-shadow: 0 0 12px rgb(163 92 224 / 0.45); }
+.perfil-pvp-topo { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; }
+.perfil-pvp-formato { font: inherit; font-size: 0.8rem; padding: 2px 4px; border-radius: 6px; background: var(--painel-2); color: var(--texto); border: 1px solid var(--borda); }
+.ranking-elo { display: flex; align-items: center; gap: 6px; }
+.aviso-ranqueado { border-color: #4fb3ff; pointer-events: auto; }
+.aviso-ranqueado strong { color: #8fd0ff; }
+.aviso-ranqueado .botao { padding: 2px 8px; min-height: 0; font-size: 0.75rem; }
+
+/* ---------- Loja do dia (aba do Pokémarket) e Lojas da Liga (ui/loja.ts, ui/lojaLiga.ts) ---------- */
+.mercado-secao-dia { border-color: #e9b949; color: #8a5c0a; }
+.mercado-secao-dia.ativa { background: linear-gradient(#f5d36b, #d9a62a); border-color: #b5841a; color: #2a1d05; }
+.mercado-dia-aviso { grid-column: 1 / -1; }
+.liga-lojas { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.janela-loja-liga .janela-corpo { max-width: 760px; }
+.loja-liga { display: flex; flex-direction: column; gap: 10px; }
+.loja-liga-topo { display: flex; flex-direction: column; gap: 4px; }
+.loja-liga-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; max-height: 60vh; overflow-y: auto; }
+.loja-liga-grade .mercado-item { background: #fff; color: #1d2a3d; border: 1px solid #c3ccd8; border-radius: 10px; padding: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; font: inherit; }
+.loja-liga-grade .mercado-item:disabled { opacity: 0.55; cursor: not-allowed; }
+.loja-liga-grade .mercado-preco { font-weight: 700; font-size: 0.8rem; }
+.loja-liga-topo .db-busca { flex: none; height: auto; }
+.loja-guilda-limite { font-size: 0.72rem; color: #66738a; }
+.loja-liga-grade .mercado-icone img.sprite { width: 56px; height: 56px; margin: -11px 0; image-rendering: pixelated; }
+.pontos-guilda { display: inline-flex; align-items: center; gap: 2px; font-variant-numeric: tabular-nums; }
+.loja-liga-corpo { display: grid; grid-template-columns: 160px 1fr; gap: 12px; align-items: start; }
+@media (max-width: 600px) { .loja-liga-corpo { grid-template-columns: 1fr; } .loja-liga-corpo .mercado-secoes { flex-direction: row; flex-wrap: wrap; } }
+/* Liga: time travado do desafio (ui/liga.ts) */
+.liga-time { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; margin: 6px 0; }
+.liga-membro { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px; background: rgb(15 14 12 / 0.6); border: 1px solid var(--borda); }
+.liga-membro > img, .liga-membro > .sprite, .liga-membro > :first-child { width: 48px; height: 48px; flex: none; object-fit: contain; image-rendering: pixelated; }
+.liga-membro > div { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.liga-membro strong { font-size: 0.85rem; }
+.liga-membro .liga-hp { display: block; height: 6px; }
+.liga-membro select { font-size: 0.8rem; padding: 3px 6px; }
+.liga-membro.desmaiado { opacity: 0.55; }
+.liga-membro select.db-busca { flex: none; height: auto; min-height: 0; }
+.liga-membro .liga-hp .preenchido { display: block; height: 100%; background: #3fbf6b; }
+
+/* Joystick de toque do mapa (jogo/joystick.ts): nasce embaixo do dedo */
+.joystick { position: fixed; z-index: 40; width: 110px; height: 110px; margin: -55px 0 0 -55px; border-radius: 50%; background: radial-gradient(rgba(0,0,0,.15), rgba(0,0,0,.35)); border: 2px solid rgba(245,239,224,.55); box-shadow: 0 0 12px rgba(0,0,0,.4); pointer-events: none; }
+.joystick-bolinha { position: absolute; left: 50%; top: 50%; width: 48px; height: 48px; border-radius: 50%; background: var(--dourado); border: 2px solid rgba(255,255,255,.7); box-shadow: 0 2px 6px rgba(0,0,0,.5); }
+canvas { touch-action: none; }
+
+/* Celular: segurar o dedo (toque longo, ui/toqueLongo.ts) não seleciona texto nem abre o menu do navegador */
+@media (hover: none) {
+  button, img, .lugar, .mercado-item, [data-item], [data-dica], .com-dica { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+}
+
+/* Celular: a barra do topo quebra em linhas (antes ela esticava a página e as janelas fixas, como a batalha, abriam fora da tela) */
+@media (max-width: 760px) {
+  .barra-topo-conteudo { height: auto; flex-wrap: wrap; gap: 6px 10px; padding: 6px 12px; }
+  .abas-topo { flex-wrap: wrap; }
+}
+
+/* Celular: batalha em pé. Caixas menores e cada Pokémon do lado oposto da sua caixa (antes a caixa tampava o Pokémon) */
+@media (max-width: 600px) {
+  .batalha-fundo { padding: 8px; align-items: start; overflow-y: auto; }
+  .arena { height: 300px; }
+  .caixa-info { width: 168px; padding: 6px 9px; font-size: 0.85rem; }
+  .caixa-info.do-selvagem { left: 8px; top: 8px; }
+  .caixa-info.do-jogador { right: 8px; bottom: 8px; }
+  .lugar-selvagem { right: 0; top: 78px; width: 160px; height: 110px; }
+  .lugar-selvagem::before { width: 130px; height: 32px; }
+  .lugar-jogador { left: 0; bottom: 14px; width: 170px; height: 140px; }
+  .lugar-jogador::before { width: 150px; height: 38px; }
+  .contador-turnos { padding: 4px 10px; }
+  .contador-turnos strong { font-size: 1.3rem; }
+}
+@media (max-width: 600px) {
+  .batalha-area .batalha { min-width: 0; }
+  .acoes-batalha { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .acoes-batalha .golpe { min-width: 0; padding: 8px; }
+  .acoes-batalha .golpe .detalhes { flex-wrap: wrap; gap: 2px 6px; font-size: 0.72rem; }
+}
+
+/* Celular: os atalhos de bioma viram uma fileira na barra do mapa (entre o nome do bioma e o contador), sem cobrir o jogo */
+@media (max-width: 760px) {
+  .tela-bioma .atalhos-biomas { position: static; flex: 1 1 100%; flex-direction: row; overflow-x: auto; padding: 4px; box-shadow: none; }
+  .tela-bioma .atalhos-alca { display: none; }
+  .tela-bioma .atalho-bioma { flex: none; width: 52px; height: 52px; }
+}
+
+/* Barra do topo: menu ☰ só no celular (ui/barraTopo.ts). No PC o menu some do layout e a barra fica igual. */
+.botao-menu-celular { display: none; }
+.barra-topo-menu { display: contents; }
+@media (max-width: 760px) {
+  .barra-topo-conteudo { height: 48px; flex-wrap: nowrap; gap: 10px; padding: 0 12px; position: relative; }
+  .botao-menu-celular { display: grid; place-items: center; margin-left: auto; width: 40px; height: 36px; border-radius: 8px; border: 1px solid var(--borda); background: var(--painel-2); color: var(--texto); font-size: 1.3rem; cursor: pointer; }
+  .barra-topo-menu { display: none; }
+  .barra-topo-menu.aberto {
+    display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px 12px; position: absolute; top: 100%; left: 0; right: 0;
+    max-height: calc(100vh - 60px); overflow-y: auto; padding: 10px 12px 14px; background: rgb(12 11 10 / 0.97); border-bottom: 1px solid var(--borda); box-shadow: 0 12px 24px rgb(0 0 0 / 0.5);
+  }
+  .barra-topo-menu .abas-topo { flex: 1 1 100%; flex-direction: column; flex-wrap: nowrap; padding-bottom: 8px; border-bottom: 1px solid var(--borda); }
+  .barra-topo-menu .aba-topo { width: 100%; text-align: left; }
+  .barra-topo-menu .menu-topo { position: static; box-shadow: none; margin: 2px 0 6px 12px; }
+}
+
+/* Celular: os botões redondos (Centro, Loja, Bolsa…) ficam por cima do começo da tela; a barra do mapa desce para
+   baixo deles e não reserva os 300 px da direita (no PC eles ficam à direita da barra) */
+@media (max-width: 760px) {
+  .tela-bioma > .barra, .tela-cidade > .barra { padding-right: 0; }
+  /* os botões redondos entram no fluxo da página, logo abaixo do cabeçalho: nada fica por baixo deles em nenhuma tela */
+  .cab-atalhos-fora { position: static; justify-content: center; flex-wrap: wrap; padding: 10px 12px 2px; }
+  /* o cabeçalho é alto no celular: rola com a página em vez de ficar preso no topo cobrindo a tela */
+  .cabecalho-jogo { position: relative; top: auto; }
+}

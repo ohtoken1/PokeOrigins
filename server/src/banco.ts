@@ -744,3 +744,43 @@ export const doadoNoPeriodo = (contaId: number, inicio: number, fim: number) => 
 export const metasPremiadas = (contaId: number, trimestre: string) => (sqlRecompensas.metas.all(contaId, trimestre) as { gold: number }[]).map((m) => m.gold);
 /** Marca a meta como premiada; devolve false se já estava (dois pedidos juntos não premiam duas vezes). */
 export const marcarMetaPremiada = (contaId: number, trimestre: string, gold: number) => sqlRecompensas.marcarMeta.run(contaId, trimestre, gold, Date.now()).changes > 0;
+
+// ---------- PvP ranqueado (server/src/ranqueado.ts) ----------
+// Uma linha por conta e formato (Uber, OU, UU, RU): pontos, vitórias e derrotas. `subiu_em` = quando os pontos
+// subiram pela última vez (desempate da Master Ball: quem chegou primeiro fica).
+db.exec(`
+  CREATE TABLE IF NOT EXISTS ranqueado (
+    conta_id INTEGER NOT NULL REFERENCES contas(id) ON DELETE CASCADE,
+    formato TEXT NOT NULL,
+    pontos INTEGER NOT NULL DEFAULT 0 CHECK (pontos >= 0),
+    vitorias INTEGER NOT NULL DEFAULT 0,
+    derrotas INTEGER NOT NULL DEFAULT 0,
+    subiu_em INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (conta_id, formato)
+  );
+  CREATE INDEX IF NOT EXISTS ranqueado_formato ON ranqueado (formato, pontos DESC, subiu_em);
+`);
+export interface LinhaRanqueado { conta_id: number; usuario: string; nome: string | null; formato: string; pontos: number; vitorias: number; derrotas: number }
+const sqlRanqueado = {
+  daConta: db.prepare('SELECT conta_id, formato, pontos, vitorias, derrotas FROM ranqueado WHERE conta_id = ?'),
+  criar: db.prepare('INSERT OR IGNORE INTO ranqueado (conta_id, formato) VALUES (?, ?)'),
+  resultado: db.prepare(`UPDATE ranqueado SET pontos = MAX(0, pontos + ?), vitorias = vitorias + ?, derrotas = derrotas + ?,
+    subiu_em = CASE WHEN ? > 0 THEN ? ELSE subiu_em END WHERE conta_id = ? AND formato = ?`),
+  pontos: db.prepare('SELECT pontos FROM ranqueado WHERE conta_id = ? AND formato = ?'),
+  lista: db.prepare(`SELECT r.conta_id, c.usuario, json_extract(s.dados, '$.aparencia.nome') AS nome, r.formato, r.pontos, r.vitorias, r.derrotas
+    FROM ranqueado r JOIN contas c ON c.id = r.conta_id LEFT JOIN saves s ON s.conta_id = r.conta_id
+    WHERE r.formato = ? AND (r.vitorias + r.derrotas) > 0 ORDER BY r.pontos DESC, r.subiu_em ASC, r.conta_id ASC LIMIT ?`),
+  masters: db.prepare('SELECT conta_id FROM ranqueado WHERE formato = ? AND pontos >= ? ORDER BY pontos DESC, subiu_em ASC, conta_id ASC LIMIT ?'),
+};
+export const ranqueadoDaConta = (contaId: number) => sqlRanqueado.daConta.all(contaId) as { conta_id: number; formato: string; pontos: number; vitorias: number; derrotas: number }[];
+/** Soma o resultado de uma partida (pontos nunca ficam negativos); devolve os pontos novos. */
+export function resultadoRanqueado(contaId: number, formato: string, delta: number, venceu: boolean): number {
+  sqlRanqueado.criar.run(contaId, formato);
+  sqlRanqueado.resultado.run(delta, venceu ? 1 : 0, venceu ? 0 : 1, delta, Date.now(), contaId, formato);
+  return (sqlRanqueado.pontos.get(contaId, formato) as { pontos: number }).pontos;
+}
+export const pontosRanqueado = (contaId: number, formato: string) => (sqlRanqueado.pontos.get(contaId, formato) as { pontos: number } | undefined)?.pontos ?? 0;
+/** Quem já jogou no formato, do primeiro para o último. */
+export const listaRanqueado = (formato: string, limite: number) => sqlRanqueado.lista.all(formato, limite) as unknown as LinhaRanqueado[];
+/** Os donos das vagas da Master Ball (os primeiros com pontos de Beast Ball). */
+export const mastersRanqueado = (formato: string, pontosMinimos: number, vagas: number) => (sqlRanqueado.masters.all(formato, pontosMinimos, vagas) as { conta_id: number }[]).map((l) => l.conta_id);

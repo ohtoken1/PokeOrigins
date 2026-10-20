@@ -1,10 +1,11 @@
 import { ATRIBUTOS, IV_MIN_SHINY, especie, golpesIniciais, hpMaximo, nomeGolpe, ppMaximo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
+import { DURACAO_LUCK_INCENSE_MS, LUCK_INCENSE } from '../../../shared/campo';
 import { evoluir, trocarGolpe } from '../../../shared/batalha/progresso';
 import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { iconeTicketDoPokemon } from './ticketEvento';
-import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
+import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, TODOS_OS_ITENS, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { SEGURAR_OU_EVOLUIR, ehEquipavel, ehItemDeHabilidade, usarItemDeHabilidade, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
-import { seletorDeOrb, CHANCE_SHINY_CUBO_LENDARIO, IV_MINIMO_CUBO_LENDARIO, KIT_INICIANTE, NIVEL_CUBO_LENDARIO, cuboPorItem, ehSeloSazonal } from '../../../shared/itensCustom';
+import { seletorDeItem, seletorDeOrb, CHANCE_SHINY_CUBO_LENDARIO, IV_MINIMO_CUBO_LENDARIO, KIT_INICIANTE, NIVEL_CUBO_LENDARIO, cuboPorItem, ehSeloSazonal } from '../../../shared/itensCustom';
 
 /** Cubo que gera o Pokémon sem precisar de um de origem (Koraidon, Miraidon). */
 const cuboQueGera = (id: string) => { const c = cuboPorItem(id); return c && !c.origens.length ? c : undefined; };
@@ -54,7 +55,12 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
 /** O botão do item: pela categoria; na aba Up, Ability Capsule e Ability Patch são de usar. */
 /** Itens que são gastos ao usar num Pokémon e não voltam: perguntam "tem certeza?" (pedido do dono). */
 const PEDE_CONFIRMACAO = (item: ItemLoja) => ['evolucao', 'cubos', 'mints', 'terashards', 'tm', 'tr', 'formas'].includes(item.categoria) || ehItemDeHabilidade(item.id);
-const acaoDe = (item: ItemLoja) => (seletorDeOrb(item.id) || ehItemDeHabilidade(item.id) || cuboQueGera(item.id) || item.id === BOX_POKEMON || item.id === KIT_INICIANTE || item.id === PASSE_PREMIUM || ehItemDeForma(item.id) ? 'Usar' : ACAO[item.categoria]);
+/** Opções de um Seletor de Mint / de Charm: todas as Mints / os 18 Charms (sem as versões NT). */
+const opcoesDoSeletor = (id: string) => {
+  const s = seletorDeItem(id);
+  return s ? TODOS_OS_ITENS.filter((i) => i.categoria === s.categoria && !i.id.endsWith('-nt') && !seletorDeItem(i.id)).map((i) => i.id) : null;
+};
+const acaoDe = (item: ItemLoja) => (seletorDeOrb(item.id) || seletorDeItem(item.id) || item.id === LUCK_INCENSE || ehItemDeHabilidade(item.id) || cuboQueGera(item.id) || item.id === BOX_POKEMON || item.id === KIT_INICIANTE || item.id === PASSE_PREMIUM || ehItemDeForma(item.id) ? 'Usar' : ACAO[item.categoria]);
 
 type Modo =
   | { tipo: 'lista' }
@@ -326,13 +332,14 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
     }
 
     if (modo.tipo === 'orb') {
-      // Seletor de Orb (pedido do dono): escolhe a Orb da lista; com mais de um seletor, escolhe também quantos usar
+      // Seletor de Orb (pedido do dono): escolhe a Orb da lista; com mais de um seletor, escolhe também quantos usar.
+      // Os Seletores de Mint e de Charm (Loja da Liga Nightmare) usam a mesma tela.
       const m = modo;
       const tem = save.itens[m.item.id] ?? 0;
       const campoQtd = el('input', { type: 'number', class: 'db-busca seletor-quantidade', min: '1', max: String(tem), value: '1', 'aria-label': 'Quantidade' }) as HTMLInputElement;
       const quantos = () => Math.min(tem, Math.max(1, Math.floor(Number(campoQtd.value) || 1)));
       return el('div', { class: 'bolsa' },
-        el('p', {}, `${m.item.nome}: escolha a Orb que você quer.`),
+        el('p', {}, seletorDeOrb(m.item.id) ? `${m.item.nome}: escolha a Orb que você quer.` : `${m.item.nome}: escolha o item que você quer.`),
         tem > 1 ? el('label', { class: 'seletor-qtd' }, `Quantos usar (você tem ${tem}): `, campoQtd) : '',
         el('div', { class: 'escolha-forma' },
           m.orbs.map((orb) => {
@@ -348,7 +355,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                 concluir(`Você recebeu ${n} ${nomeOrb}!`);
                 refazer();
               },
-            }, iconeTicketDoPokemon(orb, 44) ?? '', el('strong', {}, nomeOrb));
+            }, iconeTicketDoPokemon(orb, 44) ?? (itemDaLoja(orb) ? iconeItem(itemDaLoja(orb)!) : ''), el('strong', {}, nomeOrb));
           })),
         el('button', { class: 'botao', onclick: () => ((modo = { tipo: 'lista' }), refazer()) }, 'Cancelar'));
     }
@@ -526,8 +533,20 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                     onclick: async () => {
                       aviso = '';
                       if (item.id === BOX_POKEMON && podeAbrirBox(save) && !(await confirmar(item.nome, 'Usar o Box Pokémon para abrir mais uma box no PC? O item é gasto.'))) return;
-                      if (seletorDeOrb(item.id)) {
-                        modo = { tipo: 'orb', item, orbs: seletorDeOrb(item.id)!.orbs };
+                      if (item.id === LUCK_INCENSE) {
+                        // Luck Incense (pedido do dono): consumível, +20% de Poké Dólares por 1 hora
+                        const ate = save.incensoAte ?? 0;
+                        if (ate > Date.now()) {
+                          aviso = `Já tem um Luck Incense valendo até ${new Date(ate).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}.`;
+                          return refazer();
+                        }
+                        if (!(await confirmar(item.nome, 'Usar o Luck Incense? Por 1 hora, as batalhas contra treinadores e ginásios dão 20% a mais de Poké Dólares. Ele é gasto.'))) return;
+                        gastar(item.id);
+                        save.incensoAte = Date.now() + DURACAO_LUCK_INCENSE_MS;
+                        concluir('Luck Incense aceso: +20% de Poké Dólares por 1 hora.');
+                        refazer();
+                      } else if (seletorDeOrb(item.id) || seletorDeItem(item.id)) {
+                        modo = { tipo: 'orb', item, orbs: seletorDeOrb(item.id)?.orbs ?? opcoesDoSeletor(item.id)! };
                         refazer();
                       } else if (item.categoria === 'ovos') {
                         abrirJanelaOvo(save, item.id, () => {

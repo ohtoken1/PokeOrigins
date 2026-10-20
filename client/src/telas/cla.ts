@@ -1,5 +1,6 @@
 // Comunidade → Clã. Sem clã: criar (bandeira + nome, custa gold) ou entrar num da lista. Com clã: bandeira, nível
 // (só a porcentagem), missões do nível, membros com o cargo (líder, vice-líder, membro) e a gestão de quem pode.
+import { abrirLojaDaGuilda } from '../ui/lojaGuilda';
 import {
   BANDEIRA_PADRAO, bonusDoCla, DESCRICAO_CLA_MAX, XP_CLA_POR_POKEMON_DE_TREINADOR, XP_CLA_POR_SELVAGEM, XP_CLA_POR_TORNEIO, limparNomeCla, NIVEL_MAX_CLA, NOME_CLA_MAX, NOME_CLA_VALIDO, PRECO_CRIAR_CLA_GOLD, VAGAS_CLA, type Bandeira,
 } from '../../../shared/cla';
@@ -114,6 +115,7 @@ export const telaCla: Tela = (raiz) => {
             botao('Recusar', () => void fazer(responderPedidoDeCla(p.usuario, false)))))))) : null,
       aviso,
       el('div', { class: 'cla-rodape' },
+        botao('🛒 Loja da guilda', () => abrirLojaDaGuilda(), ''),
         lider ? botao('Editar bandeira e descrição', editar) : null,
         botao('Sair da guilda', async () => {
           const sozinho = c.membros.length === 1;

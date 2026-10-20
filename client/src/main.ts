@@ -44,6 +44,8 @@ import { vigiarRecompensas } from './recompensas';
 import { ativarAtalhos } from './atalhos';
 import { ativarDicasDoJogo, avisar } from './ui/avisos';
 import { vigiarTorneio } from './ui/torneio';
+import { vigiarRanqueado } from './ui/ranqueado';
+import { vigiarLiga } from './ui/liga';
 import { vigiarEntregas } from './entregas';
 import { vigiarCreche } from './creche';
 import { vigiarMercado } from './mercado';
@@ -53,8 +55,10 @@ import { prepararIdioma } from './idioma';
 import './ui/chat';
 import { vigiarTutorial } from './tutorial';
 import { ativarDicaDeItens } from './ui/dicaItem';
+import { ativarToqueLongo } from './ui/toqueLongo';
+import { prepararApp } from './instalar';
 
-export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes'; professor?: 'relembrar' | 'tutor'; daCidade?: boolean } | { tela: 'ranking' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' } | { tela: 'cidade' } | { tela: 'safari' };
+export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes'; professor?: 'relembrar' | 'tutor'; daCidade?: boolean } | { tela: 'ranking'; categoria?: 'ranqueado' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' } | { tela: 'cidade' } | { tela: 'safari' };
 export type Navegar = (destino: Destino) => void;
 /** Cada tela desenha dentro de `raiz` e pode devolver uma função de limpeza. */
 export type Tela = (raiz: HTMLElement, navegar: Navegar) => (() => void) | void;
@@ -80,7 +84,7 @@ const navegar: Navegar = (destino) => {
   else if (destino.tela === 'personagem') limparTelaAtual = telaPersonagem(raiz, navegar);
   else if (destino.tela === 'opcoes') limparTelaAtual = telaOpcoes(raiz, navegar);
   else if (destino.tela === 'golpes') limparTelaAtual = telaGolpes(destino.professor, destino.daCidade)(raiz, navegar);
-  else if (destino.tela === 'ranking') limparTelaAtual = telaRanking(raiz, navegar);
+  else if (destino.tela === 'ranking') limparTelaAtual = telaRanking(raiz, navegar, destino.categoria);
   else if (destino.tela === 'comunidade') limparTelaAtual = telaComunidade(destino.secao)(raiz, navegar);
   else if (destino.tela === 'administracao') limparTelaAtual = telaAdministracao(destino.secao)(raiz, navegar);
   else if (destino.tela === 'jogadores') limparTelaAtual = telaJogadores(raiz, navegar);
@@ -97,6 +101,10 @@ ativarDeslizantes();
 // o idioma vem antes de tudo: a tela de entrada já aparece traduzida
 // avisos e dicas no visual do jogo (nada de janela do navegador); alert esquecido também vira aviso
 ativarDicasDoJogo();
+// celular: tocar e segurar mostra os cartões que no PC aparecem com o mouse em cima
+ativarToqueLongo();
+// app instalável (PWA): pedido de instalação e assistente de fundo
+prepararApp();
 window.alert = (texto?: unknown) => avisar(String(texto ?? ''));
 void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   if (conta.admin) montarPainelAdmin(() => navegar(destinoAtual));
@@ -133,6 +141,8 @@ void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   // atalhos de teclado (I Bolsa, P PC, X Pokédex… F1 mostra todos)
   ativarAtalhos(navegar, () => destinoAtual);
   vigiarTorneio();
+  vigiarRanqueado();
+  vigiarLiga();
   vigiarCreche();
   vigiarMercado();
   vigiarQuadro();

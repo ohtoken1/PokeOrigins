@@ -16,8 +16,9 @@ interface Licao {
 }
 
 const LICOES: Licao[] = [
+  { conteudo: 'loginBoasVindas', guia: { grupo: 'sistemas', topico: 'login' }, fala: 'Agora você ganha prêmios só por entrar no jogo! Nos 7 primeiros dias da sua conta, cada dia em que você entra vale um prêmio. Veja em Minha conta → Recompensas; os prêmios chegam pelo Correio.' },
+  { conteudo: 'loginTrinta', guia: { grupo: 'sistemas', topico: 'login' }, fala: 'Você liberou o login dos 30 dias! Nos 30 primeiros dias do servidor, cada dia tem o seu prêmio: entrou naquele dia, ganha; não entrou, perde. Se for VIP, dá para recuperar até 3 dias perdidos.' },
   { conteudo: 'troca', guia: { grupo: 'sistemas', topico: 'trocas' }, fala: 'Agora você pode trocar com outros treinadores! Clique em um jogador no mapa e escolha "Trocar": cada um monta a sua oferta de Pokémon, itens e moedas.' },
-  { conteudo: 'loginBoasVindas', fala: 'Agora você ganha prêmios só por entrar no jogo! Nos 7 primeiros dias da sua conta, cada dia em que você entra vale um prêmio, e há também o login dos 30 dias. Veja em Minha conta → Recompensas; os prêmios chegam pelo Correio.' },
   { conteudo: 'mercadoNegro', guia: { grupo: 'sistemas', topico: 'mercado' }, fala: 'Agora você pode usar o Mercado negro da cidade! Lá os treinadores anunciam Pokémon, itens e Origin Coins, e você pode comprar ou vender os seus.' },
   { conteudo: 'canteiros', guia: { grupo: 'sistemas', topico: 'craft' }, fala: 'A Artesã da horta liberou os canteiros para você! Plante Berries e Apricorns, regue e colha depois.' },
   { conteudo: 'craftBola', guia: { grupo: 'sistemas', topico: 'craft' }, fala: 'Agora a Artesã também faz Pokébolas especiais para você, usando Apricorns.' },
@@ -28,7 +29,7 @@ const LICOES: Licao[] = [
   { conteudo: 'boss', guia: { grupo: 'eventos', topico: 'boss' }, fala: 'Agora você pode enfrentar os Bosses que aparecem na gaiola da cidade! Cada treinador luta uma vez, e quem causar mais dano ganha prêmios.' },
   { conteudo: 'safari', guia: { grupo: 'eventos', topico: 'safari' }, fala: 'O Safari está aberto para você! Escolha um tipo e passe por três salas cheias de Pokémon com IVs altos, e shiny e raros aparecem muito mais.' },
   { conteudo: 'craftCharm', guia: { grupo: 'sistemas', topico: 'craft' }, fala: 'A Artesã agora sabe fazer Charms! Com Berries e Energies do mesmo tipo, você aumenta a chance de shiny daquele tipo.' },
-  { conteudo: 'liga', guia: { grupo: 'eventos', topico: 'liga' }, fala: 'Você está pronto para a Liga Pokémon! Enfrente a Elite 4 e o Campeão — ou a Liga Nightmare, se tiver coragem. Uma tentativa por semana.' },
+  { conteudo: 'liga', guia: { grupo: 'eventos', topico: 'liga' }, fala: 'Você está pronto para a Liga Pokémon! Enfrente a Elite 4 — ou a Liga Nightmare, se tiver coragem. Uma tentativa por semana, com o time de 6 travado do começo ao fim.' },
 ];
 
 /** Introdução ao jogo (pedido do dono): aparece uma vez, para quem acabou de começar. Uma fala por página. */

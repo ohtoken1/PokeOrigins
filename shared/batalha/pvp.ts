@@ -36,24 +36,34 @@ const TODAS: MecanicasPvp = { mega: true, dynamax: true, z: true, tera: true };
 export class BatalhaPvp {
   readonly batalha: Battle;
   private visoes: [BatalhaSelvagem, BatalhaSelvagem];
+  /** Os times da batalha (cópias; `timeFinal` devolve com HP, status e PP do fim). */
+  private times: PokemonIndividual[][];
 
-  constructor(a: JogadorPvp, b: JogadorPvp, regras: RegraPvp[] = [], private mecanicas: MecanicasPvp = TODAS) {
-    // todo mundo entra curado (cópias: o save de ninguém muda)
-    const times = [a, b].map((j) =>
+  /**
+   * `curar`: quem entra curado (padrão: os dois). A Liga Pokémon (PvE no servidor) passa [false, true]: o time do
+   * jogador entra como está (o desafio não cura entre as batalhas) e o do treinador, curado.
+   */
+  constructor(a: JogadorPvp, b: JogadorPvp, regras: RegraPvp[] = [], private mecanicas: MecanicasPvp = TODAS, curarTimes: [boolean, boolean] = [true, true]) {
+    // cópias: o save de ninguém muda
+    const times = [a, b].map((j, lado) =>
       j.time.map((p) => {
         const c = structuredClone(p);
-        curar(c);
+        if (curarTimes[lado]) curar(c);
         return c;
       }),
     );
+    this.times = times;
+    // time sem curar (Liga) pode ter desmaiados: só os vivos entram no simulador (com o número original, P<i>)
+    const vivos = times.map((t) => t.map((p, i) => ({ p, i })).filter((x) => x.p.hp > 0));
+    if (vivos.some((v) => !v.length)) throw new Error('Nenhum Pokémon em condições de lutar');
     // o vencedor é reconhecido pelo nome: dois jogadores com o mesmo nome de treinador ganham um sufixo
     const nomes = [a.nome, a.nome === b.nome ? `${b.nome} (2)` : b.nome];
     const formato = `gen9customgame@@@${['HP Percentage Mod', ...regras].join(',')}`;
     this.batalha = new Battle({ formatid: formato as never, format: Dex.formats.get(formato, true) as never });
     // o formato de teste do Showdown mostra o HP exato dos dois lados; aqui cada um vê o do outro só em porcentagem
     this.batalha.reportExactHP = false;
-    this.batalha.setPlayer('p1', { name: nomes[0], team: times[0].map((p, i) => conjuntoShowdown(p, `P${i}`)) as never });
-    this.batalha.setPlayer('p2', { name: nomes[1], team: times[1].map((p, i) => conjuntoShowdown(p, `P${i}`)) as never });
+    this.batalha.setPlayer('p1', { name: nomes[0], team: vivos[0].map(({ p, i }) => conjuntoShowdown(p, `P${i}`)) as never });
+    this.batalha.setPlayer('p2', { name: nomes[1], team: vivos[1].map(({ p, i }) => conjuntoShowdown(p, `P${i}`)) as never });
     // Dynamax: o simulador só libera na 8ª geração; religamos para os dois (a Dynamax Band é conferida no pedido)
     for (const lado of [this.batalha.p1, this.batalha.p2]) {
       lado.dynamaxUsed = false;
@@ -62,8 +72,8 @@ export class BatalhaPvp {
     const visao = (eu: number, lado: 'p1' | 'p2') => {
       const outro = 1 - eu;
       const j = [a, b];
-      return new BatalhaSelvagem(times[eu], j[eu].nomes, times[outro][0], j[outro].nomes[0], 0, Math.random,
-        { nome: nomes[outro], equipe: times[outro], nomesEquipe: j[outro].nomes }, { batalha: this.batalha, lado });
+      return new BatalhaSelvagem(times[eu], j[eu].nomes, vivos[outro][0].p, j[outro].nomes[vivos[outro][0].i], 0, Math.random,
+        { nome: nomes[outro], equipe: vivos[outro].map((x) => x.p), nomesEquipe: j[outro].nomes }, { batalha: this.batalha, lado });
     };
     this.visoes = [visao(0, 'p1'), visao(1, 'p2')];
   }
@@ -104,6 +114,44 @@ export class BatalhaPvp {
       comando = v.comandoTroca(escolha.posicao);
     }
     return this.batalha.choose(lado === 0 ? 'p1' : 'p2', comando);
+  }
+
+  /**
+   * Escolha automática do treinador NPC (Liga): troca para o próximo vivo quando precisa e, ao atacar, usa o golpe
+   * que mais machuca 75% das vezes (a mesma IA dos treinadores do jogo, shared/batalha/motor.ts).
+   */
+  escolherIa(lado: 0 | 1, aleatorio = Math.random): void {
+    const id = lado === 0 ? 'p1' : 'p2';
+    const s = this.batalha[id];
+    const alvo = this.batalha[lado === 0 ? 'p2' : 'p1'].active[0];
+    if (s.requestState === 'switch') {
+      const i = s.pokemon.findIndex((p) => !p.fainted && !p.isActive);
+      if (i < 0 || !this.batalha.choose(id, `switch ${i + 1}`)) this.batalha.choose(id, 'default');
+      return;
+    }
+    if (s.requestState !== 'move') return;
+    const golpes = (((s.activeRequest as { active?: { moves: { id: string; disabled?: boolean; pp?: number }[] }[] } | null)?.active?.[0]?.moves) ?? [])
+      .map((m, i) => ({ m, i }))
+      .filter(({ m }) => !m.disabled && (m.pp === undefined || m.pp > 0));
+    if (!golpes.length) return void this.batalha.choose(id, 'default');
+    let escolhido = golpes[Math.floor(aleatorio() * golpes.length)].i + 1;
+    if (aleatorio() < 0.75) {
+      const atacante = s.active[0];
+      const forca = (golpe: string) => {
+        const g = Dex.moves.get(golpe);
+        if (g.category === 'Status' || !alvo) return 15;
+        if (!Dex.getImmunity(g.type, alvo.getTypes())) return 0;
+        return (g.basePower || 50) * (atacante.hasType(g.type) ? 1.5 : 1) * 2 ** Dex.getEffectiveness(g.type, alvo.getTypes());
+      };
+      escolhido = golpes.reduce((x, y) => (forca(y.m.id) > forca(x.m.id) ? y : x)).i + 1;
+    }
+    if (!this.batalha.choose(id, `move ${escolhido}`)) this.batalha.choose(id, 'default');
+  }
+
+  /** O time de um lado como terminou a batalha (HP, status, PP e frutas gastas). */
+  timeFinal(lado: 0 | 1): PokemonIndividual[] {
+    this.visoes[lado].sincronizar();
+    return this.times[lado];
   }
 
   /** Desistência (ou tempo esgotado): o lado perde na hora. */

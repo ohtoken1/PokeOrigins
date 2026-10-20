@@ -15,11 +15,13 @@ export function selosBonus(): HTMLElement | null {
   const save = carregarSave();
   const charms = save ? charmsAtivos(save) : [];
   const hora = (ms: number) => new Date(ms).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  if (!ativos.length && !charms.length) return null;
+  const incenso = save?.incensoAte && save.incensoAte > Date.now() ? save.incensoAte : 0;
+  if (!ativos.length && !charms.length && !incenso) return null;
   return el(
     'div',
     { class: 'selos-bonus' },
     ...ativos.map((k) => el('span', { class: `selo-bonus bonus-${k}`, title: 'Bônus ligado pela administração' }, `${CURTOS[k]} ${textoBonus(b[k])}`)),
+    incenso ? el('span', { class: 'selo-bonus bonus-silver', title: 'Luck Incense usado: +20% de Poké Dólares nas batalhas contra treinadores e ginásios' }, `Luck Incense até ${hora(incenso)}`) : '',
     ...charms.map((t) => el('span', { class: 'selo-bonus bonus-charm', style: { '--cor-tipo': corTipo(t) }, title: `${nomeCharm(t)} usado: +20% de chance de shiny nos Pokémon desse tipo` }, `${nomeCharm(t)} até ${hora(charmAte(save!, t))}`)),
   );
 }

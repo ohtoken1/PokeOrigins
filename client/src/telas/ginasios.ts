@@ -89,8 +89,9 @@ export const telaGinasios: Tela = (raiz, navegar) => {
     const fechado = bloqueio();
     const podeLutar = !fechado && save!.time.some((p) => p.hp > 0);
     corpo.replaceChildren(
-      el('nav', { class: 'abas abas-regioes-ginasio' },
-        ...REGIOES.filter((r) => r.disponivel).map((r) => el('button', { class: `aba ${r.id === regiao ? 'ativa' : ''}`, onclick: () => ((regiao = r.id), desenhar()) }, r.nome))),
+      // escolher a região só para a staff (pedido do dono): o jogador vê só os ginásios da região onde está
+      admin ? el('nav', { class: 'abas abas-regioes-ginasio' },
+        ...REGIOES.filter((r) => r.disponivel).map((r) => el('button', { class: `aba ${r.id === regiao ? 'ativa' : ''}`, onclick: () => ((regiao = r.id), desenhar()) }, r.nome))) : '',
       fechado ? el('p', { class: 'aviso-mapas-viagem' }, fechado) : '',
       el('div', { class: 'ginasios-resumo' },
         el('strong', {}, `Insígnias de ${REGIOES.find((r) => r.id === regiao)?.nome}: ${ganhas}/${lideres.length}`),

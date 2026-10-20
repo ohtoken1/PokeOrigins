@@ -1,6 +1,7 @@
 // Aba "Administração" (só para contas de administrador). Eventos (o que a staff liga na hora: por enquanto a
 // Bonificação), Dar item (manda um item para qualquer jogador, pelo servidor), Dar Pokémon e Anúncios (vão para o
 // Mural da cidade) funcionam; o Log fica "em breve".
+import { comMenuLateral, menuLateral } from '../ui/menuLateral';
 import type { Tela } from '../main';
 import { painelEventosStaff } from '../ui/eventos';
 import { painelRecompensasStaff } from './adminRecompensas';
@@ -40,6 +41,14 @@ export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBre
     emBreve: 'Registro de tudo o que acontece no jogo: o que entra e sai (Poké Dólares, Origin Coins, itens, Pokémon, tickets), quem fez e quando — para achar abuso de bug. Vai ser ligado com o servidor.',
   },
   { id: 'anuncios', nome: 'Anúncios' },
+];
+
+/** Menu na lateral (modelo escolhido pelo dono): as seções por assunto, com ícone. */
+const GRUPOS_ADMIN: { titulo: string; secoes: [SecaoAdministracao, string][] }[] = [
+  { titulo: 'Jogadores', secoes: [['correio', '✉️'], ['itens', '🎁'], ['pokemon', '🐾'], ['banimentos', '⛔']] },
+  { titulo: 'Eventos', secoes: [['eventos', '📅'], ['liga', '👑'], ['torneio', '🏟️']] },
+  { titulo: 'Comunicação', secoes: [['anuncios', '📢'], ['log', '📜']] },
+  { titulo: 'Negócios', secoes: [['parceria', '🤝']] },
 ];
 
 /** Anúncios: escrever um aviso novo (vai para o Mural de anúncios da cidade de todos) e apagar os que já estão lá. */
@@ -207,8 +216,8 @@ export const telaAdministracao = (secaoInicial: SecaoAdministracao): Tela => (ra
     const b = bonificacao();
     const ativos = (Object.keys(b) as ChaveBonus[]).filter((k) => b[k] > 1);
     corpo.replaceChildren(
-      el('nav', { class: 'admin-abas' },
-        ...SECOES_ADMINISTRACAO.map((s) => el('button', { class: `aba ${s.id === secao ? 'ativa' : ''}`, onclick: () => navegar({ tela: 'administracao', secao: s.id }) }, s.nome))),
+      comMenuLateral(menuLateral(GRUPOS_ADMIN.map((g) => ({ titulo: g.titulo, opcoes: g.secoes.map(([id, icone]) => ({ id, icone, nome: SECOES_ADMINISTRACAO.find((s) => s.id === id)!.nome })) })),
+        secao, (id) => navegar({ tela: 'administracao', secao: id as SecaoAdministracao })),
       info.emBreve
         ? el('section', { class: 'em-breve' }, el('span', { class: 'selo-em-breve' }, 'Em breve'), el('p', {}, info.emBreve))
         : partesAnuncios ? partesAnuncios.elemento
@@ -226,7 +235,7 @@ export const telaAdministracao = (secaoInicial: SecaoAdministracao): Tela => (ra
             el('small', { class: 'meta' }, 'Por enquanto fica guardado só neste navegador; com o servidor, vai valer para todo mundo.'),
             painelEventosStaff(),
             painelRecompensasStaff(),
-          ),
+          )),
     );
   }
   desenhar();

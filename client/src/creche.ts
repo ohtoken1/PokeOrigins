@@ -1,5 +1,6 @@
 // Creche (breeding) no save do jogador: casais guardados em `save.creche`, ciclos de ovo e o ovo que sai como um
 // Pokémon para o PC. Regras em shared/breeding.ts (planilha do dono).
+import { DESTINY_KNOT } from '../../shared/breeding';
 import { golpesIniciais, hpMaximo, ppMaximo } from '../../shared/batalha/pokemon';
 import {
   PASSOS_PARA_CHOCAR,
@@ -85,6 +86,9 @@ export function retirarOvo(save: Save, i: number): PokemonDoJogador | null {
   const casal = casaisDe(save)[i];
   if (!casal?.ovo) return null;
   const ovo = criarOvo(casal);
+  // Destiny Knot (pedido do dono, 20/10/2026): é gasto no ovo em que foi usado (um só, mesmo com os dois segurando)
+  const comNo = casal.pais.find((p) => p.item === DESTINY_KNOT);
+  if (comNo) comNo.item = null;
   guardarNoPC(save, ovo);
   casal.ovo = false;
   casal.desde = Date.now();

@@ -1,5 +1,6 @@
 // Os OUTROS jogadores no mesmo mapa (sala do servidor): personagem LPC de cada um, nome em cima, sombra e o
 // Pokémon que segue (sprite do PMD). Andam de tile em tile como o jogador; clicar no boneco abre o menu de interação.
+import { SeloEloNoMapa } from './eloNoMapa';
 import Phaser from 'phaser';
 import { APARENCIA_PADRAO, montarPersonagem, type FolhasPersonagem } from '../personagem/lpc';
 import type { DirecaoOnline, JogadorOnline, OuvinteSala, VisualOnline } from '../online';
@@ -44,6 +45,7 @@ interface Outro {
   corpo: Phaser.GameObjects.Image;
   sombra: Phaser.GameObjects.Ellipse;
   nome: Phaser.GameObjects.Text;
+  seloElo: SeloEloNoMapa;
   seguidor: Phaser.GameObjects.Sprite | null;
   sombraSeguidor: Phaser.GameObjects.Ellipse | null;
   pmd: InfoPmd | null;
@@ -89,7 +91,8 @@ export class OutrosJogadores implements OuvinteSala {
       .setDepth(99999)
       .setScale(TAMANHO_NOME_TELA / (FONTE_NOME * ZOOM));
     nome.texture.setFilter(Phaser.Textures.FilterMode.LINEAR);
-    const outro: Outro = { dados: j, corpo, sombra, nome, seguidor: null, sombraSeguidor: null, pmd: null, linhaPmd: 0, posSeguidor: { x: j.x, y: j.y }, lpc: null, brilho: null, ciclo: 0, movendo: false, fila: [] };
+    const seloElo = new SeloEloNoMapa(cena, nome, (p) => this.aoClicar(outro.dados, p.event as MouseEvent));
+    const outro: Outro = { dados: j, corpo, sombra, nome, seloElo, seguidor: null, sombraSeguidor: null, pmd: null, linhaPmd: 0, posSeguidor: { x: j.x, y: j.y }, lpc: null, brilho: null, ciclo: 0, movendo: false, fila: [] };
     this.outros.set(j.id, outro);
     // clicar no boneco (ou no nome) abre o menu: perfil, trocar, duelo
     for (const alvo of [corpo, nome]) {
@@ -105,6 +108,7 @@ export class OutrosJogadores implements OuvinteSala {
     if (!o) return;
     this.cena.tweens.killTweensOf([o.corpo, o.seguidor].filter(Boolean) as Phaser.GameObjects.GameObject[]);
     o.brilho?.destruir();
+    o.seloElo.destruir();
     for (const obj of [o.corpo, o.sombra, o.nome, o.seguidor, o.sombraSeguidor]) obj?.destroy();
     this.outros.delete(id);
   }
@@ -131,6 +135,7 @@ export class OutrosJogadores implements OuvinteSala {
 
   // ---- desenho ----
   private aplicarVisual(o: Outro): void {
+    o.seloElo.definir(o.dados.visual.elo);
     const { chave, folhas } = folhasDe(o.dados.visual.aparencia);
     void folhas.then((f) => {
       if (!o.corpo.active) return;
@@ -165,6 +170,7 @@ export class OutrosJogadores implements OuvinteSala {
     o.sombra.setPosition(o.corpo.x, o.corpo.y - 1).setDepth(o.corpo.y - 0.5);
     o.corpo.setDepth(o.corpo.y);
     o.nome.setPosition(o.corpo.x, o.corpo.y - (o.lpc ? 25 : 18));
+    o.seloElo.posicionar();
     if (o.seguidor && o.sombraSeguidor) {
       o.seguidor.setDepth(o.seguidor.y);
       o.sombraSeguidor.setPosition(o.seguidor.x, o.seguidor.y - 1).setDepth(o.seguidor.y - 0.5);
