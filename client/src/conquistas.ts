@@ -3,6 +3,7 @@
 // conquistas; só então vai para `feitas`, que é o que vale para os bônus e os títulos. A lista e as recompensas ficam em shared/conquistas.ts.
 import { CONQUISTAS, CONQUISTAS_CONTADAS, textoRecompensa, type Conquista, type EstadoConquistas } from '../../shared/conquistas';
 import { TIPOS_DOS_CHARMS } from '../../shared/charms';
+import { SELOS_SAZONAIS } from '../../shared/itensCustom';
 import { ehLendario } from '../../shared/encontros';
 import { ehParadoxo, formaRegional } from '../../shared/formasRegionais';
 import { LIDERES, lideresDaRegiao } from '../../shared/ginasios';
@@ -19,7 +20,10 @@ import { el } from './ui/dom';
 /** Coisas feitas uma vez que o save não mostra sozinho. */
 export type MarcaConquista =
   | 'charm' | 'cuboPassado' | 'cuboFuturo' | 'ticketEpico' | 'ticketLendario' | 'ticketMitico' | 'ovoLendario'
-  | 'lendarioEscapou' | 'lendarioUltraball' | 'mega' | 'tera' | 'dynamax' | 'guildaEntrou' | 'guildaCriou' | 'guildaMax';
+  | 'lendarioEscapou' | 'lendarioUltraball' | 'mega' | 'tera' | 'dynamax' | 'guildaEntrou' | 'guildaCriou' | 'guildaMax'
+  | 'craftBola' | 'craftCharm' | 'plantou' | 'breeding' | 'safariInicial' | 'safariLendario' | 'tutorial'
+  // anotadas pelo SERVIDOR (cartas do Correio e Mercado negro; `marcarConquistaNoSave` em server/src/entregas.ts)
+  | 'ligaNormal' | 'ligaNightmare' | 'bossMundial' | 'bossMundialVenceu' | 'cofre' | 'vendeuPokemon' | 'doou' | 'bossGuildaPrimeiro';
 
 const estadoDe = (save: Save): EstadoConquistas => {
   const e = (save.conquistas ??= { feitas: {}, marcas: {} });
@@ -131,6 +135,32 @@ const FIXAS: Record<string, (x: Contexto) => Progresso> = {
   'guilda-entrar': (x) => sim(!!x.marcas.guildaEntrou),
   'guilda-criar': (x) => sim(!!x.marcas.guildaCriou),
   'guilda-max': (x) => sim(!!x.marcas.guildaMax),
+  'torneio-1': (x) => ({ valor: Math.min(1, x.save.estatisticas?.medalhasOuro ?? 0), meta: 1 }),
+  'torneio-20': (x) => ({ valor: x.save.estatisticas?.medalhasOuro ?? 0, meta: 20 }),
+  'torneio-100': (x) => ({ valor: x.save.estatisticas?.medalhasOuro ?? 0, meta: 100 }),
+  'pokemon-medalhas': (x) => ({ valor: Math.max(0, ...x.meus.map((p) => p.medalhas ?? 0)), meta: 100 }),
+  'liga-normal': (x) => sim(!!x.marcas.ligaNormal),
+  'liga-nightmare': (x) => sim(!!x.marcas.ligaNightmare),
+  'safari-1': (x) => ({ valor: Math.min(1, x.save.safari?.total ?? 0), meta: 1 }),
+  'safari-50': (x) => ({ valor: x.save.safari?.total ?? 0, meta: 50 }),
+  'safari-500': (x) => ({ valor: x.save.safari?.total ?? 0, meta: 500 }),
+  'safari-inicial': (x) => sim(!!x.marcas.safariInicial),
+  'safari-lendario': (x) => sim(!!x.marcas.safariLendario),
+  'boss-mundial': (x) => sim(!!x.marcas.bossMundial),
+  'boss-mundial-vencer': (x) => sim(!!x.marcas.bossMundialVenceu),
+  chaveiro: (x) => sim(!!x.marcas.cofre),
+  breeding: (x) => sim(!!x.marcas.breeding),
+  fazendeiro: (x) => sim(!!x.marcas.plantou),
+  engenheiro: (x) => sim(!!x.marcas.craftBola),
+  charmoso: (x) => sim(!!x.marcas.craftCharm),
+  comerciante: (x) => sim(!!x.marcas.vendeuPokemon),
+  vip: (x) => sim(typeof x.save.vipAte === 'number' && x.save.vipAte > 0),
+  conhecedor: (x) => sim(!!x.marcas.tutorial),
+  doacao: (x) => sim(!!x.marcas.doou),
+  'que-boss': (x) => sim(!!x.marcas.bossGuildaPrimeiro),
+  sazonal: (x) => sim(SELOS_SAZONAIS.some((s) => (x.save.itens[s.id] ?? 0) > 0)),
+  'sazonal-todos': (x) => ({ valor: SELOS_SAZONAIS.filter((s) => (x.save.itens[s.id] ?? 0) > 0).length, meta: SELOS_SAZONAIS.length }),
+  ...Object.fromEntries(SELOS_SAZONAIS.map((s) => [`sazonal-${s.id.slice('selo-'.length)}`, (x: Contexto) => sim((x.save.itens[s.id] ?? 0) > 0)])),
 };
 
 function progressoCom(c: Conquista, x: Contexto): Progresso {
@@ -175,9 +205,12 @@ export function resgatarConquista(save: Save, id: string): Conquista | null {
 
 function entregar(save: Save, c: Conquista): void {
   const r = c.recompensa;
+  // Kit iniciante da Conhecedor: quem começou antes de ele vir por aqui já ganhou o kit no começo (não ganha dois)
+  if (c.id === 'conhecedor' && !save.kitPelaConquista) return;
   if (r.tipo === 'item') save.itens[r.id] = (save.itens[r.id] ?? 0) + r.quantidade;
   else if (r.tipo === 'silver') save.silver += r.quantidade;
   else if (r.tipo === 'fragmentos') save.fragmentos = (save.fragmentos ?? 0) + r.quantidade;
+  else if (r.tipo === 'vip') save.vipAte = Math.max(save.vipAte ?? 0, Date.now()) + r.dias * 86_400_000;
   // bônus e títulos valem pela conquista estar concluída (não guardam nada a mais)
 }
 
@@ -214,12 +247,18 @@ function mostrarProximo(): void {
     ...lote.slice(0, 3).map((c) => el('span', {}, el('b', {}, c.nome), ` · ${textoRecompensa(c.recompensa)}`)),
     lote.length > 3 ? el('small', {}, `e mais ${lote.length - 3}.`) : '',
     el('small', {}, 'Resgate a recompensa em Minha conta → Conquistas.'),
+    // pedido do dono: leva direto para a conquista do aviso (a tela rola até ela e a destaca)
+    el('button', { class: 'botao aviso-conquista-ir', onclick: () => {
+      destaque = lote[0].id;
+      caixa!.hidden = true;
+      irParaConquistas?.();
+    } }, 'Ir para a conquista'),
   );
   caixa.hidden = false;
   setTimeout(() => {
     if (caixa) caixa.hidden = true;
     setTimeout(mostrarProximo, 300);
-  }, 6000);
+  }, 9000);
 }
 
 const aoConcluirFns: (() => void)[] = [];
@@ -229,8 +268,18 @@ export const aoConcluirConquista = (fn: () => void) => {
   return () => void aoConcluirFns.splice(aoConcluirFns.indexOf(fn), 1);
 };
 
-/** Liga a conferência: uma vez agora e de novo logo depois de cada salvamento. */
-export function vigiarConquistas(): void {
+let irParaConquistas: (() => void) | null = null;
+let destaque: string | null = null;
+/** A conquista que o aviso mandou mostrar (a tela das conquistas pega uma vez só). */
+export function pegarConquistaEmDestaque(): string | null {
+  const d = destaque;
+  destaque = null;
+  return d;
+}
+
+/** Liga a conferência: uma vez agora e de novo logo depois de cada salvamento. `abrirConquistas` abre a tela delas. */
+export function vigiarConquistas(abrirConquistas: () => void): void {
+  irParaConquistas = abrirConquistas;
   caixa = el('div', { class: 'aviso-conquista', role: 'status', hidden: true });
   document.body.append(caixa);
   let relogio: ReturnType<typeof setTimeout> | undefined;

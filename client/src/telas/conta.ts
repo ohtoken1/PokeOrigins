@@ -2,7 +2,7 @@
 import { bonusAtivoDaSkin, bonusDaSkin, moverSkin, skinsNaBolsa, skinsNaColecao, temSkin, textoBonusSkin } from '../../../shared/skins';
 import { itemInegociavel } from '../../../shared/naoTrocavel';
 import { BONUS_DO_TITULO, bonusDasConquistas, conquistaFeita, GRUPOS_CONQUISTA, textoRecompensa, TITULOS, tituloAtivo, tituloLiberado, type Conquista } from '../../../shared/conquistas';
-import { aoConcluirConquista, progressoDasConquistas, resgatarConquista } from '../conquistas';
+import { aoConcluirConquista, pegarConquistaEmDestaque, progressoDasConquistas, resgatarConquista } from '../conquistas';
 import type { Tela } from '../main';
 import { TODOS_OS_ITENS } from '../../../shared/loja';
 import { carregarSave, salvar, salvarAgora, type Save } from '../estado';
@@ -17,7 +17,7 @@ import { bonusAtuais } from '../bonificacao';
 import { enquadrarPersonagem } from '../personagem/enquadrar';
 import { iconeItem } from '../ui/iconeItem';
 import { perfilJogador } from './jogadores';
-import { TERMOS_DOACAO, pacoteJaComprado, PACOTES_FUNDADOR, PACOTES_VIP, DOACAO_MAXIMA, DOACAO_MINIMA, DOACOES_LIGADAS, goldDoPacote, GOLD_POR_REAL, PACOTES_DOACAO } from '../../../shared/doacao';
+import { TERMOS_DOACAO, pacoteJaComprado, PACOTES_FUNDADOR, PACOTES_VIP, DOACOES_LIGADAS, goldDoPacote, GOLD_POR_REAL, PACOTES_DOACAO } from '../../../shared/doacao';
 import { valorEmMoeda } from '../ui/moeda';
 import { avisar } from '../ui/avisos';
 import { confirmar } from '../ui/confirmar';
@@ -62,7 +62,7 @@ function achievements(save: Save): HTMLElement {
           el('summary', {}, g.nome, el('small', {}, ` ${doGrupo.filter((x) => x.feita || x.aResgatar).length}/${doGrupo.length}`)),
           el('div', { class: 'lista-achievements' },
             ...doGrupo.map(({ conquista: c, valor, meta, feita, aResgatar }) =>
-              el('div', { class: `achievement ${feita ? 'feito' : ''} ${aResgatar ? 'a-resgatar' : ''}` },
+              el('div', { class: `achievement ${feita ? 'feito' : ''} ${aResgatar ? 'a-resgatar' : ''}`, 'data-conquista': c.id },
                 el('span', { class: 'achievement-selo' }, feita ? '★' : aResgatar ? '🎁' : ''),
                 el('div', { class: 'achievement-texto' },
                   el('strong', {}, c.nome),
@@ -76,6 +76,14 @@ function achievements(save: Save): HTMLElement {
     );
   };
   desenhar();
+  // veio pelo botão "Ir para a conquista" do aviso: rola até ela e destaca
+  const alvo = pegarConquistaEmDestaque();
+  if (alvo)
+    requestAnimationFrame(() => {
+      const cartao = secao.querySelector(`[data-conquista="${CSS.escape(alvo)}"]`);
+      cartao?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      cartao?.classList.add('achievement-destaque');
+    });
   // concluiu alguma com a tela aberta: redesenha (para de ouvir quando a tela sai)
   const parar = aoConcluirConquista(() => (secao.isConnected ? desenhar() : parar()));
   return secao;
@@ -406,20 +414,6 @@ function doacao(save: Save): HTMLElement {
         DOACOES_LIGADAS ? '' : el('small', { class: 'meta' }, 'Os pagamentos ainda não estão abertos. Em breve!'));
     }, { classe: 'janela-doacao' });
   };
-  // valor livre
-  const campo = el('input', { type: 'number', min: String(DOACAO_MINIMA), max: String(DOACAO_MAXIMA), step: '1', value: '15', class: 'doacao-campo' }) as HTMLInputElement;
-  const recebe = el('strong', { class: 'doacao-gold' });
-  const botaoLivre = el('button', { class: 'botao', onclick: () => doar(valorLivre(), 'Outro valor', [valorEmMoeda('gold', goldDoPacote({ reais: valorLivre() }))]) }) as HTMLButtonElement;
-  const valorLivre = () => Math.floor(Number(campo.value) || 0);
-  const atualizar = () => {
-    const v = valorLivre();
-    const ok = v >= DOACAO_MINIMA && v <= DOACAO_MAXIMA;
-    recebe.replaceChildren(valorEmMoeda('gold', ok ? goldDoPacote({ reais: v }) : 0));
-    botaoLivre.disabled = !ok;
-    botaoLivre.textContent = ok ? `Doar ${reais(v)}` : `De ${reais(DOACAO_MINIMA)} a ${reais(DOACAO_MAXIMA)}`;
-  };
-  campo.addEventListener('input', atualizar);
-  atualizar();
   const acumulada = el('div', {}, blocoDoacaoAcumulada(estadoRecompensas()));
   const pararAcumulada = aoMudarRecompensas(() => (acumulada.isConnected || pacotes.isConnected ? acumulada.replaceChildren(blocoDoacaoAcumulada(estadoRecompensas())) : pararAcumulada()));
   void buscarRecompensas().catch(() => {});
@@ -463,10 +457,6 @@ function doacao(save: Save): HTMLElement {
         el('strong', { class: 'doacao-gold' }, p.nome),
         el('span', { class: 'doacao-vip' }, `${p.vipDias} dias de VIP`),
         el('button', { class: 'botao', onclick: () => doar(p.reais, p.nome, [`${p.vipDias} dias de VIP`]) }, `Doar ${reais(p.reais)}`)))),
-    el('h2', {}, 'Outro valor'),
-    el('div', { class: 'doacao-livre' },
-      el('label', {}, 'R$ ', campo),
-      el('span', {}, '→'), recebe, botaoLivre),
     el('p', { class: 'sub doacao-nota' }, 'As Origin Coins chegam pelo Correio depois que o pagamento for confirmado.'));
   // abas (pedido do dono): os pacotes numa, a doação acumulada em outra
   const corpo = el('div', {});

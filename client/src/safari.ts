@@ -1,13 +1,14 @@
 // Safari (shared/safari.ts): entra pelo servidor (ele conta as entradas do dia e cobra o gold), sorteia os
 // Pokémon das 3 salas e guarda o andamento no save (recarregar a página continua de onde parou).
+import { marcarConquista } from './conquistas';
 import { BIOMAS, biomaPorId, type Bioma } from '../../shared/biomas';
-import { AJUSTES_PADRAO, CHANCE_SHINY, ajustarTabela, faixaDosEncontros, montarTabelaDoTipo, sortearEncontro, type AjustesEncontro } from '../../shared/encontros';
+import { AJUSTES_PADRAO, CHANCE_SHINY, ajustarTabela, categoriaRara, faixaDosEncontros, montarTabelaDoTipo, sortearEncontro, type AjustesEncontro } from '../../shared/encontros';
 import { MULT_RAROS_SAFARI, POKEMON_POR_SALA, SALAS_SAFARI, diaDoSafari, entradasUsadas, lerSafariAberto, ticketComprado, ticketsDoDia, type PokemonSafari, type SafariAberto } from '../../shared/safari';
 import { nivelTreinador } from '../../shared/treinador';
 import { vipAtivo } from '../../shared/vip';
 import { ehAdministrador } from './bonificacao';
 import { api } from './conta';
-import { todosOsPokemons } from './dados';
+import { pokemonPorId, todosOsPokemons } from './dados';
 import { adotarSaveDoServidor, carregarSave, salvar, salvarAgora, type Save } from './estado';
 
 /**
@@ -54,6 +55,13 @@ export function prepararSafari(save: Save): SafariAberto | null {
   const completo = aberto.salas.length === SALAS_SAFARI && aberto.salas.every((s) => Array.isArray(s) && s.length === POKEMON_POR_SALA);
   if (!completo) {
     aberto.salas = sortearSalas(save, aberto.tipo);
+    // conquistas "Era pra ter um charmander/mewtwo aqui?": um inicial / lendário (mítico, Ultra Beast) nas salas
+    const todos = todosOsPokemons();
+    for (const s of aberto.salas.flat()) {
+      const cat = categoriaRara(pokemonPorId(s.id), todos);
+      if (cat === 'inicial') marcarConquista(save, 'safariInicial');
+      else if (cat) marcarConquista(save, 'safariLendario');
+    }
     save.safari = { ...save.safari!, aberto };
     salvar(save);
   }

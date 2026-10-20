@@ -160,7 +160,6 @@ export const telaCidade: Tela = (raiz, navegar) => {
     else if (acao === 'arena')
       // a Liga é calculada no servidor: a batalha abre sozinha (client/src/pvp.ts) e a janela volta no fim
       abrirArena(navegar, () => abrirLiga(save!));
-    else if (acao === 'banco' && !ehAdministrador()) avisar('Banco: fechado por enquanto.');
     else if (acao === 'banco') abrirBanco(save!, () => atualizarTime());
     else if (acao === 'mural') abrirMural();
     else if (acao === 'guildas') navegar({ tela: 'comunidade', secao: 'cla' });

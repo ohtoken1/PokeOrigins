@@ -2,6 +2,8 @@
 // Professor Carvalho aparece num balão de fala explicando o básico, e o botão abre o Guia do jogo no tópico certo.
 // Cada aviso aparece uma vez por conta (`save.tutorialVisto`). Quem já passou do nível quando isto entrou no jogo
 // não recebe os avisos antigos de uma vez (a primeira conferência marca o que já estava liberado como visto).
+import { conferirConquistas, marcarConquista, resgatarConquista } from './conquistas';
+import { avisar } from './ui/avisos';
 import { NIVEL_MINIMO, type ConteudoTrancado } from '../../shared/trancas';
 import { nivelTreinador } from '../../shared/treinador';
 import { aoSalvar, carregarSave, salvar, type Save } from './estado';
@@ -67,7 +69,8 @@ function conferir(save: Save): void {
   }
   const vistas = save.tutorialVisto!;
   const novas: Fala[] = [
-    ...(vistas.includes('intro') ? [] : [{ id: 'intro', paginas: INTRO }]),
+    // a introdução volta enquanto o jogador novo não a fechou (é ela que entrega o Kit iniciante)
+    ...(vistas.includes('intro') && !(save.kitPelaConquista && !save.conquistas?.marcas?.tutorial) ? [] : [{ id: 'intro', paginas: INTRO }]),
     ...liberadas.filter((l) => !vistas.includes(l.conteudo)).map(falaDaLicao),
   ].filter((f) => !fila.some((x) => x.id === f.id));
   if (!novas.length) return;
@@ -93,6 +96,28 @@ async function mostrarProxima(): Promise<void> {
  * O Professor fala fora da fila do tutorial (telas de criação do personagem, ovo e região, que vêm antes do save).
  * `fim` = texto do botão da última página. Devolve uma promessa que resolve quando o jogador fecha.
  */
+/** Mostra a introdução do Professor de novo (Opções → "Ver a introdução do Professor"). */
+export function verIntroducao(): void {
+  if (fila.some((f) => f.id === 'intro')) return;
+  fila.unshift({ id: 'intro', paginas: INTRO });
+  void mostrarProxima();
+}
+
+/**
+ * Fechou a introdução (no fim ou em "Pular"): conquista Conhecedor. Para quem começou depois que o Kit iniciante
+ * passou a vir por ela (`save.kitPelaConquista`), a recompensa é resgatada na hora: o kit já vai para a Bolsa.
+ */
+function introVista(): void {
+  const save = carregarSave();
+  if (!save || save.conquistas?.marcas?.tutorial) return;
+  marcarConquista(save, 'tutorial');
+  if (save.kitPelaConquista) {
+    conferirConquistas(save);
+    if (resgatarConquista(save, 'conhecedor')) avisar('Conquista Conhecedor: você ganhou o Kit iniciante! Abra pela Bolsa (aba Itens-chave).', 'ok');
+  }
+  salvar(save);
+}
+
 export function falarProfessor(paginas: string[], fim = 'Entendi!'): Promise<void> {
   return new Promise((resolver) => balao({ id: '', paginas }, () => resolver(), fim));
 }
@@ -101,6 +126,7 @@ function balao(fala: Fala, aoFechar?: () => void, textoFim = 'Começar!'): void 
   let pagina = 0;
   const fechar = () => {
     caixa.remove();
+    if (fala.id === 'intro') introVista();
     if (aoFechar) return aoFechar();
     mostrando = false;
     void mostrarProxima();

@@ -189,8 +189,22 @@ export const PRODUTOS_LIGA: ProdutoLiga[] = [
   { id: 'destinyknot', loja: 'nightmare', preco: 30 },
   { id: 'seletor-mint', loja: 'nightmare', preco: 15 },
   { id: 'seletor-charm', loja: 'nightmare', preco: 5 },
+  // os Scrolls do Kubfu (pedido do dono): com os itens de forma, mesmo preço
+  { id: 'scrollofdarkness', loja: 'nightmare', preco: 120 },
+  { id: 'scrollofwaters', loja: 'nightmare', preco: 120 },
   { id: 'titulo-mestre-nightmare', loja: 'nightmare', preco: 300, titulo: 'mestre-nightmare', nome: 'Título Mestre Nightmare' },
 ];
 /** Z-Crystals (todos) na Loja da Liga e itens de forma (todos) na Loja Nightmare. */
 export const PRECO_Z_NA_LIGA = 20;
 export const PRECO_FORMA_NA_NIGHTMARE = 120;
+
+/**
+ * Aba "💎 Premium" do Pokémarket (pedido do dono, 20/10/2026): Passe Premium e dias de VIP por Origin Coins.
+ * Comprado no servidor (server/src/lojas.ts, loja 'premium'). `vipDias` = dias somados ao VIP do jogador.
+ */
+export interface ProdutoPremium { id: string; nome: string; preco: number; descricao: string; simbolo: string; item?: string; vipDias?: number }
+export const PRODUTOS_PREMIUM: ProdutoPremium[] = [
+  { id: 'passe-premium', nome: 'Passe Premium', preco: 750, item: 'passe-premium', simbolo: '👑', descricao: 'Libera a trilha premium do passe de batalha da temporada em vigor. Use pela bolsa.' },
+  { id: 'vip-15', nome: 'VIP 15 dias', preco: 300, vipDias: 15, simbolo: '💎', descricao: '15 dias de VIP, somados ao VIP que você já tem. Começa na hora da compra.' },
+  { id: 'vip-30', nome: 'VIP 30 dias', preco: 500, vipDias: 30, simbolo: '💎', descricao: '30 dias de VIP, somados ao VIP que você já tem. Começa na hora da compra.' },
+];

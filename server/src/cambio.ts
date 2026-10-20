@@ -8,6 +8,7 @@
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { avisarTodos } from './mundo.ts';
+import { contar } from './dashboard.ts';
 import { CAMBIO_MAX_POR_VEZ, COFRE_GOLD_INICIAL, COFRE_SILVER_INICIAL, silverDaOperacao } from '../../shared/cambio.ts';
 
 banco.garantirCofre(COFRE_SILVER_INICIAL, COFRE_GOLD_INICIAL);
@@ -20,7 +21,6 @@ export const cofre = () => banco.lerCofre();
 
 export function trocar(conta: banco.Conta, dados: Record<string, unknown>) {
   // banco fechado para jogadores comuns até a economia abrir (decisão do dono)
-  if (!conta.admin) throw new ErroConta('O banco está fechado por enquanto.', 403);
   const { operacao, quantidade } = dados;
   if (operacao !== 'comprar' && operacao !== 'vender') throw new ErroConta('Operação inválida.');
   if (!Number.isSafeInteger(quantidade) || (quantidade as number) < 1) throw new ErroConta('Quantidade inválida.');
@@ -46,6 +46,7 @@ export function trocar(conta: banco.Conta, dados: Record<string, unknown>) {
     save.gold = novoGold;
     banco.mudarCofre(cofreSilver, cofreGold);
   });
+  contar('cambio-trocas');
   const agora = banco.lerCofre();
   // quem está com o banco aberto vê o cofre mudar
   avisarTodos({ t: 'cofre', cofre: agora });

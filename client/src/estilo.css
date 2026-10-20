@@ -3172,3 +3172,47 @@ canvas { touch-action: none; }
   /* o cabeçalho é alto no celular: rola com a página em vez de ficar preso no topo cobrindo a tela */
   .cabecalho-jogo { position: relative; top: auto; }
 }
+
+/* ---- Administração → Dashboard (telas/adminDashboard.ts) ---- */
+.admin-dashboard { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.dash-topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.dash-topo .sub { margin: 0; }
+.dash-corpo { display: flex; flex-direction: column; gap: 16px; }
+.dash-bloco { background: var(--painel); border: 1px solid var(--borda); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.dash-bloco h2 { margin: 0; color: var(--destaque); font-size: 1.15rem; }
+.dash-bloco h3 { margin: 6px 0 0; font-size: 0.95rem; color: var(--texto-2); }
+.dash-bloco > .meta { margin: 0; }
+.dash-cartoes { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+.dash-cartao { background: var(--painel-2); border: 1px solid var(--borda); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.dash-cartao small { color: var(--texto-2); }
+.dash-cartao strong { font-size: 1.5rem; color: var(--destaque); }
+.dash-tabela { border-collapse: collapse; width: 100%; max-width: 640px; }
+.dash-tabela th, .dash-tabela td { padding: 6px 10px; border-bottom: 1px solid var(--borda); text-align: right; }
+.dash-tabela th:first-child { text-align: left; }
+.dash-tabela thead th { color: var(--texto-2); font-weight: normal; font-size: 0.85rem; }
+.dash-tabela td:last-child { color: var(--destaque); }
+.dash-barras { display: flex; flex-direction: column; gap: 4px; }
+.dash-barra { display: grid; grid-template-columns: minmax(120px, 2fr) 3fr auto; align-items: center; gap: 10px; font-size: 0.9rem; }
+.dash-barra-nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-barra-trilho { height: 10px; background: var(--painel-2); border-radius: 5px; overflow: hidden; }
+.dash-barra-cheio { display: block; height: 100%; background: var(--dourado, var(--destaque)); border-radius: 5px; }
+.dash-barra strong { min-width: 60px; text-align: right; }
+.dash-duas { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.dash-grafico { display: flex; align-items: flex-end; gap: 6px; height: 150px; padding-top: 6px; }
+.dash-coluna { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 2px; min-width: 0; }
+.dash-coluna-barra { width: 100%; max-width: 28px; min-height: 2px; background: var(--dourado, var(--destaque)); border-radius: 4px 4px 0 0; }
+.dash-coluna small { font-size: 0.7rem; }
+@media (max-width: 760px) {
+  .dash-duas { grid-template-columns: 1fr; }
+  .dash-cartoes { grid-template-columns: 1fr 1fr; }
+  .dash-cartao strong { font-size: 1.2rem; }
+  .dash-barra { grid-template-columns: minmax(90px, 1fr) 1fr auto; }
+  .dash-grafico { gap: 2px; }
+  .dash-coluna small.meta { writing-mode: vertical-rl; }
+}
+.dash-tabela-larga { max-width: 760px; }
+.dash-tabela .dash-grupo th { text-align: left; color: var(--destaque); padding-top: 12px; font-size: 0.85rem; }
+@media (max-width: 760px) { .dash-tabela-larga { font-size: 0.8rem; } .dash-tabela-larga th, .dash-tabela-larga td { padding: 4px 4px; } }
+.aviso-conquista-ir { pointer-events: auto; align-self: flex-start; margin-top: 6px; padding: 4px 12px; font-size: 0.85rem; }
+.achievement-destaque { animation: achievement-destaque 1.2s ease-in-out 3; border-color: var(--destaque) !important; }
+@keyframes achievement-destaque { 50% { box-shadow: 0 0 0 3px var(--destaque), 0 0 18px rgb(233 185 73 / 0.6); } }

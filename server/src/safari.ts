@@ -53,7 +53,9 @@ export function entrar(conta: banco.Conta, dados: Record<string, unknown>) {
       if (!entrada) throw new ErroConta('Seus Tickets Safari de hoje acabaram.', 409);
       usadas.push(entrada);
     }
-    save.safari = { dia: hoje, usadas, ...(comprada ? { comprada } : {}), aberto: { tipo, sala: 0, escolhido: false, salas: [] } };
+    // `total` = quantas vezes entrou no Safari (conquistas "A primeira é a da sorte"…); só o servidor conta
+    const total = totalDeEntradas(save.safari) + 1;
+    save.safari = { dia: hoje, usadas, ...(comprada ? { comprada } : {}), total, aberto: { tipo, sala: 0, escolhido: false, salas: [] } };
   });
   return resposta(conta.id);
 }
@@ -68,5 +70,10 @@ export function proteger(save: Record<string, unknown>, antes: Record<string, un
   if (!guardado || typeof guardado !== 'object') return void delete save.safari;
   const doJogo = save.safari && typeof save.safari === 'object' ? (save.safari as Record<string, unknown>).aberto : null;
   const continua = lerSafariAberto(guardado) && doJogo && typeof doJogo === 'object';
-  save.safari = { dia: guardado.dia, usadas: guardado.usadas, ...(guardado.comprada === true ? { comprada: true } : {}), ...(continua ? { aberto: doJogo } : {}) };
+  save.safari = { dia: guardado.dia, usadas: guardado.usadas, ...(guardado.comprada === true ? { comprada: true } : {}), total: totalDeEntradas(guardado), ...(continua ? { aberto: doJogo } : {}) };
 }
+
+const totalDeEntradas = (safari: unknown): number => {
+  const t = safari && typeof safari === 'object' ? (safari as Record<string, unknown>).total : 0;
+  return Number.isSafeInteger(t) && (t as number) > 0 ? (t as number) : 0;
+};

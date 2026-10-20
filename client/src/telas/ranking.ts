@@ -25,7 +25,8 @@ function dadosDoJogador(save: Save): Linha {
     capturasLendarios: e.capturasLendarios,
     nivel: nivelTreinador(save.xpTreinador),
     xp: save.xpTreinador,
-    medalhas: e.medalhas,
+    // as medalhas que o Torneio entrega (ouro, prata e bronze somadas)
+    medalhas: (e.medalhasOuro ?? 0) + (e.medalhasPrata ?? 0) + (e.medalhasBronze ?? 0),
     missoes: e.missoesQuadro ?? 0,
     silver: save.silver,
     gold: save.gold,

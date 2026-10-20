@@ -18,14 +18,16 @@ import { secaoParcerias } from './adminParcerias';
 import { secaoLiga } from './adminLiga';
 import { secaoTorneio } from './adminTorneio';
 import { secaoCorreio } from './adminCorreio';
+import { secaoDashboard } from './adminDashboard';
 import { iconeItem } from '../ui/iconeItem';
 import { el } from '../ui/dom';
 import { cartaoAnuncio } from '../ui/mural';
 import { confirmar } from '../ui/confirmar';
 
-export type SecaoAdministracao = 'correio' | 'itens' | 'pokemon' | 'liga' | 'torneio' | 'banimentos' | 'parceria' | 'log' | 'eventos' | 'anuncios';
+export type SecaoAdministracao = 'dashboard' | 'correio' | 'itens' | 'pokemon' | 'liga' | 'torneio' | 'banimentos' | 'parceria' | 'log' | 'eventos' | 'anuncios';
 
 export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBreve?: string }[] = [
+  { id: 'dashboard', nome: 'Dashboard' },
   // só eventos que a staff ativa direto (pedido do dono); a Bonificação mora aqui
   { id: 'eventos', nome: 'Eventos' },
   { id: 'correio', nome: 'Correio' },
@@ -45,6 +47,7 @@ export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBre
 
 /** Menu na lateral (modelo escolhido pelo dono): as seções por assunto, com ícone. */
 const GRUPOS_ADMIN: { titulo: string; secoes: [SecaoAdministracao, string][] }[] = [
+  { titulo: 'Visão geral', secoes: [['dashboard', '📊']] },
   { titulo: 'Jogadores', secoes: [['correio', '✉️'], ['itens', '🎁'], ['pokemon', '🐾'], ['banimentos', '⛔']] },
   { titulo: 'Eventos', secoes: [['eventos', '📅'], ['liga', '👑'], ['torneio', '🏟️']] },
   { titulo: 'Comunicação', secoes: [['anuncios', '📢'], ['log', '📜']] },
@@ -198,7 +201,7 @@ export const telaAdministracao = (secaoInicial: SecaoAdministracao): Tela => (ra
   let secao = secaoInicial;
   const corpo = el('div', { class: 'admin-corpo' });
   // montada uma vez só (redesenhar a tela não apaga o que a pessoa está escrevendo)
-  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : secao === 'correio' ? secaoCorreio() : secao === 'pokemon' ? secaoDarPokemon() : secao === 'banimentos' ? secaoBanimentos() : secao === 'parceria' ? secaoParcerias() : secao === 'liga' ? secaoLiga() : secao === 'torneio' ? secaoTorneio() : null;
+  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : secao === 'correio' ? secaoCorreio() : secao === 'pokemon' ? secaoDarPokemon() : secao === 'banimentos' ? secaoBanimentos() : secao === 'parceria' ? secaoParcerias() : secao === 'liga' ? secaoLiga() : secao === 'torneio' ? secaoTorneio() : secao === 'dashboard' ? secaoDashboard() : null;
 
   const linhaBonus = (chave: ChaveBonus) => {
     const atual = bonificacao()[chave];

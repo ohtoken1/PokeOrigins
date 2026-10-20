@@ -73,6 +73,8 @@ function pagar(contaId: number, liga: TipoLiga, meu: Progresso): void {
   if (!moedas) return;
   const anexos = [correio.anexoItem(premio.moeda, premio.nomeMoeda, moedas)];
   if (venceuTudo) anexos.unshift(correio.anexoItem('silver', 'Poké Dólares', premio.silver));
+  // conquistas "Vença a Liga Pokémon" (normal e Nightmare)
+  if (venceuTudo) anexos.push(correio.anexoMarca(liga === 'nightmare' ? 'ligaNightmare' : 'ligaNormal'));
   correio.enviar(contaId, NOME_LIGA[liga], venceuTudo
     ? `Parabéns! Você venceu a ${NOME_LIGA[liga]}: ${total * premio.porVitoria} pelas vitórias + ${premio.bonus} de bônus por vencer todos.`
     : `Seu desafio na ${NOME_LIGA[liga]} terminou: você venceu ${meu.etapa} de ${total} treinadores.`, anexos, 'liga');

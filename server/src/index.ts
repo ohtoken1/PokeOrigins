@@ -27,6 +27,7 @@ import * as pvp from './pvp.ts';
 import * as torneio from './torneio.ts';
 import * as ranqueado from './ranqueado.ts';
 import * as lojas from './lojas.ts';
+import * as dashboard from './dashboard.ts';
 import { avisarDaStaff, estaOnline, ligarMundo } from './mundo.ts';
 import { tituloAtivo } from '../../shared/conquistas.ts';
 import { temSkin, type ComSkins } from '../../shared/skins.ts';
@@ -53,6 +54,7 @@ setInterval(() => {
   banco.limparSessoesVencidas();
   amigos.limpar();
   cla.consertar();
+  dashboard.contarMinuto();
 }, 60 * 1000).unref();
 
 // ---- utilidades de HTTP ----
@@ -389,6 +391,8 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   if (caminho === '/api/entregas/receber' && metodo === 'POST') return responder(res, 200, entregas.receber(exigirConta(req)));
 
   // ---- parcerias com criadores de conteúdo (server/src/parcerias.ts) ----
+  // ---- Dashboard da Administração (server/src/dashboard.ts) ----
+  if (caminho === '/api/admin/dashboard' && metodo === 'GET') return responder(res, 200, dashboard.painel(exigirConta(req)));
   if (caminho === '/api/admin/parcerias' && metodo === 'GET') return responder(res, 200, parcerias.listar(exigirConta(req)));
   if (caminho === '/api/admin/parcerias' && metodo === 'POST') {
     const conta = exigirConta(req);

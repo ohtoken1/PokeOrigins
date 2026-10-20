@@ -107,6 +107,16 @@ export function aplicarItem(save: Record<string, unknown>, item: string, quantid
   somar(itens, item);
 }
 
+/**
+ * Marca de conquista anotada pelo SERVIDOR (o jogo confere as conquistas pelas marcas do save; ver
+ * client/src/conquistas.ts). Só use dentro de uma mudança do save guardado (mudarSaves).
+ */
+export function marcarConquistaNoSave(save: Record<string, unknown>, marca: string): void {
+  const c = (save.conquistas && typeof save.conquistas === 'object' ? save.conquistas : (save.conquistas = { feitas: {}, marcas: {} })) as Record<string, unknown>;
+  const marcas = (c.marcas && typeof c.marcas === 'object' ? c.marcas : (c.marcas = {})) as Record<string, number>;
+  marcas[marca] = (Number.isSafeInteger(marcas[marca]) ? marcas[marca] : 0) + 1;
+}
+
 /** O jogo veio buscar: põe os itens no save guardado e apaga as entregas (tudo numa mudança só). */
 export function receber(conta: banco.Conta) {
   if (!banco.lerSave(conta.id)) return { entregas: [] };

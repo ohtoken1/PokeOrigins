@@ -20,7 +20,7 @@ function comoMostrar(p: ProdutoGuilda): { nome: string; descricao: string; icone
     const e = pokemonPorId(p.inicial);
     return { nome: e.nome, descricao: 'Inicial do mês: nível 1, cada IV de 10 a 31 e 5% de chance de shiny.', icone: spritePokemon(e, { animado: false }) };
   }
-  if (p.aleatorio) return { nome: p.nome ?? p.id, descricao: p.aleatorio === 'mint' ? 'Uma Mint sorteada na compra.' : 'Um Charm de tipo sorteado na compra.', icone: el('span', { class: 'icone-simbolo' }, '❔') };
+  if (p.aleatorio) return { nome: p.nome ?? p.id, descricao: p.aleatorio === 'mint' ? 'Uma Mint sorteada na compra.' : p.aleatorio === 'terashard' ? 'Um tipo sorteado na compra: as 10 Tera Shards vêm desse tipo. 50 do mesmo tipo trocam o Tera Type de um Pokémon.' : 'Um Charm de tipo sorteado na compra.', icone: el('span', { class: 'icone-simbolo' }, '❔') };
   const i = itemDaLoja(p.item!);
   return { nome: `${i?.nome ?? p.item} ×${p.quantidade}`, descricao: i?.descricao ?? '', icone: i ? iconeItem(i) : el('span', {}, '?') };
 }

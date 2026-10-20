@@ -4,12 +4,18 @@
 // mudança só (mudarSaves). Assim nada troca o save por baixo de quem está jogando.
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
-import { aplicarItem, lerNome, lerPokemon } from './entregas.ts';
+import { aplicarItem, lerNome, lerPokemon, marcarConquistaNoSave } from './entregas.ts';
 import { avisar } from './mundo.ts';
 import { guardarPokemon, type PokemonSave, type SaveMin } from './trocas.ts';
 
 /** `nt` = o item chega NT (não pode ser trocado nem vendido): conta em `save.itensNt` se não for uma versão "-nt". */
-export type Anexo = { tipo: 'item'; item: string; nome: string; quantidade: number; nt?: true } | { tipo: 'pokemon'; nome: string; dados: PokemonSave };
+export type Anexo = { tipo: 'item'; item: string; nome: string; quantidade: number; nt?: true } | { tipo: 'pokemon'; nome: string; dados: PokemonSave } | AnexoEscondido;
+/**
+ * Anexos que o jogador não vê na carta, aplicados junto com o resgate: `marca` = marca de conquista (venceu a Liga,
+ * o Boss global, abriu o Cofre…); `medalhaPokemon` = +1 medalha de torneio em cada Pokémon com esses `uid`.
+ */
+export type AnexoEscondido = { tipo: 'marca'; marca: string } | { tipo: 'medalhaPokemon'; uids: number[] };
+export const anexoMarca = (marca: string): Anexo => ({ tipo: 'marca', marca });
 
 /** Cartas guardadas por conta: passando disso, as mais velhas já lidas e sem nada para resgatar são apagadas. */
 const CARTAS_MAX = 200;
@@ -32,6 +38,7 @@ export function enviar(contaId: number, titulo: string, texto: string, anexos: A
 /** O que o jogo mostra de um anexo (Pokémon: só o que aparece na carta). */
 function anexoParaFora(a: Anexo) {
   if (a.tipo === 'item') return a;
+  if (a.tipo === 'marca' || a.tipo === 'medalhaPokemon') return null;
   return { tipo: 'pokemon' as const, nome: a.nome, especieId: a.dados.especieId, nivel: a.dados.nivel, shiny: a.dados.shiny === true };
 }
 
@@ -39,7 +46,7 @@ function anexoParaFora(a: Anexo) {
 export function listar(conta: banco.Conta) {
   const cartas = banco.cartasDaConta(conta.id).map((c) => ({
     id: c.id, titulo: c.titulo, texto: c.texto, de: c.de, criadoEm: c.criado_em, lida: !!c.lida, resgatada: !!c.resgatada,
-    anexos: (JSON.parse(c.anexos) as Anexo[]).map(anexoParaFora),
+    anexos: (JSON.parse(c.anexos) as Anexo[]).map(anexoParaFora).filter((a) => a !== null),
   }));
   return { cartas };
 }
@@ -69,6 +76,15 @@ export function resgatar(conta: banco.Conta, dados: Record<string, unknown>) {
     // da mais velha para a mais nova (a ordem em que chegaram)
     for (const c of [...cartas].reverse()) {
       for (const a of JSON.parse(c.anexos) as Anexo[]) {
+        if (a.tipo === 'marca') {
+          marcarConquistaNoSave(save, a.marca);
+          continue;
+        }
+        if (a.tipo === 'medalhaPokemon') {
+          const meus = [...(Array.isArray(save.time) ? save.time : []), ...(Array.isArray(save.caixa) ? save.caixa : [])] as Record<string, unknown>[];
+          for (const p of meus) if (a.uids.includes(p.uid as number)) p.medalhas = (Number.isSafeInteger(p.medalhas) ? (p.medalhas as number) : 0) + 1;
+          continue;
+        }
         if (a.tipo === 'item') {
           aplicarItem(save, a.item, a.quantidade);
           if (a.nt && !a.item.endsWith('-nt')) {

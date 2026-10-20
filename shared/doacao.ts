@@ -47,6 +47,17 @@ export const DOACAO_MAXIMA = 1000;
 /** Quantas Origin Coins um pacote dá (com o bônus, se houver). */
 export const goldDoPacote = (p: { reais: number; bonus?: number }) => Math.round(p.reais * GOLD_POR_REAL * (1 + (p.bonus ?? 0)));
 
+/**
+ * Tudo o que se compra com dinheiro real, com um id fixo (Dashboard da Administração → Compras com dinheiro real).
+ * Quando o pagamento for ligado, o servidor registra cada compra confirmada com este id
+ * (`registrarCompraReal` em server/src/dashboard.ts). Pacote novo: entra aqui sozinho se estiver numa das listas.
+ */
+export const PRODUTOS_DINHEIRO_REAL: { id: string; nome: string; reais: number; grupo: string }[] = [
+  ...PACOTES_DOACAO.map((p) => ({ id: `gold-${p.reais}`, nome: `${goldDoPacote(p).toLocaleString('pt-BR')} Origin Coins`, reais: p.reais, grupo: 'Pacotes de Origin Coins' })),
+  ...PACOTES_VIP.map((p) => ({ id: `vip-${p.vipDias}`, nome: p.nome, reais: p.reais, grupo: 'VIP' })),
+  ...PACOTES_FUNDADOR.map((p) => ({ id: p.id, nome: p.nome, reais: p.reais, grupo: 'Founder' })),
+];
+
 /** O pagamento ainda não existe (a conta no serviço de pagamento é com a equipe). */
 export const DOACOES_LIGADAS = false;
 

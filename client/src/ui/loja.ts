@@ -1,4 +1,5 @@
 import { CATALOGO, CATEGORIAS, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
+import { somarCompra } from '../../../shared/metricas';
 import { adotarSaveDoServidor, salvar, salvarAgora, type Save } from '../estado';
 import { api, ErroApi } from '../conta';
 import { bonusVip, vipAtivo } from '../../../shared/vip';
@@ -6,6 +7,7 @@ import { abrirJanela } from './janela';
 import { el } from './dom';
 import { iconeItem } from './iconeItem';
 import { nomeDaMoeda } from '../../../shared/moedas';
+import type { ProdutoPremium } from '../../../shared/lojasEspeciais';
 
 const LIMITE_LISTA = 120;
 const MAXIMO_POR_COMPRA = 999;
@@ -17,11 +19,12 @@ const MAXIMO_POR_COMPRA = 999;
  * (4 Mega Stones + 1 Z-Crystal, em Origin Coins) e a compra dela é feita NO SERVIDOR (server/src/lojas.ts).
  */
 /** Dados da Loja do dia (GET /api/lojas). */
-interface LojaDoDia { doDia: { id: string; preco: number }[]; trocaEm: number; agora: number }
+interface LojaDoDia { doDia: { id: string; preco: number }[]; premium: ProdutoPremium[]; trocaEm: number; agora: number }
 const MAXIMO_DO_DIA = 99;
-type ItemDoDia = ItemLoja & { doDia?: true };
+/** `doDia` = comprado no servidor; `lojaServidor` diz qual loja (Loja do dia ou a aba Premium) */
+type ItemDoDia = ItemLoja & { doDia?: true; lojaServidor?: 'dia' | 'premium' };
 export function abrirLoja(save: Save, aoMudar: () => void): void {
-  let categoria: CategoriaLoja | 'dia' = 'dia';
+  let categoria: CategoriaLoja | 'dia' | 'premium' = 'dia';
   let doDia: LojaDoDia | null = null;
   let erroDoDia = '';
   let busca = '';
@@ -51,10 +54,10 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
   const comDesconto = (item: ItemLoja) => vipAtivo(save) && item.moeda !== 'gold';
 
   /** Compra da Loja do dia: o servidor confere a rotação e o saldo e devolve o save. */
-  const comprarDoDia = async (item: ItemLoja, quantos: number) => {
+  const comprarDoDia = async (item: ItemDoDia, quantos: number) => {
     try {
       await salvarAgora();
-      const r = await api<{ save: Save; versao: number; texto: string }>('POST', '/lojas/comprar', { loja: 'dia', item: item.id, quantidade: quantos });
+      const r = await api<{ save: Save; versao: number; texto: string }>('POST', '/lojas/comprar', { loja: item.lojaServidor ?? 'dia', item: item.id, quantidade: quantos });
       adotarSaveDoServidor(r.save, r.versao);
       aoMudar();
       aviso.textContent = r.texto;
@@ -75,6 +78,7 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
       if (item.moeda === 'gold') save.gold -= custo;
       else save.silver -= custo;
       save.itens[item.id] = (save.itens[item.id] ?? 0) + quantos;
+      somarCompra(save, item.id, quantos);
       salvar(save);
       aoMudar();
       aviso.textContent = `Comprou ${quantos}× ${item.nome} por ${textoFinal(item, quantos)}${comDesconto(item) ? ' (desconto VIP)' : ''}.`;
@@ -96,6 +100,17 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
           desenharVitrine(true);
         },
       }, '⭐ Loja do dia'),
+      // Passe Premium e VIP por Origin Coins (pedido do dono), comprados no servidor
+      el('button', {
+        class: `mercado-secao mercado-secao-dia ${!busca && categoria === 'premium' ? 'ativa' : ''}`,
+        onclick: () => {
+          categoria = 'premium';
+          busca = '';
+          campoBusca.value = '';
+          desenharAbas();
+          desenharVitrine(true);
+        },
+      }, '💎 Premium'),
       ...CATEGORIAS.map((c) =>
         el(
           'button',
@@ -170,6 +185,11 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
       const i = itemDaLoja(id);
       return i ? [{ ...i, preco, moeda: 'gold' as const, doDia: true as const }] : [];
     });
+  const itensPremium = (): ItemDoDia[] =>
+    (doDia?.premium ?? []).map((p) => ({
+      id: p.id, nome: p.nome, descricao: p.descricao, simbolo: p.simbolo, categoria: 'chave', preco: p.preco, moeda: 'gold' as const, naLoja: true,
+      doDia: true as const, lojaServidor: 'premium' as const,
+    }) as ItemDoDia);
   const textoTroca = () => {
     if (!doDia) return erroDoDia || 'Carregando a Loja do dia…';
     const min = Math.max(1, Math.ceil((doDia.trocaEm - doDia.agora) / 60_000));
@@ -178,10 +198,10 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
 
   function desenharVitrine(trocar: boolean) {
     const termo = busca.trim().toLowerCase();
-    if (!termo && categoria === 'dia') {
-      const lista = itensDoDia();
+    if (!termo && (categoria === 'dia' || categoria === 'premium')) {
+      const lista = categoria === 'dia' ? itensDoDia() : itensPremium();
       vitrine.replaceChildren(
-        el('p', { class: 'mercado-vazio mercado-dia-aviso' }, textoTroca()),
+        el('p', { class: 'mercado-vazio mercado-dia-aviso' }, categoria === 'dia' ? textoTroca() : doDia ? 'Passe Premium e VIP, pagos em Origin Coins. O VIP comprado soma com o que você já tem.' : erroDoDia || 'Carregando…'),
         ...lista.map((item) =>
           el('button', { class: 'mercado-item', 'data-id': item.id, title: item.nome, onclick: () => escolher(item) },
             el('span', { class: 'mercado-icone' }, iconeItem(item)),
@@ -221,7 +241,7 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
   desenharAbas();
   desenharVitrine(true);
   api<LojaDoDia>('GET', '/lojas').then((r) => (doDia = r), () => (erroDoDia = 'Sem conexão com o servidor: a Loja do dia não carregou.')).finally(() => {
-    if (categoria === 'dia' && !busca) desenharVitrine(true);
+    if ((categoria === 'dia' || categoria === 'premium') && !busca) desenharVitrine(true);
   });
   abrirJanela(
     'Loja',

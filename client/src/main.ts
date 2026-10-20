@@ -131,7 +131,7 @@ void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
     if (s && ajustarTimeAoLimite(s)) salvar(s);
   }
   // conquistas: confere agora e depois de cada salvamento
-  vigiarConquistas();
+  vigiarConquistas(() => navegar({ tela: 'conta', secao: 'achievements' }));
   ativarDicaDeItens();
   // itens dados pela administração
   vigiarEntregas();

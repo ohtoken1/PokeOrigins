@@ -101,7 +101,7 @@ export function tentarCofre(conta: banco.Conta, dados: Record<string, unknown>) 
     banco.gravarEvento('cofre', c);
     // o prêmio chega pelo correio
     correio.enviar(conta.id, 'Cofre PokeOrigins', `Você descobriu a senha ${c.senha} e abriu o cofre! Aqui está o prêmio.`,
-      [c.conteudo.tipo === 'item' ? correio.anexoItem(c.conteudo.item, c.premio, c.conteudo.quantidade) : { tipo: 'pokemon', nome: c.premio, dados: JSON.parse(c.conteudo.dados) }], 'cofre');
+      [c.conteudo.tipo === 'item' ? correio.anexoItem(c.conteudo.item, c.premio, c.conteudo.quantidade) : { tipo: 'pokemon', nome: c.premio, dados: JSON.parse(c.conteudo.dados) }, correio.anexoMarca('cofre')], 'cofre');
     avisarEvento(`🔓 ${c.vencedor.nome} abriu o Cofre PokeOrigins (senha ${c.senha}) e levou: ${c.premio}!`);
     return { acertou: true as const, premio: c.premio };
   });
@@ -493,6 +493,9 @@ export function conferirBoss(agora = Date.now()): void {
       // todo mundo que lutou ganha (top 3, 4º ao 10º e participação: premiosBossGlobal)
       rankingBoss(b).forEach((r, i) => {
         const anexos = premiosBossGlobal(i).map((p) => correio.anexoItem(p.item, p.nome, p.quantidade));
+        // conquistas "Newbie mundial" (participou) e "Lider mundial" (1º lugar)
+        anexos.push(correio.anexoMarca('bossMundial'));
+        if (i === 0 && r.dano > 0) anexos.push(correio.anexoMarca('bossMundialVenceu'));
         correio.enviar(r.contaId, 'Boss global', i < 10 ? `Você ficou em ${i + 1}º lugar no ranking de dano do Boss global!` : `Você ficou em ${i + 1}º lugar no ranking de dano do Boss global. Obrigado por participar!`, anexos, 'boss');
         if (i < 3 && r.dano > 0) frases.push(`${i + 1}º ${r.nome}`);
       });
@@ -501,7 +504,7 @@ export function conferirBoss(agora = Date.now()): void {
       rankingGuildas(b).forEach((g, i) => {
         const pontos = pontosGuildaDaPosicao(i);
         for (const id of g.membros) {
-          correio.enviar(id, 'Boss da guilda', `Sua guilda ficou em ${i + 1}º lugar no ranking de dano do Boss da guilda. Você ganhou ${pontos} ${pontos === 1 ? 'Ponto' : 'Pontos'} de guilda (1 por participar${pontos > 1 ? ' + o prêmio da posição' : ''}).`, [correio.anexoItem('pontos-guilda', 'Pontos de guilda', pontos)], 'boss');
+          correio.enviar(id, 'Boss da guilda', `Sua guilda ficou em ${i + 1}º lugar no ranking de dano do Boss da guilda. Você ganhou ${pontos} ${pontos === 1 ? 'Ponto' : 'Pontos'} de guilda (1 por participar${pontos > 1 ? ' + o prêmio da posição' : ''}).`, [correio.anexoItem('pontos-guilda', 'Pontos de guilda', pontos), ...(i === 0 ? [correio.anexoMarca('bossGuildaPrimeiro')] : [])], 'boss');
         }
         if (i < 3 && g.dano > 0) frases.push(`${i + 1}º ${g.nome}`);
       });

@@ -159,6 +159,9 @@ export function somarDoacao(contaId: number, gold: number, origem: string): void
   if (!Number.isSafeInteger(gold) || gold <= 0) return;
   const t = trimestreDoacao();
   banco.transacao(() => {
+    // primeira doação da conta: carta de agradecimento com a marca da conquista "Faça uma doação"
+    if (banco.doadoNoPeriodo(contaId, 0, Number.MAX_SAFE_INTEGER) === 0)
+      correio.enviar(contaId, 'Obrigado pela doação!', 'Obrigado por apoiar o PokeOrigins! Sua primeira doação liberou a conquista "Faça uma doação" (Minha conta → Conquistas).', [correio.anexoMarca('doou')], 'doacoes');
     banco.registrarDoacaoAcumulada(contaId, gold, origem);
     const total = banco.doadoNoPeriodo(contaId, t.inicio, t.fim);
     for (const meta of METAS_DOACAO) {

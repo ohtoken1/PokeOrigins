@@ -187,6 +187,13 @@ function proximaRodada(t: EstadoTorneio, agora: number): void {
   avisarTimesForaDasRegras(t, proxima.flatMap((p) => [p.a, p.b]), t.rodadaComecaEm);
 }
 
+/** `uid` dos Pokémon do time guardado (o time do Torneio é o do save guardado). */
+function timeDaConta(contaId: number): number[] {
+  const guardado = banco.lerSave(contaId);
+  const time = guardado ? (JSON.parse(guardado.dados) as { time?: { uid?: unknown; ovo?: unknown }[] }).time : [];
+  return (Array.isArray(time) ? time : []).filter((p) => !p.ovo && Number.isSafeInteger(p.uid)).map((p) => p.uid as number);
+}
+
 function premiar(t: EstadoTorneio): void {
   const [final, terceiro] = t.rodadas[3];
   const segundo = final.vencedor === final.a ? final.b! : final.a!;
@@ -200,6 +207,9 @@ function premiar(t: EstadoTorneio): void {
     if (p.gold) anexos.push(correio.anexoItem('gold', 'Origin Coins', p.gold));
     anexos.push(correio.anexoItem(['medalha-ouro', 'medalha-prata', 'medalha-bronze'][i], `Medalha de ${['ouro', 'prata', 'bronze'][i]} do Torneio`, 1));
     if (p.roleta) anexos.push(premioDaRoleta(contaId));
+    // conquista "Melhor pokemon": cada Pokémon do time que jogou o Torneio ganha 1 medalha
+    const uids = timeDaConta(contaId);
+    if (uids.length) anexos.push({ tipo: 'medalhaPokemon', uids });
     correio.enviar(contaId, `Torneio: ${i + 1}º lugar`, `Parabéns! Você ficou em ${i + 1}º lugar no Torneio.`, anexos, 'torneio');
   });
   gravar(t);

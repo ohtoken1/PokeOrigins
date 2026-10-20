@@ -38,8 +38,8 @@ export const problemasDoTimeNoTorneio = (time: Record<string, unknown>[], regras
 /** Nome de um item do jogo (para as mensagens de prêmio). */
 export const nomeDoItem = (id: string) => loja.TODOS_OS_ITENS.find((i) => i.id === id)?.nome ?? id;
 /** Sorteia um item de um grupo das roletas: Mint, Charm ou Orb aleatória. */
-export function itemAleatorio(grupo: 'mint' | 'charm' | 'orb'): string {
-  const lista = grupo === 'mint' ? loja.TODOS_OS_ITENS.filter((i) => i.categoria === 'mints').map((i) => i.id) : grupo === 'charm' ? tickets.itensDoGrupo('charm') : tickets.TICKETS.map((t) => t.id);
+export function itemAleatorio(grupo: 'mint' | 'charm' | 'orb' | 'terashard'): string {
+  const lista = grupo === 'terashard' ? tickets.itensDoGrupo('terashard') : grupo === 'mint' ? loja.TODOS_OS_ITENS.filter((i) => i.categoria === 'mints').map((i) => i.id) : grupo === 'charm' ? tickets.itensDoGrupo('charm') : tickets.TICKETS.map((t) => t.id);
   return lista[Math.floor(Math.random() * lista.length)];
 }
 /** Ids de todos os itens de uma categoria do jogo (Mega Stones, Z-Crystals…), para as lojas especiais. */
@@ -75,4 +75,17 @@ export function gerarPokemon(especieId: number, nivel: number, opcoes: { shiny: 
   for (const a of Object.keys(p.ivs)) p.ivs[a] = minimo + Math.floor(Math.random() * (32 - minimo));
   p.hp = pokemon.hpMaximo(p);
   return p;
+}
+
+// ---- Dashboard: categoria rara de cada espécie (a mesma regra dos encontros e do letreiro)
+const encontros = (await import(caminho('../../shared/encontros.ts'))) as { categoriaRara(p: unknown, todos: unknown[]): 'inicial' | 'lendario' | 'mitico' | 'ultra' | null };
+const dadosTodos = dados as unknown as { pokemonPorId(id: number): unknown; todosOsPokemons(): unknown[] };
+const categorias = new Map<number, 'inicial' | 'lendario' | 'mitico' | 'ultra' | null>();
+/** Inicial (a linha inteira), lendário, mítico, Ultra Beast ou null (comum). Guardada por espécie. */
+export function categoriaDaEspecie(especieId: number): 'inicial' | 'lendario' | 'mitico' | 'ultra' | null {
+  if (!categorias.has(especieId)) {
+    const p = dadosTodos.pokemonPorId(especieId);
+    categorias.set(especieId, p ? encontros.categoriaRara(p, dadosTodos.todosOsPokemons()) : null);
+  }
+  return categorias.get(especieId)!;
 }

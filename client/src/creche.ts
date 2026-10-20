@@ -1,5 +1,6 @@
 // Creche (breeding) no save do jogador: casais guardados em `save.creche`, ciclos de ovo e o ovo que sai como um
 // Pokémon para o PC. Regras em shared/breeding.ts (planilha do dono).
+import { marcarConquista } from './conquistas';
 import { DESTINY_KNOT } from '../../shared/breeding';
 import { golpesIniciais, hpMaximo, ppMaximo } from '../../shared/batalha/pokemon';
 import {
@@ -44,6 +45,7 @@ export function deixarCasal(save: Save, a: PokemonDoJogador, b: PokemonDoJogador
   tirarDoJogador(save, a);
   tirarDoJogador(save, b);
   casaisDe(save).push({ pais: [a, b], desde: Date.now() });
+  marcarConquista(save, 'breeding');
   return null;
 }
 
