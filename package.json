@@ -13,5 +13,8 @@
     "dados": "node scripts/baixar-pokeapi.mjs",
     "maquinas": "node scripts/baixar-maquinas.mjs",
     "idiomas": "node scripts/idiomas-extrair.mjs"
+  },
+  "engines": {
+    "node": ">=24.19 <25"
   }
 }
