@@ -8,6 +8,8 @@
 //   Anúncio vencido volta para o dono do mesmo jeito.
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
+import { contar } from './dashboard.ts';
+import { marcarConquistaNoSave } from './entregas.ts';
 import { avisar, avisarTodos } from './mundo.ts';
 import { guardarPokemon, type PokemonSave, type SaveMin } from './trocas.ts';
 import {
@@ -172,6 +174,8 @@ export function comprar(conta: banco.Conta, id: number) {
     entregar(save, l.tipo, JSON.parse(l.dados) as Guardado, true);
     if (!banco.venderAnuncioMercado(id)) throw new ErroConta('Este anúncio não está mais à venda.', 409);
     vendedor = l.vendedor;
+    contar('mercado-vendas');
+    contar('mercado-taxa', l.preco - valorDoVendedor(l.preco));
   });
   // o jogo do vendedor vem buscar o pagamento; as listas abertas se atualizam
   avisar(vendedor, { t: 'mercado-acerto' });
@@ -206,6 +210,8 @@ export function receber(conta: banco.Conta) {
         const valor = valorDoVendedor(l.preco);
         save[moeda] = saldo(save[moeda]) + valor;
         acertos.push({ motivo: 'vendido', ...oQue, valor, moeda });
+        // conquista "Eu sou um comerciante!": vendeu um Pokémon no Mercado negro
+        if (l.tipo === 'pokemon') marcarConquistaNoSave(s, 'vendeuPokemon');
       } else {
         entregar(save, l.tipo, g, false);
         acertos.push({ motivo: 'venceu', ...oQue });

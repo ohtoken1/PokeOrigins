@@ -1,8 +1,9 @@
 // Conquistas: a lista vem da planilha do dono ("Conquistas PokeOrigins"). Aqui ficam o nome, a descrição e a
 // recompensa de cada uma; quem confere o progresso é o jogo (client/src/conquistas.ts).
-// Só entram as que dependem de sistemas que já existem: torneios, Liga, Safari, breeding, farming, craft,
-// monotype, bosses, baú, mercado negro, selos sazonais, Dynamax, doação/VIP, Discord e tutorial entram quando
-// cada sistema chegar (pedido do dono: um por um).
+// Só entram as que dependem de sistemas que já existem (pedido do dono). Ainda faltam, por não ter sistema:
+// monotype (Representante 1/3/5) e Discord. Os selos sazonais já estão aqui (os selos chegam com o evento de Natal)
+// e "Faça uma doação" conclui na primeira doação (quando o pagamento for ligado).
+// "Que boss?" mudou (pedido do dono): ficar em 1º lugar no Boss da guilda (o boss nunca é derrotado).
 // Sem imports: o servidor usa este arquivo para mostrar o título no perfil.
 
 /** Bônus permanentes que as conquistas dão (frações: 0.05 = +5%). */
@@ -13,15 +14,18 @@ export type RecompensaConquista =
   | { tipo: 'item'; id: string; nome: string; quantidade: number }
   | { tipo: 'silver'; quantidade: number }
   | { tipo: 'fragmentos'; quantidade: number }
-  | { tipo: 'titulo'; titulo: string };
+  | { tipo: 'titulo'; titulo: string }
+  | { tipo: 'vip'; dias: number };
 
-export type GrupoConquista = 'ginasios' | 'pokedex' | 'shiny' | 'capturas' | 'batalhas' | 'riqueza' | 'treinador' | 'jornada' | 'colecao';
+export type GrupoConquista = 'ginasios' | 'pokedex' | 'shiny' | 'capturas' | 'batalhas' | 'eventos' | 'sazonais' | 'riqueza' | 'treinador' | 'jornada' | 'colecao';
 export const GRUPOS_CONQUISTA: { id: GrupoConquista; nome: string }[] = [
   { id: 'ginasios', nome: 'Ginásios' },
   { id: 'pokedex', nome: 'Pokédex' },
   { id: 'shiny', nome: 'Pokédex shiny' },
   { id: 'capturas', nome: 'Capturas raras' },
   { id: 'batalhas', nome: 'Batalhas' },
+  { id: 'eventos', nome: 'Eventos' },
+  { id: 'sazonais', nome: 'Selos sazonais' },
   { id: 'treinador', nome: 'Treinador' },
   { id: 'riqueza', nome: 'Riqueza' },
   { id: 'jornada', nome: 'Jornada' },
@@ -102,6 +106,23 @@ export const CONQUISTAS: Conquista[] = [
   c('nivel-100', 'batalhas', 'Level 100', 'Evolua um Pokémon para o level 100.', captura(0.01)),
   c('time-100', 'batalhas', 'Time level 100', 'Evolua 6 Pokémon para o level 100.', captura(0.01)),
 
+  // ---- eventos (entraram em 20/10/2026, com os sistemas prontos)
+  c('torneio-1', 'eventos', 'Campeão', 'Vença 1 Torneio PvP.', item('ovo-misterioso-s', 'Ovo Misterioso S')),
+  c('torneio-20', 'eventos', 'Grande campeão', 'Vença 20 Torneios PvP.', item('ovo-misterioso-s', 'Ovo Misterioso S', 3)),
+  c('torneio-100', 'eventos', 'Campeão supremo', 'Vença 100 Torneios PvP.', item('ovo-lendario-s', 'Ovo Lendário S')),
+  c('pokemon-medalhas', 'eventos', 'Melhor pokemon', 'Tenha um Pokémon com 100 medalhas de Torneio (cada pódio dá 1 medalha a cada Pokémon do time).', item('ovo-lendario-s', 'Ovo Lendário S', 3)),
+  c('liga-normal', 'eventos', 'Vença a liga pokemon', 'Vença a Liga Pokémon.', item('ovo-lendario-s-nt', 'Ovo Lendário S (NT)')),
+  c('liga-nightmare', 'eventos', 'Vença a liga pokemon (Nightmare)', 'Vença a Liga Pokémon Nightmare.', item('ovo-lendario-s', 'Ovo Lendário S')),
+  c('safari-1', 'eventos', 'A primeira é a da sorte', 'Entre 1 vez no Safari.', item('ovo-misterioso-a', 'Ovo Misterioso A')),
+  c('safari-50', 'eventos', 'A quinquagésima é da sorte', 'Entre 50 vezes no Safari.', item('ovo-inicial-a', 'Ovo Inicial A')),
+  c('safari-500', 'eventos', 'A insistência traz a sorte', 'Entre 500 vezes no Safari.', item('ovo-lendario', 'Ovo Lendário')),
+  c('safari-inicial', 'eventos', 'Era pra ter um charmander aqui?', 'Encontre um inicial no Safari.', item('masterball', 'Master Ball')),
+  c('safari-lendario', 'eventos', 'Era pra ter um mewtwo aqui?', 'Encontre um lendário (ou mítico, ou Ultra Beast) no Safari.', item('masterball', 'Master Ball')),
+  c('boss-mundial', 'eventos', 'Newbie mundial', 'Participe do Boss global.', item('ovo-misterioso-a-nt', 'Ovo Misterioso A (NT)')),
+  c('boss-mundial-vencer', 'eventos', 'Lider mundial', 'Fique em 1º lugar no Boss global.', item('ovo-lendario-a', 'Ovo Lendário A')),
+  c('que-boss', 'eventos', 'Que boss?', 'Fique em 1º lugar com a sua guilda no Boss da guilda.', item('ovo-lendario', 'Ovo Lendário')),
+  c('chaveiro', 'eventos', 'Chaveiro', 'Abra o Cofre PokeOrigins (descubra a senha) uma vez.', item('skin-chaveiro', 'Skin Chaveiro (NT)')),
+
   // ---- nível de treinador
   c('treinador-5', 'treinador', 'Treinador iniciante', 'Alcance o nível 5 de treinador.', item('ovo-misterioso', 'Ovo Misterioso')),
   c('treinador-10', 'treinador', 'Treinador intermediário', 'Alcance o nível 10 de treinador.', item('ovo-inicial-a', 'Ovo Inicial A')),
@@ -130,6 +151,25 @@ export const CONQUISTAS: Conquista[] = [
   c('guilda-entrar', 'jornada', 'União', 'Entre em uma guilda.', titulo('Membro de guilda')),
   c('guilda-criar', 'jornada', 'Lider da união', 'Crie uma guilda.', titulo('Líder de guilda')),
   c('guilda-max', 'jornada', 'União max', 'Esteja em uma guilda de nível máximo.', item('ovo-misterioso-a', 'Ovo Misterioso A')),
+  c('breeding', 'jornada', 'Olha o ovo', 'Deixe um casal no Daycare uma vez.', item('ovo-misterioso-a-nt', 'Ovo Misterioso A (NT)')),
+  c('fazendeiro', 'jornada', 'Fazendeiro', 'Plante num canteiro da Artesã uma vez.', captura(0.01)),
+  c('engenheiro', 'jornada', 'Engenheiro', 'Crie Pokébolas com a Artesã uma vez.', captura(0.01)),
+  c('charmoso', 'jornada', 'Charmoso', 'Crie um Charm com a Artesã uma vez.', captura(0.01)),
+  c('comerciante', 'jornada', 'Eu sou um comerciante!', 'Venda um Pokémon no Mercado negro.', captura(0.01)),
+  c('vip', 'jornada', 'VIP!', 'Tenha VIP uma vez.', titulo('VIP')),
+  c('doacao', 'jornada', 'Faça uma doação', 'Faça uma doação para o servidor.', { tipo: 'vip', dias: 3 }),
+  // o Kit iniciante do começo do jogo vem por aqui (pedido do dono): termine ou pule a introdução do Professor
+  c('conhecedor', 'jornada', 'Conhecedor', 'Veja a introdução do Professor Carvalho (ela aparece no começo do jogo e em Opções → "Ver a introdução do Professor").', item('kit-iniciante', 'Kit iniciante (NT)')),
+
+  // ---- selos sazonais (o sistema chega com o evento de Natal; os selos ficam em save.itens)
+  c('sazonal', 'sazonais', 'Sazonal', 'Compre um selo sazonal.', item('ovo-misterioso-s-nt', 'Ovo Misterioso S (NT)')),
+  c('sazonal-todos', 'sazonais', 'Complete os selos sazonais', 'Compre todos os selos sazonais.', item('ovo-lendario-s', 'Ovo Lendário S')),
+  c('sazonal-carnaval', 'sazonais', "Quaquaval's day", 'Compre o Selo do Carnaval.', item('moeda-quaquaval', 'Quaquaval Coin', 200)),
+  c('sazonal-pascoa', 'sazonais', "Bunnelby's day", 'Compre o Selo da Páscoa.', item('moeda-bunnelby', 'Bunnelby Coin', 200)),
+  c('sazonal-namorados', 'sazonais', "Enamorus's day", 'Compre o Selo do Dia dos Namorados.', item('moeda-enamorus', 'Enamorus Coin', 200)),
+  c('sazonal-aniversario', 'sazonais', 'Aniversário Poke Origins', 'Compre o Selo do Aniversário Poke Origins.', item('moeda-pokeorigins', 'Poke Origins Coin', 200)),
+  c('sazonal-halloween', 'sazonais', "Mimikyu's day", 'Compre o Selo do Halloween.', item('moeda-mimikyu', 'Mimikyu Coin', 200)),
+  c('sazonal-natal', 'sazonais', "Delibird's day", 'Compre o Selo do Natal.', item('moeda-delibird', 'Delibird Coin', 200)),
 
   // ---- coleção: parte das outras conquistas concluídas
   c('conquistas-25', 'colecao', '25%', 'Conclua 25% das conquistas.', item('ovo-inicial-a', 'Ovo Inicial A'), { parte: 0.25 }),
@@ -169,6 +209,7 @@ export function textoRecompensa(r: RecompensaConquista): string {
   if (r.tipo === 'item') return `${r.quantidade}x ${r.nome}`;
   if (r.tipo === 'silver') return `${r.quantidade.toLocaleString('pt-BR')} de Poké Dólares`;
   if (r.tipo === 'fragmentos') return `${r.quantidade}x Fragmento Temporal`;
+  if (r.tipo === 'vip') return `${r.dias} dias de VIP`;
   return `Título "${r.titulo}"`;
 }
 

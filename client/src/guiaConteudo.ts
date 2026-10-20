@@ -28,7 +28,7 @@ export const GUIA: GrupoGuia[] = [
       { id: 'inicio', emoji: '🥚', titulo: 'Começo da jornada', texto: [
         'Toda conta nova ganha um Ovo de Inicial: ao abrir, ele choca um dos 27 iniciais de todas as regiões, sorteado com a mesma chance, e depois você escolhe em qual região começar.',
         'O inicial vem com IVs altos e é NT (não negociável): não pode ser trocado nem vendido.',
-        'Você também começa com um Kit iniciante na Bolsa. Abra-o para receber Pokébolas, remédios, Poké Dólares, uma skin e um Charm.',
+        'Ao fechar a introdução do Professor Carvalho, você ganha um Kit iniciante (conquista Conhecedor). Abra-o pela Bolsa para receber Pokébolas, remédios, Poké Dólares, uma skin e um Charm.',
       ] },
       { id: 'treinador', emoji: '⭐', titulo: 'Nível de treinador', texto: [
         'Seu nível de treinador vai do 1 ao 25. Você ganha o mesmo XP que o seu Pokémon ganha ao derrotar ou capturar.',
@@ -133,7 +133,7 @@ export const GUIA: GrupoGuia[] = [
         '• A guilda ganha XP quando os membros derrotam ou capturam selvagens e vencem treinadores.',
         '• Cada nível (até o 10) dá bônus para todos os membros: shiny, raros, XP e Poké Dólares.',
         '• A guilda tem chat próprio e bandeira personalizada.',
-        '• Loja da guilda (botão na tela da guilda): paga em Pontos de guilda, ganhos no Boss da guilda. A loja é a mesma para todos e troca todo mês; os limites de compra zeram no dia 1º. Tem o inicial do mês (20 pontos, 1 por mês), Mint aleatória (6, até 5), Charm aleatório (5, até 10) e packs de 10 Pokébolas da Artesã (1 ponto, até 10 de cada).',
+        '• Loja da guilda (botão na tela da guilda): paga em Pontos de guilda, ganhos no Boss da guilda. A loja é a mesma para todos e troca todo mês; os limites de compra zeram no dia 1º. Tem o inicial do mês (20 pontos, 1 por mês), Mint aleatória (6, até 5), Charm aleatório (5, até 10), 10 Tera Shards de um tipo sorteado (5, até 10) e packs de 10 Pokébolas da Artesã (1 ponto, até 10 de cada).',
       ] },
       { id: 'amigos', emoji: '👥', titulo: 'Amigos e chat', texto: [
         'Em Comunidade → Amigos você adiciona jogadores e conversa em particular.',
@@ -333,7 +333,7 @@ export const GUIA: GrupoGuia[] = [
         'Vencer um Ninho ou ser campeão de um Torneio dá um giro na roleta daquele evento. O resultado é sorteado no servidor.',
       ] },
       { id: 'kit', emoji: '🎒', titulo: 'Kit iniciante', texto: [
-        'Vem na Bolsa de toda conta nova: 100 Pokébolas, remédios, 20.000 Poké Dólares, uma skin e um Charm sorteados. Tudo NT.',
+        'Chega na Bolsa de toda conta nova quando a introdução do Professor Carvalho termina (conquista Conhecedor): 100 Pokébolas, remédios, 20.000 Poké Dólares, uma skin e um Charm sorteados. Tudo NT.',
       ] },
     ],
   },

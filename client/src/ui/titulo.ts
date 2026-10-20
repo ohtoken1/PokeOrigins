@@ -19,6 +19,7 @@ const VISUAIS: Record<string, VisualTitulo> = {
   'gold-10000': { tema: 'riqueza', grau: 4, simbolo: '💎' },
   'lendario-shiny': { tema: 'shiny', grau: 4, simbolo: '✨' },
   'ticket-mitico': { tema: 'mitico', grau: 4, simbolo: '🎰' },
+  vip: { tema: 'riqueza', grau: 2, simbolo: '💎' },
   'passe-nov26': { tema: 'riqueza', grau: 3, simbolo: '🎫' },
   // pacotes Founder (pedido do dono): nas cores de cada lendário, com o acabamento mais alto
   'fundador-palkia': { tema: 'palkia', grau: 4, simbolo: '🌌' },

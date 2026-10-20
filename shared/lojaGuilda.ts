@@ -38,7 +38,8 @@ export interface ProdutoGuilda {
   /** unidades por compra (bolas: pack de 10) */
   quantidade: number;
   item?: string;
-  aleatorio?: 'mint' | 'charm';
+  /** sorteado na compra; `terashard` = UM tipo sorteado, e as `quantidade` unidades vêm todas desse tipo */
+  aleatorio?: 'mint' | 'charm' | 'terashard';
   inicial?: number;
   nome?: string;
 }
@@ -49,6 +50,8 @@ export function produtosDaGuilda(mes: string): ProdutoGuilda[] {
     { id: 'inicial', preco: 20, limite: 1, quantidade: 1, inicial: inicialDoMes(mes) },
     { id: 'mint-aleatoria', preco: 6, limite: 5, quantidade: 1, aleatorio: 'mint', nome: 'Mint aleatória' },
     { id: 'charm-aleatorio', preco: 5, limite: 10, quantidade: 1, aleatorio: 'charm', nome: 'Charm aleatório' },
+    // pedido do dono: 10 Tera Shards de um tipo sorteado (as 10 do mesmo tipo) por 5 pontos
+    { id: 'pack-terashard', preco: 5, limite: 10, quantidade: 10, aleatorio: 'terashard', nome: '10 Tera Shards (tipo aleatório)' },
     ...BOLAS_GUILDA.map((b) => ({ id: `pack-${b}`, preco: 1, limite: 10, quantidade: 10, item: b })),
   ];
 }

@@ -45,7 +45,7 @@ export const CATEGORIAS_RANKING: { id: CategoriaRanking; nome: string; coluna: s
   { id: 'lendarios', nome: 'Lendários', coluna: 'Lendários', descricao: 'Lendários, míticos e Ultra Beasts capturados em batalha.', valor: (d) => d.capturasLendarios },
   { id: 'nivel', nome: 'Nível', coluna: 'Nível', descricao: 'Nível de treinador (empate: quem tem mais XP).', valor: (d) => d.nivel },
   { id: 'missoes', nome: 'Missões do quadro', coluna: 'Missões', descricao: 'Missões concluídas no Quadro de missões da cidade.', valor: (d) => d.missoes },
-  { id: 'medalhas', nome: 'Medalhas de torneio', coluna: 'Medalhas', descricao: 'Medalhas ganhas nos torneios online.', valor: (d) => d.medalhas, emBreve: true },
+  { id: 'medalhas', nome: 'Medalhas de torneio', coluna: 'Medalhas', descricao: 'Medalhas de torneio: ouro (1º lugar), prata (2º) e bronze (3º), somadas.', valor: (d) => d.medalhas },
   { id: 'silver', nome: 'Poké Dólar', coluna: 'Poké Dólar', descricao: 'Poké Dólares na carteira.', valor: (d) => d.silver },
   { id: 'gold', nome: 'Origin Coin', coluna: 'Origin Coin', descricao: 'Origin Coins na carteira.', valor: (d) => d.gold },
 ];

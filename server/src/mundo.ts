@@ -67,6 +67,8 @@ const porConta = new Map<number, Conexao>();
 
 /** O jogador está com o jogo aberto agora? (perfil mostra "Online agora") */
 export const estaOnline = (contaId: number) => porConta.has(contaId);
+/** Contas com o jogo aberto agora (Dashboard: tempo online e pico). */
+export const contasOnline = () => [...porConta.keys()];
 /** Manda uma mensagem para o jogo de uma conta, se estiver aberto (pedido de amizade, mensagem privada…). */
 export function avisar(contaId: number, msg: unknown): void {
   const c = porConta.get(contaId);

@@ -9,6 +9,7 @@ import { aoMudarAjustesSom, ajustesSom, mudarAjustesSom } from '../sons';
 import { el } from '../ui/dom';
 import { modoDesempenho, mudarModoDesempenho } from '../desempenho';
 import { seletorDeIdioma } from '../idioma';
+import { verIntroducao } from '../tutorial';
 
 export const telaOpcoes: Tela = (raiz, navegar) => {
   const save = carregarSave();
@@ -97,6 +98,7 @@ export const telaOpcoes: Tela = (raiz, navegar) => {
       'Perfil',
       campo('Nome de treinador', nomeTreinador, `Aparece em cima do seu personagem no mapa. Para trocar (${PRECO_TROCAR_NOME_GOLD} Origin Coins), use "Mudar o visual do personagem".`),
       el('button', { class: 'botao secundario', onclick: () => navegar({ tela: 'personagem' }) }, 'Mudar o visual do personagem'),
+      el('button', { class: 'botao secundario', onclick: () => verIntroducao() }, 'Ver a introdução do Professor'),
     ),
     secao(
       'Privacidade e convites',

@@ -29,6 +29,8 @@ function abaDe(p: ProdutoLiga): Aba {
   if (p.titulo) return 'titulos';
   if (p.id.startsWith('ovo-')) return 'ovos';
   const c = itemDaLoja(p.item ?? p.id)?.categoria;
+  // os Scrolls do Kubfu (evolução) ficam junto dos itens de forma
+  if (c === 'evolucao') return 'formas';
   return c === 'megapedras' || c === 'zcristais' || c === 'formas' ? c : 'itens';
 }
 

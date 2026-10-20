@@ -100,10 +100,11 @@ export const ITENS: Record<ItemId, Item> = {
 export const ITENS_COM_VERSAO_NT = ['pokeball', 'greatball', 'ultraball', 'potion', 'superpotion', 'hyperpotion', 'revive', 'maxrevive'];
 for (const id of ITENS_COM_VERSAO_NT) ITENS[`${id}-nt`] = { ...ITENS[id], nome: `${ITENS[id].nome} (NT)`, descricao: `${ITENS[id].descricao} NT: não pode ser trocado.` };
 
-/** Toda conta nova começa só com o Kit iniciante (pedido do dono); o resto sai de dentro dele. */
-export const ITENS_INICIAIS: Record<ItemId, number> = {
-  'kit-iniciante': 1,
-};
+/**
+ * Conta nova começa sem itens: o Kit iniciante (pedido do dono) chega pela conquista Conhecedor, ao terminar ou
+ * pular a introdução do Professor Carvalho (client/src/tutorial.ts), e o resto sai de dentro dele.
+ */
+export const ITENS_INICIAIS: Record<ItemId, number> = {};
 
 /** Estado que um remédio lê/altera (serve para o save e para a batalha). */
 export interface EstadoRemedio {

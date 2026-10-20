@@ -51,6 +51,8 @@ export interface EstadoSafari {
   usadas: EntradaSafari[];
   /** comprou o ticket extra de hoje (com gold) */
   comprada?: boolean;
+  /** quantas vezes entrou no Safari, desde sempre (só o servidor conta; conquistas do Safari) */
+  total?: number;
   aberto?: SafariAberto | null;
 }
 

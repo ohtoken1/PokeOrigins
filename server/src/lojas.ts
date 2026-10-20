@@ -2,6 +2,7 @@
 // Liga (League Coins / League Coins Nightmare). O servidor sorteia a rotação, confere preço e saldo no save
 // guardado e entrega na mesma mudança (o jogo faz salvarAgora antes e adota o save que volta).
 import * as banco from './banco.ts';
+import { contar } from './dashboard.ts';
 import { ErroConta } from './contas.ts';
 import { gerarPokemon, idsDaCategoria, itemAleatorio, nomeDaEspecie, nomeDoItem } from './motorDoJogo.ts';
 import { guardarPokemon, type PokemonSave, type SaveMin } from './trocas.ts';
@@ -9,7 +10,7 @@ import {
   CHANCE_SHINY_INICIAL_GUILDA, IV_MINIMO_INICIAL_GUILDA, comprasDoMes, mesDaLoja, produtosDaGuilda, proximoMesDaLoja, type EstadoLojaGuilda,
 } from '../../shared/lojaGuilda.ts';
 import {
-  LOJAS_DA_LIGA, PRECO_FORMA_NA_NIGHTMARE, PRECO_Z_NA_LIGA, PRODUTOS_LIGA, diaDaLoja, itensDaLojaDaLiga, precoNoDia, proximaRotacao, rotacaoDoDia,
+  LOJAS_DA_LIGA, PRODUTOS_PREMIUM, PRECO_FORMA_NA_NIGHTMARE, PRECO_Z_NA_LIGA, PRODUTOS_LIGA, diaDaLoja, itensDaLojaDaLiga, precoNoDia, proximaRotacao, rotacaoDoDia,
   type IdLojaLiga, type ProdutoLiga,
 } from '../../shared/lojasEspeciais.ts';
 
@@ -31,6 +32,7 @@ export function estado() {
   return {
     agora, dia, trocaEm: proximaRotacao(agora),
     doDia: rotacaoDoDia(dia, megas(), idsDaCategoria('zcristais')).map((id) => ({ id, preco: precoNoDia(id) })),
+    premium: PRODUTOS_PREMIUM,
     liga: catalogo('liga'),
     nightmare: catalogo('nightmare'),
   };
@@ -45,6 +47,7 @@ export function comprar(conta: banco.Conta, dados: Record<string, unknown>) {
   const quantidade = dados.quantidade ?? 1;
   if (!Number.isSafeInteger(quantidade) || (quantidade as number) < 1 || (quantidade as number) > MAXIMO_POR_COMPRA) throw new ErroConta('Quantidade inválida.');
   const qtd = quantidade as number;
+  if (loja === 'premium') return comprarPremium(conta, id, qtd);
   let campo: 'gold' | 'leagueCoins' | 'leagueCoinsNightmare';
   let produto: ProdutoLiga;
   let nomeMoeda: string;
@@ -80,12 +83,33 @@ export function comprar(conta: banco.Conta, dados: Record<string, unknown>) {
       }
     save[campo] = saldo(save[campo]) - custo;
   });
+  contar(`compra:${loja}:${produto.titulo ?? produto.item ?? produto.id}`, qtd);
   const guardado = banco.lerSave(conta.id)!;
   const nome = produto.nome ?? nomeDoItem(produto.item ?? produto.id);
   return {
     save: JSON.parse(guardado.dados), versao: guardado.versao,
     texto: `Comprou ${qtd}× ${nome} por ${custo.toLocaleString('pt-BR')} ${nomeMoeda}.${recebidos.length ? ` Saiu: ${recebidos.join(', ')}.` : ''}`,
   };
+}
+
+/** Aba Premium do Pokémarket: Passe Premium (item na bolsa) ou dias de VIP, pagos em Origin Coins. */
+function comprarPremium(conta: banco.Conta, id: string, qtd: number) {
+  const produto = PRODUTOS_PREMIUM.find((p) => p.id === id);
+  if (!produto) throw new ErroConta('Esta loja não vende este item.', 409);
+  if (!banco.lerSave(conta.id)) throw new ErroConta('Comece sua jornada antes de comprar.');
+  const custo = produto.preco * qtd;
+  banco.mudarSaves([conta.id], ([save]) => {
+    if (saldo(save.gold) < custo) throw new ErroConta('Você não tem Origin Coins suficientes.');
+    if (produto.vipDias) save.vipAte = Math.max(saldo(save.vipAte), Date.now()) + produto.vipDias * qtd * 86_400_000;
+    else {
+      const itens = (save.itens && typeof save.itens === 'object' ? save.itens : (save.itens = {})) as Record<string, number>;
+      itens[produto.item!] = saldo(itens[produto.item!]) + qtd;
+    }
+    save.gold = saldo(save.gold) - custo;
+  });
+  contar(`compra:premium:${produto.id}`, qtd);
+  const guardado = banco.lerSave(conta.id)!;
+  return { save: JSON.parse(guardado.dados), versao: guardado.versao, texto: `Comprou ${qtd > 1 ? `${qtd}× ` : ''}${produto.nome} por ${custo.toLocaleString('pt-BR')} Origin Coins.` };
 }
 
 // ---------- Loja da guilda (shared/lojaGuilda.ts) ----------
@@ -133,6 +157,12 @@ export function comprarGuilda(conta: banco.Conta, dados: Record<string, unknown>
         }
         if (shiny) recebidos.push(`${nomeDaEspecie(produto.inicial)} ✨ shiny`);
       } else
+      if (produto.aleatorio === 'terashard') {
+        // um tipo sorteado, e o pacote inteiro vem dele
+        const shard = itemAleatorio('terashard');
+        itens[shard] = saldo(itens[shard]) + produto.quantidade;
+        recebidos.push(`${produto.quantidade}× ${nomeDoItem(shard)}`);
+      } else
         for (let u = 0; u < produto.quantidade; u++) {
           const item = produto.aleatorio ? itemAleatorio(produto.aleatorio) : produto.item!;
           itens[item] = saldo(itens[item]) + 1;
@@ -143,6 +173,7 @@ export function comprarGuilda(conta: banco.Conta, dados: Record<string, unknown>
     save.lojaGuilda = { mes, compras } satisfies EstadoLojaGuilda;
     save.pontosGuilda = saldo(save.pontosGuilda) - custo;
   });
+  contar(`compra:guilda:${produto.inicial ? `inicial-${produto.inicial}` : produto.id}`, vezes);
   const guardado = banco.lerSave(conta.id)!;
   const nome = produto.inicial ? nomeDaEspecie(produto.inicial) : produto.nome ?? `${produto.quantidade}× ${nomeDoItem(produto.item!)}`;
   return {

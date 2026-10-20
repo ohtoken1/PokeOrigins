@@ -123,7 +123,7 @@ const sql = {
   contaPorUsuario: db.prepare('SELECT * FROM contas WHERE usuario = ?'),
   ranking: db.prepare(`SELECT c.usuario, json_extract(s.dados, '$.aparencia.nome') AS nome, json_extract(s.dados, '$.xpTreinador') AS xp,
     json_extract(s.dados, '$.estatisticas.capturas') AS capturas, json_extract(s.dados, '$.estatisticas.capturasShiny') AS shiny,
-    json_extract(s.dados, '$.estatisticas.capturasLendarios') AS lendarios, json_extract(s.dados, '$.estatisticas.medalhas') AS medalhas,
+    json_extract(s.dados, '$.estatisticas.capturasLendarios') AS lendarios, (ifnull(json_extract(s.dados, '$.estatisticas.medalhasOuro'), 0) + ifnull(json_extract(s.dados, '$.estatisticas.medalhasPrata'), 0) + ifnull(json_extract(s.dados, '$.estatisticas.medalhasBronze'), 0)) AS medalhas,
     json_extract(s.dados, '$.estatisticas.missoesQuadro') AS missoes, json_extract(s.dados, '$.silver') AS silver, json_extract(s.dados, '$.gold') AS gold
     FROM contas c JOIN saves s ON s.conta_id = c.id LIMIT 5000`),
   buscar: db.prepare(`SELECT c.id, c.usuario, json_extract(s.dados, '$.aparencia.nome') AS nome FROM contas c JOIN saves s ON s.conta_id = c.id
@@ -784,3 +784,76 @@ export const pontosRanqueado = (contaId: number, formato: string) => (sqlRanquea
 export const listaRanqueado = (formato: string, limite: number) => sqlRanqueado.lista.all(formato, limite) as unknown as LinhaRanqueado[];
 /** Os donos das vagas da Master Ball (os primeiros com pontos de Beast Ball). */
 export const mastersRanqueado = (formato: string, pontosMinimos: number, vagas: number) => (sqlRanqueado.masters.all(formato, pontosMinimos, vagas) as { conta_id: number }[]).map((l) => l.conta_id);
+
+// ---------- Dashboard da Administração (server/src/dashboard.ts) ----------
+// `atividade` = quanto tempo cada conta ficou com o jogo aberto em cada dia (Brasília), medido pelo servidor a cada
+// minuto; `metricas_dia` = contadores do servidor por dia (compras nas lojas do servidor, vendas do Mercado negro…);
+// `pico_online` = maior número de jogadores online ao mesmo tempo em cada dia.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS atividade (
+    conta_id INTEGER NOT NULL REFERENCES contas(id) ON DELETE CASCADE,
+    dia TEXT NOT NULL,
+    ms INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (conta_id, dia)
+  );
+  CREATE INDEX IF NOT EXISTS atividade_dia ON atividade (dia);
+  CREATE TABLE IF NOT EXISTS metricas_dia (
+    dia TEXT NOT NULL,
+    chave TEXT NOT NULL,
+    valor INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (dia, chave)
+  );
+  CREATE TABLE IF NOT EXISTS pico_online (
+    dia TEXT PRIMARY KEY,
+    maximo INTEGER NOT NULL
+  );
+`);
+const sqlDashboard = {
+  somarAtividade: db.prepare(`INSERT INTO atividade (conta_id, dia, ms) VALUES (?, ?, ?)
+    ON CONFLICT(conta_id, dia) DO UPDATE SET ms = ms + excluded.ms`),
+  somarMetrica: db.prepare(`INSERT INTO metricas_dia (dia, chave, valor) VALUES (?, ?, ?)
+    ON CONFLICT(dia, chave) DO UPDATE SET valor = valor + excluded.valor`),
+  pico: db.prepare(`INSERT INTO pico_online (dia, maximo) VALUES (?, ?)
+    ON CONFLICT(dia) DO UPDATE SET maximo = MAX(maximo, excluded.maximo)`),
+  lerPico: db.prepare('SELECT maximo FROM pico_online WHERE dia = ?'),
+  atividadeDesde: db.prepare('SELECT conta_id, dia, ms FROM atividade WHERE dia >= ?'),
+  metricasDesde: db.prepare('SELECT dia, chave, valor FROM metricas_dia WHERE dia >= ?'),
+  contas: db.prepare('SELECT c.id, c.usuario, c.criada_em, s.dados FROM contas c LEFT JOIN saves s ON s.conta_id = c.id'),
+  primeiroDiaAtivo: db.prepare('SELECT conta_id, MIN(dia) AS primeiro, MAX(dia) AS ultimo, GROUP_CONCAT(dia) AS dias FROM atividade GROUP BY conta_id'),
+  contar: (tabela: string, onde = '') => db.prepare(`SELECT COUNT(*) AS n FROM ${tabela} ${onde}`),
+};
+export const somarAtividade = (contaId: number, dia: string, ms: number) => void sqlDashboard.somarAtividade.run(contaId, dia, ms);
+export const somarMetricaDoServidor = (dia: string, chave: string, valor: number) => void sqlDashboard.somarMetrica.run(dia, chave, valor);
+export const registrarPicoOnline = (dia: string, online: number) => void sqlDashboard.pico.run(dia, online);
+export const picoOnline = (dia: string) => (sqlDashboard.lerPico.get(dia) as { maximo: number } | undefined)?.maximo ?? 0;
+export const atividadeDesde = (dia: string) => sqlDashboard.atividadeDesde.all(dia) as { conta_id: number; dia: string; ms: number }[];
+export const metricasDoServidorDesde = (dia: string) => sqlDashboard.metricasDesde.all(dia) as { dia: string; chave: string; valor: number }[];
+/** Todas as contas com o save (texto) — só para o Dashboard, que guarda o resultado por um minuto. */
+export const contasParaDashboard = () => sqlDashboard.contas.all() as { id: number; usuario: string; criada_em: number; dados: string | null }[];
+/** Dias em que cada conta jogou (para o retorno D1/D7). */
+export const diasAtivosPorConta = () => sqlDashboard.primeiroDiaAtivo.all() as { conta_id: number; dias: string }[];
+/** Contagens simples de tabelas do jogo (guildas, anúncios do Mercado negro…). */
+export const contarLinhas = (tabela: 'clas' | 'cla_membros' | 'mercado' | 'ranqueado' | 'amizades', onde = '') => (sqlDashboard.contar(tabela, onde).get() as { n: number }).n;
+
+// Compras com dinheiro real confirmadas (Dashboard). Gravadas só pelo servidor, ao confirmar o pagamento.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS compras_reais (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    conta_id INTEGER REFERENCES contas(id) ON DELETE SET NULL,
+    produto TEXT NOT NULL,
+    centavos INTEGER NOT NULL,
+    quando INTEGER NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS compras_reais_quando ON compras_reais (quando);
+`);
+const sqlComprasReais = {
+  gravar: db.prepare('INSERT INTO compras_reais (conta_id, produto, centavos, quando) VALUES (?, ?, ?, ?)'),
+  resumo: db.prepare(`SELECT produto, COUNT(*) AS total, SUM(centavos) AS centavos,
+    SUM(CASE WHEN quando >= ? THEN 1 ELSE 0 END) AS semana, SUM(CASE WHEN quando >= ? THEN 1 ELSE 0 END) AS mes,
+    COUNT(DISTINCT conta_id) AS compradores FROM compras_reais GROUP BY produto`),
+  compradores: db.prepare('SELECT COUNT(DISTINCT conta_id) AS n FROM compras_reais'),
+};
+export const gravarCompraReal = (contaId: number, produto: string, centavos: number) => void sqlComprasReais.gravar.run(contaId, produto, centavos, Date.now());
+export const resumoComprasReais = (desdeSemana: number, desdeMes: number) =>
+  sqlComprasReais.resumo.all(desdeSemana, desdeMes) as { produto: string; total: number; centavos: number; semana: number; mes: number; compradores: number }[];
+export const compradoresReais = () => (sqlComprasReais.compradores.get() as { n: number }).n;

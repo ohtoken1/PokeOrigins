@@ -1,4 +1,5 @@
 import { bonificacao } from '../bonificacao';
+import { somarMetrica } from '../../../shared/metricas';
 import { podeUsar, tetoDoJogador, textoDoLimite } from '../limiteNivel';
 import { bonusVip } from '../../../shared/vip';
 import { AMIZADE_POR_BATALHA, ganharAmizade } from '../../../shared/amizade';
@@ -1091,12 +1092,14 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       if (treinador) await dizer(`Você venceu ${treinador.nome}!`);
       if (treinador?.mensagemVitoria) await dizer(treinador.mensagemVitoria);
       await darXpTreinador();
+      somarMetrica(save, 'vitorias');
       // silver só em batalhas contra treinadores e ginásios (pedido do dono): selvagem não dá
       if (treinador && treinador.recompensa > 0) {
         // Amulet Coin: +20% se quem segura entrou em campo; Luck Incense usado na última hora: +20%
         const amuleto = multSilverDoTime([...batalha.participantes].map((pos) => save.time[pos])) * multSilverDoIncenso(save);
         const silver = Math.round(treinador.recompensa * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver') * multConquistas(save, 'silver') * multTitulo(save) * (1 + bonusDaMinhaGuilda().silver) * amuleto);
         save.silver += silver;
+        somarMetrica(save, 'silver', silver);
         await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${nomeDaMoeda('silver', silver)}!`);
       }
       await darXpTime();
@@ -1114,6 +1117,10 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       registrarCapturaNoRanking(save, selvagem);
       // letreiro de todos os jogadores: shiny, lendário, mítico, Ultra Beast ou inicial
       const rara = categoriaRara(dadosSelvagem, todosOsPokemons());
+      // Dashboard da Administração (shared/metricas.ts)
+      somarMetrica(save, 'capturas');
+      if (selvagem.shiny) somarMetrica(save, 'shiny');
+      if (rara) somarMetrica(save, rara === 'ultra' ? 'ultra' : rara);
       if (selvagem.shiny || rara) avisarCapturaRara(selvagem.especieId, selvagem.shiny, rara);
       await avisarMissoes(contarNasMissoes(save, 'capturar', selvagem.especieId));
       if (selvagem.shiny) await avisarMissoes(contarNasMissoes(save, 'shiny'));

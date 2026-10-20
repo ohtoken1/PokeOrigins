@@ -1,4 +1,5 @@
 // Save do jogador: fica na conta (servidor), com o objeto único em memória e uma cópia no navegador até chegar lá.
+import type { MetricasDoDia } from '../../shared/metricas';
 import { BOXES_MAXIMO, TAMANHO_BOX, numeroDeBoxes } from '../../shared/pc';
 import { atributosZerados, curar, gerarIndividuo, hpMaximo, lembrarGolpes, type PokemonIndividual } from '../../shared/batalha/pokemon';
 import { IV_INICIAL } from '../../shared/regioes';
@@ -23,6 +24,8 @@ export type PokemonDoJogador = PokemonIndividual & {
   origem?: 'ovo' | 'ticket' | 'troca';
   /** Ovo da creche que ainda não chocou (fica no PC; não luta, não troca; o choco vem depois). */
   ovo?: { desde: number; passos?: number };
+  /** Medalhas de torneio deste Pokémon (+1 a cada pódio em que ele estava no time; escrito pelo servidor). */
+  medalhas?: number;
 };
 
 export interface Save {
@@ -121,6 +124,8 @@ export interface Save {
   pacotesComprados?: string[];
   /** Avisos do tutorial (Professor Carvalho) já mostrados: ids de conteúdo de shared/trancas.ts */
   tutorialVisto?: string[];
+  /** Save criado depois que o Kit iniciante passou a vir pela conquista Conhecedor (os antigos já ganharam no começo). */
+  kitPelaConquista?: boolean;
   /** Quando virou treinador (ms). No MMO = data do cadastro da conta. */
   criadoEm?: number;
 }
@@ -137,6 +142,8 @@ export interface Estatisticas {
   medalhasOuro?: number;
   medalhasPrata?: number;
   medalhasBronze?: number;
+  /** Dia a dia (Brasília), para o Dashboard da Administração: Poké Dólares ganhos, capturas, compras (shared/metricas.ts). */
+  porDia?: Record<string, MetricasDoDia>;
 }
 
 /** Conta uma captura feita em batalha (para os rankings). */
@@ -211,6 +218,8 @@ export function novoSave(regiao: string, inicial: number, aparencia?: Aparencia)
     time: [novoInicial(inicial)],
     caixa: [],
     itens: { ...ITENS_INICIAIS },
+    // o Kit iniciante vem pela conquista Conhecedor (introdução do Professor), não mais no começo
+    kitPelaConquista: true,
     silver: SILVER_INICIAL,
     gold: 0,
     passos: 0,

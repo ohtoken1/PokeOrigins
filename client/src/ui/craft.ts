@@ -1,6 +1,7 @@
 // NPC de craft da cidade (perto da horta grande, lado leste): Pokébolas com Apricorns, Charms com Berries + Energies
 // e os canteiros onde se plantam Berries e Apricorns. Regras em shared/craft.ts (planilha do dono). Como o resto do
 // save, ainda é feito no navegador.
+import { marcarConquista } from '../conquistas';
 import {
   BOLAS_POR_CRAFT,
   BERRIES_POR_CHARM,
@@ -98,6 +99,7 @@ export function abrirCraft(save: Save, aoMudar: () => void = () => {}): void {
               ids.forEach((id) => gastar(save, id, n));
               save.silver -= n * preco;
               ganhar(save, bola, n * BOLAS_POR_CRAFT);
+              marcarConquista(save, 'craftBola');
               mudou(`Criou ${n * BOLAS_POR_CRAFT} ${nomeItem(bola)}! Estão na bolsa.`);
             },
           }, 'Criar'));
@@ -126,6 +128,7 @@ export function abrirCraft(save: Save, aoMudar: () => void = () => {}): void {
               gastar(save, r.energia, ENERGIES_POR_CHARM);
               save.silver -= PRECO_CRAFT_CHARM;
               ganhar(save, r.charm, sai);
+              marcarConquista(save, 'craftCharm');
               mudou(`Criou ${sai} ${nomeItem(r.charm)}! ${sai > 1 ? 'Estão' : 'Está'} na bolsa.`);
             },
           }, 'Criar'));
@@ -152,6 +155,7 @@ export function abrirCraft(save: Save, aoMudar: () => void = () => {}): void {
       if (save.silver < custo) return;
       save.silver -= custo;
       lista.forEach((c) => plantar(c, semente, Date.now()));
+      marcarConquista(save, 'plantou');
       mudou(`Plantou ${lista.length}× ${nomeItem(semente)}.`);
     };
     const colher = (lista: Canteiro[]) => {
