@@ -32,7 +32,7 @@ export const RECOMPENSA_POR_POKEMON: Record<Dificuldade, number> = { 1: 30, 2: 4
  * Poké Dólares por vencer ou capturar um selvagem (pedido do dono, 20/10/2026: pouco, crescendo com o nível; os
  * bônus de Poké Dólares valem por cima): 1 + 1 a cada 10 níveis (nível 5 = 1, nível 50 = 6, nível 100 = 11).
  */
-export const recompensaDoSelvagem = (nivel: number): number => 1 + Math.floor(Math.max(1, nivel) / 10);
+export const recompensaDoSelvagem = (nivel: number): number => 3 * (1 + Math.floor(Math.max(1, nivel) / 10));
 export const recompensaDoDuelo = (dificuldade: Dificuldade, pokemons: number): number => RECOMPENSA_POR_POKEMON[dificuldade] * pokemons;
 export const NOMES_DIFICULDADE: Record<Dificuldade, string> = { 1: 'Fácil', 2: 'Normal', 3: 'Difícil', 4: 'Muito difícil', 5: 'Lendário' };
 
@@ -125,9 +125,10 @@ export function formaNoNivel(numero: number, nivel: number): number {
 }
 
 /** Monta o time do NPC para um duelo: últimos Pokémon do time dele (os mais fortes), nível da média, IVs da dificuldade, sem EVs. */
-export function montarTimeNpc(npc: TreinadorNpc, timeDoJogador: PokemonIndividual[], crescimentoDe: (n: number) => string | null, nivel = nivelDoDuelo(timeDoJogador)): PokemonIndividual[] {
+/** `completo`: o time inteiro do treinador, sem olhar o tamanho do time do jogador (ginásios, pedido do dono). */
+export function montarTimeNpc(npc: TreinadorNpc, timeDoJogador: PokemonIndividual[], crescimentoDe: (n: number) => string | null, nivel = nivelDoDuelo(timeDoJogador), completo = false): PokemonIndividual[] {
   const iv = IV_POR_DIFICULDADE[npc.dificuldade];
-  return npc.time.slice(-tamanhoDoTime(npc, timeDoJogador.length)).map((n) => {
+  return (completo ? npc.time : npc.time.slice(-tamanhoDoTime(npc, timeDoJogador.length))).map((n) => {
     const numero = formaNoNivel(n, nivel);
     const p = gerarIndividuo(numero, nivel, { crescimento: crescimentoDe(numero) });
     p.ivs = { hp: iv, atk: iv, def: iv, spa: iv, spd: iv, spe: iv };

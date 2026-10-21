@@ -3,7 +3,7 @@ import { SPRITE_OVO } from '../creche';
 import { pokemonPorId } from '../dados';
 import { treinadorParaUsar } from '../../../shared/treinador';
 import { podeUsar, textoDoLimite } from '../limiteNivel';
-import { numeroDeBoxes, TAMANHO_BOX, TAMANHO_MAXIMO_TIME, TAMANHO_NOME_BOX, nomeDaBox, pokemonsDaBox, salvar, type PokemonDoJogador, type Save } from '../estado';
+import { casaLivre, numeroDeBoxes, organizarCasas, TAMANHO_BOX, TAMANHO_MAXIMO_TIME, TAMANHO_NOME_BOX, nomeDaBox, pokemonsDaBox, salvar, type PokemonDoJogador, type Save } from '../estado';
 import { tornarArrastavel } from './arrastar';
 import { fichaPokemon } from './detalhes';
 import { precoAvaliarIvs } from '../../../shared/loja';
@@ -57,14 +57,28 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
     const lista = noTime(p) ? save.time : save.caixa;
     lista.splice(lista.indexOf(p), 1);
   };
-  /** Coloca no PC, na box e posição dadas (posição = índice dentro da box). */
-  const colocarNaBox = (p: PokemonDoJogador, box: number, posicao = Infinity) => {
-    const daBox = pokemonsDaBox(save, box).filter((q) => q !== p);
-    remover(p);
+  /**
+   * Coloca no PC, na box e na casa escolhidas (sem casa = a primeira livre). Casa ocupada: os dois trocam de lugar
+   * (quem vem do time manda o outro para a primeira casa livre da box).
+   */
+  const colocarNaBox = (p: PokemonDoJogador, box: number, casa?: number) => {
+    const veioDoTime = noTime(p);
+    const [boxAntes, casaAntes] = [p.box, p.casa];
+    const ocupante = casa === undefined ? undefined : save.caixa.find((q) => q !== p && q.box === box && q.casa === casa);
+    if (veioDoTime) {
+      remover(p);
+      save.caixa.push(p);
+    }
     p.box = box;
-    const antes = daBox[posicao];
-    if (antes) save.caixa.splice(save.caixa.indexOf(antes), 0, p);
-    else save.caixa.push(p);
+    p.casa = casa ?? casaLivre(save, box, p);
+    if (ocupante) {
+      if (veioDoTime) ocupante.casa = casaLivre(save, box, ocupante);
+      else {
+        ocupante.box = boxAntes;
+        ocupante.casa = casaAntes;
+      }
+    }
+    organizarCasas(save);
   };
   const colocarNoTime = (p: PokemonDoJogador, posicao: number) => {
     remover(p);
@@ -91,16 +105,18 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
       const outro = save.time[i];
       save.caixa[save.caixa.indexOf(p)] = outro;
       outro.box = p.box;
+      outro.casa = p.casa;
       delete p.box;
       save.time[i] = p;
       return true;
     }
     if (tipo === 'box' || tipo === 'outra-box') {
       const box = tipo === 'box' ? boxAtual : Number(alvo.dataset.box);
-      const cabe = pokemonsDaBox(save, box).filter((q) => q !== p).length < TAMANHO_BOX;
+      // trocar de lugar dentro da box ou com outro da box sempre cabe; vindo de fora, precisa de casa livre
+      const cabe = pokemonsDaBox(save, box).filter((q) => q !== p).length < TAMANHO_BOX || (tipo === 'box' && !noTime(p));
       if (!cabe) return false;
       if (noTime(p) && save.time.length <= 1) return false;
-      colocarNaBox(p, box, tipo === 'box' ? i : Infinity);
+      colocarNaBox(p, box, tipo === 'box' ? i : undefined);
       return true;
     }
     return false;
@@ -179,14 +195,16 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
   const organizarPorIvs = () => {
     const daBox = pokemonsDaBox(save, boxAtual);
     const ordenados = [...daBox].sort((a, b) => Number(avaliado(b)) - Number(avaliado(a)) || (avaliado(a) ? somaIvs(b) - somaIvs(a) : 0));
-    const lugares = daBox.map((p) => save.caixa.indexOf(p));
-    lugares.forEach((lugar, k) => (save.caixa[lugar] = ordenados[k]));
+    // ordenar junta todos no começo da box, um em cada casa
+    ordenados.forEach((p, k) => (p.casa = k));
   };
 
   abrirJanela(
     'PC de Pokémon',
     (janela) => {
       const refazer = () => janela.redesenhar();
+      // Pokémon que chegou pelo servidor (troca, Correio, Mercado) ainda sem casa
+      organizarCasas(save);
       if (selecionado && !save.time.includes(selecionado) && !save.caixa.includes(selecionado)) selecionado = null;
       for (const m of [...marcados]) if (!save.time.includes(m) && !save.caixa.includes(m)) marcados.delete(m);
       const marcar = (q: PokemonDoJogador) => {
@@ -273,9 +291,10 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
         grade.classList.toggle('buscando', !!termo);
         if (!termo) {
           grade.replaceChildren(
-            ...Array.from({ length: TAMANHO_BOX }, (_, i) =>
-              daBox[i] ? arrastavel(casa(daBox[i], prefixar({ alvo: 'box', i })), daBox[i]) : el('div', { class: 'vaga vazia', 'data-alvo': 'box', 'data-i': i }),
-            ),
+            ...Array.from({ length: TAMANHO_BOX }, (_, i) => {
+              const q = daBox.find((x) => x.casa === i);
+              return q ? arrastavel(casa(q, prefixar({ alvo: 'box', i })), q) : el('div', { class: 'vaga vazia', 'data-alvo': 'box', 'data-i': i });
+            }),
           );
           return;
         }

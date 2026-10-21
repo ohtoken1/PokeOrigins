@@ -9,6 +9,9 @@ import { AMIZADE_INICIAL, especie, ppComPPMax, ppMaximo, type PokemonIndividual 
 import { aplicarRemedio, usarRemedio, type Item } from '../itens';
 import type { EfeitoBola } from '../bolas';
 
+/** Mudanças de forma que nos jogos são só a troca da imagem, sem o brilho de transformação. */
+const FORMAS_SEM_ANIMACAO = new Set(['Mimikyu-Busted', 'Mimikyu-Busted-Totem']);
+
 export type Lado = 'jogador' | 'selvagem';
 
 /** `registro`: frase para o chat lateral da batalha (se faltar, usa `texto`; null = não registra). */
@@ -24,8 +27,12 @@ export type EventoBatalha = (
   | { tipo: 'dynamax'; lado: Lado; forma: string | null; texto: string }
   | { tipo: 'dynamaxFim'; lado: Lado; texto: string }
   /** Mudou de forma no meio da batalha (Primal Reversion…). */
-  | { tipo: 'forma'; lado: Lado; forma: string; texto?: string }
-  | { tipo: 'golpe'; lado: Lado; alvo: Lado | null; golpe: string; tipoGolpe: string; categoria: string; texto: string }
+  /** `semAnimacao`: só troca a imagem (ex.: o disfarce do Mimikyu quebrando não é uma transformação). */
+  | { tipo: 'forma'; lado: Lado; forma: string; texto?: string; semAnimacao?: boolean }
+  /** `semAnimacao`: o Showdown marcou "[still]" (ex.: 1º turno de Fly/Solar Beam, quem só se prepara). */
+  | { tipo: 'golpe'; lado: Lado; alvo: Lado | null; golpe: string; tipoGolpe: string; categoria: string; texto: string; semAnimacao?: boolean }
+  /** 1º turno de golpe de dois turnos (Fly, Dig, Solar Beam…): a tela mostra o Pokémon se preparando (voando, cavando, carregando). */
+  | { tipo: 'preparar'; lado: Lado; golpe: string; tipoGolpe: string; texto: string }
   | { tipo: 'hp'; lado: Lado; hp: number; hpMax: number; texto?: string }
   | { tipo: 'status'; lado: Lado; status: string | null; texto?: string }
   | { tipo: 'impacto'; forte: boolean; texto: string }
@@ -67,7 +74,7 @@ export type Pedido =
   /** `zGolpes[i]` = nome do Z-Move do golpe i (Pokémon segurando Z-Crystal), ou null. */
   /** `tera` = Tera Type se ainda pode terastalizar nesta batalha, ou null. `mega` = pode megaevoluir agora (Mega Stone certa). */
   /** `dynamax` = pode usar Dynamax agora (segurando a Dynamax Band; 'gigantamax' se a espécie tem a forma). `dinamaxado` = está em Dynamax (os golpes são os `max`). */
-  | { tipo: 'acao'; golpes: OpcaoGolpe[]; podeTrocar: boolean; podeFugir: boolean; zGolpes: (string | null)[] | null; tera: string | null; mega: boolean; dynamax: 'dynamax' | 'gigantamax' | null; dinamaxado: boolean }
+  | { tipo: 'acao'; golpes: OpcaoGolpe[]; podeTrocar: boolean; podeFugir: boolean; zGolpes: (string | null)[] | null; tera: string | null; mega: boolean; dynamax: 'dynamax' | 'gigantamax' | null; dinamaxado: boolean; tiposAlvo?: string[] }
   | { tipo: 'troca' }
   /** PvP: a vez é do outro jogador (ele está escolhendo, ou eu já escolhi). */
   | { tipo: 'espera' }
@@ -373,7 +380,7 @@ export class BatalhaSelvagem {
     // Dynamax só segurando a Dynamax Band, uma vez por batalha
     const dinamaxado = !!this.eu.active[0]?.volatiles['dynamax'];
     const dynamax = this.time[this.ativo]?.item === DYNAMAX_BAND && ativo.canDynamax && maximos ? (ativo.maxMoves.gigantamax ? 'gigantamax' : 'dynamax') : null;
-    return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso && !this.treinador, zGolpes, tera, mega, dynamax, dinamaxado };
+    return { tipo: 'acao', golpes, podeTrocar: !preso && this.reservasSaudaveis().length > 0, podeFugir: !preso && !this.treinador, zGolpes, tera, mega, dynamax, dinamaxado, tiposAlvo: this.ele.active[0]?.getTypes() };
   }
 
   /** Posições no time dos Pokémon que podem entrar no lugar do atual. */
@@ -407,8 +414,16 @@ export class BatalhaSelvagem {
   }
 
   /** Clima e terreno em campo agora, com os turnos que faltam (null = não acaba sozinho, ex.: clima Primal). */
-  campo(): { clima: string | null; turnosClima: number | null; terreno: string | null; turnosTerreno: number | null } {
+  campo(): { clima: string | null; turnosClima: number | null; terreno: string | null; turnosTerreno: number | null; lados?: { meu: boolean; nome: string; turnos: number }[] } {
     const f = this.batalha.field;
+    // condições de lado com tempo (Reflect, Light Screen, Aurora Veil, Tailwind, Safeguard…)
+    const lados: { meu: boolean; nome: string; turnos: number }[] = [];
+    for (const [lado, meu] of [[this.eu, true], [this.ele, false]] as const) {
+      for (const [id, estado] of Object.entries(lado.sideConditions ?? {})) {
+        const turnos = (estado as { duration?: number }).duration;
+        if (turnos) lados.push({ meu, nome: this.batalha.dex.conditions.get(id).name || id, turnos });
+      }
+    }
     const clima = f.weather ? f.getWeather().name : null;
     const terreno = f.terrain ? f.getTerrain().name : null;
     return {
@@ -416,6 +431,7 @@ export class BatalhaSelvagem {
       turnosClima: clima && f.weatherState.duration ? f.weatherState.duration : null,
       terreno,
       turnosTerreno: terreno && f.terrainState.duration ? f.terrainState.duration : null,
+      lados,
     };
   }
 
@@ -427,25 +443,37 @@ export class BatalhaSelvagem {
    * Arremessa uma Pokébola (fórmula da 3ª/4ª geração, bônus de status da 5ª em diante).
    * Se falhar, o selvagem ataca de graça.
    */
+  /** Tipos do Pokémon do adversário em campo agora (Terastal e mudanças de forma incluídos). */
+  tiposDoAdversario(): string[] | undefined {
+    const a = this.ele.active[0];
+    return a && !a.fainted ? a.getTypes() : undefined;
+  }
+
+  /** Chance (0 a 1) de capturar com esta bola AGORA, sem arremessar (o cartão da bola na bolsa mostra). */
+  chanceDeCaptura(bola: EfeitoBola, bonusExtra = 1): number {
+    return bola.garantida ? 1 : this.contaDaCaptura(bola, bonusExtra).chance;
+  }
+
+  /** Fórmula da 3ª/4ª geração (bônus de status da 5ª): `b` = valor de cada checagem (null = captura garantida). */
+  private contaDaCaptura(bola: EfeitoBola, bonusExtra: number): { b: number | null; chance: number } {
+    const alvo = this.ele.active[0];
+    const taxa = Math.max(1, Math.min(255, this.taxaCaptura + bola.ajusteTaxa));
+    const bonusStatus = alvo.status === 'slp' || alvo.status === 'frz' ? 2.5 : alvo.status ? 1.5 : 1;
+    const a = Math.floor((((3 * alvo.maxhp - 2 * alvo.hp) * taxa * bola.bonus) / (3 * alvo.maxhp)) * bonusStatus * bonusExtra);
+    if (a >= 255) return { b: null, chance: 1 };
+    // 4 checagens, chance final ≈ a/255 (igual ao Pokémon Database)
+    const b = Math.floor(1048560 / (16711680 / Math.max(1, a)) ** 0.25);
+    return { b, chance: Math.min(1, b / 65536) ** 4 };
+  }
+
   /** `chance` = probabilidade (0 a 1) de capturar com esse arremesso (as 4 checagens de tremida). */
   /** `bonusExtra` multiplica a chance (VIP: 1,05 = +5% em cima da chance normal). */
   arremessarBola(bola: EfeitoBola, bonusExtra = 1): { capturou: boolean; tremidas: number; chance: number; eventos: EventoBatalha[] } {
     if (bola.garantida) return { capturou: true, tremidas: 3, chance: 1, eventos: [] };
-    const alvo = this.ele.active[0];
-    const bonusBola = bola.bonus;
-    const taxa = Math.max(1, Math.min(255, this.taxaCaptura + bola.ajusteTaxa));
-    const bonusStatus = alvo.status === 'slp' || alvo.status === 'frz' ? 2.5 : alvo.status ? 1.5 : 1;
-    const a = Math.floor((((3 * alvo.maxhp - 2 * alvo.hp) * taxa * bonusBola) / (3 * alvo.maxhp)) * bonusStatus * bonusExtra);
-
+    const { b, chance } = this.contaDaCaptura(bola, bonusExtra);
     let tremidas = 0;
-    let chance = 1;
-    if (a >= 255) tremidas = 4;
-    else {
-      // 3ª/4ª geração: 4 checagens, chance final ≈ a/255 (igual ao Pokémon Database)
-      const b = Math.floor(1048560 / (16711680 / Math.max(1, a)) ** 0.25);
-      chance = Math.min(1, b / 65536) ** 4;
-      while (tremidas < 4 && Math.floor(this.aleatorio() * 65536) < b) tremidas++;
-    }
+    if (b === null) tremidas = 4;
+    else while (tremidas < 4 && Math.floor(this.aleatorio() * 65536) < b) tremidas++;
     if (tremidas === 4) return { capturou: true, tremidas: 3, chance, eventos: [] };
     return { capturou: false, tremidas, chance, eventos: this.turnoGratisDoSelvagem() };
   }
@@ -679,7 +707,7 @@ export class BatalhaSelvagem {
           const mega = comando === 'detailschange' ? megaPorForma(forma) : undefined;
           // Mega Evolução: o "|-mega|" que vem logo depois só repete a informação
           if (mega) eventos.push({ tipo: 'mega', lado: this.lado(args[0]), forma, texto: `${quem} megaevoluiu em ${mega.nome}!` });
-          else eventos.push({ tipo: 'forma', lado: this.lado(args[0]), forma });
+          else eventos.push({ tipo: 'forma', lado: this.lado(args[0]), forma, semAnimacao: FORMAS_SEM_ANIMACAO.has(forma) });
           break;
         }
         case '-primal':
@@ -720,6 +748,7 @@ export class BatalhaSelvagem {
             tipoGolpe: golpe.type,
             categoria: golpe.category,
             texto: `${quem} usou ${golpe.name}!`,
+            semAnimacao: args.includes('[still]'),
           };
           eventos.push(evento);
           this.ultimoGolpe = { quem, golpe: golpe.name, evento, acertos: 0, avisos: [] };
@@ -755,6 +784,7 @@ export class BatalhaSelvagem {
             else if (dono) texto = `${quem} foi ferido pelo ${item} de ${this.nome(dono)}!`;
             else texto = `${quem} perdeu HP por causa do ${item}!`;
           }
+          else if (de?.startsWith('pokemon: Mimikyu')) texto = `O disfarce de ${quem} foi desfeito!`;
           else if (de === 'Sandstorm' || de === 'Hail') texto = `${quem} foi atingido pelo clima!`;
           else if (de) texto = `${quem} foi afetado por ${de.replace(/^(move|ability): /, '')}!`;
           else if (comando === '-damage' && antes.hp > (hp || 0)) {
@@ -873,8 +903,18 @@ export class BatalhaSelvagem {
           else if (efeito === 'Substitute') eventos.push({ tipo: 'mensagem', texto: `${quem} criou um substituto!` });
           break;
         }
+        case '-ability': {
+          // Ability anunciada: Trace (copiou a do outro), Pressure, Mold Breaker, Skill Swap…
+          const habilidade = args[1];
+          const dono = args.find((a) => a.startsWith('[of]'))?.slice(4).trim();
+          if (de === 'ability: Trace' && dono) eventos.push({ tipo: 'mensagem', texto: `${quem} copiou a Ability ${habilidade} de ${this.nome(dono)} com Trace!` });
+          else if (de) eventos.push({ tipo: 'mensagem', texto: `${quem} agora tem a Ability ${habilidade}! (${de.replace(/^(move|ability|item): /, '')})` });
+          else eventos.push({ tipo: 'mensagem', texto: `Ability de ${quem}: ${habilidade}!` });
+          break;
+        }
         case '-activate':
           if (args[1] === 'confusion') eventos.push({ tipo: 'mensagem', texto: `${quem} está confuso!` });
+          else if (args[1] === 'ability: Disguise') eventos.push({ tipo: 'mensagem', texto: `O disfarce de ${quem} serviu de isca!` });
           break;
         case '-end':
           if (args[1] === 'Dynamax') eventos.push({ tipo: 'dynamaxFim', lado: this.lado(args[0]), texto: `${quem} voltou ao tamanho normal.` });
@@ -883,9 +923,11 @@ export class BatalhaSelvagem {
         case '-weather':
           if (!args.includes('[upkeep]')) eventos.push({ tipo: 'clima', clima: args[0] === 'none' ? null : args[0], texto: CLIMAS[args[0]] });
           break;
-        case '-prepare':
-          eventos.push({ tipo: 'mensagem', texto: `${quem} está se preparando!` });
+        case '-prepare': {
+          const g = Dex.moves.get(args[1]);
+          eventos.push({ tipo: 'preparar', lado: this.lado(args[0]), golpe: g.id, tipoGolpe: g.type, texto: `${quem} está se preparando!` });
           break;
+        }
         case 'win':
           eventos.push({ tipo: 'fim', vencedor: args[0] === this.eu.name ? 'jogador' : 'selvagem' });
           break;

@@ -67,7 +67,8 @@ export const telaRegiao: Tela = (raiz, navegar) => {
       {
         class: 'cartao-bioma',
         // em cima, o primeiro fundo de batalha do bioma (o mesmo cenário das lutas)
-        style: { '--cor-bioma': hex(bioma.cores.zona), '--cor-chao': hex(bioma.cores.chao), '--fundo-bioma': FUNDOS_BATALHA[bioma.id] ? `url(batalha/${FUNDOS_BATALHA[bioma.id][0]})` : 'none' },
+        style: { '--cor-bioma': hex(bioma.cores.zona), '--cor-chao': hex(bioma.cores.chao), // endereço completo: dentro de variável CSS, caminho relativo é lido a partir do arquivo de estilos (/assets/) no site publicado
+        '--fundo-bioma': FUNDOS_BATALHA[bioma.id] ? `url("${new URL(`batalha/${FUNDOS_BATALHA[bioma.id][0]}`, document.baseURI).href}")` : 'none' },
         onclick: () => navegar({ tela: 'bioma', biomaId: bioma.id }),
       },
       el('div', { class: 'faixa' }, destaques.map((e) => spritePokemon(e.pokemon, { animado: false }))),      el('strong', {}, bioma.nome),

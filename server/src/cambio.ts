@@ -46,7 +46,7 @@ export function trocar(conta: banco.Conta, dados: Record<string, unknown>) {
     save.gold = novoGold;
     banco.mudarCofre(cofreSilver, cofreGold);
   });
-  contar('cambio-trocas');
+  contar('cambio-trocas', 1, conta);
   const agora = banco.lerCofre();
   // quem está com o banco aberto vê o cofre mudar
   avisarTodos({ t: 'cofre', cofre: agora });

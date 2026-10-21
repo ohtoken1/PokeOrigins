@@ -5,6 +5,18 @@ import { TEMPO_CURA_MS, TEMPO_CURA_VIP_MS, vipAtivo } from '../../../shared/vip'
 import { curarTime, type Save } from '../estado';
 import { volumeDosEfeitos } from '../sons';
 import { el } from './dom';
+import { avisar } from './avisos';
+
+/** Espera do ATALHO do Centro Pokémon (coração do cabeçalho e tecla H) depois de uma cura, pedido do dono. O Centro da cidade não espera. */
+export const ESPERA_ATALHO_CURA_MS = 30_000;
+let ultimaCura = 0;
+
+/** Atalho do Centro Pokémon: só abre 30 s depois da última cura. */
+export function abrirCuraPeloAtalho(save: Save, aoCurar: () => void): void {
+  const falta = ultimaCura + ESPERA_ATALHO_CURA_MS - Date.now();
+  if (falta > 0) return avisar(`O atalho do Centro Pokémon volta em ${Math.ceil(falta / 1000)} s (ou use o Centro Pokémon da cidade).`, 'info');
+  abrirCura(save, aoCurar);
+}
 
 /** Se o dono colocar este arquivo, ele toca no fim da cura no lugar do toque do jogo. */
 const SOM_DO_DONO = 'musicas/cura.mp3';
@@ -124,6 +136,7 @@ export function abrirCura(save: Save, aoCurar: () => void): void {
     }
     if (fechada) return;
     curarTime(save);
+    ultimaCura = Date.now();
     aoCurar();
     maquina.classList.replace('curando', 'pronta');
     somFinal();

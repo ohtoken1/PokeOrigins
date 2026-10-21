@@ -58,7 +58,7 @@ export const telaGinasios: Tela = (raiz, navegar) => {
 
   const desafiar = (lider: LiderGinasio) => {
     if (bloqueio() || faltaAntes(lider)) return desenhar();
-    const equipe = montarTimeNpc(lider, save.time, crescimentoDe, nivelDoGinasio(save.time));
+    const equipe = montarTimeNpc(lider, save.time, crescimentoDe, nivelDoGinasio(save.time), true);
     const jaTinha = save.insignias!.includes(lider.id);
     abrirBatalha({
       save,
@@ -99,7 +99,7 @@ export const telaGinasios: Tela = (raiz, navegar) => {
       el('div', { class: 'lista-ginasios' },
         ...lideres.map((l) => {
           const ganha = save!.insignias!.includes(l.id);
-          const equipe = montarTimeNpc(l, save!.time, crescimentoDe, nivelDoGinasio(save!.time));
+          const equipe = montarTimeNpc(l, save!.time, crescimentoDe, nivelDoGinasio(save!.time), true);
           const antes = faltaAntes(l);
           return el('article', { class: `cartao-ginasio ${ganha ? 'vencido' : ''} ${antes ? 'trancado' : ''}`, style: { '--cor-tipo': corTipo(l.tipo) } },
             el('img', { class: 'retrato-npc', src: imagemTreinador(l.id), alt: l.nome }),

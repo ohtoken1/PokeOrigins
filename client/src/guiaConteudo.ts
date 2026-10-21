@@ -41,7 +41,7 @@ export const GUIA: GrupoGuia[] = [
         'Para caçar, saia pela saída do sul da cidade e escolha um dos 6 biomas da sua região. Cada Pokémon mora no bioma do seu tipo.',
       ] },
       { id: 'encontros', emoji: '🌿', titulo: 'Encontros e captura', texto: [
-        'Nos mapas, cada passo pode trazer um Pokémon. O encontro aparece quando você PARA de andar: andar de novo foge, Enter (ou o botão) começa a batalha.',
+        'Nos mapas, cada passo pode trazer um Pokémon. O encontro aparece quando você PARA de andar: andar de novo foge, Espaço (ou o botão) começa a batalha. As teclas dos atalhos podem ser trocadas no F1 ou em Opções.',
         '• Shiny: 1 em 1.500 encontros.',
         '• Algum inicial: 1 em 12.000. Algum lendário, algum mítico e alguma Ultra Beast: 1 em 20.000 cada.',
         '• Os bônus (VIP, skins, títulos, guilda, Charms…) aumentam essas chances.',
@@ -49,7 +49,7 @@ export const GUIA: GrupoGuia[] = [
       ] },
       { id: 'ivs', emoji: '🔍', titulo: 'IVs e avaliação', texto: [
         'Os IVs dos Pokémon capturados ficam ocultos. Na ficha do Pokémon, use "Avaliar IVs" para revelar.',
-        '• Preço: 5.000 Poké Dólares (VIP: 3.000).',
+        '• Preço: 2.000 Poké Dólares (VIP: 1.000).',
         '• Quem não é VIP vê a faixa de cada IV (0–5, 6–10… 26–31). VIP vê o valor exato.',
         '• Depois de avaliado, o Pokémon ganha um selo de tier pela soma dos IVs: C, B, A, S ou S+.',
       ] },
@@ -210,7 +210,7 @@ export const GUIA: GrupoGuia[] = [
         'A cada 20 minutos surge um ninho num mapa, com um Pokémon nível 150, por 10 minutos.',
         '• Entrada: 100.000 Poké Dólares (VIP: 50.000).',
         '• Vencer: 100.000 Poké Dólares e um giro na Roleta do Ninho. Se for lendário, 5% de chance de ganhar o Pokémon.',
-        '• Cada derrota faz o ninho mudar de lugar e ganhar mais 5 minutos.',
+        '• Cada derrota faz o ninho mudar de lugar no mesmo mapa (o Pokémon continua o mesmo) e ganhar mais 5 minutos.',
       ] },
       { id: 'captura', emoji: '🎯', titulo: 'Evento de captura', texto: [
         'Quando a equipe abre o evento, uma espécie é sorteada e vale até a meia-noite. Capture-a nos mapas: conta a sua melhor soma de IVs.',

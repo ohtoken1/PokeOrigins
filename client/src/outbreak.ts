@@ -83,6 +83,18 @@ export function tabelaComOutbreak(tabela: EntradaTabela[], regiao: string, bioma
   return daLinha.length ? daLinha : tabela;
 }
 
+/** Chances do painel % com o Outbreak: metade das vezes a tabela normal, metade só a linha (como `tabelaComOutbreak`). */
+export function chancesComOutbreak(tabela: EntradaTabela[], chances: number[], chancesDe: (t: EntradaTabela[]) => number[], regiao: string, bioma: string): number[] {
+  const o = outbreakAtual();
+  if (!o || o.regiao !== regiao || o.bioma.id !== bioma) return chances;
+  const daLinha = tabela.filter((e) => e.linha === o.linha);
+  if (!daLinha.length) return chances;
+  const daLinhaChances = chancesDe(daLinha);
+  if (daLinhaChances.reduce((a, b) => a + b, 0) <= 0) return chances;
+  const porEntrada = new Map(daLinha.map((e, i) => [e, daLinhaChances[i]]));
+  return chances.map((c, i) => (1 - CHANCE_OUTBREAK) * c + CHANCE_OUTBREAK * (porEntrada.get(tabela[i]) ?? 0));
+}
+
 /** Caixa fixa no canto de baixo à esquerda onde ficam os avisos de eventos (Outbreak, Ninho), um em cima do outro. */
 export function caixaDeAvisos(): HTMLElement {
   let c = document.querySelector<HTMLElement>('.avisos-eventos');

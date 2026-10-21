@@ -26,7 +26,7 @@ import { abrirJanela } from '../ui/janela';
 import { conteudoLiberado } from '../trancas';
 import { textoTranca } from '../../../shared/trancas';
 import { DIAS_LOGIN, DIAS_LOGIN_TRINTA, METAS_DOACAO, PREMIOS_LOGIN, PREMIOS_LOGIN_TRINTA, RECUPERACOES_VIP, type EstadoRecompensas, type PremioRecompensa } from '../../../shared/recompensas';
-import { aoMudarRecompensas, buscarRecompensas, estadoRecompensas, recuperarDia } from '../recompensas';
+import { aoMudarRecompensas, buscarRecompensas, conferirLoginAgora, estadoRecompensas, recuperarDia } from '../recompensas';
 
 export type SecaoConta = 'perfil' | 'achievements' | 'skins' | 'doacao' | 'recompensas';
 
@@ -363,7 +363,8 @@ function recompensas(): HTMLElement {
     secao.replaceChildren(...partes);
   };
   desenhar();
-  void buscarRecompensas().catch(() => {});
+  // registra o login de hoje na hora (virou o dia ou subiu de nível com a aba aberta)
+  void conferirLoginAgora();
   const parar = aoMudarRecompensas(() => (secao.isConnected ? desenhar() : parar()));
   return secao;
 }

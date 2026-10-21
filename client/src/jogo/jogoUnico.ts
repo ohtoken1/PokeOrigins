@@ -5,6 +5,27 @@ import Phaser from 'phaser';
 import { ALTURA_TELA, BiomaScene, LARGURA_TELA, resolucao, type OpcoesBioma } from './BiomaScene';
 
 let jogo: Phaser.Game | null = null;
+/** Há um mapa na tela (entre o mostrarJogo e o tirar). */
+let mapaNaTela = false;
+
+/**
+ * Durante a batalha o mapa dorme (não desenha): ele ficava animando por baixo da janela da batalha e dos painéis
+ * com desfoque, e o navegador às vezes piscava ou mostrava quadrados pretos (pedido do dono). Acorda quando ela fecha.
+ */
+let vigiandoBatalha = false;
+function dormirNaBatalha(): void {
+  if (vigiandoBatalha) return;
+  vigiandoBatalha = true;
+  let emBatalha = false;
+  new MutationObserver(() => {
+    const agora = !!document.querySelector('.batalha-fundo');
+    if (agora === emBatalha) return;
+    emBatalha = agora;
+    if (!jogo || !mapaNaTela) return;
+    if (agora) jogo.loop.sleep();
+    else jogo.loop.wake();
+  }).observe(document.body, { childList: true });
+}
 
 /** Coloca o jogo dentro de `area` e começa o bioma. Devolve a função que tira o jogo da tela. */
 export function mostrarJogo(area: HTMLElement, opcoes: OpcoesBioma): { cena: () => BiomaScene | null; tirar: () => void } {
@@ -41,6 +62,8 @@ export function mostrarJogo(area: HTMLElement, opcoes: OpcoesBioma): { cena: () 
     jogo.loop.wake();
   }
   const atual = jogo;
+  mapaNaTela = true;
+  dormirNaBatalha();
   // começa no quadro seguinte: dá tempo da página mostrar o "Carregando mapa…" antes de desenhar
   let tirado = false;
   setTimeout(() => !tirado && atual.scene.start('bioma', opcoes), 30);
@@ -52,6 +75,7 @@ export function mostrarJogo(area: HTMLElement, opcoes: OpcoesBioma): { cena: () 
     },
     tirar: () => {
       tirado = true;
+      if (atual === jogo) mapaNaTela = false;
       atual.scene.stop('bioma');
       // sem mapa na tela, o jogo dorme (não gasta nada) até o próximo bioma
       atual.loop.sleep();

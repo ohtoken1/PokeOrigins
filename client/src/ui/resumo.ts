@@ -14,7 +14,13 @@ const linha = (rotulo: string, ...valor: (Node | string)[]) => el('div', { class
 /** `emBatalha`: atributos atuais na batalha (com estágios), no lugar dos calculados fora dela. */
 export function resumoPokemon(
   p: PokemonIndividual,
-  opcoes: { abilityConhecida: boolean; completo?: boolean; emBatalha?: Record<'atk' | 'def' | 'spa' | 'spd' | 'spe', { valor: number; estagio: number; semEstagio?: number }> | null },
+  opcoes: {
+    abilityConhecida: boolean;
+    completo?: boolean;
+    emBatalha?: Record<'atk' | 'def' | 'spa' | 'spd' | 'spe', { valor: number; estagio: number; semEstagio?: number }> | null;
+    /** Tipos do adversário em campo (trocar na batalha): mostra a efetividade de cada golpe e dos tipos dele. */
+    contra?: string[];
+  },
 ): HTMLElement[] {
   // ovo da creche: não mostra quem está dentro (choca depois)
   if ((p as { ovo?: unknown }).ovo) return [el('div', { class: 'resumo-titulo' }, el('strong', {}, '🥚 Ovo')), el('small', { class: 'meta' }, `Veio do Daycare. Ainda não chocou: o que está dentro é surpresa. Passos: ${(p as { ovo?: { passos?: number } }).ovo?.passos ?? 0}/1.000.`)];
@@ -71,12 +77,34 @@ export function resumoPokemon(
       el('h5', {}, 'Golpes'),
       ...p.golpes.map((g) => {
         const m = Dex.moves.get(g.id);
-        return el('div', { class: 'resumo-golpe' }, seloTipo(m.type), el('span', {}, m.name), el('small', {}, `PP ${g.pp}/${m.pp}`));
+        const ef = opcoes.contra?.length && m.category !== 'Status' ? multiplicador(m.type, opcoes.contra) : null;
+        return el('div', { class: 'resumo-golpe' }, seloTipo(m.type), el('span', {}, m.name),
+          ef === null ? null : el('small', { class: `resumo-ef ${classeEf(ef)}` }, `${textoEf(ef)}x`),
+          el('small', {}, `PP ${g.pp}/${m.pp}`));
       }),
     ),
   );
+  // golpes do tipo do adversário contra este Pokémon (STAB dele): quanto recebe
+  if (opcoes.contra?.length) {
+    const tipos = especie(p.especieId).types;
+    linhas.push(el('div', { class: 'resumo-golpes' }, el('h5', {}, 'Golpes do tipo do adversário contra ele'),
+      ...opcoes.contra.map((t) => {
+        const ef = multiplicador(t, tipos);
+        return el('div', { class: 'resumo-golpe' }, seloTipo(t), el('small', { class: `resumo-ef ${classeEf(ef, true)}` }, `recebe ${textoEf(ef)}x`));
+      })));
+  }
   return linhas;
 }
+
+/** Multiplicador de um tipo de golpe contra os tipos do alvo (0, 0,25 … 4). */
+const multiplicador = (tipo: string, alvo: string[]) => (Dex.getImmunity(tipo, alvo) ? 2 ** Dex.getEffectiveness(tipo, alvo) : 0);
+const textoEf = (x: number) => x.toLocaleString('pt-BR');
+/** Verde = bom para o jogador; `defesa` inverte (receber muito dano é ruim). */
+const classeEf = (x: number, defesa = false) => {
+  const bom = defesa ? x < 1 : x > 1;
+  const ruim = defesa ? x > 1 : x < 1;
+  return bom ? 'ef-bom' : ruim ? 'ef-ruim' : '';
+};
 
 let flutuante: HTMLElement | null = null;
 let atual: HTMLElement | null = null;
@@ -86,7 +114,7 @@ document.addEventListener('mousemove', (e) => {
 });
 
 /** Mostra o resumo completo ao lado do elemento enquanto o mouse estiver em cima. */
-export function resumoAoPassar(alvo: HTMLElement, pokemon: () => PokemonIndividual) {
+export function resumoAoPassar(alvo: HTMLElement, pokemon: () => PokemonIndividual, contra?: () => string[] | undefined) {
   alvo.addEventListener('mouseenter', () => {
     if (alvo.classList.contains('arrastando')) return;
     atual = alvo;
@@ -94,7 +122,7 @@ export function resumoAoPassar(alvo: HTMLElement, pokemon: () => PokemonIndividu
     // sempre por cima de tudo (inclusive das janelas do PC e da bolsa)
     document.body.appendChild(flutuante);
     Object.assign(flutuante.style, { position: 'fixed', zIndex: '100000' });
-    flutuante.replaceChildren(...resumoPokemon(pokemon(), { abilityConhecida: true, completo: true }));
+    flutuante.replaceChildren(...resumoPokemon(pokemon(), { abilityConhecida: true, completo: true, contra: contra?.() }));
     flutuante.hidden = false;
     const r = alvo.getBoundingClientRect();
     const largura = flutuante.offsetWidth;

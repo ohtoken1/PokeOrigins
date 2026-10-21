@@ -20,6 +20,8 @@ import { api, ErroApi } from './conta';
 export type PokemonDoJogador = PokemonIndividual & {
   /** Box do PC onde está guardado (0 a numeroDeBoxes(save) − 1); só vale para quem está no PC. */
   box?: number;
+  /** Casa dentro da box (0 a TAMANHO_BOX − 1): o jogador escolhe onde deixar (pedido do dono). `organizarCasas` corrige faltas e repetidas. */
+  casa?: number;
   /** De onde veio, quando não foi capturado: ovo, ticket ou troca com outro jogador (as conquistas olham isso). */
   origem?: 'ovo' | 'ticket' | 'troca';
   /** Ovo da creche que ainda não chocou (fica no PC; não luta, não troca; o choco vem depois). */
@@ -69,6 +71,8 @@ export interface Save {
   titulo?: string | null;
   /** Treinadores de "Duelos com treinadores" já vencidos (ids). */
   duelosVencidos?: string[];
+  /** treinadores dos Duelos que já apareceram sorteados (o caderno de treinadores, telas/duelos.ts) */
+  duelosVistos?: string[];
   /** Viagens de trem: quantas e por quais regiões passou (quem escreve é o servidor). */
   trem?: { viagens: number; regioes: string[] };
   /** Visual do personagem (camadas LPC + detalhes Pokémon); sem isso, usa APARENCIA_PADRAO. */
@@ -172,9 +176,38 @@ export const TAMANHO_NOME_BOX = 16;
 /** Nome da box: o que o jogador deu (`save.nomesBox`) ou "Box N". */
 export const nomeDaBox = (save: Save, box: number): string => save.nomesBox?.[box]?.trim() || `Box ${box + 1}`;
 
-/** Pokémon da box, na ordem em que aparecem. */
+/** Pokémon da box, na ordem das casas. */
 export function pokemonsDaBox(save: Save, box: number): PokemonDoJogador[] {
-  return save.caixa.filter((p) => p.box === box);
+  return save.caixa.filter((p) => p.box === box).sort((a, b) => (a.casa ?? 0) - (b.casa ?? 0));
+}
+
+/** Primeira casa livre da box (−1 = cheia). */
+export function casaLivre(save: Save, box: number, ignorar?: PokemonDoJogador): number {
+  const ocupadas = new Set(save.caixa.filter((p) => p.box === box && p !== ignorar).map((p) => p.casa));
+  for (let i = 0; i < TAMANHO_BOX; i++) if (!ocupadas.has(i)) return i;
+  return -1;
+}
+
+/**
+ * Cada Pokémon do PC numa casa só da sua box: quem não tem casa, tem uma repetida ou fora da grade vai para a primeira
+ * livre (Pokémon recebido pelo servidor, saves antigos). Box passando do limite (PC todo cheio): os que sobram ficam
+ * depois da última casa.
+ */
+export function organizarCasas(save: Save): void {
+  const porBox = new Map<number, Set<number>>();
+  const semCasa: PokemonDoJogador[] = [];
+  for (const p of save.caixa) {
+    const usadas = porBox.get(p.box ?? 0) ?? porBox.set(p.box ?? 0, new Set()).get(p.box ?? 0)!;
+    if (Number.isInteger(p.casa) && p.casa! >= 0 && p.casa! < TAMANHO_BOX && !usadas.has(p.casa!)) usadas.add(p.casa!);
+    else semCasa.push(p);
+  }
+  for (const p of semCasa) {
+    const usadas = porBox.get(p.box ?? 0)!;
+    let i = 0;
+    while (usadas.has(i)) i++;
+    p.casa = i;
+    usadas.add(i);
+  }
 }
 
 /**
@@ -192,7 +225,9 @@ export function guardarNoPC(save: Save, p: PokemonDoJogador, preferida = 0): num
     }
   }
   p.box = box;
+  p.casa = casaLivre(save, box);
   save.caixa.push(p);
+  organizarCasas(save);
   return box;
 }
 const CHAVE = 'jogo-claude:save';
@@ -275,6 +310,7 @@ function normalizar(save: Save): Save {
   // saves antigos (PC sem boxes): distribui pela ordem, 30 por box
   save.caixa.forEach((p, i) => (p.box ??= Math.min(BOXES_MAXIMO - 1, Math.floor(i / TAMANHO_BOX))));
   garantirIds(save);
+  organizarCasas(save);
 
   // os itens iniciais só entram em save SEM bolsa (antes eram somados a cada carga: item gasto até o fim voltava)
   const itens: Record<string, number> = save.itens ? { ...save.itens } : { ...ITENS_INICIAIS };
@@ -342,7 +378,11 @@ export function arquivarSaveAntigo(): void {
 }
 
 // ---- sincronização com o servidor ----
-type Copia = { save: Save; versao: number; pendente: boolean };
+/**
+ * Cópia no navegador. `seguinte`: havia um envio a caminho quando ela foi feita; se ele chegou (o servidor está em
+ * `seguinte`) mas a página fechou antes da resposta, a cópia continua sendo a mais nova (tem tudo o que foi e mais).
+ */
+type Copia = { save: Save; versao: number; pendente: boolean; seguinte?: number };
 let contaId = 0;
 let versao = 0;
 let envio: ReturnType<typeof setTimeout> | undefined;
@@ -362,7 +402,7 @@ const avisar = (estado: EstadoSincronia, mensagem?: string) => aoMudarSincroniaF
 function guardarCopia(): void {
   if (!emMemoria || !contaId) return;
   try {
-    localStorage.setItem(chaveCopia(), JSON.stringify({ save: emMemoria, versao, pendente } satisfies Copia));
+    localStorage.setItem(chaveCopia(), JSON.stringify({ save: emMemoria, versao, pendente, ...(enviando && pendente ? { seguinte: versao + 1 } : {}) } satisfies Copia));
   } catch {
     // sem espaço: o servidor continua sendo a fonte
   }
@@ -378,7 +418,9 @@ export function iniciarSaveDaConta(id: number, doServidor: Save | null, versaoSe
   emMemoria = doServidor ? normalizar(doServidor) : null;
   try {
     const copia = JSON.parse(localStorage.getItem(chaveCopia()) ?? 'null') as Copia | null;
-    if (copia?.pendente && copia.versao === versaoServidor) {
+    // a cópia é da mesma versão, ou o envio que estava a caminho chegou (capturou e recarregou logo em seguida:
+    // antes a cópia mais nova era jogada fora e os últimos Pokémon sumiam)
+    if (copia?.pendente && (copia.versao === versaoServidor || copia.seguinte === versaoServidor)) {
       emMemoria = normalizar(copia.save);
       agendarEnvio(0);
     } else localStorage.removeItem(chaveCopia());
@@ -403,10 +445,13 @@ async function enviar(): Promise<void> {
     if (apagando) await apagando;
     const r = await api<{ versao: number }>('PUT', '/save', { save: emMemoria, versao });
     versao = r.versao;
+    // a resposta chegou: nada mais a caminho (a cópia não marca `seguinte`)
+    enviando = false;
     guardarCopia();
     if (!pendente) avisar('salvo');
   } catch (e) {
     pendente = true;
+    enviando = false;
     guardarCopia();
     const status = e instanceof ErroApi ? e.status : 0;
     if (status === 409) avisar('conflito', (e as Error).message);
@@ -476,6 +521,7 @@ export function salvar(save: Save): void {
   emMemoria = save;
   // quem entrou no time/PC desde o último save (captura, ovo, ticket…) ganha o ID único aqui
   garantirIds(save);
+  organizarCasas(save);
   pendente = true;
   guardarCopia();
   agendarEnvio();

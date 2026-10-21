@@ -129,9 +129,9 @@ export const SILVER_INICIAL = 0;
  * Preço em silver para avaliar os IVs de um Pokémon (provisório). Uma forma só de pagar (pedido do dono): depois de
  * avaliado, quem é VIP vê o valor exato e quem não é vê a FAIXA de cada IV.
  */
-export const PRECO_REVELAR_IVS = 5_000;
+export const PRECO_REVELAR_IVS = 2_000;
 /** Avaliar IVs para quem é VIP (pedido do dono). */
-export const PRECO_REVELAR_IVS_VIP = 3_000;
+export const PRECO_REVELAR_IVS_VIP = 1_000;
 export const precoAvaliarIvs = (vip: boolean) => (vip ? PRECO_REVELAR_IVS_VIP : PRECO_REVELAR_IVS);
 /** Trocar o nome de treinador e mudar a aparência do personagem depois de criado (provisório; criar é grátis). */
 export const PRECO_TROCAR_NOME_GOLD = 50;

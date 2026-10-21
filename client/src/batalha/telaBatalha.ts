@@ -1,4 +1,5 @@
 import { bonificacao } from '../bonificacao';
+import { acaoDaTecla, escolhendoTecla, teclaDoEvento } from '../teclas';
 import { recompensaDoSelvagem } from '../../../shared/treinadoresNpc';
 import { somarMetrica } from '../../../shared/metricas';
 import { podeUsar, tetoDoJogador, textoDoLimite } from '../limiteNivel';
@@ -60,7 +61,7 @@ import { categoriaRara, ehLendario } from '../../../shared/encontros';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { iconeItem } from '../ui/iconeItem';
-import { resumoPokemon } from '../ui/resumo';
+import { resumoAoPassar, resumoPokemon } from '../ui/resumo';
 import { dicaGolpe } from '../ui/dicaGolpe';
 import { nomeCategoria, traduzir } from '../../../shared/traducao';
 import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarFimDynamax, animarRetorno, animarTransformacao, tremerArena } from './animacoes';
@@ -184,7 +185,7 @@ export const FUNDOS_BATALHA: Record<string, string[]> = {
   vulcao: ['vulcao-1.png', 'vulcao-2.jpg', 'vulcao-3.jpg'],
   caverna: ['caverna-1.jpg', 'caverna-2.jpg'],
   torre: ['torre-1.jpg', 'torre-2.jpg'],
-  pico: ['pico-1.png', 'pico-2.png', 'pico-5.png'],
+  pico: ['pico-1.png', 'pico-5.png'],
 };
 /** Sorteia o fundo do bioma para esta batalha. */
 function sortearFundo(biomaId: string): string | null {
@@ -279,6 +280,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
   arena.prepend(camadaTerreno);
   arena.append(camadaClima);
   const resumoFixo = el('div', { class: 'resumo-pokemon resumo-fixo', hidden: true });
+  /** Tipos do adversário vistos no último pedido de ação (PvP: a tela não tem o simulador). */
+  let ultimosTiposAlvo: string[] | undefined;
   // a ficha (250 px) fica um pouco à direita do meio da arena, mas sempre dentro da tela (celular)
   const posicaoDaFicha = (r: DOMRect) => Math.max(8, Math.min(r.left + r.width * 0.36, window.innerWidth - 258));
   const mostrarResumo = (lugar: HTMLElement, lado: 'selvagem' | 'jogador', quem: () => PokemonIndividual | undefined) => {
@@ -370,7 +373,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
   // atalhos de teclado da batalha (pedido do dono): F Lutar, 1–4 golpe, B Bolsa, Q Pokémon, R Fugir/Desistir,
   // Espaço passa a mensagem. Clicam o botão que está na tela, então valem as mesmas regras (botão apagado não faz nada).
   const atalhosDaBatalha = (e: KeyboardEvent) => {
-    if (e.ctrlKey || e.altKey || e.metaKey || e.repeat || digitando() || document.querySelector('.janela-fundo')) return;
+    if (e.ctrlKey || e.altKey || e.metaKey || e.repeat || digitando() || escolhendoTecla || document.querySelector('.janela-fundo')) return;
     const clicar = (seletor: string) => {
       // dentro de um submenu (golpes, bolsa): volta ao menu principal antes
       if (!acoes.querySelector(seletor)) acoes.querySelector<HTMLButtonElement>('.voltar')?.click();
@@ -378,19 +381,20 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       if (b && !b.disabled) b.click();
       return !!b;
     };
-    const tecla = e.key.toLowerCase();
-    if (tecla === ' ') {
+    // teclas configuráveis (teclas.ts: F1 ou Opções)
+    const acao = acaoDaTecla(teclaDoEvento(e), 'batalha');
+    if (acao === 'passar') {
       if (!pular) return;
       e.preventDefault();
       pular();
-    } else if (tecla === 'f') clicar('.lutar');
-    else if (tecla === 'b') clicar('.bolsa');
-    else if (tecla === 'q') clicar('.pokemon');
-    else if (tecla === 'r') clicar('.fugir');
-    else if (/^[1-4]$/.test(tecla)) {
+    } else if (acao === 'lutar') clicar('.lutar');
+    else if (acao === 'bolsaBatalha') clicar('.bolsa');
+    else if (acao === 'pokemon') clicar('.pokemon');
+    else if (acao === 'fugir') clicar('.fugir');
+    else if (acao?.startsWith('golpe')) {
       // no menu principal, o número já abre os golpes e escolhe
       if (!acoes.querySelector('.golpe')) clicar('.lutar');
-      const golpe = acoes.querySelectorAll<HTMLButtonElement>('.golpe')[Number(tecla) - 1];
+      const golpe = acoes.querySelectorAll<HTMLButtonElement>('.golpe')[Number(acao.slice(5)) - 1];
       if (golpe && !golpe.disabled) golpe.click();
     }
   };
@@ -413,7 +417,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     const chip = (nome: string, turnos: number | null, classe: string) =>
       el('div', { class: `chip-campo ${classe}` }, el('span', {}, nome), el('small', {}, turnos === null ? 'sem fim' : `${turnos} turno${turnos === 1 ? '' : 's'}`));
     painelCampo.replaceChildren(
-      ...[c.clima ? chip(NOMES_CLIMA[c.clima] ?? c.clima, c.turnosClima, `clima-${CLASSE_CLIMA[c.clima] ?? ''}`) : null, c.terreno ? chip(c.terreno, c.turnosTerreno, `terreno-${CLASSE_TERRENO[c.terreno] ?? ''}`) : null].filter(
+      ...[c.clima ? chip(NOMES_CLIMA[c.clima] ?? c.clima, c.turnosClima, `clima-${CLASSE_CLIMA[c.clima] ?? ''}`) : null, c.terreno ? chip(c.terreno, c.turnosTerreno, `terreno-${CLASSE_TERRENO[c.terreno] ?? ''}`) : null,
+        ...(c.lados ?? []).map((l) => chip(`${l.nome} (${l.meu ? 'seu lado' : 'adversário'})`, l.turnos, l.meu ? 'lado-meu' : 'lado-dele'))].filter(
         (x): x is HTMLDivElement => !!x,
       ),
     );
@@ -500,7 +505,12 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         case 'mensagem':
           await dizer(ev.texto);
           break;
+        case 'preparar':
+          if (!rapido) prepararGolpe(sprite(ev.lado), ev.golpe, ev.tipoGolpe);
+          await dizer(ev.texto);
+          break;
         case 'entrar':
+          voltarDoPreparo(sprite(ev.lado));
           // quem entra em campo começa sem estágios de atributo (e sem Terastal)
           info(ev.lado).zerarBoosts();
           marcarTera(ev.lado, null);
@@ -541,7 +551,12 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           // o golpe do adversário aparece na hora no resumo aberto
           if (ev.lado === 'selvagem') desenharResumoAdversario();
           await esperar(350);
-          if (!rapido) await animarGolpeOriginal(arena, sprite(ev.lado), ev.alvo && ev.alvo !== ev.lado ? sprite(ev.alvo) : null, ev.golpe, ev.tipoGolpe, ev.categoria, sprite(ev.lado === 'jogador' ? 'selvagem' : 'jogador'));
+          // 2º turno de Fly/Dig/Solar Beam…: o Pokémon volta antes de atacar
+          if (sprite(ev.lado).dataset.preparo) {
+            voltarDoPreparo(sprite(ev.lado));
+            if (!rapido) await esperar(350);
+          }
+          if (!rapido && !ev.semAnimacao) await animarGolpeOriginal(arena, sprite(ev.lado), ev.alvo && ev.alvo !== ev.lado ? sprite(ev.alvo) : null, ev.golpe, ev.tipoGolpe, ev.categoria, sprite(ev.lado === 'jogador' ? 'selvagem' : 'jogador'));
           break;
         case 'hp': {
           info(ev.lado).hp(ev.hp, ev.hpMax);
@@ -660,6 +675,11 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           const trocar = () => trocarSpriteForma(alvo, ev.forma, { shiny: ev.lado === 'jogador' ? save.time[batalha.ativo].shiny : selvagem.shiny, costas: ev.lado === 'jogador' });
           const primal = /-Primal$/.test(ev.forma);
           const groudon = ev.forma.startsWith('Groudon');
+          if (ev.semAnimacao) {
+            trocar();
+            if (ev.texto) await dizer(ev.texto);
+            break;
+          }
           await transformar(lugar(ev.lado), alvo, trocar, primal
             ? { cores: [groudon ? '#ff4a1c' : '#2f8cff'], simbolo: el('span', { class: `simbolo-primal ${groudon ? 'omega' : 'alpha'}` }, groudon ? 'Ω' : 'α') }
             : { cores: [corTipo(Dex.species.get(ev.forma).types[0] ?? 'Normal')], rapida: true });
@@ -670,6 +690,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           // hazards ficam desenhados no chão em volta do Pokémon do lado (pedras, espinhos, teia)
           if (ev.ativa) colocarHazard(ev.lado, ev.condicao);
           else tirarHazard(ev.lado, ev.condicao);
+          atualizarCampo();
           await dizer(ev.texto);
           break;
         case 'trocarCondicoes': {
@@ -700,6 +721,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     }
 
     atualizarCampo();
+    if (pedido.tipo === 'acao') ultimosTiposAlvo = pedido.tiposAlvo;
     mensagem.textContent = `O que ${nomeDe(save.time[batalha.ativo].especieId)} vai fazer?`;
     if (pvp)
       return acoes.replaceChildren(
@@ -721,6 +743,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
   function menuGolpes(modo: 'z' | 'tera' | 'mega' | 'dynamax' | null = null) {
     const pedido = batalha.pedido();
     if (pedido.tipo !== 'acao') return menuPrincipal();
+    ultimosTiposAlvo = pedido.tiposAlvo;
     const z = pedido.zGolpes;
     const relogio = pvp ? relogioPvp() : '';
     const usarZ = modo === 'z';
@@ -748,7 +771,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
             el('span', {}, `Poder ${(maxDe(g) ? maxDe(g)!.poder : usarZ && z?.[i] ? (Dex.moves.get(g.id).category === 'Status' ? 0 : Dex.moves.get(g.id).zMove?.basePower) : Dex.moves.get(g.id).basePower) || '—'}`),
             g.ppMax > 0 ? el('span', {}, `PP ${g.pp}/${g.ppMax}`) : '',
           ),
-        ), maxDe(g)?.id ?? g.id, g.ppMax > 0 ? () => ({ atual: g.pp, max: g.ppMax }) : undefined, maxDe(g) ? g.id : undefined),
+        ), maxDe(g)?.id ?? g.id, g.ppMax > 0 ? () => ({ atual: g.pp, max: g.ppMax }) : undefined, maxDe(g) ? g.id : undefined, pedido.tiposAlvo),
       ),
       // Z-Crystal segurado: liga/desliga o Z-Move (uma vez por batalha)
       z ? botao(usarZ ? 'Z-Move ligado' : 'Z-Move', () => menuGolpes(usarZ ? null : 'z'), { class: `botao secundario botao-z ${usarZ ? 'ligado' : ''}` }) : '',
@@ -787,7 +810,9 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
         .map((id) =>
           botao([iconeItem({ id, categoria: ITENS[id].categoria === 'bola' ? 'bolas' : 'remedios' }), el('span', {}, ITENS[id].nome), el('small', {}, `×${save.itens[id]}`)] as never, () => (ITENS[id].categoria === 'bola' ? arremessar(id) : menuAlvoRemedio(id)), {
             class: `botao item ${ITENS[id].categoria}`,
-            title: ITENS[id].descricao,
+            // Pokébola: a chance de capturar AGORA, antes de arremessar (pedido do dono)
+            title: ITENS[id].categoria === 'bola' ? `${ITENS[id].descricao}
+Chance de captura agora: ${textoDaChance(batalha.chanceDeCaptura(efeitoDaBola(id), bonusDeCaptura()))}%` : ITENS[id].descricao,
           }),
         ),
       botao('← Voltar', menuPrincipal, { class: 'botao secundario voltar' }),
@@ -822,6 +847,10 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     await executar(() => resultado.eventos);
   }
 
+  /** Tipos do adversário em campo (no PvP a tela só sabe pelo último pedido de ação). */
+  const tiposDoAdversario = () =>
+    ('tiposDoAdversario' in batalha ? (batalha as { tiposDoAdversario(): string[] | undefined }).tiposDoAdversario() : undefined) ?? ultimosTiposAlvo;
+
   function menuPokemon(obrigatorio: boolean) {
     const reservas = batalha.reservasSaudaveis();
     mensagem.textContent = obrigatorio ? 'Escolha o próximo Pokémon!' : 'Trocar por qual Pokémon?';
@@ -829,7 +858,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       ...batalha.indices.map((pos) => {
         const p = save.time[pos];
         const ativo = pos === batalha.ativo && !obrigatorio;
-        return el(
+        const b = el(
           'button',
           {
             class: 'botao membro',
@@ -839,6 +868,10 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           spritePokemon(pokemonPorId(p.especieId), { shiny: p.shiny, animado: false }),
           el('span', {}, `${nomeDe(p.especieId)} Nv. ${p.nivel}${ativo ? ' (em campo)' : ''}`),
         );
+        // ficha ao passar o mouse (pedido do dono): tipos, HP, Ability, item, atributos e golpes, com a efetividade
+        // contra o adversário em campo
+        resumoAoPassar(b, () => p, () => tiposDoAdversario());
+        return b;
       }),
       ...(obrigatorio ? [] : [botao('← Voltar', menuPrincipal, { class: 'botao secundario voltar' })]),
       pvp ? relogioPvp() : '',
@@ -899,13 +932,10 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     await executar(() => batalha.trocar(pos));
   }
 
-  async function arremessar(bola: ItemId) {
-    acoes.replaceChildren();
-    save.itens[bola]--;
-    salvar(save);
-    mensagem.textContent = `Você arremessou uma ${ITENS[bola].nome}!`;
+  /** Efeito da bola contra o selvagem agora (turno, status, quem está em campo…). */
+  const efeitoDaBola = (bola: ItemId) => {
     const ativo = save.time[batalha.ativo];
-    const efeito = efeitoBola(bola, {
+    return efeitoBola(bola, {
       especieId: selvagem.especieId,
       tipos: dadosSelvagem.tipos,
       velocidadeBase: dadosSelvagem.stats.velocidade,
@@ -920,10 +950,20 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       bioma: bioma.id,
       jaPossui: [...save.time, ...save.caixa].some((p) => p.especieId === selvagem.especieId),
     });
-    // VIP, skin de bônus e conquistas aumentam a chance de captura
-    const { capturou, tremidas, chance, eventos } = batalha.arremessarBola(efeito, bonusVip(save, 'captura') * multSkins(save, 'captura') * multConquistas(save, 'captura'));
+  };
+  // VIP, skin de bônus e conquistas aumentam a chance de captura
+  const bonusDeCaptura = () => bonusVip(save, 'captura') * multSkins(save, 'captura') * multConquistas(save, 'captura');
+  const textoDaChance = (chance: number) => (chance >= 1 ? '100' : chance < 0.001 ? '<0,1' : (chance * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }));
+
+  async function arremessar(bola: ItemId) {
+    acoes.replaceChildren();
+    save.itens[bola]--;
+    salvar(save);
+    mensagem.textContent = `Você arremessou uma ${ITENS[bola].nome}!`;
+    const efeito = efeitoDaBola(bola);
+    const { capturou, tremidas, chance, eventos } = batalha.arremessarBola(efeito, bonusDeCaptura());
     if (capturou && semNt(bola) === 'ultraball' && ehLendario(dadosSelvagem)) marcarConquista(save, 'lendarioUltraball');
-    const porcentagem = chance >= 1 ? '100' : chance < 0.001 ? '<0,1' : (chance * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+    const porcentagem = textoDaChance(chance);
     mensagem.textContent = `Você arremessou uma ${ITENS[bola].nome}! Chance de captura: ${porcentagem}%`;
     if (capturou && bola === 'healball') curarAoCapturar = true;
     await animarBola(arena, spriteSelvagem, tremidas, capturou, semNt(bola));
@@ -1190,4 +1230,35 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     }
     menuPrincipal();
   })();
+}
+
+/** Golpes de dois turnos: como o Pokémon fica no 1º turno (o resto, Solar Beam, Skull Bash…, brilha carregando). */
+const PREPARO: Record<string, string> = {
+  fly: 'voar', bounce: 'voar', skydrop: 'voar',
+  dig: 'cavar', dive: 'mergulhar',
+  phantomforce: 'sumir', shadowforce: 'sumir',
+};
+const animacaoDoPreparo = new WeakMap<HTMLElement, Animation>();
+/** Para onde vai o sprite em cada preparo (estilo direto no elemento: as animações de golpe também mexem nele). */
+const DESLOCAMENTO: Record<string, string> = { voar: '0 -220px', cavar: '0 30px', mergulhar: '0 40px', sumir: '0 0' };
+function prepararGolpe(alvo: HTMLElement, golpe: string, tipo: string): void {
+  const modo = PREPARO[golpe] ?? 'carregar';
+  alvo.dataset.preparo = modo;
+  alvo.style.setProperty('--cor-preparo', corTipo(tipo));
+  alvo.classList.add('preparando', `prep-${modo}`);
+  // animação própria por cima das outras (a de entrada fica "presa" no fim e seguraria a opacidade)
+  if (DESLOCAMENTO[modo])
+    animacaoDoPreparo.set(alvo, alvo.animate([{ translate: '0 0', opacity: 1 }, { translate: DESLOCAMENTO[modo], opacity: 0 }], { duration: 400, easing: 'ease-in', fill: 'forwards' }));
+}
+function voltarDoPreparo(alvo: HTMLElement): void {
+  if (!alvo.dataset.preparo) return;
+  alvo.classList.remove('preparando', `prep-${alvo.dataset.preparo}`);
+  const animacao = animacaoDoPreparo.get(alvo);
+  if (animacao) {
+    animacaoDoPreparo.delete(alvo);
+    // volta pelo mesmo caminho e solta
+    animacao.reverse();
+    void animacao.finished.then(() => animacao.cancel()).catch(() => {});
+  }
+  delete alvo.dataset.preparo;
 }

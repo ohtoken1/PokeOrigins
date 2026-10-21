@@ -3,7 +3,9 @@
 // de que o prêmio chegou no Correio. A tela fica em Minha conta → Recompensas (telas/conta.ts).
 import type { EstadoRecompensas } from '../../shared/recompensas';
 import { api } from './conta';
-import { carregarSave } from './estado';
+import { aoSalvar, carregarSave, salvarAgora } from './estado';
+import { nivelTreinador } from '../../shared/treinador';
+import { agoraDoServidor } from './ui/relogio';
 import { aoAvisoDoServidor } from './online';
 import { avisar } from './ui/avisos';
 
@@ -48,5 +50,25 @@ export function vigiarRecompensas(): void {
     if (msg.t === 'recompensas') void tentar();
   });
   setInterval(() => document.visibilityState === 'visible' && void tentar(), 10 * 60 * 1000);
+  // na virada do dia (meia-noite de Brasília, pelo relógio do servidor) pergunta na hora, sem esperar os 10 min
+  const DIA = 24 * 60 * 60 * 1000;
+  const FUSO = -3 * 60 * 60 * 1000;
+  const agendarVirada = () => {
+    const agora = agoraDoServidor();
+    const falta = DIA - ((agora + FUSO) % DIA) + 3000;
+    setTimeout(() => (void tentar(), agendarVirada()), falta);
+  };
+  agendarVirada();
+  // subiu de nível de treinador (a tranca do login é por nível): manda o save e pergunta de novo
+  let nivel = nivelTreinador(carregarSave()?.xpTreinador ?? 0);
+  aoSalvar((save) => {
+    const novo = nivelTreinador(save.xpTreinador ?? 0);
+    if (novo === nivel) return;
+    nivel = novo;
+    void salvarAgora().then(tentar, tentar);
+  });
   void tentar();
 }
+
+/** A aba Recompensas foi aberta: confere o login de hoje na hora (não só o estado guardado). */
+export const conferirLoginAgora = (): Promise<void> => registrarLogin().catch(() => {});

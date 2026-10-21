@@ -83,7 +83,7 @@ export function comprar(conta: banco.Conta, dados: Record<string, unknown>) {
       }
     save[campo] = saldo(save[campo]) - custo;
   });
-  contar(`compra:${loja}:${produto.titulo ?? produto.item ?? produto.id}`, qtd);
+  contar(`compra:${loja}:${produto.titulo ?? produto.item ?? produto.id}`, qtd, conta);
   const guardado = banco.lerSave(conta.id)!;
   const nome = produto.nome ?? nomeDoItem(produto.item ?? produto.id);
   return {
@@ -107,7 +107,7 @@ function comprarPremium(conta: banco.Conta, id: string, qtd: number) {
     }
     save.gold = saldo(save.gold) - custo;
   });
-  contar(`compra:premium:${produto.id}`, qtd);
+  contar(`compra:premium:${produto.id}`, qtd, conta);
   const guardado = banco.lerSave(conta.id)!;
   return { save: JSON.parse(guardado.dados), versao: guardado.versao, texto: `Comprou ${qtd > 1 ? `${qtd}× ` : ''}${produto.nome} por ${custo.toLocaleString('pt-BR')} Origin Coins.` };
 }
@@ -173,7 +173,7 @@ export function comprarGuilda(conta: banco.Conta, dados: Record<string, unknown>
     save.lojaGuilda = { mes, compras } satisfies EstadoLojaGuilda;
     save.pontosGuilda = saldo(save.pontosGuilda) - custo;
   });
-  contar(`compra:guilda:${produto.inicial ? `inicial-${produto.inicial}` : produto.id}`, vezes);
+  contar(`compra:guilda:${produto.inicial ? `inicial-${produto.inicial}` : produto.id}`, vezes, conta);
   const guardado = banco.lerSave(conta.id)!;
   const nome = produto.inicial ? nomeDaEspecie(produto.inicial) : produto.nome ?? `${produto.quantidade}× ${nomeDoItem(produto.item!)}`;
   return {

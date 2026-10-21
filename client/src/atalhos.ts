@@ -1,49 +1,62 @@
-// Atalhos de teclado (pedido do dono, lista aprovada em 17/10/2026). Fora da batalha: I Bolsa, P PC, X Pokédex,
-// C Correio, E Comunidade → Eventos, H Centro Pokémon, M Mapas (jogador comum: Cidade), T escrever no chat, F1 lista.
-// Os da batalha (F, 1–4, B, Q, R, Espaço) ficam em batalha/telaBatalha.ts. W, A, S, D e setas continuam sendo para
+// Atalhos de teclado (pedido do dono, lista aprovada em 17/10/2026; as teclas o jogador troca no F1 ou em Opções,
+// guardadas por teclas.ts). Padrão fora da batalha: I Bolsa, P PC, X Pokédex, C Correio, E Eventos, H Centro Pokémon,
+// M voltar ao jogo, T chat, Espaço lutar com o selvagem (ui/popupEncontro.ts), F1 lista. Os da batalha ficam em batalha/telaBatalha.ts. W, A, S, D e setas continuam sendo para
 // andar; nada funciona enquanto o jogador digita num campo. Apertar de novo a tecla da janela aberta fecha ela.
+import { ultimoLugar } from './lugar';
 import type { Destino, Navegar } from './main';
 import { ehAdministrador } from './bonificacao';
 import { carregarSave } from './estado';
 import { abrirBolsa } from './ui/bolsa';
 import { abrirCorreio } from './ui/correio';
-import { abrirCura } from './ui/cura';
+import { abrirCuraPeloAtalho } from './ui/cura';
 import { digitando } from './ui/digitando';
 import { el } from './ui/dom';
 import { abrirJanela, fecharTodasJanelas } from './ui/janela';
 import { abrirPC } from './ui/pc';
+import { ACOES_TECLA, acaoDaTecla, escolhendoTecla, marcarEscolhendo, mudarTecla, nomeDaTecla, restaurarTeclas, teclaDe, teclaDoEvento } from './teclas';
 
-/** Lista mostrada no F1 (e no guia, mais tarde). */
-export const ATALHOS: { tecla: string; acao: string }[] = [
-  { tecla: 'I', acao: 'Bolsa' },
-  { tecla: 'P', acao: 'PC' },
-  { tecla: 'X', acao: 'Pokédex' },
-  { tecla: 'C', acao: 'Correio' },
-  { tecla: 'E', acao: 'Comunidade → Eventos' },
-  { tecla: 'H', acao: 'Centro Pokémon (cura)' },
-  { tecla: 'M', acao: 'Mapas (jogador: Cidade)' },
-  { tecla: 'T', acao: 'Escrever no chat' },
-  { tecla: 'Esc', acao: 'Fechar janela' },
-  { tecla: 'F1', acao: 'Esta lista de atalhos' },
-];
-export const ATALHOS_BATALHA: { tecla: string; acao: string }[] = [
-  { tecla: 'F', acao: 'Lutar' },
-  { tecla: '1 a 4', acao: 'Escolher o golpe' },
-  { tecla: 'B', acao: 'Bolsa' },
-  { tecla: 'Q', acao: 'Trocar de Pokémon' },
-  { tecla: 'R', acao: 'Fugir' },
-  { tecla: 'Espaço', acao: 'Passar a mensagem' },
-];
-
-function abrirListaDeAtalhos(): void {
-  const tabela = (titulo: string, lista: typeof ATALHOS) =>
-    el('section', {}, el('h3', {}, titulo), el('dl', { class: 'atalhos-lista' }, ...lista.flatMap((a) => [el('dt', {}, el('kbd', {}, a.tecla)), el('dd', {}, a.acao)])));
-  abrirJanela('⌨️ Atalhos de teclado', () =>
-    el('div', { class: 'atalhos' },
-      tabela('No jogo', ATALHOS),
-      tabela('Na batalha', ATALHOS_BATALHA),
-      el('p', { class: 'meta' }, 'W, A, S, D e as setas andam com o personagem. Os atalhos não funcionam enquanto você escreve num campo.')),
-  { classe: 'janela-atalhos' });
+/**
+ * Janela dos atalhos (F1 e Opções → Atalhos): cada ação com a sua tecla; clicar na tecla e apertar outra troca
+ * (teclas.ts guarda no navegador). Esc cancela a escolha.
+ */
+export function abrirListaDeAtalhos(): void {
+  let escolhendo: string | null = null;
+  let erro = '';
+  const janela = abrirJanela('⌨️ Atalhos de teclado', () => {
+    const tabela = (titulo: string, grupo: 'jogo' | 'batalha') =>
+      el('section', {}, el('h3', {}, titulo), el('dl', { class: 'atalhos-lista' },
+        ...ACOES_TECLA.filter((a) => a.grupo === grupo).flatMap((a) => [
+          el('dt', {}, el('button', {
+            class: `tecla-atalho ${escolhendo === a.id ? 'escolhendo' : ''}`,
+            title: 'Clique e aperte a tecla nova',
+            onclick: () => ((escolhendo = escolhendo === a.id ? null : a.id), (erro = ''), marcarEscolhendo(!!escolhendo), janela.redesenhar()),
+          }, el('kbd', {}, escolhendo === a.id ? 'Aperte…' : nomeDaTecla(teclaDe(a.id))))),
+          el('dd', {}, a.nome),
+        ]),
+        ...(grupo === 'jogo' ? [el('dt', {}, el('kbd', {}, 'Esc')), el('dd', {}, 'Fechar janela'), el('dt', {}, el('kbd', {}, 'F1')), el('dd', {}, 'Esta lista de atalhos')] : [])));
+    return el('div', { class: 'atalhos' },
+      el('p', { class: 'meta' }, 'Clique numa tecla e aperte a nova para trocar. Se outra ação usava essa tecla, as duas trocam.'),
+      erro ? el('p', { class: 'erro-atalho' }, erro) : null,
+      tabela('No jogo', 'jogo'),
+      tabela('Na batalha', 'batalha'),
+      el('p', { class: 'meta' }, 'W, A, S, D e as setas andam com o personagem. Os atalhos não funcionam enquanto você escreve num campo.'),
+      el('button', { class: 'botao secundario', onclick: () => (restaurarTeclas(), (escolhendo = null), marcarEscolhendo(false), janela.redesenhar()) }, 'Restaurar padrão'));
+  }, { classe: 'janela-atalhos', aoFechar: () => {
+    escolhendo = null;
+    marcarEscolhendo(false);
+    window.removeEventListener('keydown', pegarTecla, true);
+  } });
+  // pega a tecla antes de todo mundo (atalhos do jogo, Esc da janela)
+  function pegarTecla(e: KeyboardEvent) {
+    if (!escolhendo) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (e.key !== 'Escape') erro = mudarTecla(escolhendo, teclaDoEvento(e)) ?? '';
+    escolhendo = null;
+    marcarEscolhendo(false);
+    janela.redesenhar();
+  }
+  window.addEventListener('keydown', pegarTecla, true);
 }
 
 /** Telas em que ainda não há jogo (criação do personagem, roleta do inicial). */
@@ -59,21 +72,22 @@ export function ativarAtalhos(navegar: Navegar, destinoAtual: () => Destino): vo
   };
 
   window.addEventListener('keydown', (e) => {
-    if (e.ctrlKey || e.altKey || e.metaKey || e.repeat || digitando()) return;
+    if (e.ctrlKey || e.altKey || e.metaKey || e.repeat || digitando() || escolhendoTecla) return;
     const save = carregarSave();
     if (!save || SEM_ATALHOS.includes(destinoAtual().tela)) return;
     // na batalha valem os atalhos dela (telaBatalha.ts)
     if (document.querySelector('.batalha-fundo')) return;
-    const tecla = e.key === 'F1' ? 'F1' : e.key.length === 1 ? e.key.toLowerCase() : '';
+    const tecla = e.key === 'F1' ? 'F1' : acaoDaTecla(teclaDoEvento(e), 'jogo');
+    if (!tecla) return;
     const acoes: Record<string, () => void> = {
-      i: () => abrirBolsa(save, aoMudar),
-      p: () => abrirPC(save, aoMudar),
-      x: () => navegar({ tela: 'pokedex' }),
-      c: () => abrirCorreio(),
-      e: () => navegar({ tela: 'comunidade', secao: 'eventos' }),
-      h: () => abrirCura(save, aoMudar),
-      m: () => navegar(ehAdministrador() ? { tela: 'regiao' } : { tela: 'cidade' }),
-      t: () => {
+      bolsa: () => abrirBolsa(save, aoMudar),
+      pc: () => abrirPC(save, aoMudar),
+      pokedex: () => navegar({ tela: 'pokedex' }),
+      correio: () => abrirCorreio(),
+      eventos: () => navegar({ tela: 'comunidade', secao: 'eventos' }),
+      cura: () => abrirCuraPeloAtalho(save, aoMudar),
+      mapas: () => navegar(ehAdministrador() ? { tela: 'regiao' } : ultimoLugar()),
+      chat: () => {
         const campo = document.querySelector<HTMLInputElement>('.chat-campo:not(:disabled)');
         if (campo) setTimeout(() => campo.focus());
       },
