@@ -64,6 +64,8 @@ export function evolucaoPorItem(p: PokemonIndividual, itemId: string, existe: (n
 
 /** Se o Pokémon pode aprender o golpe por máquina (TM/TR) em alguma geração. */
 export function podeAprenderPorMaquina(p: PokemonIndividual, golpeId: string): boolean {
+  // Smeargle aprende qualquer TM/TR (pedido do dono)
+  if (especie(p.especieId).id === 'smeargle') return true;
   const fontes = Dex.species.getLearnsetData(especie(p.especieId).id).learnset?.[golpeId] ?? [];
   return fontes.some((f) => /^\dM$/.test(f));
 }

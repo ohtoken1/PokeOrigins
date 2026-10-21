@@ -163,7 +163,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
       treinador: { nome: `Ninho de ${nome}`, titulo: 'Ninho', equipe, recompensa: 0, mensagemInicio: `Um ${nome} furioso saltou do ninho!`, avisoFuga: 'Os Poké Dólares pagos para entrar no ninho NÃO serão devolvidos.' },
       aoTerminar: (resultado) => {
         aoFim(resultado === 'vitoria');
-        if (resultado === 'derrota') return navegar({ tela: 'regiao' });
+        if (resultado === 'derrota') return navegar({ tela: 'cidade' });
         atualizarTime();
         emBatalha = false;
         atualizarPausa();
@@ -255,7 +255,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
             bioma,
             selvagem,
             aoTerminar: (resultado) => {
-              if (resultado === 'derrota') return navegar({ tela: 'regiao' });
+              if (resultado === 'derrota') return navegar({ tela: 'cidade' });
               // Evento de captura: o servidor confere a captura no save guardado
               if (resultado === 'captura') void registrarNaCaptura(selvagem);
               atualizarTime();

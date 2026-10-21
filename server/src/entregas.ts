@@ -7,6 +7,9 @@ import * as correio from './correio.ts';
 import { guardarPokemon, type PokemonSave, type SaveMin } from './trocas.ts';
 
 /** Entregas que vão para um saldo do save, não para a bolsa (prêmios de eventos). */
+/** Anexo "dias de VIP": a quantidade é o número de dias (no máximo `VIP_DIAS_MAX` por anexo). */
+export const VIP_DIAS = 'vip-dias';
+const VIP_DIAS_MAX = 3650;
 const SALDOS: Record<string, string> = { silver: 'silver', gold: 'gold', fragmentos: 'fragmentos', 'pontos-guilda': 'pontosGuilda', 'league-coins': 'leagueCoins', 'league-coins-nightmare': 'leagueCoinsNightmare' };
 
 /** Medalhas de torneio (entregues como item, vão para save.estatisticas). */
@@ -98,6 +101,12 @@ export function aplicarItem(save: Record<string, unknown>, item: string, quantid
     const atual = dono[chave];
     dono[chave] = (typeof atual === 'number' && Number.isFinite(atual) ? Math.max(0, atual) : 0) + quantidade;
   };
+  // dias de VIP (Correio da staff, pedido do dono para o Closed Beta): somam a partir do maior entre agora e o VIP atual
+  if (item === VIP_DIAS) {
+    const ate = typeof save.vipAte === 'number' && Number.isFinite(save.vipAte) ? save.vipAte : 0;
+    save.vipAte = Math.max(ate, Date.now()) + Math.min(quantidade, VIP_DIAS_MAX) * 86_400_000;
+    return;
+  }
   const medalha = MEDALHAS[item];
   if (medalha) return somar((save.estatisticas && typeof save.estatisticas === 'object' ? save.estatisticas : (save.estatisticas = {})) as Record<string, unknown>, medalha);
   const saldo = SALDOS[item];

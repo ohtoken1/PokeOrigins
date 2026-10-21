@@ -106,9 +106,14 @@ export function atalhosBiomas(atual: string, ir: (biomaId: string) => void): HTM
     }),
   );
 
+  // nunca embaixo da barra do topo e do cabeçalho (pedido do dono: arrastada para lá, ficava presa atrás deles e
+  // não dava mais para pegar a alça); vale também para uma posição antiga já salva lá em cima
+  const topoLivre = () => Math.max(0, ...[...document.querySelectorAll('.barra-topo, .cabecalho-jogo')]
+    .filter((e) => (e as HTMLElement).offsetParent !== null)
+    .map((e) => e.getBoundingClientRect().bottom + 4));
   const posicionar = (x: number, y: number) => {
     x = Math.max(0, Math.min(window.innerWidth - caixa.offsetWidth, x));
-    y = Math.max(0, Math.min(window.innerHeight - caixa.offsetHeight, y));
+    y = Math.max(topoLivre(), Math.min(window.innerHeight - caixa.offsetHeight, y));
     Object.assign(caixa.style, { left: `${x}px`, top: `${y}px` });
   };
   // posição salva (depois de entrar na página, quando já tem tamanho)
@@ -120,6 +125,13 @@ export function atalhosBiomas(atual: string, ir: (biomaId: string) => void): HTM
       /* fica na posição padrão */
     }
   });
+
+  // a janela mudou de tamanho: traz de volta para dentro da área livre
+  const reajustar = () => {
+    if (!caixa.isConnected) return window.removeEventListener('resize', reajustar);
+    if (caixa.style.top) posicionar(caixa.offsetLeft, caixa.offsetTop);
+  };
+  window.addEventListener('resize', reajustar);
 
   alca.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;

@@ -175,6 +175,20 @@ function sairDaSala(c: Conexao): void {
   c.sala = null;
 }
 
+/**
+ * O save guardado mudou (PUT /api/save): se o nome de treinador mudou, atualiza a conexão (chat) e avisa quem está
+ * no mesmo mapa. Antes o nome só era lido ao conectar e ao trocar de mapa: numa conta nova (o personagem chega ao
+ * servidor um pouco depois) ou depois de trocar o nome, os outros viam o usuário da conta até a troca de mapa.
+ */
+export function nomeMudou(contaId: number): void {
+  const c = porConta.get(contaId);
+  if (!c?.conta) return;
+  const novo = nomeDe(c.conta);
+  if (novo === c.nome) return;
+  c.nome = novo;
+  if (c.sala) paraSala(c.sala, { t: 'nome', id: contaId, nome: novo }, c);
+}
+
 /** Nome de treinador vem do save guardado (o jogo não escolhe o próprio nome aqui). */
 function nomeDe(conta: banco.Conta): string {
   try {

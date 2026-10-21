@@ -28,6 +28,8 @@ export interface OuvinteSala {
   saiu(id: number): void;
   moveu(id: number, x: number, y: number, dir: DirecaoOnline): void;
   visual(id: number, visual: VisualOnline): void;
+  /** o jogador trocou o nome de treinador (ou ele acabou de chegar ao servidor) */
+  nome(id: number, nome: string): void;
 }
 
 export type CanalChat = 'local' | 'global' | 'cla';
@@ -116,6 +118,7 @@ export function conectarOnline(): void {
     else if (msg.t === 'saiu') ouvinte.saiu(msg.id as number);
     else if (msg.t === 'moveu') ouvinte.moveu(msg.id as number, msg.x as number, msg.y as number, msg.dir as DirecaoOnline);
     else if (msg.t === 'visual') ouvinte.visual(msg.id as number, msg.visual as VisualOnline);
+    else if (msg.t === 'nome' && typeof msg.nome === 'string') ouvinte.nome(msg.id as number, msg.nome);
   });
   sock.addEventListener('close', (e) => {
     ws = null;

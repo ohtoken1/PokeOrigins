@@ -1,4 +1,5 @@
 import { bonificacao } from '../bonificacao';
+import { recompensaDoSelvagem } from '../../../shared/treinadoresNpc';
 import { somarMetrica } from '../../../shared/metricas';
 import { podeUsar, tetoDoJogador, textoDoLimite } from '../limiteNivel';
 import { bonusVip } from '../../../shared/vip';
@@ -188,7 +189,9 @@ export const FUNDOS_BATALHA: Record<string, string[]> = {
 /** Sorteia o fundo do bioma para esta batalha. */
 function sortearFundo(biomaId: string): string | null {
   const lista = FUNDOS_BATALHA[biomaId];
-  return lista ? `batalha/${lista[Math.floor(Math.random() * lista.length)]}` : null;
+  // endereço completo: dentro de uma variável CSS, um caminho relativo é lido a partir do arquivo de estilos
+  // (/assets/ no site montado), e a imagem não era achada no Closed Beta
+  return lista ? new URL(`batalha/${lista[Math.floor(Math.random() * lista.length)]}`, document.baseURI).href : null;
 }
 
 export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTerminar, boss, pvp }: OpcoesBatalha): void {
@@ -255,7 +258,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     'div',
     {
       class: `arena ${imagemFundo ? 'com-fundo' : ''}`,
-      style: { '--chao': hex(bioma.cores.chao), '--zona': hex(bioma.cores.zona), '--fundo-batalha': imagemFundo ? `url(${imagemFundo})` : 'none' },
+      style: { '--chao': hex(bioma.cores.chao), '--zona': hex(bioma.cores.zona), '--fundo-batalha': imagemFundo ? `url("${imagemFundo}")` : 'none' },
     },
     el('div', { class: 'canto-esquerdo' }, infoSelvagem.raiz, painelCampo),
     // retrato do treinador (duelos e ginásios), no canto de cima à direita
@@ -995,11 +998,23 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
   const xpPelosDerrotados = (nivel: number) => derrotados().reduce((s, d) => s + expGanha(pokemonPorId(d.especieId).experienciaBase ?? 50, d.nivel, nivel, true), 0);
 
   /** O treinador ganha o mesmo XP que o Pokémon derrotado/capturado dá ao Pokémon em campo. */
+  /** Poké Dólares da batalha com todos os bônus (VIP, Bonificação, skins, conquistas, título, guilda, Amulet Coin, incenso). */
+  async function ganharSilver(base: number) {
+    const amuleto = multSilverDoTime([...batalha.participantes].map((pos) => save.time[pos])) * multSilverDoIncenso(save);
+    const silver = Math.round(base * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver') * multConquistas(save, 'silver') * multTitulo(save) * (1 + bonusDaMinhaGuilda().silver) * amuleto);
+    if (silver <= 0) return;
+    save.silver += silver;
+    somarMetrica(save, 'silver', silver);
+    await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${nomeDaMoeda('silver', silver)}!`);
+  }
+
   async function darXpTreinador() {
     const nivelAtivo = save.time[batalha.ativo]?.nivel ?? 1;
     const xp = Math.round(xpPelosDerrotados(nivelAtivo) * bonusVip(save, 'xpTreinador') * bonificacao().xp * multSkins(save, 'xp') * multTitulo(save) * (1 + bonusDaMinhaGuilda().xp));
     const antes = nivelTreinador(save.xpTreinador);
     save.xpTreinador += xp;
+    // o cabeçalho mostra o XP novo na hora (ui/cabecalho.ts)
+    window.dispatchEvent(new Event('xp-treinador'));
     // a guilda ganha PONTOS pela ação (não o XP): 1 por selvagem, 1 por Pokémon do time do treinador vencido
     darXpAoCla(treinador ? treinador.equipe.length * XP_CLA_POR_POKEMON_DE_TREINADOR : XP_CLA_POR_SELVAGEM);
     await dizer(`Você ganhou ${xp} XP de treinador!`);
@@ -1093,15 +1108,10 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       if (treinador?.mensagemVitoria) await dizer(treinador.mensagemVitoria);
       await darXpTreinador();
       somarMetrica(save, 'vitorias');
-      // silver só em batalhas contra treinadores e ginásios (pedido do dono): selvagem não dá
-      if (treinador && treinador.recompensa > 0) {
-        // Amulet Coin: +20% se quem segura entrou em campo; Luck Incense usado na última hora: +20%
-        const amuleto = multSilverDoTime([...batalha.participantes].map((pos) => save.time[pos])) * multSilverDoIncenso(save);
-        const silver = Math.round(treinador.recompensa * bonusVip(save, 'silver') * bonificacao().silver * multSkins(save, 'silver') * multConquistas(save, 'silver') * multTitulo(save) * (1 + bonusDaMinhaGuilda().silver) * amuleto);
-        save.silver += silver;
-        somarMetrica(save, 'silver', silver);
-        await dizer(`Você ganhou ${silver.toLocaleString('pt-BR')} ${nomeDaMoeda('silver', silver)}!`);
-      }
+      // treinadores e ginásios pagam a recompensa deles
+      if (treinador && treinador.recompensa > 0) await ganharSilver(treinador.recompensa);
+      // selvagem também dá um pouco (pedido do dono), crescendo com o nível dele
+      if (!treinador && !boss) await ganharSilver(recompensaDoSelvagem(selvagem.nivel));
       await darXpTime();
       // missões diárias do passe: derrotar conta só selvagens; vitória em Duelos com treinadores conta duelo
       if (!treinador) await avisarMissoes(contarNasMissoes(save, 'derrotar', selvagem.especieId));
@@ -1115,6 +1125,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
       selvagem.teraTipo = sortearTeraTipo();
       registrarCapturado(save, selvagem.especieId, selvagem.shiny);
       registrarCapturaNoRanking(save, selvagem);
+      // capturar também dá os Poké Dólares do selvagem (como vencer)
+      if (!boss) await ganharSilver(recompensaDoSelvagem(selvagem.nivel));
       // letreiro de todos os jogadores: shiny, lendário, mítico, Ultra Beast ou inicial
       const rara = categoriaRara(dadosSelvagem, todosOsPokemons());
       // Dashboard da Administração (shared/metricas.ts)

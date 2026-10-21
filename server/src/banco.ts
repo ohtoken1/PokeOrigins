@@ -809,7 +809,8 @@ db.exec(`
   );
 `);
 const sqlDashboard = {
-  somarAtividade: db.prepare(`INSERT INTO atividade (conta_id, dia, ms) VALUES (?, ?, ?)
+  // só conta que ainda existe (uma conta apagada com o jogo aberto quebrava a chave estrangeira e derrubava o servidor)
+  somarAtividade: db.prepare(`INSERT INTO atividade (conta_id, dia, ms) SELECT ?1, ?2, ?3 WHERE EXISTS (SELECT 1 FROM contas WHERE id = ?1)
     ON CONFLICT(conta_id, dia) DO UPDATE SET ms = ms + excluded.ms`),
   somarMetrica: db.prepare(`INSERT INTO metricas_dia (dia, chave, valor) VALUES (?, ?, ?)
     ON CONFLICT(dia, chave) DO UPDATE SET valor = valor + excluded.valor`),
