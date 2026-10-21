@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { falarEm } from './balaoFala';
+import { posicaoSalva, salvarPosicao } from '../lugar';
 import type { Bioma } from '../../../shared/biomas';
 import { TAM, desenharMapa, gerarMapa, type Mapa } from './mapa';
 import { FOLHAS_CIDADE, PECAS, URL_ESTATUA, gerarMapaCidade, type ImagensCidade, type Peca } from './cidade';
@@ -248,7 +250,10 @@ export class BiomaScene extends Phaser.Scene {
     }
     this.mapa = mapa;
     this.pos = { ...this.mapa.inicio };
-    this.posSeguidor = { ...this.mapa.inicio };
+    // volta ao tile em que estava neste mapa (client/src/lugar.ts), se ainda dá para pisar nele
+    const salva = this.opcoes.sala ? posicaoSalva(this.opcoes.sala) : null;
+    if (salva && !this.mapa.bloqueado[salva.y]?.[salva.x] && salva.x < this.mapa.largura) this.pos = { ...salva };
+    this.posSeguidor = { ...this.pos };
 
     const imagem = (chave: string) => this.textures.get(chave).getSourceImage() as HTMLImageElement;
     const chaveMapa = `mapa-${idMapa}`;
@@ -695,7 +700,7 @@ export class BiomaScene extends Phaser.Scene {
   private entrarOnline() {
     const { sala, aoClicarJogador } = this.opcoes;
     if (!sala) return;
-    const outros = new OutrosJogadores(this, (j, e) => aoClicarJogador?.(j, e));
+    const outros = new OutrosJogadores(this, (j, e) => aoClicarJogador?.(j, e), (texto) => this.nomeJogador && falarEm(this, this.nomeJogador, texto));
     this.outros = outros;
     entrarNaSala(sala, this.pos.x, this.pos.y, this.linhaLpc as DirecaoOnline, this.visualOnline(), outros);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -969,6 +974,7 @@ export class BiomaScene extends Phaser.Scene {
     // o seguidor vai para onde o jogador estava
     const anterior = this.pos;
     this.pos = { x, y };
+    if (this.opcoes.sala) salvarPosicao(this.opcoes.sala, x, y);
     this.movendo = true;
     moverOnline(x, y, (dy < 0 ? 0 : dy > 0 ? 2 : dx < 0 ? 1 : 3) as DirecaoOnline);
 

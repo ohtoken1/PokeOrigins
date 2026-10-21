@@ -1,5 +1,6 @@
 // Aba Opções (barra do topo): perfil (nome fixo; trocar fica na tela do personagem), privacidade e convites, teto dos encontros, som e desempenho.
 // Liga/desliga são interruptores (checkbox com o visual de chave: apagado à esquerda, aceso à direita).
+import { abrirListaDeAtalhos } from '../atalhos';
 import { abertoComoApp, aoMudarInstalacao, ehIos, instalar, podeInstalar } from '../instalar';
 import type { Tela } from '../main';
 import { carregarSave, salvar } from '../estado';
@@ -122,6 +123,11 @@ export const telaOpcoes: Tela = (raiz, navegar) => {
       el('div', { class: 'opcoes-campo' }, el('span', {}, 'Gritos dos Pokémon'), controleVolume('volume')),
       el('div', { class: 'opcoes-campo' }, el('span', {}, 'Volume geral'), controleVolume('geral'), el('small', {}, 'O mesmo controle do canto da barra do topo.')),
       linhaInterruptor(semSom, 'Silenciar o jogo', 'O mesmo botão do canto da barra do topo.'),
+    ),
+    secao(
+      'Atalhos de teclado',
+      el('div', { class: 'opcoes-campo' }, el('span', {}, 'Ver e trocar as teclas dos atalhos'), el('button', { class: 'botao secundario', onclick: abrirListaDeAtalhos }, '⌨️ Mudar atalhos')),
+      el('small', { class: 'meta' }, 'A mesma janela do F1. As teclas ficam guardadas neste navegador.'),
     ),
     secaoInstalar(secao),
     secao(

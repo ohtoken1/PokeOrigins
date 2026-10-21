@@ -9,8 +9,12 @@ import type { Destino, Navegar } from '../main';
 import { regiaoPorId } from '../../../shared/regioes';
 import { progressoTreinador } from '../../../shared/treinador';
 import { tempoRestanteVip, vipAtivo } from '../../../shared/vip';
+import { GUIA } from '../guiaConteudo';
+
+/** Vantagens do VIP (o mesmo texto do Guia do jogo). */
+const textoVantagensVip = () => GUIA.flatMap((g) => g.topicos).find((t) => t.id === 'vip')?.texto.join('\n') ?? '';
 import { aoSalvar, carregarSave } from '../estado';
-import { abrirCura } from './cura';
+import { abrirCuraPeloAtalho } from './cura';
 import { aoMudarCorreio, cartasNovas } from '../correio';
 import { abrirCorreio } from './correio';
 import { abrirBolsa } from './bolsa';
@@ -73,7 +77,11 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
         el('div', { class: 'cab-grupo cab-treinador' },
           el('div', { class: 'cab-nome' },
             el('strong', {}, save.aparencia?.nome || 'Treinador'),
-            vip ? el('span', { class: 'icone-vip', title: `VIP ativo · acaba em ${tempoRestanteVip(save)}` }, 'VIP') : el('span', { class: 'cab-sem-vip', title: 'Sem VIP' }, 'sem VIP')),
+            vip ? el('span', { class: 'icone-vip', title: `VIP ativo · acaba em ${tempoRestanteVip(save)}
+
+${textoVantagensVip()}` }, 'VIP') : el('span', { class: 'cab-sem-vip', title: `Sem VIP
+
+${textoVantagensVip()}` }, 'sem VIP')),
           el('div', { class: 'cab-xp', title: t.necessario ? `${t.atual.toLocaleString('pt-BR')} / ${t.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo' },
             el('small', { class: 'cab-xp-nivel' }, `Treinador Nv. ${t.nivel}`),
             el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${t.necessario ? (t.atual / t.necessario) * 100 : 100}%` } })))),
@@ -93,7 +101,7 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
       // atalhos fora da barra: botões hexagonais soltos, um do lado do outro
       el('div', { class: 'cab-atalhos-fora' },
           atalho('coracao', 'Centro Pokémon', () => {
-            abrirCura(save, aoMudar);
+            abrirCuraPeloAtalho(save, aoMudar);
           }),
           // Pokémarket: jogadores vão até ele na cidade; o atalho fica só para administradores (pedido do dono)
           ehAdministrador() ? atalho('loja', 'Pokémarket', () => abrirLoja(save, aoMudar)) : null,

@@ -8,6 +8,7 @@ import { iconeCharm, iconeItem, iconeOvo } from './iconeItem';
 import { iconeTicketDoPokemon } from './ticketEvento';
 import { abrirJanela, type Janela } from './janela';
 import { NIVEL_MINIMO } from '../../../shared/trancas';
+import { tr } from '../idioma';
 
 let aberta: Janela | null = null;
 
@@ -103,7 +104,28 @@ export function abrirGuia(destino?: { grupo: string; topico: string }): void {
   const voltar = (texto: string, acao: () => void) => el('button', { class: 'botao secundario guia-voltar', onclick: acao }, `← ${texto}`);
   const paragrafo = (linha: string) => (linha.startsWith('• ') ? el('li', {}, linha.slice(2)) : el('p', {}, linha));
 
-  aberta = abrirJanela('❓ Guia do jogo', (janela) => {
+  // busca em todos os tópicos (pedido do dono): o campo é o mesmo entre os redesenhos (não perde o texto nem o foco)
+  const semAcento = (t: string) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const campoBusca = el('input', { class: 'guia-busca', type: 'search', placeholder: 'Buscar no guia…', maxlength: 40 }) as HTMLInputElement;
+  const resultados = el('div', { class: 'guia-lista' });
+  /** Texto do tópico em português e no idioma da tela (quem joga em inglês busca em inglês). */
+  const textoDoTopico = (t: TopicoGuia) => semAcento([t.titulo, ...t.texto].flatMap((x) => [x, tr(x)]).join(' '));
+  let grupos: HTMLElement | null = null;
+  const buscar = () => {
+    const termos = semAcento(campoBusca.value.trim()).split(/\s+/).filter(Boolean);
+    grupos?.toggleAttribute('hidden', termos.length > 0);
+    resultados.hidden = !termos.length;
+    if (!termos.length) return resultados.replaceChildren();
+    const achados = GUIA.flatMap((g) => g.topicos.map((t) => ({ g, t }))).filter(({ t }) => termos.every((x) => textoDoTopico(t).includes(x)));
+    resultados.replaceChildren(...(achados.length
+      ? achados.map(({ g, t }) => el('button', { class: 'guia-item', onclick: () => ((grupo = g), (topico = t), janela.redesenhar()) },
+          el('span', { class: 'guia-emoji' }, t.emoji), el('strong', {}, t.titulo), el('small', { class: 'guia-item-nivel' }, `${g.emoji} ${g.nome}`)))
+      : [el('p', { class: 'meta' }, 'Nada encontrado no guia.')]));
+  };
+  campoBusca.addEventListener('input', buscar);
+  let janela!: Janela;
+
+  aberta = janela = abrirJanela('❓ Guia do jogo', (janela) => {
     if (grupo && topico) {
       // junta os itens "• " seguidos numa lista só
       const blocos: HTMLElement[] = [];
@@ -131,12 +153,16 @@ export function abrirGuia(destino?: { grupo: string; topico: string }): void {
             el('span', { class: 'guia-emoji' }, t.emoji), el('strong', {}, t.titulo),
             t.trancas ? el('small', { class: 'guia-item-nivel' }, `🔒 Nv. ${Math.min(...t.trancas.map((x) => NIVEL_MINIMO[x.conteudo]))}`) : ''))));
     }
+    grupos = el('div', { class: 'guia-grupos' },
+      ...GUIA.map((g) => el('button', { class: 'guia-grupo', onclick: () => ((grupo = g), janela.redesenhar()) },
+        el('span', { class: 'guia-emoji' }, g.emoji),
+        el('strong', {}, g.nome),
+        el('small', {}, g.descricao))));
+    queueMicrotask(() => (buscar(), campoBusca.focus()));
     return el('div', { class: 'guia' },
-      el('p', { class: 'sub' }, 'Escolha um assunto para ver como funciona.'),
-      el('div', { class: 'guia-grupos' },
-        ...GUIA.map((g) => el('button', { class: 'guia-grupo', onclick: () => ((grupo = g), janela.redesenhar()) },
-          el('span', { class: 'guia-emoji' }, g.emoji),
-          el('strong', {}, g.nome),
-          el('small', {}, g.descricao)))));
+      el('p', { class: 'sub' }, 'Escolha um assunto para ver como funciona, ou busque uma palavra.'),
+      campoBusca,
+      resultados,
+      grupos);
   }, { classe: 'janela-guia', aoFechar: () => (aberta = null) });
 }

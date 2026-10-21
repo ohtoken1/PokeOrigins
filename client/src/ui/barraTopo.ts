@@ -1,6 +1,7 @@
 // Barra no topo do site: Início (o time lado a lado), Jogar (jogador comum: vai direto para a Cidade; administrador:
 // menu com Mapas, Cidade, Duelos e Ginásios), Minha conta e Comunidade (Buscar jogadores, Amigos, Guilda, Ranking,
 // Database). Cada item tem um iconezinho. Menus com setinha abrem ao clicar.
+import { ultimoLugar } from '../lugar';
 import { avisar } from './avisos';
 import { abrirGuia } from './guia';
 import { ehAdministrador } from '../bonificacao';
@@ -46,7 +47,8 @@ const ABAS: Aba[] = [
     itens: [
       // jogadores chegam aos mapas pela saída do sul da cidade (pedido do dono); o atalho fica só para administradores
       { nome: '🗺️ Mapas', soAdmin: true, destino: () => (carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' }) },
-      { nome: '🏙️ Cidade', destino: () => (carregarSave() ? { tela: 'cidade' } : { tela: 'inicial' }) },
+      // conta comum: o Jogar volta ao último lugar (mapa e tile em que estava; client/src/lugar.ts), pedido do dono
+      { nome: '🏙️ Cidade', destino: () => (!carregarSave() ? { tela: 'inicial' } : ehAdministrador() ? { tela: 'cidade' } : ultimoLugar()) },
       // tudo de duelos fica na Arena da cidade (pedido do dono); os atalhos ficam só para administradores
       { nome: '⚔️ Duelos com treinadores', soAdmin: true, destino: () => ({ tela: 'duelos' }) },
       { nome: '🏅 Ginásios', soAdmin: true, destino: () => ({ tela: 'ginasios' }) },

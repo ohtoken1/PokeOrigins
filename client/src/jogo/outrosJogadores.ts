@@ -7,6 +7,7 @@ import type { DirecaoOnline, JogadorOnline, OuvinteSala, VisualOnline } from '..
 import { DURACAO_PASSO, ESCALA_LPC, ESCALA_PMD, FONTE_NOME, QUADROS_POR_PASSO, TAMANHO_NOME_TELA, ZOOM } from './BiomaScene';
 import { BrilhoShiny, BrilhoSkin } from './brilhoSkin';
 import { TAM } from './mapa';
+import { falarEm } from './balaoFala';
 import { carregarPmd, temSpritePmd, type InfoPmd } from './seguidoresPmd';
 
 /**
@@ -62,10 +63,19 @@ export class OutrosJogadores implements OuvinteSala {
   private outros = new Map<number, Outro>();
   private cena: Phaser.Scene;
   private aoClicar: (j: JogadorOnline, evento: MouseEvent) => void;
+  /** O próprio jogador falou no chat local (o balão dele é da cena). */
+  private aoEuFalar: (texto: string) => void;
 
-  constructor(cena: Phaser.Scene, aoClicar: (j: JogadorOnline, evento: MouseEvent) => void) {
+  constructor(cena: Phaser.Scene, aoClicar: (j: JogadorOnline, evento: MouseEvent) => void, aoEuFalar: (texto: string) => void = () => {}) {
     this.cena = cena;
     this.aoClicar = aoClicar;
+    this.aoEuFalar = aoEuFalar;
+  }
+
+  falou(id: number | null, texto: string): void {
+    if (id === null) return this.aoEuFalar(texto);
+    const o = this.outros.get(id);
+    if (o) falarEm(this.cena, o.nome, texto);
   }
 
   /** Quantos estão no mapa agora (para o aviso "N jogadores aqui"). */

@@ -38,7 +38,7 @@ const LICOES: Licao[] = [
 const INTRO = [
   'Chegamos à cidade! Vou te mostrar rapidinho o básico para começar a sua jornada. Ande com as setas ou W A S D.',
   'Aqui ficam a loja, o Centro Pokémon, a estação de trem, a Arena e muitos NPCs. Clique no nome de um lugar para usá-lo na hora, ou no minimapa, no canto de cima, para andar até ele.',
-  'Para caçar Pokémon, saia pela saída do sul da cidade e escolha um bioma. Quando você para de andar, pode aparecer um Pokémon: aperte Enter para lutar, ou continue andando para fugir.',
+  'Para caçar Pokémon, saia pela saída do sul da cidade e escolha um bioma. Quando você para de andar, pode aparecer um Pokémon: aperte Espaço para lutar, ou continue andando para fugir.',
   'Seus Pokémon se cansam nas batalhas. Cure o time de graça no Centro Pokémon: é o coração no alto da tela. Ali do lado ficam também os atalhos da Bolsa, do PC e do Correio.',
   'Antes de sair, abra a sua Bolsa: tem um Kit iniciante esperando por você, com Pokébolas, remédios e Poké Dólares!',
   'Conforme você sobe de nível de treinador, novos sistemas são liberados, e eu volto para te contar cada um. Ficou com dúvida? Clique no botão dourado "?" no canto de cima, ou aperte F1 para ver os atalhos do teclado. Boa jornada!',
@@ -55,6 +55,8 @@ const falaDaLicao = (l: Licao): Fala => ({ id: l.conteudo, paginas: [`Parabéns,
 /** Falas que ainda vão aparecer (uma de cada vez). */
 const fila: Fala[] = [];
 let mostrando = false;
+/** Id da fala aberta agora (não entra na fila de novo enquanto aparece: a introdução repetia). */
+let naTela: string | null = null;
 
 function conferir(save: Save): void {
   const nivel = nivelTreinador(save.xpTreinador ?? 0);
@@ -72,7 +74,7 @@ function conferir(save: Save): void {
     // a introdução volta enquanto o jogador novo não a fechou (é ela que entrega o Kit iniciante)
     ...(vistas.includes('intro') && !(save.kitPelaConquista && !save.conquistas?.marcas?.tutorial) ? [] : [{ id: 'intro', paginas: INTRO }]),
     ...liberadas.filter((l) => !vistas.includes(l.conteudo)).map(falaDaLicao),
-  ].filter((f) => !fila.some((x) => x.id === f.id));
+  ].filter((f) => f.id !== naTela && !fila.some((x) => x.id === f.id));
   if (!novas.length) return;
   fila.push(...novas);
   void mostrarProxima();
@@ -89,6 +91,7 @@ async function mostrarProxima(): Promise<void> {
     save.tutorialVisto = [...new Set([...(save.tutorialVisto ?? []), fala.id])];
     salvar(save);
   }
+  naTela = fala.id;
   balao(fala);
 }
 
@@ -98,7 +101,7 @@ async function mostrarProxima(): Promise<void> {
  */
 /** Mostra a introdução do Professor de novo (Opções → "Ver a introdução do Professor"). */
 export function verIntroducao(): void {
-  if (fila.some((f) => f.id === 'intro')) return;
+  if (naTela === 'intro' || fila.some((f) => f.id === 'intro')) return;
   fila.unshift({ id: 'intro', paginas: INTRO });
   void mostrarProxima();
 }
@@ -127,6 +130,7 @@ function balao(fala: Fala, aoFechar?: () => void, textoFim = 'Começar!'): void 
   const fechar = () => {
     caixa.remove();
     if (fala.id === 'intro') introVista();
+    if (naTela === fala.id) naTela = null;
     if (aoFechar) return aoFechar();
     mostrando = false;
     void mostrarProxima();

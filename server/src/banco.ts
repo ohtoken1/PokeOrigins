@@ -833,6 +833,9 @@ export const metricasDoServidorDesde = (dia: string) => sqlDashboard.metricasDes
 export const contasParaDashboard = () => sqlDashboard.contas.all() as { id: number; usuario: string; criada_em: number; dados: string | null }[];
 /** Dias em que cada conta jogou (para o retorno D1/D7). */
 export const diasAtivosPorConta = () => sqlDashboard.primeiroDiaAtivo.all() as { conta_id: number; dias: string }[];
+/** Contas da administração (ficam fora do Dashboard). */
+const sqlAdmins = db.prepare('SELECT id FROM contas WHERE admin = 1');
+export const idsAdmin = () => new Set((sqlAdmins.all() as { id: number }[]).map((l) => l.id));
 /** Contagens simples de tabelas do jogo (guildas, anúncios do Mercado negro…). */
 export const contarLinhas = (tabela: 'clas' | 'cla_membros' | 'mercado' | 'ranqueado' | 'amizades', onde = '') => (sqlDashboard.contar(tabela, onde).get() as { n: number }).n;
 
@@ -851,8 +854,8 @@ const sqlComprasReais = {
   gravar: db.prepare('INSERT INTO compras_reais (conta_id, produto, centavos, quando) VALUES (?, ?, ?, ?)'),
   resumo: db.prepare(`SELECT produto, COUNT(*) AS total, SUM(centavos) AS centavos,
     SUM(CASE WHEN quando >= ? THEN 1 ELSE 0 END) AS semana, SUM(CASE WHEN quando >= ? THEN 1 ELSE 0 END) AS mes,
-    COUNT(DISTINCT conta_id) AS compradores FROM compras_reais GROUP BY produto`),
-  compradores: db.prepare('SELECT COUNT(DISTINCT conta_id) AS n FROM compras_reais'),
+    COUNT(DISTINCT conta_id) AS compradores FROM compras_reais WHERE conta_id IS NULL OR conta_id NOT IN (SELECT id FROM contas WHERE admin = 1) GROUP BY produto`),
+  compradores: db.prepare('SELECT COUNT(DISTINCT conta_id) AS n FROM compras_reais WHERE conta_id NOT IN (SELECT id FROM contas WHERE admin = 1)'),
 };
 export const gravarCompraReal = (contaId: number, produto: string, centavos: number) => void sqlComprasReais.gravar.run(contaId, produto, centavos, Date.now());
 export const resumoComprasReais = (desdeSemana: number, desdeMes: number) =>

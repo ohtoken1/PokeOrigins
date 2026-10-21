@@ -1,5 +1,5 @@
 import { comBonificacao } from '../bonificacao';
-import { tabelaComOutbreak } from '../outbreak';
+import { chancesComOutbreak, tabelaComOutbreak } from '../outbreak';
 import { botaoDoNinho } from '../ninho';
 import { registrarNaCaptura } from '../ui/eventos';
 import { passoDosOvos } from '../creche';
@@ -73,7 +73,8 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   let selecionado: number | null = null;
   const atualizarChances = () => {
     const nivelFixo = ajustesAdmin().nivel;
-    const chances = probabilidades(tabela, nivelFixo === null ? faixaAtual() : [nivelFixo, nivelFixo]);
+    const faixa: [number, number] = nivelFixo === null ? faixaAtual() : [nivelFixo, nivelFixo];
+    const chances = chancesComOutbreak(tabela, probabilidades(tabela, faixa), (t) => probabilidades(t, faixa), regiao.id, bioma.id);
     const chancePorId = new Map(tabela.map((e, i) => [e.pokemon.id, chances[i]]));
     const entradaPorId = new Map(tabelaNormal.map((e) => [e.pokemon.id, e]));
     const linhas = moradores.map((p) => {

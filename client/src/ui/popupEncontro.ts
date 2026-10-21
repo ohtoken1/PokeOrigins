@@ -1,4 +1,5 @@
 import { digitando } from './digitando';
+import { escolhendoTecla, nomeDaTecla, teclaDe, teclaDoEvento } from '../teclas';
 import type { Encontro } from '../../../shared/encontros';
 import { el, seloGenero, selosTipos, spritePokemon } from './dom';
 
@@ -18,7 +19,7 @@ export function mostrarEncontro(raiz: HTMLElement, encontro: Encontro, acoes: Ac
   const lendario = pokemon.lendario || pokemon.mitico;
 
   const aoTeclar = (e: KeyboardEvent) => {
-    if (e.key !== 'Enter' || acoes.bloqueio || digitando()) return;
+    if (e.repeat || teclaDoEvento(e) !== teclaDe('lutarSelvagem') || acoes.bloqueio || digitando() || escolhendoTecla || document.querySelector('.janela-fundo')) return;
     e.preventDefault();
     acoes.lutar();
   };
@@ -39,9 +40,9 @@ export function mostrarEncontro(raiz: HTMLElement, encontro: Encontro, acoes: Ac
       selosTipos(pokemon),
       el(
         'button',
-        { class: 'botao', disabled: !!acoes.bloqueio, title: acoes.bloqueio ?? 'Atalho: Enter', onclick: acoes.lutar },
+        { class: 'botao', disabled: !!acoes.bloqueio, title: acoes.bloqueio ?? `Atalho: ${nomeDaTecla(teclaDe('lutarSelvagem'))}`, onclick: acoes.lutar },
         'Lutar ',
-        el('kbd', {}, 'Enter'),
+        el('kbd', {}, nomeDaTecla(teclaDe('lutarSelvagem'))),
       ),
       el('p', { class: 'dica' }, acoes.bloqueio ?? 'Continue andando para fugir'),
     ),

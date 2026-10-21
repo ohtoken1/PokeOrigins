@@ -1,0 +1,43 @@
+# Ajustes do Closed Beta (21/10/2026): campo da batalha, efetividade, caderno de treinadores, atalho de cura.
+{0} (seu lado)	{0} (your side)	{0} (tu lado)
+{0} (adversário)	{0} (opponent)	{0} (rival)
+Contra o adversário	Against the opponent	Contra el rival
+Sem efeito (0x)	No effect (0x)	Sin efecto (0x)
+Super efetivo (4x)	Super effective (4x)	Súper eficaz (4x)
+Efetivo (2x)	Effective (2x)	Eficaz (2x)
+Normal (1x)	Normal (1x)	Normal (1x)
+Pouco efetivo ({0}x)	Not very effective ({0}x)	Poco eficaz ({0}x)
+Treinadores	Trainers	Entrenadores
+📖 Treinadores	📖 Trainers	📖 Entrenadores
+✔ Derrotado	✔ Defeated	✔ Derrotado
+Vistos: {0}/{1} · Derrotados: {2}/{3}	Seen: {0}/{1} · Defeated: {2}/{3}	Vistos: {0}/{1} · Derrotados: {2}/{3}
+O atalho do Centro Pokémon volta em {0} s (ou use o Centro Pokémon da cidade).	The Pokémon Center shortcut is back in {0} s (or use the Pokémon Center in the city).	El atajo del Centro Pokémon vuelve en {0} s (o usa el Centro Pokémon de la ciudad).
+Espaço	Space	Espacio
+Aperte…	Press…	Pulsa…
+Clique e aperte a tecla nova	Click and press the new key	Haz clic y pulsa la tecla nueva
+Clique numa tecla e aperte a nova para trocar. Se outra ação usava essa tecla, as duas trocam.	Click a key and press the new one to change it. If another action used that key, the two swap.	Haz clic en una tecla y pulsa la nueva para cambiarla. Si otra acción usaba esa tecla, las dos se intercambian.
+Restaurar padrão	Restore defaults	Restaurar predeterminado
+Essa tecla é reservada (andar, Esc, F1, Tab).	That key is reserved (walking, Esc, F1, Tab).	Esa tecla está reservada (caminar, Esc, F1, Tab).
+Voltar ao jogo (mapa onde estava)	Back to the game (map you were on)	Volver al juego (mapa donde estabas)
+Lutar contra o Pokémon selvagem	Fight the wild Pokémon	Luchar contra el Pokémon salvaje
+Golpe {0}	Move {0}	Movimiento {0}
+Fugir / Desistir	Run / Forfeit	Huir / Rendirse
+Passar a mensagem	Skip the message	Pasar el mensaje
+Atalhos de teclado	Keyboard shortcuts	Atajos de teclado
+Ver e trocar as teclas dos atalhos	See and change the shortcut keys	Ver y cambiar las teclas de los atajos
+⌨️ Mudar atalhos	⌨️ Change shortcuts	⌨️ Cambiar atajos
+A mesma janela do F1. As teclas ficam guardadas neste navegador.	The same window as F1. The keys are saved in this browser.	La misma ventana de F1. Las teclas se guardan en este navegador.
+Atalho: {0}	Shortcut: {0}	Atajo: {0}
+{0} copiou a Ability {1} de {2} com Trace!	{0} copied {2}'s {1} with Trace!	¡{0} copió la Ability {1} de {2} con Trace!
+Ability de {0}: {1}!	{0}'s Ability: {1}!	¡Ability de {0}: {1}!
+{0} agora tem a Ability {1}! ({2})	{0} now has the Ability {1}! ({2})	¡{0} ahora tiene la Ability {1}! ({2})
+Buscar no guia…	Search the guide…	Buscar en la guía…
+Escolha um assunto para ver como funciona, ou busque uma palavra.	Choose a topic to see how it works, or search for a word.	Elige un tema para ver cómo funciona, o busca una palabra.
+Nada encontrado no guia.	Nothing found in the guide.	No se encontró nada en la guía.
+Chance de captura agora: {0}%	Catch chance right now: {0}%	Probabilidad de captura ahora: {0}%
+O disfarce de {0} serviu de isca!	{0}'s disguise served it as a decoy!	¡El disfraz de {0} le sirvió de señuelo!
+O disfarce de {0} foi desfeito!	{0}'s disguise was busted!	¡El disfraz de {0} se rompió!
+Golpes do tipo do adversário contra ele	Opponent's type moves against it	Movimientos del tipo del rival contra él
+recebe {0}x	takes {0}x	recibe {0}x
+• Cada derrota faz o ninho mudar de lugar no mesmo mapa (o Pokémon continua o mesmo) e ganhar mais 5 minutos.	• Each defeat moves the nest to another spot on the same map (the Pokémon stays the same) and adds 5 more minutes.	• Cada derrota hace que el nido cambie de lugar en el mismo mapa (el Pokémon sigue siendo el mismo) y suma 5 minutos más.
+Cada derrota faz o ninho mudar de lugar no mesmo mapa (o Pokémon continua o mesmo) e ganhar mais 5 minutos.	Each defeat moves the nest to another spot on the same map (the Pokémon stays the same) and adds 5 more minutes.	Cada derrota hace que el nido cambie de lugar en el mismo mapa (el Pokémon sigue siendo el mismo) y suma 5 minutos más.

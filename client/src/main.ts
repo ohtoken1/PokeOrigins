@@ -1,4 +1,5 @@
 import './estilo.css';
+import { lembrarLugar, ultimoLugar } from './lugar';
 import './estilo-pokedex.css';
 import { carregarSave, salvar } from './estado';
 import { ajustarTimeAoLimite } from './limiteNivel';
@@ -71,6 +72,7 @@ let atualizarCabecalho: ((destino: Destino) => void) | undefined;
 
 const navegar: Navegar = (destino) => {
   destinoAtual = destino;
+  lembrarLugar(destino);
   marcarAba?.(destino);
   atualizarCabecalho?.(destino);
   limparTelaAtual?.();
@@ -149,5 +151,5 @@ void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   vigiarTutorial();
   aoMudarViagem(() => (destinoAtual.tela === 'regiao' ? navegar(destinoAtual) : atualizarCabecalho?.(destinoAtual)));
   // com save, o jogo abre na cidade (pedido do dono)
-  navegar(carregarSave() ? { tela: 'cidade' } : { tela: 'inicial' });
+  navegar(carregarSave() ? ultimoLugar() : { tela: 'inicial' });
 });

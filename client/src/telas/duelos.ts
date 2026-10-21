@@ -9,6 +9,7 @@ import { carregarSave, salvar } from '../estado';
 import { colunaDoTime } from '../ui/time';
 import { el, spritePokemon } from '../ui/dom';
 import { valorEmMoeda } from '../ui/moeda';
+import { abrirJanela } from '../ui/janela';
 
 /** Imagem do personagem (sprites do Pokémon Showdown, guardados em client/public/treinadores). */
 export const imagemTreinador = (id: string) => `treinadores/${id}.png`;
@@ -22,6 +23,26 @@ const PASSO_FINAL_MS = 320;
 let npcAtual: TreinadorNpc | null = null;
 
 const estrelas = (d: Dificuldade) => el('span', { class: `estrelas dificuldade-${d}`, title: NOMES_DIFICULDADE[d] }, '★'.repeat(d), el('span', { class: 'apagadas' }, '★'.repeat(5 - d)));
+
+/** Caderno de treinadores (pedido do dono): como uma Pokédex, os nunca vistos ficam pretos com "?",
+ *  os vistos com retrato e nome, e os derrotados com o selo "Derrotado". */
+function abrirCaderno(save: { duelosVencidos?: string[]; duelosVistos?: string[] }): void {
+  const vencidos = new Set(save.duelosVencidos ?? []);
+  const vistos = new Set([...(save.duelosVistos ?? []), ...vencidos]);
+  abrirJanela('Treinadores', () =>
+    el('div', { class: 'caderno-treinadores' },
+      el('p', { class: 'sub' }, `Vistos: ${vistos.size}/${TREINADORES_NPC.length} · Derrotados: ${vencidos.size}/${TREINADORES_NPC.length}`),
+      el('div', { class: 'caderno-grade' },
+        ...TREINADORES_NPC.map((t, i) => {
+          const visto = vistos.has(t.id);
+          const venceu = vencidos.has(t.id);
+          return el('div', { class: `caderno-npc ${visto ? '' : 'nao-visto'} ${venceu ? 'derrotado' : ''}`, title: visto ? `${t.titulo} ${t.nome}${venceu ? ' · Derrotado' : ''}` : '???' },
+            el('small', { class: 'caderno-numero' }, `#${String(i + 1).padStart(2, '0')}`),
+            el('img', { src: imagemTreinador(t.id), alt: '' }),
+            el('strong', {}, visto ? t.nome : '???'),
+            venceu ? el('span', { class: 'caderno-selo' }, '✔ Derrotado') : null);
+        }))), { classe: 'janela-caderno' });
+}
 
 export const telaDuelos: Tela = (raiz, navegar) => {
   const save = carregarSave();
@@ -91,6 +112,10 @@ export const telaDuelos: Tela = (raiz, navegar) => {
     equipe = montarTimeNpc(npc, save.time, crescimentoDe);
     const recompensa = recompensaDoDuelo(npc.dificuldade, equipe.length);
     const podeLutar = save.time.some((p) => p.hp > 0);
+    if (!(save.duelosVistos ??= []).includes(npc.id)) {
+      save.duelosVistos.push(npc.id);
+      salvar(save);
+    }
     cartao.replaceChildren(
       el('div', { class: 'duelo-topo' },
         el('img', { class: 'retrato-npc', src: imagemTreinador(npc.id), alt: npc.nome }),
@@ -128,7 +153,8 @@ export const telaDuelos: Tela = (raiz, navegar) => {
             });
           },
         }, 'Batalhar!'),
-        el('button', { class: 'botao secundario', onclick: sortearOutro }, 'Sortear outro')),
+        el('button', { class: 'botao secundario', onclick: sortearOutro }, 'Sortear outro'),
+        el('button', { class: 'botao secundario', onclick: () => abrirCaderno(save) }, '📖 Treinadores')),
     );
   };
   desenhar();

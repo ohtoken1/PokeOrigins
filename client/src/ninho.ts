@@ -1,5 +1,5 @@
 // Ninho (evento do dono): a cada 20 min aparece um ninho num mapa de uma região; clicar → paga 100k (VIP 50k) e luta
-// contra um Pokémon nível 150. O lugar e o Pokémon saem de uma semente (horário + quantas derrotas): igual para todos;
+// contra um Pokémon nível 150. O mapa e o Pokémon saem de uma semente (o horário) e o lugar dentro do mapa, do horário + quantas derrotas: igual para todos;
 // perdeu, o ninho "teleporta" (outra semente). O servidor (server/src/eventos.ts) guarda o tempo, quem está lutando
 // e quem venceu. Venceu: 100k + roleta do Ninho; se era lendário, 5% de ganhar o Pokémon.
 import { BIOMAS, type Bioma } from '../../shared/biomas';
@@ -39,9 +39,11 @@ function aleatorioCom(semente: string): () => number {
 
 const cache = new Map<string, Ninho>();
 /** Onde está o ninho deste horário depois de `derrotas` tentativas que falharam, e qual Pokémon ele tem. */
-export function ninhoDe(slot: number, derrotas: number, inicio: number | null = null): Ninho {
-  // ninho ligado pela staff (`inicio`) tem outra semente: não repete o do horário
-  const chave = inicio ? `${slot}-${derrotas}-${inicio}` : `${slot}-${derrotas}`;
+export function ninhoDe(slot: number, _derrotas: number, inicio: number | null = null): Ninho {
+  // mapa e Pokémon saem SÓ do horário (pedido do dono: perder não leva o ninho para outro mapa nem troca o Pokémon);
+  // as derrotas só mudam o lugar dentro do mesmo mapa (a semente do tile, em `mostrarNinho`, inclui as derrotas).
+  // Ninho ligado pela staff (`inicio`) tem outra semente: não repete o do horário
+  const chave = inicio ? `${slot}-${inicio}` : `${slot}`;
   if (!cache.has(chave)) {
     const aleatorio = aleatorioCom(`ninho-${chave}`);
     const regioes = REGIOES.filter((r) => r.disponivel);

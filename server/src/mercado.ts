@@ -174,8 +174,8 @@ export function comprar(conta: banco.Conta, id: number) {
     entregar(save, l.tipo, JSON.parse(l.dados) as Guardado, true);
     if (!banco.venderAnuncioMercado(id)) throw new ErroConta('Este anúncio não está mais à venda.', 409);
     vendedor = l.vendedor;
-    contar('mercado-vendas');
-    contar('mercado-taxa', l.preco - valorDoVendedor(l.preco));
+    contar('mercado-vendas', 1, conta);
+    contar('mercado-taxa', l.preco - valorDoVendedor(l.preco), conta);
   });
   // o jogo do vendedor vem buscar o pagamento; as listas abertas se atualizam
   avisar(vendedor, { t: 'mercado-acerto' });

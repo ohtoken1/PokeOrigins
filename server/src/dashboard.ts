@@ -23,7 +23,9 @@ const DIA = 86_400_000;
 /** A cada minuto: soma 1 minuto para cada conta online e anota o pico do dia. */
 export function contarMinuto(agora = Date.now()): void {
   const dia = diaDaMetrica(agora);
-  const online = contasOnline();
+  // contas ADM não contam (nem no tempo online nem no pico)
+  const admins = banco.idsAdmin();
+  const online = contasOnline().filter((id) => !admins.has(id));
   // nunca deixa um erro daqui derrubar o servidor (roda num intervalo, fora de qualquer pedido)
   try {
     banco.transacao(() => {
@@ -41,8 +43,14 @@ export function contarMinuto(agora = Date.now()): void {
  */
 export const registrarCompraReal = (contaId: number, produto: string, centavos: number) => banco.gravarCompraReal(contaId, produto, centavos);
 
-/** Conta algo que aconteceu no servidor (compra numa loja do servidor, venda no Mercado negro…). */
-export const contar = (chave: string, valor = 1) => banco.somarMetricaDoServidor(diaDaMetrica(Date.now()), chave, valor);
+/**
+ * Conta algo que aconteceu no servidor (compra numa loja do servidor, venda no Mercado negro…). `conta` = quem fez:
+ * conta ADM não entra no Dashboard (pedido do dono: os testes da equipe sujavam os números).
+ */
+export const contar = (chave: string, valor = 1, conta?: { admin: number | boolean }) => {
+  if (conta?.admin) return;
+  banco.somarMetricaDoServidor(diaDaMetrica(Date.now()), chave, valor);
+};
 
 const NOME_LOJA: Record<string, string> = {
   pokemarket: 'Pokémarket', dia: 'Loja do dia', premium: 'Premium', liga: 'Loja da Liga', nightmare: 'Loja Nightmare', guilda: 'Loja da guilda',
@@ -73,8 +81,11 @@ function montar(agora: number): Dashboard {
   const periodo = (d: string): (keyof NumeroPorPeriodo)[] => (d === hoje ? ['hoje', 'semana', 'mes'] : d >= inicioSemana ? ['semana', 'mes'] : d >= inicioMes ? ['mes'] : []);
   const zero = (): NumeroPorPeriodo => ({ hoje: 0, semana: 0, mes: 0 });
 
+  // contas ADM ficam fora de todos os números (pedido do dono)
+  const admins = banco.idsAdmin();
+
   // ---- tempo online
-  const atividade = banco.atividadeDesde(inicioMes);
+  const atividade = banco.atividadeDesde(inicioMes).filter((a) => !admins.has(a.conta_id));
   const msPorConta = { hoje: new Map<number, number>(), semana: new Map<number, number>(), mes: new Map<number, number>() };
   const porDia = new Map<string, { contas: Set<number>; ms: number }>();
   for (const a of atividade) {
@@ -87,7 +98,7 @@ function montar(agora: number): Dashboard {
   const soma = (m: Map<number, number>) => [...m.values()].reduce((s, v) => s + v, 0);
 
   // ---- saves
-  const contas = banco.contasParaDashboard();
+  const contas = banco.contasParaDashboard().filter((c) => !admins.has(c.id));
   const capturas = { capturas: zero(), shiny: zero(), inicial: zero(), lendario: zero(), mitico: zero(), ultra: zero() };
   const existentes = { pokemon: 0, shiny: 0, inicial: 0, lendario: 0, mitico: 0, ultra: 0 };
   const silverGanho = zero();
@@ -165,7 +176,7 @@ function montar(agora: number): Dashboard {
   });
 
   // ---- retorno: só contas criadas depois que a contagem de atividade começou (antes não há registro)
-  const diasAtivos = new Map(banco.diasAtivosPorConta().map((l) => [l.conta_id, l.dias.split(',')]));
+  const diasAtivos = new Map(banco.diasAtivosPorConta().filter((l) => !admins.has(l.conta_id)).map((l) => [l.conta_id, l.dias.split(',')]));
   const primeiroRegistro = [...diasAtivos.values()].flat().sort()[0];
   const retorno = (dias: number): number | null => {
     if (!primeiroRegistro) return null;
@@ -192,7 +203,7 @@ function montar(agora: number): Dashboard {
       comSave,
       novasHoje: contas.filter((c) => diaDaMetrica(c.criada_em) === hoje).length,
       novasSemana: contas.filter((c) => diaDaMetrica(c.criada_em) >= inicioSemana).length,
-      onlineAgora: contasOnline().length,
+      onlineAgora: contasOnline().filter((id) => !admins.has(id)).length,
       picoHoje: banco.picoOnline(hoje),
       ativosHoje: msPorConta.hoje.size,
       ativosSemana: msPorConta.semana.size,
@@ -240,13 +251,13 @@ function montar(agora: number): Dashboard {
     })(),
     sistemas: [
       { nome: 'Guildas', valor: banco.contarLinhas('clas') },
-      { nome: 'Jogadores em guildas', valor: banco.contarLinhas('cla_membros') },
+      { nome: 'Jogadores em guildas', valor: banco.contarLinhas('cla_membros', 'WHERE conta_id NOT IN (SELECT id FROM contas WHERE admin = 1)') },
       { nome: 'Amizades', valor: banco.contarLinhas('amizades', 'WHERE aceita = 1') },
-      { nome: 'Anúncios no Mercado negro agora', valor: banco.contarLinhas('mercado', "WHERE status = 'ativo'") },
+      { nome: 'Anúncios no Mercado negro agora', valor: banco.contarLinhas('mercado', "WHERE status = 'ativo' AND vendedor NOT IN (SELECT id FROM contas WHERE admin = 1)") },
       { nome: 'Vendas no Mercado negro (7 dias)', valor: servidor.get('mercado-vendas') ?? 0 },
       { nome: 'Taxa do Mercado negro que saiu do jogo (7 dias)', valor: servidor.get('mercado-taxa') ?? 0, extra: 'Poké Dólares + Origin Coins' },
       { nome: 'Trocas no Banco (7 dias)', valor: servidor.get('cambio-trocas') ?? 0 },
-      { nome: 'Jogadores no PvP Ranqueado', valor: banco.contarLinhas('ranqueado', 'WHERE vitorias + derrotas > 0') },
+      { nome: 'Jogadores no PvP Ranqueado', valor: banco.contarLinhas('ranqueado', 'WHERE vitorias + derrotas > 0 AND conta_id NOT IN (SELECT id FROM contas WHERE admin = 1)') },
     ],
   };
 }
