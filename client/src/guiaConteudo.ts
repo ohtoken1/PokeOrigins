@@ -45,7 +45,7 @@ export const GUIA: GrupoGuia[] = [
         '• Shiny: 1 em 1.500 encontros.',
         '• Algum inicial: 1 em 12.000. Algum lendário, algum mítico e alguma Ultra Beast: 1 em 20.000 cada.',
         '• Os bônus (VIP, skins, títulos, guilda, Charms…) aumentam essas chances.',
-        'Selvagens não dão Poké Dólares, mas dão XP e, às vezes, uma Energy do tipo deles (10%) ou uma Orb (rara).',
+        'Selvagens dão um pouco de Poké Dólares (1 + 1 a cada 10 níveis do selvagem, com os seus bônus de Poké Dólares), XP e, às vezes, uma Energy do tipo deles (10%) ou uma Orb (rara).',
       ] },
       { id: 'ivs', emoji: '🔍', titulo: 'IVs e avaliação', texto: [
         'Os IVs dos Pokémon capturados ficam ocultos. Na ficha do Pokémon, use "Avaliar IVs" para revelar.',

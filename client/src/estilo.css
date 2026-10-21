@@ -3216,3 +3216,10 @@ canvas { touch-action: none; }
 .aviso-conquista-ir { pointer-events: auto; align-self: flex-start; margin-top: 6px; padding: 4px 12px; font-size: 0.85rem; }
 .achievement-destaque { animation: achievement-destaque 1.2s ease-in-out 3; border-color: var(--destaque) !important; }
 @keyframes achievement-destaque { 50% { box-shadow: 0 0 0 3px var(--destaque), 0 0 18px rgb(233 185 73 / 0.6); } }
+
+/* Tela jogável maior (pedido do dono): mapas, cidade e Safari usam a largura toda em telas grandes, e o mapa cresce
+   até onde a altura da janela deixa (proporção 3:2), nunca menor que antes (960 px) */
+.tela.tela-bioma { max-width: 1760px; }
+@media (min-width: 761px) {
+  .tela-bioma .area-jogo { max-width: max(960px, calc((100vh - 200px) * 1.5)); margin-inline: auto; }
+}

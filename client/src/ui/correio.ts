@@ -16,7 +16,7 @@ const REMETENTE: Record<string, string> = {
 };
 /** Saldos e medalhas não são itens da bolsa: imagem ou símbolo próprio. */
 const IMAGENS: Record<string, string> = { silver: 'itens/pokedolar.svg', gold: 'itens/origincoin.svg', fragmentos: 'itens/fragmento-temporal.svg' };
-const SIMBOLOS: Record<string, string> = { 'league-coins': '🏅', 'league-coins-nightmare': '🎖️', 'pontos-guilda': '🛡️', 'medalha-ouro': '🥇', 'medalha-prata': '🥈', 'medalha-bronze': '🥉' };
+const SIMBOLOS: Record<string, string> = { 'league-coins': '🏅', 'league-coins-nightmare': '🎖️', 'pontos-guilda': '🛡️', 'vip-dias': '💎', 'medalha-ouro': '🥇', 'medalha-prata': '🥈', 'medalha-bronze': '🥉' };
 
 function iconeAnexo(a: AnexoCarta): HTMLElement {
   if (a.tipo === 'pokemon') return spritePokemon(pokemonPorId(a.especieId), { shiny: a.shiny, animado: false });

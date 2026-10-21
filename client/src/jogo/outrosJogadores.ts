@@ -122,6 +122,13 @@ export class OutrosJogadores implements OuvinteSala {
     if (!o.movendo) this.proximoPasso(o);
   }
 
+  nome(id: number, nome: string): void {
+    const o = this.outros.get(id);
+    if (!o) return;
+    o.dados.nome = nome;
+    o.nome.setText(nome);
+  }
+
   visual(id: number, visual: VisualOnline): void {
     const o = this.outros.get(id);
     if (!o) return;

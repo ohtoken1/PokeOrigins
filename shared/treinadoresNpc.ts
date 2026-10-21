@@ -28,6 +28,11 @@ export const IV_POR_DIFICULDADE: Record<Dificuldade, number> = { 1: 5, 2: 6, 3: 
  */
 export const RECOMPENSA_POR_POKEMON: Record<Dificuldade, number> = { 1: 30, 2: 40, 3: 55, 4: 75, 5: 100 };
 /** Silver de um duelo contra um time de `pokemons` Pokémon. */
+/**
+ * Poké Dólares por vencer ou capturar um selvagem (pedido do dono, 20/10/2026: pouco, crescendo com o nível; os
+ * bônus de Poké Dólares valem por cima): 1 + 1 a cada 10 níveis (nível 5 = 1, nível 50 = 6, nível 100 = 11).
+ */
+export const recompensaDoSelvagem = (nivel: number): number => 1 + Math.floor(Math.max(1, nivel) / 10);
 export const recompensaDoDuelo = (dificuldade: Dificuldade, pokemons: number): number => RECOMPENSA_POR_POKEMON[dificuldade] * pokemons;
 export const NOMES_DIFICULDADE: Record<Dificuldade, string> = { 1: 'Fácil', 2: 'Normal', 3: 'Difícil', 4: 'Muito difícil', 5: 'Lendário' };
 

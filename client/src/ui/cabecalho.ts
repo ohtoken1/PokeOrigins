@@ -75,7 +75,7 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
             el('strong', {}, save.aparencia?.nome || 'Treinador'),
             vip ? el('span', { class: 'icone-vip', title: `VIP ativo · acaba em ${tempoRestanteVip(save)}` }, 'VIP') : el('span', { class: 'cab-sem-vip', title: 'Sem VIP' }, 'sem VIP')),
           el('div', { class: 'cab-xp', title: t.necessario ? `${t.atual.toLocaleString('pt-BR')} / ${t.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo' },
-            el('small', {}, `Treinador Nv. ${t.nivel}`),
+            el('small', { class: 'cab-xp-nivel' }, `Treinador Nv. ${t.nivel}`),
             el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${t.necessario ? (t.atual / t.necessario) * 100 : 100}%` } })))),
         el('div', { class: 'cab-grupo cab-regiao', title: 'Região atual' },
           el('strong', {}, regiao?.nome ?? save.regiao)),
@@ -119,6 +119,21 @@ export function montarCabecalho(navegar: Navegar): (destino: Destino) => void {
   aoMudarCorreio(() => void seloDoCorreio());
 
   // gastou ou ganhou silver/gold (ficha, loja, bolsa, admin…): a carteira muda na hora, sem esperar trocar de tela
+  // XP de treinador na hora (pedido do dono): a cada salvar e logo que a batalha dá o XP (evento 'xp-treinador')
+  const atualizarXp = () => {
+    const save = carregarSave();
+    const caixa = raiz.querySelector<HTMLElement>('.cab-xp');
+    if (!save || !caixa) return;
+    const t = progressoTreinador(save.xpTreinador);
+    caixa.title = t.necessario ? `${t.atual.toLocaleString('pt-BR')} / ${t.necessario.toLocaleString('pt-BR')} XP` : 'Nível máximo';
+    const nivel = caixa.querySelector('.cab-xp-nivel');
+    if (nivel) nivel.textContent = `Treinador Nv. ${t.nivel}`;
+    const barra = caixa.querySelector<HTMLElement>('.preenchido');
+    if (barra) barra.style.width = `${t.necessario ? (t.atual / t.necessario) * 100 : 100}%`;
+  };
+  window.addEventListener('xp-treinador', atualizarXp);
+  aoSalvar(atualizarXp);
+
   aoSalvar((save) => {
     const silver = raiz.querySelector('.cab-valor-silver');
     const gold = raiz.querySelector('.cab-valor-gold');

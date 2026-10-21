@@ -87,6 +87,8 @@ function golpesDeOvo(p: PokemonBase): string[] {
 }
 
 function podeAprenderTM(p: PokemonBase, golpe: string): boolean {
+  // Smeargle aprende qualquer TM/TR (pedido do dono; a bolsa usa podeAprenderPorMaquina, com a mesma regra)
+  if (especie(p.id).id === 'smeargle') return true;
   const fontes = Dex.species.getLearnsetData(especie(p.id).id).learnset?.[golpe] ?? [];
   return fontes.some((f) => /^\dM$/.test(f));
 }

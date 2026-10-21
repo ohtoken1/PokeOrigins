@@ -28,7 +28,7 @@ import * as torneio from './torneio.ts';
 import * as ranqueado from './ranqueado.ts';
 import * as lojas from './lojas.ts';
 import * as dashboard from './dashboard.ts';
-import { avisarDaStaff, estaOnline, ligarMundo } from './mundo.ts';
+import { avisarDaStaff, estaOnline, ligarMundo, nomeMudou } from './mundo.ts';
 import { tituloAtivo } from '../../shared/conquistas.ts';
 import { temSkin, type ComSkins } from '../../shared/skins.ts';
 
@@ -51,10 +51,14 @@ function limitar(ip: string): void {
 setInterval(() => {
   const agora = Date.now();
   for (const [ip, t] of tentativas) if (agora - t.desde > JANELA_TENTATIVAS) tentativas.delete(ip);
-  banco.limparSessoesVencidas();
-  amigos.limpar();
-  cla.consertar();
-  dashboard.contarMinuto();
+  // cada tarefa separada: um erro numa não derruba o servidor nem impede as outras
+  for (const tarefa of [banco.limparSessoesVencidas, amigos.limpar, cla.consertar, dashboard.contarMinuto]) {
+    try {
+      tarefa();
+    } catch (e) {
+      console.error('Tarefa de cada minuto falhou', e);
+    }
+  }
 }, 60 * 1000).unref();
 
 // ---- utilidades de HTTP ----
@@ -143,6 +147,8 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     if (texto.length > TAMANHO_MAX_SAVE) throw new ErroConta('Save grande demais.', 413);
     const versao = banco.gravarSave(conta.id, texto, c.versao);
     if (versao === null) throw new ErroConta('Seu progresso foi salvo em outra aba ou computador. Recarregue a página.', 409);
+    // o nome de treinador pode ter chegado agora (conta nova) ou mudado: o mapa e o chat passam a usar o novo
+    nomeMudou(conta.id);
     return responder(res, 200, { versao });
   }
   if (metodo === 'DELETE' && caminho === '/api/save') {

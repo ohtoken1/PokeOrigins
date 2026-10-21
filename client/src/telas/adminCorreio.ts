@@ -14,6 +14,8 @@ const MOEDAS = [
   { id: 'league-coins', nome: 'League Coins' },
   { id: 'league-coins-nightmare', nome: 'League Coins Nightmare' },
   { id: 'pontos-guilda', nome: 'Pontos de guilda' },
+  // quantidade = número de dias; soma ao VIP que o jogador já tem
+  { id: 'vip-dias', nome: 'Dias de VIP' },
 ];
 const TITULO_MAX = 60;
 const TEXTO_MAX = 2000;

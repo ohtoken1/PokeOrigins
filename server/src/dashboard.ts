@@ -24,10 +24,15 @@ const DIA = 86_400_000;
 export function contarMinuto(agora = Date.now()): void {
   const dia = diaDaMetrica(agora);
   const online = contasOnline();
-  banco.transacao(() => {
-    for (const id of online) banco.somarAtividade(id, dia, MINUTO);
-    banco.registrarPicoOnline(dia, online.length);
-  });
+  // nunca deixa um erro daqui derrubar o servidor (roda num intervalo, fora de qualquer pedido)
+  try {
+    banco.transacao(() => {
+      for (const id of online) banco.somarAtividade(id, dia, MINUTO);
+      banco.registrarPicoOnline(dia, online.length);
+    });
+  } catch (e) {
+    console.error('Dashboard: falha ao contar o minuto online', e);
+  }
 }
 
 /**
