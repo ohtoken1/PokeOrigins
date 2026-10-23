@@ -14,6 +14,7 @@ import { TODOS_OS_ITENS, nomeCategoriaItem } from '../../../shared/loja';
 import { darItemAoJogador } from '../entregas';
 import { secaoDarPokemon } from './adminPokemon';
 import { secaoBanimentos } from './adminBanimentos';
+import { secaoAdministradores } from './adminAdministradores';
 import { secaoParcerias } from './adminParcerias';
 import { secaoLiga } from './adminLiga';
 import { secaoTorneio } from './adminTorneio';
@@ -24,7 +25,7 @@ import { el } from '../ui/dom';
 import { cartaoAnuncio } from '../ui/mural';
 import { confirmar } from '../ui/confirmar';
 
-export type SecaoAdministracao = 'dashboard' | 'correio' | 'itens' | 'pokemon' | 'liga' | 'torneio' | 'banimentos' | 'parceria' | 'log' | 'eventos' | 'anuncios';
+export type SecaoAdministracao = 'dashboard' | 'correio' | 'itens' | 'pokemon' | 'liga' | 'torneio' | 'banimentos' | 'administradores' | 'parceria' | 'log' | 'eventos' | 'anuncios';
 
 export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBreve?: string }[] = [
   { id: 'dashboard', nome: 'Dashboard' },
@@ -36,6 +37,7 @@ export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBre
   { id: 'liga', nome: 'Liga' },
   { id: 'torneio', nome: 'Torneio' },
   { id: 'banimentos', nome: 'Banimentos' },
+  { id: 'administradores', nome: 'Administradores' },
   { id: 'parceria', nome: 'Parceria' },
   {
     id: 'log',
@@ -48,7 +50,7 @@ export const SECOES_ADMINISTRACAO: { id: SecaoAdministracao; nome: string; emBre
 /** Menu na lateral (modelo escolhido pelo dono): as seções por assunto, com ícone. */
 const GRUPOS_ADMIN: { titulo: string; secoes: [SecaoAdministracao, string][] }[] = [
   { titulo: 'Visão geral', secoes: [['dashboard', '📊']] },
-  { titulo: 'Jogadores', secoes: [['correio', '✉️'], ['itens', '🎁'], ['pokemon', '🐾'], ['banimentos', '⛔']] },
+  { titulo: 'Jogadores', secoes: [['correio', '✉️'], ['itens', '🎁'], ['pokemon', '🐾'], ['banimentos', '⛔'], ['administradores', '🛡️']] },
   { titulo: 'Eventos', secoes: [['eventos', '📅'], ['liga', '👑'], ['torneio', '🏟️']] },
   { titulo: 'Comunicação', secoes: [['anuncios', '📢'], ['log', '📜']] },
   { titulo: 'Negócios', secoes: [['parceria', '🤝']] },
@@ -201,7 +203,7 @@ export const telaAdministracao = (secaoInicial: SecaoAdministracao): Tela => (ra
   let secao = secaoInicial;
   const corpo = el('div', { class: 'admin-corpo' });
   // montada uma vez só (redesenhar a tela não apaga o que a pessoa está escrevendo)
-  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : secao === 'correio' ? secaoCorreio() : secao === 'pokemon' ? secaoDarPokemon() : secao === 'banimentos' ? secaoBanimentos() : secao === 'parceria' ? secaoParcerias() : secao === 'liga' ? secaoLiga() : secao === 'torneio' ? secaoTorneio() : secao === 'dashboard' ? secaoDashboard() : null;
+  const partesAnuncios = secao === 'anuncios' ? secaoAnuncios() : secao === 'itens' ? secaoItens() : secao === 'correio' ? secaoCorreio() : secao === 'pokemon' ? secaoDarPokemon() : secao === 'banimentos' ? secaoBanimentos() : secao === 'administradores' ? secaoAdministradores() : secao === 'parceria' ? secaoParcerias() : secao === 'liga' ? secaoLiga() : secao === 'torneio' ? secaoTorneio() : secao === 'dashboard' ? secaoDashboard() : null;
 
   const linhaBonus = (chave: ChaveBonus) => {
     const atual = bonificacao()[chave];

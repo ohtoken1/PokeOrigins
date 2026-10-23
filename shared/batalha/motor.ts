@@ -513,6 +513,8 @@ export class BatalhaSelvagem {
     sim.hp = efeito.hp;
     const eventos: EventoBatalha[] = [];
     if (sim === this.eu.active[0]) {
+      // o registro calcula o dano do próximo golpe a partir daqui
+      this.hpLado.jogador = { hp: sim.hp, max: sim.maxhp };
       eventos.push({ tipo: 'hp', lado: 'jogador', hp: sim.hp, hpMax: sim.maxhp }, { tipo: 'status', lado: 'jogador', status: sim.status || null });
     }
     return { mensagem: efeito.mensagem, eventos: [...eventos, ...this.turnoGratisDoSelvagem()] };
@@ -541,8 +543,10 @@ export class BatalhaSelvagem {
       // quem termina a batalha em Dynamax guarda o HP na medida normal
       p.hp = sim.fainted ? 0 : sim.volatiles['dynamax'] ? sim.getUndynamaxedHP() : sim.hp;
       p.status = sim.fainted || !sim.status ? null : sim.status;
-      // frutas comidas na batalha são gastas; os outros itens voltam ao dono no fim (como nos jogos atuais)
-      if (p.item && !sim.item && Dex.items.get(p.item).isBerry) p.item = null;
+      // frutas comidas na batalha são gastas; os outros itens voltam ao dono no fim (como nos jogos atuais);
+      // o mesmo vale para todo item de uso único consumido (Focus Sash, Air Balloon, Weakness Policy, Gems…):
+      // o simulador marca em lastItem só o que foi gasto; item roubado ou derrubado (Knock Off) volta
+      if (p.item && !sim.item && Dex.items.get(sim.lastItem).id === Dex.items.get(p.item).id) p.item = null;
       for (const g of p.golpes) {
         const slot = sim.baseMoveSlots.find((s) => s.id === g.id);
         if (slot) g.pp = slot.pp;

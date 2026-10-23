@@ -23,6 +23,7 @@ import { avisar } from '../ui/avisos';
 import { confirmar } from '../ui/confirmar';
 import { api, ErroApi } from '../conta';
 import { abrirJanela } from '../ui/janela';
+import { abrirCorreio } from '../ui/correio';
 import { conteudoLiberado } from '../trancas';
 import { textoTranca } from '../../../shared/trancas';
 import { DIAS_LOGIN, DIAS_LOGIN_TRINTA, METAS_DOACAO, PREMIOS_LOGIN, PREMIOS_LOGIN_TRINTA, RECUPERACOES_VIP, type EstadoRecompensas, type PremioRecompensa } from '../../../shared/recompensas';
@@ -31,8 +32,15 @@ import { aoMudarRecompensas, buscarRecompensas, conferirLoginAgora, estadoRecomp
 export type SecaoConta = 'perfil' | 'achievements' | 'skins' | 'doacao' | 'recompensas';
 
 /** Conquistas: resumo dos bônus ganhos e a lista por grupo, com o progresso e a recompensa de cada uma. */
+/** Filtro das conquistas (pedido do dono): fica escolhido enquanto o jogo está aberto. */
+type FiltroConquistas = 'todas' | 'completas' | 'incompletas';
+let filtroConquistas: FiltroConquistas = 'todas';
+
 function achievements(save: Save): HTMLElement {
   const secao = el('section', { class: 'conta-secao' });
+  // veio pelo aviso "Ir para a conquista": mostra todas, para achar a conquista
+  const alvo = pegarConquistaEmDestaque();
+  if (alvo) filtroConquistas = 'todas';
   const pct = (v: number) => `+${(Math.round(v * 1000) / 10).toLocaleString('pt-BR')}%`;
   const desenhar = () => {
     const todas = progressoDasConquistas(save);
@@ -56,12 +64,18 @@ function achievements(save: Save): HTMLElement {
         el('span', {}, 'Poké Dólares em batalhas: ', el('strong', {}, pct(bonus.silver))),
         el('span', {}, 'Shiny, lendários e iniciais: ', el('strong', {}, pct(bonus.raros))),
         el('span', {}, 'Captura: ', el('strong', {}, pct(bonus.captura)))),
+      el('div', { class: 'filtro-conquistas' },
+        ...([['todas', 'Todas'], ['completas', '★ Completas'], ['incompletas', 'Incompletas']] as const).map(([id, texto]) =>
+          el('button', { class: `botao ${filtroConquistas === id ? 'ligado' : ''}`, 'aria-pressed': String(filtroConquistas === id), onclick: () => ((filtroConquistas = id), desenhar()) }, texto))),
       ...GRUPOS_CONQUISTA.map((g) => {
         const doGrupo = todas.filter((x) => x.conquista.grupo === g.id);
+        const completa = (x: (typeof todas)[number]) => x.feita || x.aResgatar;
+        const visiveis = doGrupo.filter((x) => filtroConquistas === 'todas' || (filtroConquistas === 'completas') === completa(x));
+        if (!visiveis.length) return '';
         return el('details', { class: 'grupo-conquistas', open: true },
           el('summary', {}, g.nome, el('small', {}, ` ${doGrupo.filter((x) => x.feita || x.aResgatar).length}/${doGrupo.length}`)),
           el('div', { class: 'lista-achievements' },
-            ...doGrupo.map(({ conquista: c, valor, meta, feita, aResgatar }) =>
+            ...visiveis.map(({ conquista: c, valor, meta, feita, aResgatar }) =>
               el('div', { class: `achievement ${feita ? 'feito' : ''} ${aResgatar ? 'a-resgatar' : ''}`, 'data-conquista': c.id },
                 el('span', { class: 'achievement-selo' }, feita ? '★' : aResgatar ? '🎁' : ''),
                 el('div', { class: 'achievement-texto' },
@@ -77,7 +91,6 @@ function achievements(save: Save): HTMLElement {
   };
   desenhar();
   // veio pelo botão "Ir para a conquista" do aviso: rola até ela e destaca
-  const alvo = pegarConquistaEmDestaque();
   if (alvo)
     requestAnimationFrame(() => {
       const cartao = secao.querySelector(`[data-conquista="${CSS.escape(alvo)}"]`);
@@ -268,10 +281,26 @@ function gradeDeLogin(premios: PremioRecompensa[][], dia: number, hoje: boolean)
 }
 
 /** Janela que abre no primeiro login do dia com prêmio de boas-vindas (pedido do dono): os 7 prêmios e o dia atual. */
-export function janelaDoLogin(dia: number): void {
-  abrirJanela(`🎁 Login de boas-vindas: dia ${dia} de ${DIAS_LOGIN}`, () => el('div', { class: 'janela-login' },
-    el('p', { class: 'sub' }, `Obrigado por entrar hoje! Nos ${DIAS_LOGIN} primeiros dias da sua conta, cada dia em que você entra anda uma casinha. O prêmio de hoje já está no seu Correio (NT).`),
-    gradeDeLogin(PREMIOS_LOGIN, dia, true)), { classe: 'janela-login-diario' });
+/**
+ * Prêmios de login que chegaram agora (pedido do dono: aviso claro): uma janela só com o que veio de cada login,
+ * em destaque, o botão para abrir o Correio e, no de boas-vindas, as casinhas dos 7 dias.
+ */
+export function janelaDosPremios(novos: { evento: 'login' | 'trinta'; dia: number }[]): void {
+  if (!novos.length) return;
+  const bloco = (n: { evento: 'login' | 'trinta'; dia: number }) => {
+    const login = n.evento === 'login';
+    const premios = (login ? PREMIOS_LOGIN : PREMIOS_LOGIN_TRINTA)[n.dia - 1] ?? [];
+    return el('div', { class: 'premio-do-dia' },
+      el('h3', {}, login ? `🎁 Login de boas-vindas · dia ${n.dia} de ${DIAS_LOGIN}` : `📅 Login dos 30 dias · dia ${n.dia} de ${DIAS_LOGIN_TRINTA}`),
+      listaPremios(premios),
+      login ? gradeDeLogin(PREMIOS_LOGIN, n.dia, true) : '');
+  };
+  abrirJanela('🎁 Prêmios de hoje', (j) => el('div', { class: 'janela-login' },
+    el('p', { class: 'sub' }, 'Obrigado por entrar hoje! Estes prêmios chegaram no seu Correio (NT). Abra o Correio e clique em Resgatar para levá-los para a bolsa.'),
+    ...novos.map(bloco),
+    el('div', { class: 'premio-do-dia-botoes' },
+      el('button', { class: 'botao', onclick: () => (j.fechar(), abrirCorreio()) }, '📬 Abrir o Correio'),
+      el('button', { class: 'botao secundario', onclick: () => j.fechar() }, 'Depois'))), { classe: 'janela-login-diario' });
 }
 
 /** Login dos 30 dias: cada dia do calendário tem o seu prêmio; pego ✔, perdido ✖ (VIP recupera), hoje e os que vêm. */

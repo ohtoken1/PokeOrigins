@@ -22,13 +22,13 @@ export class ErroConta extends Error {
   }
 }
 
-async function hashSenha(senha: string): Promise<string> {
+export async function hashSenha(senha: string): Promise<string> {
   const sal = randomBytes(16);
   const hash = await scryptAsync(senha, sal, 64);
   return `scrypt$${sal.toString('base64')}$${hash.toString('base64')}`;
 }
 
-async function senhaConfere(senha: string, guardada: string): Promise<boolean> {
+export async function senhaConfere(senha: string, guardada: string): Promise<boolean> {
   const [tipo, sal, hash] = guardada.split('$');
   if (tipo !== 'scrypt' || !sal || !hash) return false;
   const esperado = Buffer.from(hash, 'base64');

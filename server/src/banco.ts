@@ -214,6 +214,9 @@ export function criarConta(usuario: string, email: string, senhaHash: string, ad
 }
 /** Devolve se achou a conta. */
 export const definirAdmin = (usuario: string, admin: boolean) => sql.mudarAdmin.run(admin ? 1 : 0, usuario).changes > 0;
+const sqlListaAdmins = db.prepare('SELECT id, usuario, criada_em FROM contas WHERE admin = 1 ORDER BY id');
+/** Contas administradoras, da mais antiga para a mais nova (a primeira é a do dono). */
+export const listarAdmins = () => sqlListaAdmins.all() as { id: number; usuario: string; criada_em: number }[];
 
 export const criarSessao = (tokenHash: string, contaId: number, expiraEm: number) => void sql.criarSessao.run(tokenHash, contaId, expiraEm);
 export const sessao = (tokenHash: string) => sql.sessao.get(tokenHash) as { conta_id: number; expira_em: number } | undefined;

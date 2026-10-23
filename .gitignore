@@ -8,5 +8,8 @@ server/dados/
 shared/data/idiomas/_textos.json
 shared/data/idiomas/_faltam-*.json
 
-research_notes/
-reports/
+
+
+
+# arquivos de trabalho que não vão para o GitHub (prévias, planilhas, Discord, pesquisas)
+fora_github/

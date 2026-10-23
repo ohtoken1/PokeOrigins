@@ -22,12 +22,33 @@ export interface Janela {
 }
 
 /** Janela sobre a tela (Esc ou ✕ fecham). `conteudo` é chamado de novo a cada redesenho. */
-export function abrirJanela(titulo: string, conteudo: (janela: Janela) => HTMLElement, opcoes: { aoFechar?: () => void; classe?: string; /** fica no meio da barra do título, entre o nome e o ✕ */ noTopo?: HTMLElement } = {}): Janela {
+export function abrirJanela(titulo: string, conteudo: (janela: Janela) => HTMLElement, opcoes: {
+  aoFechar?: () => void;
+  classe?: string;
+  /** fica no meio da barra do título, entre o nome e o ✕ */
+  noTopo?: HTMLElement;
+  /** clicar fora da janela não fecha */
+  semFecharFora?: boolean;
+  /** pergunta antes de fechar pelo ✕ ou pelo Esc (false = continua aberta) */
+  antesDeFechar?: () => boolean | Promise<boolean>;
+} = {}): Janela {
   const corpo = el('div', { class: 'janela-corpo' });
+  // ✕ e Esc: o jogador pediu para fechar
+  let perguntando = false;
+  const pedirParaFechar = async () => {
+    if (perguntando) return;
+    perguntando = true;
+    try {
+      if (!opcoes.antesDeFechar || (await opcoes.antesDeFechar())) janela.fechar();
+    } finally {
+      perguntando = false;
+    }
+  };
   const aoTeclar = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       e.stopPropagation();
-      janela.fechar();
+      // com a confirmação aberta, o Esc é dela
+      if (!perguntando) void pedirParaFechar();
     }
   };
   const fundo = el(
@@ -35,13 +56,13 @@ export function abrirJanela(titulo: string, conteudo: (janela: Janela) => HTMLEl
     {
       class: 'janela-fundo',
       onclick: (e: MouseEvent) => {
-        if (e.target === fundo) janela.fechar();
+        if (e.target === fundo && !opcoes.semFecharFora) void pedirParaFechar();
       },
     },
     el(
       'div',
       { class: `janela ${opcoes.classe ?? ''}`, role: 'dialog', 'aria-label': titulo },
-      el('header', {}, el('h2', {}, titulo), opcoes.noTopo ? el('div', { class: 'janela-no-topo' }, opcoes.noTopo) : null, el('button', { class: 'fechar', 'aria-label': 'Fechar', onclick: () => janela.fechar() }, '✕')),
+      el('header', {}, el('h2', {}, titulo), opcoes.noTopo ? el('div', { class: 'janela-no-topo' }, opcoes.noTopo) : null, el('button', { class: 'fechar', 'aria-label': 'Fechar', onclick: () => void pedirParaFechar() }, '✕')),
       corpo,
     ),
   );

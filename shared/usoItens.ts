@@ -53,13 +53,29 @@ export function evolucaoPorItem(p: PokemonIndividual, itemId: string, existe: (n
     const id = idDaEvolucao(p.especieId, evo);
     if (id === null || !existe(id)) continue;
     // pedras e itens de evoluir (maçãs, bules, armaduras, Dragon Scale…): usar o item já evolui
-    if (itemId !== CABO_DE_LIGACAO && evo.evoItem && Dex.items.get(evo.evoItem).id === itemId) return id;
+    // (os de troca, como Dragon Scale e Metal Coat, não: são segurados e quem evolui é o Linking Cord)
+    if (itemId !== CABO_DE_LIGACAO && evo.evoType !== 'trade' && evo.evoItem && Dex.items.get(evo.evoItem).id === itemId) return id;
     if (itemId === CABO_DE_LIGACAO && evo.evoType === 'trade') {
       // troca com item (ex.: Onix + Metal Coat = Steelix): o item precisa estar equipado
       if (!evo.evoItem || Dex.items.get(evo.evoItem).id === p.item) return id;
     }
   }
   return null;
+}
+
+/** Itens que só servem para evoluir por troca (Dragon Scale, Metal Coat, Up-Grade…): na bolsa são de segurar. */
+let itensDeTroca: Set<string> | null = null;
+export function ehItemDeTroca(itemId: string): boolean {
+  if (!itensDeTroca) {
+    const daTroca = new Set<string>();
+    const outros = new Set<string>();
+    for (const e of Dex.species.all()) {
+      if (!e.evoItem) continue;
+      (e.evoType === 'trade' ? daTroca : outros).add(Dex.items.get(e.evoItem).id);
+    }
+    itensDeTroca = new Set([...daTroca].filter((i) => !outros.has(i)));
+  }
+  return itensDeTroca.has(itemId);
 }
 
 /** Se o Pokémon pode aprender o golpe por máquina (TM/TR) em alguma geração. */
