@@ -19,6 +19,7 @@ import * as correio from './correio.ts';
 import * as entregas from './entregas.ts';
 import * as mercado from './mercado.ts';
 import * as banimentos from './banimentos.ts';
+import * as administradores from './administradores.ts';
 import * as parcerias from './parcerias.ts';
 import * as recompensas from './recompensas.ts';
 import * as eventos from './eventos.ts';
@@ -425,6 +426,12 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   if (caminho === '/api/admin/recompensas/doacao' && metodo === 'POST') {
     const conta = exigirConta(req);
     return responder(res, 200, recompensas.doacaoManual(conta, await lerCorpo(req)));
+  }
+  // ---- dar/tirar ADM de outras contas, com a senha da administração (server/src/administradores.ts) ----
+  if (caminho === '/api/admin/administradores' && metodo === 'GET') return responder(res, 200, administradores.listar(exigirConta(req)));
+  if (caminho === '/api/admin/administradores' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, await administradores.mudar(conta, await lerCorpo(req)));
   }
   // ---- banimentos (server/src/banimentos.ts) ----
   if (caminho === '/api/admin/banimentos' && metodo === 'GET') return responder(res, 200, banimentos.listar(exigirConta(req)));

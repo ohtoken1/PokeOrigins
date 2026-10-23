@@ -152,10 +152,11 @@ export interface Estatisticas {
 
 /** Conta uma captura feita em batalha (para os rankings). */
 export function registrarCapturaNoRanking(save: Save, p: PokemonDoJogador): void {
-  const e = save.estatisticas!;
-  e.capturas++;
-  if (p.shiny) e.capturasShiny++;
-  if (ehLendario(pokemonPorId(p.especieId))) e.capturasLendarios++;
+  const e = (save.estatisticas ??= { capturas: 0, capturasShiny: 0, capturasLendarios: 0, medalhas: 0 });
+  const n = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
+  e.capturas = n(e.capturas) + 1;
+  if (p.shiny) e.capturasShiny = n(e.capturasShiny) + 1;
+  if (ehLendario(pokemonPorId(p.especieId))) e.capturasLendarios = n(e.capturasLendarios) + 1;
 }
 
 /** Marca a espécie como capturada na Pokédex (e, se for shiny, também na marca de shiny). */
@@ -263,6 +264,9 @@ export function novoSave(regiao: string, inicial: number, aparencia?: Aparencia)
     vistos: [inicial],
     capturados: [inicial],
     criadoEm: Date.now(),
+    // os contadores do perfil/ranking nascem em zero (sem isto a 1ª captura virava um número inválido e o
+    // contador recomeçava do 1 ao recarregar)
+    estatisticas: { capturas: 0, capturasShiny: 0, capturasLendarios: 0, medalhas: 0 },
   };
 }
 
@@ -338,6 +342,17 @@ function normalizar(save: Save): Save {
       capturasLendarios: tem.filter((p) => ehLendario(pokemonPorId(p.especieId))).length,
       medalhas: 0,
     };
+  }
+  // conserto: contas criadas sem os contadores perderam capturas (o número recomeçava). Nunca menos que os Pokémon
+  // capturados em batalha que o jogador ainda tem (sem `origem` = não veio de ovo, Orb, troca ou presente; sem NT e sem ovo)
+  {
+    const e = save.estatisticas;
+    const n = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
+    const meus = [...save.time, ...save.caixa, ...(save.expedicao?.pokemons ?? [])].filter((p) => !p.inegociavel && !p.origem && !p.ovo);
+    e.capturas = Math.max(n(e.capturas), meus.length);
+    e.capturasShiny = Math.max(n(e.capturasShiny), meus.filter((p) => p.shiny).length);
+    e.capturasLendarios = Math.max(n(e.capturasLendarios), meus.filter((p) => ehLendario(pokemonPorId(p.especieId))).length);
+    e.medalhas = n(e.medalhas);
   }
   return save;
 }

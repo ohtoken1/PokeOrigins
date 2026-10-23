@@ -3278,3 +3278,41 @@ body:has(> .batalha-fundo) :where(*:not(.batalha-fundo, .batalha-fundo *)) { -we
 .resumo-ef { font-weight: 800; margin-left: auto; }
 .resumo-ef.ef-bom { color: #6fe08a; }
 .resumo-ef.ef-ruim { color: #ff8a7a; }
+
+/* prêmios de login que chegaram agora */
+.premio-do-dia { border: 1px solid var(--borda); border-radius: 10px; padding: 10px 12px; margin-top: 10px; background: var(--painel-2); }
+.premio-do-dia h3 { margin: 0 0 8px; color: var(--destaque); font-size: 1rem; }
+.premio-do-dia > .recompensa-premios .recompensa-premio { font-size: 15px; font-weight: 700; }
+.premio-do-dia > .recompensa-premios .recompensa-premio img, .premio-do-dia > .recompensa-premios .recompensa-premio .icone-item { width: 36px; height: 36px; }
+.premio-do-dia .recompensas-grade { margin-top: 10px; }
+.premio-do-dia-botoes { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+.filtro-conquistas { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 10px; }
+
+/* Celular estreito (≤ 420 px): também quando o jogador aumenta o zoom/tamanho do texto do navegador, que faz a
+   página "ver" uma tela de ~300 px (pedido do dono, prints do Closed Beta) */
+@media (max-width: 420px) {
+  .cabecalho-conteudo { padding: 8px 10px; gap: 6px 12px; font-size: 0.85rem; }
+  .cab-nome { font-size: 1.05rem; }
+  .cab-nome .icone-vip { padding: 1px 6px; font-size: 0.72rem; }
+  .cab-treinador { gap: 10px; flex: 1 1 100%; min-width: 0; }
+  .cab-xp { min-width: 0; flex: 1; }
+  .cab-xp small { font-size: 0.75rem; }
+  .cab-regiao strong { font-size: 0.95rem; }
+  .cab-dex { font-size: 0.75rem; padding: 3px 8px; }
+  .insignia { width: 13px; height: 13px; }
+  .cab-insignias-lista { gap: 4px; }
+  .cab-moedas { font-size: 0.95rem; gap: 10px; }
+  .cab-moeda .icone-moeda { width: 18px; height: 18px; }
+  .atalho-hex { width: 38px; height: 38px; }
+  .atalho-hex .icone svg { width: 18px; height: 18px; }
+  .minimapa { transform: scale(0.45); }
+  .avisos-eventos { right: 12px; }
+  .avisos-eventos .aviso-viagem { max-width: 100%; white-space: normal; }
+}
+/* Chrome do Android aumenta só as letras (ajuste "tamanho do texto" / font boosting) sem mudar o resto: botões e
+   janelas estouravam a tela (prints do Closed Beta). O zoom da página continua funcionando. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+/* Administração → Administradores: aviso grande do poder do ADM */
+.aviso-perigo-adm { padding: 14px 16px; margin-bottom: 14px; border: 2px solid #c0392b; border-radius: 12px; background: rgb(192 57 43 / 0.16); }
+.aviso-perigo-adm strong { display: block; font-size: 1.25rem; color: #ff8a7a; margin-bottom: 6px; }
+.aviso-perigo-adm p { margin: 4px 0; }

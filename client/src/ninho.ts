@@ -10,7 +10,8 @@ import { CHANCE_LENDARIO_NINHO, NIVEL_NINHO, PRECO_NINHO, PRECO_NINHO_VIP, PREMI
 import { REGIOES } from '../../shared/regioes';
 import { TICKETS, itensDoGrupo } from '../../shared/tickets';
 import { TODOS_OS_ITENS } from '../../shared/loja';
-import { hpMaximo, type PokemonIndividual } from '../../shared/batalha/pokemon';
+import { golpesPorNivel, hpMaximo, ppMaximo, type PokemonIndividual } from '../../shared/batalha/pokemon';
+import { Dex } from '@pkmn/sim';
 import { sortearIvs } from '../../shared/ovos';
 import { vipAtivo } from '../../shared/vip';
 import { api, ErroApi } from './conta';
@@ -97,10 +98,28 @@ export function vigiarNinho(): void {
   setInterval(desenhar, 20_000);
 }
 
-/** O Pokémon do ninho: nível 150 (atributos proporcionais), IVs sorteados. */
+/**
+ * Golpes do Pokémon do ninho: os 4 últimos que ele aprende por nível até o NIVEL_NINHO, sem os que derrubam ele mesmo
+ * (Memento, Explosion, Self-Destruct, Final Gambit, Healing Wish…: com eles o jogador vencia de graça).
+ */
+function golpesDoNinho(especieId: number): PokemonIndividual['golpes'] {
+  const ids: string[] = [];
+  for (const g of golpesPorNivel(especieId)) {
+    if (g.nivel > NIVEL_NINHO || Dex.moves.get(g.id).selfdestruct) continue;
+    const i = ids.indexOf(g.id);
+    if (i >= 0) ids.splice(i, 1);
+    ids.push(g.id);
+  }
+  return ids.slice(-4).map((id) => ({ id, pp: ppMaximo(id) }));
+}
+
+/** O Pokémon do ninho: nível 150 (atributos proporcionais), IVs sorteados, EVs 50 em tudo. */
 function pokemonDoNinho(n: Ninho): PokemonIndividual {
   const p = novoPokemon(n.especieId, NIVEL_NINHO, false);
   p.ivs = sortearIvs(0, 0);
+  // EVs 50 em todos os atributos (pedido do dono)
+  p.evs = { hp: 50, atk: 50, def: 50, spa: 50, spd: 50, spe: 50 };
+  p.golpes = golpesDoNinho(n.especieId);
   p.hp = hpMaximo(p);
   return p;
 }
@@ -151,8 +170,8 @@ export function botaoDoNinho(save: Save, regiao: string, bioma: string, cena: ()
         const r = await api<{ venceu: boolean; fatia?: number; lendario?: boolean }>('POST', '/eventos/ninho/resultado', { slot: n.servidor.slot, venceu, lendario: n.lendario, especie: n.nome });
         if (!r.venceu) return void (await atualizar());
         save.silver += PREMIO_NINHO;
-        await girarRoleta('Roleta do Ninho', ROLETA_NINHO, r.fatia ?? 0);
-        premioDaFatia(save, r.fatia ?? 0);
+        if (await girarRoleta('Roleta do Ninho', ROLETA_NINHO, r.fatia ?? 0, { perdeAoFechar: true })) premioDaFatia(save, r.fatia ?? 0);
+        else avisar('Você fechou a roleta e perdeu o prêmio dela.', 'info');
         if (r.lendario) {
           const p = novoPokemon(n.especieId, 100, false);
           p.origem = 'ticket';

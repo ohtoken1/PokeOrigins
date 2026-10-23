@@ -7,7 +7,6 @@ import { aoSalvar, carregarSave, salvarAgora } from './estado';
 import { nivelTreinador } from '../../shared/treinador';
 import { agoraDoServidor } from './ui/relogio';
 import { aoAvisoDoServidor } from './online';
-import { avisar } from './ui/avisos';
 
 let atual: EstadoRecompensas | null = null;
 const ouvintes = new Set<() => void>();
@@ -30,10 +29,8 @@ async function registrarLogin(): Promise<void> {
   if (!carregarSave()) return;
   const r = await api<EstadoRecompensas & { novos: { evento: 'login' | 'trinta'; dia: number }[] }>('POST', '/recompensas/login');
   adotar(r);
-  const login = r.novos.find((n) => n.evento === 'login');
-  if (login) void import('./telas/conta').then((m) => m.janelaDoLogin(login.dia));
-  for (const n of r.novos)
-    avisar(n.evento === 'login' ? `🎁 Login de boas-vindas: o prêmio do dia ${n.dia} chegou no Correio!` : `📅 Login dos 30 dias: o prêmio do dia ${n.dia} chegou no Correio!`, 'ok');
+  // aviso claro do que chegou (uma janela com os prêmios de cada login)
+  if (r.novos.length) void import('./telas/conta').then((m) => m.janelaDosPremios(r.novos));
 }
 
 /** VIP recupera o prêmio de um dia perdido do Login dos 30 dias (o servidor confere VIP e o limite). */

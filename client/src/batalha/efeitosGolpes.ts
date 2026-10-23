@@ -349,13 +349,16 @@ function roteiro(golpeId: string, categoria: string, tipo: string): (ctx: Contex
   return (c) => bola(c, fx, 64);
 }
 
+/** Golpes cuja animação do Showdown só sacode o fundo (que o nosso palco não tem): usam o nosso roteiro. */
+const SO_FUNDO_NO_SHOWDOWN = new Set(['bulldoze']);
+
 /** Anima o golpe na arena. `alvo` null = golpe em si mesmo (ou sem alvo). */
 export async function animarGolpeOriginal(arena: HTMLElement, atacante: HTMLElement, alvo: HTMLElement | null, golpeId: string, tipo: string, categoria: string, oposto: HTMLElement | null = null) {
   const ctx: Contexto = { arena, atacante, alvo, oposto, tipo, cor: corTipo(tipo), golpe: golpeId };
   try {
     // primeiro a animação do próprio Pokémon Showdown (animShowdown.ts); os hazards continuam com a nossa, porque as
     // peças ficam no chão. Sem alvo: golpe em si mesmo fica no atacante, os outros miram o outro lado.
-    if (!HAZARDS[golpeId]) {
+    if (!HAZARDS[golpeId] && !SO_FUNDO_NO_SHOWDOWN.has(golpeId)) {
       const emSi = ['self', 'allySide', 'allyTeam', 'adjacentAllyOrSelf', 'adjacentAlly', 'allies'].includes(Dex.moves.get(golpeId).target);
       const defensor = alvo ?? (emSi ? atacante : oposto ?? atacante);
       if (await animarComShowdown(arena, atacante, defensor, golpeId)) return;

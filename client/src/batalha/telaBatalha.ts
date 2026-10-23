@@ -1003,12 +1003,20 @@ Chance de captura agora: ${textoDaChance(batalha.chanceDeCaptura(efeitoDaBola(id
       dicaGolpe(el('span', { class: 'golpe-novo', style: { '--cor-tipo': corTipo(Dex.moves.get(novo).type) } }, nomeGolpe(novo)), novo),
       ', mas já conhece 4 golpes. Esquecer qual?',
     );
-    const escolha = await new Promise<number | null>((resolver) =>
-      acoes.replaceChildren(
-        ...p.golpes.map((g, i) => dicaGolpe(botao(nomeGolpe(g.id), () => resolver(i), { class: 'botao golpe', style: { '--cor-tipo': corTipo(Dex.moves.get(g.id).type) } }), g.id, () => ({ atual: g.pp, max: ppMaximo(g.id) }))),
-        botao(`Não aprender ${nomeGolpe(novo)}`, () => resolver(null), { class: 'botao secundario' }),
-      ),
-    );
+    // confirmação antes de esquecer ou de desistir (pedido do dono); "Não" volta para a escolha
+    let escolha: number | null;
+    for (;;) {
+      escolha = await new Promise<number | null>((resolver) =>
+        acoes.replaceChildren(
+          ...p.golpes.map((g, i) => dicaGolpe(botao(nomeGolpe(g.id), () => resolver(i), { class: 'botao golpe', style: { '--cor-tipo': corTipo(Dex.moves.get(g.id).type) } }), g.id, () => ({ atual: g.pp, max: ppMaximo(g.id) }))),
+          botao(`Não aprender ${nomeGolpe(novo)}`, () => resolver(null), { class: 'botao secundario' }),
+        ),
+      );
+      const pergunta = escolha === null
+        ? `${nome} não vai aprender ${nomeGolpe(novo)}. Confirmar?`
+        : `${nome} vai esquecer ${nomeGolpe(p.golpes[escolha].id)} e aprender ${nomeGolpe(novo)}. Confirmar?`;
+      if (await confirmar(escolha === null ? 'Não aprender' : 'Trocar golpe', pergunta)) break;
+    }
     acoes.replaceChildren();
     if (escolha === null) return dizer(`${nome} não aprendeu ${nomeGolpe(novo)}.`);
     const esquecido = nomeGolpe(p.golpes[escolha].id);
