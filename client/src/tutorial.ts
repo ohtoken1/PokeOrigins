@@ -38,6 +38,10 @@ interface Licao {
 const NA_ARENA: Ir = { cidade: 'arena', rotulo: 'Ir até a Arena' };
 const NA_ARTESA: Ir = { cidade: 'craft', rotulo: 'Ir até a Artesã' };
 
+/** Tela de toque (celular, tablet): as falas dizem "toque" e o joystick no lugar de "clique" e das teclas. */
+const TOQUE = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+const noAparelho = (computador: string, toque: string): string => (TOQUE ? toque : computador);
+
 const LICOES: Licao[] = [
   {
     conteudo: 'duelos', guia: { grupo: 'sistemas', topico: 'ginasios' },
@@ -64,7 +68,7 @@ const LICOES: Licao[] = [
     fala: ['Agora a Artesã também faz Pokébolas especiais, usando dois Apricorns e Poké Dólares.', `Tome o material para a sua primeira: ${PRESENTES_TUTORIAL.craftBola.texto}. Dá para uma Dream Ball!`],
     tarefa: { texto: 'Faça uma Pokébola na Artesã (aba Pokébolas).', evento: 'craftBola', ir: NA_ARTESA },
   },
-  { conteudo: 'troca', guia: { grupo: 'sistemas', topico: 'trocas' }, fala: ['Agora você pode trocar com outros treinadores! Clique em um jogador no mapa e escolha "Trocar": cada um monta a sua oferta de Pokémon, itens e moedas.'] },
+  { conteudo: 'troca', guia: { grupo: 'sistemas', topico: 'trocas' }, fala: [noAparelho('Agora você pode trocar com outros treinadores! Clique em um jogador no mapa e escolha "Trocar": cada um monta a sua oferta de Pokémon, itens e moedas.', 'Agora você pode trocar com outros treinadores! Toque em um jogador no mapa e escolha "Trocar": cada um monta a sua oferta de Pokémon, itens e moedas.')] },
   {
     conteudo: 'mercadoNegro', guia: { grupo: 'sistemas', topico: 'mercado' },
     fala: ['Agora você pode usar o Mercado negro da cidade! Lá os treinadores anunciam Pokémon, itens e Origin Coins, e você pode comprar ou vender os seus.'],
@@ -110,8 +114,10 @@ const LICOES: Licao[] = [
 
 /** Introdução (uma vez, para o jogador novo): só "Próximo", sem pular. */
 const INTRO = [
-  'Chegamos à cidade! Eu sou o Professor Carvalho e vou te guiar nos primeiros passos. Ande com as setas ou W A S D.',
-  'Aqui ficam a loja, o Centro Pokémon, a estação de trem, a Arena e muitos NPCs. Clique no nome de um lugar para usá-lo, ou no minimapa, no canto de cima, para andar até ele.',
+  noAparelho('Chegamos à cidade! Eu sou o Professor Carvalho e vou te guiar nos primeiros passos. Ande com as setas ou W A S D.',
+    'Chegamos à cidade! Eu sou o Professor Carvalho e vou te guiar nos primeiros passos. Para andar, encoste o dedo no mapa e arraste para onde quer ir: um controle aparece embaixo do dedo.'),
+  noAparelho('Aqui ficam a loja, o Centro Pokémon, a estação de trem, a Arena e muitos NPCs. Clique no nome de um lugar para usá-lo, ou no minimapa, no canto de cima, para andar até ele.',
+    'Aqui ficam a loja, o Centro Pokémon, a estação de trem, a Arena e muitos NPCs. Toque no nome de um lugar para usá-lo, ou no minimapa, no canto de cima, para andar até ele.'),
   'Seus Pokémon se cansam nas batalhas. Cure o time de graça no Centro Pokémon: é o coração no alto da tela. Ali do lado ficam os atalhos da Bolsa, do PC e do Correio.',
   'Agora vou te passar algumas missões rápidas para você aprender o básico. Siga o quadro do Professor, embaixo na tela. Vamos lá!',
 ];
@@ -121,12 +127,12 @@ interface Passo extends Tarefa { id: string; feito?: (s: Save) => boolean; depoi
 const PASSOS: Passo[] = [
   { id: 'kit', texto: 'Abra a sua Bolsa e use o Kit iniciante (aba Itens-chave): dentro dele tem Pokébolas, remédios e Poké Dólares.', evento: 'bolsa', feito: (s) => !(s.itens[KIT_INICIANTE] > 0), ir: { abrir: 'bolsa', rotulo: 'Abrir a Bolsa' } },
   { id: 'mapa', texto: 'Hora de caçar! Saia pela saída do sul da cidade e escolha um bioma.', evento: 'bioma', ir: { cidade: 'mapas', rotulo: 'Ir até a saída' } },
-  { id: 'derrotar', texto: 'Ande e pare: quando aparecer um Pokémon, aperte Espaço (ou Lutar) e derrote-o.', evento: 'derrotou', ir: { cidade: 'mapas', rotulo: 'Ir para os mapas' } },
+  { id: 'derrotar', texto: noAparelho('Ande e pare: quando aparecer um Pokémon, aperte Espaço (ou Lutar) e derrote-o.', 'Ande e pare: quando aparecer um Pokémon, toque em Lutar e derrote-o.'), evento: 'derrotou', ir: { cidade: 'mapas', rotulo: 'Ir para os mapas' } },
   { id: 'capturar', texto: 'Agora capture um Pokémon! Deixe ele fraco, abra a Bolsa na batalha e jogue uma Poké Ball.', evento: 'capturou', ir: { cidade: 'mapas', rotulo: 'Ir para os mapas' } },
   { id: 'cidade', texto: 'Muito bem! Volte para a cidade.', evento: 'cidade', ir: { tela: { tela: 'cidade' }, rotulo: 'Voltar para a cidade' } },
   { id: 'pc', texto: 'Abra o PC, no botão do PC no alto da tela.', evento: 'pc', ir: { abrir: 'pc', rotulo: 'Abrir o PC' } },
   {
-    id: 'ficha', texto: 'Clique no Pokémon que você capturou e depois em "Ver ficha".', evento: 'ficha', ir: { abrir: 'pc', rotulo: 'Abrir o PC' },
+    id: 'ficha', texto: noAparelho('Clique no Pokémon que você capturou e depois em "Ver ficha".', 'Toque no Pokémon que você capturou e depois em "Ver ficha".'), evento: 'ficha', ir: { abrir: 'pc', rotulo: 'Abrir o PC' },
     depois: [
       'Esta é a ficha do Pokémon. Os 6 atributos (HP, Attack, Defense, Sp. Atk, Sp. Def e Speed) decidem a força dele na batalha.',
       `IVs são a genética: de 0 a 31 em cada atributo, e nunca mudam. Nos Pokémon capturados eles vêm escondidos: avalie na ficha por ${PRECO_REVELAR_IVS.toLocaleString('pt-BR')} Poké Dólares para ver o tier (C, B, A, S ou S+).`,
@@ -292,6 +298,7 @@ function botaoUtil(ir: Ir): boolean {
   return true;
 }
 
+let vigiaAltura: ResizeObserver | null = null;
 function desenharMissao(save: Save): void {
   const atual = tarefaAtual(save);
   const chave = atual ? `${atual.id}|${atual.tarefa.ir && botaoUtil(atual.tarefa.ir)}` : '';
@@ -299,16 +306,22 @@ function desenharMissao(save: Save): void {
   desenhado = chave;
   quadro?.remove();
   quadro = null;
+  vigiaAltura?.disconnect();
+  document.documentElement.style.removeProperty('--altura-missao');
   if (!atual) return;
   const { tarefa } = atual;
   const numero = passoAtual(save) ? ` ${PASSOS.findIndex((p) => p.id === atual.id) + 1}/${PASSOS.length}` : '';
   quadro = el('aside', { class: 'tutorial-missao', role: 'status' },
-    el('img', { class: 'tutorial-missao-foto', src: 'treinadores/oak.png', alt: '' }),
+    el('img', { class: 'tutorial-missao-foto', src: 'treinadores/oak-retrato.png', alt: '' }),
     el('div', { class: 'tutorial-missao-corpo' },
       el('strong', {}, '🎯 Missão do Professor', numero ? el('span', {}, numero) : ''),
       el('p', {}, tarefa.texto),
       tarefa.ir && botaoUtil(tarefa.ir) ? el('button', { class: 'botao', onclick: () => irPara(tarefa.ir!) }, tarefa.ir.rotulo) : ''));
   document.body.append(quadro);
+  // os avisos do canto de baixo (Outbreak, Ninho, viagem) sobem para ficar acima do quadro, nunca por cima dele
+  const q = quadro;
+  vigiaAltura = new ResizeObserver(() => document.documentElement.style.setProperty('--altura-missao', `${q.offsetHeight + 14}px`));
+  vigiaAltura.observe(q);
 }
 
 // ---------- balão do Professor ----------
@@ -390,7 +403,7 @@ function balao(fala: Fala, aoFechar?: () => void, textoFim = 'Começar!'): void 
   // janela no meio da tela, por cima de tudo (pedido do dono: o Professor grande e centralizado)
   const caixa = el('div', { class: 'tutorial-fundo' },
     el('div', { class: 'tutorial-prof', role: 'dialog', 'aria-label': 'Professor Carvalho' },
-      el('img', { class: 'tutorial-prof-foto', src: 'treinadores/oak.png', alt: '' }),
+      el('img', { class: 'tutorial-prof-foto', src: 'treinadores/oak-retrato.png', alt: '' }),
       el('div', { class: 'tutorial-prof-balao' },
         el('div', { class: 'tutorial-prof-topo' }, el('strong', { class: 'tutorial-prof-nome' }, 'Professor Carvalho'), contador),
         texto,

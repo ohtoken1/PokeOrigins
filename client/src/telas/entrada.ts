@@ -70,7 +70,13 @@ function formularioEntrada(raiz: HTMLElement): Promise<void> {
     const linhaSenha = rotulo('Senha', senha);
     const linhaConfirmar = rotulo('Confirmar senha', confirmar);
     const abaEntrar = el('button', { type: 'button', class: 'aba-entrada', onclick: () => trocar('entrar') }, 'Entrar');
-    const abaCriar = el('button', { type: 'button', class: 'aba-entrada', onclick: () => trocar('criar') }, 'Criar conta');
+    // durante o pré-registro, "Criar conta" leva à página do pré-registro (pedido do dono): lá a conta é criada
+    // junto com as informações do jogo e do kit
+    let irAoPreRegistro = false;
+    void fetch('/api/pre-registro').then((r) => r.json()).then((p: { ligado?: boolean; aberto?: boolean }) => {
+      irAoPreRegistro = !!p.ligado && !p.aberto;
+    }).catch(() => undefined);
+    const abaCriar = el('button', { type: 'button', class: 'aba-entrada', onclick: () => (irAoPreRegistro ? location.assign('/pre-registro') : trocar('criar')) }, 'Criar conta');
 
     const trocar = (m: typeof modo) => {
       modo = m;
@@ -131,7 +137,6 @@ function formularioEntrada(raiz: HTMLElement): Promise<void> {
           seletorDeIdioma(),
           el('p', { class: 'entrada-texto' }, 'Entre na sua conta para jogar.'),
           formulario,
-          el('a', { class: 'link-pre-registro', href: '/pre-registro' }, '📝 Pré-registro: conheça o jogo e garanta o seu kit'),
         ),
       ),
     );

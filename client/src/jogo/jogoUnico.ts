@@ -27,6 +27,29 @@ function dormirNaBatalha(): void {
   }).observe(document.body, { childList: true });
 }
 
+/**
+ * Mapa em tela cheia (ui/telaCheia.ts): o jogo muda de formato para o da tela, mostrando MAIS mapa em vez de faixas
+ * pretas (celular em pé fica alto e estreito). A área de jogo fica parecida com a normal (960 × 640), então os
+ * bonecos ficam de um tamanho parecido; o zoom da câmera vem de `config.width`, que não muda.
+ */
+let telaCheia = false;
+function aplicarTamanho(): void {
+  if (!jogo) return;
+  const r = resolucao();
+  let [w, h] = [LARGURA_TELA, ALTURA_TELA];
+  if (telaCheia) {
+    const k = Math.sqrt((innerWidth * innerHeight) / (LARGURA_TELA * ALTURA_TELA));
+    [w, h] = [Math.round(innerWidth / k), Math.round(innerHeight / k)];
+  }
+  if (jogo.scale.width !== w * r || jogo.scale.height !== h * r) jogo.scale.setGameSize(w * r, h * r);
+  jogo.scale.refresh();
+}
+export function definirTelaCheia(sim: boolean): void {
+  telaCheia = sim;
+  aplicarTamanho();
+}
+addEventListener('resize', () => telaCheia && aplicarTamanho());
+
 /** Coloca o jogo dentro de `area` e começa o bioma. Devolve a função que tira o jogo da tela. */
 export function mostrarJogo(area: HTMLElement, opcoes: OpcoesBioma): { cena: () => BiomaScene | null; tirar: () => void } {
   // o modo desempenho muda a resolução: o jogo é criado de novo com o tamanho certo
@@ -61,6 +84,7 @@ export function mostrarJogo(area: HTMLElement, opcoes: OpcoesBioma): { cena: () 
     jogo.scale.refresh();
     jogo.loop.wake();
   }
+  aplicarTamanho();
   const atual = jogo;
   mapaNaTela = true;
   dormirNaBatalha();

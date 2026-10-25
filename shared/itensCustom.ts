@@ -169,7 +169,7 @@ export const ITENS_CUSTOM: ItemCustom[] = [
   { id: VALE_POKE_S, nome: 'Vale Poke S', categoria: 'chave', simbolo: '🎟️', descricao: 'Procure a staff para ganhar um Pokémon à escolha S.' },
   { id: 'passe-premium', nome: 'Passe Premium', categoria: 'chave', simbolo: '👑', descricao: 'Libera a trilha premium do passe de batalha da temporada em vigor. Use pela bolsa.' },
   { id: KIT_INICIANTE, nome: 'Kit iniciante', categoria: 'chave', simbolo: '🎒', descricao: 'Um kit para quem está começando: 50 Poké Balls, 30 Great Balls, 20 Ultra Balls, 10 Potions, 7 Super Potions, 5 Hyper Potions, 7 Revives, 1 Max Revive, 20.000 Poké Dólares, uma skin sorteada (Ash, Gary, May ou Misty) e um Charm sorteado. O kit e os itens dele são NT: não podem ser trocados.' },
-  { id: KIT_PRE_REGISTRO, nome: 'Kit de pré-registro', categoria: 'chave', simbolo: '🎁', descricao: 'Presente para quem se pré-registrou no PokeOrigins. Use pela bolsa para abrir. O kit e os itens dele são NT: não podem ser trocados.' },
+  { id: KIT_PRE_REGISTRO, nome: 'Kit de pré-registro', categoria: 'chave', imagem: 'itens/kit-pre-registro.svg', descricao: 'Presente para quem se pré-registrou no PokeOrigins. Use pela bolsa para abrir. O kit e os itens dele são NT: não podem ser trocados.' },
   ...MOEDAS_SAZONAIS.map((m): ItemCustom => ({ id: m.id, nome: m.nome, categoria: 'chave', simbolo: '🪙', descricao: `Moeda do evento de ${m.evento}. Uso em breve.` })),
   ...CUBOS.map((c): ItemCustom => ({ id: c.id, nome: c.nome, categoria: 'cubos', cubo: { especie: c.especie, era: c.era }, descricao: !c.origens.length
     ? `Gera um ${c.nome.replace('Cubo de ', '')}, um Pokémon ${TEXTO_ERA[c.era]}, nível 1 e com IVs de 10 a 31 em cada atributo. Use pela bolsa.`

@@ -1,6 +1,7 @@
 // Safari: as 3 salas do jogador (ninguém mais entra: sem sala online). Os Pokémon andam no mapa e a batalha começa
 // ao clicar em um; os outros somem e a saída de cima leva à sala seguinte. Mapa e Pokémon em jogo/safariVida.ts,
 // regras em shared/safari.ts, entradas no servidor.
+import { botaoTelaCheia } from '../ui/telaCheia';
 import { aplicarLiderNoSelvagem } from '../../../shared/campo';
 import { SALAS_SAFARI } from '../../../shared/safari';
 import { nomeTipo } from '../../../shared/traducao';
@@ -79,6 +80,7 @@ export const telaSafari: Tela = (raiz, navegar) => {
   }, '← Sair do Safari');
 
   const areaJogo = el('div', { class: 'area-jogo' });
+  botaoTelaCheia(areaJogo);
   const chat = montarChat();
   raiz.append(
     el('main', { class: 'tela tela-bioma tela-safari' },

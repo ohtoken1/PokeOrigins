@@ -1,4 +1,5 @@
 import { comBonificacao } from '../bonificacao';
+import { botaoTelaCheia } from '../ui/telaCheia';
 import { chancesComOutbreak, tabelaComOutbreak } from '../outbreak';
 import { botaoDoNinho } from '../ninho';
 import { registrarNaCaptura } from '../ui/eventos';
@@ -143,6 +144,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   atualizarTitulo();
 
   const areaJogo = el('div', { class: 'area-jogo' });
+  botaoTelaCheia(areaJogo);
   // "Pokémon deste bioma" virou um botão % no canto do mapa (pedido do dono: o lugar ao lado é do chat)
   const painelChances = el('div', { class: 'painel-chances', hidden: true, role: 'dialog', 'aria-label': 'Pokémon deste bioma' }, tituloChances, listaChances, fichaMorador);
   const botaoChances = el('button', {
