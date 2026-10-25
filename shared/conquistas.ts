@@ -237,6 +237,7 @@ export const BONUS_DO_TITULO: Record<string, number> = {
   'gold-10000': 0.03,
   'lendario-shiny': 0.04,
   'ticket-mitico': 0.04,
+  vip: 0.02,
 };
 /**
  * Títulos que NÃO vêm de conquista (passe de batalha…): liberados por `save.titulosGanhos` (lista de ids).

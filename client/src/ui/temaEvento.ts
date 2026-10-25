@@ -2,10 +2,10 @@
 // tem cores, emblema e um desenho de fundo próprios (CSS em `.tema-<id>`), usados no banner do topo das janelas
 // (Torneio, Liga, Boss, Eventos) e nos cartões de Comunidade → Eventos. O catálogo também mora aqui.
 import { NIVEL_MINIMO, type ConteudoTrancado } from '../../../shared/trancas';
-import { PRECO_BILHETE, PRECO_NINHO, PRECO_NINHO_VIP, POTE_INICIAL, PREMIO_CAPTURA, NIVEL_NINHO, PREMIO_NINHO } from '../../../shared/eventosRegras';
+import { PRECO_BILHETE, PRECO_NINHO, PRECO_NINHO_VIP, poteInicial, premiosCaptura, NIVEL_NINHO, premioNinho, premiosBossGlobal, pontosGuildaDaPosicao } from '../../../shared/eventosRegras';
 import { ENTRADA_TORNEIO } from '../../../shared/torneioRegras';
 import { JANELAS_RANQUEADO, PONTOS_DERROTA, PONTOS_VITORIA } from '../../../shared/ranqueado';
-import { PREMIO_LIGA } from '../../../shared/liga';
+import { premioLiga } from '../../../shared/liga';
 import { el } from './dom';
 
 export type IdEvento = 'torneio' | 'ranqueado' | 'liga' | 'nightmare' | 'boss' | 'outbreak' | 'ninho' | 'captura' | 'cofre' | 'loteria' | 'expedicao' | 'safari';
@@ -43,21 +43,25 @@ export const EVENTOS: Record<IdEvento, InfoEvento> = {
     nome: 'Liga Pokémon', emblema: '👑', lema: 'Elite 4', onde: 'Arena da cidade',
     quando: 'Uma tentativa por semana. A semana vira na segunda-feira, 00h00.',
     descricao: 'Quatro batalhas seguidas, sem curar o time entre elas (a bolsa vale entre uma e outra).',
-    premios: `${PREMIO_LIGA.normal.porVitoria} League Coin por vitória; vencendo os 4: +${PREMIO_LIGA.normal.bonus} (${PREMIO_LIGA.normal.quantidade} no total) + ${n(PREMIO_LIGA.normal.silver)} Poké Dólares`,
+    get premios() { const PREMIO_LIGA = { normal: premioLiga('normal') }; return `${PREMIO_LIGA.normal.porVitoria} League Coin por vitória; vencendo os 4: +${PREMIO_LIGA.normal.bonus} (${PREMIO_LIGA.normal.quantidade} no total) + ${n(PREMIO_LIGA.normal.silver)} Poké Dólares`; },
     tranca: 'liga',
   },
   nightmare: {
     nome: 'Liga Pokémon Nightmare', emblema: '💀', lema: 'Um mestre de cada tipo', onde: 'Arena da cidade',
     quando: 'Uma tentativa por semana. A semana vira na segunda-feira, 00h00.',
     descricao: '18 treinadores seguidos, um de cada tipo, com Pokémon até o nível 200. Sem curar entre as batalhas.',
-    premios: `${PREMIO_LIGA.nightmare.porVitoria} League Coin Nightmare por vitória; vencendo os 18: +${PREMIO_LIGA.nightmare.bonus} (${PREMIO_LIGA.nightmare.quantidade} no total) + ${n(PREMIO_LIGA.nightmare.silver)} Poké Dólares`,
+    get premios() { const PREMIO_LIGA = { nightmare: premioLiga('nightmare') }; return `${PREMIO_LIGA.nightmare.porVitoria} League Coin Nightmare por vitória; vencendo os 18: +${PREMIO_LIGA.nightmare.bonus} (${PREMIO_LIGA.nightmare.quantidade} no total) + ${n(PREMIO_LIGA.nightmare.silver)} Poké Dólares`; },
     tranca: 'liga',
   },
   boss: {
     nome: 'Boss', emblema: '👹', lema: 'A fera da gaiola', onde: 'Gaiola da cidade',
     quando: 'Quando a staff liga. Fica 2 horas na gaiola.',
     descricao: 'Boss global e Boss da guilda: HP infinito, cada treinador luta uma vez, por até 50 turnos, e o dano vale para o ranking.',
-    premios: 'Global: top 3 Chave Temporal / 5 / 2 Fragmentos + 500k / 300k / 200k + 50 / 30 / 20 Origin Coins, 4º–10º 100k, demais 50k · Guilda: 1 Ponto de guilda por lutar + 15 / 10 / 5 para o top 3 e +1 do 4º ao 10º',
+    get premios() {
+      const lista = (pos: number) => premiosBossGlobal(pos).map((p) => `${n(p.quantidade)} ${p.nome}`).join(' + ');
+      const g = (pos: number) => pontosGuildaDaPosicao(pos);
+      return `Global: 1º ${lista(0)} · 2º ${lista(1)} · 3º ${lista(2)} · 4º–10º ${lista(3)} · demais ${lista(10)} · Guilda: ${g(10)} Ponto de guilda por lutar; top 3 ${g(0)} / ${g(1)} / ${g(2)}; 4º–10º ${g(3)}`;
+    },
   },
   outbreak: {
     nome: 'Outbreak', emblema: '🔥', lema: 'Uma espécie toma conta do mapa', onde: 'Mapas (o aviso no canto da tela mostra qual)',
@@ -69,13 +73,13 @@ export const EVENTOS: Record<IdEvento, InfoEvento> = {
     nome: 'Ninho', emblema: '🪺', lema: 'Um gigante protege o ninho', onde: 'Mapas (o aviso no canto da tela mostra qual)',
     quando: 'Um novo a cada 20 minutos. Fica 10 minutos (+5 por derrota).',
     descricao: `Pokémon nível ${NIVEL_NINHO} que não pode ser capturado. Entrada de ${n(PRECO_NINHO)} Poké Dólares (VIP ${n(PRECO_NINHO_VIP)}).`,
-    premios: `${n(PREMIO_NINHO)} Poké Dólares + Roleta do Ninho · ninho de lendário: 5% de ganhar o Pokémon`,
+    get premios() { return `${n(premioNinho())} Poké Dólares + Roleta do Ninho · ninho de lendário: 5% de ganhar o Pokémon`; },
   },
   captura: {
     nome: 'Evento de captura', emblema: '🎯', lema: 'A melhor captura do dia', onde: 'Mapas',
     quando: 'Quando a staff liga. Vai até a meia-noite.',
     descricao: 'Capture a espécie sorteada em batalha: ganha quem tiver a maior soma de IVs.',
-    premios: `Ovo Lendário + ${n(PREMIO_CAPTURA.silver)} Poké Dólares + ${PREMIO_CAPTURA.gold} Origin Coins`,
+    get premios() { return premiosCaptura().map((p) => `${n(p.quantidade)} ${p.nome}`).join(' + '); },
   },
   cofre: {
     nome: 'Cofre PokeOrigins', emblema: '🔐', lema: 'Quem descobre a senha leva', onde: 'NPC Eventos (feira do oeste)',
@@ -87,7 +91,7 @@ export const EVENTOS: Record<IdEvento, InfoEvento> = {
     nome: 'Loteria PokeOrigins', emblema: '🎰', lema: 'O prêmio acumula', onde: 'NPC Eventos (feira do oeste)',
     quando: 'Vendas até as 20h; o sorteio sai às 20h05.',
     descricao: `Bilhete de ${n(PRECO_BILHETE)} com um número de 5 dígitos. Metade vai para o prêmio; ninguém acertou, acumula.`,
-    premios: `O prêmio acumulado (começa em ${n(POTE_INICIAL)} Poké Dólares)`,
+    get premios() { return `O prêmio acumulado (começa em ${n(poteInicial())} Poké Dólares)`; },
   },
   expedicao: {
     nome: 'Expedição', emblema: '🧭', lema: 'Seus Pokémon exploram por você', onde: 'NPC Eventos (feira do oeste)',

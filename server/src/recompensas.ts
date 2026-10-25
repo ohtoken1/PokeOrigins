@@ -13,7 +13,7 @@ import { liberado } from '../../shared/trancas.ts';
 import { nivelTreinador } from '../../shared/treinador.ts';
 import { avisar } from './mundo.ts';
 import {
-  diaBrasilia, diasEntre, DIAS_LOGIN, DIAS_LOGIN_TRINTA, INICIO_LOGIN_TRINTA, METAS_DOACAO, PREMIOS_LOGIN, PREMIOS_LOGIN_TRINTA,
+  diaBrasilia, diasEntre, DIAS_LOGIN, DIAS_LOGIN_TRINTA, INICIO_LOGIN_TRINTA, metasDoacao, premiosLogin, premiosLoginTrinta,
   RECUPERACOES_VIP, trimestreDoacao, type EstadoRecompensas, type PremioRecompensa,
 } from '../../shared/recompensas.ts';
 
@@ -22,11 +22,12 @@ type ProgressoTrinta = { pegos: number[]; recuperacoes: number };
 const DIA_MS = 24 * 60 * 60 * 1000;
 const NT = '(não podem ser trocados)';
 
-// moedas (Poké Dólares, Origin Coins) não têm como ser NT; `mint`/`charm` = um sorteio por unidade, juntando os iguais
-function anexos(premios: PremioRecompensa[], nt: boolean) {
+// moedas (Poké Dólares, Origin Coins) não têm como ser NT; `mint`/`charm`/`orb` = um sorteio por unidade, juntando os iguais.
+// Usado por todo prêmio editável pela staff (shared/premiosEventos.ts): logins, doação, Evento de captura, Boss, Torneio.
+export function anexosDePremios(premios: PremioRecompensa[], nt = false) {
   const lista: correio.Anexo[] = [];
   for (const x of premios) {
-    if (x.id !== 'mint' && x.id !== 'charm') {
+    if (x.id !== 'mint' && x.id !== 'charm' && x.id !== 'orb') {
       lista.push(correio.anexoItem(x.id, x.nome, x.quantidade, nt && x.id !== 'silver' && x.id !== 'gold'));
       continue;
     }
@@ -96,12 +97,12 @@ export function registrarLogin(conta: banco.Conta) {
   banco.transacao(() => {
     // login da conta nova
     const l = progressoLogin(conta.id);
-    if (podeLogin && Date.now() < fimLoginDaConta(conta) && l.ultimo !== hoje && l.dia < PREMIOS_LOGIN.length) {
+    if (podeLogin && Date.now() < fimLoginDaConta(conta) && l.ultimo !== hoje && l.dia < premiosLogin().length) {
       const dia = l.dia + 1;
       banco.gravarProgressoRecompensa(conta.id, 'login', { dia, ultimo: hoje });
       correio.enviar(conta.id, `Login de boas-vindas: dia ${dia}`,
-        `Bem-vindo ao PokeOrigins! Nos 7 primeiros dias da sua conta, cada dia em que você entra vale um prêmio. Este é o ${dia} de ${PREMIOS_LOGIN.length}. Os prêmios são NT ${NT}.`,
-        anexos(PREMIOS_LOGIN[dia - 1], true), 'eventos');
+        `Bem-vindo ao PokeOrigins! Nos 7 primeiros dias da sua conta, cada dia em que você entra vale um prêmio. Este é o ${dia} de ${premiosLogin().length}. Os prêmios são NT ${NT}.`,
+        anexosDePremios(premiosLogin()[dia - 1], true), 'eventos');
       novos.push({ evento: 'login', dia });
     }
     // login dos 30 dias
@@ -111,7 +112,7 @@ export function registrarLogin(conta: banco.Conta) {
       banco.gravarProgressoRecompensa(conta.id, 'trinta', { ...t, pegos: [...t.pegos, n] });
       correio.enviar(conta.id, `Login dos 30 dias: dia ${n}`,
         `Obrigado por entrar hoje! Este é o prêmio do dia ${n} de ${DIAS_LOGIN_TRINTA}. Entre todos os dias: o prêmio de um dia em que você não entrar é perdido. Os prêmios são NT ${NT}.`,
-        anexos(PREMIOS_LOGIN_TRINTA[n - 1], true), 'eventos');
+        anexosDePremios(premiosLoginTrinta()[n - 1], true), 'eventos');
       novos.push({ evento: 'trinta', dia: n });
     }
   });
@@ -132,7 +133,7 @@ export function recuperar(conta: banco.Conta, dados: Record<string, unknown>) {
     banco.gravarProgressoRecompensa(conta.id, 'trinta', { pegos: [...t.pegos, dia], recuperacoes: t.recuperacoes + 1 });
     correio.enviar(conta.id, `Login dos 30 dias: dia ${dia} (recuperado)`,
       `Vantagem VIP: você recuperou o prêmio do dia ${dia}. Recuperações usadas: ${t.recuperacoes + 1} de ${RECUPERACOES_VIP}. Os prêmios são NT ${NT}.`,
-      anexos(PREMIOS_LOGIN_TRINTA[dia - 1], true), 'eventos');
+      anexosDePremios(premiosLoginTrinta()[dia - 1], true), 'eventos');
   });
   return estado(conta);
 }
@@ -164,11 +165,11 @@ export function somarDoacao(contaId: number, gold: number, origem: string): void
       correio.enviar(contaId, 'Obrigado pela doação!', 'Obrigado por apoiar o PokeOrigins! Sua primeira doação liberou a conquista "Faça uma doação" (Minha conta → Conquistas).', [correio.anexoMarca('doou')], 'doacoes');
     banco.registrarDoacaoAcumulada(contaId, gold, origem);
     const total = banco.doadoNoPeriodo(contaId, t.inicio, t.fim);
-    for (const meta of METAS_DOACAO) {
+    for (const meta of metasDoacao()) {
       if (total < meta.gold || !banco.marcarMetaPremiada(contaId, t.id, meta.gold)) continue;
       correio.enviar(contaId, `Doação acumulada: ${meta.gold.toLocaleString('pt-BR')} Origin Coins`,
         `Obrigado por apoiar o PokeOrigins! Você passou de ${meta.gold.toLocaleString('pt-BR')} Origin Coins doadas neste trimestre e ganhou este prêmio.`,
-        anexos(meta.premios, false), 'doacoes');
+        anexosDePremios(meta.premios, false), 'doacoes');
     }
   });
   avisar(contaId, { t: 'recompensas' });

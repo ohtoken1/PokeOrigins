@@ -19,7 +19,7 @@ export interface BatalhaPvp {
   empatar(): void;
   eventos(lado: 0 | 1): EventoPvp[];
   foto(lado: 0 | 1): FotoPvp;
-  escolherIa(lado: 0 | 1): void;
+  escolherIa(lado: 0 | 1, nivel?: 'facil' | 'medio' | 'dificil'): void;
   timeFinal(lado: 0 | 1): Record<string, unknown>[];
 }
 
@@ -29,9 +29,12 @@ const pvp = (await import(caminho('../../shared/batalha/pvp.ts'))) as { BatalhaP
 const torneioTime = (await import(caminho('../../shared/torneioTime.ts'))) as { problemasDoTime(time: Record<string, unknown>[], regras: unknown, nome: (p: { especieId: number }) => string): string[] };
 const loja = (await import(caminho('../../shared/loja.ts'))) as { TODOS_OS_ITENS: { id: string; categoria: string; nome: string }[] };
 const tickets = (await import(caminho('../../shared/tickets.ts'))) as { TICKETS: { id: string; nome: string }[]; itensDoGrupo(grupo: string): string[] };
+const tiers = (await import(caminho('../../shared/tiers.ts'))) as { definirAjustesTiers(a: unknown): void };
 const dados = (await import(caminho('../../client/src/dados.ts'))) as { pokemonPorId(id: number): { nome: string } | undefined };
 
 export const novaBatalhaPvp = (a: JogadorPvp, b: JogadorPvp, regras: string[] = [], mecanicas?: MecanicasPvp, curar?: [boolean, boolean]) => new pvp.BatalhaPvp(a, b, regras, mecanicas, curar);
+/** Tiers mudadas pela staff (server/src/ajustes.ts) valem também nas regras do Torneio e do Ranqueado. */
+export const aplicarAjustesTiers = (a: unknown) => tiers.definirAjustesTiers(a);
 export const nomeDaEspecie = (id: number) => dados.pokemonPorId(id)?.nome ?? `#${id}`;
 /** Problemas do time para o Torneio (lista vazia = pode jogar). */
 export const problemasDoTimeNoTorneio = (time: Record<string, unknown>[], regras: unknown) => torneioTime.problemasDoTime(time, regras, (p) => nomeDaEspecie(p.especieId));

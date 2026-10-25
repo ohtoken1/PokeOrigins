@@ -28,7 +28,8 @@ export const GUIA: GrupoGuia[] = [
       { id: 'inicio', emoji: '🥚', titulo: 'Começo da jornada', texto: [
         'Toda conta nova ganha um Ovo de Inicial: ao abrir, ele choca um dos 27 iniciais de todas as regiões, sorteado com a mesma chance, e depois você escolhe em qual região começar.',
         'O inicial vem com IVs altos e é NT (não negociável): não pode ser trocado nem vendido.',
-        'Ao fechar a introdução do Professor Carvalho, você ganha um Kit iniciante (conquista Conhecedor). Abra-o pela Bolsa para receber Pokébolas, remédios, Poké Dólares, uma skin e um Charm.',
+        'Ao terminar a introdução do Professor Carvalho, você ganha um Kit iniciante (conquista Conhecedor). Abra-o pela Bolsa para receber Pokébolas, remédios, Poké Dólares, uma skin e um Charm.',
+        'Depois, o Professor passa missões rápidas para você aprender o básico: usar o kit, caçar e capturar nos mapas e conhecer o PC e a ficha do Pokémon. A cada conteúdo liberado pelo nível de treinador, ele volta com uma missão nova (às vezes com um presente para você experimentar).',
       ] },
       { id: 'treinador', emoji: '⭐', titulo: 'Nível de treinador', texto: [
         'Seu nível de treinador vai do 1 ao 25. Você ganha o mesmo XP que o seu Pokémon ganha ao derrotar ou capturar.',
@@ -80,13 +81,16 @@ export const GUIA: GrupoGuia[] = [
         '• Fly ou Surf: se um Pokémon do seu time sabe Fly ou Surf, você pode usá-lo na estação. É de graça e leva o mesmo tempo do trem.',
         'Durante a viagem você pode usar a cidade normalmente, mas os mapas e ginásios só abrem quando chegar.',
       ] },
-      { id: 'ginasios', emoji: '🏅', titulo: 'Ginásios', texto: [
+      { id: 'ginasios', trancas: [{ conteudo: 'duelos' }], emoji: '🏅', titulo: 'Ginásios', texto: [
         'Cada região tem 8 líderes de ginásio, na Arena da cidade. Você só desafia os da região onde está.',
-        '• Ordem: é preciso vencer os líderes anteriores antes de desafiar o próximo.',
-        '• Nível: os Pokémon do líder vêm no nível do Pokémon mais alto do seu time.',
-        '• Prêmio: a insígnia e Poké Dólares (só na primeira vitória).',
+        '• Três dificuldades: Fácil, Médio e Difícil, cada uma com a sua sequência.',
+        '• Ordem: em cada dificuldade, é preciso vencer os líderes anteriores antes de desafiar o próximo.',
+        '• Fácil: o time dos jogos, no nível do Pokémon mais alto do seu time, com mínimo de 10 no 1º ginásio, subindo de 6 em 6.',
+        '• Médio: time especial, no nível do seu Pokémon mais alto, com mínimo de 10 no 1º ginásio, subindo de 10 em 10.',
+        '• Difícil: time especial, todos no nível 100.',
+        '• Prêmio: a insígnia sai só no Fácil. Poké Dólares só na primeira vitória de cada dificuldade (o Médio paga o dobro e o Difícil, quatro vezes).',
       ] },
-      { id: 'duelos', emoji: '⚔️', titulo: 'Duelos com treinadores', texto: [
+      { id: 'duelos', trancas: [{ conteudo: 'duelos' }], emoji: '⚔️', titulo: 'Duelos com treinadores', texto: [
         'Na Arena você enfrenta treinadores de dificuldade 1 a 5. É a principal forma de ganhar Poké Dólares e pode ser repetido.',
         '• O time do treinador é montado na hora de batalhar, no nível médio do seu time.',
         '• Quanto maior a dificuldade e o time dele, maior o prêmio.',

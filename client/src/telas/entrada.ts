@@ -5,9 +5,13 @@ import { arquivarSaveAntigo, iniciarSaveDaConta, salvar, saveAntigoDoNavegador, 
 import { el } from '../ui/dom';
 import { seletorDeIdioma } from '../idioma';
 import { confirmar } from '../ui/confirmar';
+import { telaPreRegistro } from './preRegistro';
+import { criadorDoLink, esquecerCriador, lerLinkDeCriador } from '../linkCriador';
 
 /** Resolve quando há uma conta logada e o save dela já está em memória. */
 export async function garantirConta(raiz: HTMLElement): Promise<Conta> {
+  // link de um criador de conteúdo (/c/CODIGO): guarda o criador e vira /pre-registro
+  await lerLinkDeCriador();
   let r: Awaited<ReturnType<typeof buscarConta>> = null;
   for (;;) {
     try {
@@ -18,6 +22,10 @@ export async function garantirConta(raiz: HTMLElement): Promise<Conta> {
       await aguardarServidor(raiz);
     }
   }
+  // link de divulgação /pre-registro, sem conta: a página de pré-registro (com o formulário)
+  if (!r && location.pathname.startsWith('/pre-registro')) return telaPreRegistro(raiz, null);
+  // conta no pré-registro, ainda sem acesso ao jogo: só a página de pré-registro (server/src/preRegistro.ts)
+  if (r?.conta.acesso === false) return telaPreRegistro(raiz, r.conta);
   if (!r) {
     await formularioEntrada(raiz);
     r = await buscarConta();
@@ -103,7 +111,10 @@ function formularioEntrada(raiz: HTMLElement): Promise<void> {
       enviar.disabled = true;
       enviar.textContent = criar ? 'Criando…' : 'Entrando…';
       try {
-        if (criar) await cadastrar(usuario.value, email.value.trim(), senha.value, manter.checked);
+        // quem veio pelo link de um criador e criou a conta por aqui também fica ligado a ele
+        const link = criadorDoLink();
+        if (criar) await cadastrar(usuario.value, email.value.trim(), senha.value, manter.checked, link?.codigo ?? '', 'link');
+        if (criar) esquecerCriador();
         else await entrar(login.value.trim(), senha.value, manter.checked);
         pronto();
       } catch (falha) {
@@ -120,6 +131,7 @@ function formularioEntrada(raiz: HTMLElement): Promise<void> {
           seletorDeIdioma(),
           el('p', { class: 'entrada-texto' }, 'Entre na sua conta para jogar.'),
           formulario,
+          el('a', { class: 'link-pre-registro', href: '/pre-registro' }, '📝 Pré-registro: conheça o jogo e garanta o seu kit'),
         ),
       ),
     );

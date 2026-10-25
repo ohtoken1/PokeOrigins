@@ -12,7 +12,7 @@ import { nomeDaEspecie, usarRemedioNaLiga } from './motorDoJogo.ts';
 import { lerNome, lerPokemon } from './entregas.ts';
 import { NIVEL_MINIMO, liberado } from '../../shared/trancas.ts';
 import { nivelTreinador } from '../../shared/treinador.ts';
-import { ETAPAS_LIGA, INTERVALO_LIGA_MS, NIVEL_MAXIMO_LIGA, TEMPO_TURNO_LIGA_MS, NOME_LIGA, POKEMON_POR_TIME_LIGA, PREMIO_LIGA, fimDaSemanaDaLiga, semanaDaLiga, type TipoLiga } from '../../shared/liga.ts';
+import { ETAPAS_LIGA, INTERVALO_LIGA_MS, NIVEL_MAXIMO_LIGA, TEMPO_TURNO_LIGA_MS, NOME_LIGA, POKEMON_POR_TIME_LIGA, premioLiga, fimDaSemanaDaLiga, semanaDaLiga, type TipoLiga } from '../../shared/liga.ts';
 
 interface TimeLiga { nome: string; pokemon: Record<string, unknown>[] }
 type TimesLiga = Record<TipoLiga, Record<string, TimeLiga>>;
@@ -66,7 +66,7 @@ function progressoDe(p: Progressos, conta: banco.Conta, liga: TipoLiga, agora: n
 function pagar(contaId: number, liga: TipoLiga, meu: Progresso): void {
   if (meu.pago) return;
   meu.pago = true;
-  const premio = PREMIO_LIGA[liga];
+  const premio = premioLiga(liga);
   const total = ETAPAS_LIGA[liga].length;
   const venceuTudo = meu.estado === 'venceu';
   const moedas = meu.etapa * premio.porVitoria + (venceuTudo ? premio.bonus : 0);
@@ -95,7 +95,7 @@ function comecarBatalha(conta: banco.Conta, liga: TipoLiga, meu: Progresso): voi
   criarBatalhaPve(conta,
     { nome: nomeDaConta(conta), time, nomes: time.map((p) => nomeDaEspecie(Number(p.especieId))) },
     { nome: nomeDaEtapa(t, liga, meu.etapa), time: npc.pokemon, nomes: npc.pokemon.map((p) => nomeDaEspecie(Number(p.especieId))) },
-    { titulo: `${NOME_LIGA[liga]} (${meu.etapa + 1}/${ETAPAS_LIGA[liga].length})`, tempo: TEMPO_TURNO_LIGA_MS, aoFim: (venceu, final) => fimDaBatalha(conta.id, liga, venceu, final) });
+    { titulo: `${NOME_LIGA[liga]} (${meu.etapa + 1}/${ETAPAS_LIGA[liga].length})`, tempo: TEMPO_TURNO_LIGA_MS, ia: liga === 'nightmare' ? 'dificil' : 'medio', aoFim: (venceu, final) => fimDaBatalha(conta.id, liga, venceu, final) });
   meu.lutando = true;
   meu.proximaEm = null;
 }
@@ -166,7 +166,7 @@ export function estado(conta: banco.Conta, agora = Date.now()) {
     return {
       liga, nome: NOME_LIGA[liga], pronta: prontas(t, liga),
       etapas: ETAPAS_LIGA[liga].map((_, i) => nomeDaEtapa(t, liga, i)),
-      etapa: meu?.etapa ?? 0, estado: meu?.estado ?? null, premio: PREMIO_LIGA[liga],
+      etapa: meu?.etapa ?? 0, estado: meu?.estado ?? null, premio: premioLiga(liga),
       // desafio em andamento: o time travado (com HP/PP de agora), se está lutando e quando a próxima começa sozinha
       time: meu?.estado === 'jogando' ? (meu.time ?? []) : null, lutando: !!meu?.lutando, proximaEm: meu?.proximaEm ?? null,
     };

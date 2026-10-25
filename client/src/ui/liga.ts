@@ -15,6 +15,7 @@ import { el, spritePokemon } from './dom';
 import { bannerEvento, classeTematica } from './temaEvento';
 import { abrirJanela } from './janela';
 import { valorEmMoeda } from './moeda';
+import { tutorialFez } from '../tutorialEventos';
 
 interface EstadoLiga {
   liga: TipoLiga; nome: string; pronta: boolean; etapas: string[]; etapa: number; estado: 'jogando' | 'perdeu' | 'venceu' | null;
@@ -33,6 +34,7 @@ const relogio = (ms: number) => {
 let aberta: { redesenhar: () => void; recarregar: () => void } | null = null;
 
 export function abrirLiga(save: Save): void {
+  tutorialFez('liga');
   if (aberta) return aberta.recarregar();
   let dados: Dados | null = null;
   let diferenca = 0;

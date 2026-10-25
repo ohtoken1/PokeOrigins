@@ -26,8 +26,9 @@ import { abrirJanela } from '../ui/janela';
 import { abrirCorreio } from '../ui/correio';
 import { conteudoLiberado } from '../trancas';
 import { textoTranca } from '../../../shared/trancas';
-import { DIAS_LOGIN, DIAS_LOGIN_TRINTA, METAS_DOACAO, PREMIOS_LOGIN, PREMIOS_LOGIN_TRINTA, RECUPERACOES_VIP, type EstadoRecompensas, type PremioRecompensa } from '../../../shared/recompensas';
+import { DIAS_LOGIN, DIAS_LOGIN_TRINTA, metasDoacao, premiosLogin, premiosLoginTrinta, RECUPERACOES_VIP, type EstadoRecompensas, type PremioRecompensa } from '../../../shared/recompensas';
 import { aoMudarRecompensas, buscarRecompensas, conferirLoginAgora, estadoRecompensas, recuperarDia } from '../recompensas';
+import { tutorialFez } from '../tutorialEventos';
 
 export type SecaoConta = 'perfil' | 'achievements' | 'skins' | 'doacao' | 'recompensas';
 
@@ -289,11 +290,11 @@ export function janelaDosPremios(novos: { evento: 'login' | 'trinta'; dia: numbe
   if (!novos.length) return;
   const bloco = (n: { evento: 'login' | 'trinta'; dia: number }) => {
     const login = n.evento === 'login';
-    const premios = (login ? PREMIOS_LOGIN : PREMIOS_LOGIN_TRINTA)[n.dia - 1] ?? [];
+    const premios = (login ? premiosLogin() : premiosLoginTrinta())[n.dia - 1] ?? [];
     return el('div', { class: 'premio-do-dia' },
       el('h3', {}, login ? `🎁 Login de boas-vindas · dia ${n.dia} de ${DIAS_LOGIN}` : `📅 Login dos 30 dias · dia ${n.dia} de ${DIAS_LOGIN_TRINTA}`),
       listaPremios(premios),
-      login ? gradeDeLogin(PREMIOS_LOGIN, n.dia, true) : '');
+      login ? gradeDeLogin(premiosLogin(), n.dia, true) : '');
   };
   abrirJanela('🎁 Prêmios de hoje', (j) => el('div', { class: 'janela-login' },
     el('p', { class: 'sub' }, 'Obrigado por entrar hoje! Estes prêmios chegaram no seu Correio (NT). Abra o Correio e clique em Resgatar para levá-los para a bolsa.'),
@@ -317,7 +318,7 @@ function gradeDosTrinta(t: EstadoRecompensas['trinta']): HTMLElement {
     }
   };
   return el('div', { class: 'recompensas-grade' },
-    ...PREMIOS_LOGIN_TRINTA.map((p, i) => {
+    ...premiosLoginTrinta().map((p, i) => {
       const n = i + 1;
       const pego = t.pegos.includes(n);
       const perdido = !pego && n < hoje;
@@ -351,8 +352,8 @@ function explicacaoDosTrinta(t: EstadoRecompensas['trinta']): HTMLElement {
 function blocoDoacaoAcumulada(r: EstadoRecompensas | null): HTMLElement {
   if (!r) return el('p', { class: 'meta' }, 'Carregando…');
   const d = r.doacao;
-  const proxima = METAS_DOACAO.find((m) => d.gold < m.gold);
-  const anterior = [...METAS_DOACAO].reverse().find((m) => d.gold >= m.gold)?.gold ?? 0;
+  const proxima = metasDoacao().find((m) => d.gold < m.gold);
+  const anterior = [...metasDoacao()].reverse().find((m) => d.gold >= m.gold)?.gold ?? 0;
   const faltamDias = Math.max(0, Math.ceil((d.fim - Date.now()) / 86_400_000));
   return el('div', { class: 'doacao-acumulada' },
     el('p', { class: 'doacao-reset' }, `⏳ O acumulado zera a cada 3 meses. Este período termina em ${new Date(d.fim - 1).toLocaleDateString('pt-BR')} (${faltamDias === 1 ? 'falta 1 dia' : `faltam ${faltamDias} dias`}); depois disso, todos começam do zero e as metas podem ser ganhas de novo.`),
@@ -363,7 +364,7 @@ function blocoDoacaoAcumulada(r: EstadoRecompensas | null): HTMLElement {
           el('small', { class: 'meta' }, `Próxima meta: ${proxima.gold.toLocaleString('pt-BR')} (faltam ${(proxima.gold - d.gold).toLocaleString('pt-BR')} Origin Coins)`))
       : el('p', { class: 'meta' }, '🏆 Você alcançou todas as metas deste período. Obrigado!'),
     el('div', { class: 'recompensas-grade metas' },
-      ...METAS_DOACAO.map((m) => {
+      ...metasDoacao().map((m) => {
         const ganhou = d.metas.includes(m.gold) || d.gold >= m.gold;
         return el('div', { class: `recompensa-dia ${ganhou ? 'recebido' : m === proxima ? 'proximo' : ''}` },
           el('small', { class: 'recompensa-numero' }, `${ganhou ? '✔ ' : ''}${m.gold.toLocaleString('pt-BR')}`),
@@ -387,13 +388,14 @@ function recompensas(): HTMLElement {
         el('h2', {}, `🎁 Login de boas-vindas (${DIAS_LOGIN} dias)`),
         tranca('loginBoasVindas'),
         el('p', { class: 'sub' }, `Nos ${DIAS_LOGIN} primeiros dias da sua conta, cada dia em que você entra no jogo anda uma casinha e ganha o prêmio dela. Todos são NT e chegam pelo Correio. Termina em ${dataHora(r.login.fim)}.`),
-        gradeDeLogin(PREMIOS_LOGIN, r.login.dia, r.login.hoje));
+        gradeDeLogin(premiosLogin(), r.login.dia, r.login.hoje));
     if (!partes.length) partes.push(el('p', { class: 'meta' }, 'Nenhum login com prêmio acontecendo agora.'));
     secao.replaceChildren(...partes);
   };
   desenhar();
   // registra o login de hoje na hora (virou o dia ou subiu de nível com a aba aberta)
   void conferirLoginAgora();
+  tutorialFez('recompensas');
   const parar = aoMudarRecompensas(() => (secao.isConnected ? desenhar() : parar()));
   return secao;
 }

@@ -43,7 +43,8 @@ const texto = (v: unknown, formato: RegExp): v is string => typeof v === 'string
  * Confere o Pokémon montado em Administração → Dar Pokémon e devolve só os campos conhecidos. O servidor não tem
  * os dados das espécies (isso é do jogo): aqui só se garante o formato e os limites (IV 0–31, EV 252/510…).
  */
-export function lerPokemon(v: unknown, nivelMaximo = 100): PokemonSave {
+/** `comItem` = aceita o item segurado (times de NPC montados pela staff). */
+export function lerPokemon(v: unknown, nivelMaximo = 100, comItem = false): PokemonSave {
   const invalido = () => new ErroConta('Pokémon inválido.');
   if (!v || typeof v !== 'object') throw invalido();
   const p = v as Record<string, unknown>;
@@ -67,6 +68,7 @@ export function lerPokemon(v: unknown, nivelMaximo = 100): PokemonSave {
   if (!inteiro(p.especieId, 1, 99999) || !inteiro(p.nivel, 1, nivelMaximo) || !inteiro(p.exp, 0, 100_000_000) || !inteiro(p.hp, 1, 9999)) throw invalido();
   if (!texto(p.natureza, /^[A-Za-z]{3,12}$/) || !texto(p.habilidade, /^[A-Za-z0-9' .()-]{1,40}$/) || !texto(p.genero, /^[MFN]$/)) throw invalido();
   if (p.teraTipo !== undefined && !texto(p.teraTipo, /^[A-Za-z]{3,10}$/)) throw invalido();
+  const item = comItem && typeof p.item === 'string' && /^[a-z0-9-]{1,40}$/.test(p.item) ? p.item : null;
   return {
     especieId: p.especieId, nivel: p.nivel, exp: p.exp, shiny: p.shiny === true, natureza: p.natureza, habilidade: p.habilidade, genero: p.genero,
     ivs, evs, golpes: lidos, hp: p.hp, status: null, amizade: 50,
@@ -74,6 +76,7 @@ export function lerPokemon(v: unknown, nivelMaximo = 100): PokemonSave {
     ivsFaixa: true, origem: 'ticket',
     ...(p.teraTipo ? { teraTipo: p.teraTipo } : {}),
     ...(p.inegociavel === true ? { inegociavel: true } : {}),
+    ...(item ? { item } : {}),
   };
 }
 

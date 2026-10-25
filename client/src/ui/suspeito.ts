@@ -16,6 +16,7 @@ import { el } from './dom';
 import { abrirJanela } from './janela';
 import { cartaoPokemon } from './time';
 import { valorEmMoeda } from './moeda';
+import { tutorialFez } from '../tutorialEventos';
 
 const numero = (n: number) => n.toLocaleString('pt-BR');
 const nome = (p: PokemonDoJogador) => pokemonPorId(p.especieId).nome;
@@ -81,6 +82,7 @@ function fazer(save: Save, servico: ServicoSuspeito, p: PokemonDoJogador): strin
 }
 
 export function abrirSuspeito(save: Save, aoMudar: () => void = () => {}): void {
+  tutorialFez('suspeito');
   // null = os quatro quadros; com um serviço escolhido, o time para apontar o Pokémon
   let servico: ServicoSuspeito | null = null;
   let aviso = '';

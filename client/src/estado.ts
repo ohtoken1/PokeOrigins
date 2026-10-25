@@ -106,6 +106,8 @@ export interface Save {
   missoesQuadro?: EstadoQuadro;
   /** Insígnias conquistadas (ids dos líderes de ginásio, shared/ginasios.ts). */
   insignias?: string[];
+  /** Líderes vencidos no Médio e no Difícil (shared/ginasiosDificuldade.ts; insígnia só sai no Fácil). */
+  ginasiosVencidos?: { media?: string[]; dificil?: string[] };
   /** VIP: data/hora (ms) em que acaba (shared/vip.ts). PRÉ-SISTEMA: no MMO fica na conta. */
   vipAte?: number | null;
   /** Contadores para os rankings (capturas em batalha; ovos e tickets não contam). */
@@ -128,6 +130,14 @@ export interface Save {
   pacotesComprados?: string[];
   /** Avisos do tutorial (Professor Carvalho) já mostrados: ids de conteúdo de shared/trancas.ts */
   tutorialVisto?: string[];
+  /** Tutorial do começo (client/src/tutorial.ts): 'intro', a missão da vez ou 'fim'. Sem o campo = save antigo. */
+  tutorialPasso?: string;
+  /** Missões das trancas de nível ainda por fazer (ids de conteúdo de shared/trancas.ts), a primeira é a da vez. */
+  tutorialTarefas?: string[];
+  /** Presentes do tutorial já recebidos (escrito só pelo servidor, server/src/tutorial.ts). */
+  tutorialPresentes?: string[];
+  /** Sementes de graça nos canteiros (presente do tutorial). */
+  sementesGratis?: number;
   /** Save criado depois que o Kit iniciante passou a vir pela conquista Conhecedor (os antigos já ganharam no começo). */
   kitPelaConquista?: boolean;
   /** Quando virou treinador (ms). No MMO = data do cadastro da conta. */
@@ -256,6 +266,9 @@ export function novoSave(regiao: string, inicial: number, aparencia?: Aparencia)
     itens: { ...ITENS_INICIAIS },
     // o Kit iniciante vem pela conquista Conhecedor (introdução do Professor), não mais no começo
     kitPelaConquista: true,
+    // tutorial do começo: introdução e missões (client/src/tutorial.ts)
+    tutorialPasso: 'intro',
+    tutorialVisto: [],
     silver: SILVER_INICIAL,
     gold: 0,
     passos: 0,

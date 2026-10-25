@@ -864,3 +864,83 @@ export const gravarCompraReal = (contaId: number, produto: string, centavos: num
 export const resumoComprasReais = (desdeSemana: number, desdeMes: number) =>
   sqlComprasReais.resumo.all(desdeSemana, desdeMes) as { produto: string; total: number; centavos: number; semana: number; mes: number; compradores: number }[];
 export const compradoresReais = () => (sqlComprasReais.compradores.get() as { n: number }).n;
+
+// ---- pré-registro e whitelist (server/src/preRegistro.ts) ----
+// Conta criada com o pré-registro ligado ganha uma linha aqui (`liberada` 0 = só vê a tela de pré-registro).
+// Conta SEM linha (as do Closed Beta, de antes) tem acesso. `premio_enviado` = o kit de pré-registro já foi mandado.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS pre_registro (
+    conta_id INTEGER PRIMARY KEY REFERENCES contas(id) ON DELETE CASCADE,
+    liberada INTEGER NOT NULL DEFAULT 0,
+    codigo TEXT,
+    nota TEXT NOT NULL DEFAULT '',
+    criada_em INTEGER NOT NULL,
+    liberada_em INTEGER,
+    liberada_por TEXT,
+    premio_enviado INTEGER NOT NULL DEFAULT 0
+  );
+`);
+export interface PreRegistro { conta_id: number; liberada: number; codigo: string | null; nota: string; criada_em: number; liberada_em: number | null; liberada_por: string | null; premio_enviado: number }
+const sqlPre = {
+  criar: db.prepare('INSERT OR IGNORE INTO pre_registro (conta_id, codigo, criada_em) VALUES (?, ?, ?)'),
+  ler: db.prepare('SELECT * FROM pre_registro WHERE conta_id = ?'),
+  lista: db.prepare(`SELECT p.*, c.usuario, c.email FROM pre_registro p JOIN contas c ON c.id = p.conta_id ORDER BY p.criada_em DESC`),
+  total: db.prepare('SELECT COUNT(*) AS n FROM pre_registro'),
+  liberar: db.prepare('UPDATE pre_registro SET liberada = ?, liberada_em = ?, liberada_por = ? WHERE conta_id = ?'),
+  nota: db.prepare('UPDATE pre_registro SET nota = ?, codigo = ? WHERE conta_id = ?'),
+  semPremio: db.prepare('SELECT conta_id FROM pre_registro WHERE premio_enviado = 0'),
+  premiado: db.prepare('UPDATE pre_registro SET premio_enviado = 1 WHERE conta_id = ?'),
+};
+export const criarPreRegistro = (contaId: number, codigo: string | null) => void sqlPre.criar.run(contaId, codigo, Date.now());
+export const preRegistroDe = (contaId: number) => sqlPre.ler.get(contaId) as unknown as PreRegistro | undefined;
+export const listaPreRegistro = () => sqlPre.lista.all() as unknown as (PreRegistro & { usuario: string; email: string })[];
+export const totalPreRegistro = () => (sqlPre.total.get() as { n: number }).n;
+export const liberarPreRegistro = (contaId: number, liberada: boolean, por: string) => void sqlPre.liberar.run(liberada ? 1 : 0, Date.now(), por, contaId);
+export const anotarPreRegistro = (contaId: number, nota: string, codigo: string | null) => void sqlPre.nota.run(nota, codigo, contaId);
+export const preRegistrosSemPremio = () => (sqlPre.semPremio.all() as { conta_id: number }[]).map((r) => r.conta_id);
+export const marcarPremioPreRegistro = (contaId: number) => void sqlPre.premiado.run(contaId);
+
+// ---- links dos criadores de conteúdo (server/src/parcerias.ts): de qual criador veio cada conta e os cliques ----
+// `parceria_contas` = uma linha por conta que veio de um criador (pelo link, pelo código digitado ou anotada pela
+// staff); fica para sempre, mesmo que a pessoa clique em outro link depois. `parceria_cliques` = cliques por dia.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS parceria_contas (
+    conta_id INTEGER PRIMARY KEY REFERENCES contas(id) ON DELETE CASCADE,
+    codigo TEXT NOT NULL,
+    via TEXT NOT NULL,
+    criada_em INTEGER NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS parceria_contas_codigo ON parceria_contas (codigo, criada_em);
+  CREATE TABLE IF NOT EXISTS parceria_cliques (
+    codigo TEXT NOT NULL,
+    dia TEXT NOT NULL,
+    n INTEGER NOT NULL,
+    PRIMARY KEY (codigo, dia)
+  );
+  INSERT OR IGNORE INTO parceria_contas (conta_id, codigo, via, criada_em)
+    SELECT p.conta_id, p.codigo, 'codigo', c.criada_em FROM pre_registro p JOIN contas c ON c.id = p.conta_id WHERE p.codigo IS NOT NULL;
+`);
+const sqlLinks = {
+  ligar: db.prepare('INSERT OR IGNORE INTO parceria_contas (conta_id, codigo, via, criada_em) SELECT id, ?, ?, criada_em FROM contas WHERE id = ?'),
+  trocar: db.prepare('INSERT OR REPLACE INTO parceria_contas (conta_id, codigo, via, criada_em) SELECT id, ?, ?, criada_em FROM contas WHERE id = ?'),
+  tirar: db.prepare('DELETE FROM parceria_contas WHERE conta_id = ?'),
+  clique: db.prepare('INSERT INTO parceria_cliques (codigo, dia, n) VALUES (?, ?, 1) ON CONFLICT (codigo, dia) DO UPDATE SET n = n + 1'),
+  cliques: db.prepare('SELECT codigo, SUM(n) AS total, SUM(CASE WHEN dia >= ? THEN n ELSE 0 END) AS mes FROM parceria_cliques GROUP BY codigo'),
+  contas: db.prepare(`SELECT pc.codigo, COUNT(*) AS total, SUM(CASE WHEN pc.criada_em >= ? THEN 1 ELSE 0 END) AS mes,
+      SUM(CASE WHEN ifnull(json_extract(s.dados, '$.xpTreinador'), 0) >= ? THEN 1 ELSE 0 END) AS jogadores,
+      SUM(CASE WHEN pc.via = 'link' THEN 1 ELSE 0 END) AS peloLink
+    FROM parceria_contas pc LEFT JOIN saves s ON s.conta_id = pc.conta_id GROUP BY pc.codigo`),
+  doCodigo: db.prepare(`SELECT c.usuario, pc.via, pc.criada_em AS criadaEm, ifnull(json_extract(s.dados, '$.xpTreinador'), 0) AS xp
+    FROM parceria_contas pc JOIN contas c ON c.id = pc.conta_id LEFT JOIN saves s ON s.conta_id = pc.conta_id
+    WHERE pc.codigo = ? ORDER BY pc.criada_em DESC LIMIT 500`),
+};
+/** Liga a conta nova ao criador (só a primeira vez: depois de criada, a conta não muda de criador sozinha). */
+export const ligarContaAoCriador = (contaId: number, codigo: string, via: string) => void sqlLinks.ligar.run(codigo, via, contaId);
+/** A staff muda (ou tira, com null) o criador de uma conta. */
+export const trocarCriadorDaConta = (contaId: number, codigo: string | null) =>
+  void (codigo ? sqlLinks.trocar.run(codigo, 'staff', contaId) : sqlLinks.tirar.run(contaId));
+export const contarCliqueParceria = (codigo: string, dia: string) => void sqlLinks.clique.run(codigo, dia);
+export const cliquesParcerias = (diaInicioMes: string) => sqlLinks.cliques.all(diaInicioMes) as { codigo: string; total: number; mes: number }[];
+export const contasParcerias = (inicioMes: number, xpJogador: number) =>
+  sqlLinks.contas.all(inicioMes, xpJogador) as { codigo: string; total: number; mes: number; jogadores: number; peloLink: number }[];
+export const contasDoCriador = (codigo: string) => sqlLinks.doCodigo.all(codigo) as { usuario: string; via: string; criadaEm: number; xp: number }[];

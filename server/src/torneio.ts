@@ -5,6 +5,7 @@ import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { avisar, avisarEvento, avisarTodos, estaOnline } from './mundo.ts';
 import * as correio from './correio.ts';
+import { anexosDePremios } from './recompensas.ts';
 import { criarBatalha, emBatalha } from './pvp.ts';
 import { itemAleatorio, nomeDoItem, problemasDoTimeNoTorneio } from './motorDoJogo.ts';
 import { NIVEL_MINIMO, liberado } from '../../shared/trancas.ts';
@@ -12,7 +13,7 @@ import { nivelTreinador } from '../../shared/treinador.ts';
 import { sortearFatia } from '../../shared/eventosRegras.ts';
 import {
   ABRE_ANTES_MS, ENTRADA_TORNEIO, ESPERA_INICIO_MS, EXTENSAO_MAXIMA_MS, EXTENSAO_MS, FECHA_ANTES_MS, HORARIOS_TORNEIO, NOMES_RODADAS,
-  PAUSA_ENTRE_RODADAS_MS, PREMIOS_TORNEIO, ROLETA_TORNEIO, TIERS_TORNEIO, VAGAS_TORNEIO, sortearRegras, type RegrasTorneio,
+  PAUSA_ENTRE_RODADAS_MS, premiosTorneio, roletaTorneio, TIERS_TORNEIO, VAGAS_TORNEIO, sortearRegras, type RegrasTorneio,
 } from '../../shared/torneioRegras.ts';
 
 interface Inscrito { contaId: number; nome: string; usuario: string }
@@ -202,11 +203,9 @@ function premiar(t: EstadoTorneio): void {
   t.fase = 'fim';
   const nome = (c: number) => t.inscritos.find((i) => i.contaId === c)?.nome ?? '?';
   podio.forEach((contaId, i) => {
-    const p = PREMIOS_TORNEIO[i];
-    const anexos = [correio.anexoItem('silver', 'Poké Dólares', p.silver)];
-    if (p.gold) anexos.push(correio.anexoItem('gold', 'Origin Coins', p.gold));
+    const anexos: correio.Anexo[] = anexosDePremios(premiosTorneio()[i] ?? []);
     anexos.push(correio.anexoItem(['medalha-ouro', 'medalha-prata', 'medalha-bronze'][i], `Medalha de ${['ouro', 'prata', 'bronze'][i]} do Torneio`, 1));
-    if (p.roleta) anexos.push(premioDaRoleta(contaId));
+    if (i === 0) anexos.push(premioDaRoleta(contaId));
     // conquista "Melhor pokemon": cada Pokémon do time que jogou o Torneio ganha 1 medalha
     const uids = timeDaConta(contaId);
     if (uids.length) anexos.push({ tipo: 'medalhaPokemon', uids });
@@ -218,13 +217,16 @@ function premiar(t: EstadoTorneio): void {
 
 /** Roleta do Torneio: sorteada aqui; o jogo do campeão só gira até a fatia. O prêmio vai junto na carta do 1º lugar. */
 function premioDaRoleta(contaId: number): correio.Anexo {
-  const fatia = sortearFatia(ROLETA_TORNEIO);
-  const id = ROLETA_TORNEIO[fatia].id;
+  const roleta = roletaTorneio();
+  const fatia = sortearFatia(roleta);
+  const { id, nome, quantidade } = roleta[fatia];
   avisar(contaId, { t: 'torneio-roleta', fatia });
-  if (id === 'silver') return correio.anexoItem('silver', 'Roleta do Torneio: Poké Dólares', 50_000);
-  if (id === 'fragmentos') return correio.anexoItem('fragmentos', 'Roleta do Torneio: Fragmentos Temporais', 3);
-  const item = id === 'mint' || id === 'charm' || id === 'orb' ? itemAleatorio(id) : id;
-  return correio.anexoItem(item, `Roleta do Torneio: ${nomeDoItem(item)}`, 1);
+  // sorteios (Mint, Charm, Orb) saem como UM item sorteado, na quantidade da fatia
+  if (id === 'mint' || id === 'charm' || id === 'orb') {
+    const item = itemAleatorio(id);
+    return correio.anexoItem(item, `Roleta do Torneio: ${nomeDoItem(item)}`, quantidade);
+  }
+  return correio.anexoItem(id, `Roleta do Torneio: ${nome}`, quantidade);
 }
 
 // ---------- relógio do torneio ----------

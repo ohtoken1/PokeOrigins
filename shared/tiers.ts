@@ -13,6 +13,18 @@ export const ORDEM_TIERS = ['UBER', 'OU', 'UU', 'RU', 'NU', 'NFE', 'LC'];
 /** Tiers que vêm do link do Smogon (ou que a staff definiu). */
 const DO_JOGO = dados as { pokemon: Record<string, string>; megas: Record<string, string> };
 
+/**
+ * Tiers mudadas pela staff (Administração → Tiers, pedido do dono 24/10/2026), por cima do JSON. Guardadas no servidor
+ * (server/src/ajustes.ts); o servidor também aplica (regras do Torneio e do Ranqueado).
+ */
+export interface AjustesTiers { pokemon: Record<string, string>; megas: Record<string, string> }
+let ajustes: AjustesTiers = { pokemon: {}, megas: {} };
+export const definirAjustesTiers = (a: AjustesTiers | null | undefined) => void (ajustes = { pokemon: a?.pokemon ?? {}, megas: a?.megas ?? {} });
+export const ajustesDosTiers = (): AjustesTiers => ajustes;
+/** Tier sem o ajuste da staff (o que o JSON ou a sugestão dizem). */
+export const tierOriginal = (numero: number): string => DO_JOGO.pokemon[numero] ?? sugestaoDeTier(especie(numero));
+export const tierMegaOriginal = (forma: string, s: { tier?: string; natDexTier?: string }) => DO_JOGO.megas[forma] ?? sugestaoDeTier(s);
+
 const REDUZIR: Record<string, string> = {
   Uber: 'UBER', AG: 'UBER', OU: 'OU', UUBL: 'OU', UU: 'UU', RUBL: 'UU', RU: 'RU', NUBL: 'RU',
   NU: 'NU', PUBL: 'NU', PU: 'NU', ZUBL: 'NU', ZU: 'NU', NFE: 'NFE', LC: 'LC',
@@ -27,12 +39,12 @@ export function sugestaoDeTier(s: { tier?: string; natDexTier?: string }): strin
 }
 
 export function tierDoPokemon(numero: number): string {
-  return DO_JOGO.pokemon[numero] ?? sugestaoDeTier(especie(numero));
+  return ajustes.pokemon[numero] ?? DO_JOGO.pokemon[numero] ?? sugestaoDeTier(especie(numero));
 }
 
 /** A tier deste Pokémon ainda é a sugestão provisória (a staff vai definir na mão)? */
-export const tierProvisoria = (numero: number) => !DO_JOGO.pokemon[numero];
+export const tierProvisoria = (numero: number) => !ajustes.pokemon[numero] && !DO_JOGO.pokemon[numero];
 
 /** Tier de uma Mega pela forma do Showdown ("Charizard-Mega-X"). */
-export const tierDaFormaMega = (forma: string, s: { tier?: string; natDexTier?: string }) => DO_JOGO.megas[forma] ?? sugestaoDeTier(s);
-export const tierMegaProvisoria = (forma: string) => !DO_JOGO.megas[forma];
+export const tierDaFormaMega = (forma: string, s: { tier?: string; natDexTier?: string }) => ajustes.megas[forma] ?? DO_JOGO.megas[forma] ?? sugestaoDeTier(s);
+export const tierMegaProvisoria = (forma: string) => !ajustes.megas[forma] && !DO_JOGO.megas[forma];

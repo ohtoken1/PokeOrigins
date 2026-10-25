@@ -6,6 +6,7 @@
 // Medidas do Showdown: palco de 640 × 360; o Pokémon de perto (o do jogador) fica em (210, 245) com z = 0 e o de
 // longe em (430, 135) com z = 200. Esses dois pontos são casados com o centro dos nossos dois sprites.
 import type { EfeitoShowdown } from './showdown/anims.js';
+import { ajustarAnimacoes } from './animsNossas';
 
 const FX = 'https://play.pokemonshowdown.com/fx/';
 
@@ -73,7 +74,12 @@ function estadoEm(p: Peca, t: number): Caixa | null {
 
 let dados: Promise<typeof import('./showdown/anims.js')> | null = null;
 /** O arquivo das animações é grande: só é baixado na primeira batalha. */
-export const carregarAnimacoes = () => (dados ??= import('./showdown/anims.js'));
+export const carregarAnimacoes = () =>
+  (dados ??= import('./showdown/anims.js').then((m) => {
+    // golpes sem animação e animações emprestadas ganham as nossas (animsNossas.ts)
+    ajustarAnimacoes(m);
+    return m;
+  }));
 
 const centroDe = (e: Element, arena: HTMLElement) => {
   const r = e.getBoundingClientRect();
@@ -81,14 +87,31 @@ const centroDe = (e: Element, arena: HTMLElement) => {
   return { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height / 2, w: r.width, h: r.height };
 };
 
+/** Golpes que tremem a tela além dos que o Showdown já treme (Earthquake, Bulldoze e Earth Power usam `$bg`). */
+const TREMEM = new Set([
+  'magnitude', 'fissure', 'precipiceblades', 'stompingtantrum', 'thousandarrows', 'thousandwaves', 'headlongrush', 'highhorsepower',
+  'explosion', 'selfdestruct', 'mistyexplosion', 'heavyslam', 'heatcrash', 'bodypress', 'gigaimpact', 'dracometeor', 'meteorbeam',
+  'rockslide', 'stoneedge', 'rockwrecker', 'headsmash', 'woodhammer', 'dragonhammer', 'gigatonhammer', 'hammerarm', 'icehammer',
+  'crushgrip', 'superpower', 'outrage', 'ragingbull', 'collisioncourse', 'electrodrift', 'sacredsword', 'diamondstorm', 'landswrath',
+  'tectonicrage', 'continentalcrash', 'supersonicskystrike', 'shatteredpsyche',
+]);
+
+export interface OpcoesShowdown {
+  /** 1º turno dos golpes de dois turnos (Solar Beam, Fly…): toca a parte de preparo (`prepareAnim`) */
+  preparo?: boolean;
+  /** o golpe errou: a animação vai para um ponto ao lado do alvo, como no Showdown (`missedPokemon`) */
+  errou?: boolean;
+}
+
 /**
  * Toca a animação do Showdown para o golpe. `defensor` = quem recebe (o próprio atacante nos golpes em si mesmo).
  * Devolve false se o Showdown não tem animação para este golpe (quem chamou usa a nossa).
  */
-export async function animarComShowdown(arena: HTMLElement, atacante: HTMLElement, defensor: HTMLElement, golpeId: string): Promise<boolean> {
+export async function animarComShowdown(arena: HTMLElement, atacante: HTMLElement, defensor: HTMLElement, golpeId: string, opcoes: OpcoesShowdown = {}): Promise<boolean> {
   const m = await carregarAnimacoes().catch(() => null);
   const entrada = m?.BattleMoveAnims[golpeId];
-  if (!m || !entrada?.anim || document.hidden) return false;
+  const roteiroDoGolpe = opcoes.preparo ? entrada?.prepareAnim : entrada?.anim;
+  if (!m || !roteiroDoGolpe || document.hidden) return false;
 
   // quem está perto (o do jogador) e quem está longe; os dois pontos do Showdown casam com os nossos centros
   const outro = atacante === defensor ? arena.querySelector<HTMLElement>(atacante.closest('.lugar-jogador') ? '.sprite-selvagem' : '.sprite-jogador') : defensor;
@@ -108,13 +131,33 @@ export async function animarComShowdown(arena: HTMLElement, atacante: HTMLElemen
   const pecas: Peca[] = [];
   const nos: HTMLElement[] = [];
   const imagens: HTMLImageElement[] = [];
+  // tremor da tela: o Showdown mexe o cenário dele (`$bg`, top −90 = parado); aqui a arena inteira treme junto
+  const tremor: Peca = { trechos: [], aplicar: (c) => void (arena.style.translate = c ? `0 ${Math.round(c.top * 1.1)}px` : '') };
+  let cursorTremor = 0;
+  let ultimoTremor = 0;
+  const parado = (top: number): Caixa => ({ left: 0, top, width: 0, height: 0, opacity: 1 });
+  const tremer = (top: number, tempo: number) => {
+    tremor.trechos.push({ t0: cursorTremor, t1: cursorTremor + tempo, de: parado(ultimoTremor), para: parado(top), curvas: curvasDe('swing', parado(top), parado(ultimoTremor), {}) });
+    cursorTremor += tempo;
+    ultimoTremor = top;
+  };
   const cena = {
     timeOffset: 0,
     animating: true,
     acceleration: 1,
     battle: { mySide: { x: 0, y: 0, z: 0 } },
-    // os golpes de terremoto balançam o cenário deles (jQuery); aqui só o resto da animação toca
-    $bg: { animate() { return this; }, delay() { return this; }, css() { return this; } },
+    // os golpes de terremoto balançam o cenário deles (jQuery `$bg.animate({ top, bottom }, tempo)`)
+    $bg: {
+      animate(css: { top?: number }, tempo = 400) {
+        tremer((css.top ?? -90) + 90, tempo);
+        return this;
+      },
+      delay(tempo: number) {
+        cursorTremor += tempo;
+        return this;
+      },
+      css() { return this; },
+    },
     wait(tempo: number) { cena.timeOffset += tempo; },
     showEffect(efeito: string | EfeitoShowdown, inicio: Loc, fim: Loc, transicao?: string, depois?: string) {
       const ef = typeof efeito === 'string' ? m.BattleEffects[efeito] : efeito;
@@ -189,12 +232,12 @@ export async function animarComShowdown(arena: HTMLElement, atacante: HTMLElemen
   };
 
   /** Um dos nossos sprites, do jeito que as animações do Showdown esperam (posição, fila de movimentos). */
-  const boneco = (no: HTMLElement, frente: boolean) => {
+  const boneco = (no: HTMLElement, frente: boolean, deslocado = 0) => {
     const ct = frente ? B : A;
     const esc = frente ? 1 : 1.5;
     // medidas "do Showdown" que dão o tamanho que o nosso sprite tem na tela (para as cópias dele: Double Team…)
     const sp: EfeitoShowdown = { url: (no as HTMLImageElement).currentSrc || (no as HTMLImageElement).src || '', w: ct.w / (su * esc), h: ct.h / (su * esc) };
-    const b = { x: 0, y: 0, z: frente ? 200 : 0, sp, isFrontSprite: frente, isMissedPokemon: false };
+    const b = { x: deslocado, y: 0, z: frente ? 200 : 0, sp, isFrontSprite: frente, isMissedPokemon: !!deslocado };
     const repouso = pos(b, sp);
     const original = { transform: no.style.transform, origem: no.style.transformOrigin, opacity: no.style.opacity, transicao: no.style.transition };
     let cursor = 0;
@@ -213,6 +256,8 @@ export async function animarComShowdown(arena: HTMLElement, atacante: HTMLElemen
     return Object.assign(b, {
       peca,
       comecar() {
+        // a animação de entrada termina "presa" (fill forwards) e passaria por cima do movimento (Close Combat…)
+        for (const a of no.getAnimations()) if (a.playState === 'finished') a.cancel();
         no.style.transition = 'none';
         no.style.transformOrigin = '50% 50%';
       },
@@ -239,19 +284,29 @@ export async function animarComShowdown(arena: HTMLElement, atacante: HTMLElemen
     });
   };
   const bAtacante = boneco(atacante, !dePerto(atacante));
-  const bDefensor = defensor === atacante ? bAtacante : boneco(defensor, !dePerto(defensor));
+  // errou: um "alvo de mentira" ao lado do de verdade (o de verdade não se mexe), 100 unidades para a esquerda dele
+  const falso = document.createElement('div');
+  const bDefensor = defensor === atacante ? bAtacante : opcoes.errou ? boneco(falso, !dePerto(defensor), -100) : boneco(defensor, !dePerto(defensor));
   const bonecos = bDefensor === bAtacante ? [bAtacante] : [bAtacante, bDefensor];
 
   const limpar = () => {
     for (const n of nos) n.remove();
     for (const b of bonecos) b.voltar();
+    arena.style.translate = '';
   };
   try {
-    entrada.anim(cena, [bAtacante, bDefensor]);
+    roteiroDoGolpe(cena, [bAtacante, bDefensor]);
   } catch {
     limpar();
     return false;
   }
+  // golpes pesados que o Showdown não treme: um tremor curto no meio da animação
+  if (!opcoes.preparo && !opcoes.errou && !tremor.trechos.length && TREMEM.has(golpeId)) {
+    const fimAnim = Math.max(0, ...pecas.flatMap((p) => p.trechos.map((t) => t.t1)));
+    cursorTremor = Math.max(0, fimAnim * 0.45);
+    for (const [top, tempo] of [[-10, 70], [8, 80], [-6, 80], [4, 80], [-2, 80], [0, 80]]) tremer(top, tempo);
+  }
+  if (tremor.trechos.length) pecas.push(tremor);
   const total = Math.max(0, ...pecas.flatMap((p) => p.trechos.map((t) => t.t1)));
   if (!total) {
     limpar();

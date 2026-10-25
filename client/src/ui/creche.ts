@@ -12,6 +12,7 @@ import { confirmar } from './confirmar';
 import { el, spritePokemon } from './dom';
 import { abrirJanela } from './janela';
 import { resumoAoPassar } from './resumo';
+import { tutorialFez } from '../tutorialEventos';
 
 const nome = (p: PokemonDoJogador) => `${pokemonPorId(p.especieId).nome}${p.shiny ? ' ✨' : ''}`;
 const sexo = (p: PokemonDoJogador) => (p.genero === 'M' ? '♂' : p.genero === 'F' ? '♀' : '');
@@ -21,6 +22,7 @@ const duracao = (ms: number) => {
 };
 
 export function abrirCreche(save: Save, aoMudar: () => void = () => {}): void {
+  tutorialFez('creche');
   // escolhendo um casal: o primeiro escolhido (null = escolhendo o primeiro)
   let escolhendo = false;
   let primeiro: PokemonDoJogador | null = null;

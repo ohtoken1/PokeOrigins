@@ -6,7 +6,7 @@ import { BIOMAS, type Bioma } from '../../shared/biomas';
 import { biomaDoPokemon, ehLendario } from '../../shared/encontros';
 import { especie } from '../../shared/batalha/pokemon';
 import { ehParadoxo, foraDosMapas } from '../../shared/formasRegionais';
-import { CHANCE_LENDARIO_NINHO, NIVEL_NINHO, PRECO_NINHO, PRECO_NINHO_VIP, PREMIO_NINHO, ROLETA_NINHO } from '../../shared/eventosRegras';
+import { CHANCE_LENDARIO_NINHO, NIVEL_NINHO, PRECO_NINHO, PRECO_NINHO_VIP, premioNinho, roletaNinho } from '../../shared/eventosRegras';
 import { REGIOES } from '../../shared/regioes';
 import { TICKETS, itensDoGrupo } from '../../shared/tickets';
 import { TODOS_OS_ITENS } from '../../shared/loja';
@@ -126,15 +126,16 @@ function pokemonDoNinho(n: Ninho): PokemonIndividual {
 
 /** Entrega o prêmio da fatia da roleta (os itens que o servidor não conhece saem aqui). */
 function premioDaFatia(save: Save, fatia: number): void {
-  const id = ROLETA_NINHO[fatia].id;
+  const { id, quantidade: q } = roletaNinho()[fatia] ?? { id: 'silver', quantidade: 0 };
   const dar = (item: string, qtd = 1) => (save.itens[item] = (save.itens[item] ?? 0) + qtd);
   const sorteia = (lista: string[]) => lista[Math.floor(Math.random() * lista.length)];
-  if (id === 'silver') save.silver += 50_000;
-  else if (id === 'fragmentos') save.fragmentos = (save.fragmentos ?? 0) + 3;
-  else if (id === 'mint') dar(sorteia(TODOS_OS_ITENS.filter((i) => i.categoria === 'mints').map((i) => i.id)));
-  else if (id === 'charm') dar(sorteia(itensDoGrupo('charm')));
-  else if (id === 'orb') dar(sorteia(TICKETS.map((t) => t.id)));
-  else dar(id);
+  if (id === 'silver') save.silver += q;
+  else if (id === 'gold') save.gold += q;
+  else if (id === 'fragmentos') save.fragmentos = (save.fragmentos ?? 0) + q;
+  else if (id === 'mint') dar(sorteia(TODOS_OS_ITENS.filter((i) => i.categoria === 'mints').map((i) => i.id)), q);
+  else if (id === 'charm') dar(sorteia(itensDoGrupo('charm')), q);
+  else if (id === 'orb') dar(sorteia(TICKETS.map((t) => t.id)), q);
+  else dar(id, q);
 }
 
 /**
@@ -155,7 +156,7 @@ export function botaoDoNinho(save: Save, regiao: string, bioma: string, cena: ()
     const n = ninhoAtual();
     if (!n) return;
     const preco = vipAtivo(save) ? PRECO_NINHO_VIP : PRECO_NINHO;
-    if (!(await confirmar('Ninho', `Pagar ${preco.toLocaleString('pt-BR')} Poké Dólares para enfrentar o ${n.nome} nível ${NIVEL_NINHO}? Ele não pode ser capturado. Vencendo: ${PREMIO_NINHO.toLocaleString('pt-BR')} + a roleta do Ninho${n.lendario ? ` e ${CHANCE_LENDARIO_NINHO * 100}% de chance de ganhar o ${n.nome}` : ''}.`))) return;
+    if (!(await confirmar('Ninho', `Pagar ${preco.toLocaleString('pt-BR')} Poké Dólares para enfrentar o ${n.nome} nível ${NIVEL_NINHO}? Ele não pode ser capturado. Vencendo: ${premioNinho().toLocaleString('pt-BR')} + a roleta do Ninho${n.lendario ? ` e ${CHANCE_LENDARIO_NINHO * 100}% de chance de ganhar o ${n.nome}` : ''}.`))) return;
     try {
       await salvarAgora();
       const r = await api<{ save: Save; versao: number; ninho: EstadoNinhoServidor }>('POST', '/eventos/ninho/entrar', { slot: n.servidor.slot });
@@ -169,8 +170,8 @@ export function botaoDoNinho(save: Save, regiao: string, bioma: string, cena: ()
       try {
         const r = await api<{ venceu: boolean; fatia?: number; lendario?: boolean }>('POST', '/eventos/ninho/resultado', { slot: n.servidor.slot, venceu, lendario: n.lendario, especie: n.nome });
         if (!r.venceu) return void (await atualizar());
-        save.silver += PREMIO_NINHO;
-        if (await girarRoleta('Roleta do Ninho', ROLETA_NINHO, r.fatia ?? 0, { perdeAoFechar: true })) premioDaFatia(save, r.fatia ?? 0);
+        save.silver += premioNinho();
+        if (await girarRoleta('Roleta do Ninho', roletaNinho(), r.fatia ?? 0, { perdeAoFechar: true })) premioDaFatia(save, r.fatia ?? 0);
         else avisar('Você fechou a roleta e perdeu o prêmio dela.', 'info');
         if (r.lendario) {
           const p = novoPokemon(n.especieId, 100, false);

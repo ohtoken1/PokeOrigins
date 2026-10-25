@@ -5,6 +5,7 @@
 import { Battle, Dex } from '@pkmn/sim';
 import { BatalhaSelvagem, conjuntoShowdown, type EventoBatalha, type Pedido } from './motor';
 import { curar, type PokemonIndividual } from './pokemon';
+import { MemoriaIa, escolherAcaoIa, type NivelIa } from './ia';
 
 export interface JogadorPvp {
   nome: string;
@@ -118,35 +119,22 @@ export class BatalhaPvp {
 
   /**
    * Escolha automática do treinador NPC (Liga): troca para o próximo vivo quando precisa e, ao atacar, usa o golpe
-   * que mais machuca 75% das vezes (a mesma IA dos treinadores do jogo, shared/batalha/motor.ts).
+   * IA no nível pedido (shared/batalha/ia.ts): Liga = médio, Nightmare = difícil.
    */
-  escolherIa(lado: 0 | 1, aleatorio = Math.random): void {
+  escolherIa(lado: 0 | 1, nivel: NivelIa = 'dificil', aleatorio = Math.random): void {
     const id = lado === 0 ? 'p1' : 'p2';
     const s = this.batalha[id];
-    const alvo = this.batalha[lado === 0 ? 'p2' : 'p1'].active[0];
     if (s.requestState === 'switch') {
       const i = s.pokemon.findIndex((p) => !p.fainted && !p.isActive);
       if (i < 0 || !this.batalha.choose(id, `switch ${i + 1}`)) this.batalha.choose(id, 'default');
       return;
     }
     if (s.requestState !== 'move') return;
-    const golpes = (((s.activeRequest as { active?: { moves: { id: string; disabled?: boolean; pp?: number }[] }[] } | null)?.active?.[0]?.moves) ?? [])
-      .map((m, i) => ({ m, i }))
-      .filter(({ m }) => !m.disabled && (m.pp === undefined || m.pp > 0));
-    if (!golpes.length) return void this.batalha.choose(id, 'default');
-    let escolhido = golpes[Math.floor(aleatorio() * golpes.length)].i + 1;
-    if (aleatorio() < 0.75) {
-      const atacante = s.active[0];
-      const forca = (golpe: string) => {
-        const g = Dex.moves.get(golpe);
-        if (g.category === 'Status' || !alvo) return 15;
-        if (!Dex.getImmunity(g.type, alvo.getTypes())) return 0;
-        return (g.basePower || 50) * (atacante.hasType(g.type) ? 1.5 : 1) * 2 ** Dex.getEffectiveness(g.type, alvo.getTypes());
-      };
-      escolhido = golpes.reduce((x, y) => (forca(y.m.id) > forca(x.m.id) ? y : x)).i + 1;
-    }
-    if (!this.batalha.choose(id, `move ${escolhido}`)) this.batalha.choose(id, 'default');
+    this.memorias[lado] ??= new MemoriaIa();
+    if (!escolherAcaoIa(this.batalha as never, s as never, this.batalha[lado === 0 ? 'p2' : 'p1'] as never, nivel, this.memorias[lado]!, aleatorio)) this.batalha.choose(id, 'default');
   }
+  /** O que a IA de cada lado já viu (só lados de NPC). */
+  private memorias: [MemoriaIa?, MemoriaIa?] = [];
 
   /** O time de um lado como terminou a batalha (HP, status, PP e frutas gastas). */
   timeFinal(lado: 0 | 1): PokemonIndividual[] {

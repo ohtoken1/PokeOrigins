@@ -3,7 +3,7 @@
 import { BIOMAS, type Bioma } from '../../shared/biomas';
 import { montarTabela, type EntradaTabela } from '../../shared/encontros';
 import { REGIOES } from '../../shared/regioes';
-import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons } from './dados';
+import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons, pokemonsDosMapasDe } from './dados';
 import { el, spritePokemon } from './ui/dom';
 import { comDica } from './ui/dica';
 
@@ -64,7 +64,7 @@ export function outbreakAtual(agora = Date.now()): Outbreak | null {
     for (let i = 0; i < 10 && !achado; i++) {
       const regiao = regioes[Math.floor(aleatorio() * regioes.length)];
       const bioma = BIOMAS[Math.floor(aleatorio() * BIOMAS.length)];
-      const linhas = [...new Set(montarTabela(bioma, pokemonsDaRegiao(regiao.id), [], todosOsPokemons()).filter((e) => e.grupo === null).map((e) => e.linha))];
+      const linhas = [...new Set(montarTabela(bioma, pokemonsDosMapasDe(regiao.id), [], todosOsPokemons()).filter((e) => e.grupo === null).map((e) => e.linha))];
       if (!linhas.length) continue;
       const linha = linhas[Math.floor(aleatorio() * linhas.length)];
       const inicio = ligado ? ligado.inicio : Date.UTC(br.getUTCFullYear(), br.getUTCMonth(), br.getUTCDate(), hora) - BRASILIA_MS;

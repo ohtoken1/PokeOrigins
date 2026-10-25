@@ -1,3 +1,4 @@
+import { GUIA } from '../guiaConteudo';
 import { FUNDOS_BATALHA } from '../batalha/telaBatalha';
 import { tempoRestanteVip, vipAtivo } from '../../../shared/vip';
 import type { Tela } from '../main';
@@ -5,7 +6,7 @@ import { REGIOES, regiaoPorId } from '../../../shared/regioes';
 import { BIOMAS } from '../../../shared/biomas';
 import { faixaDosEncontros, montarTabela, probabilidades } from '../../../shared/encontros';
 import { progressoTreinador } from '../../../shared/treinador';
-import { pokemonsDaRegiao, todosOsPokemons } from '../dados';
+import { pokemonsDosMapasDe, todosOsPokemons } from '../dados';
 import { apagarSave, carregarSave, salvar, usarSave } from '../estado';
 import { icone } from '../ui/icones';
 import { ehAdministrador } from '../bonificacao';
@@ -21,7 +22,7 @@ export const telaRegiao: Tela = (raiz, navegar) => {
   if (!save) return navegar({ tela: 'inicial' });
   usarSave(save);
   const regiao = regiaoPorId(save.regiao);
-  const pokemons = pokemonsDaRegiao(regiao.id);
+  const pokemons = pokemonsDosMapasDe(regiao.id);
   const treinador = progressoTreinador(save.xpTreinador);
   // time ao lado: acompanha o PC e a bolsa (aparece na hora)
   const caixaTime = el('div', {});
@@ -105,7 +106,7 @@ export const telaRegiao: Tela = (raiz, navegar) => {
             el('div', { class: 'moeda moeda-silver', title: 'Poké Dólar: ganho jogando' }, el('span', { class: 'moeda-icone' }), el('small', {}, 'Poké Dólar'), el('strong', {}, save.silver.toLocaleString('pt-BR'))),
             el('div', { class: 'moeda moeda-gold', title: 'Origin Coin: moeda paga (por enquanto, pelo painel Admin)' }, el('span', { class: 'moeda-icone' }), el('small', {}, 'Origin Coin'), el('strong', {}, save.gold.toLocaleString('pt-BR'))),
             vipAtivo(save)
-              ? el('div', { class: 'selo-vip-conta', title: 'VIP: bônus na conta por um tempo (os bônus ainda vão ser definidos)' }, el('span', { class: 'icone-vip' }, 'VIP'), el('small', {}, `ativo · acaba em ${tempoRestanteVip(save)}`))
+              ? el('div', { class: 'selo-vip-conta', title: `VIP ativo · acaba em ${tempoRestanteVip(save)}\n\n${GUIA.flatMap((g) => g.topicos).find((t) => t.id === 'vip')?.texto.join('\n') ?? ''}` }, el('span', { class: 'icone-vip' }, 'VIP'), el('small', {}, `ativo · acaba em ${tempoRestanteVip(save)}`))
               : null,
           ),
           el(

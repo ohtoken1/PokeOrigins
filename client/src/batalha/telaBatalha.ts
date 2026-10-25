@@ -1,5 +1,6 @@
 import { bonificacao } from '../bonificacao';
 import { acaoDaTecla, escolhendoTecla, teclaDoEvento } from '../teclas';
+import type { NivelIa } from '../../../shared/batalha/ia';
 import { recompensaDoSelvagem } from '../../../shared/treinadoresNpc';
 import { somarMetrica } from '../../../shared/metricas';
 import { podeUsar, tetoDoJogador, textoDoLimite } from '../limiteNivel';
@@ -66,6 +67,7 @@ import { dicaGolpe } from '../ui/dicaGolpe';
 import { nomeCategoria, traduzir } from '../../../shared/traducao';
 import { animarBola, animarDano, animarDesmaio, animarEntrada, animarEvolucao, animarFimDynamax, animarRetorno, animarTransformacao, tremerArena } from './animacoes';
 import { HAZARDS, animarGolpeOriginal } from './efeitosGolpes';
+import { tutorialFez } from '../tutorialEventos';
 
 export type ResultadoBatalha = 'vitoria' | 'derrota' | 'captura' | 'fuga';
 
@@ -75,7 +77,7 @@ export interface OpcoesBatalha {
   selvagem: PokemonIndividual;
   bioma: Bioma;
   /** Duelo contra treinador NPC (sem captura nem fuga; recompensa em silver ao vencer). */
-  treinador?: { nome: string; titulo: string; equipe: PokemonIndividual[]; recompensa: number; imagem?: string; mensagemVitoria?: string; duelo?: boolean; /** frase do começo no lugar de "Fulano, título, quer batalhar!" (Ninho) */ mensagemInicio?: string; /** o que se perde ao fugir (a tela pergunta antes): Poké Dólares do Ninho, vaga da Liga… */ avisoFuga?: string };
+  treinador?: { /** nível da IA (shared/batalha/ia.ts): ginásio Fácil e Duelos 'facil', ginásio Médio 'medio', ginásio Difícil, Ninho e Boss 'dificil' (sem nada = 'facil') */ ia?: NivelIa; nome: string; titulo: string; equipe: PokemonIndividual[]; recompensa: number; imagem?: string; mensagemVitoria?: string; duelo?: boolean; /** frase do começo no lugar de "Fulano, título, quer batalhar!" (Ninho) */ mensagemInicio?: string; /** o que se perde ao fugir (a tela pergunta antes): Poké Dólares do Ninho, vaga da Liga… */ avisoFuga?: string };
   aoTerminar(resultado: ResultadoBatalha): void;
   /** Boss (eventos): HP infinito, acaba em `turnos`; no fim, `aoDano` recebe o dano total causado. */
   boss?: { turnos: number; aoDano(dano: number): void };
@@ -211,7 +213,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     dadosSelvagem.nome,
     dadosSelvagem.taxaCaptura,
     Math.random,
-    treinador ? { nome: treinador.nome, equipe: treinador.equipe, nomesEquipe: treinador.equipe.map((p) => nomeDe(p.especieId)) } : null,
+    treinador ? { nome: treinador.nome, equipe: treinador.equipe, nomesEquipe: treinador.equipe.map((p) => nomeDe(p.especieId)), ia: treinador.ia } : null,
   );
 
   if (boss) batalha.modoBoss(boss.turnos);
@@ -506,7 +508,12 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
           await dizer(ev.texto);
           break;
         case 'preparar':
-          if (!rapido) prepararGolpe(sprite(ev.lado), ev.golpe, ev.tipoGolpe);
+          // 1º turno de Solar Beam, Fly, Phantom Force…: a metade de preparo da animação do Showdown e depois o
+          // Pokémon fica brilhando (carregando) ou meio transparente (fora de alcance) até o 2º turno
+          if (!rapido) {
+            await animarGolpeOriginal(arena, sprite(ev.lado), null, ev.golpe, ev.tipoGolpe, '', sprite(ev.lado === 'jogador' ? 'selvagem' : 'jogador'), { preparo: true });
+            prepararGolpe(sprite(ev.lado), ev.golpe, ev.tipoGolpe);
+          }
           await dizer(ev.texto);
           break;
         case 'entrar':
@@ -556,7 +563,8 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
             voltarDoPreparo(sprite(ev.lado));
             if (!rapido) await esperar(350);
           }
-          if (!rapido && !ev.semAnimacao) await animarGolpeOriginal(arena, sprite(ev.lado), ev.alvo && ev.alvo !== ev.lado ? sprite(ev.alvo) : null, ev.golpe, ev.tipoGolpe, ev.categoria, sprite(ev.lado === 'jogador' ? 'selvagem' : 'jogador'));
+          // errou: a animação sai ao lado do alvo (não parece que acertou)
+          if (!rapido && !ev.semAnimacao) await animarGolpeOriginal(arena, sprite(ev.lado), ev.alvo && ev.alvo !== ev.lado ? sprite(ev.alvo) : null, ev.golpe, ev.tipoGolpe, ev.categoria, sprite(ev.lado === 'jogador' ? 'selvagem' : 'jogador'), { errou: ev.errou });
           break;
         case 'hp': {
           info(ev.lado).hp(ev.hp, ev.hpMax);
@@ -1164,6 +1172,7 @@ Chance de captura agora: ${textoDaChance(batalha.chanceDeCaptura(efeitoDaBola(id
       // missões diárias do passe: derrotar conta só selvagens; vitória em Duelos com treinadores conta duelo
       if (!treinador) await avisarMissoes(contarNasMissoes(save, 'derrotar', selvagem.especieId));
       else if (treinador.duelo) await avisarMissoes(contarNasMissoes(save, 'duelo'));
+      if (!treinador && !boss) tutorialFez('derrotou');
     } else if (resultado === 'captura') {
       await darXpTreinador();
       await darXpTime();
@@ -1184,6 +1193,7 @@ Chance de captura agora: ${textoDaChance(batalha.chanceDeCaptura(efeitoDaBola(id
       if (selvagem.shiny || rara) avisarCapturaRara(selvagem.especieId, selvagem.shiny, rara);
       await avisarMissoes(contarNasMissoes(save, 'capturar', selvagem.especieId));
       if (selvagem.shiny) await avisarMissoes(contarNasMissoes(save, 'shiny'));
+      tutorialFez('capturou');
       // acima do limite de nível do treinador (um lendário nível 50, por exemplo): vai para o PC até poder ser usado
       const usavel = podeUsar(save, selvagem);
       if (usavel && save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(selvagem);
@@ -1247,8 +1257,12 @@ const PREPARO: Record<string, string> = {
   phantomforce: 'sumir', shadowforce: 'sumir',
 };
 const animacaoDoPreparo = new WeakMap<HTMLElement, Animation>();
-/** Para onde vai o sprite em cada preparo (estilo direto no elemento: as animações de golpe também mexem nele). */
-const DESLOCAMENTO: Record<string, string> = { voar: '0 -220px', cavar: '0 30px', mergulhar: '0 40px', sumir: '0 0' };
+/**
+ * Para onde vai o sprite em cada preparo (estilo direto no elemento: as animações de golpe também mexem nele). Fora de
+ * alcance o Pokémon fica meio transparente (pedido do dono), não some: dá para ver que ele está lá, inalcançável.
+ */
+const DESLOCAMENTO: Record<string, string> = { voar: '0 -40px', cavar: '0 18px', mergulhar: '0 22px', sumir: '0 0' };
+const OPACIDADE_FORA_DE_ALCANCE = 0.25;
 function prepararGolpe(alvo: HTMLElement, golpe: string, tipo: string): void {
   const modo = PREPARO[golpe] ?? 'carregar';
   alvo.dataset.preparo = modo;
@@ -1256,7 +1270,7 @@ function prepararGolpe(alvo: HTMLElement, golpe: string, tipo: string): void {
   alvo.classList.add('preparando', `prep-${modo}`);
   // animação própria por cima das outras (a de entrada fica "presa" no fim e seguraria a opacidade)
   if (DESLOCAMENTO[modo])
-    animacaoDoPreparo.set(alvo, alvo.animate([{ translate: '0 0', opacity: 1 }, { translate: DESLOCAMENTO[modo], opacity: 0 }], { duration: 400, easing: 'ease-in', fill: 'forwards' }));
+    animacaoDoPreparo.set(alvo, alvo.animate([{ translate: '0 0', opacity: 1 }, { translate: DESLOCAMENTO[modo], opacity: OPACIDADE_FORA_DE_ALCANCE }], { duration: 400, easing: 'ease-in', fill: 'forwards' }));
 }
 function voltarDoPreparo(alvo: HTMLElement): void {
   if (!alvo.dataset.preparo) return;

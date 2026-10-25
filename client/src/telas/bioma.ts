@@ -14,7 +14,7 @@ import { comoEvolui } from '../../../shared/evolucoes';
 import type { BiomaScene, OpcoesBioma } from '../jogo/BiomaScene';
 import { mostrarJogo } from '../jogo/jogoUnico';
 import { abrirBatalha } from '../batalha/telaBatalha';
-import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons } from '../dados';
+import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons, pokemonsDosMapasDe } from '../dados';
 import { ajustesAdmin, aoMudarAdmin } from '../ui/admin';
 import { carregarSave, usarSave, novoPokemon, salvar } from '../estado';
 import { abrirMenuJogador } from '../ui/menuJogador';
@@ -36,7 +36,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   // wallpaper do bioma (client/public/fundo-<bioma>.svg); volta ao do menu ao sair
   document.body.dataset.fundo = bioma.id;
   const regiao = regiaoPorId(save.regiao);
-  const tabelaNormal = montarTabela(bioma, pokemonsDaRegiao(regiao.id), [], todosOsPokemons());
+  const tabelaNormal = montarTabela(bioma, pokemonsDosMapasDe(regiao.id), [], todosOsPokemons());
   // tabela com os ajustes do painel de administrador (lendários mais/menos comuns…)
   let tabela = ajustarTabela(tabelaNormal, comBonificacao(ajustesAdmin()));
   const nivelDoTreinador = nivelTreinador(save.xpTreinador);
@@ -161,7 +161,7 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
     atualizarPausa();
     abrirBatalha({
       save, bioma, selvagem: equipe[0],
-      treinador: { nome: `Ninho de ${nome}`, titulo: 'Ninho', equipe, recompensa: 0, mensagemInicio: `Um ${nome} furioso saltou do ninho!`, avisoFuga: 'Os Poké Dólares pagos para entrar no ninho NÃO serão devolvidos.' },
+      treinador: { ia: 'dificil', nome: `Ninho de ${nome}`, titulo: 'Ninho', equipe, recompensa: 0, mensagemInicio: `Um ${nome} furioso saltou do ninho!`, avisoFuga: 'Os Poké Dólares pagos para entrar no ninho NÃO serão devolvidos.' },
       aoTerminar: (resultado) => {
         aoFim(resultado === 'vitoria');
         if (resultado === 'derrota') return navegar({ tela: 'cidade' });

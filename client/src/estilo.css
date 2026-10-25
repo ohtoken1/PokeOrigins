@@ -747,6 +747,16 @@ button.vaga:hover { border-color: var(--borda); }
 }
 .menu-topo button:hover { background: var(--painel-2); }
 .menu-topo small { color: var(--texto-2); font-weight: 500; font-size: 0.7rem; }
+/* itens dos menus do topo: ícone na Pokébola preta e dourada (ui/icones.ts, iconeMenu) */
+.menu-topo button { justify-content: flex-start; }
+.menu-topo button small { margin-left: auto; }
+.icone-menu {
+  position: relative; flex: none; display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: #f3cf6b;
+  background: radial-gradient(circle at 35% 28%, #3a3328 0%, #121110 60%); border: 2px solid var(--destaque); box-shadow: 0 0 0 1px var(--borda);
+}
+.icone-menu::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 2px; translate: 0 -50%; background: linear-gradient(90deg, #c98f24, #f6d77a, #c98f24); }
+.icone-menu svg { position: relative; z-index: 1; width: 15px; height: 15px; padding: 2px; box-sizing: content-box; border-radius: 50%; background: #121110; outline: 1.5px solid var(--destaque); }
+
 /* telas da Comunidade (em breve) */
 .tela-comunidade { max-width: 640px; margin: 0 auto; }
 .em-breve {
@@ -1387,16 +1397,17 @@ button.vaga:hover { border-color: var(--borda); }
 .cabecalho-jogo { position: sticky; }
 .cab-atalhos-fora { position: absolute; top: calc(100% + 8px); right: max(16px, calc((100% - 1340px) / 2 + 16px)); display: flex; align-items: center; gap: 8px; pointer-events: none; }
 .atalho-hex {
-  pointer-events: auto; position: relative; width: 42px; height: 42px; padding: 0; border-radius: 50%; cursor: pointer; color: #fff;
-  background: #121212; border: 2px solid #f2f2f2; box-shadow: 0 3px 6px rgb(0 0 0 / 0.5); display: grid; place-items: center;
+  pointer-events: auto; position: relative; width: 42px; height: 42px; padding: 0; border-radius: 50%; cursor: pointer; color: #f3cf6b;
+  background: radial-gradient(circle at 35% 28%, #3a3328 0%, #121110 60%); border: 2px solid var(--destaque);
+  box-shadow: 0 0 0 1px var(--borda), 0 3px 6px rgb(0 0 0 / 0.5); display: grid; place-items: center;
   transition: transform 0.12s, box-shadow 0.12s;
 }
-/* a faixa branca do meio da Pokébola (passa por trás do centro) */
-.atalho-hex::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 2px; translate: 0 -50%; background: #f2f2f2; }
-/* no lugar do botão central: só o desenho do destino, com um fundo preto que "corta" a faixa */
-.atalho-hex .icone { position: relative; z-index: 1; display: grid; place-items: center; padding: 2px; border-radius: 6px; background: #121212; }
+/* a faixa dourada do meio da Pokébola (passa por trás do centro) */
+.atalho-hex::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 2px; translate: 0 -50%; background: linear-gradient(90deg, #c98f24, #f6d77a, #c98f24); }
+/* no lugar do botão central: o desenho do destino num círculo preto com contorno dourado, que "corta" a faixa */
+.atalho-hex .icone { position: relative; z-index: 1; display: grid; place-items: center; padding: 3px; border-radius: 50%; background: #121110; outline: 1.5px solid var(--destaque); }
 .atalho-hex .icone svg { width: 20px; height: 20px; }
-.atalho-hex:hover { transform: translateY(-2px) rotate(-12deg); box-shadow: 0 5px 10px rgb(0 0 0 / 0.55), 0 0 0 2px rgb(255 255 255 / 0.25); }
+.atalho-hex:hover { transform: translateY(-2px) rotate(-12deg); box-shadow: 0 0 0 1px var(--borda), 0 5px 10px rgb(0 0 0 / 0.55), 0 0 10px rgb(233 185 73 / 0.45); }
 .cab-atalhos-fora .cabecalho-aviso { pointer-events: none; margin-left: 4px; text-shadow: 0 1px 3px #000; }
 .cab-moedas { margin-left: auto; }
 
@@ -2971,6 +2982,12 @@ button.creche-pokemon:hover { border-color: var(--destaque); }
 .guia-ampliada small { color: #ddd; }
 
 /* Tutorial: o Professor Carvalho fala quando um conteúdo é liberado */
+.tutorial-missao { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 900; display: flex; gap: 10px; align-items: center; width: min(560px, calc(100vw - 32px)); padding: 10px 14px; background: rgb(26 24 21 / 0.96); border: 2px solid var(--destaque); border-radius: 12px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.5); animation: tutorial-aparece 0.25s ease-out; }
+.tutorial-missao-foto { width: 56px; height: 56px; object-fit: contain; image-rendering: pixelated; flex: none; }
+.tutorial-missao-corpo { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tutorial-missao-corpo strong { color: var(--destaque); }
+.tutorial-missao-corpo p { margin: 0; font-size: 0.92rem; }
+.tutorial-missao-corpo .botao { align-self: flex-start; padding: 4px 12px; }
 .tutorial-fundo { position: fixed; inset: 0; z-index: 4000; display: grid; place-items: center; padding: 16px; background: rgb(0 0 0 / 0.55); backdrop-filter: blur(2px); animation: tutorial-aparece 0.25s ease-out; }
 @keyframes tutorial-aparece { from { opacity: 0; } to { opacity: 1; } }
 .tutorial-prof { display: flex; align-items: center; gap: 8px; width: min(820px, 100%); animation: tutorial-entra 0.35s ease-out; }
@@ -3009,6 +3026,13 @@ button.creche-pokemon:hover { border-color: var(--destaque); }
 .parceria-status.ativa { background: #1f3a24; color: #9fe0a8; }
 .parceria-pendente { color: #ffcf6e; }
 .parceria-botoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.parceria-link { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.parceria-link .db-busca { flex: 1 1 240px; font-family: monospace; }
+.parceria-contas { max-height: 320px; overflow: auto; border: 1px solid var(--borda); border-radius: 8px; }
+.parceria-tabela { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.parceria-tabela th, .parceria-tabela td { padding: 5px 10px; text-align: left; border-bottom: 1px solid var(--borda); }
+.parceria-tabela th { position: sticky; top: 0; background: var(--painel-2); color: var(--texto-2); }
+.parceria-tabela .parceria-jogador td:last-child { color: #9fe0a8; font-weight: 700; }
 .doacao-criador { display: flex; flex-direction: column; gap: 6px; padding: 14px; margin: 12px 0; background: var(--painel); border: 1px solid var(--borda); border-radius: 12px; }
 .doacao-criador small { color: var(--texto-2); }
 .doacao-criador-linha { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -3316,3 +3340,89 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 .aviso-perigo-adm { padding: 14px 16px; margin-bottom: 14px; border: 2px solid #c0392b; border-radius: 12px; background: rgb(192 57 43 / 0.16); }
 .aviso-perigo-adm strong { display: block; font-size: 1.25rem; color: #ff8a7a; margin-bottom: 6px; }
 .aviso-perigo-adm p { margin: 4px 0; }
+/* Atualização nova publicada (client/src/novaVersao.ts) */
+.aviso-nova-versao {
+  position: fixed; left: 50%; top: 70px; translate: -50% 0; z-index: 3000; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 12px;
+  max-width: min(560px, calc(100vw - 24px)); padding: 12px 16px; border-radius: 14px; text-align: center;
+  background: rgb(18 17 15 / 0.97); border: 2px solid var(--destaque); box-shadow: 0 10px 28px rgb(0 0 0 / 0.5);
+}
+.aviso-nova-versao strong { color: var(--destaque); width: 100%; }
+
+/* Administração → Ginásios e Biomas; abas de dificuldade dos ginásios */
+.abas-dificuldade-ginasio { margin: 6px 0 10px; }
+.admin-ginasio-lider { display: flex; align-items: center; gap: 12px; margin: 8px 0; }
+.admin-ginasio-lider .retrato-npc { width: 64px; height: 64px; object-fit: contain; }
+.adm-biomas-painel { margin: 10px 0; display: flex; flex-direction: column; gap: 8px; }
+.adm-biomas-regioes { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 4px; }
+
+/* Administração → Prêmios, Tiers e Ver jogador */
+.adm-premio-grupo { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; padding: 10px; border: 1px solid var(--borda); border-radius: 8px; background: var(--painel); }
+.adm-premio-linha { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.adm-premio-campo { display: flex; flex-direction: column; gap: 2px; }
+.adm-premio-campo.largo { flex: 1 1 180px; min-width: 140px; }
+.adm-premio-num { width: 110px; }
+.adm-premio-meta { margin: 12px 0; padding-top: 6px; border-top: 1px solid var(--borda); }
+.adm-premio-acoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.adm-jog-dados { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 6px 0 14px; }
+.adm-jog-dados dt { color: var(--texto-2); }
+.adm-jog-dados dd { margin: 0; overflow-wrap: anywhere; }
+.adm-jog-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 8px; }
+.adm-jog-pk { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; padding: 8px; border: 1px solid var(--borda); border-radius: 8px; background: var(--painel); }
+.adm-jog-boxes { flex-wrap: wrap; }
+.adm-jog-itens { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
+.adm-jog-item { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border: 1px solid var(--borda); border-radius: 6px; background: var(--painel); }
+
+/* Pré-registro (telas/preRegistro.ts) e Whitelist */
+.link-pre-registro { display: block; margin-top: 14px; text-align: center; color: var(--destaque); }
+.pre-registro { min-height: 100vh; background: var(--fundo); color: var(--texto); padding: 24px 16px 40px; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.pre-topo { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; max-width: 900px; }
+.pre-logo { width: min(460px, 90vw); }
+.pre-chamada { font-size: 1.2rem; color: var(--texto-2); margin: 0; }
+.pre-selo { background: var(--dourado, var(--destaque)); color: var(--texto-no-dourado, #12110f); font-weight: 700; padding: 6px 16px; border-radius: 999px; }
+.pre-total { margin: 0; color: var(--texto-2); }
+.pre-contador { color: var(--destaque); font-size: 1.4rem; }
+.pre-bloco { width: 100%; max-width: 1100px; background: var(--painel); border: 1px solid var(--borda); border-radius: 12px; padding: 20px; box-sizing: border-box; }
+.pre-bloco h2 { margin: 0 0 8px; color: var(--destaque); }
+.pre-principal { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; }
+.pre-form { max-width: 420px; }
+.pre-link-criador { margin: 0; padding: 8px 10px; border: 1px solid var(--borda); border-radius: 8px; background: var(--painel-2); color: var(--destaque); font-size: 0.9rem; }
+.pre-kit-lista { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; }
+.pre-kit-item { display: flex; align-items: center; gap: 10px; padding: 6px 10px; background: var(--painel-2); border: 1px solid var(--borda); border-radius: 8px; }
+.pre-status { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.pre-destaques { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.pre-destaque { background: var(--painel-2); border: 1px solid var(--borda); border-radius: 10px; padding: 14px; }
+.pre-destaque h3 { margin: 6px 0 4px; }
+.pre-destaque p { margin: 0; color: var(--texto-2); }
+.pre-emoji { font-size: 1.8rem; }
+.pre-founders { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-top: 10px; }
+.pre-founder { background: var(--painel-2); border: 1px solid var(--borda); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.pre-founder h3 { margin: 4px 0; }
+.pre-founder ul { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 3px; color: var(--texto-2); font-size: .92rem; }
+.pre-preco { color: var(--destaque); font-size: 1.3rem; }
+.pre-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.pre-links .botao { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.pre-links img { width: 22px; height: 22px; }
+.pre-rodape { text-align: center; max-width: 700px; }
+.wl-liberada { opacity: .85; }
+@media (max-width: 760px) { .pre-principal { grid-template-columns: 1fr; } }
+
+/* Lugares da cidade (ui/lugaresCidade.ts): setinha na beira esquerda do mapa e a aba que abre por cima do jogo */
+.lugares-seta { position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 6; width: 28px; height: 84px; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; box-shadow: 2px 0 8px rgb(0 0 0 / 0.4); border: 2px solid var(--borda); border-left: 0; border-radius: 0 10px 10px 0; background: var(--painel-2); color: var(--destaque); font-size: 0.85rem; line-height: 1; cursor: pointer; transition: left 0.25s ease; }
+.lugares-seta:hover, .lugares-seta:focus-visible { background: var(--dourado); color: var(--texto-no-dourado); }
+.lugares-seta.aberta { left: min(260px, 70%); }
+.lugares-cidade { position: absolute; left: 0; top: 0; bottom: 0; z-index: 6; width: min(260px, 70%); display: flex; flex-direction: column; gap: 4px; padding: 10px 8px; line-height: 1.3; background: rgb(18 17 15 / 0.92); border-right: 2px solid var(--borda); transform: translateX(-102%); transition: transform 0.25s ease; overflow-y: auto; }
+.lugares-cidade.aberta { transform: none; }
+.lugares-titulo { color: var(--destaque); font-size: 0.95rem; }
+.lugares-sub { color: var(--texto-2); font-size: 0.75rem; margin-bottom: 4px; }
+.lugares-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.lugares-item { width: 100%; display: flex; align-items: center; gap: 8px; padding: 5px 8px; border: 1px solid transparent; border-radius: 8px; background: var(--painel); color: var(--texto); font: inherit; font-size: 0.85rem; text-align: left; cursor: pointer; }
+.lugares-item:hover, .lugares-item:focus-visible { border-color: var(--destaque); background: var(--painel-2); }
+.lugares-item.trancado { opacity: 0.6; }
+.lugares-emoji { width: 1.4em; text-align: center; flex: none; }
+.lugares-cadeado { margin-left: auto; font-size: 0.75rem; }
+
+/* Administração → Animações (telas/adminAnimacoes.ts): o palco da batalha para testar cada golpe */
+.admin-animacoes .anim-palco { width: min(760px, 100%); border-radius: 12px; overflow: hidden; border: 2px solid var(--borda); }
+.admin-animacoes .anim-info { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin: 8px 0; }
+.admin-animacoes .anim-titulo { color: var(--destaque); }
+.admin-animacoes .anim-controles .db-busca { max-width: 360px; }
