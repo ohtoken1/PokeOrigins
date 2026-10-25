@@ -115,7 +115,7 @@ export function conectarOnline(): void {
     }
     if (msg.t === 'chat-historico') return ouvintesChat.forEach((o) => o.historico(msg.canal as CanalChat, msg.lista as MensagemChat[]));
     if (msg.t === 'chat-erro') return ouvintesChat.forEach((o) => o.erro(msg.canal as CanalChat, msg.texto as string));
-    if (msg.t === 'amigos' || msg.t === 'privado' || msg.t === 'cla' || msg.t === 'anuncios' || msg.t === 'cofre' || msg.t === 'entrega' || msg.t === 'correio' || msg.t === 'recompensas' || msg.t === 'mercado' || msg.t === 'missoes' || msg.t === 'mercado-acerto' || msg.t === 'letreiro' || msg.t === 'eventos' || msg.t === 'letreiro-historico' || (typeof msg.t === 'string' && (msg.t.startsWith('pvp-') || msg.t.startsWith('torneio') || msg.t.startsWith('ranqueado') || msg.t === 'liga'))) return ouvintesAviso.forEach((f) => f(msg));
+    if (msg.t === 'amigos' || msg.t === 'privado' || msg.t === 'cla' || msg.t === 'anuncios' || msg.t === 'cofre' || msg.t === 'entrega' || msg.t === 'correio' || msg.t === 'recompensas' || msg.t === 'mercado' || msg.t === 'missoes' || msg.t === 'mercado-acerto' || msg.t === 'letreiro' || msg.t === 'eventos' || msg.t === 'ajustes' || msg.t === 'letreiro-historico' || (typeof msg.t === 'string' && (msg.t.startsWith('pvp-') || msg.t.startsWith('torneio') || msg.t.startsWith('ranqueado') || msg.t === 'liga'))) return ouvintesAviso.forEach((f) => f(msg));
     const ouvinte = salaAtual?.ouvinte;
     if (!ouvinte) return;
     if (msg.t === 'jogadores' && msg.sala === salaAtual!.sala) ouvinte.todos(msg.lista as JogadorOnline[]);
@@ -132,6 +132,8 @@ export function conectarOnline(): void {
     salaAtual?.ouvinte.todos([]);
     // 4000 = o jogo foi aberto em outra aba; 4001 = sessão vencida: não fica tentando
     if (e.code === 4000 || e.code === 4001) return void (desistiu = true);
+    // 4005 = a conta voltou para o pré-registro (a staff tirou o acesso): recarrega e cai na tela de pré-registro
+    if (e.code === 4005) return void location.reload();
     setTimeout(conectarOnline, espera);
     espera = Math.min(espera * 2, 15000);
   });

@@ -15,6 +15,7 @@ import { el, seloGenero, spritePokemon } from './dom';
 import { iconeItem } from './iconeItem';
 import { abrirJanela } from './janela';
 import { nomeDaMoeda } from '../../../shared/moedas';
+import { tutorialFez } from '../tutorialEventos';
 
 type Aba = 'comprar' | 'vender' | 'meus';
 const numero = (n: number) => n.toLocaleString('pt-BR');
@@ -44,6 +45,7 @@ function nomeDoAnuncio(a: AnuncioMercado): string {
 }
 
 export function abrirMercado(save: Save, aoMudar: () => void = () => {}): void {
+  tutorialFez('mercado');
   let aba: Aba = 'comprar';
   let lista: ListaMercado | null = null;
   let filtro: 'todos' | TipoAnuncio = 'todos';

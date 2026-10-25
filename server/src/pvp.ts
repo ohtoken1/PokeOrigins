@@ -26,6 +26,8 @@ interface Sala {
   tempo: number;
   /** Lado 1 é um treinador NPC (Liga): o servidor escolhe por ele (`escolherIa`). `contas[1]` = 0. */
   npc: boolean;
+  /** nível da IA do NPC (shared/batalha/ia.ts) */
+  nivelIa?: 'facil' | 'medio' | 'dificil';
   /** Tudo o que cada lado já viu (começo + turnos): quem recarrega a página volta para a batalha com isto. */
   historico: [unknown[], unknown[]];
   /** Só uma mecânica especial (Mega, Z-Move ou Tera) por lado; usar uma segunda diferente = derrota (ranqueado). */
@@ -106,11 +108,11 @@ export function criarBatalha(a: banco.Conta, b: banco.Conta, opcoes: { tipo: Sal
  * por ele. O time do jogador entra COMO ESTÁ (sem curar); `aoFim` recebe se o jogador venceu e o time como terminou.
  * Recarregar a página volta para a batalha (`atual`) e o relógio do turno não para.
  */
-export function criarBatalhaPve(conta: banco.Conta, jogador: JogadorPvp, npc: JogadorPvp, opcoes: { titulo: string; tempo: number; aoFim: (venceu: boolean, time: Record<string, unknown>[]) => void }): number {
+export function criarBatalhaPve(conta: banco.Conta, jogador: JogadorPvp, npc: JogadorPvp, opcoes: { titulo: string; tempo: number; ia?: 'facil' | 'medio' | 'dificil'; aoFim: (venceu: boolean, time: Record<string, unknown>[]) => void }): number {
   if (salaDaConta.has(conta.id)) throw new ErroConta('Você já está numa batalha.', 409);
   const batalha = novaBatalhaPvp(jogador, npc, [], undefined, [false, true]);
   const sala: Sala = {
-    id: proximaSala++, batalha, contas: [conta.id, 0], nomes: [jogador.nome, npc.nome], prazo: Date.now() + opcoes.tempo + FOLGA_ANIMACAO_MS, tipo: 'liga', tempo: opcoes.tempo, npc: true,
+    id: proximaSala++, batalha, contas: [conta.id, 0], nomes: [jogador.nome, npc.nome], prazo: Date.now() + opcoes.tempo + FOLGA_ANIMACAO_MS, tipo: 'liga', tempo: opcoes.tempo, npc: true, nivelIa: opcoes.ia ?? 'dificil',
     historico: [[], []], abertura: [{}, {}], umaMecanica: false, mecanicaUsada: [null, null],
     aoFim: (v) => opcoes.aoFim(v === conta.id, batalha.timeFinal(0)),
   };
@@ -126,7 +128,7 @@ export function criarBatalhaPve(conta: banco.Conta, jogador: JogadorPvp, npc: Jo
 
 /** NPC escolhe sempre que precisa (pode precisar mais de uma vez: trocar o desmaiado e já escolher o golpe). */
 function vezDoNpc(sala: Sala): void {
-  for (let i = 0; sala.npc && i < 6 && sala.batalha.precisaEscolher(1); i++) sala.batalha.escolherIa(1);
+  for (let i = 0; sala.npc && i < 6 && sala.batalha.precisaEscolher(1); i++) sala.batalha.escolherIa(1, sala.nivelIa);
 }
 
 function lerEscolha(v: unknown): EscolhaPvp {

@@ -141,7 +141,7 @@ export const telaDuelos: Tela = (raiz, navegar) => {
               save,
               selvagem: equipe[0],
               bioma: BIOMAS[Math.floor(Math.random() * BIOMAS.length)],
-              treinador: { nome: npc.nome, titulo: npc.titulo, equipe, recompensa, imagem: imagemTreinador(npc.id), duelo: true },
+              treinador: { nome: npc.nome, titulo: npc.titulo, equipe, recompensa, imagem: imagemTreinador(npc.id), duelo: true, ia: 'facil' },
               aoTerminar: (resultado) => {
                 // conquista 50/50: guarda quem já foi vencido
                 if (resultado === 'vitoria' && !(save.duelosVencidos ??= []).includes(npc.id)) save.duelosVencidos.push(npc.id);

@@ -42,6 +42,9 @@ import { aoMudarJanelas } from '../ui/janela';
 import { acompanharTime, painelTime } from '../ui/time';
 import { aparenciaDoSave } from '../personagem/aparencia';
 import { montarPersonagem } from '../personagem/lpc';
+import { bloqueioDoTutorial } from '../tutorial';
+import { definirIrNaCidade } from '../tutorialEventos';
+import { montarLugaresCidade } from '../ui/lugaresCidade';
 
 /** NPCs que ainda não têm função. */
 const EM_BREVE: Record<string, string> = { sazonal: 'Evento sazonal' };
@@ -144,6 +147,8 @@ export const telaCidade: Tela = (raiz, navegar) => {
   let saindo = false;
   /** O que cada lugar faz quando o personagem chega. */
   function usarLocal(acao: string) {
+    const presoNoTutorial = bloqueioDoTutorial(acao);
+    if (presoNoTutorial) return avisar(presoNoTutorial);
     if (acao === 'centro') {
       abrirCura(save!, () => atualizarTime());
     } else if (acao === 'loja') abrirLoja(save!, () => atualizarTime());
@@ -181,7 +186,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
         cena()?.pausar(true);
         abrirBatalha({
           save: save!, bioma: biomaPorId('caverna'), selvagem: boss,
-          treinador: { nome, titulo: 'Boss', equipe: [boss], recompensa: 0, mensagemInicio: `${nome} ruge furioso dentro da gaiola!`, avisoFuga: 'Vale o dano que você já causou, mas você não poderá enfrentar este boss de novo.' },
+          treinador: { ia: 'dificil', nome, titulo: 'Boss', equipe: [boss], recompensa: 0, mensagemInicio: `${nome} ruge furioso dentro da gaiola!`, avisoFuga: 'Vale o dano que você já causou, mas você não poderá enfrentar este boss de novo.' },
           boss: { turnos: TURNOS_BOSS, aoDano: aoFim },
           aoTerminar: () => {
             cena()?.pausar(false);
@@ -194,11 +199,20 @@ export const telaCidade: Tela = (raiz, navegar) => {
     else avisar(`${EM_BREVE[acao] ?? 'Este lugar'}: em breve.`);
   }
   const minimapa = montarMinimapa(areaJogo, () => cena(), irAoLocal);
+  // setinha na beira do mapa: a aba com os lugares da cidade e o que cada um faz (ui/lugaresCidade.ts)
+  montarLugaresCidade(areaJogo, irAoLocal);
+  // "Ir até lá" do quadro da missão do Professor (client/src/tutorial.ts)
+  definirIrNaCidade((acao) => {
+    if (!cena()) return false;
+    irAoLocal(acao);
+    return true;
+  });
 
   // o mapa para com PC/Bolsa/ficha abertos
   const pararDeOuvirJanelas = aoMudarJanelas((aberta) => cena()?.pausar(aberta));
 
   return () => {
+    definirIrNaCidade(null);
     pararBoss();
     clearInterval(relogioBoss);
     pararDeOuvirJanelas();

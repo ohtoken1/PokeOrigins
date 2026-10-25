@@ -5,13 +5,14 @@ import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { avisar, avisarEvento, avisarTodos } from './mundo.ts';
 import * as correio from './correio.ts';
+import { anexosDePremios } from './recompensas.ts';
 import { lerNome, lerPokemon } from './entregas.ts';
 import { NIVEL_MINIMO, liberado } from '../../shared/trancas.ts';
 import { nivelTreinador } from '../../shared/treinador.ts';
 import {
-  BILHETES_POR_JOGADOR, DIGITOS_COFRE, FECHA_VENDAS, HORA_SORTEIO, INTERVALO_TENTATIVA_COFRE_MS, NUMEROS_LOTERIA, PARTE_DO_POTE, POTE_INICIAL,
+  BILHETES_POR_JOGADOR, DIGITOS_COFRE, FECHA_VENDAS, HORA_SORTEIO, INTERVALO_TENTATIVA_COFRE_MS, NUMEROS_LOTERIA, PARTE_DO_POTE, poteInicial,
   PRECO_BILHETE, PREMIO_COFRE_MAX, agoraEmBrasilia, formatarBilhete, primeiroDoProximoMes,
-  CHANCE_LENDARIO_NINHO, DURACAO_NINHO_MS, EXTRA_POR_DERROTA_MS, INTERVALO_NINHO_MS, LUTA_NINHO_MS, PRECO_NINHO, PRECO_NINHO_VIP, PREMIO_CAPTURA, ROLETA_NINHO,
+  CHANCE_LENDARIO_NINHO, DURACAO_NINHO_MS, EXTRA_POR_DERROTA_MS, INTERVALO_NINHO_MS, LUTA_NINHO_MS, PRECO_NINHO, PRECO_NINHO_VIP, premiosCaptura, roletaNinho,
   proximaMeiaNoite, slotDoNinho, sortearFatia,
   DANO_MAXIMO_BOSS, DURACAO_BOSS_MS, NIVEL_BOSS, pontosGuildaDaPosicao, premiosBossGlobal,
 } from '../../shared/eventosRegras.ts';
@@ -120,7 +121,7 @@ interface EstadoLoteria {
   sorteadoEm: string | null;
   ultimo?: { dia: string; numero: number; vencedor: string | null; premio: number };
 }
-const loteria = (): EstadoLoteria => banco.lerEvento<EstadoLoteria>('loteria') ?? { pote: POTE_INICIAL, voltaEm: null, sorteadoEm: null };
+const loteria = (): EstadoLoteria => banco.lerEvento<EstadoLoteria>('loteria') ?? { pote: poteInicial(), voltaEm: null, sorteadoEm: null };
 const minutos = (h: { hora: number; minuto: number }) => h.hora * 60 + h.minuto;
 
 function situacao(l: EstadoLoteria, agora = Date.now()) {
@@ -147,7 +148,7 @@ export function conferirSorteio(agora = Date.now(), forcar = false): void {
       if (l.pote > 0) correio.enviar(dono, 'Loteria PokeOrigins', `Seu bilhete ${formatarBilhete(numero)} foi sorteado! Aqui está o prêmio.`, [correio.anexoItem('silver', 'Poké Dólares', l.pote)], 'loteria');
       l.ultimo = { dia, numero, vencedor: nome, premio: l.pote };
       avisarEvento(`🎰 ${nome} ganhou a Loteria com o número ${formatarBilhete(numero)} e levou ${l.pote.toLocaleString('pt-BR')} Poké Dólares! A Loteria volta no dia 1º do próximo mês.`);
-      l.pote = POTE_INICIAL;
+      l.pote = poteInicial();
       l.voltaEm = primeiroDoProximoMes(dia);
     }
     banco.gravarEvento('loteria', l);
@@ -282,7 +283,7 @@ export function resultadoDoNinho(conta: banco.Conta, dados: Record<string, unkno
       n.derrotado = { nome: nomeDe(conta), especie };
       banco.gravarEvento('ninho', n);
       avisarEvento(`🪺 ${n.derrotado.nome} derrotou o ninho de ${especie}!`);
-      return { venceu: true, fatia: sortearFatia(ROLETA_NINHO), lendario: dados.lendario === true && Math.random() < CHANCE_LENDARIO_NINHO };
+      return { venceu: true, fatia: sortearFatia(roletaNinho()), lendario: dados.lendario === true && Math.random() < CHANCE_LENDARIO_NINHO };
     }
     n.derrotas++;
     banco.gravarEvento('ninho', n);
@@ -352,9 +353,7 @@ export function conferirCaptura(agora = Date.now()): void {
     if (primeiro) {
       c.vencedor = { nome: primeiro.nome, soma: primeiro.soma };
       correio.enviar(primeiro.contaId, 'Evento de captura', `Você venceu o Evento de captura com ${primeiro.soma} de IVs! Aqui está o prêmio.`, [
-        correio.anexoItem(PREMIO_CAPTURA.item, 'Ovo Lendário', 1),
-        correio.anexoItem('silver', 'Poké Dólares', PREMIO_CAPTURA.silver),
-        correio.anexoItem('gold', 'Origin Coins', PREMIO_CAPTURA.gold),
+        ...anexosDePremios(premiosCaptura()),
       ], 'captura');
     }
     banco.gravarEvento('captura', c);
@@ -492,7 +491,7 @@ export function conferirBoss(agora = Date.now()): void {
     if (b.tipo === 'global') {
       // todo mundo que lutou ganha (top 3, 4º ao 10º e participação: premiosBossGlobal)
       rankingBoss(b).forEach((r, i) => {
-        const anexos = premiosBossGlobal(i).map((p) => correio.anexoItem(p.item, p.nome, p.quantidade));
+        const anexos = anexosDePremios(premiosBossGlobal(i).map((p) => ({ id: p.item, nome: p.nome, quantidade: p.quantidade })));
         // conquistas "Newbie mundial" (participou) e "Lider mundial" (1º lugar)
         anexos.push(correio.anexoMarca('bossMundial'));
         if (i === 0 && r.dano > 0) anexos.push(correio.anexoMarca('bossMundialVenceu'));

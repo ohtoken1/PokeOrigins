@@ -15,10 +15,10 @@ import { DURACOES_EXPEDICAO, FAIXAS_EXPEDICAO, POKEMON_POR_EXPEDICAO, faixaDoPow
 import { BIOMAS } from '../../../shared/biomas';
 import { REGIOES } from '../../../shared/regioes';
 import { montarTabela } from '../../../shared/encontros';
-import { PREMIO_CAPTURA } from '../../../shared/eventosRegras';
+import { premiosCaptura } from '../../../shared/eventosRegras';
 import { buscarExpedicao, candidatosDaExpedicao, comecarExpedicao, powerDoGrupo, precoDaExpedicao } from '../expedicao';
 import { ninhoAtual, type EstadoNinhoServidor } from '../ninho';
-import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons } from '../dados';
+import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons, pokemonsDosMapasDe } from '../dados';
 import { salvar, type PokemonDoJogador } from '../estado';
 import { spritePokemon } from './dom';
 import { EVENTOS, bannerEvento, type EstadoSelo } from './temaEvento';
@@ -198,7 +198,7 @@ export function abrirEventos(save: Save, aoMudar: () => void = () => {}, abaInic
       c?.ativo
         ? el('div', {},
             el('div', { class: 'expedicao-time' }, spritePokemon(pokemonPorId(c.especieId), { animado: false }), el('strong', {}, c.nome)),
-            el('p', { class: 'meta' }, `Capture o ${c.nome} em batalha nos mapas (não valem ovo, troca, Safari ou Orb). A maior soma de IVs até a meia-noite leva 1 Ovo Lendário + ${numero(PREMIO_CAPTURA.silver)} Poké Dólares + ${PREMIO_CAPTURA.gold} Origin Coins. Empate: quem capturou primeiro. Termina em ${tempo(c.fim - Date.now())}.`),
+            el('p', { class: 'meta' }, `Capture o ${c.nome} em batalha nos mapas (não valem ovo, troca, Safari ou Orb). A maior soma de IVs até a meia-noite leva ${premiosCaptura().map((p) => `${numero(p.quantidade)} ${p.nome}`).join(' + ')}. Empate: quem capturou primeiro. Termina em ${tempo(c.fim - Date.now())}.`),
             el('p', {}, `Sua melhor: ${c.meu ?? '—'}`),
             el('ol', { class: 'evento-ranking' }, ...c.ranking.map((r) => el('li', {}, `${r.nome} — ${r.soma}`))))
         : el('p', { class: 'meta' }, c?.vencedor ? `O último evento (${c.nome}) foi vencido por ${c.vencedor.nome}, com ${c.vencedor.soma} de IVs.` : 'Nenhum evento de captura agora.'));
@@ -356,7 +356,7 @@ export function painelEventosStaff(): HTMLElement {
         : el('button', {
             class: 'botao', onclick: async () => {
               // só espécies comuns que aparecem soltas em algum mapa
-              const lista = REGIOES.filter((r) => r.disponivel).flatMap((r) => BIOMAS.flatMap((b) => montarTabela(b, pokemonsDaRegiao(r.id), [], todosOsPokemons()).filter((x) => x.grupo === null).map((x) => x.pokemon)));
+              const lista = REGIOES.filter((r) => r.disponivel).flatMap((r) => BIOMAS.flatMap((b) => montarTabela(b, pokemonsDosMapasDe(r.id), [], todosOsPokemons()).filter((x) => x.grupo === null).map((x) => x.pokemon)));
               const p = lista[Math.floor(Math.random() * lista.length)];
               if (!(await confirmar('Confirmar', `Começar o Evento de captura com ${p.nome}? Vai até a meia-noite.`))) return;
               void enviar('/eventos/captura/iniciar', { especieId: p.id, nome: p.nome });

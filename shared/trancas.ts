@@ -1,10 +1,12 @@
 // Trancas de nível: conteúdos que só abrem a partir de um nível de treinador (pedido do dono; a cada conteúdo
 // novo ele diz se quer tranca). Administradores passam por todas. Sem imports: o servidor também usa.
 
-export type ConteudoTrancado = 'guilda' | 'mercadoNegro' | 'torneio' | 'liga' | 'suspeito' | 'safari' | 'canteiros' | 'craftBola' | 'craftCharm' | 'creche' | 'boss' | 'loginBoasVindas' | 'loginTrinta' | 'troca';
+export type ConteudoTrancado = 'guilda' | 'mercadoNegro' | 'torneio' | 'liga' | 'suspeito' | 'safari' | 'canteiros' | 'craftBola' | 'craftCharm' | 'creche' | 'boss' | 'loginBoasVindas' | 'loginTrinta' | 'troca' | 'duelos';
 
 /** Nível de treinador mínimo de cada conteúdo. */
 export const NIVEL_MINIMO: Record<ConteudoTrancado, number> = {
+  // Arena: Duelos com treinadores e Ginásios (pedido do dono, 24/10/2026)
+  duelos: 2,
   guilda: 11,
   mercadoNegro: 7,
   troca: 6,
@@ -19,7 +21,7 @@ export const NIVEL_MINIMO: Record<ConteudoTrancado, number> = {
   creche: 8,
   boss: 13,
   // logins com prêmio (shared/recompensas.ts): o servidor confere
-  loginBoasVindas: 2,
+  loginBoasVindas: 3,
   loginTrinta: 3,
 };
 

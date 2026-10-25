@@ -11,10 +11,12 @@ import { el } from './dom';
 import { abrirJanela } from './janela';
 import { abrirTorneio } from './torneio';
 import { abrirRanqueado } from './ranqueado';
+import { tutorialFez } from '../tutorialEventos';
 
 const nomeDaRegiao = (id: string) => REGIOES.find((r) => r.id === id)?.nome ?? id;
 
 export function abrirArena(navegar: Navegar, abrirLiga?: () => void): void {
+  tutorialFez('arena');
   const janela = abrirJanela('Arena', () => {
     const save = carregarSave();
     const viagem = ehAdministrador() ? null : viagemAtual();
@@ -24,9 +26,9 @@ export function abrirArena(navegar: Navegar, abrirLiga?: () => void): void {
         descricao: save ? `Os 8 líderes de ${nomeDaRegiao(save.regiao)}. Vença para ganhar as insígnias.` : 'Vença os líderes para ganhar as insígnias.',
         destino: { tela: 'ginasios' },
         // viajando, o jogador não está em região nenhuma
-        fechado: viagem ? `Fechado até o trem chegar a ${nomeDaRegiao(viagem.para)}` : undefined,
+        fechado: !conteudoLiberado('duelos') ? textoTranca('duelos') : viagem ? `Fechado até o trem chegar a ${nomeDaRegiao(viagem.para)}` : undefined,
       },
-      { nome: 'Duelos com treinadores', descricao: 'Enfrente treinadores e ganhe Poké Dólares.', destino: { tela: 'duelos' } },
+      { nome: 'Duelos com treinadores', descricao: 'Enfrente treinadores e ganhe Poké Dólares.', destino: { tela: 'duelos' }, fechado: conteudoLiberado('duelos') ? undefined : textoTranca('duelos') },
       { nome: 'Torneio', descricao: 'Mata-mata de 16 jogadores, às 12h30 e 18h30.', acao: abrirTorneio, fechado: conteudoLiberado('torneio') ? undefined : textoTranca('torneio') },
       { nome: 'PvP Ranqueado', descricao: 'Fila contra outros treinadores: suba da Poké Ball à Master Ball, em cada tier.', acao: () => abrirRanqueado(() => navegar({ tela: 'ranking', categoria: 'ranqueado' })) },
       { nome: 'Liga Pokémon', descricao: 'Elite 4 e a Liga Nightmare, com um treinador de cada tipo.', acao: abrirLiga, fechado: !conteudoLiberado('liga') ? textoTranca('liga') : abrirLiga ? undefined : 'Em breve' },

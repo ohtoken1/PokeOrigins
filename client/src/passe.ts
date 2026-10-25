@@ -6,7 +6,7 @@ import { temporadaAtual, type TemporadaPasse } from '../../shared/passeTemporada
 import { itensDoGrupo, type Premio } from '../../shared/tickets';
 import { entregar } from './ui/ticket';
 import { nivelTreinador } from '../../shared/treinador';
-import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons } from './dados';
+import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons, pokemonsDosMapasDe } from './dados';
 import type { Save } from './estado';
 
 /**
@@ -18,7 +18,7 @@ function especiesDasMissoes(save: Save): number[] {
   const todos = todosOsPokemons();
   const ids = new Set<number>();
   for (const bioma of BIOMAS)
-    for (const e of montarTabela(bioma, pokemonsDaRegiao(save.regiao), [], todos))
+    for (const e of montarTabela(bioma, pokemonsDosMapasDe(save.regiao), [], todos))
       if (e.grupo === null && e.nivelMin <= max && e.nivelMax >= min) ids.add(e.pokemon.id);
   return [...ids];
 }

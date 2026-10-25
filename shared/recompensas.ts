@@ -1,6 +1,8 @@
 // Recompensas de login e de doação acumulada (pedido do dono, 19/10/2026). Sem imports: o servidor lê.
 // Quem decide é o SERVIDOR (server/src/recompensas.ts): conta os dias de login, manda os prêmios pelo Correio e soma
 // as doações. Os prêmios são provisórios ("depois a gente vê caso a caso").
+// A staff pode trocar os prêmios em Administração → Prêmios (shared/premiosEventos.ts): use as funções premiosLogin()…
+import { ajustesPremios } from './premiosEventos.ts';
 
 export type PremioRecompensa = { id: string; nome: string; quantidade: number };
 const p = (id: string, nome: string, quantidade = 1): PremioRecompensa => ({ id, nome, quantidade });
@@ -18,7 +20,7 @@ export const RECUPERACOES_VIP = 3;
  * Login (7 dias, conta nova): cada dia em que o jogador entra, anda uma casinha e ganha o PRÓXIMO prêmio da lista.
  * Todos NT (pedido do dono): item com versão "-nt" sai nela; os outros contam em `save.itensNt` no servidor.
  */
-export const PREMIOS_LOGIN: PremioRecompensa[][] = [
+export const PREMIOS_LOGIN_PADRAO: PremioRecompensa[][] = [
   [p('ultraball-nt', 'Ultra Ball (NT)', 20)],
   [p('silver', 'Poké Dólares', 30_000)],
   [p('abilitycapsule', 'Ability Capsule')],
@@ -33,7 +35,7 @@ export const PREMIOS_LOGIN: PremioRecompensa[][] = [
  * dia pega o prêmio dele, quem não entra perde (VIP recupera até 3). Também tudo NT. Itens comuns em quantidade;
  * raros escassos (pedido do dono): só UMA Chave Temporal (dia 14), uma Ability Capsule e uma Ability Patch.
  */
-export const PREMIOS_LOGIN_TRINTA: PremioRecompensa[][] = [
+export const PREMIOS_LOGIN_TRINTA_PADRAO: PremioRecompensa[][] = [
   [p('greatball-nt', 'Great Ball (NT)', 30)], // 1
   [p('superpotion-nt', 'Super Potion (NT)', 20)], // 2
   [p('ultraball-nt', 'Ultra Ball (NT)', 20)], // 3
@@ -71,7 +73,7 @@ export const PREMIOS_LOGIN_TRINTA: PremioRecompensa[][] = [
  * out–dez, horário de Brasília). Ao passar de cada meta, o servidor manda o prêmio pelo Correio.
  * Metas e prêmios: planilha do dono (20/10/2026). `mint` e `charm` = sorteados pelo servidor, um por unidade.
  */
-export const METAS_DOACAO: { gold: number; premios: PremioRecompensa[] }[] = [
+export const METAS_DOACAO_PADRAO: { gold: number; premios: PremioRecompensa[] }[] = [
   { gold: 500, premios: [p('mint', 'Mint aleatória', 1), p('ovo-inicial', 'Ovo Inicial'), p('abilitycapsule', 'Ability Capsule', 1), p('seletor-orb-1', 'Seletor de Orb 1', 5)] },
   { gold: 1000, premios: [p('mint', 'Mint aleatória', 1), p('ovo-inicial', 'Ovo Inicial'), p('abilitypatch', 'Ability Patch', 1), p('ovo-lendario', 'Ovo Lendário', 1), p('masterball', 'Master Ball', 1), p('seletor-orb-1', 'Seletor de Orb 1', 10)] },
   { gold: 2500, premios: [p('mint', 'Mint aleatória', 1), p('ovo-inicial', 'Ovo Inicial'), p('abilitycapsule', 'Ability Capsule', 2), p('ovo-lendario', 'Ovo Lendário', 1), p('masterball', 'Master Ball', 1), p('seletor-orb-1', 'Seletor de Orb 1', 15)] },
@@ -83,6 +85,10 @@ export const METAS_DOACAO: { gold: number; premios: PremioRecompensa[] }[] = [
   { gold: 75000, premios: [p('mint', 'Mint aleatória', 7), p('ovo-inicial-a', 'Ovo Inicial A'), p('ovo-lendario-a', 'Ovo Lendário A'), p('ovo-lendario', 'Ovo Lendário', 2), p('charm', 'Charm aleatório', 75), p('masterball', 'Master Ball', 5), p('seletor-orb-1', 'Seletor de Orb 1', 100)] },
   { gold: 100000, premios: [p('mint', 'Mint aleatória', 10), p('ovo-inicial-s', 'Ovo Inicial S'), p('ovo-lendario-s', 'Ovo Lendário S'), p('ovo-lendario', 'Ovo Lendário', 4), p('charm', 'Charm aleatório', 100), p('masterball', 'Master Ball', 6), p('seletor-orb-1', 'Seletor de Orb 1', 100), p('seletor-orb-3', 'Seletor de Orb 3', 50)] },
 ];
+
+export const premiosLogin = () => ajustesPremios().login7 ?? PREMIOS_LOGIN_PADRAO;
+export const premiosLoginTrinta = () => ajustesPremios().login30 ?? PREMIOS_LOGIN_TRINTA_PADRAO;
+export const metasDoacao = () => ajustesPremios().doacao ?? METAS_DOACAO_PADRAO;
 
 const BRASILIA_MS = -3 * 60 * 60 * 1000;
 

@@ -246,7 +246,25 @@ function faixasDeNivel(pokemons: PokemonBase[]): Map<number, Faixa> {
 
 /** `pokemons` = os da região; `todos` = todas as regiões carregadas (as faixas dependem das evoluções). */
 export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: number[] = [], todos: PokemonBase[] = pokemons): EntradaTabela[] {
-  return montarTabelaCom((p) => biomaDoPokemon(p) === bioma.id, pokemons, excluir, todos);
+  return montarTabelaCom((p, base) => (ajustesBiomas.mover[base.id] ?? biomaDoPokemon(p)) === bioma.id, pokemons, excluir, todos);
+}
+
+/**
+ * Ajustes dos biomas feitos pela staff (Administração → Biomas, guardados no servidor, server/src/ajustes.ts).
+ * Chave = número da forma BASE da linha evolutiva (vale para a linha toda). `mover` = bioma novo; `fora` = não aparece
+ * solto (mapas e Safari); `extra` = regiões onde também aparece (além da sua), no bioma de sempre (ou no do `mover`).
+ */
+export interface AjustesBiomas { mover: Record<string, string>; fora: number[]; extra: Record<string, string[]> }
+let ajustesBiomas: AjustesBiomas = { mover: {}, fora: [], extra: {} };
+export const definirAjustesBiomas = (a: AjustesBiomas) => void (ajustesBiomas = a);
+export const ajustesDosBiomas = (): AjustesBiomas => ajustesBiomas;
+/** Os Pokémon dos mapas de uma região: os dela + as linhas que a staff pôs lá também (`extra`). */
+export function pokemonsDosMapas(regiaoId: string, daRegiao: PokemonBase[], todos: PokemonBase[]): PokemonBase[] {
+  const linhas = Object.entries(ajustesBiomas.extra).filter(([, rs]) => rs.includes(regiaoId)).map(([k]) => Number(k));
+  if (!linhas.length) return daRegiao;
+  const porSlug = new Map(todos.map((p) => [p.slug, p]));
+  const ja = new Set(daRegiao.map((p) => p.id));
+  return [...daRegiao, ...todos.filter((p) => !ja.has(p.id) && linhas.includes(baseDaLinha(p, porSlug).id))];
 }
 
 /**
@@ -255,14 +273,17 @@ export function montarTabela(bioma: Bioma, pokemons: PokemonBase[], excluir: num
  */
 export const montarTabelaDoTipo = (tipo: string, todos: PokemonBase[]): EntradaTabela[] => montarTabelaCom((p) => p.tipos.includes(tipo), todos, [], todos);
 
-function montarTabelaCom(mora: (p: PokemonBase) => boolean, pokemons: PokemonBase[], excluir: number[], todos: PokemonBase[]): EntradaTabela[] {
+function montarTabelaCom(mora: (p: PokemonBase, base: PokemonBase) => boolean, pokemons: PokemonBase[], excluir: number[], todos: PokemonBase[]): EntradaTabela[] {
   // evoluções podem ser de outra região (Golbat de Kanto → Crobat de Johto): faixas olham todos
   const faixas = faixasDeNivel(todos);
   const porSlug = new Map(todos.map((p) => [p.slug, p]));
   return pokemons
     // Paradox (passado/futuro) existem no jogo mas não aparecem nos mapas (pedido do dono)
     .filter((p) => !excluir.includes(p.id) && !evoluiSemNivel(p, porSlug) && !ehParadoxo(especie(p.id).name) && !foraDosMapas(p.id))
-    .filter(mora)
+    .filter((p) => {
+      const base = baseDaLinha(p, porSlug);
+      return !ajustesBiomas.fora.includes(base.id) && mora(p, base);
+    })
     .map((p) => {
       const [nivelMin, nivelMax] = faixas.get(p.id)!;
       const base = baseDaLinha(p, porSlug);

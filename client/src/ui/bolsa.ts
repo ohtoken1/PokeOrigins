@@ -5,11 +5,14 @@ import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { iconeTicketDoPokemon } from './ticketEvento';
 import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, TODOS_OS_ITENS, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
 import { SEGURAR_OU_EVOLUIR, ehItemDeTroca, ehEquipavel, ehItemDeHabilidade, usarItemDeHabilidade, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
-import { seletorDeItem, seletorDeOrb, CHANCE_SHINY_CUBO_LENDARIO, IV_MINIMO_CUBO_LENDARIO, KIT_INICIANTE, NIVEL_CUBO_LENDARIO, cuboPorItem, ehSeloSazonal } from '../../../shared/itensCustom';
+import { seletorDeItem, seletorDeOrb, CHANCE_SHINY_CUBO_LENDARIO, IV_MINIMO_CUBO_LENDARIO, KIT_INICIANTE, KIT_PRE_REGISTRO, NIVEL_CUBO_LENDARIO, cuboPorItem, ehSeloSazonal } from '../../../shared/itensCustom';
 
 /** Cubo que gera o Pokémon sem precisar de um de origem (Koraidon, Miraidon). */
 const cuboQueGera = (id: string) => { const c = cuboPorItem(id); return c && !c.origens.length ? c : undefined; };
 import { sortearKit } from '../../../shared/kitIniciante';
+import { conteudoKitPreRegistro, type Premio } from '../../../shared/premiosEventos';
+import { TICKETS, itensDoGrupo } from '../../../shared/tickets';
+import { itemInegociavel } from '../../../shared/naoTrocavel';
 import { PASSE_PREMIUM } from '../../../shared/passeTemporadas';
 import { ativarPremium } from '../passe';
 import { FUSOES, GOLPE_DA_FORMA, ehItemDeForma, ivDaFusao, jaMudouDeForma, outrasFormas, proximaForma } from '../../../shared/formasPorItem';
@@ -60,7 +63,23 @@ const opcoesDoSeletor = (id: string) => {
   const s = seletorDeItem(id);
   return s ? TODOS_OS_ITENS.filter((i) => i.categoria === s.categoria && !i.id.endsWith('-nt') && !seletorDeItem(i.id)).map((i) => i.id) : null;
 };
-const acaoDe = (item: ItemLoja) => (seletorDeOrb(item.id) || seletorDeItem(item.id) || item.id === LUCK_INCENSE || ehItemDeHabilidade(item.id) || cuboQueGera(item.id) || item.id === BOX_POKEMON || item.id === KIT_INICIANTE || item.id === PASSE_PREMIUM || ehItemDeForma(item.id) ? 'Usar' : ehItemDeTroca(item.id) ? 'Equipar' : ACAO[item.categoria]);
+/** Entrega um prêmio do Kit de pré-registro no save (NT: a versão "-nt" do item, se existir; senão conta em `itensNt`). */
+function abrirPremioDoKit(save: Save, p: Premio): string {
+  const sorteia = (lista: string[]) => lista[Math.floor(Math.random() * lista.length)];
+  if (p.id === 'silver') return void (save.silver += p.quantidade), `${p.quantidade.toLocaleString('pt-BR')} Poké Dólares`;
+  if (p.id === 'gold') return void (save.gold += p.quantidade), `${p.quantidade.toLocaleString('pt-BR')} Origin Coins`;
+  if (p.id === 'fragmentos') return void (save.fragmentos = (save.fragmentos ?? 0) + p.quantidade), `${p.quantidade} Fragmentos Temporais`;
+  const base = p.id === 'mint' ? sorteia(TODOS_OS_ITENS.filter((i) => i.categoria === 'mints').map((i) => i.id))
+    : p.id === 'charm' ? sorteia(itensDoGrupo('charm'))
+    : p.id === 'orb' ? sorteia(TICKETS.map((t) => t.id))
+    : p.id;
+  const id = itemDaLoja(`${base}-nt`) ? `${base}-nt` : base;
+  save.itens[id] = (save.itens[id] ?? 0) + p.quantidade;
+  if (id === base && !itemInegociavel(id)) (save.itensNt ??= {})[id] = (save.itensNt[id] ?? 0) + p.quantidade;
+  return `${p.quantidade}× ${itemDaLoja(id)?.nome ?? id}`;
+}
+
+const acaoDe = (item: ItemLoja) => (seletorDeOrb(item.id) || seletorDeItem(item.id) || item.id === LUCK_INCENSE || ehItemDeHabilidade(item.id) || cuboQueGera(item.id) || item.id === BOX_POKEMON || item.id === KIT_INICIANTE || item.id === KIT_PRE_REGISTRO || item.id === PASSE_PREMIUM || ehItemDeForma(item.id) ? 'Usar' : ehItemDeTroca(item.id) ? 'Equipar' : ACAO[item.categoria]);
 
 type Modo =
   | { tipo: 'lista' }
@@ -578,6 +597,14 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                         for (const [id, quantidade] of Object.entries(kit.itens)) save.itens[id] = (save.itens[id] ?? 0) + quantidade;
                         save.silver += kit.silver;
                         concluir(`Kit iniciante aberto! Você recebeu Pokébolas, remédios, ${kit.silver.toLocaleString('pt-BR')} Poké Dólares, a ${itemDaLoja(kit.skin)?.nome ?? 'skin'} e um ${itemDaLoja(kit.charm)?.nome ?? 'Charm'}.`);
+                      } else if (item.id === KIT_PRE_REGISTRO) {
+                        // conteúdo definido pela staff (Administração → Prêmios → Kit de pré-registro); tudo sai NT
+                        const conteudo = conteudoKitPreRegistro();
+                        if (!conteudo.length) aviso = 'O conteúdo do Kit de pré-registro ainda vai ser anunciado. Guarde o kit: ele abre quando estiver pronto.';
+                        else {
+                          gastar(item.id);
+                          concluir(`Kit de pré-registro aberto! ${conteudo.map((p) => abrirPremioDoKit(save, p)).join(' · ')}`);
+                        }
                       } else if (cuboQueGera(item.id)) {
                         // Cubo de Koraidon/Miraidon (pedido do dono): gera o Pokémon direto, IVs de 10 a 31
                         const cubo = cuboQueGera(item.id)!;

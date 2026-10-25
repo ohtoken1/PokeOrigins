@@ -24,6 +24,10 @@ import * as parcerias from './parcerias.ts';
 import * as recompensas from './recompensas.ts';
 import * as eventos from './eventos.ts';
 import * as liga from './liga.ts';
+import * as ajustes from './ajustes.ts';
+import * as adminJogador from './adminJogador.ts';
+import * as preRegistro from './preRegistro.ts';
+import * as tutorial from './tutorial.ts';
 import * as pvp from './pvp.ts';
 import * as torneio from './torneio.ts';
 import * as ranqueado from './ranqueado.ts';
@@ -98,6 +102,8 @@ function exigirConta(req: IncomingMessage): banco.Conta {
   if (!conta) throw new ErroConta('Sessão expirada. Entre de novo.', 401);
   // banir já derruba as sessões; isto cobre qualquer sessão que tenha sobrado
   banimentos.exigirSemBanimento(conta.id);
+  // pré-registro sem acesso: só a tela de pré-registro (server/src/preRegistro.ts)
+  if (!preRegistro.ROTAS_SEM_ACESSO.has((req.url ?? '').split('?')[0]) && !preRegistro.temAcesso(conta)) throw new ErroConta('Sua conta está no pré-registro: o jogo ainda não abriu para ela.', 403);
   return conta;
 }
 
@@ -108,7 +114,13 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   if (metodo === 'POST' && caminho === '/api/cadastro') {
     limitar(ipDe(req));
     const c = await lerCorpo(req);
-    return responder(res, 201, await cadastrar(c.usuario, c.email, c.senha, c.manter === true));
+    // código de criador (opcional) conferido ANTES de criar a conta; `via` = veio do link /c/CODIGO ou foi digitado
+    const via = c.via === 'link' ? 'link' : 'codigo';
+    const codigo = preRegistro.lerCodigo(c.codigo, via);
+    const r = await cadastrar(c.usuario, c.email, c.senha, c.manter === true);
+    preRegistro.aoCadastrar(r.conta.id, codigo);
+    parcerias.ligarConta(r.conta.id, codigo, via);
+    return responder(res, 201, r);
   }
   if (metodo === 'POST' && caminho === '/api/entrar') {
     limitar(ipDe(req));
@@ -130,8 +142,10 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   }
   if (metodo === 'GET' && caminho === '/api/eu') {
     const conta = exigirConta(req);
+    // sem acesso (pré-registro): só a conta, sem o save
+    if (!preRegistro.temAcesso(conta)) return responder(res, 200, { conta: { ...publica(conta), acesso: false }, save: null, versao: 0 });
     const save = banco.lerSave(conta.id);
-    return responder(res, 200, { conta: publica(conta), save: save ? JSON.parse(save.dados) : null, versao: save?.versao ?? 0 });
+    return responder(res, 200, { conta: { ...publica(conta), acesso: true }, save: save ? JSON.parse(save.dados) : null, versao: save?.versao ?? 0 });
   }
   if (metodo === 'PUT' && caminho === '/api/save') {
     const conta = exigirConta(req);
@@ -144,6 +158,7 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     // entradas do Safari: valem as guardadas (server/src/safari.ts)
     safari.proteger(c.save as Record<string, unknown>, antes);
     lojas.proteger(c.save as Record<string, unknown>, antes);
+    tutorial.proteger(c.save as Record<string, unknown>, antes);
     const texto = JSON.stringify(c.save);
     if (texto.length > TAMANHO_MAX_SAVE) throw new ErroConta('Save grande demais.', 413);
     const versao = banco.gravarSave(conta.id, texto, c.versao);
@@ -309,6 +324,32 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
       return responder(res, 200, f(conta, await lerCorpo(req)));
     }
 
+  // ---- presentes do tutorial (server/src/tutorial.ts) ----
+  if (caminho === '/api/tutorial/presente' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, tutorial.presente(conta, await lerCorpo(req)));
+  }
+  // ---- pré-registro e whitelist (server/src/preRegistro.ts) ----
+  if (caminho === '/api/pre-registro' && metodo === 'GET') return responder(res, 200, preRegistro.publico());
+  if (caminho === '/api/pre-registro/eu' && metodo === 'GET') return responder(res, 200, preRegistro.meu(exigirConta(req)));
+  if (caminho === '/api/admin/whitelist' && metodo === 'GET') return responder(res, 200, preRegistro.listar(exigirConta(req)));
+  for (const [rota, f] of [['/api/admin/whitelist', preRegistro.mudar], ['/api/admin/whitelist/config', preRegistro.configurar], ['/api/admin/whitelist/liberar-todas', preRegistro.liberarTodas]] as const)
+    if (caminho === rota && metodo === 'POST') {
+      const conta = exigirConta(req);
+      return responder(res, 200, f(conta, await lerCorpo(req)));
+    }
+
+  // ---- Ajustes da staff: biomas e times dos ginásios (server/src/ajustes.ts) ----
+  if (caminho === '/api/ajustes' && metodo === 'GET') {
+    exigirConta(req);
+    return responder(res, 200, ajustes.ler());
+  }
+  for (const [rota, f] of [['/api/admin/biomas', ajustes.gravarBiomas], ['/api/admin/ginasios', ajustes.gravarGinasio], ['/api/admin/tiers', ajustes.gravarTier], ['/api/admin/premios', ajustes.gravarPremios]] as const)
+    if (caminho === rota && metodo === 'POST') {
+      const conta = exigirConta(req);
+      return responder(res, 200, f(conta, await lerCorpo(req)));
+    }
+
   // ---- Liga Pokémon (server/src/liga.ts) ----
   if (caminho === '/api/liga' && metodo === 'GET') return responder(res, 200, liga.estado(exigirConta(req)));
   if (caminho === '/api/admin/liga' && metodo === 'GET') return responder(res, 200, liga.timesDaStaff(exigirConta(req)));
@@ -411,6 +452,10 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     const [, codigo, acao] = rotaParceria;
     return responder(res, 200, acao === 'repasse' ? parcerias.repassar(conta, codigo) : parcerias.ativar(conta, codigo, acao === 'recadastrar'));
   }
+  const rotaContas = caminho.match(/^\/api\/admin\/parcerias\/([A-Za-z0-9]{3,20})\/contas$/);
+  if (rotaContas && metodo === 'GET') return responder(res, 200, parcerias.contasDoCodigo(exigirConta(req), rotaContas[1]));
+  // link de divulgação aberto (público, sem conta)
+  if (caminho === '/api/parcerias/clique' && metodo === 'POST') return responder(res, 200, parcerias.clique((await lerCorpo(req)).codigo, ipDe(req)));
   const rotaCodigo = caminho.match(/^\/api\/parcerias\/([A-Za-z0-9]{1,30})$/);
   if (rotaCodigo && metodo === 'GET') {
     exigirConta(req);
@@ -428,6 +473,8 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     return responder(res, 200, recompensas.doacaoManual(conta, await lerCorpo(req)));
   }
   // ---- dar/tirar ADM de outras contas, com a senha da administração (server/src/administradores.ts) ----
+  // ---- Administração → Ver jogador (só leitura; server/src/adminJogador.ts) ----
+  if (caminho.startsWith('/api/admin/jogador/') && metodo === 'GET') return responder(res, 200, adminJogador.verJogador(exigirConta(req), decodeURIComponent(caminho.slice('/api/admin/jogador/'.length))));
   if (caminho === '/api/admin/administradores' && metodo === 'GET') return responder(res, 200, administradores.listar(exigirConta(req)));
   if (caminho === '/api/admin/administradores' && metodo === 'POST') {
     const conta = exigirConta(req);
@@ -526,5 +573,7 @@ const servidor = createServer(async (req, res) => {
   }
 });
 cla.consertar();
+// tiers e prêmios mudados pela staff valem aqui também (server/src/ajustes.ts)
+ajustes.aplicarAoLigar();
 ligarMundo(servidor);
 servidor.listen(PORTA, () => console.log(`Servidor do PokeOrigins em http://localhost:${PORTA}`));

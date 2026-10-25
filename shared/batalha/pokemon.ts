@@ -1,6 +1,7 @@
 // Regras de um Pokémon "individual" (o que o jogador possui): golpes por nível, IVs,
 // natureza, atributos, experiência e evolução. Os dados oficiais vêm do Pokémon Showdown.
 import { Dex } from '@pkmn/sim';
+import { horaDoJogo } from '../horaDoJogo';
 import { especieRegional, idDaEvolucao } from '../formasRegionais';
 import { CONDICOES_DE_ATRIBUTO, CONDICOES_IGNORADAS, EVOLUCAO_SEM_LIGACAO, NIVEL_DA_EVOLUCAO_ESPECIAL } from '../evolucoesEspeciais';
 
@@ -253,10 +254,10 @@ const CONDICOES_SO_DOS_JOGOS = ['from a special Rockruff during the evening'];
 
 /**
  * Número da espécie para a qual evolui ao atingir o nível, ou null. Só evoluções por nível; as de dia/noite
- * seguem o relógio do computador (dia = 6h às 18h, como na amizade).
+ * seguem o relógio do jogo (shared/horaDoJogo.ts: dia = manhã e tarde, como na amizade).
  */
-export function evolucaoPorNivel(numero: number, nivel: number, hora = new Date().getHours(), individuo?: PokemonIndividual): number | null {
-  const dia = hora >= 6 && hora < 18;
+export function evolucaoPorNivel(numero: number, nivel: number, hora = horaDoJogo(), individuo?: PokemonIndividual): number | null {
+  const dia = hora >= 6 && hora < 18.5; // manhã e tarde do relógio do jogo (shared/horaDoJogo.ts)
   const possiveis: { id: number; genero?: string }[] = [];
   for (const nome of [...(especie(numero).evos ?? []), ...(EVOLUCAO_SEM_LIGACAO[especie(numero).id] ?? [])]) {
     const evo = Dex.species.get(nome);

@@ -9,6 +9,8 @@ import { CORES_CABELO, CORES_ROUPA, PELES, cabelosDoSexo, montarPersonagem, type
 import { TAM_TREM, desenharTrem } from './cidadePecas';
 import { sombraProjetada } from './cidadeDesenhos';
 import { PECAS } from './cidade';
+import { horaDoJogo } from '../../../shared/horaDoJogo';
+import { agoraDoServidor } from '../ui/relogio';
 
 /** Profundidades (por cima de tudo que está no chão e em pé, embaixo dos nomes). */
 const PROF_NUVENS = 99400;
@@ -33,7 +35,10 @@ export interface VidaDaCidade {
   ocupa(x: number, y: number): boolean;
 }
 
-/** Hora do dia (0–24) do relógio; `jogo-claude:hora-teste` no localStorage força uma hora (para testar). */
+/**
+ * Hora do dia (0–24) do relógio do JOGO (shared/horaDoJogo.ts: um dia a cada 6 h reais, pelo relógio do servidor);
+ * `jogo-claude:hora-teste` no localStorage força uma hora (para testar).
+ */
 export function horaDoDia(): number {
   try {
     const teste = localStorage.getItem('jogo-claude:hora-teste');
@@ -41,8 +46,7 @@ export function horaDoDia(): number {
   } catch {
     /* sem localStorage */
   }
-  const d = new Date();
-  return d.getHours() + d.getMinutes() / 60;
+  return horaDoJogo(agoraDoServidor());
 }
 
 /** Cor do céu sobre a cidade (multiplica) e quanto é noite (0–1), conforme a hora. */

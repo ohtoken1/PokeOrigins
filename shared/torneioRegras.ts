@@ -1,4 +1,5 @@
-// Torneio (regras do dono, 15/10/2026). Sem imports: o servidor lê este arquivo.
+// Torneio (regras do dono, 15/10/2026). O servidor lê este arquivo. Prêmios editáveis pela staff: premiosTorneio()/roletaTorneio().
+import { ajustesPremios, type Fatia, type Premio } from './premiosEventos.ts';
 // Mata-mata de 16, melhor de 1, 60 s por turno, times de 6 sem trava (dá para mudar o time entre as partidas),
 // regras clássicas (sem espécie repetida, sem item repetido, Sleep Clause), cada Pokémon no nível que tem.
 // 12h30 = regras sorteadas pelo sistema; 18h30 = regras escolhidas pela staff. Entrada 10k, tranca nível 10.
@@ -58,23 +59,26 @@ export function textoDasRegras(r: RegrasTorneio): string[] {
 }
 
 /** Prêmios (15/10). O 1º gira a Roleta do Torneio na hora. */
-export const PREMIOS_TORNEIO = [
-  { silver: 150_000, gold: 15, roleta: true },
-  { silver: 100_000, gold: 10, roleta: false },
-  { silver: 50_000, gold: 0, roleta: false },
+export const PREMIOS_TORNEIO: Premio[][] = [
+  [{ id: 'silver', nome: 'Poké Dólares', quantidade: 150_000 }, { id: 'gold', nome: 'Origin Coins', quantidade: 15 }],
+  [{ id: 'silver', nome: 'Poké Dólares', quantidade: 100_000 }, { id: 'gold', nome: 'Origin Coins', quantidade: 10 }],
+  [{ id: 'silver', nome: 'Poké Dólares', quantidade: 50_000 }],
 ];
+/** 1º, 2º e 3º lugar; as medalhas e a roleta do 1º são sempre dadas. */
+export const premiosTorneio = () => ajustesPremios().torneio?.lugares ?? PREMIOS_TORNEIO;
 /** Roleta do Torneio (aprovada 15/10): fatias do mesmo tamanho na roda, chances ao lado. */
-export const ROLETA_TORNEIO: { id: string; nome: string; chance: number }[] = [
-  { id: 'silver', nome: '50.000 Poké Dólares', chance: 0.49 },
-  { id: 'mint', nome: 'Mint aleatória', chance: 0.1 },
-  { id: 'abilitycapsule', nome: 'Ability Capsule', chance: 0.1 },
-  { id: 'abilitypatch', nome: 'Ability Patch', chance: 0.1 },
-  { id: 'charm', nome: 'Charm aleatório', chance: 0.05 },
-  { id: 'ovo-comum-s', nome: 'Ovo Comum S', chance: 0.05 },
-  { id: 'orb', nome: 'Orb aleatória', chance: 0.05 },
-  { id: 'fragmentos', nome: '3 Fragmentos Temporais', chance: 0.05 },
-  { id: 'chave-temporal', nome: 'Chave Temporal', chance: 0.01 },
+export const ROLETA_TORNEIO: Fatia[] = [
+  { id: 'silver', nome: '50.000 Poké Dólares', quantidade: 50_000, chance: 0.49 },
+  { id: 'mint', nome: 'Mint aleatória', quantidade: 1, chance: 0.1 },
+  { id: 'abilitycapsule', nome: 'Ability Capsule', quantidade: 1, chance: 0.1 },
+  { id: 'abilitypatch', nome: 'Ability Patch', quantidade: 1, chance: 0.1 },
+  { id: 'charm', nome: 'Charm aleatório', quantidade: 1, chance: 0.05 },
+  { id: 'ovo-comum-s', nome: 'Ovo Comum S', quantidade: 1, chance: 0.05 },
+  { id: 'orb', nome: 'Orb aleatória', quantidade: 1, chance: 0.05 },
+  { id: 'fragmentos', nome: '3 Fragmentos Temporais', quantidade: 3, chance: 0.05 },
+  { id: 'chave-temporal', nome: 'Chave Temporal', quantidade: 1, chance: 0.01 },
 ];
+export const roletaTorneio = () => ajustesPremios().torneio?.roleta ?? ROLETA_TORNEIO;
 
 /** Nomes das rodadas do mata-mata de 16. */
 export const NOMES_RODADAS = ['Oitavas de final', 'Quartas de final', 'Semifinais', 'Final e disputa de 3º lugar'];

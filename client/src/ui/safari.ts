@@ -11,11 +11,13 @@ import { comprarTicketDoSafari, entrarNoSafari, fecharSafari, safariAberto, tick
 import { corTipo, el } from './dom';
 import { abrirJanela } from './janela';
 import { iconeTicketEvento } from './ticketEvento';
+import { tutorialFez } from '../tutorialEventos';
 
 /** Ticket Safari: o ticket de evento com o S (ui/ticketEvento.ts). */
 export const iconeTicketSafari = () => iconeTicketEvento('S', 'Ticket Safari');
 
 export function abrirSafari(save: Save, navegar: Navegar, aoMudar: () => void = () => {}): void {
+  tutorialFez('safari');
   let tipo: string | null = null;
   let ocupado = false;
   let aviso = '';

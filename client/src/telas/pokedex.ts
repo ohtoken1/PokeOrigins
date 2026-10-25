@@ -18,7 +18,7 @@ import { REGIOES } from '../../../shared/regioes';
 import { CATEGORIAS_POKEMON, categoriasDoPokemon } from '../../../shared/categorias';
 import { nomeCategoria, nomeTipo, traduzir } from '../../../shared/traducao';
 import type { PokemonBase } from '../../../shared/tipos';
-import { pokemonsDaRegiao, todosOsPokemons } from '../dados';
+import { pokemonsDaRegiao, todosOsPokemons, pokemonsDosMapasDe } from '../dados';
 import { carregarSave } from '../estado';
 import { pokedexRevelada } from '../ui/admin';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
@@ -41,7 +41,7 @@ function mapaDeEncontros(todos: PokemonBase[]): Map<number, Encontro> {
   const mapa = new Map<number, Encontro>();
   for (const r of REGIOES.filter((x) => x.disponivel))
     for (const b of BIOMAS) {
-      const tabela = montarTabela(b, pokemonsDaRegiao(r.id), [], todos);
+      const tabela = montarTabela(b, pokemonsDosMapasDe(r.id), [], todos);
       for (const entrada of tabela) mapa.set(entrada.pokemon.id, { bioma: `${r.nome} · ${b.nome}`, entrada, tabela, biomaObj: b });
     }
   return mapa;

@@ -15,6 +15,7 @@ import { iconeItem } from './iconeItem';
 import { formatarId, saveDoPokemon, salvar } from '../estado';
 import { vipAtivo } from '../../../shared/vip';
 import { valorEmMoeda } from './moeda';
+import { tutorialFez } from '../tutorialEventos';
 
 const NOMES: Record<Atributo, string> = { hp: 'HP', atk: 'Ataque', def: 'Defesa', spa: 'At. Esp.', spd: 'Def. Esp.', spe: 'Velocidade' };
 const CATEGORIAS: Record<string, string> = { Physical: 'Físico', Special: 'Especial', Status: 'Status' };
@@ -80,6 +81,7 @@ function revelarIvs(p: PokemonIndividual, aoRevelar: () => void): HTMLElement | 
 }
 
 export function fichaPokemon(p: PokemonIndividual): HTMLElement {
+  tutorialFez('ficha');
   // ovo da creche: só o ovo (quem está dentro, os IVs e os golpes aparecem ao chocar)
   if ((p as { ovo?: unknown }).ovo)
     return el('div', { class: 'ficha ficha-ovo' }, el('img', { class: 'ovo-ficha', src: SPRITE_OVO, alt: 'Ovo' }), el('h3', {}, 'Ovo'), el('p', { class: 'meta' }, 'Veio do Daycare. Ainda não chocou: o que está dentro é surpresa. Ovos não lutam, então ficam no PC. Chocam com 1.000 passos no mapa, ou a moça do Daycare choca para você.'));

@@ -47,6 +47,7 @@ import { ativarDicasDoJogo, avisar } from './ui/avisos';
 import { vigiarTorneio } from './ui/torneio';
 import { vigiarRanqueado } from './ui/ranqueado';
 import { vigiarLiga } from './ui/liga';
+import { vigiarAjustes } from './ajustesJogo';
 import { vigiarEntregas } from './entregas';
 import { vigiarCreche } from './creche';
 import { vigiarMercado } from './mercado';
@@ -55,9 +56,11 @@ import { prepararIdioma } from './idioma';
 // o chat ouve o servidor desde a conexão (guarda as mensagens mesmo fora do mapa)
 import './ui/chat';
 import { vigiarTutorial } from './tutorial';
+import { definirTela, tutorialFez } from './tutorialEventos';
 import { ativarDicaDeItens } from './ui/dicaItem';
 import { ativarToqueLongo } from './ui/toqueLongo';
 import { prepararApp } from './instalar';
+import { vigiarNovaVersao } from './novaVersao';
 
 export type Destino = { tela: 'inicio' } | { tela: 'inicial' } | { tela: 'regiao' } | { tela: 'bioma'; biomaId: string } | { tela: 'pokedex'; id?: number; mega?: string } | { tela: 'database' } | { tela: 'personagem' } | { tela: 'opcoes' } | { tela: 'golpes'; professor?: 'relembrar' | 'tutor'; daCidade?: boolean } | { tela: 'ranking'; categoria?: 'ranqueado' } | { tela: 'comunidade'; secao: SecaoComunidade } | { tela: 'administracao'; secao: SecaoAdministracao } | { tela: 'jogadores' } | { tela: 'conta'; secao: SecaoConta } | { tela: 'duelos' } | { tela: 'ginasios' } | { tela: 'cidade' } | { tela: 'safari' };
 export type Navegar = (destino: Destino) => void;
@@ -73,6 +76,11 @@ let atualizarCabecalho: ((destino: Destino) => void) | undefined;
 const navegar: Navegar = (destino) => {
   destinoAtual = destino;
   lembrarLugar(destino);
+  // missões do Professor (client/src/tutorial.ts)
+  definirTela(destino.tela);
+  if (destino.tela === 'cidade') tutorialFez('cidade');
+  else if (destino.tela === 'bioma') tutorialFez('bioma');
+  else if (destino.tela === 'comunidade' && destino.secao === 'cla') tutorialFez('guildas');
   marcarAba?.(destino);
   atualizarCabecalho?.(destino);
   limparTelaAtual?.();
@@ -107,6 +115,7 @@ ativarDicasDoJogo();
 ativarToqueLongo();
 // app instalável (PWA): pedido de instalação e assistente de fundo
 prepararApp();
+vigiarNovaVersao();
 window.alert = (texto?: unknown) => avisar(String(texto ?? ''));
 void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   if (conta.admin) montarPainelAdmin(() => navegar(destinoAtual));
@@ -145,10 +154,11 @@ void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   vigiarTorneio();
   vigiarRanqueado();
   vigiarLiga();
+  vigiarAjustes();
   vigiarCreche();
   vigiarMercado();
   vigiarQuadro();
-  vigiarTutorial();
+  vigiarTutorial(navegar);
   aoMudarViagem(() => (destinoAtual.tela === 'regiao' ? navegar(destinoAtual) : atualizarCabecalho?.(destinoAtual)));
   // com save, o jogo abre na cidade (pedido do dono)
   navegar(carregarSave() ? ultimoLugar() : { tela: 'inicial' });

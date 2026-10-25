@@ -37,6 +37,7 @@ import { el } from './dom';
 import { iconeItem } from './iconeItem';
 import { abrirJanela } from './janela';
 import { valorEmMoeda } from './moeda';
+import { tutorialFez } from '../tutorialEventos';
 
 type Aba = 'bolas' | 'charms' | 'canteiros';
 const ABAS: { id: Aba; nome: string; tranca: ConteudoTrancado }[] = [
@@ -100,6 +101,7 @@ export function abrirCraft(save: Save, aoMudar: () => void = () => {}): void {
               save.silver -= n * preco;
               ganhar(save, bola, n * BOLAS_POR_CRAFT);
               marcarConquista(save, 'craftBola');
+              tutorialFez('craftBola');
               mudou(`Criou ${n * BOLAS_POR_CRAFT} ${nomeItem(bola)}! Estão na bolsa.`);
             },
           }, 'Criar'));
@@ -129,6 +131,7 @@ export function abrirCraft(save: Save, aoMudar: () => void = () => {}): void {
               save.silver -= PRECO_CRAFT_CHARM;
               ganhar(save, r.charm, sai);
               marcarConquista(save, 'craftCharm');
+              tutorialFez('craftCharm');
               mudou(`Criou ${sai} ${nomeItem(r.charm)}! ${sai > 1 ? 'Estão' : 'Está'} na bolsa.`);
             },
           }, 'Criar'));
@@ -149,13 +152,20 @@ export function abrirCraft(save: Save, aoMudar: () => void = () => {}): void {
     const secos = meus.filter((c) => canteiroSeco(c, agora, vip));
 
     const plantarEm = async (lista: Canteiro[]) => {
-      const custo = lista.length * PRECO_SEMENTE;
+      // sementes de presente (tutorial do Professor) são usadas antes
+      const gratis = Math.min(save.sementesGratis ?? 0, lista.length);
+      const custo = (lista.length - gratis) * PRECO_SEMENTE;
       if (save.silver < custo) return mudou(`Faltam Poké Dólares: ${lista.length} sementes custam ${numero(custo)}.`);
-      if (!(await confirmar('Plantar', `Comprar ${lista.length} semente${lista.length > 1 ? 's' : ''} de ${nomeItem(semente)} por ${numero(custo)} Poké Dólares e plantar? A semente não volta na colheita.`))) return;
+      const pergunta = custo
+        ? `Comprar ${lista.length - gratis} semente${lista.length - gratis > 1 ? 's' : ''} de ${nomeItem(semente)} por ${numero(custo)} Poké Dólares e plantar?${gratis ? ` (${gratis} de presente)` : ''} A semente não volta na colheita.`
+        : `Usar ${gratis > 1 ? `${gratis} sementes` : 'a semente'} de presente para plantar ${nomeItem(semente)}?`;
+      if (!(await confirmar('Plantar', pergunta))) return;
       if (save.silver < custo) return;
       save.silver -= custo;
+      if (gratis) save.sementesGratis = (save.sementesGratis ?? 0) - gratis;
       lista.forEach((c) => plantar(c, semente, Date.now()));
       marcarConquista(save, 'plantou');
+      if (semente.startsWith('apricorn-')) tutorialFez('plantouApricorn');
       mudou(`Plantou ${lista.length}× ${nomeItem(semente)}.`);
     };
     const colher = (lista: Canteiro[]) => {
@@ -178,6 +188,7 @@ export function abrirCraft(save: Save, aoMudar: () => void = () => {}): void {
 
     return el('div', { class: 'craft-canteiros' },
       el('p', { class: 'meta' }, `Você tem ${quantos} canteiro${quantos > 1 ? 's' : ''} (um por nível de treinador). Cada semente custa ${numero(PRECO_SEMENTE)} Poké Dólares e não volta na colheita. ${vip ? 'VIP: cresce sem precisar regar, mais rápido e colhe mais.' : 'Regue a cada 1 hora: sem água, a planta para de crescer (nada morre).'} Berry: ${numero(colheitaDe('oranberry', vip))} por canteiro; Apricorn: ${numero(colheitaDe('apricorn-red', vip))}.`),
+      save.sementesGratis ? el('p', { class: 'meta' }, save.sementesGratis > 1 ? `🎁 Você tem ${save.sementesGratis} sementes de presente.` : '🎁 Você tem 1 semente de presente.') : '',
       el('div', { class: 'craft-acoes' },
         el('label', {}, 'Semente: ', seletor),
         el('button', { class: 'botao', disabled: !vazios.length, onclick: () => void plantarEm(vazios) }, `Plantar nos vazios (${vazios.length})`),

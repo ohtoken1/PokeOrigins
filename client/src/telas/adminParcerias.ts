@@ -1,7 +1,9 @@
 // Administração → Parceria (pedido do dono): códigos dos criadores de conteúdo. Cadastrar, descadastrar e
 // recadastrar códigos; ver quanto foi doado com cada um (no mês e no total) e marcar o repasse feito no fim do mês.
+// Cada código tem o seu link (/c/CODIGO): cliques, contas criadas e jogadores (treinador nível 5+) por criador.
 // Quem guarda e soma é o servidor (server/src/parcerias.ts).
-import { CRIADOR_MAX, type ParceriaPublica } from '../../../shared/parcerias';
+import { caminhoDoLink, CRIADOR_MAX, NIVEL_JOGADOR_PARCERIA, type ContaDoCriador, type ParceriaPublica } from '../../../shared/parcerias';
+import { avisar } from '../ui/avisos';
 import { api, ErroApi } from '../conta';
 import { confirmar } from '../ui/confirmar';
 import { el } from '../ui/dom';
@@ -10,6 +12,27 @@ type Resposta = { parcerias: ParceriaPublica[] };
 
 const reais = (centavos: number) => (centavos / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const data = (ms: number) => new Date(ms).toLocaleDateString('pt-BR');
+const num = (n: number) => n.toLocaleString('pt-BR');
+const linkDe = (codigo: string) => `${location.origin}${caminhoDoLink(codigo)}`;
+/** Quantos % de `de` viraram `para` (ex.: cliques → contas). */
+const taxa = (para: number, de: number) => (de > 0 ? `${Math.round((para / de) * 100)}%` : '—');
+const VIA: Record<string, string> = { link: 'pelo link', codigo: 'código digitado', staff: 'anotada pela staff' };
+const numero = (rotulo: string, valor: string, dica?: string) => el('div', dica ? { title: dica } : {}, el('small', {}, rotulo), el('strong', {}, valor));
+
+/** Lista das contas que vieram do criador (aberta pelo botão "Ver contas"). */
+function listaDeContas(codigo: string): HTMLElement {
+  const caixa = el('div', { class: 'parceria-contas' }, el('p', { class: 'meta' }, 'Carregando…'));
+  api<{ contas: ContaDoCriador[] }>('GET', `/admin/parcerias/${encodeURIComponent(codigo)}/contas`).then(
+    ({ contas }) => caixa.replaceChildren(...(contas.length
+      ? [el('table', { class: 'parceria-tabela' },
+        el('thead', {}, el('tr', {}, el('th', {}, 'Conta'), el('th', {}, 'Criada em'), el('th', {}, 'Como veio'), el('th', {}, 'Treinador'))),
+        el('tbody', {}, ...contas.map((c) => el('tr', { class: c.nivel >= NIVEL_JOGADOR_PARCERIA ? 'parceria-jogador' : '' },
+          el('td', {}, c.usuario), el('td', {}, data(c.criadaEm)), el('td', {}, VIA[c.via] ?? c.via),
+          el('td', {}, `Nv. ${c.nivel}${c.nivel >= NIVEL_JOGADOR_PARCERIA ? ' ✔' : ''}`)))))]
+      : [el('p', { class: 'meta' }, 'Nenhuma conta veio deste criador ainda.')])),
+    (e) => caixa.replaceChildren(el('p', { class: 'meta' }, e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.')));
+  return caixa;
+}
 
 export function secaoParcerias(): { elemento: HTMLElement; parar: () => void } {
   const campoCodigo = el('input', { type: 'text', class: 'db-busca', maxlength: 20, placeholder: 'Código (ex.: ASHGAMER)', 'aria-label': 'Código da parceria', autocomplete: 'off' }) as HTMLInputElement;
@@ -38,6 +61,16 @@ export function secaoParcerias(): { elemento: HTMLElement; parar: () => void } {
         el('strong', { class: 'parceria-codigo' }, p.codigo),
         el('span', {}, p.criador),
         el('span', { class: `parceria-status ${p.ativo ? 'ativa' : ''}` }, p.ativo ? 'Ativa' : 'Descadastrada')),
+      el('div', { class: 'parceria-link' },
+        el('input', { type: 'text', class: 'db-busca', readonly: true, value: linkDe(p.codigo), 'aria-label': 'Link do criador', onclick: (e: Event) => (e.target as HTMLInputElement).select() }),
+        el('button', { class: 'botao secundario', onclick: () => navigator.clipboard.writeText(linkDe(p.codigo)).then(() => avisar(`Link de ${p.criador} copiado.`, 'ok'), () => avisar('Não deu para copiar: selecione o link e copie.', 'erro')) }, 'Copiar link')),
+      el('div', { class: 'parceria-numeros' },
+        numero('Cliques no mês', num(p.cliquesNoMes), `Total: ${num(p.cliques)} (cada pessoa conta uma vez por dia)`),
+        numero('Contas no mês', num(p.contasNoMes), `${num(p.peloLink)} das ${num(p.contas)} contas vieram pelo link`),
+        numero('Contas (total)', num(p.contas)),
+        numero(`Jogadores (nível ${NIVEL_JOGADOR_PARCERIA}+)`, num(p.jogadores), 'Contas que chegaram ao nível de treinador mínimo'),
+        numero('Cliques → contas', taxa(p.contas, p.cliques)),
+        numero('Contas → jogadores', taxa(p.jogadores, p.contas))),
       el('div', { class: 'parceria-numeros' },
         el('div', {}, el('small', {}, 'Doado neste mês'), el('strong', {}, reais(p.doadoNoMes))),
         el('div', {}, el('small', {}, 'Falta repassar'), el('strong', { class: p.pendente > 0 ? 'parceria-pendente' : '' }, reais(p.pendente))),
@@ -46,6 +79,14 @@ export function secaoParcerias(): { elemento: HTMLElement; parar: () => void } {
         el('div', {}, el('small', {}, 'Usos do código'), el('strong', {}, p.usos.toLocaleString('pt-BR')))),
       el('small', { class: 'meta' }, `Cadastrada em ${data(p.criadoEm)}${p.ultimoRepasse ? ` · último repasse em ${data(p.ultimoRepasse)}` : ''}`),
       el('div', { class: 'parceria-botoes' },
+        el('button', { class: 'botao secundario', onclick: (e: Event) => {
+          const botao = e.currentTarget as HTMLButtonElement;
+          const cartao = botao.closest('.parceria-cartao')!;
+          const aberta = cartao.querySelector('.parceria-contas');
+          if (aberta) return void (aberta.remove(), (botao.textContent = `Ver contas (${num(p.contas)})`));
+          cartao.append(listaDeContas(p.codigo));
+          botao.textContent = 'Esconder contas';
+        } }, `Ver contas (${num(p.contas)})`),
         p.pendente > 0
           ? el('button', { class: 'botao', onclick: () => acao(`${base}/repasse`, ['Repasse feito', `Marcar como repassado ${reais(p.pendente)} para ${p.criador} (${p.codigo})? Faça o pagamento ao criador antes.`], `Repasse de ${reais(p.pendente)} para ${p.criador} registrado.`) }, `Marcar repasse feito (${reais(p.pendente)})`)
           : null,
@@ -57,11 +98,17 @@ export function secaoParcerias(): { elemento: HTMLElement; parar: () => void } {
   function desenhar(r: Resposta): void {
     const ativas = r.parcerias.filter((p) => p.ativo);
     const soma = (f: (p: ParceriaPublica) => number) => reais(r.parcerias.reduce((s, p) => s + f(p), 0));
+    const total = (f: (p: ParceriaPublica) => number) => num(r.parcerias.reduce((s, p) => s + f(p), 0));
     resumo.replaceChildren(
       el('div', {}, el('small', {}, 'Parcerias ativas'), el('strong', {}, String(ativas.length))),
+      numero('Cliques no mês', total((p) => p.cliquesNoMes)),
+      numero('Contas no mês', total((p) => p.contasNoMes)),
+      numero(`Jogadores (nível ${NIVEL_JOGADOR_PARCERIA}+)`, total((p) => p.jogadores)),
       el('div', {}, el('small', {}, 'Doado neste mês'), el('strong', {}, soma((p) => p.doadoNoMes))),
       el('div', {}, el('small', {}, 'Falta repassar (todas)'), el('strong', {}, soma((p) => p.pendente))));
-    lista.replaceChildren(...(r.parcerias.length ? r.parcerias.map(linha) : [el('p', { class: 'meta' }, 'Nenhuma parceria cadastrada ainda.')]));
+    // ranking: ativas primeiro, depois quem trouxe mais jogadores, mais contas e mais cliques
+    const ordem = [...r.parcerias].sort((a, b) => Number(b.ativo) - Number(a.ativo) || b.jogadores - a.jogadores || b.contas - a.contas || b.cliques - a.cliques);
+    lista.replaceChildren(...(ordem.length ? ordem.map(linha) : [el('p', { class: 'meta' }, 'Nenhuma parceria cadastrada ainda.')]));
   }
 
   const cadastrar = async () => {
@@ -78,12 +125,12 @@ export function secaoParcerias(): { elemento: HTMLElement; parar: () => void } {
   void api<Resposta>('GET', '/admin/parcerias').then(desenhar, erro);
 
   const elemento = el('section', { class: 'admin-parcerias' },
-    el('p', { class: 'sub' }, 'Códigos dos criadores de conteúdo. O jogador digita o código na página de doação e o valor doado fica somado aqui. No fim do mês, faça o pagamento ao criador e clique em "Marcar repasse feito". As doações só começam a contar quando o pagamento for ligado.'),
+    el('p', { class: 'sub' }, `Cada criador tem um código e um link. Quem abre o link cai na página de pré-registro com o código já preenchido, e a conta criada fica ligada ao criador para sempre (vale o último link clicado antes de criar a conta; quem não usou o link pode digitar o código no cadastro). "Jogadores" = contas que chegaram ao treinador nível ${NIVEL_JOGADOR_PARCERIA}. O código também vale na página de doação: no fim do mês, faça o pagamento ao criador e clique em "Marcar repasse feito" (as doações só contam quando o pagamento for ligado).`),
     el('h3', {}, 'Cadastrar parceria'),
     el('div', { class: 'parceria-form' }, campoCodigo, campoCriador, el('button', { class: 'botao', onclick: cadastrar }, 'Cadastrar')),
     aviso,
     resumo,
-    el('h3', {}, 'Parcerias'),
+    el('h3', {}, 'Parcerias (ranking por jogadores)'),
     lista);
   return { elemento, parar: () => {} };
 }

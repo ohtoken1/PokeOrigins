@@ -16,6 +16,7 @@ import { FUNDOS_BOX, estiloDoFundo, fundoDaBox, type FundoBox } from './fundosBo
 import { resumoAoPassar } from './resumo';
 import { spriteMapa } from './spriteMapa';
 import { cadeado, cartaoPokemon } from './time';
+import { tutorialFez } from '../tutorialEventos';
 
 /** Box aberta por último (continua a mesma ao reabrir o PC). */
 let boxAtual = 0;
@@ -28,6 +29,7 @@ let boxAtual = 0;
  * ordena a box e a busca procura em todas.
  */
 export function abrirPC(save: Save, aoMudar: () => void): void {
+  tutorialFez('pc');
   let selecionado: PokemonDoJogador | null = null;
   let verFicha = false;
   /** Marcados para soltar juntos (segurar o clique num Pokémon marca; depois, cada clique marca/desmarca). */

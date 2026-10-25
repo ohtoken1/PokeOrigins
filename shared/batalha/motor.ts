@@ -8,6 +8,7 @@ import { Battle, Dex } from '@pkmn/sim';
 import { AMIZADE_INICIAL, especie, ppComPPMax, ppMaximo, type PokemonIndividual } from './pokemon';
 import { aplicarRemedio, usarRemedio, type Item } from '../itens';
 import type { EfeitoBola } from '../bolas';
+import { MemoriaIa, escolherAcaoIa, type NivelIa } from './ia';
 
 /** Mudanças de forma que nos jogos são só a troca da imagem, sem o brilho de transformação. */
 const FORMAS_SEM_ANIMACAO = new Set(['Mimikyu-Busted', 'Mimikyu-Busted-Totem']);
@@ -30,7 +31,8 @@ export type EventoBatalha = (
   /** `semAnimacao`: só troca a imagem (ex.: o disfarce do Mimikyu quebrando não é uma transformação). */
   | { tipo: 'forma'; lado: Lado; forma: string; texto?: string; semAnimacao?: boolean }
   /** `semAnimacao`: o Showdown marcou "[still]" (ex.: 1º turno de Fly/Solar Beam, quem só se prepara). */
-  | { tipo: 'golpe'; lado: Lado; alvo: Lado | null; golpe: string; tipoGolpe: string; categoria: string; texto: string; semAnimacao?: boolean }
+  /** `errou`: o Showdown marcou "[miss]" (a animação vai para o lado do alvo, não em cima dele). */
+  | { tipo: 'golpe'; lado: Lado; alvo: Lado | null; golpe: string; tipoGolpe: string; categoria: string; texto: string; semAnimacao?: boolean; errou?: boolean }
   /** 1º turno de golpe de dois turnos (Fly, Dig, Solar Beam…): a tela mostra o Pokémon se preparando (voando, cavando, carregando). */
   | { tipo: 'preparar'; lado: Lado; golpe: string; tipoGolpe: string; texto: string }
   | { tipo: 'hp'; lado: Lado; hp: number; hpMax: number; texto?: string }
@@ -256,7 +258,7 @@ export class BatalhaSelvagem {
     private taxaCaptura: number,
     private aleatorio: () => number = Math.random,
     /** Duelo contra treinador NPC: o time dele (o `selvagem` é o primeiro) e os nomes. Sem captura nem fuga. */
-    readonly treinador: { nome: string; equipe: PokemonIndividual[]; nomesEquipe: string[] } | null = null,
+    readonly treinador: { nome: string; equipe: PokemonIndividual[]; nomesEquipe: string[]; /** nível da IA (shared/batalha/ia.ts); padrão 'facil' */ ia?: NivelIa } | null = null,
     /**
      * PvP (shared/batalha/pvp.ts): a batalha já existe com os dois jogadores e esta é a VISÃO de um dos lados
      * (`lado`): o "jogador" é ele e o "selvagem" é o outro jogador. Não cria batalha nem escolhe pelo adversário.
@@ -571,6 +573,9 @@ export class BatalhaSelvagem {
     return this.lerEventos();
   }
 
+  /** O que a IA do treinador já viu nesta batalha (imunidades descobertas). */
+  private memoriaIa = new MemoriaIa();
+
   private escolherSelvagem() {
     const lado = this.ele;
     if (lado.requestState === 'switch') return this.trocarAdversario();
@@ -578,19 +583,9 @@ export class BatalhaSelvagem {
     const golpes = ((lado.activeRequest as any).active[0].moves as any[])
       .map((m, i) => ({ m, i }))
       .filter(({ m }) => !m.disabled && (m.pp === undefined || m.pp > 0));
-    let escolhido = golpes.length ? golpes[Math.floor(this.aleatorio() * golpes.length)].i + 1 : 1;
-    // treinador NPC: na maioria das vezes usa o golpe que mais machuca (tipo, STAB e poder)
-    if (this.treinador && golpes.length && this.aleatorio() < 0.75) {
-      const atacante = lado.active[0];
-      const alvo = this.eu.active[0];
-      const forca = (id: string) => {
-        const g = Dex.moves.get(id);
-        if (g.category === 'Status' || !alvo) return 15;
-        if (!Dex.getImmunity(g.type, alvo.getTypes())) return 0;
-        return (g.basePower || 50) * (atacante.hasType(g.type) ? 1.5 : 1) * 2 ** Dex.getEffectiveness(g.type, alvo.getTypes());
-      };
-      escolhido = golpes.reduce((a, b) => (forca(b.m.id) > forca(a.m.id) ? b : a)).i + 1;
-    }
+    // treinador NPC: IA por nível (shared/batalha/ia.ts); selvagem: um golpe ao acaso
+    if (this.treinador && escolherAcaoIa(this.batalha as never, lado as never, this.eu as never, this.treinador.ia ?? 'facil', this.memoriaIa, this.aleatorio)) return;
+    const escolhido = golpes.length ? golpes[Math.floor(this.aleatorio() * golpes.length)].i + 1 : 1;
     this.batalha.choose('p2', `move ${escolhido}`);
   }
 
@@ -753,6 +748,7 @@ export class BatalhaSelvagem {
             categoria: golpe.category,
             texto: `${quem} usou ${golpe.name}!`,
             semAnimacao: args.includes('[still]'),
+            errou: args.includes('[miss]'),
           };
           eventos.push(evento);
           this.ultimoGolpe = { quem, golpe: golpe.name, evento, acertos: 0, avisos: [] };

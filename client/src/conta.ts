@@ -8,6 +8,8 @@ export interface Conta {
   email: string;
   admin: boolean;
   criadaEm: number;
+  /** false = conta no pré-registro, sem acesso ao jogo (server/src/preRegistro.ts) */
+  acesso?: boolean;
 }
 
 let contaAtual: Conta | null = null;
@@ -65,8 +67,9 @@ export async function api<T>(metodo: string, caminho: string, corpo?: unknown, o
 
 type RespostaLogin = { token: string; conta: Conta };
 
-export async function cadastrar(usuario: string, email: string, senha: string, manter: boolean): Promise<Conta> {
-  const r = await api<RespostaLogin>('POST', '/cadastro', { usuario, email, senha, manter });
+/** `via` = o código veio do link do criador (/c/CODIGO) ou foi digitado. */
+export async function cadastrar(usuario: string, email: string, senha: string, manter: boolean, codigo = '', via: 'link' | 'codigo' = 'codigo'): Promise<Conta> {
+  const r = await api<RespostaLogin>('POST', '/cadastro', { usuario, email, senha, manter, codigo, via });
   guardarToken(r.token, manter);
   return (contaAtual = r.conta);
 }

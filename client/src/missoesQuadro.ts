@@ -7,7 +7,7 @@ import { cumpreMissao, missoesDoQuadro, rodadaDe, type MissaoQuadro } from '../.
 import type { MissaoConcluida } from '../../shared/missoesRegras';
 import { REGIOES } from '../../shared/regioes';
 import { api, conta, ErroApi } from './conta';
-import { pokemonsDaRegiao, todosOsPokemons } from './dados';
+import { pokemonsDaRegiao, todosOsPokemons, pokemonsDosMapasDe } from './dados';
 import { adotarSaveDoServidor, salvarAgora, type PokemonDoJogador, type Save } from './estado';
 import { aoAvisoDoServidor } from './online';
 
@@ -18,7 +18,7 @@ function especiesComuns(): number[] {
   const todos = todosOsPokemons();
   const ids = new Set<number>();
   for (const r of REGIOES.filter((x) => x.disponivel))
-    for (const bioma of BIOMAS) for (const e of montarTabela(bioma, pokemonsDaRegiao(r.id), [], todos)) if (!e.grupo) ids.add(e.pokemon.id);
+    for (const bioma of BIOMAS) for (const e of montarTabela(bioma, pokemonsDosMapasDe(r.id), [], todos)) if (!e.grupo) ids.add(e.pokemon.id);
   return (comuns = [...ids].sort((a, b) => a - b));
 }
 

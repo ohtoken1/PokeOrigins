@@ -1,4 +1,5 @@
-// Liga Pokémon (planilha de eventos do dono). Sem imports: o servidor lê este arquivo.
+// Liga Pokémon (planilha de eventos do dono). O servidor lê este arquivo. Prêmios editáveis pela staff: premioLiga().
+import { ajustesPremios } from './premiosEventos.ts';
 // Normal = Elite 4 (4 batalhas seguidas; o Campeão saiu a pedido do dono, 20/10/2026); Nightmare = um treinador de
 // cada um dos 18 tipos.
 // Os times são montados pela staff (Administração → Liga), no nível que ela escolher. O time NÃO é curado entre
@@ -38,6 +39,14 @@ export const PREMIO_LIGA: Record<TipoLiga, { silver: number; moeda: string; nome
   normal: { silver: 200_000, moeda: 'league-coins', nomeMoeda: 'League Coins', porVitoria: 1, bonus: 6, quantidade: 10 },
   nightmare: { silver: 1_000_000, moeda: 'league-coins-nightmare', nomeMoeda: 'League Coins Nightmare', porVitoria: 1, bonus: 12, quantidade: 30 },
 };
+
+/** Prêmio da Liga com o que a staff mudou (Administração → Prêmios); `quantidade` = total vencendo tudo. */
+export function premioLiga(liga: TipoLiga): (typeof PREMIO_LIGA)[TipoLiga] {
+  const a = ajustesPremios().liga?.[liga];
+  const base = PREMIO_LIGA[liga];
+  if (!a) return base;
+  return { ...base, ...a, quantidade: a.porVitoria * ETAPAS_LIGA[liga].length + a.bonus };
+}
 
 /** A semana da Liga vira na segunda-feira à meia-noite de Brasília (escolha nossa; o dono deixou a gente escolher). */
 const SEMANA_MS = 7 * 24 * 3600_000;

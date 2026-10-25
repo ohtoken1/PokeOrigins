@@ -8,6 +8,7 @@ import alola from '../../shared/data/pokemon-alola.json';
 import galar from '../../shared/data/pokemon-galar.json';
 import paldea from '../../shared/data/pokemon-paldea.json';
 import type { PokemonBase } from '../../shared/tipos';
+import { pokemonsDosMapas } from '../../shared/encontros';
 import { Dex } from '@pkmn/sim';
 import { FORMAS_REGIONAIS, idDaFormaRegional, montarFormaRegional } from '../../shared/formasRegionais';
 
@@ -57,6 +58,9 @@ export function todosOsPokemons(): PokemonBase[] {
 export function pokemonsDaRegiao(regiao: string): PokemonBase[] {
   return POKEMONS_POR_REGIAO[regiao] ?? [];
 }
+
+/** Quem aparece nos mapas da região: os dela + as linhas que a staff pôs lá também (Administração → Biomas). */
+export const pokemonsDosMapasDe = (regiao: string): PokemonBase[] => pokemonsDosMapas(regiao, pokemonsDaRegiao(regiao), TODOS);
 
 export function pokemonPorId(id: number): PokemonBase {
   const p = porId.get(id);

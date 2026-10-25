@@ -4,7 +4,7 @@
 
 export const SUFIXO_NT = '-nt';
 /** Itens que são sempre NT (prêmios de conquistas). */
-const SEMPRE_NT = new Set(['skin-galante', 'skin-chaveiro', 'skin-indianajones', 'kit-iniciante', 'skin-ash', 'skin-gary', 'skin-may', 'skin-misty']);
+const SEMPRE_NT = new Set(['skin-galante', 'skin-chaveiro', 'skin-indianajones', 'kit-iniciante', 'kit-pre-registro', 'skin-ash', 'skin-gary', 'skin-may', 'skin-misty']);
 
 /**
  * Id do item normal de uma versão NT ("pokeball-nt" → "pokeball"). As versões NT de Pokébolas, remédios e charms

@@ -4,6 +4,7 @@
 import { Dex } from '@pkmn/sim';
 import { ATRIBUTOS, EV_MAX_ATRIBUTO, EV_MAX_TOTAL, IV_MIN_SHINY, TIPOS_TERA, especie, golpesIniciais, hpMaximo, ppMaximo, type Atributo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { tierIv } from '../../../shared/tierIv';
+import { TODOS_OS_ITENS } from '../../../shared/loja';
 import { api, ErroApi } from '../conta';
 import { todosOsPokemons } from '../dados';
 import { darPokemonAoJogador } from '../entregas';
@@ -30,7 +31,13 @@ function golpesDaEspecie(especieId: number): { id: string; nome: string; ovo: bo
  * Editor de Pokémon da staff. Sem opções: Administração → Dar Pokémon (escolhe o jogador). Com `destino`: o Pokémon
  * montado vai para outro lugar (o Cofre, em ui/eventos.ts) e o campo do jogador some.
  */
-export function secaoDarPokemon(destino?: { botao: string; enviar: (p: PokemonIndividual, nome: string) => Promise<string>; nivelMaximo?: number }): { elemento: HTMLElement; parar: () => void } {
+export function secaoDarPokemon(destino?: {
+  botao: string; enviar: (p: PokemonIndividual, nome: string) => Promise<string>; nivelMaximo?: number;
+  /** mostra o campo "Item segurado" (times de NPC) */
+  comItem?: boolean;
+  /** o nível é decidido pelo jogo: esconde o campo e mostra este texto */
+  nivelAutomatico?: string;
+}): { elemento: HTMLElement; parar: () => void } {
   const todos = todosOsPokemons();
   const nivelMax = destino?.nivelMaximo ?? 100;
   const campo = (atributos: Record<string, unknown>) => el('input', { class: 'db-busca', ...atributos }) as HTMLInputElement;
@@ -47,6 +54,8 @@ export function secaoDarPokemon(destino?: { botao: string; enviar: (p: PokemonIn
   const campoNature = escolha('Nature');
   const campoAbility = escolha('Ability');
   const campoTera = escolha('Tera Type');
+  const listaItens = el('datalist', { id: 'adm-itens-pk' }, ...TODOS_OS_ITENS.map((i) => el('option', { value: i.nome })));
+  const campoItem = campo({ type: 'text', list: 'adm-itens-pk', placeholder: 'Nenhum', 'aria-label': 'Item segurado', autocomplete: 'off' });
   const campoJogador = campo({ type: 'text', list: 'adm-jogadores-pokemon', placeholder: 'Usuário do jogador', 'aria-label': 'Usuário do jogador', autocomplete: 'off' });
   const ivs = Object.fromEntries(ATRIBUTOS.map((a) => [a, numero(0, 31, 31, `IV de ${ROTULOS[a]}`)])) as Record<Atributo, HTMLInputElement>;
   const evs = Object.fromEntries(ATRIBUTOS.map((a) => [a, numero(0, EV_MAX_ATRIBUTO, 0, `EV de ${ROTULOS[a]}`)])) as Record<Atributo, HTMLInputElement>;
@@ -127,6 +136,9 @@ export function secaoDarPokemon(destino?: { botao: string; enviar: (p: PokemonIn
     const ev = valores(evs, EV_MAX_ATRIBUTO);
     if (Object.values(ev).reduce((s, n) => s + n, 0) > EV_MAX_TOTAL) return void (aviso.textContent = `Os EVs somam no máximo ${EV_MAX_TOTAL}.`);
     if (!usuario && !destino) return void (aviso.textContent = 'Diga para qual jogador vai.');
+    const nomeItem = campoItem.value.trim().toLowerCase();
+    const item = nomeItem ? TODOS_OS_ITENS.find((i) => i.nome.toLowerCase() === nomeItem) : undefined;
+    if (nomeItem && !item) return void (aviso.textContent = 'Escolha um item da lista.');
 
     const nivel = lido(campoNivel, 1, nivelMax);
     const shiny = campoShiny.checked;
@@ -134,8 +146,9 @@ export function secaoDarPokemon(destino?: { botao: string; enviar: (p: PokemonIn
     const p: PokemonIndividual = { ...novoPokemon(base.id, nivel, shiny), shiny, natureza: campoNature.value, habilidade: campoAbility.value, ivs: valores(ivs, 31), evs: ev, golpes: escolhidos.map((id) => ({ id, pp: ppMaximo(id) })) };
     if (campoTera.value) p.teraTipo = campoTera.value;
     if (campoNT.checked) p.inegociavel = true;
+    if (destino?.comItem && item) p.item = item.id;
     p.hp = hpMaximo(p);
-    const nome = `${base.nome}${shiny ? ' shiny' : ''} Nv. ${nivel}`;
+    const nome = `${base.nome}${shiny ? ' shiny' : ''}${destino?.nivelAutomatico ? '' : ` Nv. ${nivel}`}`;
     if (!(await confirmar('Confirmar', destino ? `${destino.botao}: ${nome}?` : `Dar ${nome} para ${usuario}?`))) return;
     enviando = true;
     aviso.textContent = '';
@@ -159,17 +172,18 @@ export function secaoDarPokemon(destino?: { botao: string; enviar: (p: PokemonIn
     parar: () => clearTimeout(relogio),
     elemento: el('section', { class: 'bonus-secao' },
       destino ? null : el('p', { class: 'sub' }, 'Monta um Pokémon e manda para um jogador. Chega no Correio dele; ao resgatar, o Pokémon vai para o time ou, se o time está cheio, para o PC, e já chega com os IVs avaliados.'),
-      listaPokemon, listaJogadores,
+      listaPokemon, listaJogadores, destino?.comItem ? listaItens : null,
       el('div', { class: 'cla-formulario adm-pk' },
         el('label', { class: 'cla-campo' }, 'Pokémon', campoPokemon),
         previa,
         el('div', { class: 'adm-pk-linha' },
-          el('label', { class: 'cla-campo' }, 'Nível', campoNivel),
+          destino?.nivelAutomatico ? el('small', { class: 'meta' }, destino.nivelAutomatico) : el('label', { class: 'cla-campo' }, 'Nível', campoNivel),
           el('label', { class: 'adm-pk-chave' }, campoShiny, 'Shiny'),
           el('label', { class: 'adm-pk-chave', title: 'Inegociável: não pode ser trocado nem vendido' }, campoNT, 'NT')),
         el('label', { class: 'cla-campo' }, 'Nature', campoNature),
         el('label', { class: 'cla-campo' }, 'Ability', campoAbility),
         el('label', { class: 'cla-campo' }, 'Tera Type', campoTera),
+        destino?.comItem ? el('label', { class: 'cla-campo' }, 'Item segurado', campoItem) : null,
         el('div', { class: 'cla-campo' }, el('span', { class: 'adm-pk-titulo' }, 'IVs (0 a 31)', atalho('Todos 31', preencher(ivs, 31)), atalho('Todos 0', preencher(ivs, 0)), atalho('Aleatórios', sortearIvs(0)), atalho('Aleatórios 15+', sortearIvs(IV_MIN_SHINY))), grade(ivs), somaIvs),
         el('div', { class: 'cla-campo' }, el('span', { class: 'adm-pk-titulo' }, `EVs (0 a ${EV_MAX_ATRIBUTO}, total ${EV_MAX_TOTAL})`, atalho('Zerar', preencher(evs, 0))), grade(evs), somaEvs),
         el('div', { class: 'cla-campo' }, 'Golpes (os marcados com "Egg Move" só se aprendem por ovo)', el('div', { class: 'adm-pk-golpes' }, ...golpes)),

@@ -2,6 +2,7 @@
 // (pedido do dono: +5 por batalha contra selvagem ou treinador NPC). Com amizade alta, quem evolui por amizade
 // (Golbat → Crobat, Eevee → Espeon/Umbreon…) evolui ao subir de nível.
 import { Dex } from '@pkmn/sim';
+import { horaDoJogo } from './horaDoJogo';
 import { idDaEvolucao } from './formasRegionais';
 import { CONDICAO_SYLVEON } from './evolucoesEspeciais';
 import { AMIZADE_INICIAL, especie, type PokemonIndividual } from './batalha/pokemon';
@@ -45,9 +46,9 @@ export function evolucaoPorGolpe(p: PokemonIndividual): number | null {
 }
 
 /** Evolução por amizade ao subir de nível (respeita "de dia"/"à noite" pelo relógio do computador). */
-export function evolucaoPorAmizade(p: PokemonIndividual, hora = new Date().getHours()): number | null {
+export function evolucaoPorAmizade(p: PokemonIndividual, hora = horaDoJogo()): number | null {
   if (amizadeDe(p) < AMIZADE_PARA_EVOLUIR) return null;
-  const dia = hora >= 6 && hora < 18;
+  const dia = hora >= 6 && hora < 18.5; // manhã e tarde do relógio do jogo (shared/horaDoJogo.ts)
   for (const nome of especie(p.especieId).evos ?? []) {
     const evo = Dex.species.get(nome);
     const id = idDaEvolucao(p.especieId, evo);

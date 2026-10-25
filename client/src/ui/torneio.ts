@@ -1,6 +1,6 @@
 // Janela do Torneio (Arena → Torneio): próximo torneio, regras, inscrição (10k), inscritos e a chave do mata-mata.
 // Tudo é decidido pelo servidor (server/src/torneio.ts); as partidas abrem sozinhas na hora (batalha PvP).
-import { ENTRADA_TORNEIO, NOMES_RODADAS, ROLETA_TORNEIO, textoDasRegras, type RegrasTorneio } from '../../../shared/torneioRegras';
+import { ENTRADA_TORNEIO, NOMES_RODADAS, roletaTorneio, textoDasRegras, type RegrasTorneio } from '../../../shared/torneioRegras';
 import { problemasDoTime } from '../../../shared/torneioTime';
 import { api, ErroApi } from '../conta';
 import { pokemonPorId } from '../dados';
@@ -13,6 +13,7 @@ import { abrirJanela } from './janela';
 import { girarRoleta } from './roleta';
 import { valorEmMoeda } from './moeda';
 import { avisar } from './avisos';
+import { tutorialFez } from '../tutorialEventos';
 
 interface PartidaFora { a: string | null; b: string | null; vencedor: string | null; wo: boolean }
 interface EstadoTorneio {
@@ -29,6 +30,7 @@ const hora = (ms: number) => new Date(ms).toLocaleTimeString('pt-BR', { timeZone
 const minutos = (ms: number) => Math.max(0, Math.ceil((ms - Date.now()) / 60_000));
 
 export function abrirTorneio(): void {
+  tutorialFez('torneio');
   let dados: EstadoTorneio | null = null;
   let aviso = '';
   const carregar = () => api<EstadoTorneio>('GET', '/torneio').then((r) => ((dados = r), janela.redesenhar())).catch(() => ((aviso = 'Sem conexão com o servidor.'), janela.redesenhar()));
@@ -106,7 +108,7 @@ export function vigiarTorneio(): void {
     if (msg.t === 'torneio-aviso') avisar(String(msg.texto), msg.erro ? 'erro' : 'info', 12_000);
     // o prêmio já foi sorteado e vai por entrega; a roleta só gira até ele (depois que a tela da final fecha)
     else if (msg.t === 'torneio-roleta') {
-      const girar = () => (document.querySelector('.batalha-fundo') ? setTimeout(girar, 1000) : void girarRoleta('🏆 Roleta do Torneio', ROLETA_TORNEIO, Number(msg.fatia)));
+      const girar = () => (document.querySelector('.batalha-fundo') ? setTimeout(girar, 1000) : void girarRoleta('🏆 Roleta do Torneio', roletaTorneio(), Number(msg.fatia)));
       girar();
     }
   });

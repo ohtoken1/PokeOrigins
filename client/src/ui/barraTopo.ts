@@ -30,11 +30,14 @@ function iconeGuia(): HTMLElement {
 }
 
 /** Link do grupo do WhatsApp. Vazio = ainda não existe (o botão avisa "em breve"). */
-const LINK_WHATSAPP = 'https://chat.whatsapp.com/JSaPynYUewEHZLl06t0XVH';
+/** Comunidades (também na tela de pré-registro). */
+export const LINK_DISCORD = 'https://discord.gg/zqkXC8Hddu';
+export const LINK_WHATSAPP = 'https://chat.whatsapp.com/JSaPynYUewEHZLl06t0XVH';
 import { pintarDeslizante } from './deslizante';
+import { iconeMenu, type NomeIcone } from './icones';
 
 /** `acao`: em vez de navegar, faz outra coisa (ex.: sair da conta). */
-type Item = { nome: string; destino: () => Destino; emBreve?: boolean; acao?: () => void; soAdmin?: boolean };
+type Item = { nome: string; icone?: NomeIcone; destino: () => Destino; emBreve?: boolean; acao?: () => void; soAdmin?: boolean };
 /** Aba simples (`itens` com 1 item, sem menu) ou grupo com menu. `telas` = telas em que a aba fica marcada. */
 type Aba = { nome: string; telas: string[]; itens: Item[]; menu?: boolean; soAdmin?: boolean };
 
@@ -46,12 +49,12 @@ const ABAS: Aba[] = [
     telas: ['inicial', 'regiao', 'bioma', 'personagem', 'cidade', 'safari', 'duelos', 'ginasios'],
     itens: [
       // jogadores chegam aos mapas pela saída do sul da cidade (pedido do dono); o atalho fica só para administradores
-      { nome: '🗺️ Mapas', soAdmin: true, destino: () => (carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' }) },
+      { nome: 'Mapas', icone: 'mapa', soAdmin: true, destino: () => (carregarSave() ? { tela: 'regiao' } : { tela: 'inicial' }) },
       // conta comum: o Jogar volta ao último lugar (mapa e tile em que estava; client/src/lugar.ts), pedido do dono
-      { nome: '🏙️ Cidade', destino: () => (!carregarSave() ? { tela: 'inicial' } : ehAdministrador() ? { tela: 'cidade' } : ultimoLugar()) },
+      { nome: 'Cidade', icone: 'cidade', destino: () => (!carregarSave() ? { tela: 'inicial' } : ehAdministrador() ? { tela: 'cidade' } : ultimoLugar()) },
       // tudo de duelos fica na Arena da cidade (pedido do dono); os atalhos ficam só para administradores
-      { nome: '⚔️ Duelos com treinadores', soAdmin: true, destino: () => ({ tela: 'duelos' }) },
-      { nome: '🏅 Ginásios', soAdmin: true, destino: () => ({ tela: 'ginasios' }) },
+      { nome: 'Duelos com treinadores', icone: 'duelos', soAdmin: true, destino: () => ({ tela: 'duelos' }) },
+      { nome: 'Ginásios', icone: 'ginasios', soAdmin: true, destino: () => ({ tela: 'ginasios' }) },
     ],
   },
   // Golpes saiu da barra (pedido do dono): os professores ficam na cidade (Move Reminder / Move Tutor).
@@ -61,13 +64,13 @@ const ABAS: Aba[] = [
     menu: true,
     telas: ['conta-perfil', 'conta-achievements', 'conta-skins', 'conta-recompensas', 'conta-doacao', 'opcoes'],
     itens: [
-      { nome: '🧑 Meu perfil', destino: () => ({ tela: 'conta', secao: 'perfil' }) },
-      { nome: '🏆 Conquistas', destino: () => ({ tela: 'conta', secao: 'achievements' }) },
-      { nome: '🎨 Minhas skins', destino: () => ({ tela: 'conta', secao: 'skins' }) },
-      { nome: '🎁 Recompensas', destino: () => ({ tela: 'conta', secao: 'recompensas' }) },
-      { nome: '💛 Doação', destino: () => ({ tela: 'conta', secao: 'doacao' }) },
-      { nome: '⚙️ Opções', destino: () => ({ tela: 'opcoes' }) },
-      { nome: '🚪 Sair da conta', destino: () => ({ tela: 'inicio' }), acao: () => void sairDaConta() },
+      { nome: 'Meu perfil', icone: 'perfil', destino: () => ({ tela: 'conta', secao: 'perfil' }) },
+      { nome: 'Conquistas', icone: 'conquistas', destino: () => ({ tela: 'conta', secao: 'achievements' }) },
+      { nome: 'Minhas skins', icone: 'skins', destino: () => ({ tela: 'conta', secao: 'skins' }) },
+      { nome: 'Recompensas', icone: 'recompensas', destino: () => ({ tela: 'conta', secao: 'recompensas' }) },
+      { nome: 'Doação', icone: 'doacao', destino: () => ({ tela: 'conta', secao: 'doacao' }) },
+      { nome: 'Opções', icone: 'opcoes', destino: () => ({ tela: 'opcoes' }) },
+      { nome: 'Sair da conta', icone: 'sair', destino: () => ({ tela: 'inicio' }), acao: () => void sairDaConta() },
     ],
   },
   {
@@ -75,12 +78,12 @@ const ABAS: Aba[] = [
     menu: true,
     telas: ['amigos', 'cla', 'eventos', 'jogadores', 'ranking', 'database'],
     itens: [
-      { nome: '🔎 Buscar jogadores', destino: () => ({ tela: 'jogadores' }) },
-      { nome: '👥 Amigos', destino: () => ({ tela: 'comunidade', secao: 'amigos' }) },
-      { nome: '🛡️ Guilda', destino: () => ({ tela: 'comunidade', secao: 'cla' }) },
-      { nome: '📅 Eventos', destino: () => ({ tela: 'comunidade', secao: 'eventos' }) },
-      { nome: '📊 Ranking', destino: () => ({ tela: 'ranking' }) },
-      { nome: '📚 Database', destino: () => ({ tela: 'database' }) },
+      { nome: 'Buscar jogadores', icone: 'buscar', destino: () => ({ tela: 'jogadores' }) },
+      { nome: 'Amigos', icone: 'amigos', destino: () => ({ tela: 'comunidade', secao: 'amigos' }) },
+      { nome: 'Guilda', icone: 'guilda', destino: () => ({ tela: 'comunidade', secao: 'cla' }) },
+      { nome: 'Eventos', icone: 'eventos', destino: () => ({ tela: 'comunidade', secao: 'eventos' }) },
+      { nome: 'Ranking', icone: 'ranking', destino: () => ({ tela: 'ranking' }) },
+      { nome: 'Database', icone: 'database', destino: () => ({ tela: 'database' }) },
     ],
   },
   {
@@ -164,7 +167,7 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
       return { botao: b, raiz: b };
     }
     const menu = el('div', { class: 'menu-topo', hidden: true },
-      ...itens.map((item) => el('button', { onclick: () => (fecharTodos(), item.acao ? item.acao() : navegar(item.destino())) }, item.nome, item.emBreve ? el('small', {}, 'em breve') : null)));
+      ...itens.map((item) => el('button', { onclick: () => (fecharTodos(), item.acao ? item.acao() : navegar(item.destino())) }, item.icone ? iconeMenu(item.icone) : '', el('span', {}, item.nome), item.emBreve ? el('small', {}, 'em breve') : null)));
     const botao = el('button', { class: 'aba-topo aba-menu', 'aria-haspopup': 'true' }, aba.nome, el('span', { class: 'setinha' }, '▾'));
     botao.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -216,7 +219,7 @@ export function montarBarraTopo(navegar: Navegar): (destino: Destino) => void {
         relogioBrasilia(),
         controlesSom(),
         // convite do Discord da comunidade (pedido do dono)
-        el('a', { class: 'botao-discord', href: 'https://discord.gg/zqkXC8Hddu', target: '_blank', rel: 'noopener', title: 'Entre no nosso Discord', 'aria-label': 'Discord do PokeOrigins' },
+        el('a', { class: 'botao-discord', href: LINK_DISCORD, target: '_blank', rel: 'noopener', title: 'Entre no nosso Discord', 'aria-label': 'Discord do PokeOrigins' },
           el('img', { src: 'discord.svg', alt: '' })),
         // grupo do WhatsApp (pedido do dono): enquanto `LINK_WHATSAPP` estiver vazio, o botão só avisa "em breve"
         el('a', {

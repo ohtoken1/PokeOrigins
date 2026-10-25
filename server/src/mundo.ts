@@ -8,6 +8,7 @@ import type { IncomingMessage, Server } from 'node:http';
 import { WebSocket, WebSocketServer } from 'ws';
 import * as banco from './banco.ts';
 import { contaDoToken } from './contas.ts';
+import { temAcesso } from './preRegistro.ts';
 import { temSkin, type ComSkins } from '../../shared/skins.ts';
 
 const SALA_VALIDA = /^[a-z0-9:_-]{1,40}$/;
@@ -101,9 +102,9 @@ function porNoLetreiro(aviso: AvisoLetreiro): void {
   if (letreiro.length > LETREIRO_GUARDADOS) letreiro.shift();
   avisarTodos({ t: 'letreiro', aviso });
 }
-/** Fecha a conexão de uma conta (banimento): o jogo dela para de receber e de mandar. */
-export function derrubar(contaId: number): void {
-  porConta.get(contaId)?.ws.close(4003, 'Conta banida');
+/** Fecha a conexão de uma conta (banimento 4003; acesso tirado do pré-registro 4005): o jogo dela para de receber e de mandar. */
+export function derrubar(contaId: number, codigo = 4003, motivo = 'Conta banida'): void {
+  porConta.get(contaId)?.ws.close(codigo, motivo);
 }
 /** Aviso de banimento para todos (server/src/banimentos.ts). */
 export const avisarBanimento = (jogador: string) => porNoLetreiro({ id: proximoAviso++, quando: Date.now(), tipo: 'banido', jogador });
@@ -246,6 +247,8 @@ function receber(c: Conexao, texto: string): void {
     if (msg.t !== 'entrar' || typeof msg.token !== 'string') return void c.ws.close(4001, 'Sem sessão');
     const conta = contaDoToken(msg.token);
     if (!conta) return void c.ws.close(4001, 'Sessão expirada');
+    // pré-registro sem acesso não entra no mundo (server/src/preRegistro.ts)
+    if (!temAcesso(conta)) return void c.ws.close(4005, 'Pré-registro');
     // uma conexão por conta: a mais nova fica (a outra aba é avisada e para de reconectar)
     const antiga = porConta.get(conta.id);
     if (antiga) {
