@@ -1,16 +1,14 @@
 // Tela de pré-registro (pedido do dono, 24/10/2026). Aparece em dois casos:
-// • quem abre o link /pre-registro sem estar logado: informações do jogo, kit de pré-registro, Founders, comunidades
+// • quem abre o link /pre-registro sem estar logado: informações do jogo, kit de pré-registro, comunidades
 //   e o formulário para criar a conta (com código de criador opcional);
 // • quem está logado numa conta que ainda não tem acesso (server/src/preRegistro.ts): a mesma página, com
 //   "Você está pré-registrado!" no lugar do formulário. Quando a staff libera, a página recarrega e o jogo abre.
-import { PACOTES_FUNDADOR } from '../../../shared/doacao';
 import { TODOS_OS_ITENS } from '../../../shared/loja';
 import type { Premio } from '../../../shared/premiosEventos';
 import { api, cadastrar, entrar, ErroApi, sairDaConta, type Conta } from '../conta';
-import { pokemonPorId } from '../dados';
 import { seletorDeIdioma } from '../idioma';
 import { LINK_DISCORD, LINK_WHATSAPP } from '../ui/barraTopo';
-import { el, spritePokemon } from '../ui/dom';
+import { el } from '../ui/dom';
 import { iconeItem } from '../ui/iconeItem';
 import { valorEmMoeda } from '../ui/moeda';
 import { criadorDoLink, esquecerCriador } from '../linkCriador';
@@ -29,7 +27,6 @@ const DESTAQUES: [string, string, string][] = [
 ];
 
 const numero = (n: number) => n.toLocaleString('pt-BR');
-const nomeDoItem = (id: string) => TODOS_OS_ITENS.find((i) => i.id === id)?.nome ?? id;
 
 function linhaDePremio(p: Premio): HTMLElement {
   const item = TODOS_OS_ITENS.find((i) => i.id === p.id);
@@ -121,24 +118,6 @@ export function telaPreRegistro(raiz: HTMLElement, conta: Conta | null): Promise
   // logado: confere de tempos em tempos se a conta já foi liberada
   if (conta) setInterval(buscar, 60_000);
 
-  const founders = PACOTES_FUNDADOR.map((f) => {
-    let sprite: HTMLElement | string = '';
-    try {
-      sprite = spritePokemon(pokemonPorId(f.numero), { animado: false });
-    } catch {
-      /* sem sprite */
-    }
-    return el('article', { class: 'pre-founder' },
-      sprite,
-      el('h3', {}, f.nome),
-      el('strong', { class: 'pre-preco' }, `R$ ${f.reais}`),
-      el('ul', {},
-        el('li', {}, valorEmMoeda('gold', f.gold), ' Origin Coins'),
-        el('li', {}, `${f.vipDias} dias de VIP`),
-        el('li', {}, `Título ${f.nome}`),
-        ...f.itens.map((i) => el('li', {}, `${i.quantidade}× ${nomeDoItem(i.id)}`))));
-  });
-
   raiz.replaceChildren(el('main', { class: 'pre-registro' },
     el('header', { class: 'pre-topo' },
       seletorDeIdioma(),
@@ -155,10 +134,6 @@ export function telaPreRegistro(raiz: HTMLElement, conta: Conta | null): Promise
     el('section', { class: 'pre-bloco' },
       el('h2', {}, 'O que você vai encontrar'),
       el('div', { class: 'pre-destaques' }, ...DESTAQUES.map(([emoji, titulo, texto]) => el('article', { class: 'pre-destaque' }, el('span', { class: 'pre-emoji' }, emoji), el('h3', {}, titulo), el('p', {}, texto))))),
-    el('section', { class: 'pre-bloco' },
-      el('h2', {}, '👑 Pacotes Founder'),
-      el('p', { class: 'meta' }, 'Para quem quer apoiar o projeto desde o começo. Cada pacote só pode ser comprado uma vez por conta e estará disponível no lançamento.'),
-      el('div', { class: 'pre-founders' }, ...founders)),
     el('section', { class: 'pre-bloco pre-comunidade' },
       el('h2', {}, 'Entre na comunidade'),
       el('p', { class: 'meta' }, 'Novidades, data de lançamento, sorteios e a galera do jogo.'),

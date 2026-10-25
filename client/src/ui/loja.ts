@@ -1,4 +1,4 @@
-import { CATALOGO, CATEGORIAS, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
+import { CATALOGO, CATEGORIAS, itemDaLoja, type CategoriaLoja, type ItemLoja, ehUsoUnico } from '../../../shared/loja';
 import { somarCompra } from '../../../shared/metricas';
 import { adotarSaveDoServidor, salvar, salvarAgora, type Save } from '../estado';
 import { api, ErroApi } from '../conta';
@@ -159,6 +159,7 @@ export function abrirLoja(save: Save, aoMudar: () => void): void {
       el('div', { class: 'mercado-icone-grande' }, iconeItem(item)),
       el('strong', { class: 'mercado-nome' }, item.nome),
       el('p', { class: 'mercado-desc' }, item.descricao),
+      ehUsoUnico(item.id) ? el('span', { class: 'selo-uso-unico', title: 'Some depois de agir na batalha (como nos jogos): é preciso equipar outro.' }, '⏳ Uso único') : '',
       el(
         'span',
         { class: 'mercado-qtd' },

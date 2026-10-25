@@ -103,6 +103,18 @@ export const PRECO_PADRAO = 1;
  * silver por hora de jogo). TMs e TRs vão ser vistos um por um depois.
  */
 export const PRECO_DA_CATEGORIA: Partial<Record<CategoriaLoja, number>> = { remedios: 100, evolucao: 30_000, batalha: 20_000, up: 10_000, tm: 20_000, tr: 20_000 };
+/**
+ * Itens de batalha de USO ÚNICO (pedido do dono, 25/10/2026): o simulador gasta o item quando ele age (o motor tira o
+ * item do Pokémon no fim, `sim.lastItem`), então custam menos que os permanentes e a loja/bolsa avisam "Uso único".
+ */
+export const ITENS_DE_USO_UNICO = new Set([
+  'focussash', 'airballoon', 'weaknesspolicy', 'blunderpolicy', 'whiteherb', 'mentalherb', 'powerherb', 'mirrorherb',
+  'redcard', 'ejectbutton', 'ejectpack', 'roomservice', 'throatspray', 'adrenalineorb', 'absorbbulb', 'cellbattery',
+  'luminousmoss', 'snowball', 'electricseed', 'grassyseed', 'mistyseed', 'psychicseed', 'boosterenergy', 'berryjuice',
+]);
+export const PRECO_USO_UNICO = 5_000;
+/** Também as Berries: comidas na batalha, somem (pedido do dono: replantar nos canteiros). Não vão para a loja. */
+export const ehUsoUnico = (id: string): boolean => ITENS_DE_USO_UNICO.has(id) || itemDaLoja(id)?.categoria === 'frutas';
 /** Preços que fogem do da categoria. */
 export const PRECOS: Record<string, number> = {
   // Pokébolas (decisão do dono)
@@ -177,7 +189,7 @@ const ITENS_DE_UP = new Set(['machobrace', 'powerweight', 'powerbracer', 'powerb
 /** Item nosso (não existe no Showdown): faz evoluir quem evolui por troca, como o Linking Cord do Legends: Arceus. */
 export const CABO_DE_LIGACAO = 'linkingcord';
 
-const preco = (id: string, categoria: CategoriaLoja) => PRECOS[id] ?? PRECO_DA_CATEGORIA[categoria] ?? PRECO_PADRAO;
+const preco = (id: string, categoria: CategoriaLoja) => PRECOS[id] ?? (ITENS_DE_USO_UNICO.has(id) ? PRECO_USO_UNICO : undefined) ?? PRECO_DA_CATEGORIA[categoria] ?? PRECO_PADRAO;
 
 const ehLendario = (nome: string) => (Dex.species.get(nome).tags ?? []).some((t) => /Legendary|Mythical/.test(t));
 

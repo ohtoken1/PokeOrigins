@@ -3,7 +3,7 @@ import { DURACAO_LUCK_INCENSE_MS, LUCK_INCENSE } from '../../../shared/campo';
 import { evoluir, trocarGolpe } from '../../../shared/batalha/progresso';
 import { ITENS, usarRemedio, type ItemId } from '../../../shared/itens';
 import { iconeTicketDoPokemon } from './ticketEvento';
-import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, TODOS_OS_ITENS, itemDaLoja, type CategoriaLoja, type ItemLoja } from '../../../shared/loja';
+import { CATEGORIAS_BOLSA as CATEGORIAS, CABO_DE_LIGACAO, SHARDS_POR_TROCA, TODOS_OS_ITENS, itemDaLoja, type CategoriaLoja, type ItemLoja, ehUsoUnico } from '../../../shared/loja';
 import { SEGURAR_OU_EVOLUIR, ehItemDeTroca, ehEquipavel, ehItemDeHabilidade, usarItemDeHabilidade, especiePodeTerGolpe, evolucaoPorItem, nomeItemEquipado, podeAprenderPorMaquina } from '../../../shared/usoItens';
 import { seletorDeItem, seletorDeOrb, CHANCE_SHINY_CUBO_LENDARIO, IV_MINIMO_CUBO_LENDARIO, KIT_INICIANTE, KIT_PRE_REGISTRO, NIVEL_CUBO_LENDARIO, cuboPorItem, ehSeloSazonal } from '../../../shared/itensCustom';
 
@@ -509,6 +509,7 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
               el('div', { class: 'mercado-icone-grande' }, iconeItem(item)),
               el('strong', { class: 'mercado-nome' }, item.nome),
               el('p', { class: 'mercado-desc' }, item.descricao),
+      ehUsoUnico(item.id) ? el('span', { class: 'selo-uso-unico', title: 'Some depois de agir na batalha (como nos jogos): é preciso equipar outro.' }, '⏳ Uso único') : null,
               el('div', { class: 'mercado-total' }, el('span', {}, 'Na bolsa'), el('span', { class: 'mercado-preco' }, `×${qtd}`, quantidadeNt(save, item.id) ? el('small', { class: 'qtd-nt', title: 'NT: não pode ser trocado nem vendido' }, ` (${quantidadeNt(save, item.id)} NT)`) : null)),
               // charm: usa na conta (como uma poção); travado enquanto o bônus de 30 minutos daquele tipo está ativo
               (() => {

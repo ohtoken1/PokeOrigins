@@ -3,6 +3,7 @@
 // Move Reminder/Move Tutor abrem os professores, estação = trem entre as regiões, Arena para os ginásios, Banco, Mural)
 // e o minimapa no canto mostra onde fica cada um. Clicar no nome abre direto; clicar no minimapa faz o personagem andar
 // sozinho até o lugar (a função abre quando ele chega); a saída do sul abre os mapas da região; andar com as teclas no meio do caminho cancela. Usa o mesmo jogo (Phaser) dos biomas, com o mapa da cidade e sem encontros.
+import { botaoTelaCheia } from '../ui/telaCheia';
 import { textoTranca } from '../../../shared/trancas';
 import { abrirEventos } from '../ui/eventos';
 import { abrirBoss, aoMudarBoss, bossAtual } from '../boss';
@@ -70,6 +71,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
   acompanharTime(caixaTime, atualizarTime);
 
   const areaJogo = el('div', { class: 'area-jogo' });
+  botaoTelaCheia(areaJogo);
   const chat = montarChat();
   raiz.append(
     el('main', { class: 'tela tela-bioma tela-cidade' },
