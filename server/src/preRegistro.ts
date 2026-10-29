@@ -47,7 +47,9 @@ export function aoCadastrar(contaId: number, codigo: string | null): void {
 }
 
 /** Números para a tela pública. */
-export const publico = () => ({ total: banco.totalPreRegistro(), ligado: config().ligado, aberto: config().aberto, kit: conteudoKitPreRegistro() });
+/** Contador da página (pedido do dono, 28/10/2026): todas as contas já criadas + alguns de enfeite, por enquanto. */
+const PRE_REGISTRO_EXTRA = 20;
+export const publico = () => ({ total: banco.totalDeContas() + PRE_REGISTRO_EXTRA, ligado: config().ligado, aberto: config().aberto, kit: conteudoKitPreRegistro() });
 
 /** A situação da própria conta (tela de pré-registro). */
 export function meu(conta: banco.Conta) {
