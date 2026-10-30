@@ -5,7 +5,7 @@ import { NIVEL_OVO, chocarOvo, ovoPorId, type Ovo, type ResultadoOvo } from '../
 import { marcarConquista } from '../conquistas';
 import { pokemonPorId, todosOsPokemons } from '../dados';
 import { TODOS_INICIAIS } from '../../../shared/regioes';
-import { TAMANHO_MAXIMO_TIME, guardarNoPC, novoPokemon, registrarCapturado, salvar, type Save } from '../estado';
+import { TAMANHO_MAXIMO_TIME, cabemPokemons, PC_CHEIO, guardarNoPC, novoPokemon, registrarCapturado, salvar, type Save } from '../estado';
 import { abrirJanela } from './janela';
 import { corTipo, el, selosTipos, spritePokemon } from './dom';
 import { iconeOvo } from './iconeItem';
@@ -39,6 +39,7 @@ function entregar(save: Save, r: ResultadoOvo, ovo: Ovo): string {
   p.ivs = r.ivs;
   p.hp = hpMaximo(p);
   p.origem = 'ovo';
+  p.obtido = 'ovo';
   // ovo NT: o Pokémon que nasce também não pode ser trocado (os IVs continuam escondidos)
   if (ovo.nt) {
     p.inegociavel = true;
@@ -98,6 +99,8 @@ export function abrirJanelaOvo(save: Save, ovoId: string, aoMudar: () => void): 
       const resultado = el('div', { class: 'ticket-resultado' });
       const chocarVarios = (n: number) => {
         if (girando || (save.itens[ovoId] ?? 0) < n) return;
+        // cada ovo é um Pokémon novo: com o PC cheio não choca (regra do dono)
+        if (!cabemPokemons(save, n)) return void resultado.replaceChildren(el('p', { class: 'aviso-bolsa' }, PC_CHEIO));
         girando = true;
         botoes.travar(true);
         resultado.replaceChildren();

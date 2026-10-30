@@ -6,6 +6,7 @@ import { REGIOES } from '../../shared/regioes';
 import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons, pokemonsDosMapasDe } from './dados';
 import { el, spritePokemon } from './ui/dom';
 import { comDica } from './ui/dica';
+import { carregarSave } from './estado';
 
 /** Horas de Brasília em que começa um Outbreak. */
 export const HORAS_OUTBREAK = [15, 21];
@@ -118,7 +119,8 @@ export function vigiarOutbreak(): void {
     if (!o) return;
     const min = Math.max(1, Math.ceil((o.fim - Date.now()) / 60_000));
     const regiao = REGIOES.find((r) => r.id === o.regiao)?.nome ?? o.regiao;
-    selo!.replaceChildren(el('strong', {}, '🔥 Outbreak de ', nomeComImagem(o.linha, o.nome)), el('span', {}, `${regiao} · ${o.bioma.nome} · termina em ${min} min`));
+    selo!.replaceChildren(el('strong', {}, '🔥 Outbreak de ', nomeComImagem(o.linha, o.nome)), el('span', {}, `${regiao} · ${o.bioma.nome} · termina em ${min} min`),
+      carregarSave()?.regiao !== o.regiao ? el('small', {}, 'Em outra região: pegue o trem na estação da cidade.') : '');
   };
   redesenharSelo = desenhar;
   desenhar();

@@ -1,5 +1,6 @@
 import './estilo.css';
 import { lembrarLugar, ultimoLugar } from './lugar';
+import { destinoDaBatalha } from './batalha/retomada';
 import './estilo-pokedex.css';
 import { carregarSave, salvar } from './estado';
 import { ajustarTimeAoLimite } from './limiteNivel';
@@ -37,6 +38,7 @@ import { vigiarAnuncios } from './anuncios';
 import { aoMudarViagem, vigiarViagem } from './viagem';
 import { vigiarOutbreak } from './outbreak';
 import { vigiarNinho } from './ninho';
+import { vigiarExpedicao } from './expedicao';
 import { vigiarBoss } from './boss';
 import { vigiarConquistas } from './conquistas';
 import { vigiarPvp } from './pvp';
@@ -135,11 +137,13 @@ void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   vigiarViagem();
   vigiarOutbreak();
   vigiarNinho();
+  vigiarExpedicao();
   vigiarBoss();
   // limite de nível pelo treinador: quem estava no time acima do limite (save de antes da regra) vai para o PC
   {
     const s = carregarSave();
-    if (s && ajustarTimeAoLimite(s)) salvar(s);
+    // com uma batalha em andamento o time fica como está (ela é refeita com ele)
+    if (s && !s.batalhaAberta && ajustarTimeAoLimite(s)) salvar(s);
   }
   // conquistas: confere agora e depois de cada salvamento
   vigiarConquistas(() => navegar({ tela: 'conta', secao: 'achievements' }));
@@ -161,5 +165,7 @@ void prepararIdioma().then(() => garantirConta(raiz)).then((conta) => {
   vigiarTutorial(navegar);
   aoMudarViagem(() => (destinoAtual.tela === 'regiao' ? navegar(destinoAtual) : atualizarCabecalho?.(destinoAtual)));
   // com save, o jogo abre na cidade (pedido do dono)
-  navegar(carregarSave() ? ultimoLugar() : { tela: 'inicial' });
+  // recarregou no meio de uma batalha do navegador: abre a tela de onde ela saiu, que volta para a batalha
+  const salvo = carregarSave();
+  navegar(salvo?.batalhaAberta ? destinoDaBatalha(salvo.batalhaAberta) : salvo ? ultimoLugar() : { tela: 'inicial' });
 });

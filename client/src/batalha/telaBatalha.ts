@@ -12,7 +12,9 @@ import { digitando } from '../ui/digitando';
 import { arquivoSpriteForma } from '../../../shared/formas';
 import { megaPorForma } from '../../../shared/megas';
 import type { Bioma } from '../../../shared/biomas';
-import { BatalhaSelvagem, type EventoBatalha, type Lado } from '../../../shared/batalha/motor';
+import { BatalhaSelvagem, aleatorioDaSemente, novaSemente, type EventoBatalha, type Lado } from '../../../shared/batalha/motor';
+import { anotarBatalha, restaurarTime, type AcaoGravada, type BatalhaAberta, type ContextoBatalha } from './retomada';
+import { avisar } from '../ui/avisos';
 import { atributos, curar, especie, expGanha, expParaNivel, faixaVelocidade, ganharEvs, hpMaximo, nomeGolpe, ppMaximo, sortearTeraTipo, type PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { Dex } from '@pkmn/sim';
 import { evoluir, ganharExperiencia, trocarGolpe, type ResultadoProgresso } from '../../../shared/batalha/progresso';
@@ -28,7 +30,7 @@ import { multSkins } from '../../../shared/skins';
 import { evsComItem, multSilverDoIncenso, multSilverDoTime, multXpDoItem } from '../../../shared/campo';
 import { sortearTicketDaBatalha } from '../../../shared/tickets';
 import { nomeEnergia, sortearEnergia } from '../../../shared/materiais';
-import { curarTime, guardarNoPC, registrarCapturaNoRanking, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, type Save } from '../estado';
+import { curarTime, guardarNoPC, registrarCapturaNoRanking, registrarCapturado, salvar, TAMANHO_MAXIMO_TIME, cabemPokemons, PC_CHEIO, type PokemonDoJogador, type Save } from '../estado';
 import { bonusDaMinhaGuilda, darXpAoCla } from '../cla';
 import { XP_CLA_POR_POKEMON_DE_TREINADOR, XP_CLA_POR_SELVAGEM } from '../../../shared/cla';
 import { marcarConquista } from '../conquistas';
@@ -60,6 +62,7 @@ const spriteAntesDoDynamax: Record<string, string | null> = {};
 import { multConquistas, multTitulo } from '../../../shared/conquistas';
 import { categoriaRara, ehLendario } from '../../../shared/encontros';
 import { corTipo, el, seloGenero, seloTipo, selosTipos, spritePokemon } from '../ui/dom';
+import { icone } from '../ui/icones';
 import { urlSprite3D, usarSprites3D } from './sprites3d';
 import { iconeItem } from '../ui/iconeItem';
 import { resumoAoPassar, resumoPokemon } from '../ui/resumo';
@@ -86,6 +89,13 @@ export interface OpcoesBatalha {
    * com o que dá para ver) e `save` traz uma CÓPIA curada do time: nada da batalha volta para o save.
    */
   pvp?: BatalhaRemota;
+  /**
+   * De onde a batalha saiu: com isso ela fica anotada no save e recarregar a página volta para ela
+   * (client/src/batalha/retomada.ts). Sem contexto (PvP), nada é anotado.
+   */
+  contexto?: ContextoBatalha;
+  /** Refazer a batalha anotada (voltou depois de recarregar): `opcoesDaRetomada` monta selvagem, treinador e bioma. */
+  retomada?: BatalhaAberta;
 }
 
 const hex = (cor: number) => `#${cor.toString(16).padStart(6, '0')}`;
@@ -197,13 +207,22 @@ function sortearFundo(biomaId: string): string | null {
   return lista ? new URL(`batalha/${lista[Math.floor(Math.random() * lista.length)]}`, document.baseURI).href : null;
 }
 
-export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTerminar, boss, pvp }: OpcoesBatalha): void {
+export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTerminar, boss, pvp, contexto, retomada }: OpcoesBatalha): void {
+  // voltou depois de recarregar: o time volta ao começo da batalha e ela é refeita ação por ação (lá embaixo)
+  if (retomada && !pvp && !restaurarTime(save, retomada.time)) {
+    delete save.batalhaAberta;
+    salvar(save);
+    avisar('Não foi possível voltar para a batalha (o time mudou).', 'erro');
+    return aoTerminar('fuga');
+  }
   // tema de batalha (selvagem ou treinador); volta para a música de fundo no fim
   tocarMusica('batalha');
   /** Quem está em campo do outro lado (num duelo, muda quando o treinador troca). */
   let selvagem = primeiro;
   let dadosSelvagem = pokemonPorId(selvagem.especieId);
-  const imagemFundo = sortearFundo(bioma.id);
+  const imagemFundo = retomada ? retomada.fundo || null : sortearFundo(bioma.id);
+  // a mesma semente refaz a mesma batalha (simulador e os nossos sorteios: captura, fuga, IA)
+  const semente = pvp ? null : (retomada?.semente ?? novaSemente());
   // no PvP quem responde é o servidor; o objeto remoto tem as mesmas funções que a tela usa (as ações devolvem
   // uma promessa, por isso `executar` espera o resultado)
   const batalha: BatalhaSelvagem = pvp ? (pvp as unknown as BatalhaSelvagem) : new BatalhaSelvagem(
@@ -212,11 +231,31 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     selvagem,
     dadosSelvagem.nome,
     dadosSelvagem.taxaCaptura,
-    Math.random,
+    semente ? aleatorioDaSemente(semente) : Math.random,
     treinador ? { nome: treinador.nome, equipe: treinador.equipe, nomesEquipe: treinador.equipe.map((p) => nomeDe(p.especieId)), ia: treinador.ia } : null,
+    null,
+    semente,
   );
 
   if (boss) batalha.modoBoss(boss.turnos);
+
+  // batalha anotada no save (retomada.ts): o começo agora, cada ação do jogador em `gravar`
+  if (!pvp && semente && (contexto || retomada)) {
+    if (!retomada)
+      anotarBatalha(save, { contexto: contexto!, semente, bioma: bioma.id, fundo: imagemFundo ?? '', selvagem: primeiro, treinador: treinador ?? null, boss: boss ? { turnos: boss.turnos } : null });
+    salvar(save);
+  }
+  /** Anota uma ação feita (logo depois de feita, no mesmo instante: o save nunca fica com uma sem a outra). */
+  const gravar = (acao: AcaoGravada) => {
+    if (pvp || !save.batalhaAberta) return;
+    save.batalhaAberta.acoes.push(acao);
+    salvar(save);
+  };
+  const usarGolpeGravado = (i: number, e: 'z' | 'tera' | 'mega' | 'dynamax' | null) => {
+    const eventos = batalha.usarGolpe(i, e);
+    gravar({ t: 'golpe', i, e });
+    return eventos;
+  };
 
   // ---------- montagem da tela ----------
   const modo3D = usarSprites3D();
@@ -733,17 +772,17 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
     mensagem.textContent = `O que ${nomeDe(save.time[batalha.ativo].especieId)} vai fazer?`;
     if (pvp)
       return acoes.replaceChildren(
-        botao([el('span', { class: 'emote' }, '⚔️'), 'Lutar'] as never, () => menuGolpes(), { class: 'botao grande lutar' }),
-        botao([el('span', { class: 'emote' }, '🔄'), 'Pokémon'] as never, () => menuPokemon(false), { class: 'botao grande pokemon', disabled: !pedido.podeTrocar }),
-        botao([el('span', { class: 'emote' }, '🏳️'), 'Desistir'] as never, desistirPvp, { class: 'botao grande fugir' }),
+        botao([el('span', { class: 'emote' }, icone('duelos')), 'Lutar'] as never, () => menuGolpes(), { class: 'botao grande lutar' }),
+        botao([el('span', { class: 'emote' }, icone('trocar')), 'Pokémon'] as never, () => menuPokemon(false), { class: 'botao grande pokemon', disabled: !pedido.podeTrocar }),
+        botao([el('span', { class: 'emote' }, icone('bandeira')), 'Desistir'] as never, desistirPvp, { class: 'botao grande fugir' }),
         relogioPvp(),
       );
     acoes.replaceChildren(
-      botao([el('span', { class: 'emote' }, '⚔️'), 'Lutar'] as never, () => menuGolpes(), { class: 'botao grande lutar' }),
-      botao([el('span', { class: 'emote' }, '🎒'), 'Bolsa'] as never, menuBolsa, { class: 'botao grande bolsa' }),
-      botao([el('span', { class: 'emote' }, '🔄'), 'Pokémon'] as never, () => menuPokemon(false), { class: 'botao grande pokemon', disabled: !pedido.podeTrocar }),
+      botao([el('span', { class: 'emote' }, icone('duelos')), 'Lutar'] as never, () => menuGolpes(), { class: 'botao grande lutar' }),
+      botao([el('span', { class: 'emote' }, icone('mochila')), 'Bolsa'] as never, menuBolsa, { class: 'botao grande bolsa' }),
+      botao([el('span', { class: 'emote' }, icone('trocar')), 'Pokémon'] as never, () => menuPokemon(false), { class: 'botao grande pokemon', disabled: !pedido.podeTrocar }),
       // contra treinador, ninho, boss e Liga também dá para fugir, mas pergunta antes (conta como derrota)
-      botao([el('span', { class: 'emote' }, '🏃'), 'Fugir'] as never, treinador ? fugirDoTreinador : tentarFugir, { class: 'botao grande fugir', disabled: !treinador && !pedido.podeFugir }),
+      botao([el('span', { class: 'emote' }, icone('correr')), 'Fugir'] as never, treinador ? fugirDoTreinador : tentarFugir, { class: 'botao grande fugir', disabled: !treinador && !pedido.podeFugir }),
     );
   }
 
@@ -767,7 +806,7 @@ export function abrirBatalha({ save, selvagem: primeiro, bioma, treinador, aoTer
             class: `botao golpe ${usarZ && z?.[i] ? 'golpe-z' : ''} ${modo === 'tera' ? 'golpe-tera' : ''} ${modo === 'mega' ? 'golpe-mega' : ''} ${usarMax ? 'golpe-dynamax' : ''}`,
             style: { '--cor-tipo': corTipo(maxDe(g)?.tipo ?? g.tipo) },
             disabled: g.desabilitado || (g.ppMax > 0 && g.pp <= 0) || (usarZ && !z?.[i]) || !!maxDe(g)?.desabilitado,
-            onclick: () => executar(() => batalha.usarGolpe(g.indice, usarZ && z?.[i] ? 'z' : modo === 'tera' || modo === 'mega' || modo === 'dynamax' ? modo : null)),
+            onclick: () => executar(() => usarGolpeGravado(g.indice, usarZ && z?.[i] ? 'z' : modo === 'tera' || modo === 'mega' || modo === 'dynamax' ? modo : null)),
           },
           el('strong', {}, usarZ && z?.[i] ? z[i]! : (maxDe(g)?.nome ?? g.nome)),
           el(
@@ -850,6 +889,7 @@ Chance de captura agora: ${textoDaChance(batalha.chanceDeCaptura(efeitoDaBola(id
       return menuPrincipal();
     }
     save.itens[id]--;
+    gravar({ t: 'remedio', pos, item: id });
     salvar(save);
     await dizer(`Você usou ${ITENS[id].nome}. ${resultado.mensagem}`);
     await executar(() => resultado.eventos);
@@ -937,7 +977,11 @@ Chance de captura agora: ${textoDaChance(batalha.chanceDeCaptura(efeitoDaBola(id
       await dizer(`Volte, ${nomeDe(save.time[batalha.ativo].especieId)}!`);
       await animarRetorno(spriteJogador);
     }
-    await executar(() => batalha.trocar(pos));
+    await executar(() => {
+      const eventos = batalha.trocar(pos);
+      gravar({ t: 'troca', pos });
+      return eventos;
+    });
   }
 
   /** Efeito da bola contra o selvagem agora (turno, status, quem está em campo…). */
@@ -964,12 +1008,16 @@ Chance de captura agora: ${textoDaChance(batalha.chanceDeCaptura(efeitoDaBola(id
   const textoDaChance = (chance: number) => (chance >= 1 ? '100' : chance < 0.001 ? '<0,1' : (chance * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }));
 
   async function arremessar(bola: ItemId) {
+    // PC cheio: não arremessa (nem gasta a bola); o jogador libera espaço antes
+    if (!cabemPokemons(save)) return void (mensagem.textContent = PC_CHEIO);
     acoes.replaceChildren();
     save.itens[bola]--;
     salvar(save);
     mensagem.textContent = `Você arremessou uma ${ITENS[bola].nome}!`;
     const efeito = efeitoDaBola(bola);
-    const { capturou, tremidas, chance, eventos } = batalha.arremessarBola(efeito, bonusDeCaptura());
+    const bonus = bonusDeCaptura();
+    const { capturou, tremidas, chance, eventos } = batalha.arremessarBola(efeito, bonus);
+    gravar({ t: 'bola', bola, efeito, bonus });
     if (capturou && semNt(bola) === 'ultraball' && ehLendario(dadosSelvagem)) marcarConquista(save, 'lendarioUltraball');
     const porcentagem = textoDaChance(chance);
     mensagem.textContent = `Você arremessou uma ${ITENS[bola].nome}! Chance de captura: ${porcentagem}%`;
@@ -994,6 +1042,7 @@ Chance de captura agora: ${textoDaChance(batalha.chanceDeCaptura(efeitoDaBola(id
   async function tentarFugir() {
     acoes.replaceChildren();
     const { fugiu, eventos } = batalha.fugir();
+    gravar({ t: 'fugir' });
     if (fugiu) {
       await dizer('Você fugiu em segurança!');
       return finalizar('fuga');
@@ -1087,6 +1136,8 @@ Chance de captura agora: ${textoDaChance(batalha.chanceDeCaptura(efeitoDaBola(id
   async function finalizar(resultado: ResultadoBatalha) {
     if (finalizada) return;
     finalizada = true;
+    // a batalha acabou: sai do save junto com o que ela deu (o salvar do fim leva as duas coisas)
+    if (!pvp) delete save.batalhaAberta;
     try {
       await fimDaBatalha(resultado);
     } catch (erro) {
@@ -1103,7 +1154,9 @@ Chance de captura agora: ${textoDaChance(batalha.chanceDeCaptura(efeitoDaBola(id
     // PvP: só o resultado (nada de XP, prêmios ou cura; o time da batalha era uma cópia)
     if (pvp) {
       pararRelogio?.();
-      if (!pvp.vencedor) await dizer('Os dois deixaram o tempo acabar: ninguém venceu.');
+      // Boss: a luta é no servidor; o que importa é o dano (já anotado lá)
+      if (pvp.boss) return void (await dizer(`${pvp.boss.turnosAcabaram ? 'Acabaram os turnos! ' : ''}Você causou ${pvp.boss.dano.toLocaleString('pt-BR')} de dano no boss.`));
+      if (!pvp.vencedor) await dizer('Empate! Ninguém venceu a batalha.');
       else await dizer(resultado === 'vitoria' ? `Você venceu ${treinador?.nome}!` : `${treinador?.nome} venceu a batalha.`);
       return;
     }
@@ -1194,6 +1247,8 @@ Chance de captura agora: ${textoDaChance(batalha.chanceDeCaptura(efeitoDaBola(id
       await avisarMissoes(contarNasMissoes(save, 'capturar', selvagem.especieId));
       if (selvagem.shiny) await avisarMissoes(contarNasMissoes(save, 'shiny'));
       tutorialFez('capturou');
+      (selvagem as PokemonDoJogador).capturadoEm = Date.now();
+      (selvagem as PokemonDoJogador).obtido = contexto?.tipo === 'safari' ? 'safari' : 'mapa';
       // acima do limite de nível do treinador (um lendário nível 50, por exemplo): vai para o PC até poder ser usado
       const usavel = podeUsar(save, selvagem);
       if (usavel && save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(selvagem);
@@ -1233,15 +1288,68 @@ Chance de captura agora: ${textoDaChance(batalha.chanceDeCaptura(efeitoDaBola(id
     }
   }
 
+  /**
+   * Refaz uma ação anotada (voltou depois de recarregar): os eventos, ou como a batalha acabou (bola que pegou, fuga).
+   * `frase` = o que a tela tinha dito na hora (vai para o registro).
+   */
+  const refazer = (a: AcaoGravada): { eventos: EventoBatalha[]; frase?: string } | { fim: 'captura' | 'fuga' } => {
+    if (a.t === 'golpe') return { eventos: batalha.usarGolpe(a.i, a.e) };
+    if (a.t === 'troca') return { eventos: batalha.trocar(a.pos) };
+    if (a.t === 'remedio') {
+      const r = batalha.usarRemedio(a.pos, ITENS[a.item], nomeDe(save.time[a.pos].especieId));
+      if (!r) throw new Error(`Remédio sem efeito ao refazer: ${a.item}`);
+      return { eventos: r.eventos, frase: `Você usou ${ITENS[a.item].nome}. ${r.mensagem}` };
+    }
+    if (a.t === 'bola') {
+      const r = batalha.arremessarBola(a.efeito, a.bonus);
+      if (!r.capturou) return { eventos: r.eventos, frase: FRASES_FALHA[r.tremidas] };
+      if (a.bola === 'healball') curarAoCapturar = true;
+      return { fim: 'captura' };
+    }
+    const r = batalha.fugir();
+    return r.fugiu ? { fim: 'fuga' } : { eventos: r.eventos, frase: 'Não conseguiu fugir!' };
+  };
+
   // ---------- início ----------
   (async () => {
-    // voltou para a batalha PvP (recarregou a página): passa por tudo depressa
-    rapido = !!pvp?.retomada;
+    // voltou para a batalha (recarregou a página): passa por tudo depressa
+    rapido = !!pvp?.retomada || !!retomada;
     if (treinador) await dizer(treinador.mensagemInicio ?? `${treinador.nome}, ${treinador.titulo}, quer batalhar!`);
     void gritar(selvagem.especieId);
     await animar(spriteSelvagem, animarEntrada);
     await dizer(treinador ? `${treinador.nome} enviou ${dadosSelvagem.nome}!` : `Um ${dadosSelvagem.nome} selvagem apareceu!`);
     await reproduzir(batalha.iniciar());
+    // batalha do navegador anotada no save: refaz cada ação na mesma ordem (a mesma semente dá os mesmos resultados)
+    if (retomada && !pvp) {
+      let fim: 'captura' | 'fuga' | null = null;
+      try {
+        for (const a of retomada.acoes) {
+          const r = refazer(a);
+          if ('fim' in r) {
+            fim = r.fim;
+            break;
+          }
+          turno++;
+          if (r.frase) await dizer(r.frase);
+          await reproduzir(r.eventos);
+        }
+      } catch (erro) {
+        console.error('Erro ao refazer a batalha', erro);
+        rapido = false;
+        await dizer('Não foi possível voltar para a batalha.');
+        return finalizar('fuga');
+      }
+      rapido = false;
+      await dizer('Você voltou para a batalha!');
+      if (fim === 'captura') {
+        await dizer(`Pegou! ${dadosSelvagem.nome} foi capturado!`);
+        return finalizar('captura');
+      }
+      if (fim === 'fuga') {
+        await dizer('Você fugiu em segurança!');
+        return finalizar('fuga');
+      }
+    }
     if (rapido) {
       rapido = false;
       await dizer('Você voltou para a batalha!');

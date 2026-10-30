@@ -9,7 +9,7 @@ import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { avisarTodos } from './mundo.ts';
 import { lerPokemon } from './entregas.ts';
-import { aplicarAjustesTiers } from './motorDoJogo.ts';
+import { aplicarAjustesBiomas, aplicarAjustesTiers } from './motorDoJogo.ts';
 import { definirAjustesPremios, type AjustesPremios } from '../../shared/premiosEventos.ts';
 import { DIFICULDADES_MANUAIS, POKEMON_POR_TIME_GINASIO, type DificuldadeManual } from '../../shared/ginasiosDificuldade.ts';
 
@@ -29,6 +29,7 @@ const premios = (): AjustesPremios => banco.lerEvento<AjustesPremios>('premios-e
 
 /** Ao ligar o servidor: os ajustes guardados passam a valer aqui também. */
 export function aplicarAoLigar(): void {
+  aplicarAjustesBiomas(biomas());
   aplicarAjustesTiers(tiers());
   definirAjustesPremios(premios());
 }
@@ -62,6 +63,7 @@ export function gravarBiomas(conta: banco.Conta, dados: Record<string, unknown>)
   }
   if (Object.keys(mover).length + fora.length + Object.keys(extra).length > MAX_AJUSTES) throw new ErroConta('Ajustes demais.');
   banco.gravarEvento('ajustes-biomas', { mover, fora: [...new Set(fora as number[])], extra });
+  aplicarAjustesBiomas(biomas());
   avisarTodos({ t: 'ajustes' });
   return ler();
 }

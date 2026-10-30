@@ -16,6 +16,7 @@ import { iconeItem } from './iconeItem';
 import { abrirJanela } from './janela';
 import { nomeDaMoeda } from '../../../shared/moedas';
 import { tutorialFez } from '../tutorialEventos';
+import { confirmar } from './confirmar';
 
 type Aba = 'comprar' | 'vender' | 'meus';
 const numero = (n: number) => n.toLocaleString('pt-BR');
@@ -60,7 +61,8 @@ export function abrirMercado(save: Save, aoMudar: () => void = () => {}): void {
   let uid: number | null = null;
   let item: string | null = null;
   let quantidade = 1;
-  let valor = 1;
+  // preço começa vazio: o jogador digita (antes vinha 1 e dava para anunciar um lendário por 1 sem querer)
+  let valor: number | null = null;
   let moeda: MoedaMercado = 'silver';
 
   // o campo de busca é sempre o mesmo elemento (refazer a cada letra tiraria o cursor dele)
@@ -165,7 +167,8 @@ export function abrirMercado(save: Save, aoMudar: () => void = () => {}): void {
     const todos: { p: PokemonDoJogador; noTime: boolean }[] = [...save.time.map((p) => ({ p, noTime: true })), ...save.caixa.map((p) => ({ p, noTime: false }))];
     const motivo = (p: PokemonDoJogador, noTime: boolean) =>
       p.inegociavel ? 'NT: não pode ser vendido' : p.trancado ? 'Trancado (destranque no PC)' : noTime && save.time.length <= 1 ? 'Precisa ficar 1 no time' : null;
-    const achados = todos.filter(({ p }) => !texto || pokemonPorId(p.especieId).nome.toLowerCase().includes(texto));
+    // ovos não são vendidos (o servidor recusa) e não aparecem: a imagem e a busca revelariam a espécie e o shiny
+    const achados = todos.filter(({ p }) => !p.ovo && (!texto || pokemonPorId(p.especieId).nome.toLowerCase().includes(texto)));
     gradeVenda.replaceChildren(
       ...(achados.length ? [] : [el('p', { class: 'troca-vazio' }, 'Nenhum Pokémon seu com esse nome.')]),
       ...achados.map(({ p, noTime }) => {
@@ -194,28 +197,40 @@ export function abrirMercado(save: Save, aoMudar: () => void = () => {}): void {
     if (vendendo === 'gold') moeda = 'silver';
 
     const campoQtd = el('input', { type: 'number', class: 'banco-campo', min: 1, max: maximo, step: 1, value: quantidade, 'aria-label': 'Quantidade' }) as HTMLInputElement;
-    const campoPreco = el('input', { type: 'number', class: 'banco-campo', min: 1, max: PRECO_MAXIMO_MERCADO, step: 1, value: valor, 'aria-label': 'Preço' }) as HTMLInputElement;
+    const campoPreco = el('input', { type: 'number', class: 'banco-campo', min: 1, max: PRECO_MAXIMO_MERCADO, step: 1, value: valor ?? '', placeholder: 'Digite o preço', 'aria-label': 'Preço' }) as HTMLInputElement;
+    /** O preço digitado (null = vazio ou fora de 1 a PRECO_MAXIMO_MERCADO). */
+    const precoDigitado = (): number | null => {
+      const n = Number(campoPreco.value);
+      return campoPreco.value.trim() && Number.isSafeInteger(n) && n >= 1 && n <= PRECO_MAXIMO_MERCADO ? n : null;
+    };
     const resumo = el('p', { class: 'meta mn-resumo' });
+    let botaoAnunciar: HTMLButtonElement | null = null;
     const escreverResumo = () => {
-      const v = inteiro(campoPreco, 1, PRECO_MAXIMO_MERCADO);
+      const v = precoDigitado();
+      if (botaoAnunciar) botaoAnunciar.disabled = ocupado || !pronto || cheio || v === null;
+      if (v === null) return void (resumo.textContent = `Digite o preço (de 1 a ${numero(PRECO_MAXIMO_MERCADO)}).`);
       const taxa = taxaDaVenda(v);
       resumo.textContent = `Taxa do mercado: ${TAXA_MERCADO * 100}%${taxa ? ` (${numero(taxa)} ${nomeDaMoeda(moeda, taxa)})` : ' (preço abaixo de 20 não paga)'}. Se vender, você recebe ${numero(valorDoVendedor(v))} ${nomeDaMoeda(moeda, valorDoVendedor(v))}.`;
     };
     campoQtd.addEventListener('change', () => ((quantidade = inteiro(campoQtd, 1, maximo || 1)), desenhar()));
-    campoPreco.addEventListener('input', escreverResumo);
-    campoPreco.addEventListener('change', () => ((valor = inteiro(campoPreco, 1, PRECO_MAXIMO_MERCADO)), desenhar()));
-    escreverResumo();
+    campoPreco.addEventListener('input', () => ((valor = precoDigitado()), escreverResumo()));
 
     const pronto = vendendo === 'pokemon' ? uid !== null && [...save.time, ...save.caixa].some((p) => p.uid === uid) : vendendo === 'item' ? !!item && tem > 0 : tem > 0;
-    const anunciar = () => {
+    const anunciar = async () => {
       // o que está digitado vale, mesmo sem ter saído do campo
-      valor = inteiro(campoPreco, 1, PRECO_MAXIMO_MERCADO);
+      const v = precoDigitado();
+      if (v === null) return escreverResumo();
+      valor = v;
       quantidade = inteiro(campoQtd, 1, maximo || 1);
-      const novo: NovoAnuncio = vendendo === 'pokemon' ? { tipo: 'pokemon', uid: uid!, preco: valor, moeda } : vendendo === 'item' ? { tipo: 'item', item: item!, quantidade, preco: valor, moeda } : { tipo: 'gold', quantidade, preco: valor, moeda: 'silver' };
-      void agir(() => anunciarNoMercado(novo), 'Anúncio colocado no mercado.').then(() => (uid = null));
+      const qual = vendendo === 'pokemon'
+        ? (() => { const p = [...save.time, ...save.caixa].find((x) => x.uid === uid); return p ? `${pokemonPorId(p.especieId).nome} Nv. ${p.nivel}` : 'este Pokémon'; })()
+        : vendendo === 'item' ? `${numero(quantidade)}× ${nomeDoItem(item!)}` : `${numero(quantidade)} Origin Coins`;
+      if (!(await confirmar('Anunciar no Mercado negro', `Anunciar ${qual} por ${numero(v)} ${nomeDaMoeda(moeda, v)}? Se alguém comprar, a venda não tem volta.`))) return;
+      const novo: NovoAnuncio = vendendo === 'pokemon' ? { tipo: 'pokemon', uid: uid!, preco: v, moeda } : vendendo === 'item' ? { tipo: 'item', item: item!, quantidade, preco: v, moeda } : { tipo: 'gold', quantidade, preco: v, moeda: 'silver' };
+      void agir(() => anunciarNoMercado(novo), 'Anúncio colocado no mercado.').then(() => ((uid = null), (valor = null)));
     };
 
-    return [
+    const partes = [
       el('div', { class: 'mn-filtros' },
         ...(['pokemon', 'item', 'gold'] as const).map((t) =>
           el('button', { class: `aba ${vendendo === t ? 'ativa' : ''}`, type: 'button', onclick: () => ((vendendo = t), (quantidade = 1), desenhar()) }, ROTULO_TIPO[t]))),
@@ -232,12 +247,14 @@ export function abrirMercado(save: Save, aoMudar: () => void = () => {}): void {
         el('span', { class: 'mn-preco-campo' }, campoPreco,
           vendendo === 'gold'
             ? el('span', { class: 'mn-moeda-fixa' }, 'Poké Dólares')
-            : el('select', { class: 'banco-campo mn-moeda', 'aria-label': 'Moeda', onchange: (e: Event) => ((moeda = (e.target as HTMLSelectElement).value as MoedaMercado), (valor = inteiro(campoPreco, 1, PRECO_MAXIMO_MERCADO)), desenhar()) },
+            : el('select', { class: 'banco-campo mn-moeda', 'aria-label': 'Moeda', onchange: (e: Event) => ((moeda = (e.target as HTMLSelectElement).value as MoedaMercado), (valor = precoDigitado()), desenhar()) },
                 el('option', { value: 'silver', selected: moeda === 'silver' }, 'Poké Dólares'), el('option', { value: 'gold', selected: moeda === 'gold' }, 'Origin Coins')))),
       resumo,
       el('p', { class: 'meta' }, `Você tem ${meus} de ${MAX_ANUNCIOS_POR_JOGADOR} anúncios. O que está anunciado sai do seu time, PC ou bolsa até vender, e volta se você tirar o anúncio ou se ninguém comprar em ${VALIDADE_ANUNCIO_MS / 3_600_000} horas.`),
-      el('button', { class: 'botao mn-anunciar', type: 'button', disabled: ocupado || !pronto || cheio, title: cheio ? 'Você já tem o máximo de anúncios' : '', onclick: anunciar }, ocupado ? 'Anunciando…' : 'Anunciar'),
+      (botaoAnunciar = el('button', { class: 'botao mn-anunciar', type: 'button', disabled: ocupado || !pronto || cheio || precoDigitado() === null, title: cheio ? 'Você já tem o máximo de anúncios' : '', onclick: () => void anunciar() }, ocupado ? 'Anunciando…' : 'Anunciar') as HTMLButtonElement),
     ];
+    escreverResumo();
+    return partes;
   };
 
   // ---- aba Meus anúncios ----

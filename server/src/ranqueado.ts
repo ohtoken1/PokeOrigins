@@ -1,6 +1,7 @@
 // PvP ranqueado (regras em shared/ranqueado.ts). O servidor cuida de tudo: fila por formato (Uber, OU, UU, RU), só
 // nos horários abertos; a busca começa na divisão do jogador e abre uma para cada lado a cada 30 s; a batalha é a do
 // PvP (server/src/pvp.ts, calculada aqui, com "uma mecânica só") e no fim soma/tira os pontos pela distância. A fila fica só na memória (servidor reiniciou = procura de novo).
+import { tarefaSegura } from './tarefaSegura.ts';
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { atualizarElo, avisar, estaOnline } from './mundo.ts';
@@ -75,8 +76,25 @@ function tirar(contaId: number, texto: string): void {
   avisar(contaId, { t: 'ranqueado-fila', fila: null, texto });
 }
 
+/**
+ * A mesma dupla não cai mais junta quando as últimas PARTIDAS_IGUAIS_MAX partidas entre os dois (em qualquer formato)
+ * tiveram o MESMO vencedor (pedido do dono: conta secundária perdendo de propósito). Resultado equilibrado continua.
+ * O jogador não vê esta regra; só não é pareado com aquele adversário.
+ */
+const PARTIDAS_IGUAIS_MAX = 4;
+function duplaTravada(a: number, b: number): boolean {
+  const ultimas = banco.ultimasPartidasDaDupla(a, b, PARTIDAS_IGUAIS_MAX);
+  return ultimas.length === PARTIDAS_IGUAIS_MAX && ultimas[0] !== null && ultimas.every((v) => v === ultimas[0]);
+}
+
 /** `degraus`: a divisão de cada um quando a partida começou (vale para os pontos). */
 function fimDaPartida(formato: FormatoRanqueado, a: number, b: number, degraus: [number, number], vencedor: number | null): void {
+  // o histórico da dupla não pode impedir os pontos (ex.: uma das contas foi apagada durante a partida)
+  try {
+    banco.gravarPartidaRanqueado(a, b, formato, vencedor);
+  } catch (e) {
+    console.error('Histórico do ranqueado não gravado', e);
+  }
   if (vencedor === null) {
     for (const c of [a, b]) avisar(c, { t: 'ranqueado-resultado', formato, texto: `Ranqueado ${NOME_FORMATO[formato]}: empate. Os pontos não mudaram.` });
     return;
@@ -123,6 +141,7 @@ function parear(): void {
     // o mais perto primeiro
     candidatos.sort((x, y) => Math.abs(x.degrau - degrauA) - Math.abs(y.degrau - degrauA));
     for (const { c: b, degrau: degrauB } of candidatos) {
+      if (duplaTravada(a, b)) continue;
       const contaA = banco.contaPorId(a);
       const contaB = banco.contaPorId(b);
       if (!contaA || !contaB) continue;
@@ -143,7 +162,7 @@ function parear(): void {
     }
   }
 }
-setInterval(parear, 2000).unref();
+setInterval(() => tarefaSegura('ranqueado', parear), 2000).unref();
 
 /** Ranking de um formato (só quem já jogou), com o elo de cada um. */
 export function ranking(formato: unknown) {

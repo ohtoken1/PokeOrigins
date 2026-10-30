@@ -150,6 +150,7 @@ export function comprarGuilda(conta: banco.Conta, dados: Record<string, unknown>
         const shiny = Math.random() < CHANCE_SHINY_INICIAL_GUILDA;
         const p = gerarPokemon(produto.inicial, 1, { shiny, ivMinimo: IV_MINIMO_INICIAL_GUILDA });
         p.origem = 'ticket';
+        p.obtido = 'loja';
         try {
           guardarPokemon(save as unknown as SaveMin, p as unknown as PokemonSave, false);
         } catch {
@@ -184,7 +185,8 @@ export function comprarGuilda(conta: banco.Conta, dados: Record<string, unknown>
 
 /** PUT /api/save: o navegador não mexe nos Pontos de guilda nem nas compras do mês (valem os guardados). */
 export function proteger(save: Record<string, unknown>, antes: Record<string, unknown> | null): void {
-  if (!antes) return;
+  // primeiro save da conta: os pontos e as compras da guilda só o servidor escreve
+  if (!antes) return void (delete save.pontosGuilda, delete save.lojaGuilda);
   for (const campo of ['pontosGuilda', 'lojaGuilda']) {
     if (antes[campo] === undefined) delete save[campo];
     else save[campo] = antes[campo];

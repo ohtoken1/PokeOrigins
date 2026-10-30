@@ -3,6 +3,7 @@
 // save de quem está jogando não é trocado por baixo dele. Futuramente estas linhas também alimentam o Log.
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
+import { itemExiste } from './motorDoJogo.ts';
 import * as correio from './correio.ts';
 import { guardarPokemon, type PokemonSave, type SaveMin } from './trocas.ts';
 
@@ -14,6 +15,8 @@ const SALDOS: Record<string, string> = { silver: 'silver', gold: 'gold', fragmen
 
 /** Medalhas de torneio (entregues como item, vão para save.estatisticas). */
 const MEDALHAS: Record<string, string> = { 'medalha-ouro': 'medalhasOuro', 'medalha-prata': 'medalhasPrata', 'medalha-bronze': 'medalhasBronze' };
+/** O que a staff pode mandar: um item do jogo, um saldo (Poké Dólares, Origin Coins…), medalha ou dias de VIP. */
+export const itemAceito = (id: string) => /^[a-z0-9-]{1,60}$/.test(id) && (itemExiste(id) || Object.hasOwn(SALDOS, id) || Object.hasOwn(MEDALHAS, id) || id === VIP_DIAS);
 
 /** Limites de um pedido. */
 const QUANTIDADE_MAX = 9999;
@@ -27,7 +30,7 @@ export function darItem(conta: banco.Conta, dados: Record<string, unknown>) {
   const para = usuario ? banco.contaPorUsuario(usuario) : undefined;
   if (!para) throw new ErroConta('Jogador não encontrado.', 404);
   const item = typeof dados.item === 'string' ? dados.item : '';
-  if (!/^[a-z0-9-]{1,60}$/.test(item)) throw new ErroConta('Item inválido.');
+  if (!itemAceito(item)) throw new ErroConta('Este item não existe no jogo.');
   const quantidade = dados.quantidade;
   if (typeof quantidade !== 'number' || !Number.isSafeInteger(quantidade) || quantidade < 1 || quantidade > QUANTIDADE_MAX) throw new ErroConta(`A quantidade vai de 1 a ${QUANTIDADE_MAX}.`);
   // chega pelo correio (o jogador resgata quando quiser)
@@ -73,7 +76,7 @@ export function lerPokemon(v: unknown, nivelMaximo = 100, comItem = false): Poke
     especieId: p.especieId, nivel: p.nivel, exp: p.exp, shiny: p.shiny === true, natureza: p.natureza, habilidade: p.habilidade, genero: p.genero,
     ivs, evs, golpes: lidos, hp: p.hp, status: null, amizade: 50,
     // já vem avaliado (quem recebe vê o tier) e não conta para as conquistas de "consiga um…", como prêmio de ticket
-    ivsFaixa: true, origem: 'ticket',
+    ivsFaixa: true, origem: 'ticket', obtido: 'presente',
     ...(p.teraTipo ? { teraTipo: p.teraTipo } : {}),
     ...(p.inegociavel === true ? { inegociavel: true } : {}),
     ...(item ? { item } : {}),
@@ -110,9 +113,9 @@ export function aplicarItem(save: Record<string, unknown>, item: string, quantid
     save.vipAte = Math.max(ate, Date.now()) + Math.min(quantidade, VIP_DIAS_MAX) * 86_400_000;
     return;
   }
-  const medalha = MEDALHAS[item];
+  const medalha = Object.hasOwn(MEDALHAS, item) ? MEDALHAS[item] : undefined;
   if (medalha) return somar((save.estatisticas && typeof save.estatisticas === 'object' ? save.estatisticas : (save.estatisticas = {})) as Record<string, unknown>, medalha);
-  const saldo = SALDOS[item];
+  const saldo = Object.hasOwn(SALDOS, item) ? SALDOS[item] : undefined;
   if (saldo) return somar(save, saldo);
   const itens = (save.itens && typeof save.itens === 'object' ? save.itens : (save.itens = {})) as Record<string, unknown>;
   if (typeof itens[item] === 'number') itens[item] = Math.floor(itens[item] as number);

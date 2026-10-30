@@ -90,6 +90,12 @@ export const skinsNaBolsa = (s: ComSkins, id: string): number => (ehSkin(id) ? M
 export const skinsNaColecao = (s: ComSkins, id: string): number => (ehSkin(id) ? inteiroDe(s.itens[id]) - skinsNaBolsa(s, id) : 0);
 /** Quantas unidades deste item são NT pela contagem `itensNt` (nunca mais que o total). */
 export const quantidadeNt = (s: ComSkins, id: string): number => Math.min(inteiroDe(s.itens[id]), inteiroDe(s.itensNt?.[id]));
+/**
+ * O item que um Pokémon segura conta como NT? Os NT são contados por item (`itensNt`), sem dizer qual unidade: se há
+ * mais NT anotados do que unidades na bolsa, as que faltam estão equipadas, e o Pokémon não pode sair com elas (pedido
+ * do dono: item NT não pode ser trocado). Itens "-nt" e os sempre NT são conferidos à parte (`itemInegociavel`).
+ */
+export const itemEquipadoNt = (s: ComSkins, id: string): boolean => inteiroDe(s.itensNt?.[id]) > inteiroDe(s.itens[id]);
 /** Quanto de um item pode sair em troca ou no mercado: skin, só o que está na bolsa; o resto, o total menos as NT. */
 export const quantidadeNegociavel = (s: ComSkins, id: string): number => (ehSkin(id) ? skinsNaBolsa(s, id) : inteiroDe(s.itens[id]) - quantidadeNt(s, id));
 /** Soma (ou tira, com número negativo) skins da contagem da bolsa. Chamar DEPOIS de mudar `itens`; outros itens: nada. */

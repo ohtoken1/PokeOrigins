@@ -64,6 +64,8 @@ export interface Dashboard {
     retornoD1: number | null; retornoD7: number | null;
     /** jogadores ativos por dia, últimos 14 dias (do mais velho ao de hoje) */
     ativosPorDia: { dia: string; ativos: number; horas: number }[];
+    /** "Por onde conheceu o jogo?" do cadastro (extra = os detalhes mais escritos: site, servidor, código) */
+    comoConheceram: LinhaContagem[];
   };
   capturas: {
     total: Record<'capturas' | 'shiny' | 'inicial' | 'lendario' | 'mitico' | 'ultra', NumeroPorPeriodo>;

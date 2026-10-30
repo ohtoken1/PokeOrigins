@@ -10,6 +10,7 @@ import { aparenciaDoSave } from '../personagem/aparencia';
 import { LINHA_DIRECAO, montarPersonagem } from '../personagem/lpc';
 import { temArteDeSkin } from '../personagem/skinsDesenho';
 import { el } from '../ui/dom';
+import { iconeNoTexto } from '../ui/icones';
 import { balaoTitulo } from '../ui/titulo';
 import { textoDeItem } from '../ui/dicaItem';
 import { comDica, linhaDaDica } from '../ui/dica';
@@ -78,7 +79,7 @@ function achievements(save: Save): HTMLElement {
           el('div', { class: 'lista-achievements' },
             ...visiveis.map(({ conquista: c, valor, meta, feita, aResgatar }) =>
               el('div', { class: `achievement ${feita ? 'feito' : ''} ${aResgatar ? 'a-resgatar' : ''}`, 'data-conquista': c.id },
-                el('span', { class: 'achievement-selo' }, feita ? '★' : aResgatar ? '🎁' : ''),
+                el('span', { class: 'achievement-selo' }, feita ? '★' : aResgatar ? iconeNoTexto('recompensas') : ''),
                 el('div', { class: 'achievement-texto' },
                   el('strong', {}, c.nome),
                   el('small', {}, c.descricao),
@@ -252,7 +253,7 @@ function conteudoSkins(save: Save, redesenhar: () => void): HTMLElement[] {
               el('button', { class: `botao ${i.id === bonus ? '' : 'secundario'}`, 'aria-pressed': String(i.id === bonus), onclick: () => escolher('skinBonus', i.id) }, i.id === bonus ? '✓ Bônus' : 'Usar bônus'),
               // skin NT (conquistas, Kit iniciante) é da conta: não vai para a bolsa
               itemInegociavel(i.id)
-                ? el('small', { class: 'meta skin-nt', title: 'Esta skin não pode ser trocada nem vendida' }, '🔒 NT')
+                ? el('small', { class: 'meta skin-nt', title: 'Esta skin não pode ser trocada nem vendida' }, iconeNoTexto('cadeado'), 'NT')
                 : el('button', { class: 'botao secundario skin-levar', title: 'Na bolsa a skin vira um item: pode ser trocada ou vendida no Mercado negro, mas não dá visual nem bônus', onclick: () => levar(i.id) }, 'Levar para a bolsa')))))
       : el('p', { class: 'meta' }, 'Você ainda não tem nenhuma skin. Elas saem no lendário e no mítico das Orbs, de conquistas e de eventos.'),
     naBolsa ? el('p', { class: 'meta' }, `Skins na bolsa: ${naBolsa}. Para voltar a usar, abra a bolsa e clique em Usar.`) : el('span', {}),
@@ -292,15 +293,15 @@ export function janelaDosPremios(novos: { evento: 'login' | 'trinta'; dia: numbe
     const login = n.evento === 'login';
     const premios = (login ? premiosLogin() : premiosLoginTrinta())[n.dia - 1] ?? [];
     return el('div', { class: 'premio-do-dia' },
-      el('h3', {}, login ? `🎁 Login de boas-vindas · dia ${n.dia} de ${DIAS_LOGIN}` : `📅 Login dos 30 dias · dia ${n.dia} de ${DIAS_LOGIN_TRINTA}`),
+      el('h3', {}, iconeNoTexto(login ? 'recompensas' : 'calendario'), login ? `Login de boas-vindas · dia ${n.dia} de ${DIAS_LOGIN}` : `Login dos 30 dias · dia ${n.dia} de ${DIAS_LOGIN_TRINTA}`),
       listaPremios(premios),
       login ? gradeDeLogin(premiosLogin(), n.dia, true) : '');
   };
-  abrirJanela('🎁 Prêmios de hoje', (j) => el('div', { class: 'janela-login' },
+  abrirJanela('Prêmios de hoje', (j) => el('div', { class: 'janela-login' },
     el('p', { class: 'sub' }, 'Obrigado por entrar hoje! Estes prêmios chegaram no seu Correio (NT). Abra o Correio e clique em Resgatar para levá-los para a bolsa.'),
     ...novos.map(bloco),
     el('div', { class: 'premio-do-dia-botoes' },
-      el('button', { class: 'botao', onclick: () => (j.fechar(), abrirCorreio()) }, '📬 Abrir o Correio'),
+      el('button', { class: 'botao', onclick: () => (j.fechar(), abrirCorreio()) }, iconeNoTexto('carta'), 'Abrir o Correio'),
       el('button', { class: 'botao secundario', onclick: () => j.fechar() }, 'Depois'))), { classe: 'janela-login-diario' });
 }
 
@@ -321,10 +322,12 @@ function gradeDosTrinta(t: EstadoRecompensas['trinta']): HTMLElement {
     ...premiosLoginTrinta().map((p, i) => {
       const n = i + 1;
       const pego = t.pegos.includes(n);
-      const perdido = !pego && n < hoje;
-      const estado = pego ? (n === hoje ? 'recebido hoje' : 'recebido') : perdido ? 'perdido' : n === hoje ? 'proximo' : '';
+      // dia de antes de a conta existir: não é "perdido" (e o VIP não recupera)
+      const antes = !pego && n < (t.primeiroDia ?? 1) && n < hoje;
+      const perdido = !pego && !antes && n < hoje;
+      const estado = pego ? (n === hoje ? 'recebido hoje' : 'recebido') : perdido ? 'perdido' : antes ? 'antes-da-conta' : n === hoje ? 'proximo' : '';
       return el('div', { class: `recompensa-dia ${estado}` },
-        el('small', { class: 'recompensa-numero' }, pego ? `✔ Dia ${n}` : perdido ? `✖ Dia ${n}: perdido` : n === hoje ? `Dia ${n}: hoje` : `Dia ${n}`),
+        el('small', { class: 'recompensa-numero' }, pego ? `✔ Dia ${n}` : perdido ? `✖ Dia ${n}: perdido` : antes ? `Dia ${n}: antes da sua conta` : n === hoje ? `Dia ${n}: hoje` : `Dia ${n}`),
         listaPremios(p),
         perdido && t.vip && restam > 0 ? el('button', { class: 'botao recompensa-recuperar', onclick: () => recuperar(n) }, 'Recuperar (VIP)') : '');
     }));
@@ -333,7 +336,7 @@ function gradeDosTrinta(t: EstadoRecompensas['trinta']): HTMLElement {
 /** Explicação do Login dos 30 dias com a contagem: que dia é hoje, quantos pegou/perdeu e as recuperações do VIP. */
 function explicacaoDosTrinta(t: EstadoRecompensas['trinta']): HTMLElement {
   const hoje = t.diaAtual ?? 0;
-  const perdidos = Array.from({ length: Math.max(0, hoje - 1) }, (_, i) => i + 1).filter((n) => !t.pegos.includes(n)).length;
+  const perdidos = Array.from({ length: Math.max(0, hoje - 1) }, (_, i) => i + 1).filter((n) => n >= (t.primeiroDia ?? 1) && !t.pegos.includes(n)).length;
   const restam = RECUPERACOES_VIP - t.recuperacoes;
   return el('div', { class: 'recompensa-explicacao' },
     el('div', { class: 'recompensa-contagem' },
@@ -342,9 +345,9 @@ function explicacaoDosTrinta(t: EstadoRecompensas['trinta']): HTMLElement {
       el('span', {}, 'Perdidos: ', el('strong', {}, String(perdidos))),
       el('span', {}, 'Recuperações VIP: ', el('strong', {}, `${restam} de ${RECUPERACOES_VIP}`))),
     el('p', {}, `Nos ${DIAS_LOGIN_TRINTA} primeiros dias do servidor, cada dia tem o seu prêmio. Entrou no jogo naquele dia, o prêmio é seu e chega pelo Correio. Não entrou, o prêmio daquele dia é perdido (exemplo: entrou no dia 1, faltou no dia 2 e voltou no dia 3 = pega os prêmios 1 e 3).`),
-    el('p', {}, t.vip
-      ? `⭐ Você é VIP: pode recuperar até ${RECUPERACOES_VIP} prêmios de dias que perdeu (botão "Recuperar" no dia perdido).`
-      : `⭐ Jogadores VIP podem recuperar até ${RECUPERACOES_VIP} prêmios de dias perdidos.`),
+    el('p', {}, iconeNoTexto('estrela'), t.vip
+      ? `Você é VIP: pode recuperar até ${RECUPERACOES_VIP} prêmios de dias que perdeu (botão "Recuperar" no dia perdido).`
+      : `Jogadores VIP podem recuperar até ${RECUPERACOES_VIP} prêmios de dias perdidos.`),
     el('small', { class: 'meta' }, `Todos os prêmios são NT. Depois do dia ${DIAS_LOGIN_TRINTA}, este login acaba.`));
 }
 
@@ -356,13 +359,13 @@ function blocoDoacaoAcumulada(r: EstadoRecompensas | null): HTMLElement {
   const anterior = [...metasDoacao()].reverse().find((m) => d.gold >= m.gold)?.gold ?? 0;
   const faltamDias = Math.max(0, Math.ceil((d.fim - Date.now()) / 86_400_000));
   return el('div', { class: 'doacao-acumulada' },
-    el('p', { class: 'doacao-reset' }, `⏳ O acumulado zera a cada 3 meses. Este período termina em ${new Date(d.fim - 1).toLocaleDateString('pt-BR')} (${faltamDias === 1 ? 'falta 1 dia' : `faltam ${faltamDias} dias`}); depois disso, todos começam do zero e as metas podem ser ganhas de novo.`),
+    el('p', { class: 'doacao-reset' }, iconeNoTexto('ampulheta'), `O acumulado zera a cada 3 meses. Este período termina em ${new Date(d.fim - 1).toLocaleDateString('pt-BR')} (${faltamDias === 1 ? 'falta 1 dia' : `faltam ${faltamDias} dias`}); depois disso, todos começam do zero e as metas podem ser ganhas de novo.`),
     el('p', {}, 'Doado neste período: ', valorEmMoeda('gold', d.gold)),
     proxima
       ? el('div', {},
           el('div', { class: 'barra-exp' }, el('div', { class: 'preenchido', style: { width: `${((d.gold - anterior) / (proxima.gold - anterior)) * 100}%` } })),
           el('small', { class: 'meta' }, `Próxima meta: ${proxima.gold.toLocaleString('pt-BR')} (faltam ${(proxima.gold - d.gold).toLocaleString('pt-BR')} Origin Coins)`))
-      : el('p', { class: 'meta' }, '🏆 Você alcançou todas as metas deste período. Obrigado!'),
+      : el('p', { class: 'meta' }, iconeNoTexto('conquistas'), 'Você alcançou todas as metas deste período. Obrigado!'),
     el('div', { class: 'recompensas-grade metas' },
       ...metasDoacao().map((m) => {
         const ganhou = d.metas.includes(m.gold) || d.gold >= m.gold;
@@ -382,10 +385,10 @@ function recompensas(): HTMLElement {
     // trava de nível: mostra o aviso no topo da seção (o servidor não dá o prêmio abaixo dela)
     const tranca = (c: 'loginBoasVindas' | 'loginTrinta') => (conteudoLiberado(c) ? '' : el('p', { class: 'recompensa-quebrou' }, textoTranca(c)));
     if (r.trinta.diaAtual !== null)
-      partes.push(el('h2', {}, `📅 Login dos ${DIAS_LOGIN_TRINTA} dias`), tranca('loginTrinta'), explicacaoDosTrinta(r.trinta), gradeDosTrinta(r.trinta));
+      partes.push(el('h2', {}, iconeNoTexto('calendario'), `Login dos ${DIAS_LOGIN_TRINTA} dias`), tranca('loginTrinta'), explicacaoDosTrinta(r.trinta), gradeDosTrinta(r.trinta));
     if (r.login.fim !== null)
       partes.push(
-        el('h2', {}, `🎁 Login de boas-vindas (${DIAS_LOGIN} dias)`),
+        el('h2', {}, iconeNoTexto('recompensas'), `Login de boas-vindas (${DIAS_LOGIN} dias)`),
         tranca('loginBoasVindas'),
         el('p', { class: 'sub' }, `Nos ${DIAS_LOGIN} primeiros dias da sua conta, cada dia em que você entra no jogo anda uma casinha e ganha o prêmio dela. Todos são NT e chegam pelo Correio. Termina em ${dataHora(r.login.fim)}.`),
         gradeDeLogin(premiosLogin(), r.login.dia, r.login.hoje));
@@ -414,10 +417,10 @@ function doacao(save: Save): HTMLElement {
     try {
       const r = await api<{ codigo: string; criador: string }>('GET', `/parcerias/${encodeURIComponent(valor)}`);
       codigoCriador = r.codigo;
-      statusCodigo.textContent = `✅ Apoiando ${r.criador}`;
+      statusCodigo.textContent = `Apoiando ${r.criador}`;
       statusCodigo.className = 'doacao-codigo-status ok';
     } catch (e) {
-      statusCodigo.textContent = e instanceof ErroApi ? `❌ ${e.message}` : '❌ Sem conexão com o servidor.';
+      statusCodigo.textContent = e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.';
       statusCodigo.className = 'doacao-codigo-status erro';
     }
   };
@@ -425,7 +428,7 @@ function doacao(save: Save): HTMLElement {
   /** Janela de confirmação (pedido do dono): resumo, forma de pagamento (ainda desligada) e o aceite dos termos. */
   const doar = (valor: number, titulo = 'Doação', linhas: (string | HTMLElement)[] = []) => {
     let aceito = false;
-    abrirJanela('💛 Confirmar doação', (janela) => {
+    abrirJanela('Confirmar doação', (janela) => {
       const botao = el('button', { class: 'botao doacao-confirmar', disabled: !aceito || !DOACOES_LIGADAS,
         onclick: () => avisar('As doações ainda não estão abertas. Em breve!', 'info') }, `Doar ${reais(valor)}`);
       const caixa = el('input', { type: 'checkbox', checked: aceito, onchange: (e: Event) => ((aceito = (e.target as HTMLInputElement).checked), janela.redesenhar()) });
@@ -434,11 +437,11 @@ function doacao(save: Save): HTMLElement {
           el('strong', {}, titulo),
           el('span', { class: 'doacao-resumo-valor' }, reais(valor)),
           linhas.length ? el('ul', { class: 'doacao-conteudo' }, ...linhas.map((l) => el('li', {}, l))) : '',
-          codigoCriador ? el('small', {}, `🎥 Apoiando o código ${codigoCriador}`) : ''),
+          codigoCriador ? el('small', {}, iconeNoTexto('camera'), `Apoiando o código ${codigoCriador}`) : ''),
         el('h3', {}, 'Forma de pagamento'),
         el('div', { class: 'doacao-formas' },
-          el('button', { class: 'botao secundario', disabled: true }, '⚡ Pix ', el('small', {}, '(em breve)')),
-          el('button', { class: 'botao secundario', disabled: true }, '💳 Cartão ', el('small', {}, '(em breve)'))),
+          el('button', { class: 'botao secundario', disabled: true }, 'Pix ', el('small', {}, '(em breve)')),
+          el('button', { class: 'botao secundario', disabled: true }, 'Cartão ', el('small', {}, '(em breve)'))),
         el('h3', {}, 'Termos de doação'),
         el('div', { class: 'doacao-termos' }, ...TERMOS_DOACAO.map((t) => el('p', {}, el('strong', {}, t.titulo), el('br'), t.texto))),
         el('label', { class: 'doacao-aceite' }, caixa, ' Li e aceito os Termos de doação'),
@@ -452,7 +455,7 @@ function doacao(save: Save): HTMLElement {
   const pacotes = el('div', { class: 'doacao-aba-pacotes' },
     el('p', { class: 'sub' }, `O PokeOrigins é grátis. Quem quiser ajudar a manter o servidor no ar pode fazer uma doação e recebe Origin Coins como agradecimento (R$ 1 = ${GOLD_POR_REAL} Origin Coins).`),
     el('div', { class: 'doacao-criador' },
-      el('strong', {}, '🎥 Apoie um criador de conteúdo'),
+      el('strong', {}, iconeNoTexto('camera'), 'Apoie um criador de conteúdo'),
       el('small', {}, 'Tem o código de um streamer ou criador parceiro? Digite aqui: parte da sua doação ajuda quem divulga o PokeOrigins.'),
       el('div', { class: 'doacao-criador-linha' }, campoCodigo, el('button', { class: 'botao', onclick: aplicarCodigo }, 'Aplicar')),
       statusCodigo),
@@ -495,8 +498,8 @@ function doacao(save: Save): HTMLElement {
   const abas = el('nav', { class: 'admin-abas doacao-abas' });
   const mostrar = (qual: 'pacotes' | 'acumulada') => {
     abas.replaceChildren(
-      el('button', { class: `aba ${qual === 'pacotes' ? 'ativa' : ''}`, type: 'button', onclick: () => mostrar('pacotes') }, '💛 Pacotes'),
-      el('button', { class: `aba ${qual === 'acumulada' ? 'ativa' : ''}`, type: 'button', onclick: () => mostrar('acumulada') }, '🏆 Doação acumulada'));
+      el('button', { class: `aba ${qual === 'pacotes' ? 'ativa' : ''}`, type: 'button', onclick: () => mostrar('pacotes') }, iconeNoTexto('coracao'), 'Pacotes'),
+      el('button', { class: `aba ${qual === 'acumulada' ? 'ativa' : ''}`, type: 'button', onclick: () => mostrar('acumulada') }, iconeNoTexto('conquistas'), 'Doação acumulada'));
     corpo.replaceChildren(qual === 'pacotes' ? pacotes : acumulada);
   };
   mostrar('pacotes');

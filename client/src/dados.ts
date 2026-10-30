@@ -48,6 +48,17 @@ for (const p of porId.values()) {
   if (regional) porId.set(p.id, Object.assign(p, { evoluiDe: porId.get(regional)!.slug }));
 }
 
+// a PokéAPI dá o nome da forma anterior sem a forma (o slug não existe): a linha se quebrava e Jellicent/Gourgeist
+// apareciam nos mapas do nível 1 ao 100, nasciam do ovo já evoluídos e o Homem Suspeito não voltava a evolução
+const CORRIGIR_EVOLUI_DE: Record<string, string> = { frillish: 'frillish-male', pumpkaboo: 'pumpkaboo-average', basculin: 'basculin-white-striped' };
+{
+  const slugs = new Set([...porId.values()].map((p) => p.slug));
+  for (const p of porId.values()) {
+    const certo = p.evoluiDe && !slugs.has(p.evoluiDe) ? CORRIGIR_EVOLUI_DE[p.evoluiDe] : undefined;
+    if (certo && slugs.has(certo)) p.evoluiDe = certo;
+  }
+}
+
 /** Todos os Pokémon carregados (todas as regiões), em ordem da Pokédex nacional. */
 // formas regionais logo depois da espécie normal (Rattata, Alolan Rattata, Raticate…)
 const TODOS = [...Object.values(POKEMONS_POR_REGIAO).flat(), ...SO_CADASTRADOS].sort((a, b) => (a.numeroDex ?? a.id) - (b.numeroDex ?? b.id) || a.id - b.id);

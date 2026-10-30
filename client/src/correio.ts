@@ -4,6 +4,7 @@ import type { PokemonIndividual } from '../../shared/batalha/pokemon';
 import { api } from './conta';
 import { adotarSaveDoServidor, carregarSave, salvarAgora, type Save } from './estado';
 import { aoAvisoDoServidor } from './online';
+import { avisar } from './ui/avisos';
 
 export type AnexoCarta =
   | { tipo: 'item'; item: string; nome: string; quantidade: number }
@@ -59,7 +60,9 @@ export async function marcarLida(id: number): Promise<void> {
 export async function resgatar(alvo: { id: number } | { todas: true }): Promise<{ nome: string; quantidade: number }[]> {
   // o servidor mexe no save guardado: manda antes o que ainda não subiu
   await salvarAgora();
-  const r = await api<{ cartas: Carta[]; recebidos: { nome: string; quantidade: number }[]; save: Save; versao: number }>('POST', '/correio/resgatar', alvo);
+  const r = await api<{ cartas: Carta[]; recebidos: { nome: string; quantidade: number }[]; esperando?: number; save: Save; versao: number }>('POST', '/correio/resgatar', alvo);
+  // "Resgatar tudo" com o PC cheio: as cartas com Pokémon que não cabe ficam esperando
+  if (r.esperando) avisar(r.esperando > 1 ? `${r.esperando} cartas com Pokémon ficaram esperando: seu PC está cheio.` : '1 carta com Pokémon ficou esperando: seu PC está cheio.', 'info', 8000);
   adotarSaveDoServidor(r.save, r.versao);
   adotar(r);
   return r.recebidos;

@@ -12,10 +12,22 @@ import { barraHp } from './time';
 import { precoAvaliarIvs, faixaDoIv, itemDaLoja } from '../../../shared/loja';
 import { AMIZADE_MAXIMA, amizadeDe, textoAmizade } from '../../../shared/amizade';
 import { iconeItem } from './iconeItem';
-import { formatarId, saveDoPokemon, salvar } from '../estado';
+import { formatarId, saveDoPokemon, salvar, type Obtido, type PokemonDoJogador } from '../estado';
 import { vipAtivo } from '../../../shared/vip';
 import { valorEmMoeda } from './moeda';
 import { tutorialFez } from '../tutorialEventos';
+
+const LUGAR_OBTIDO: Record<Obtido, string> = {
+  mapa: 'Mapa', safari: 'Safari', ovo: 'Ovo', daycare: 'Daycare', orb: 'Orb', passe: 'Passe de batalha', ninho: 'Ninho',
+  inicial: 'Inicial', cubo: 'Cubo lendário', loja: 'Loja da guilda', presente: 'Presente da administração',
+};
+
+/** "Obtido em": onde entrou no jogo e, se mudou de dono, por onde (Pokémon antigos: o que dá para saber). */
+function textoObtido(p: PokemonDoJogador): string {
+  const lugar = p.obtido ? LUGAR_OBTIDO[p.obtido] : p.capturadoEm ? 'Mapa' : p.origem === 'ovo' ? 'Ovo' : p.origem === 'ticket' ? 'Orb ou prêmio' : null;
+  const via = p.chegouPor === 'mercado' ? 'Mercado negro' : p.chegouPor === 'troca' || p.origem === 'troca' ? 'Troca' : null;
+  return [lugar ?? (via ? null : 'Desconhecido'), via].filter(Boolean).join(' · ');
+}
 
 const NOMES: Record<Atributo, string> = { hp: 'HP', atk: 'Ataque', def: 'Defesa', spa: 'At. Esp.', spd: 'Def. Esp.', spe: 'Velocidade' };
 const CATEGORIAS: Record<string, string> = { Physical: 'Físico', Special: 'Especial', Status: 'Status' };
@@ -179,6 +191,8 @@ export function fichaPokemon(p: PokemonIndividual): HTMLElement {
         el('dl', {},
           el('dt', {}, 'ID'),
           el('dd', {}, p.uid ? formatarId(p.uid) : '—', el('small', {}, ' (ordem de captura)'), p.trancado ? el('small', {}, ' · trancado no PC') : null),
+          el('dt', {}, 'Obtido em'),
+          el('dd', {}, textoObtido(p as PokemonDoJogador)),
           el('dt', {}, 'Natureza'),
           el('dd', {}, natureza.name, natureza.plus ? el('small', {}, ` (+${NOMES[natureza.plus as Atributo]}, −${NOMES[natureza.minus as Atributo]})`) : el('small', {}, ' (neutra)')),
           el('dt', {}, 'Ability'),

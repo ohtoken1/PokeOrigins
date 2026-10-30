@@ -7,8 +7,7 @@ import { botaoTelaCheia } from '../ui/telaCheia';
 import { textoTranca } from '../../../shared/trancas';
 import { abrirEventos } from '../ui/eventos';
 import { abrirBoss, aoMudarBoss, bossAtual } from '../boss';
-import { abrirBatalha } from '../batalha/telaBatalha';
-import { TURNOS_BOSS } from '../../../shared/eventosRegras';
+import { batalhaParaRetomar, descartarBatalha } from '../batalha/retomada';
 import { conteudoLiberado } from '../trancas';
 import type { Tela } from '../main';
 import { biomaPorId } from '../../../shared/biomas';
@@ -94,7 +93,14 @@ export const telaCidade: Tela = (raiz, navegar) => {
   const opcoes: OpcoesBioma = {
     bioma: biomaPorId('grama'),
     cidade: true,
-    aoPronto: () => carregando.remove(),
+    aoPronto: () => {
+      carregando.remove();
+      // luta contra o boss anotada no navegador (de antes de ela ir para o servidor): não vale mais
+      if (batalhaParaRetomar(save!, 'boss')) {
+        descartarBatalha(save!);
+        salvar(save!);
+      }
+    },
     seguidor: save.time[0] ? { especie: save.time[0].especieId, shiny: save.time[0].shiny } : null,
     // na cidade não há encontros
     aoPisar: () => {
@@ -183,19 +189,7 @@ export const telaCidade: Tela = (raiz, navegar) => {
     else if (acao === 'creche') abrirCreche(save!, () => atualizarTime());
     // NPC Eventos (feira do oeste): Cofre e Loteria (ui/eventos.ts)
     else if (acao === 'eventos') abrirEventos(save!, () => atualizarTime());
-    else if (acao === 'boss')
-      abrirBoss(save!, (boss, nome, aoFim) => {
-        cena()?.pausar(true);
-        abrirBatalha({
-          save: save!, bioma: biomaPorId('caverna'), selvagem: boss,
-          treinador: { ia: 'dificil', nome, titulo: 'Boss', equipe: [boss], recompensa: 0, mensagemInicio: `${nome} ruge furioso dentro da gaiola!`, avisoFuga: 'Vale o dano que você já causou, mas você não poderá enfrentar este boss de novo.' },
-          boss: { turnos: TURNOS_BOSS, aoDano: aoFim },
-          aoTerminar: () => {
-            cena()?.pausar(false);
-            atualizarTime();
-          },
-        });
-      });
+    else if (acao === 'boss') abrirBoss(save!);
     // evento sazonal: o NPC fica fechado enquanto a staff não liga nenhum (ainda não há eventos sazonais)
     else if (acao === 'sazonal') avisar('🔒 Nenhum evento sazonal ativo no momento.');
     else avisar(`${EM_BREVE[acao] ?? 'Este lugar'}: em breve.`);

@@ -18,6 +18,7 @@ import { el } from './dom';
 import { abrirJanela } from './janela';
 import { bannerEvento, classeTematica } from './temaEvento';
 import { urlDoElo } from './simboloElo';
+import { abrirPerfilDe } from '../telas/jogadores';
 import { definirMeuElo } from '../eloMapa';
 
 export type EloComPlacar = EloCalculado & { vitorias: number; derrotas: number };
@@ -104,6 +105,10 @@ export function painelEloDoPerfil(elos: ElosDoJogador | null | 'meu'): HTMLEleme
 }
 
 /** Ranking de um formato (Comunidade → Ranking → PvP Ranqueado). */
+/** Nome do treinador: clicar abre o perfil dele (o seu não). */
+export const nomeNoRanking = (nome: string, usuario: string) =>
+  usuario ? el('button', { class: 'ranking-nome', title: 'Ver perfil', onclick: () => void abrirPerfilDe(usuario) }, nome) : nome;
+
 export function tabelaRanqueado(lista: LinhaRankingRanqueado[], meuUsuario: string): HTMLElement {
   if (!lista.length) return el('p', { class: 'meta' }, 'Ninguém jogou este formato ainda.');
   return el('table', { class: 'ranking-tabela ranking-ranqueado' },
@@ -111,7 +116,7 @@ export function tabelaRanqueado(lista: LinhaRankingRanqueado[], meuUsuario: stri
     el('tbody', {}, ...lista.map((d, i) =>
       el('tr', { class: d.usuario === meuUsuario ? 'eu' : '' },
         el('td', { class: `posicao p${i + 1}` }, String(i + 1)),
-        el('td', {}, d.nome),
+        el('td', {}, nomeNoRanking(d.nome, d.usuario === meuUsuario ? '' : d.usuario)),
         el('td', { class: 'ranking-elo' }, iconeElo(d.elo, 30), nomeDoElo(d)),
         el('td', { class: 'valor' }, d.pontos.toLocaleString('pt-BR')),
         el('td', { class: 'valor' }, `${d.vitorias} / ${d.derrotas}`)))));

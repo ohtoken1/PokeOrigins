@@ -5,7 +5,7 @@ import { ajustesPremios, type Fatia, type Premio } from './premiosEventos.ts';
 
 /** Cofre: senha de 3 dígitos sorteada pelo sistema; tentativas ilimitadas, mas uma a cada tanto por conta. */
 export const DIGITOS_COFRE = 3;
-export const INTERVALO_TENTATIVA_COFRE_MS = 1500;
+export const INTERVALO_TENTATIVA_COFRE_MS = 10_000;
 export const PREMIO_COFRE_MAX = 120;
 
 /** Loteria: bilhete de 1.000 Poké Dólares com número de 5 dígitos que não se repete no dia. */
@@ -84,7 +84,7 @@ export function proximaMeiaNoite(agora = Date.now()): number {
 export const NIVEL_BOSS = 200;
 export const TURNOS_BOSS = 50;
 export const DURACAO_BOSS_MS = 2 * 60 * 60 * 1000;
-/** teto do dano aceito numa luta (o dano ainda vem do navegador) */
+/** teto do dano de uma luta (a luta é calculada no servidor; o teto é só uma garantia) */
 export const DANO_MAXIMO_BOSS = 5_000_000;
 export const PREMIOS_BOSS_GLOBAL = [
   { item: 'chave-temporal', nome: 'Chave Temporal', quantidade: 1 },

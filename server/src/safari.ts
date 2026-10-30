@@ -4,7 +4,7 @@ import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { NIVEL_MINIMO, liberado } from '../../shared/trancas.ts';
 import { nivelTreinador } from '../../shared/treinador.ts';
-import { PRECO_ENTRADA_SAFARI_GOLD, TIPOS_SAFARI, diaDoSafari, entradasUsadas, lerSafariAberto, proximaEntrada, ticketComprado } from '../../shared/safari.ts';
+import { PRECO_ENTRADA_SAFARI_GOLD, SALAS_SAFARI, TIPOS_SAFARI, diaDoSafari, entradasUsadas, lerSafariAberto, proximaEntrada, ticketComprado } from '../../shared/safari.ts';
 
 const saldo = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? Math.floor(v) : 0);
 
@@ -69,7 +69,17 @@ export function proteger(save: Record<string, unknown>, antes: Record<string, un
   const guardado = antes?.safari as Record<string, unknown> | undefined;
   if (!guardado || typeof guardado !== 'object') return void delete save.safari;
   const doJogo = save.safari && typeof save.safari === 'object' ? (save.safari as Record<string, unknown>).aberto : null;
-  const continua = lerSafariAberto(guardado) && doJogo && typeof doJogo === 'object';
+  const abertoGuardado = lerSafariAberto(guardado);
+  const continua = abertoGuardado && doJogo && typeof doJogo === 'object' && !Array.isArray(doJogo);
+  if (continua) {
+    const aberto = doJogo as Record<string, unknown>;
+    // o tipo é o que o servidor abriu; a sala só anda para a frente; os Pokémon sorteados não mudam depois de guardados
+    aberto.tipo = abertoGuardado.tipo;
+    const sala = aberto.sala;
+    if (!Number.isSafeInteger(sala) || (sala as number) < abertoGuardado.sala || (sala as number) >= SALAS_SAFARI) aberto.sala = abertoGuardado.sala;
+    if (aberto.sala === abertoGuardado.sala && abertoGuardado.escolhido) aberto.escolhido = true;
+    if (abertoGuardado.salas.length) aberto.salas = abertoGuardado.salas;
+  }
   save.safari = { dia: guardado.dia, usadas: guardado.usadas, ...(guardado.comprada === true ? { comprada: true } : {}), total: totalDeEntradas(guardado), ...(continua ? { aberto: doJogo } : {}) };
 }
 

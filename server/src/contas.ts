@@ -71,6 +71,15 @@ export async function cadastrar(usuario: unknown, email: unknown, senha: unknown
   return abrirSessao(banco.contaPorId(id)!, manter);
 }
 
+// ---- senhas erradas por CONTA (contra quem tenta adivinhar a senha de alguém, venha de quantos IPs vier) ----
+const SENHAS_ERRADAS_MAX = 10;
+const TRAVA_SENHA_MS = 15 * 60 * 1000;
+const senhasErradas = new Map<number, { n: number; desde: number }>();
+setInterval(() => {
+  const agora = Date.now();
+  for (const [id, t] of senhasErradas) if (agora - t.desde > TRAVA_SENHA_MS) senhasErradas.delete(id);
+}, 60_000).unref();
+
 export async function entrar(login: unknown, senha: unknown, manter: boolean) {
   if (typeof login !== 'string' || typeof senha !== 'string' || !login.trim() || senha.length > SENHA_MAX) throw new ErroConta('Usuário ou senha incorretos.', 401);
   const conta = banco.contaPorLogin(login.trim());
@@ -79,7 +88,16 @@ export async function entrar(login: unknown, senha: unknown, manter: boolean) {
     await senhaConfere(senha, await hashFalso);
     throw new ErroConta('Usuário ou senha incorretos.', 401);
   }
-  if (!(await senhaConfere(senha, conta.senha))) throw new ErroConta('Usuário ou senha incorretos.', 401);
+  const agora = Date.now();
+  let erradas = senhasErradas.get(conta.id);
+  if (erradas && agora - erradas.desde > TRAVA_SENHA_MS) senhasErradas.delete(conta.id), (erradas = undefined);
+  if (erradas && erradas.n >= SENHAS_ERRADAS_MAX) throw new ErroConta('Muitas senhas erradas nesta conta. Espere 15 minutos e tente de novo.', 429);
+  if (!(await senhaConfere(senha, conta.senha))) {
+    if (erradas) erradas.n++;
+    else senhasErradas.set(conta.id, { n: 1, desde: agora });
+    throw new ErroConta('Usuário ou senha incorretos.', 401);
+  }
+  senhasErradas.delete(conta.id);
   return abrirSessao(conta, manter);
 }
 

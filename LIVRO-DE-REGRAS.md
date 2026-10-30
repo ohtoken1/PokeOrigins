@@ -631,7 +631,7 @@ A administração pode multiplicar, para todos os jogadores, de **1x até 3x** (
 Com algum bônus ligado, aparecem **selos** no cabeçalho (ex.: "Shiny 2x", "XP 2x"), em todas as telas e mapas. Ele soma com o VIP (multiplica junto). Por enquanto fica guardado só no navegador; com o servidor, vale para todo mundo.
 
 ### Ranking
-A aba **Ranking**, na barra do topo, tem 8 rankings. **Por enquanto só você aparece**: a lista com todos os jogadores precisa do servidor online.
+A aba **Ranking**, na barra do topo, tem 8 rankings com todos os jogadores (a staff não aparece). Clique no nome de um treinador para ver o perfil dele.
 
 | Ranking | O que conta |
 |---|---|
@@ -666,7 +666,7 @@ Em **Minha conta → Conquistas**. A recompensa chega **na hora** em que a conqu
 - **Pokédex:** as **formas regionais** (Alolan, Galarian, Hisuian, Paldean) têm registro próprio: capturar a forma normal não conta para a regional, nem o contrário. Os Pokémon dos **cubos** (passado e futuro) têm número próprio e contam para os 100% de Paldea.
 - **Pokédex shiny:** só os "comuns", isto é, todos menos lendários, míticos, Ultra Beasts e os Pokémon do passado e do futuro. Na lista da Pokédex, a **Poké Ball** marca quem você já capturou e a **Ultra Ball** marca quem você já teve na versão **shiny**.
 - **Trocas:** Pokémon recebido em troca **conta para a Pokédex** (normal e shiny), mas **não** vale para "Lendário S", "Lendario Shiny", "Pokemon S+" e "Shiny S+" (o mesmo Pokémon não serve de conquista para vários jogadores). "Pokemon S+" e "Shiny S+" só valem para Pokémon **capturados** por você (ovo e ticket não contam); "Lendário S" e "Lendario Shiny" valem para qualquer forma de conseguir, menos troca.
-- **Itens NT** (ovos NT, skins e itens de conquista) não entram em trocas.
+- **Itens NT** (ovos NT, skins e itens de conquista) não entram em trocas. Pokémon **segurando** um item NT também não pode ser trocado nem vendido no Mercado negro: tire o item antes.
 - **Ainda não entraram** (dependem de sistemas que vão chegar, um por um): torneios PvP, Liga Pokémon, Safari Zone, breeding, farming, craft de Balls e de Charm, monotype, bosses da guilda e mundial, baú Pokémon, mercado negro, selos sazonais, doação e VIP, Discord e tutorial.
 
 **Títulos:** em **Meu perfil** você escolhe um dos títulos liberados pelas conquistas (clicar de novo tira). Ele aparece embaixo do seu nome no perfil, inclusive para os outros jogadores. Por enquanto o título **não** aparece no personagem no mapa.
@@ -881,6 +881,11 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Trancas de nível de treinador:** Mercado negro (nível 3), Guildas (nível 10), Homem Suspeito (nível 10), Torneios (nível 10) e Liga Pokémon (nível 18).
 
 ### v0.4 — 11 de outubro de 2026
+- **Cadastro:** o campo "Código de criador" virou a pergunta obrigatória **"Por onde conheceu o jogo?"** (Divulgação, Sites, Discord, Criador de conteúdo, Indicação de amigo ou Outros). Sites pergunta qual site, Discord pergunta qual servidor e Criador de conteúdo pede o código do criador (quem vem pelo link do criador já encontra tudo preenchido).
+- **PvP Ranqueado:** não dá mais para desistir no 1º turno; é preciso jogar pelo menos um turno.
+- **Item NT:** Pokémon segurando um item NT não pode ser trocado nem vendido no Mercado negro; tire o item antes.
+- **Ficha do Pokémon:** nova linha "Obtido em" (Mapa, Safari, Ovo, Daycare, Orb, Passe de batalha, Ninho…) e, se ele mudou de dono, por onde veio (Troca ou Mercado negro). Pokémon de antes mostram o que dá para saber.
+- **Ranking:** clique no nome do treinador para abrir o perfil; a staff não aparece mais no ranking.
 - **Visual das skins:** as nove skins de lendário dos tickets (normal e shiny) agora mudam o personagem no mapa, na cidade e no perfil, e os outros jogadores veem. São fantasias com capuz de cada Pokémon, animadas nas quatro direções (asas e nadadeiras batem ao andar); Zacian leva a espada nas costas e Zamazenta, o escudo.
 - **Brilho do shiny:** as skins shiny têm uma aura que pulsa e estrelinhas em volta do personagem.
 - **Minhas skins:** provador com o personagem andando com a skin escolhida; skins sem desenho ainda mostram "Visual em breve".
@@ -958,6 +963,13 @@ Wallpapers, boné, estampas e Pokébolas do cinto são desenho próprio. Pokémo
 - **Economia, tabela de preços:** a loja deixou de custar 1 Poké Dólares (tabela na seção 11); Exp. Share e Lucky Egg 100 mil, Power Items 50 mil, TMs e TRs 20 mil; Ability Capsule e Patch só por Origin Coins (50 e 100); Mega Stones 500 Origin Coins; avaliar IVs e professores 5.000 Poké Dólares; trem a 1.000 Poké Dólares por região, sem Origin Coins; guilda 100 Origin Coins; nome e aparência 50 Origin Coins; Ticket Safari extra 20 Origin Coins; ginásios de 1.000 a 8.000 Poké Dólares.
 - **Quadro de missões para o servidor inteiro:** cada missão agora só pode ser concluída por **um jogador**. Quem apresentar primeiro o Pokémon certo leva o Origin Coins, e a missão aparece como "Concluída por Fulano" para todos até o próximo sorteio.
 - **Safari:** evento novo na Cidade. Escolha um tipo e atravesse 3 salas com 10 Pokémon andando em cada uma; clique no que quiser enfrentar. Shiny e raros 10× mais comuns. 1 Ticket Safari por dia, 2 para VIP, e mais 1 comprado com Origin Coins.
+- **Janela de troca mais completa:** cada Pokémon oferecido mostra a **Nature** e, se o dono já avaliou os IVs, o **tier** e os IVs (valor exato para quem é VIP, faixa para quem não é).
+- **Boss calculado no servidor:** a luta contra o Boss da gaiola agora roda no servidor, como a Liga (60 s por turno; recarregar a página volta para a luta). O dano é contado lá e entra no ranking sozinho. O time entra curado e nada da luta muda o seu save.
+- **Time conferido no PvP:** duelos, Torneio, Ranqueado e Liga recusam time com Pokémon impossível (nível, IVs, EVs, Ability ou golpe que a espécie não tem).
+- **Prêmios entregues pelo servidor:** Orbs, Chave Temporal, recompensas do Passe de batalha, Kit de pré-registro e a roleta do Ninho agora são sorteados e entregues pelo servidor. Origin Coins, VIP, títulos e o selo NT só mudam por ele.
+- **Avisos mais claros:** "Nenhum Boss agora" na gaiola vazia; Outbreak e Ninho em outra região avisam "pegue o trem"; no Login dos 30 dias, os dias antes da sua conta aparecem como "antes da sua conta" (não contam como perdidos); o PC avisa quando a box está cheia ou o time ficaria vazio.
+- **Expedição no canto:** enquanto a expedição está fora, um selo no canto mostra quanto tempo falta para ela voltar.
+- **Uma janela por vez:** o Professor, os "Prêmios de hoje" e o aviso de conquista não abrem mais um em cima do outro.
 
 ---
 

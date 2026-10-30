@@ -1,14 +1,14 @@
 // Comunidade → Ranking: geral, capturas, shiny, lendários, nível, missões do quadro, medalhas de torneio, silver
 // e gold, e o PvP ranqueado (um ranking por tier: Ubers, OU, UU e RU, com o elo de cada um). A lista com todos os jogadores vem do servidor (GET /api/ranking, refeita a cada 30 s); a sua linha usa
 // o seu save de agora. Sem conexão, só você aparece.
-import { comMenuLateral, menuLateral } from '../ui/menuLateral';
+import { comMenuLateral, menuLateral, type OpcaoMenu } from '../ui/menuLateral';
 import type { Navegar } from '../main';
 import { CATEGORIAS_RANKING, ordenarRanking, type CategoriaRanking, type DadosRanking } from '../../../shared/ranking';
 import { nivelTreinador } from '../../../shared/treinador';
 import { api, conta } from '../conta';
 import { carregarSave, type Save } from '../estado';
 import { el } from '../ui/dom';
-import { abasFormato, formatoGuardado, guardarFormato, tabelaRanqueado, type LinhaRankingRanqueado } from '../ui/ranqueado';
+import { abasFormato, formatoGuardado, guardarFormato, nomeNoRanking, tabelaRanqueado, type LinhaRankingRanqueado } from '../ui/ranqueado';
 import { NOME_FORMATO, type FormatoRanqueado } from '../../../shared/ranqueado';
 
 type Linha = DadosRanking & { usuario: string };
@@ -48,13 +48,13 @@ export function telaRanking(raiz: HTMLElement, _navegar: Navegar, inicial?: 'ran
   let aberta = true;
 
   // menu na lateral, em grupos (modelo 3 escolhido pelo dono)
-  const opcao = (id: string, icone: string) => ({ id, icone, nome: CATEGORIAS_RANKING.find((x) => x.id === id)?.nome ?? id });
+  const opcao = (id: string, icone: OpcaoMenu['icone']) => ({ id, icone, nome: CATEGORIAS_RANKING.find((x) => x.id === id)?.nome ?? id });
   const GRUPOS = [
-    { titulo: 'Geral', opcoes: [opcao('geral', '🏆')] },
-    { titulo: 'Capturas', opcoes: [opcao('capturas', '🎯'), opcao('shiny', '✨'), opcao('lendarios', '👑')] },
-    { titulo: 'Progresso', opcoes: [opcao('nivel', '⭐'), opcao('missoes', '📋'), opcao('medalhas', '🏅')] },
-    { titulo: 'Riqueza', opcoes: [opcao('silver', '💰'), opcao('gold', '🪙')] },
-    { titulo: 'PvP', opcoes: [{ id: 'ranqueado', icone: '⚔️', nome: 'PvP Ranqueado' }] },
+    { titulo: 'Geral', opcoes: [opcao('geral', 'conquistas')] },
+    { titulo: 'Capturas', opcoes: [opcao('capturas', 'alvo'), opcao('shiny', 'brilho'), opcao('lendarios', 'coroa')] },
+    { titulo: 'Progresso', opcoes: [opcao('nivel', 'estrela'), opcao('missoes', 'prancheta'), opcao('medalhas', 'medalha')] },
+    { titulo: 'Riqueza', opcoes: [opcao('silver', el('span', { class: 'icone-moeda moeda-silver' })), opcao('gold', el('span', { class: 'icone-moeda moeda-gold' }))] },
+    { titulo: 'PvP', opcoes: [{ id: 'ranqueado', icone: 'duelos', nome: 'PvP Ranqueado' }] },
   ];
   const abas = () => menuLateral(GRUPOS, categoria, (id) => {
     categoria = id as typeof categoria;
@@ -79,12 +79,13 @@ export function telaRanking(raiz: HTMLElement, _navegar: Navegar, inicial?: 'ran
   function desenhar() {
     if (categoria === 'ranqueado') return desenharRanqueado();
     const c = CATEGORIAS_RANKING.find((x) => x.id === categoria)!;
-    const eu = save ? dadosDoJogador(save) : null;
+    // a staff não entra no ranking (pedido do dono)
+    const eu = save && !conta()?.admin ? dadosDoJogador(save) : null;
     const todos = [...(outros ?? []).filter((d) => d.usuario !== eu?.usuario), ...(eu ? [eu] : [])];
     const lista = ordenarRanking(todos, categoria) as Linha[];
     const minha = eu ? lista.indexOf(eu) : -1;
     const linha = (d: Linha, i: number) =>
-      el('tr', { class: d === eu ? 'eu' : '' }, el('td', { class: `posicao p${i + 1}` }, String(i + 1)), el('td', {}, d.nome), el('td', { class: 'valor' }, c.valor(d).toLocaleString('pt-BR')));
+      el('tr', { class: d === eu ? 'eu' : '' }, el('td', { class: `posicao p${i + 1}` }, String(i + 1)), el('td', {}, nomeNoRanking(d.nome, d === eu ? '' : d.usuario)), el('td', { class: 'valor' }, c.valor(d).toLocaleString('pt-BR')));
     const tabela = c.emBreve
       ? el('section', { class: 'em-breve' }, el('span', { class: 'selo-em-breve' }, 'Em breve'), el('p', {}, 'Os torneios online ainda vão ser feitos. Quando existirem, as medalhas aparecem aqui.'))
       : lista.length

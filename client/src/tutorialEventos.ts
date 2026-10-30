@@ -13,6 +13,14 @@ export function tutorialFez(e: EventoTutorial): void {
 }
 export const ouvirTutorial = (f: (e: EventoTutorial) => void) => void ouvintes.add(f);
 
+/**
+ * Ação que ainda não pode ser feita porque a missão dela não chegou (plantar, fazer Pokébola ou Charm antes da missão
+ * do Professor: o presente dela seria gasto antes da hora). Devolve a mensagem, ou null se pode. O tutorial registra.
+ */
+let espera: ((e: EventoTutorial) => string | null) | null = null;
+export const definirEsperaDoTutorial = (f: (e: EventoTutorial) => string | null) => void (espera = f);
+export const esperaDoTutorial = (e: EventoTutorial): string | null => espera?.(e) ?? null;
+
 /** Tela aberta agora (o quadro da missão esconde o "Ir até lá" quando o jogador já está lá). */
 let tela = '';
 let aoMudarTela: (() => void) | null = null;

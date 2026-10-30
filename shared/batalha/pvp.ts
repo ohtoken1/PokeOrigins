@@ -26,6 +26,8 @@ export interface FotoPvp {
   golpesAdversario: ReturnType<BatalhaSelvagem['golpesUsadosAdversario']>;
   habilidadeRevelada: boolean;
   vencedor: 'jogador' | 'selvagem' | null;
+  /** Boss (eventos): dano direto causado até agora e se a luta acabou pelos turnos. */
+  boss?: { dano: number; turnosAcabaram: boolean };
 }
 
 /** Regras do Showdown ligadas durante a luta (Sleep Clause etc.). As de montar o time são conferidas antes. */
@@ -114,7 +116,27 @@ export class BatalhaPvp {
       if (!v.indices.includes(escolha.posicao) || !(pedido.tipo === 'troca' || pedido.podeTrocar) || !v.reservasSaudaveis().includes(escolha.posicao)) return false;
       comando = v.comandoTroca(escolha.posicao);
     }
-    return this.batalha.choose(lado === 0 ? 'p1' : 'p2', comando);
+    const ok = this.batalha.choose(lado === 0 ? 'p1' : 'p2', comando);
+    this.fecharBoss();
+    return ok;
+  }
+
+  // ---------- Boss (eventos): o lado 1 é o boss, com vida enorme; a luta acaba no último turno ----------
+  private turnosBoss = 0;
+  /** Liga o modo boss (antes de `iniciar`): HP "infinito" para o lado 1 e fim no turno `turnos`. */
+  modoBoss(turnos: number): void {
+    this.visoes[0].modoBoss(turnos);
+    this.turnosBoss = turnos;
+    // contra o boss o jogador vê o dano de verdade (no PvP cada um vê o HP do outro só em porcentagem)
+    this.batalha.reportExactHP = true;
+  }
+  /** Dano direto causado no boss (queimadura, veneno e outros "[from]" não contam). */
+  get danoNoBoss(): number {
+    return this.turnosBoss ? this.visoes[0].danoNoBoss : 0;
+  }
+  /** Passou do último turno: o simulador não sabe disso, então a luta é encerrada aqui (o jogador "vence"). */
+  private fecharBoss(): void {
+    if (this.turnosBoss && !this.batalha.ended && this.visoes[0].turnosAcabaram) this.batalha.win('p1');
   }
 
   /**
@@ -132,6 +154,7 @@ export class BatalhaPvp {
     if (s.requestState !== 'move') return;
     this.memorias[lado] ??= new MemoriaIa();
     if (!escolherAcaoIa(this.batalha as never, s as never, this.batalha[lado === 0 ? 'p2' : 'p1'] as never, nivel, this.memorias[lado]!, aleatorio)) this.batalha.choose(id, 'default');
+    this.fecharBoss();
   }
   /** O que a IA de cada lado já viu (só lados de NPC). */
   private memorias: [MemoriaIa?, MemoriaIa?] = [];
@@ -140,6 +163,11 @@ export class BatalhaPvp {
   timeFinal(lado: 0 | 1): PokemonIndividual[] {
     this.visoes[lado].sincronizar();
     return this.times[lado];
+  }
+
+  /** Turno atual (1 = o primeiro, antes de qualquer escolha rodar). */
+  get turno(): number {
+    return this.batalha.turn;
   }
 
   /** Desistência (ou tempo esgotado): o lado perde na hora. */
@@ -180,6 +208,7 @@ export class BatalhaPvp {
       atributos: v.atributosEmCampo(), campo: v.campo(), adversarioAtivo: v.adversarioAtivo,
       golpesAdversario: v.golpesUsadosAdversario(), habilidadeRevelada: v.habilidadeSelvagemRevelada,
       vencedor: this.batalha.ended ? v.vencedor : null,
+      ...(this.turnosBoss && lado === 0 ? { boss: { dano: this.danoNoBoss, turnosAcabaram: this.visoes[0].turnosAcabaram } } : {}),
     };
   }
 }

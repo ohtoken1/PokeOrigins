@@ -366,7 +366,7 @@ export class BiomaScene extends Phaser.Scene {
     this.bossPedido = pedido;
     const gaiola = this.mapa?.cidade?.gaiola;
     if (!gaiola || !this.sys.isActive() || mesmo) return;
-    this.bossObjetos.forEach((o) => o.destroy());
+    this.bossObjetos.forEach((o) => (this.tweens.killTweensOf(o), o.destroy()));
     this.bossObjetos = [];
     if (!pedido) return;
     const { x, y } = gaiola;
@@ -417,8 +417,9 @@ export class BiomaScene extends Phaser.Scene {
       s.play(`${pmd.prefixo}-walk-${DIRECAO_PMD.direita}`);
       this.tweens.add({
         targets: s, x: x + 30, duration: 2600, yoyo: true, repeat: -1,
-        onYoyo: () => s.play(`${pmd.prefixo}-walk-${DIRECAO_PMD.esquerda}`),
-        onRepeat: () => s.play(`${pmd.prefixo}-walk-${DIRECAO_PMD.direita}`),
+        // o boss trocou ou saiu (o boneco foi apagado): a animação não mexe mais nele
+        onYoyo: () => void (s.scene && s.play(`${pmd.prefixo}-walk-${DIRECAO_PMD.esquerda}`)),
+        onRepeat: () => void (s.scene && s.play(`${pmd.prefixo}-walk-${DIRECAO_PMD.direita}`)),
       });
       this.bossObjetos.push(s);
     });
@@ -937,7 +938,8 @@ export class BiomaScene extends Phaser.Scene {
   }
 
   private atualizarSombras() {
-    if (!this.sombraJogador) return;
+    // entre o reinício da cena (init) e o create novo, as sombras e o seguidor da cena anterior já foram destruídos
+    if (!this.sombraJogador?.scene || !this.sombraSeguidor?.scene || !this.seguidor?.scene || !this.jogador?.scene) return;
     this.sombraJogador.setPosition(this.jogador.x, this.jogador.y - 1).setDepth(this.jogador.depth - 0.5);
     // nome acima da cabeça (o personagem LPC tem ~30 px de altura no mundo)
     // mesma posição do personagem (sem arredondar à parte, senão treme ao andar)

@@ -211,7 +211,7 @@ export function expulsar(conta: banco.Conta, usuario: string) {
   const { alvo, cargo: cargoAlvo } = membroAlvo(cla, membros, conta, usuario);
   if (cargo === 'vice' && cargoAlvo !== 'membro') throw new ErroConta('O vice-líder só pode expulsar membros comuns.', 403);
   banco.sairDoCla(alvo.id);
-  reservas.delete(alvo.id);
+  // a reserva de XP NÃO é apagada: sair e entrar de novo devolvia a reserva cheia (varredura de 29/10/2026)
   mandarHistoricoDoCla(alvo.id);
   atualizar(cla.id, alvo.id);
   return meu(conta);
@@ -260,7 +260,6 @@ export function sair(conta: banco.Conta) {
     }
   });
   if (!outros.length) esquecerChatDoCla(cla.id);
-  reservas.delete(conta.id);
   mandarHistoricoDoCla(conta.id);
   for (const id of [...outros.map((m) => m.id), ...pedidos]) avisar(id, { t: 'cla' });
   return meu(conta);

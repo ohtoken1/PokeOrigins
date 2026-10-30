@@ -1,6 +1,7 @@
 // Janela de troca: duas colunas (você à esquerda, o outro jogador à direita), cada um monta a oferta no seu tempo
 // (Pokémon, itens, silver, gold) e confirma. Com os dois confirmados, aparece TROCAR no meio; a troca acontece
 // quando os dois clicam. "Cancelar troca" no canto. Também: o aviso de convite recebido (Aceitar / Recusar).
+import { Dex } from '@pkmn/sim';
 import { itemDaLoja } from '../../../shared/loja';
 import { itemInegociavel } from '../../../shared/naoTrocavel';
 import { quantidadeNegociavel } from '../../../shared/skins';
@@ -10,8 +11,7 @@ import { pokemonPorId } from '../dados';
 import { adotarSaveDoServidor, carregarSave, salvarAgora, type PokemonDoJogador, type Save } from '../estado';
 import {
   cancelarTroca, clicarTrocar, confirmarOferta, mudarOferta, responderConvite, trocasAgora, trocasDisponiveis,
-  type LadoTroca, type Oferta, type PokemonNaTroca, type Troca,
-} from '../trocas';
+  type LadoTroca, type Oferta, type PokemonNaTroca, type Troca, marcarOfertaAberta } from '../trocas';
 import { iconeItem } from './iconeItem';
 import { el, spritePokemon } from './dom';
 import { abrirJanela, type Janela } from './janela';
@@ -22,6 +22,11 @@ const VIGIAR_CONVITES_MS = 4000;
 const nomeItem = (id: string) => itemDaLoja(id)?.nome ?? nomeItemEquipado(id);
 const iconeDoItem = (id: string) => iconeItem(itemDaLoja(id) ?? { id, categoria: 'batalha' });
 const formatar = (n: number) => n.toLocaleString('pt-BR');
+const ATRIBUTOS: [string, string][] = [['hp', 'HP'], ['atk', 'Atk'], ['def', 'Def'], ['spa', 'SpA'], ['spd', 'SpD'], ['spe', 'Spe']];
+function seloDoTier(tier: string): HTMLElement {
+  const classe = tier === 'S+' ? 'sp' : tier.toLowerCase();
+  return el('span', { class: `selo-tier tier-${classe}`, title: `Tier ${tier} (soma dos IVs)` }, el('span', { class: 'letra' }, tier.replace('+', '')), tier.endsWith('+') ? el('span', { class: 'mais' }, '+') : null);
+}
 
 let janelaAberta: { id: string; janela: Janela } | null = null;
 
@@ -90,6 +95,7 @@ export function abrirTroca(inicial: Troca): void {
     aoFechar: () => {
       clearInterval(relogio);
       janelaAberta = null;
+      marcarOfertaAberta([]);
       // fechar a janela no meio = cancelar
       if (!terminou && (troca.status === 'aberta' || troca.status === 'convite')) void cancelarTroca(troca.id).catch(() => {});
     },
@@ -119,6 +125,7 @@ export function abrirTroca(inicial: Troca): void {
   // ---- recebe o estado do servidor ----
   const aplicar = (t: Troca) => {
     troca = t;
+    marcarOfertaAberta(t.status === 'aberta' ? t.eu.oferta.pokemons.map((p) => p.uid) : []);
     if (!ocupado) minha = { pokemons: t.eu.oferta.pokemons.map((p) => p.uid), itens: { ...t.eu.oferta.itens }, silver: t.eu.oferta.silver, gold: t.eu.oferta.gold };
     if (t.status === 'feita' && !terminou) {
       terminou = true;
@@ -138,13 +145,19 @@ export function abrirTroca(inicial: Troca): void {
   }, ATUALIZAR_MS);
 
   // ---- desenho ----
+  // Nature, tier e IVs (pedido do dono): tier e IVs só se o dono avaliou; exato para VIP, faixa para quem não é
   const cartaoPokemon = (p: PokemonNaTroca, tirar?: () => void) => {
     const base = pokemonPorId(p.especieId);
+    const natureza = p.natureza ? Dex.natures.get(p.natureza).name : '';
     return el('div', { class: `troca-pokemon${p.shiny ? ' shiny' : ''}` },
       spritePokemon(base, { shiny: p.shiny, animado: false }),
       el('div', { class: 'troca-pokemon-info' },
-        el('strong', {}, base.nome, p.shiny ? el('span', { class: 'troca-shiny', title: 'Shiny' }, ' ★') : null),
-        el('small', {}, `Nv. ${p.nivel}${p.item ? ` · ${nomeItem(p.item)}` : ''}`)),
+        el('strong', {}, base.nome, p.shiny ? el('span', { class: 'troca-shiny', title: 'Shiny' }, ' ★') : null, p.tier ? seloDoTier(p.tier) : null),
+        el('small', {}, `Nv. ${p.nivel}${natureza ? ` · ${natureza}` : ''}${p.item ? ` · ${nomeItem(p.item)}` : ''}`),
+        p.avaliado
+          ? el('div', { class: 'troca-ivs', title: p.ivs ? 'IVs' : 'IVs por faixa: jogadores VIP veem o valor exato.' }, ...ATRIBUTOS.map(([a, rotulo]) =>
+              el('span', {}, el('small', {}, rotulo), p.ivs ? String(p.ivs[a] ?? '?') : p.faixas?.[a] ? `${p.faixas[a][0]}–${p.faixas[a][1]}` : '?')))
+          : el('small', { class: 'troca-sem-ivs' }, 'IVs não avaliados')),
       tirar ? el('button', { class: 'troca-tirar', title: 'Tirar da troca', 'aria-label': 'Tirar da troca', onclick: tirar }, '✕') : null);
   };
   const linhaItem = (id: string, qtd: number, tirar?: () => void) =>
@@ -211,7 +224,8 @@ export function abrirTroca(inicial: Troca): void {
         : p.trancado ? 'Trancado (destranque no PC)'
           : ondeTime && save.time.filter((x) => !minha.pokemons.includes(x.uid!)).length <= 1 ? 'Precisa ficar 1 no time'
             : null;
-    const lista = todos.filter(({ p }) => !minha.pokemons.includes(p.uid!));
+    // ovos não são trocados (o servidor recusa) e não aparecem: a imagem revelaria a espécie e o shiny
+    const lista = todos.filter(({ p }) => !p.ovo && !minha.pokemons.includes(p.uid!));
     return el('div', { class: 'troca-seletor' },
       lista.length ? null : el('p', { class: 'troca-vazio' }, 'Nenhum Pokémon disponível.'),
       ...lista.map(({ p, ondeTime }) => {

@@ -2,12 +2,11 @@
 import { BIOMAS } from '../../shared/biomas';
 import { biomaDoPokemon, faixaDosEncontros, montarTabela } from '../../shared/encontros';
 import { VERSAO_MISSOES, diaDeHoje, nivelPasse, registrarNaMissao, sortearMissoes, type EstadoPasse, type Missao, type TipoMissao } from '../../shared/passe';
-import { temporadaAtual, type TemporadaPasse } from '../../shared/passeTemporadas';
-import { itensDoGrupo, type Premio } from '../../shared/tickets';
-import { entregar } from './ui/ticket';
+import { temporadaAtual } from '../../shared/passeTemporadas';
 import { nivelTreinador } from '../../shared/treinador';
 import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons, pokemonsDosMapasDe } from './dados';
-import type { Save } from './estado';
+import { adotarSaveDoServidor, salvarAgora, type Save } from './estado';
+import { api } from './conta';
 
 /**
  * Espécies comuns que o jogador consegue encontrar agora: região atual, qualquer bioma, na faixa de nível natural
@@ -78,20 +77,15 @@ export function estadoDaCasa(save: Save, trilha: Trilha, nivel: number): 'resgat
   return 'pronto';
 }
 
-/** Resgata uma recompensa (quem chama salva). Devolve as frases do que chegou, ou null se não dava. */
-export function resgatarDoPasse(save: Save, temporada: TemporadaPasse, trilha: Trilha, nivel: number): string[] | null {
-  if (estadoDaCasa(save, trilha, nivel) !== 'pronto') return null;
-  const premio: Premio = temporada[trilha][nivel - 1];
-  // item aleatório vira um item de verdade; Pokémon sorteia o shiny agora
-  const resolvido = premio.tipo === 'aleatorio'
-    ? { tipo: 'item' as const, id: ((l) => l[Math.floor(Math.random() * l.length)])(itensDoGrupo(premio.grupo)), quantidade: premio.quantidade }
-    : premio;
-  const shiny = resolvido.tipo === 'pokemon' && Math.random() < resolvido.chanceShiny;
-  const passe = save.passe!;
-  passe.resgatados ??= { gratis: [], premium: [] };
-  passe.resgatados[trilha].push(nivel);
-  // trilha grátis = NT (pedido do dono): não pode ser trocada nem vendida
-  return entregar(save, { raridade: 'comum', pacote: [resolvido], shiny: [shiny] }, { nt: trilha === 'gratis' });
+/**
+ * Resgata recompensas do passe (uma casa, ou todas as prontas no "Resgatar tudo"). Quem entrega é o SERVIDOR (os
+ * prêmios podem ter Origin Coins, VIP e título, que só ele dá): devolve as frases do que chegou. Erro = ErroApi.
+ */
+export async function resgatarDoPasse(casas: [Trilha, number][]): Promise<string[]> {
+  await salvarAgora(); // o servidor confere o nível do passe no save guardado
+  const r = await api<{ save: Save; versao: number; frases: string[] }>('POST', '/passe/resgatar', { casas: casas.map(([trilha, nivel]) => ({ trilha, nivel })) });
+  adotarSaveDoServidor(r.save, r.versao);
+  return r.frases;
 }
 
 /** Libera a trilha premium da temporada em vigor (item Passe Premium). Devolve o aviso. */

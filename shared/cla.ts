@@ -45,8 +45,11 @@ export const MISSOES_CLA: Record<number, { id: string; texto: string }[]> = {};
 export const NOME_CLA_MIN = 3;
 export const NOME_CLA_MAX = 16;
 export const DESCRICAO_CLA_MAX = 120;
-/** Letras do nosso alfabeto (com acento), números e espaço, sem espaço nas pontas. */
-export const NOME_CLA_VALIDO = /^[\p{Script=Latin}0-9](?:[\p{Script=Latin}0-9 ]{1,14})[\p{Script=Latin}0-9]$/u;
+/**
+ * Letras do nosso alfabeto (A a Z, com os acentos do português e do espanhol), números e espaço, sem espaço nas pontas.
+ * Só essas: letras "parecidas" de outras línguas (ı, ł, ø…) deixavam imitar o nome de outra guilda.
+ */
+export const NOME_CLA_VALIDO = /^[A-Za-z0-9ÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇÑáàâãäéèêëíìîïóòôõöúùûüçñ](?:[A-Za-z0-9ÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇÑáàâãäéèêëíìîïóòôõöúùûüçñ ]{1,14})[A-Za-z0-9ÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇÑáàâãäéèêëíìîïóòôõöúùûüçñ]$/u;
 /** Nome como vai ser guardado: acentos numa letra só e um espaço entre as palavras. */
 export const limparNomeCla = (nome: string) => nome.normalize('NFC').replace(/\s+/g, ' ').trim();
 /** Para não existirem dois clãs "iguais": sem acentos e em minúsculas ("Ação" = "ACAO" = "acao"). */

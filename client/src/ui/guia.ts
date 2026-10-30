@@ -4,6 +4,7 @@ import { GUIA, type GrupoGuia, type TopicoGuia } from '../guiaConteudo';
 import { TODOS_OS_ITENS } from '../../../shared/loja';
 import { pokemonPorId } from '../dados';
 import { el, spritePokemon } from './dom';
+import { icone } from './icones';
 import { iconeCharm, iconeItem, iconeOvo } from './iconeItem';
 import { iconeTicketDoPokemon } from './ticketEvento';
 import { abrirJanela, type Janela } from './janela';
@@ -119,13 +120,13 @@ export function abrirGuia(destino?: { grupo: string; topico: string }): void {
     const achados = GUIA.flatMap((g) => g.topicos.map((t) => ({ g, t }))).filter(({ t }) => termos.every((x) => textoDoTopico(t).includes(x)));
     resultados.replaceChildren(...(achados.length
       ? achados.map(({ g, t }) => el('button', { class: 'guia-item', onclick: () => ((grupo = g), (topico = t), janela.redesenhar()) },
-          el('span', { class: 'guia-emoji' }, t.emoji), el('strong', {}, t.titulo), el('small', { class: 'guia-item-nivel' }, `${g.emoji} ${g.nome}`)))
+          el('span', { class: 'guia-emoji' }, icone(t.icone)), el('strong', {}, t.titulo), el('small', { class: 'guia-item-nivel' }, g.nome)))
       : [el('p', { class: 'meta' }, 'Nada encontrado no guia.')]));
   };
   campoBusca.addEventListener('input', buscar);
   let janela!: Janela;
 
-  aberta = janela = abrirJanela('❓ Guia do jogo', (janela) => {
+  aberta = janela = abrirJanela('Guia do jogo', (janela) => {
     if (grupo && topico) {
       // junta os itens "• " seguidos numa lista só
       const blocos: HTMLElement[] = [];
@@ -137,9 +138,9 @@ export function abrirGuia(destino?: { grupo: string; topico: string }): void {
       }
       return el('div', { class: 'guia' },
         voltar(grupo.nome, () => ((topico = null), janela.redesenhar())),
-        el('h3', { class: 'guia-titulo' }, `${topico.emoji} ${topico.titulo}`),
+        el('h3', { class: 'guia-titulo' }, icone(topico.icone), topico.titulo),
         topico.trancas ? el('div', { class: 'guia-trancas' }, ...topico.trancas.map((t) =>
-          el('span', { class: 'guia-tranca' }, t.rotulo ? `🔒 ${t.rotulo}: requer treinador nível ${NIVEL_MINIMO[t.conteudo]}` : `🔒 Requer treinador nível ${NIVEL_MINIMO[t.conteudo]}`))) : '',
+          el('span', { class: 'guia-tranca' }, icone('cadeado'), t.rotulo ? `${t.rotulo}: requer treinador nível ${NIVEL_MINIMO[t.conteudo]}` : `Requer treinador nível ${NIVEL_MINIMO[t.conteudo]}`))) : '',
         FIGURAS[`${grupo.id}/${topico.id}`] ? el('div', { class: 'guia-figuras' }, ...FIGURAS[`${grupo.id}/${topico.id}`]()) : '',
         el('div', { class: 'guia-texto' }, ...blocos));
     }
@@ -147,15 +148,15 @@ export function abrirGuia(destino?: { grupo: string; topico: string }): void {
       const g = grupo;
       return el('div', { class: 'guia' },
         voltar('Todos os assuntos', () => ((grupo = null), janela.redesenhar())),
-        el('h3', { class: 'guia-titulo' }, `${g.emoji} ${g.nome}`),
+        el('h3', { class: 'guia-titulo' }, icone(g.icone), g.nome),
         el('div', { class: 'guia-lista' },
           ...g.topicos.map((t) => el('button', { class: 'guia-item', onclick: () => ((topico = t), janela.redesenhar()) },
-            el('span', { class: 'guia-emoji' }, t.emoji), el('strong', {}, t.titulo),
-            t.trancas ? el('small', { class: 'guia-item-nivel' }, `🔒 Nv. ${Math.min(...t.trancas.map((x) => NIVEL_MINIMO[x.conteudo]))}`) : ''))));
+            el('span', { class: 'guia-emoji' }, icone(t.icone)), el('strong', {}, t.titulo),
+            t.trancas ? el('small', { class: 'guia-item-nivel' }, icone('cadeado'), `Nv. ${Math.min(...t.trancas.map((x) => NIVEL_MINIMO[x.conteudo]))}`) : ''))));
     }
     grupos = el('div', { class: 'guia-grupos' },
       ...GUIA.map((g) => el('button', { class: 'guia-grupo', onclick: () => ((grupo = g), janela.redesenhar()) },
-        el('span', { class: 'guia-emoji' }, g.emoji),
+        el('span', { class: 'guia-emoji' }, icone(g.icone)),
         el('strong', {}, g.nome),
         el('small', {}, g.descricao))));
     queueMicrotask(() => (buscar(), campoBusca.focus()));

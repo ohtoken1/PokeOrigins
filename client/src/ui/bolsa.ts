@@ -10,9 +10,7 @@ import { seletorDeItem, seletorDeOrb, CHANCE_SHINY_CUBO_LENDARIO, IV_MINIMO_CUBO
 /** Cubo que gera o Pokémon sem precisar de um de origem (Koraidon, Miraidon). */
 const cuboQueGera = (id: string) => { const c = cuboPorItem(id); return c && !c.origens.length ? c : undefined; };
 import { sortearKit } from '../../../shared/kitIniciante';
-import { conteudoKitPreRegistro, type Premio } from '../../../shared/premiosEventos';
-import { TICKETS, itensDoGrupo } from '../../../shared/tickets';
-import { itemInegociavel } from '../../../shared/naoTrocavel';
+import { conteudoKitPreRegistro } from '../../../shared/premiosEventos';
 import { PASSE_PREMIUM } from '../../../shared/passeTemporadas';
 import { ativarPremium } from '../passe';
 import { FUSOES, GOLPE_DA_FORMA, ehItemDeForma, ivDaFusao, jaMudouDeForma, outrasFormas, proximaForma } from '../../../shared/formasPorItem';
@@ -20,7 +18,10 @@ import { BOXES_INICIAIS, BOXES_MAXIMO, BOX_POKEMON, numeroDeBoxes, podeAbrirBox 
 import { charmAte, charmAtivo, nomeCharm, tipoDoCharm, usarCharm } from '../../../shared/charms';
 import { textoDoTempo } from '../../../shared/viagem';
 import { pokemonPorId, todosOsPokemons } from '../dados';
-import { TAMANHO_MAXIMO_TIME, guardarNoPC, novoPokemon, registrarCapturado, salvar, salvarAgora, type PokemonDoJogador, type Save } from '../estado';
+import { MOTIVO_NA_TROCA, estaNaTroca } from '../trocas';
+import { podeUsar } from '../limiteNivel';
+import { TAMANHO_MAXIMO_TIME, adotarSaveDoServidor, cabemPokemons, estaNoSave, PC_CHEIO, guardarNoPC, novoPokemon, registrarCapturado, salvar, salvarAgora, type PokemonDoJogador, type Save } from '../estado';
+import { api, ErroApi } from '../conta';
 import { sortearIvs } from '../../../shared/ovos';
 import { ehSkin, moverSkin, quantidadeNt, skinsNaBolsa } from '../../../shared/skins';
 import { abrirJanela } from './janela';
@@ -55,7 +56,6 @@ const ACAO: Partial<Record<CategoriaLoja, string>> = {
   cubos: 'Usar',
   ovos: 'Chocar',
 };
-/** O botão do item: pela categoria; na aba Up, Ability Capsule e Ability Patch são de usar. */
 /** Itens que são gastos ao usar num Pokémon e não voltam: perguntam "tem certeza?" (pedido do dono). */
 const PEDE_CONFIRMACAO = (item: ItemLoja) => (['evolucao', 'cubos', 'mints', 'terashards', 'tm', 'tr', 'formas'].includes(item.categoria) && !ehItemDeTroca(item.id)) || ehItemDeHabilidade(item.id);
 /** Opções de um Seletor de Mint / de Charm: todas as Mints / os 18 Charms (sem as versões NT). */
@@ -63,22 +63,7 @@ const opcoesDoSeletor = (id: string) => {
   const s = seletorDeItem(id);
   return s ? TODOS_OS_ITENS.filter((i) => i.categoria === s.categoria && !i.id.endsWith('-nt') && !seletorDeItem(i.id)).map((i) => i.id) : null;
 };
-/** Entrega um prêmio do Kit de pré-registro no save (NT: a versão "-nt" do item, se existir; senão conta em `itensNt`). */
-function abrirPremioDoKit(save: Save, p: Premio): string {
-  const sorteia = (lista: string[]) => lista[Math.floor(Math.random() * lista.length)];
-  if (p.id === 'silver') return void (save.silver += p.quantidade), `${p.quantidade.toLocaleString('pt-BR')} Poké Dólares`;
-  if (p.id === 'gold') return void (save.gold += p.quantidade), `${p.quantidade.toLocaleString('pt-BR')} Origin Coins`;
-  if (p.id === 'fragmentos') return void (save.fragmentos = (save.fragmentos ?? 0) + p.quantidade), `${p.quantidade} Fragmentos Temporais`;
-  const base = p.id === 'mint' ? sorteia(TODOS_OS_ITENS.filter((i) => i.categoria === 'mints').map((i) => i.id))
-    : p.id === 'charm' ? sorteia(itensDoGrupo('charm'))
-    : p.id === 'orb' ? sorteia(TICKETS.map((t) => t.id))
-    : p.id;
-  const id = itemDaLoja(`${base}-nt`) ? `${base}-nt` : base;
-  save.itens[id] = (save.itens[id] ?? 0) + p.quantidade;
-  if (id === base && !itemInegociavel(id)) (save.itensNt ??= {})[id] = (save.itensNt[id] ?? 0) + p.quantidade;
-  return `${p.quantidade}× ${itemDaLoja(id)?.nome ?? id}`;
-}
-
+/** O botão do item: pela categoria; na aba Up, Ability Capsule e Ability Patch são de usar. */
 const acaoDe = (item: ItemLoja) => (seletorDeOrb(item.id) || seletorDeItem(item.id) || item.id === LUCK_INCENSE || ehItemDeHabilidade(item.id) || cuboQueGera(item.id) || item.id === BOX_POKEMON || item.id === KIT_INICIANTE || item.id === KIT_PRE_REGISTRO || item.id === PASSE_PREMIUM || ehItemDeForma(item.id) ? 'Usar' : ehItemDeTroca(item.id) ? 'Equipar' : ACAO[item.categoria]);
 
 type Modo =
@@ -425,7 +410,11 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
           { class: 'vagas' },
           save.time.map((p) =>
             cartaoPokemon(p, {
+              disabled: estaNaTroca(p.uid),
+              title: estaNaTroca(p.uid) ? MOTIVO_NA_TROCA : '',
               onclick: async () => {
+                // o servidor trocou o save com a bolsa aberta: este cartão é de antes (o item iria para um Pokémon que não existe mais)
+                if (!estaNoSave(save, p)) return refazer();
                 // itens que são gastos e não voltam pedem confirmação (remédios e itens de segurar, não)
                 if (ehItemDeForma(item.id)) {
                   const opcoes = formasParaEscolher(item, p);
@@ -599,13 +588,23 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                         save.silver += kit.silver;
                         concluir(`Kit iniciante aberto! Você recebeu Pokébolas, remédios, ${kit.silver.toLocaleString('pt-BR')} Poké Dólares, a ${itemDaLoja(kit.skin)?.nome ?? 'skin'} e um ${itemDaLoja(kit.charm)?.nome ?? 'Charm'}.`);
                       } else if (item.id === KIT_PRE_REGISTRO) {
-                        // conteúdo definido pela staff (Administração → Prêmios → Kit de pré-registro); tudo sai NT
+                        // conteúdo definido pela staff (Administração → Prêmios → Kit de pré-registro); tudo sai NT.
+                        // Quem abre é o servidor (pode ter Origin Coins, que só ele dá)
                         const conteudo = conteudoKitPreRegistro();
                         if (!conteudo.length) aviso = 'O conteúdo do Kit de pré-registro ainda vai ser anunciado. Guarde o kit: ele abre quando estiver pronto.';
                         else {
-                          gastar(item.id);
-                          concluir(`Kit de pré-registro aberto! ${conteudo.map((p) => abrirPremioDoKit(save, p)).join(' · ')}`);
+                          try {
+                            await salvarAgora();
+                            const r = await api<{ save: Save; versao: number; frases: string[] }>('POST', '/kit-pre-registro/abrir');
+                            adotarSaveDoServidor(r.save, r.versao);
+                            concluir(`Kit de pré-registro aberto! ${r.frases.join(' · ')}`);
+                          } catch (e) {
+                            aviso = e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.';
+                          }
                         }
+                      } else if (cuboQueGera(item.id) && !cabemPokemons(save)) {
+                        // o cubo gera um Pokémon novo: com o PC cheio não abre (regra do dono)
+                        aviso = PC_CHEIO;
                       } else if (cuboQueGera(item.id)) {
                         // Cubo de Koraidon/Miraidon (pedido do dono): gera o Pokémon direto, IVs de 10 a 31
                         const cubo = cuboQueGera(item.id)!;
@@ -617,9 +616,10 @@ export function abrirBolsa(save: Save, aoMudar: () => void): void {
                         p.ivs = sortearIvs(0, Math.max(IV_MINIMO_CUBO_LENDARIO, shiny ? IV_MIN_SHINY : 0));
                         p.hp = hpMaximo(p);
                         p.origem = 'ticket';
+                        p.obtido = 'cubo';
                         registrarCapturado(save, cubo.especie, shiny);
                         const nomeNovo = `${novo}${shiny ? ' ✨' : ''}`;
-                        if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(p);
+                        if (save.time.length < TAMANHO_MAXIMO_TIME && podeUsar(save, p)) save.time.push(p);
                         const onde = save.time.includes(p) ? 'entrou no seu time' : `foi para o PC (Box ${guardarNoPC(save, p) + 1})`;
                         concluir(`O cubo se abriu e ${nomeNovo} atravessou o tempo! Ele ${onde}.`);
                       } else if (item.id === PASSE_PREMIUM) {

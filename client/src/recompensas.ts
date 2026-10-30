@@ -3,6 +3,7 @@
 // de que o prêmio chegou no Correio. A tela fica em Minha conta → Recompensas (telas/conta.ts).
 import type { EstadoRecompensas } from '../../shared/recompensas';
 import { api } from './conta';
+import { CONQUISTA_NA_TELA, PREMIOS_NA_TELA, PROFESSOR_NA_TELA, quandoLivre } from './ui/semBatalha';
 import { aoSalvar, carregarSave, salvarAgora } from './estado';
 import { nivelTreinador } from '../../shared/treinador';
 import { agoraDoServidor } from './ui/relogio';
@@ -30,7 +31,7 @@ async function registrarLogin(): Promise<void> {
   const r = await api<EstadoRecompensas & { novos: { evento: 'login' | 'trinta'; dia: number }[] }>('POST', '/recompensas/login');
   adotar(r);
   // aviso claro do que chegou (uma janela com os prêmios de cada login)
-  if (r.novos.length) void import('./telas/conta').then((m) => m.janelaDosPremios(r.novos));
+  if (r.novos.length) void import('./telas/conta').then((m) => quandoLivre(`${PROFESSOR_NA_TELA}, ${CONQUISTA_NA_TELA}, ${PREMIOS_NA_TELA}`, () => m.janelaDosPremios(r.novos)));
 }
 
 /** VIP recupera o prêmio de um dia perdido do Login dos 30 dias (o servidor confere VIP e o limite). */

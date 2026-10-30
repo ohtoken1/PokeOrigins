@@ -19,9 +19,10 @@ import { premiosCaptura } from '../../../shared/eventosRegras';
 import { buscarExpedicao, candidatosDaExpedicao, comecarExpedicao, powerDoGrupo, precoDaExpedicao } from '../expedicao';
 import { ninhoAtual, type EstadoNinhoServidor } from '../ninho';
 import { pokemonPorId, pokemonsDaRegiao, todosOsPokemons, pokemonsDosMapasDe } from '../dados';
-import { salvar, type PokemonDoJogador } from '../estado';
+import { cabemPokemons, estaNoSave, PC_CHEIO, salvar, type PokemonDoJogador } from '../estado';
 import { spritePokemon } from './dom';
-import { EVENTOS, bannerEvento, type EstadoSelo } from './temaEvento';
+import { EVENTOS, bannerEvento, type EstadoSelo, type IdEvento } from './temaEvento';
+import { emblemaEvento } from './emblemaEvento';
 import { HORA_SORTEIO, INTERVALO_NINHO_MS, agoraEmBrasilia, slotDoNinho } from '../../../shared/eventosRegras';
 
 interface EstadoEventos {
@@ -58,7 +59,7 @@ function tentarCofre(aoResultado: (texto: string) => void): void {
           const senha = digitos.join('');
           try {
             const r = await api<{ acertou: boolean; premio?: string }>('POST', '/eventos/cofre/tentar', { senha });
-            aoResultado(r.acertou ? `🔓 A senha ${senha} abriu o cofre! Prêmio: ${r.premio}. Ele já está chegando para você.` : `🔒 ${senha} não é a senha. Tente de novo!`);
+            aoResultado(r.acertou ? `A senha ${senha} abriu o cofre! Prêmio: ${r.premio}. Ele já está chegando para você.` : `${senha} não é a senha. Tente de novo!`);
           } catch (e) {
             aoResultado(erro(e));
           }
@@ -163,7 +164,7 @@ export function abrirEventos(save: Save, aoMudar: () => void = () => {}, abaInic
         el('p', {}, `Power ${numero(e.power)} · faixa ${e.faixa + 1} · ${e.horas} h`),
         volta > 0
           ? el('p', { class: 'meta' }, `Voltam em ${tempo(volta)}.`)
-          : el('button', { class: 'botao', onclick: () => { const frases = buscarExpedicao(save); aviso = frases ? `A expedição voltou! ${frases.join(' ')}` : ''; aoMudar(); janela.redesenhar(); } }, 'Buscar a expedição'));
+          : el('button', { class: 'botao', onclick: () => { if (!cabemPokemons(save, save.expedicao?.pokemons.length ?? 1)) { aviso = PC_CHEIO; return janela.redesenhar(); } const frases = buscarExpedicao(save); aviso = frases ? `A expedição voltou! ${frases.join(' ')}` : ''; aoMudar(); janela.redesenhar(); } }, 'Buscar a expedição'));
     }
     if (!escolhendo)
       return bloco(
@@ -185,6 +186,8 @@ export function abrirEventos(save: Save, aoMudar: () => void = () => {}, abaInic
             if (!(await confirmar('Expedição', `Mandar ${escolhidos.size} Pokémon por ${horas} h? Custa ${numero(precoDaExpedicao(save))} Poké Dólares e eles só voltam no fim.`))) return;
             const erroExp = comecarExpedicao(save, [...escolhidos], horas);
             aviso = erroExp ?? 'Expedição a caminho!';
+            // escolha com Pokémon velhos (o save foi atualizado): começa a escolha de novo
+            if (erroExp) for (const p of [...escolhidos]) if (!estaNoSave(save, p)) escolhidos.delete(p);
             if (!erroExp) escolhendo = false;
             aoMudar();
             janela.redesenhar();
@@ -249,7 +252,7 @@ export function abrirEventos(save: Save, aoMudar: () => void = () => {}, abaInic
             guardarAba(id);
             janela.redesenhar();
           },
-        }, el('span', { class: 'evento-aba-emblema', 'aria-hidden': 'true' }, EVENTOS[id].emblema), el('span', {}, ROTULO_ABA[id]),
+        }, emblemaEvento(id), el('span', {}, ROTULO_ABA[id]),
         s[id].estado === 'ativo' ? el('span', { class: 'evento-aba-ponto', title: 'Acontecendo agora' }) : ''))),
       el('div', { class: `evento-aba-conteudo tema-${aba}` },
         bannerEvento(aba, { subtitulo: EVENTOS[aba].quando, selo: s[aba] }),
@@ -323,19 +326,19 @@ export function painelEventosStaff(): HTMLElement {
       void desenhar();
     };
     const ligar = (evento: string, texto: string) => el('button', { class: 'botao', onclick: async () => (await confirmar('Confirmar', `${texto}?`)) && void enviar('/eventos/ligar', { evento }) }, texto);
-    const linha = (nome: string, acao: HTMLElement | string) => el('div', { class: 'evento-linha' }, el('strong', {}, nome), typeof acao === 'string' ? el('small', { class: 'meta' }, acao) : acao);
+    const linha = (evento: IdEvento, nome: string, acao: HTMLElement | string) => el('div', { class: 'evento-linha' }, el('strong', {}, emblemaEvento(evento), nome), typeof acao === 'string' ? el('small', { class: 'meta' }, acao) : acao);
     const partes: (HTMLElement | null)[] = [
       el('h2', {}, 'Ligar eventos agora (testes)'),
       el('div', { class: 'eventos-lista' },
-        linha('🔥 Outbreak', ligar('outbreak', 'Ativar agora (1 h)')),
-        linha('🪺 Ninho', ligar('ninho', 'Ativar agora (10 min)')),
-        linha('🎰 Loteria', ligar('loteria', 'Sortear agora')),
-        linha('🎯 Evento de captura', 'mais abaixo'),
-        linha('🔐 Cofre', 'mais abaixo'),
-        linha('👹 Boss global', 'mais abaixo'),
-        linha('🛡️ Boss da guilda', 'mais abaixo'),
-        linha('🏆 Torneio', 'aba Torneio'),
-        linha('👑 Liga Pokémon', 'times na aba Liga')),
+        linha('outbreak', 'Outbreak', ligar('outbreak', 'Ativar agora (1 h)')),
+        linha('ninho', 'Ninho', ligar('ninho', 'Ativar agora (10 min)')),
+        linha('loteria', 'Loteria', ligar('loteria', 'Sortear agora')),
+        linha('captura', 'Evento de captura', 'mais abaixo'),
+        linha('cofre', 'Cofre', 'mais abaixo'),
+        linha('boss', 'Boss global', 'mais abaixo'),
+        linha('boss', 'Boss da guilda', 'mais abaixo'),
+        linha('torneio', 'Torneio', 'aba Torneio'),
+        linha('liga', 'Liga Pokémon', 'times na aba Liga')),
       el('h2', {}, 'Boss (gaiola da cidade)'),
       e?.boss?.ativo
         ? el('p', {}, `Na gaiola: ${e.boss.nome} (${e.boss.tipo === 'global' ? 'global' : 'da guilda'}), termina em ${tempo(e.boss.fim - Date.now())}. `, el('button', { class: 'botao secundario', onclick: async () => (await confirmar('Confirmar', 'Encerrar o boss agora e entregar os prêmios?')) && void enviar('/eventos/boss/encerrar', {}) }, 'Encerrar agora'))

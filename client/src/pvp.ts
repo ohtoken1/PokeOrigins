@@ -74,7 +74,7 @@ function comecar(msg: TurnoPvp & { tipo?: string; titulo?: string; adversario: {
   pausarMapaAtual(true);
   abrirBatalha({
     save: { ...save, time }, bioma: biomaPorId('caverna'), selvagem: equipe[0], pvp: remota,
-    treinador: { nome: msg.adversario.nome, titulo: msg.titulo ?? 'Duelo', equipe, recompensa: 0, mensagemInicio: `${msg.titulo ?? 'Duelo'} contra ${msg.adversario.nome}!` },
+    treinador: { nome: msg.adversario.nome, titulo: msg.titulo ?? 'Duelo', equipe, recompensa: 0, mensagemInicio: msg.tipo === 'boss' ? `${msg.adversario.nome} ruge furioso dentro da gaiola!` : `${msg.titulo ?? 'Duelo'} contra ${msg.adversario.nome}!` },
     aoTerminar: () => {
       batalhas.delete(msg.id);
       pausarMapaAtual(false);

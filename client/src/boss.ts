@@ -1,12 +1,12 @@
 // Bosses (global e da guilda): o Pokémon montado pela staff fica 2 h na gaiola da cidade (BiomaScene.mostrarBoss).
 // Clicar abre a janela (ranking e "Enfrentar"); cada jogador luta UMA vez: HP infinito, 50 turnos, golpes proibidos.
-// O servidor (server/src/eventos.ts) guarda os danos e entrega os prêmios no fim.
+// A luta é calculada no servidor (server/src/eventos.ts + pvp.ts, como a Liga); ele conta o dano e entrega os prêmios no fim.
 import { GOLPES_PROIBIDOS_BOSS, TURNOS_BOSS } from '../../shared/eventosRegras';
-import { especie, hpMaximo, type PokemonIndividual } from '../../shared/batalha/pokemon';
+import { especie } from '../../shared/batalha/pokemon';
 import { Dex } from '@pkmn/sim';
 import { api, ErroApi } from './conta';
 import { pokemonPorId } from './dados';
-import { type Save } from './estado';
+import { salvarAgora, type Save } from './estado';
 import { aoAvisoDoServidor } from './online';
 import { confirmar } from './ui/confirmar';
 import { el, spritePokemon } from './ui/dom';
@@ -68,12 +68,12 @@ export function golpesProibidosNoTime(save: Save): string[] {
 
 const numero = (n: number) => n.toLocaleString('pt-BR');
 
-/** Janela do boss. `lutar` abre a batalha (a tela da cidade cuida do resto) e chama `aoFim(dano)`. */
-export function abrirBoss(save: Save, lutar: (boss: PokemonIndividual, nome: string, aoFim: (dano: number) => void) => void): void {
+/** Janela do Boss. "Enfrentar" pede ao servidor: a batalha é calculada lá e abre sozinha (client/src/pvp.ts). */
+export function abrirBoss(save: Save): void {
   let aviso = '';
   const janela = abrirJanela('Boss', () => {
     const b = estado;
-    if (!b) return el('div', { class: 'boss-janela' }, bannerEvento('boss', { selo: { texto: 'Gaiola vazia', estado: 'fechado' } }), el('p', { class: 'meta' }, 'A gaiola está vazia. Fique de olho nos avisos!'));
+    if (!b) return el('div', { class: 'boss-janela' }, bannerEvento('boss', { selo: { texto: 'Nenhum Boss agora', estado: 'fechado' } }), el('p', { class: 'meta' }, 'Nenhum Boss agora. Quando a staff soltar um, ele aparece nesta gaiola e o aviso passa na barrinha de avisos do topo.'));
     const ativo = !!bossAtual();
     const min = Math.max(0, Math.ceil((b.fim - Date.now()) / 60_000));
     return el('div', { class: 'boss-janela' },
@@ -95,18 +95,10 @@ export function abrirBoss(save: Save, lutar: (boss: PokemonIndividual, nome: str
               if (proibidos.length) return ((aviso = `Golpes proibidos no seu time: ${proibidos.join(', ')}. Troque antes de lutar.`), janela.redesenhar());
               if (!(await confirmar('Boss', `Enfrentar o ${b.nome}? Você só pode lutar UMA vez contra este boss.`))) return;
               try {
-                const r = await api<{ pokemon: PokemonIndividual; nome: string }>('POST', '/eventos/boss/entrar');
-                const p = r.pokemon;
-                p.hp = hpMaximo(p);
+                await salvarAgora(); // o servidor usa o time guardado
+                await api('POST', '/eventos/boss/entrar');
                 janela.fechar();
-                lutar(p, r.nome, async (dano) => {
-                  try {
-                    await api('POST', '/eventos/boss/resultado', { dano });
-                  } catch (e) {
-                    avisar(e instanceof ErroApi ? e.message : 'Sem conexão: o dano não foi registrado.', 'erro');
-                  }
-                  void atualizar();
-                });
+                void atualizar();
               } catch (e) {
                 aviso = e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.';
                 janela.redesenhar();

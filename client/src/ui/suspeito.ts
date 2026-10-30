@@ -9,7 +9,8 @@ import { nomeDaMoeda } from '../../../shared/moedas';
 import { PRECO_SUSPEITO, SERVICOS_SUSPEITO, type ServicoSuspeito } from '../../../shared/suspeito';
 import { especiePodeTerGolpe } from '../../../shared/usoItens';
 import { pokemonPorId, todosOsPokemons } from '../dados';
-import { guardarNoPC, registrarCapturado, salvar, type PokemonDoJogador, type Save } from '../estado';
+import { MOTIVO_NA_TROCA, estaNaTroca } from '../trocas';
+import { cabemPokemons, guardarNoPC, PC_CHEIO, registrarCapturado, salvar, type PokemonDoJogador, type Save } from '../estado';
 import { podeUsar } from '../limiteNivel';
 import { confirmar } from './confirmar';
 import { el } from './dom';
@@ -105,6 +106,8 @@ export function abrirSuspeito(save: Save, aoMudar: () => void = () => {}): void 
     const preco = PRECO_SUSPEITO[qual];
     const semSaldo = save.silver < preco;
     const escolher = async (p: PokemonDoJogador) => {
+      // separar devolve o parceiro: precisa de lugar no time ou no PC
+      if (qual === 'separar' && !cabemPokemons(save)) return void ((aviso = PC_CHEIO), janela.redesenhar());
       if (!(await confirmar(info.nome, `${info.nome} em ${nome(p)} por ${textoPreco(preco)}? Isso não tem volta.`))) return;
       // a tela ficou aberta enquanto a pergunta estava na frente: confere de novo
       if (motivo(qual, p) || save.silver < preco || !save.time.includes(p)) return janela.redesenhar();
@@ -126,7 +129,7 @@ export function abrirSuspeito(save: Save, aoMudar: () => void = () => {}): void 
         'div',
         { class: 'vagas' },
         save.time.map((p) => {
-          const porque = motivo(qual, p) ?? (semSaldo ? 'Poké Dólares insuficientes' : null);
+          const porque = (estaNaTroca(p.uid) ? MOTIVO_NA_TROCA : null) ?? motivo(qual, p) ?? (semSaldo ? 'Poké Dólares insuficientes' : null);
           return cartaoPokemon(p, { disabled: !!porque, title: porque ?? '', onclick: () => void escolher(p) });
         }),
       ),
