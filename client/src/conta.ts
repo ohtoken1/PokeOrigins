@@ -1,5 +1,7 @@
 // Conta do jogador: sessão (token do servidor) e chamadas da API. "Manter conectado" guarda o token no
 // localStorage; sem ele, no sessionStorage (o navegador esquece ao fechar).
+import type { RespostaComoConheceu } from './ui/comoConheceu';
+
 const CHAVE_SESSAO = 'jogo-claude:sessao';
 
 export interface Conta {
@@ -67,9 +69,9 @@ export async function api<T>(metodo: string, caminho: string, corpo?: unknown, o
 
 type RespostaLogin = { token: string; conta: Conta };
 
-/** `via` = o código veio do link do criador (/c/CODIGO) ou foi digitado. */
-export async function cadastrar(usuario: string, email: string, senha: string, manter: boolean, codigo = '', via: 'link' | 'codigo' = 'codigo'): Promise<Conta> {
-  const r = await api<RespostaLogin>('POST', '/cadastro', { usuario, email, senha, manter, codigo, via });
+/** `origem` = a resposta de "Por onde conheceu o jogo?" com o código de criador (ui/comoConheceu.ts). */
+export async function cadastrar(usuario: string, email: string, senha: string, manter: boolean, origem: RespostaComoConheceu): Promise<Conta> {
+  const r = await api<RespostaLogin>('POST', '/cadastro', { usuario, email, senha, manter, ...origem });
   guardarToken(r.token, manter);
   return (contaAtual = r.conta);
 }

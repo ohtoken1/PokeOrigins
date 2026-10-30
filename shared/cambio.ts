@@ -17,8 +17,10 @@ export const silverDaOperacao = (operacao: OperacaoCambio, gold: number) => gold
  * Cofre do banco (pedido do dono): o banco não cria moeda. Ele só entrega o que tem guardado, e tudo o que os
  * jogadores pagam fica nele. Começa com estes valores (uma vez só, quando o servidor cria o cofre).
  */
-export const COFRE_SILVER_INICIAL = 1000;
-export const COFRE_GOLD_INICIAL = 0;
+export const COFRE_SILVER_INICIAL = 10_000_000;
+export const COFRE_GOLD_INICIAL = 1000;
+/** Quanto a staff pode pôr no cofre de cada moeda (Administração → Banco). */
+export const COFRE_MAXIMO = 1_000_000_000_000;
 export interface Cofre {
   silver: number;
   gold: number;

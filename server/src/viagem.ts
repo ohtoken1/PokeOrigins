@@ -83,7 +83,8 @@ export function chegar(conta: banco.Conta) {
  */
 export function protegerRegiao(conta: banco.Conta, save: Record<string, unknown>, antes: Record<string, unknown> | null): void {
   if (conta.admin) return;
-  if (!antes) return void delete save.viagem;
+  // primeiro save da conta: viagem e viagens feitas só o servidor escreve
+  if (!antes) return void (delete save.viagem, delete save.trem);
   save.regiao = antes.regiao;
   if (antes.viagem) save.viagem = antes.viagem;
   else delete save.viagem;

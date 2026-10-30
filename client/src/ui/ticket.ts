@@ -1,7 +1,6 @@
 // Janela de abrir ticket: uma roleta (como a do inicial) com os prêmios enfileirados, cada casa na cor da
 // raridade (branco comum, azul raro, roxo épico, laranja lendário), que para no prêmio sorteado.
 import {
-  abrirTicket,
   CHAVE_TEMPORAL,
   chancesDasRaridades,
   ticketPorId,
@@ -16,7 +15,8 @@ import { sortearIvs } from '../../../shared/ovos';
 import { IV_MIN_SHINY, hpMaximo } from '../../../shared/batalha/pokemon';
 import { adicionarVip } from '../../../shared/vip';
 import { pokemonPorId } from '../dados';
-import { TAMANHO_MAXIMO_TIME, guardarNoPC, novoPokemon, registrarCapturado, salvar, type Save } from '../estado';
+import { TAMANHO_MAXIMO_TIME, adotarSaveDoServidor, cabemPokemons, PC_CHEIO, guardarNoPC, novoPokemon, registrarCapturado, salvar, salvarAgora, type Save } from '../estado';
+import { api, ErroApi } from '../conta';
 import { abrirJanela } from './janela';
 import { el, spritePokemon } from './dom';
 import { iconeItem } from './iconeItem';
@@ -63,6 +63,7 @@ export function entregar(save: Save, r: ResultadoTicket, opcoes: { nt?: boolean 
     p.ivs = sortearIvs(0, Math.max(premio.ivMinimo, r.shiny[i] ? IV_MIN_SHINY : 0));
     p.hp = hpMaximo(p);
     p.origem = 'ticket';
+    p.obtido = 'nt' in opcoes ? 'passe' : 'orb';
     if (opcoes.nt) p.inegociavel = true;
     registrarCapturado(save, premio.especie, r.shiny[i]);
     const nome = `${pokemonPorId(premio.especie).nome}${r.shiny[i] ? ' ✨' : ''}`;
@@ -163,16 +164,28 @@ export function abrirJanelaTicket(save: Save, ticketId: string, aoMudar: () => v
       // uma roleta por ticket aberto (uma em cima da outra)
       const roletas = areaRoletas(() => casaRoleta(...enfeite()));
       const resultado = el('div', { class: 'ticket-resultado' });
-      const abrirVarios = (n: number) => {
+      const abrirVarios = async (n: number) => {
         if (girando || (save.itens[ticketId] ?? 0) < n) return;
+        // cada Orb pode dar um Pokémon: com o PC cheio não abre (regra do dono)
+        if (!cabemPokemons(save, n)) return void resultado.replaceChildren(el('p', { class: 'aviso-bolsa' }, PC_CHEIO));
         girando = true;
         botoes.travar(true);
         resultado.replaceChildren();
-        // gasta os tickets e entrega os prêmios já no começo (fechar a janela no meio não perde nada)
-        save.itens[ticketId] -= n;
-        if (save.itens[ticketId] <= 0) delete save.itens[ticketId];
-        const todos = Array.from({ length: n }, () => abrirTicket(ticket));
-        const frases = todos.flatMap((x) => entregar(save, x));
+        // o servidor gasta as Orbs, sorteia e entrega os prêmios (Origin Coins e VIP só ele dá); fechar a janela
+        // no meio da roleta não perde nada
+        let todos: ResultadoTicket[];
+        let frases: string[];
+        try {
+          await salvarAgora();
+          const r = await api<{ save: Save; versao: number; resultados: ResultadoTicket[]; frases: string[] }>('POST', '/tickets/abrir', { id: ticketId, quantidade: n });
+          adotarSaveDoServidor(r.save, r.versao);
+          todos = r.resultados;
+          frases = r.frases;
+        } catch (e) {
+          girando = false;
+          botoes.travar(false);
+          return void resultado.replaceChildren(el('p', { class: 'aviso-bolsa' }, e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.'));
+        }
         // conquistas dos prêmios raros
         for (const x of todos) {
           if (x.raridade === 'epico') marcarConquista(save, 'ticketEpico');

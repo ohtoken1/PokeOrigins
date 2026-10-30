@@ -129,8 +129,10 @@ function registrarVencedor(id: string, r: number, k: number, vencedor: number | 
   emJogo.delete(chave(t, r, k));
   const p = t.rodadas[r]?.[k];
   if (!p || p.vencedor !== null) return;
-  // empate (os dois deixaram o tempo acabar): sorteio
+  // empate (os dois caíram juntos ou deixaram o tempo acabar): sorteio
   p.vencedor = vencedor ?? (Math.random() < 0.5 ? p.a : p.b);
+  if (vencedor === null && !wo)
+    for (const c of [p.a, p.b]) if (c !== null) avisar(c, { t: 'torneio-aviso', texto: c === p.vencedor ? 'Torneio: a partida terminou empatada e o sorteio escolheu você. Você avança!' : 'Torneio: a partida terminou empatada e o sorteio escolheu o seu adversário.' });
   if (wo) p.wo = true;
   gravar(t);
   // fora deste passo: quem chamou pode estar no meio de um laço sobre a rodada

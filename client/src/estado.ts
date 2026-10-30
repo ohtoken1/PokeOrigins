@@ -13,9 +13,12 @@ import type { Canteiro } from '../../shared/craft';
 import type { CasalCreche } from '../../shared/breeding';
 import type { Viagem } from '../../shared/viagem';
 import type { EstadoSafari } from '../../shared/safari';
+import type { BatalhaAberta } from './batalha/retomada';
 import type { EstadoQuadro } from '../../shared/missoesQuadro';
 import type { EstadoConquistas } from '../../shared/conquistas';
 import { api, ErroApi } from './conta';
+
+export type Obtido = 'mapa' | 'safari' | 'ovo' | 'daycare' | 'orb' | 'passe' | 'ninho' | 'inicial' | 'cubo' | 'loja' | 'presente';
 
 export type PokemonDoJogador = PokemonIndividual & {
   /** Box do PC onde está guardado (0 a numeroDeBoxes(save) − 1); só vale para quem está no PC. */
@@ -24,6 +27,12 @@ export type PokemonDoJogador = PokemonIndividual & {
   casa?: number;
   /** De onde veio, quando não foi capturado: ovo, ticket ou troca com outro jogador (as conquistas olham isso). */
   origem?: 'ovo' | 'ticket' | 'troca';
+  /** Onde o Pokémon entrou no jogo (a ficha mostra "Obtido em"); quem é de antes disso não tem. */
+  obtido?: Obtido;
+  /** Mudou de dono pela troca ou pelo Mercado negro (o último jeito; escrito pelo servidor). */
+  chegouPor?: 'troca' | 'mercado';
+  /** Quando foi capturado em batalha (ms). O Evento de captura só aceita quem foi capturado depois que ele começou. */
+  capturadoEm?: number;
   /** Ovo da creche que ainda não chocou (fica no PC; não luta, não troca; o choco vem depois). */
   ovo?: { desde: number; passos?: number };
   /** Medalhas de torneio deste Pokémon (+1 a cada pódio em que ele estava no time; escrito pelo servidor). */
@@ -98,6 +107,8 @@ export interface Save {
   viagem?: Viagem | null;
   /** Safari (shared/safari.ts): entradas usadas hoje (do servidor) e o Safari em andamento. */
   safari?: EstadoSafari | null;
+  /** Batalha em andamento no navegador (client/src/batalha/retomada.ts): recarregar a página volta para ela. */
+  batalhaAberta?: BatalhaAberta;
   /** Charms usados (shared/charms.ts): tipo → quando o bônus acaba (ms). */
   charms?: Record<string, number> | null;
   /** Tipos de charm já usados alguma vez (conquista "Galante"). */
@@ -241,6 +252,18 @@ export function guardarNoPC(save: Save, p: PokemonDoJogador, preferida = 0): num
   organizarCasas(save);
   return box;
 }
+/**
+ * Regra do dono (29/10/2026): com o PC cheio, nenhum Pokémon novo entra (captura, ovo, Orb, Daycare, Expedição…);
+ * o jogador libera espaço antes. Antes o Pokémon ia para uma casa escondida da última box.
+ */
+export const PC_CHEIO = 'Seu PC está cheio. Libere espaço no PC para receber novos Pokémon.';
+/** Cabem mais `quantos` Pokémon (vagas do time + casas livres das boxes)? */
+export function cabemPokemons(save: Save, quantos = 1): boolean {
+  let livres = Math.max(0, TAMANHO_MAXIMO_TIME - save.time.length);
+  for (let b = 0; b < numeroDeBoxes(save) && livres < quantos; b++) livres += Math.max(0, TAMANHO_BOX - pokemonsDaBox(save, b).length);
+  return livres >= quantos;
+}
+
 const CHAVE = 'jogo-claude:save';
 
 export function novoPokemon(especieId: number, nivel: number, shiny = false): PokemonDoJogador {
@@ -254,6 +277,7 @@ function novoInicial(especieId: number): PokemonDoJogador {
   p.hp = hpMaximo(p);
   p.inegociavel = true;
   p.ivsRevelados = true;
+  p.obtido = 'inicial';
   return p;
 }
 
@@ -513,6 +537,19 @@ export async function salvarAgora(): Promise<void> {
  * O servidor mudou o save (ex.: troca feita): troca o conteúdo do objeto único em memória pelo do servidor,
  * mantendo o MESMO objeto (as telas abertas seguram a referência) e avisa quem escuta `aoSalvar`.
  */
+/**
+ * Avisa quando o servidor trocou o save inteiro (trem chegou, pagamento do Mercado, entrega, troca…): os Pokémon viram
+ * OUTROS objetos, e uma janela aberta (PC, Daycare, Expedição) segurando os antigos duplicava ou soltava o errado.
+ * Devolve a função para parar de ouvir.
+ */
+const aoAdotarFns = new Set<() => void>();
+export function aoAdotarSave(fn: () => void): () => void {
+  aoAdotarFns.add(fn);
+  return () => aoAdotarFns.delete(fn);
+}
+/** Este Pokémon (objeto) ainda está no save (time ou PC)? Falso = a tela está com uma versão velha dele. */
+export const estaNoSave = (save: Save, p: PokemonDoJogador) => save.time.includes(p) || save.caixa.includes(p);
+
 export function adotarSaveDoServidor(doServidor: Save, versaoServidor: number): void {
   clearTimeout(envio);
   pendente = false;
@@ -525,6 +562,7 @@ export function adotarSaveDoServidor(doServidor: Save, versaoServidor: number): 
   guardarCopia();
   avisar('salvo');
   for (const fn of aoSalvarFns) fn(emMemoria);
+  for (const fn of [...aoAdotarFns]) fn();
 }
 
 // save da tela de jogo aberta (região/bioma): quem dono dos Pokémon mostrados nas fichas

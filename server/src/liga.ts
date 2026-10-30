@@ -3,12 +3,13 @@
 // O desafio é feito de uma vez (pedido do dono, 20/10/2026): o time de 6 é travado no começo, não é curado (só
 // remédios entre as batalhas), as batalhas são calculadas AQUI (server/src/pvp.ts, 180 s por turno) e seguem em
 // sequência sozinhas; sair do jogo não para nada. Perdeu = fim; largou = derrota.
+import { tarefaSegura } from './tarefaSegura.ts';
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import * as correio from './correio.ts';
 import { avisar, avisarEvento } from './mundo.ts';
 import { criarBatalhaPve, emBatalha } from './pvp.ts';
-import { nomeDaEspecie, usarRemedioNaLiga } from './motorDoJogo.ts';
+import { nomeDaEspecie, problemasDeLegalidade, usarRemedioNaLiga } from './motorDoJogo.ts';
 import { lerNome, lerPokemon } from './entregas.ts';
 import { NIVEL_MINIMO, liberado } from '../../shared/trancas.ts';
 import { nivelTreinador } from '../../shared/treinador.ts';
@@ -155,7 +156,7 @@ function rodarDesafios(agora = Date.now()): void {
     }
   if (mudou) banco.gravarEvento('liga-progresso', p);
 }
-setInterval(rodarDesafios, 5000).unref();
+setInterval(() => tarefaSegura('liga', rodarDesafios), 5000).unref();
 
 /** O que o jogador vê: etapas (nomes), onde ele está, o time do desafio e quando a semana vira. Os times da staff não são revelados. */
 export function estado(conta: banco.Conta, agora = Date.now()) {
@@ -188,11 +189,23 @@ export function entrar(conta: banco.Conta, dados: Record<string, unknown>, agora
   if (meu && meu.estado !== 'jogando') throw new ErroConta(meu.estado === 'venceu' ? 'Você já venceu esta Liga nesta semana.' : 'Você foi derrotado nesta semana. Tente de novo na semana que vem.', 409);
   if (meu?.lutando || emBatalha(conta.id)) throw new ErroConta('Você já está numa batalha.', 409);
   if (!meu) {
+    // desafio da semana passada ainda aberto (a semana acabou de virar e a conferência de 5 s não passou): termina
+    // como derrota e paga as moedas dele ANTES de começar o novo (antes o novo apagava o velho sem pagar)
+    const velho = p[conta.id]?.[liga];
+    if (velho && velho.estado === 'jogando') {
+      velho.estado = 'perdeu';
+      velho.lutando = false;
+      pagar(conta.id, liga, velho);
+      // grava já: se o time novo for recusado logo abaixo, o pagamento não pode se repetir
+      banco.gravarEvento('liga-progresso', p);
+    }
     const guardado = banco.lerSave(conta.id);
     const time = ((guardado ? (JSON.parse(guardado.dados) as { time?: unknown }).time : null) ?? []) as Record<string, unknown>[];
     const lutadores = Array.isArray(time) ? time.filter((x) => x && !x.ovo) : [];
     if (lutadores.length !== POKEMON_POR_TIME_LIGA) throw new ErroConta(`O desafio da Liga é com um time de ${POKEMON_POR_TIME_LIGA} Pokémon (sem ovos).`);
     if (!lutadores.some((x) => Number(x.hp) > 0)) throw new ErroConta('Seu time está todo desmaiado.');
+    const ilegais = problemasDeLegalidade(lutadores);
+    if (ilegais.length) throw new ErroConta(`Seu time tem um Pokémon inválido. ${ilegais[0]}`, 409);
     meu = { semana: semanaDaLiga(agora), etapa: 0, estado: 'jogando', lutando: false, time: structuredClone(lutadores), proximaEm: null };
     (p[conta.id] ??= {})[liga] = meu;
   }

@@ -118,6 +118,10 @@ export type EstadoRecompensas = {
   /** Login das contas novas: `dia` = casinhas andadas; `fim` = quando a janela de 7 dias da conta acaba (null = acabou) */
   login: { fim: number | null; dia: number; hoje: boolean };
   /** Login dos 30 dias: `diaAtual` 1–30 (null = ainda não começou ou já acabou), dias pegos e recuperações do VIP */
-  trinta: { inicio: string; diaAtual: number | null; pegos: number[]; recuperacoes: number; vip: boolean };
+  trinta: {
+    inicio: string; diaAtual: number | null; pegos: number[]; recuperacoes: number; vip: boolean;
+    /** Primeiro dia do evento em que a conta já existia (os anteriores são "antes da sua conta", não perdidos). */
+    primeiroDia: number;
+  };
   doacao: { trimestre: string; fim: number; gold: number; metas: number[] };
 };

@@ -1,8 +1,10 @@
 // Creche (breeding) no save do jogador: casais guardados em `save.creche`, ciclos de ovo e o ovo que sai como um
 // Pokémon para o PC. Regras em shared/breeding.ts (planilha do dono).
+import { depoisDaBatalha, emBatalha } from './ui/semBatalha';
 import { marcarConquista } from './conquistas';
 import { DESTINY_KNOT } from '../../shared/breeding';
-import { golpesIniciais, hpMaximo, ppMaximo } from '../../shared/batalha/pokemon';
+import { IV_MIN_SHINY, golpesIniciais, hpMaximo, ppMaximo } from '../../shared/batalha/pokemon';
+import { formaNormalDe } from '../../shared/formasPorItem';
 import {
   PASSOS_PARA_CHOCAR,
   PRECO_CHOCAR_DAYCARE,
@@ -18,9 +20,10 @@ import {
   type CasalCreche,
 } from '../../shared/breeding';
 import { formaBaseDe } from '../../shared/encontros';
+import { podeUsar } from './limiteNivel';
 import { vipAtivo } from '../../shared/vip';
 import { pokemonPorId, todosOsPokemons } from './dados';
-import { TAMANHO_MAXIMO_TIME, carregarSave, guardarNoPC, novoPokemon, registrarCapturado, salvar, type PokemonDoJogador, type Save } from './estado';
+import { TAMANHO_MAXIMO_TIME, carregarSave, estaNoSave, guardarNoPC, novoPokemon, registrarCapturado, salvar, type PokemonDoJogador, type Save } from './estado';
 import { el } from './ui/dom';
 
 export type Casal = CasalCreche<PokemonDoJogador>;
@@ -40,6 +43,8 @@ function tirarDoJogador(save: Save, p: PokemonDoJogador): void {
 /** Deixa um casal na creche (quem chama confere `podemCruzar` e salva). O time precisa ficar com 1 Pokémon. */
 export function deixarCasal(save: Save, a: PokemonDoJogador, b: PokemonDoJogador): string | null {
   if (casaisDe(save).length >= vagasDaCreche(save)) return 'O Daycare está cheio.';
+  // a janela pode estar com Pokémon de antes de o servidor atualizar o save (iam para o Daycare e ficavam no time também)
+  if (!estaNoSave(save, a) || !estaNoSave(save, b)) return 'Seu jogo foi atualizado agora há pouco. Escolha os Pokémon de novo.';
   const sobraNoTime = save.time.filter((x) => x !== a && x !== b).length;
   if (sobraNoTime < 1) return 'Seu time precisa ficar com pelo menos 1 Pokémon.';
   tirarDoJogador(save, a);
@@ -51,7 +56,8 @@ export function deixarCasal(save: Save, a: PokemonDoJogador, b: PokemonDoJogador
 
 /** Devolve um Pokémon da creche: time se tiver vaga, senão PC. */
 function devolver(save: Save, p: PokemonDoJogador): void {
-  if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(p);
+  // acima do limite de nível do treinador: volta para o PC (pedido do dono)
+  if (save.time.length < TAMANHO_MAXIMO_TIME && podeUsar(save, p)) save.time.push(p);
   else guardarNoPC(save, p);
 }
 
@@ -64,13 +70,26 @@ export function retirarCasal(save: Save, i: number): void {
   for (const p of casal.pais) devolver(save, p);
 }
 
+/**
+ * Formas que não têm forma anterior no jogo, mas cujo ovo nasce na primeira forma da espécie normal (como nos jogos):
+ * Alolan Raichu → Pichu, Alolan Exeggutor → Exeggcute, Hisuian Lilligant → Petilil, Ursaluna Bloodmoon → Teddiursa.
+ */
+const OVO_DA_FORMA: Record<number, number> = { 10100: 172, 10114: 102, 10237: 548, 10272: 216 };
+/** A espécie que nasce do ovo: forma trocada por item volta à normal (Rotom de eletrodoméstico → Rotom), depois a primeira da linha. */
+export function especieDoOvo(maeId: number): number {
+  const normal = formaNormalDe(maeId) ?? maeId;
+  return OVO_DA_FORMA[normal] ?? formaBaseDe(pokemonPorId(normal), todosOsPokemons()).id;
+}
+
 /** Cria o ovo: um Pokémon da forma base da mãe (ou do não-Ditto), nível 1, que ainda vai chocar. */
 export function criarOvo(casal: Casal): PokemonDoJogador {
   const { mae, pai } = maeEPai(casal.pais[0], casal.pais[1]);
-  const especieId = formaBaseDe(pokemonPorId(mae.especieId), todosOsPokemons()).id;
+  const especieId = especieDoOvo(mae.especieId);
   const shiny = Math.random() < chanceShinyDoCasal(mae, pai);
   const p = novoPokemon(especieId, 1, shiny);
   p.ivs = ivsDoFilhote(mae, pai);
+  // shiny: IVs de IV_MIN_SHINY a 31, como todo shiny do jogo
+  if (shiny) for (const k of Object.keys(p.ivs) as (keyof typeof p.ivs)[]) p.ivs[k] = Math.max(IV_MIN_SHINY, p.ivs[k]);
   p.natureza = naturezaDoFilhote(mae, pai) ?? p.natureza;
   // Egg Moves herdados primeiro; o resto, os golpes de nível 1
   const herdados = eggMovesHerdados(especieId, mae, pai);
@@ -78,6 +97,7 @@ export function criarOvo(casal: Casal): PokemonDoJogador {
   p.golpes = [...herdados.map((id) => ({ id, pp: ppMaximo(id) })), ...iniciais].slice(0, 4);
   p.hp = hpMaximo(p);
   p.origem = 'ovo';
+  p.obtido = 'daycare';
   p.ovo = { desde: Date.now() };
   p.ivsFaixa = false;
   p.ivsRevelados = false;
@@ -140,6 +160,8 @@ export function buscarChocado(save: Save, i: number): PokemonDoJogador | null {
 let avisoEl: HTMLElement | null = null;
 let esconder = 0;
 function avisar(titulo: string, texto: string): void {
+  // com uma batalha aberta, espera ela acabar
+  if (emBatalha()) return depoisDaBatalha(() => avisar(titulo, texto));
   if (!avisoEl) {
     avisoEl = el('div', { class: 'aviso-anuncio aviso-creche', role: 'status', hidden: true });
     document.body.append(avisoEl);

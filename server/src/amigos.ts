@@ -128,11 +128,12 @@ export function mandar(conta: banco.Conta, usuario: unknown, bruto: unknown) {
 // alguém entrou ou saiu do jogo: os amigos online atualizam a lista (bolinha de online)
 aoMudarPresenca((contaId) => {
   for (const a of banco.amizadesDe(contaId)) if (a.aceita) avisar(a.id, { t: 'amigos' });
-  if (!estaOnline(contaId)) envios.delete(contaId);
 });
 
 /** Limpeza de tempos em tempos (index.ts): esquece os contadores de quem já pode pedir de novo. */
 export function limpar(): void {
   const agora = Date.now();
   for (const [id, tempos] of pedidosFeitos) if (tempos.every((t) => agora - t >= JANELA_PEDIDOS_MS)) pedidosFeitos.delete(id);
+  // o limite das mensagens privadas é por conta (sair e entrar de novo não zera): só esquece quem já pode mandar
+  for (const [id, tempos] of envios) if (tempos.every((t) => agora - t >= JANELA_MS)) envios.delete(id);
 }

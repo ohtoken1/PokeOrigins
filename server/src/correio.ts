@@ -4,9 +4,9 @@
 // mudança só (mudarSaves). Assim nada troca o save por baixo de quem está jogando.
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
-import { aplicarItem, lerNome, lerPokemon, marcarConquistaNoSave } from './entregas.ts';
+import { aplicarItem, itemAceito, lerNome, lerPokemon, marcarConquistaNoSave } from './entregas.ts';
 import { avisar } from './mundo.ts';
-import { guardarPokemon, type PokemonSave, type SaveMin } from './trocas.ts';
+import { cabePokemon, guardarPokemon, type PokemonSave, type SaveMin } from './trocas.ts';
 
 /** `nt` = o item chega NT (não pode ser trocado nem vendido): conta em `save.itensNt` se não for uma versão "-nt". */
 export type Anexo = { tipo: 'item'; item: string; nome: string; quantidade: number; nt?: true } | { tipo: 'pokemon'; nome: string; dados: PokemonSave } | AnexoEscondido;
@@ -63,19 +63,39 @@ export function ler(conta: banco.Conta, dados: Record<string, unknown>) {
 }
 
 /**
- * Resgata os anexos de uma carta (`id`) ou de todas (`todas: true`). Tudo numa mudança só: se um Pokémon não couber
- * (PC cheio), nada é resgatado e as cartas continuam esperando.
+ * Resgata os anexos de uma carta (`id`) ou de todas (`todas: true`), numa mudança só. Carta com Pokémon que não cabe
+ * (PC cheio) continua esperando: sozinha dá erro; no "Resgatar tudo" as outras são resgatadas e `esperando` diz quantas
+ * ficaram.
  */
+const PC_CHEIO = 'Seu PC está cheio. Libere espaço no PC para resgatar o Pokémon.';
 export function resgatar(conta: banco.Conta, dados: Record<string, unknown>) {
   if (!banco.lerSave(conta.id)) throw new ErroConta('Comece sua jornada antes de resgatar.', 409);
   const cartas = (dados.todas === true ? banco.cartasDaConta(conta.id) : [banco.cartaDaConta(lerId(dados.id), conta.id)])
     .filter((c): c is banco.Carta => !!c && !c.resgatada && c.anexos !== '[]');
   if (!cartas.length) throw new ErroConta('Não há nada para resgatar.', 409);
   const recebidos: { nome: string; quantidade: number }[] = [];
+  let esperando = 0;
   banco.mudarSaves([conta.id], ([save]) => {
     // da mais velha para a mais nova (a ordem em que chegaram)
     for (const c of [...cartas].reverse()) {
-      for (const a of JSON.parse(c.anexos) as Anexo[]) {
+      const anexos = JSON.parse(c.anexos) as Anexo[];
+      // os Pokémon da carta cabem? (confere numa cópia; não cabe = a carta fica esperando)
+      const pokemons = anexos.filter((a): a is Extract<Anexo, { tipo: 'pokemon' }> => a.tipo === 'pokemon');
+      if (pokemons.length) {
+        const prova = structuredClone(save) as unknown as SaveMin;
+        let cabe = true;
+        for (const a of pokemons) {
+          if (!cabePokemon(prova, a.dados)) cabe = false;
+          else guardarPokemon(prova, structuredClone(a.dados), false);
+          if (!cabe) break;
+        }
+        if (!cabe) {
+          if (dados.todas !== true) throw new ErroConta(PC_CHEIO, 409);
+          esperando++;
+          continue;
+        }
+      }
+      for (const a of anexos) {
         if (a.tipo === 'marca') {
           marcarConquistaNoSave(save, a.marca);
           continue;
@@ -98,9 +118,10 @@ export function resgatar(conta: banco.Conta, dados: Record<string, unknown>) {
       }
       banco.marcarCartaResgatada(c.id, conta.id);
     }
+    if (!recebidos.length && esperando) throw new ErroConta(PC_CHEIO, 409);
   });
   const guardado = banco.lerSave(conta.id)!;
-  return { ...listar(conta), recebidos, save: JSON.parse(guardado.dados), versao: guardado.versao };
+  return { ...listar(conta), recebidos, esperando, save: JSON.parse(guardado.dados), versao: guardado.versao };
 }
 
 /** Apaga uma carta (`id`) ou todas as lidas (`lidas: true`). Carta com anexo esperando não é apagada. */
@@ -131,7 +152,7 @@ export function enviarDaStaff(conta: banco.Conta, dados: Record<string, unknown>
   for (const x of Array.isArray(dados.itens) ? dados.itens : []) {
     const o = (x ?? {}) as Record<string, unknown>;
     const item = typeof o.item === 'string' ? o.item : '';
-    if (!/^[a-z0-9-]{1,60}$/.test(item)) throw new ErroConta('Item inválido.');
+    if (!itemAceito(item)) throw new ErroConta(`O item "${item.slice(0, 60)}" não existe no jogo.`);
     const q = o.quantidade;
     if (typeof q !== 'number' || !Number.isSafeInteger(q) || q < 1 || q > QUANTIDADE_MAX) throw new ErroConta('Quantidade inválida.');
     anexos.push(anexoItem(item, lerNome(o.nome) || item, q));

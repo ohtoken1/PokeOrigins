@@ -6,6 +6,7 @@ import { el } from '../ui/dom';
 import { seletorDeIdioma } from '../idioma';
 import { confirmar } from '../ui/confirmar';
 import { telaPreRegistro } from './preRegistro';
+import { campoComoConheceu } from '../ui/comoConheceu';
 import { criadorDoLink, esquecerCriador, lerLinkDeCriador } from '../linkCriador';
 
 /** Resolve quando há uma conta logada e o save dela já está em memória. */
@@ -69,6 +70,8 @@ function formularioEntrada(raiz: HTMLElement): Promise<void> {
     const linhaEmail = rotulo('E-mail', email);
     const linhaSenha = rotulo('Senha', senha);
     const linhaConfirmar = rotulo('Confirmar senha', confirmar);
+    // veio pelo link de um criador: "Criador de conteúdo" e o código já vêm preenchidos
+    const comoConheceu = campoComoConheceu(criadorDoLink());
     const abaEntrar = el('button', { type: 'button', class: 'aba-entrada', onclick: () => trocar('entrar') }, 'Entrar');
     // durante o pré-registro, "Criar conta" leva à página do pré-registro (pedido do dono): lá a conta é criada
     // junto com as informações do jogo e do kit
@@ -89,6 +92,7 @@ function formularioEntrada(raiz: HTMLElement): Promise<void> {
         linha.hidden = !criar;
         entrada.required = criar;
       }
+      comoConheceu.elemento.hidden = !criar;
       senha.autocomplete = criar ? 'new-password' : 'current-password';
       (linhaSenha.querySelector('small') ?? linhaSenha.appendChild(el('small', {}))).textContent = criar ? 'Pelo menos 6 caracteres' : '';
       enviar.textContent = criar ? 'Criar conta' : 'Entrar';
@@ -98,7 +102,7 @@ function formularioEntrada(raiz: HTMLElement): Promise<void> {
 
     const formulario = el('form', { class: 'formulario-entrada', novalidate: true },
       el('div', { class: 'abas-entrada', role: 'tablist' }, abaEntrar, abaCriar),
-      linhaUsuario, linhaLogin, linhaEmail, linhaSenha, linhaConfirmar,
+      linhaUsuario, linhaLogin, linhaEmail, linhaSenha, linhaConfirmar, comoConheceu.elemento,
       el('label', { class: 'manter-entrada' }, manter, 'Manter conectado neste computador'),
       erro, enviar,
     ) as HTMLFormElement;
@@ -114,12 +118,13 @@ function formularioEntrada(raiz: HTMLElement): Promise<void> {
       if (criar && senha.value.length < 6) return void (erro.textContent = 'A senha precisa ter pelo menos 6 caracteres.');
       if (!criar && !senha.value) return void (erro.textContent = 'Digite sua senha.');
       if (criar && senha.value !== confirmar.value) return void (erro.textContent = 'As senhas não são iguais.');
+      const origem = comoConheceu.ler();
+      if (criar && typeof origem === 'string') return void (erro.textContent = origem);
       enviar.disabled = true;
       enviar.textContent = criar ? 'Criando…' : 'Entrando…';
       try {
         // quem veio pelo link de um criador e criou a conta por aqui também fica ligado a ele
-        const link = criadorDoLink();
-        if (criar) await cadastrar(usuario.value, email.value.trim(), senha.value, manter.checked, link?.codigo ?? '', 'link');
+        if (criar && typeof origem !== 'string') await cadastrar(usuario.value, email.value.trim(), senha.value, manter.checked, origem);
         if (criar) esquecerCriador();
         else await entrar(login.value.trim(), senha.value, manter.checked);
         pronto();

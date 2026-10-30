@@ -1,6 +1,7 @@
 // Conquistas no jogo: confere o progresso de cada uma pelo save, marca as concluídas e mostra o aviso. A recompensa
 // NÃO chega sozinha (pedido do dono): a conquista fica em `aResgatar` até o jogador clicar em Resgatar na tela das
 // conquistas; só então vai para `feitas`, que é o que vale para os bônus e os títulos. A lista e as recompensas ficam em shared/conquistas.ts.
+import { PREMIOS_NA_TELA, PROFESSOR_NA_TELA, quandoLivre } from './ui/semBatalha';
 import { CONQUISTAS, CONQUISTAS_CONTADAS, textoRecompensa, type Conquista, type EstadoConquistas } from '../../shared/conquistas';
 import { TIPOS_DOS_CHARMS } from '../../shared/charms';
 import { SELOS_SAZONAIS } from '../../shared/itensCustom';
@@ -210,7 +211,7 @@ function entregar(save: Save, c: Conquista): void {
   if (r.tipo === 'item') save.itens[r.id] = (save.itens[r.id] ?? 0) + r.quantidade;
   else if (r.tipo === 'silver') save.silver += r.quantidade;
   else if (r.tipo === 'fragmentos') save.fragmentos = (save.fragmentos ?? 0) + r.quantidade;
-  else if (r.tipo === 'vip') save.vipAte = Math.max(save.vipAte ?? 0, Date.now()) + r.dias * 86_400_000;
+  // VIP ("Faça uma doação"): os dias vêm na carta da primeira doação; só o servidor mexe no VIP
   // bônus e títulos valem pela conquista estar concluída (não guardam nada a mais)
 }
 
@@ -239,6 +240,12 @@ let caixa: HTMLElement | null = null;
 const fila: Conquista[][] = [];
 let mostrando = false;
 function mostrarProximo(): void {
+  // com uma batalha, o Professor ou os "Prêmios de hoje" na tela, o aviso da conquista espera eles saírem
+  const outros = `${PROFESSOR_NA_TELA}, ${PREMIOS_NA_TELA}`;
+  if (document.querySelector(`.batalha-fundo, ${outros}`)) {
+    mostrando = true;
+    return quandoLivre(outros, mostrarProximo);
+  }
   const lote = fila.shift();
   if (!lote || !caixa) return void (mostrando = false);
   mostrando = true;

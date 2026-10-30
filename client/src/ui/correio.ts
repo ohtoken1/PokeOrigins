@@ -7,22 +7,26 @@ import { avisar, avisarErro } from './avisos';
 import { confirmar } from './confirmar';
 import { el, spritePokemon } from './dom';
 import { iconeItem } from './iconeItem';
+import { icone, iconeNoTexto, type NomeIcone } from './icones';
 import { abrirJanela } from './janela';
 
 /** Quem mandou (coluna `de` da carta). */
 const REMETENTE: Record<string, string> = {
   staff: 'Staff PokeOrigins', liga: 'Liga Pokémon', torneio: 'Torneio', cofre: 'Cofre PokeOrigins', loteria: 'Loteria PokeOrigins',
   captura: 'Evento de captura', boss: 'Boss', sistema: 'PokeOrigins',
+  // logins e Kit de pré-registro ('eventos') e doações: antes aparecia o nome interno
+  eventos: 'Recompensas PokeOrigins', doacoes: 'Doações PokeOrigins',
 };
 /** Saldos e medalhas não são itens da bolsa: imagem ou símbolo próprio. */
-const IMAGENS: Record<string, string> = { silver: 'itens/pokedolar.svg', gold: 'itens/origincoin.svg', fragmentos: 'itens/fragmento-temporal.svg' };
-const SIMBOLOS: Record<string, string> = { 'league-coins': '🏅', 'league-coins-nightmare': '🎖️', 'pontos-guilda': '🛡️', 'vip-dias': '💎', 'medalha-ouro': '🥇', 'medalha-prata': '🥈', 'medalha-bronze': '🥉' };
+const IMAGENS: Record<string, string> = { silver: 'itens/pokedolar.svg', gold: 'itens/origincoin.svg', fragmentos: 'itens/fragmento-temporal.svg', 'league-coins': 'itens/leaguecoin.svg', 'league-coins-nightmare': 'itens/leaguecoinnightmare.svg' };
+/** Desenho de `ui/icones.ts` (e a cor, nas medalhas). */
+const SIMBOLOS: Record<string, [NomeIcone, string?]> = { 'pontos-guilda': ['guilda'], 'vip-dias': ['diamante'], 'medalha-ouro': ['medalha', 'ouro'], 'medalha-prata': ['medalha', 'prata'], 'medalha-bronze': ['medalha', 'bronze'] };
 
 function iconeAnexo(a: AnexoCarta): HTMLElement {
   if (a.tipo === 'pokemon') return spritePokemon(pokemonPorId(a.especieId), { shiny: a.shiny, animado: false });
   if (IMAGENS[a.item]) return el('div', { class: 'icone-caixa' }, el('img', { class: 'icone-png', src: IMAGENS[a.item], alt: '' }));
   const item = itemDaLoja(a.item);
-  return item ? iconeItem(item) : el('span', { class: 'correio-simbolo' }, SIMBOLOS[a.item] ?? '🎁');
+  return item ? iconeItem(item) : el('span', { class: `correio-simbolo ${SIMBOLOS[a.item]?.[1] ?? ''}` }, icone(SIMBOLOS[a.item]?.[0] ?? 'recompensas'));
 }
 
 const quando = (ms: number) => new Date(ms).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
@@ -52,7 +56,7 @@ export function abrirCorreio(): void {
 
   function linha(c: Carta): HTMLElement {
     return el('button', { class: `correio-linha ${c.id === aberta ? 'ativa' : ''} ${c.lida ? '' : 'nao-lida'}`, type: 'button', onclick: () => abrir(c) },
-      el('span', { class: 'correio-linha-topo' }, el('strong', {}, c.titulo), esperaResgate(c) ? el('span', { class: 'correio-presente', title: 'Tem anexo para resgatar' }, '🎁') : ''),
+      el('span', { class: 'correio-linha-topo' }, el('strong', {}, c.titulo), esperaResgate(c) ? el('span', { class: 'correio-presente', title: 'Tem anexo para resgatar' }, icone('recompensas')) : ''),
       el('small', {}, `${REMETENTE[c.de] ?? c.de} · ${quando(c.criadoEm)}`));
   }
 
@@ -79,17 +83,17 @@ export function abrirCorreio(): void {
       c.texto ? el('p', { class: 'correio-texto' }, c.texto) : '',
       anexos,
       el('div', { class: 'correio-botoes' },
-        esperaResgate(c) ? el('button', { class: 'botao', onclick: () => void resgatarAgora({ id: c.id }) }, '🎁 Resgatar') : '',
+        esperaResgate(c) ? el('button', { class: 'botao', onclick: () => void resgatarAgora({ id: c.id }) }, iconeNoTexto('recompensas'), 'Resgatar') : '',
         !esperaResgate(c)
           ? el('button', { class: 'botao secundario', onclick: () => void agir(async () => {
               if (!(await confirmar('Apagar carta', 'Apagar esta carta?'))) return;
               await apagarCarta({ id: c.id });
               aberta = null;
-            }) }, '🗑️ Apagar')
+            }) }, iconeNoTexto('lixeira'), 'Apagar')
           : ''));
   }
 
-  const janela = abrirJanela('✉️ Correio', () => {
+  const janela = abrirJanela('Correio', () => {
     const cartas = cartasDoCorreio();
     const comAnexo = cartas.filter(esperaResgate).length;
     const lidas = cartas.filter((c) => c.lida && !esperaResgate(c)).length;

@@ -21,7 +21,8 @@ import { abrirGuia } from './ui/guia';
 import { abrirBolsa } from './ui/bolsa';
 import { abrirPC } from './ui/pc';
 import type { Destino, Navegar } from './main';
-import { irAteNaCidade, ouvirTela, ouvirTutorial, telaAtual, type EventoTutorial } from './tutorialEventos';
+import { definirEsperaDoTutorial, irAteNaCidade, ouvirTela, ouvirTutorial, telaAtual, type EventoTutorial } from './tutorialEventos';
+import { CONQUISTA_NA_TELA, PREMIOS_NA_TELA } from './ui/semBatalha';
 
 /** Para onde o botão da missão leva. */
 type Ir = { cidade: string; rotulo: string } | { tela: Destino; rotulo: string } | { abrir: 'bolsa' | 'pc'; rotulo: string };
@@ -267,10 +268,35 @@ function aoFazer(e: EventoTutorial): void {
     return;
   }
   const atual = tarefaAtual(save);
-  if (!atual || atual.tarefa.evento !== e) return;
-  save.tutorialTarefas = (save.tutorialTarefas ?? []).filter((x) => x !== atual.id);
+  if (atual && atual.tarefa.evento === e) {
+    save.tutorialTarefas = (save.tutorialTarefas ?? []).filter((x) => x !== atual.id);
+    salvar(save);
+    return avisar('✅ Missão do Professor concluída!', 'ok');
+  }
+  // feito antes de a missão chegar (visitar o Mercado, o Daycare…): já conta, e a missão não fica presa na fila
+  const naFila = (save.tutorialTarefas ?? []).filter((id) => LICOES.find((l) => l.conteudo === id)?.tarefa?.evento === e);
+  if (!naFila.length) return;
+  save.tutorialTarefas = (save.tutorialTarefas ?? []).filter((id) => !naFila.includes(id));
   salvar(save);
-  avisar('✅ Missão do Professor concluída!', 'ok');
+}
+
+/** Ações com presente do Professor: só depois de a missão delas chegar (senão o presente é gasto antes da hora). */
+const ESPERAM_A_MISSAO: EventoTutorial[] = ['plantouApricorn', 'craftBola', 'craftCharm'];
+function esperaDaMissao(e: EventoTutorial): string | null {
+  if (!ESPERAM_A_MISSAO.includes(e)) return null;
+  const save = carregarSave();
+  const licao = LICOES.find((l) => l.tarefa?.evento === e);
+  // save antigo sem o tutorial novo: nada a esperar
+  if (!save || !licao || !Array.isArray(save.tutorialVisto)) return null;
+  // ainda trancado pelo nível: quem barra é a tranca
+  if (nivelTreinador(save.xpTreinador ?? 0) < NIVEL_MINIMO[licao.conteudo]) return null;
+  const vista = save.tutorialVisto.includes(licao.conteudo);
+  const naFila = (save.tutorialTarefas ?? []).includes(licao.conteudo);
+  // missão já feita
+  if (vista && !naFila) return null;
+  // é a missão da vez
+  if (naFila && tarefaAtual(save)?.id === licao.conteudo) return null;
+  return 'Professor Carvalho: calma! Termine antes a missão que está no quadro; esta vem logo depois, com um presente.';
 }
 
 // ---------- quadro da missão (canto de baixo, por cima do jogo) ----------
@@ -328,8 +354,8 @@ function desenharMissao(save: Save): void {
 async function mostrarProxima(): Promise<void> {
   if (mostrando || !fila.length) return;
   mostrando = true;
-  // não aparece no meio de uma batalha nem com o guia aberto: espera fechar
-  while (document.querySelector('.batalha-fundo, .janela-guia')) await new Promise((r) => setTimeout(r, 1000));
+  // não aparece no meio de uma batalha, com o guia aberto nem em cima dos "Prêmios de hoje" ou do aviso de conquista
+  while (document.querySelector(`.batalha-fundo, .janela-guia, ${PREMIOS_NA_TELA}, ${CONQUISTA_NA_TELA}`)) await new Promise((r) => setTimeout(r, 1000));
   const fala = fila.shift()!;
   const save = carregarSave();
   if (save && LICOES.some((l) => l.conteudo === fala.id)) {
@@ -416,6 +442,7 @@ function balao(fala: Fala, aoFechar?: () => void, textoFim = 'Começar!'): void 
 export function vigiarTutorial(nav: Navegar): void {
   navegar = nav;
   ouvirTutorial(aoFazer);
+  definirEsperaDoTutorial(esperaDaMissao);
   ouvirTela(() => {
     const s = carregarSave();
     if (s) desenharMissao(s);

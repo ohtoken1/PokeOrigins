@@ -47,7 +47,7 @@ export function abrirBanco(save: Save, aoMudar: () => void = () => {}): void {
       const semCofre = !!cofre && (comprando ? cofre.gold < 1 : cofre.silver < GOLD_VALE_SILVER);
       falta.textContent = !cofre || maximo() >= 1 ? ''
         : semSaldo ? (comprando ? 'Você não tem Poké Dólares suficientes.' : 'Você não tem Origin Coins para vender.')
-        : semCofre ? (comprando ? 'O banco está sem Origin Coins agora. Ele só tem os Origin Coins que os jogadores venderam para ele.' : 'O banco está sem Poké Dólares agora.')
+        : semCofre ? (comprando ? 'O banco está sem Origin Coins agora. Ele só tem os Origin Coins que os jogadores venderam para ele.' : 'O cofre do banco não tem Poké Dólares suficientes para esta troca agora.')
         : '';
       campo.max = String(Math.max(1, maximo()));
       for (const b of rapidos) b.disabled = ocupado || maximo() < 1;

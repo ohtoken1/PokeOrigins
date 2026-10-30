@@ -8,16 +8,15 @@ import { especie } from '../../shared/batalha/pokemon';
 import { ehParadoxo, foraDosMapas } from '../../shared/formasRegionais';
 import { CHANCE_LENDARIO_NINHO, NIVEL_NINHO, PRECO_NINHO, PRECO_NINHO_VIP, premioNinho, roletaNinho } from '../../shared/eventosRegras';
 import { REGIOES } from '../../shared/regioes';
-import { TICKETS, itensDoGrupo } from '../../shared/tickets';
-import { TODOS_OS_ITENS } from '../../shared/loja';
 import { golpesPorNivel, hpMaximo, ppMaximo, type PokemonIndividual } from '../../shared/batalha/pokemon';
 import { Dex } from '@pkmn/sim';
 import { sortearIvs } from '../../shared/ovos';
 import { vipAtivo } from '../../shared/vip';
 import { api, ErroApi } from './conta';
 import { pokemonsDaRegiao } from './dados';
-import { TAMANHO_MAXIMO_TIME, novoPokemon, adotarSaveDoServidor, guardarNoPC, registrarCapturado, salvar, salvarAgora, type Save } from './estado';
+import { TAMANHO_MAXIMO_TIME, cabemPokemons, carregarSave, PC_CHEIO, novoPokemon, adotarSaveDoServidor, guardarNoPC, registrarCapturado, salvar, salvarAgora, type Save } from './estado';
 import { aoAvisoDoServidor } from './online';
+import { podeUsar } from './limiteNivel';
 import { confirmar } from './ui/confirmar';
 import { el } from './ui/dom';
 import { girarRoleta } from './ui/roleta';
@@ -89,7 +88,8 @@ export function vigiarNinho(): void {
     selo!.hidden = !n;
     if (!n) return;
     const min = Math.max(1, Math.ceil((n.servidor.fim - Date.now()) / 60_000));
-    selo!.replaceChildren(el('strong', {}, '🪺 Ninho de ', nomeComImagem(n.especieId, n.nome)), el('span', {}, `${REGIOES.find((r) => r.id === n.regiao)?.nome} · ${n.bioma.nome} · some em ${min} min`));
+    selo!.replaceChildren(el('strong', {}, '🪺 Ninho de ', nomeComImagem(n.especieId, n.nome)), el('span', {}, `${REGIOES.find((r) => r.id === n.regiao)?.nome} · ${n.bioma.nome} · some em ${min} min`),
+      carregarSave()?.regiao !== n.regiao ? el('small', {}, 'Em outra região: pegue o trem na estação da cidade.') : '');
   };
   ouvintes.add(desenhar);
   aoAvisoDoServidor((msg) => msg.t === 'eventos' && void atualizar());
@@ -124,25 +124,50 @@ function pokemonDoNinho(n: Ninho): PokemonIndividual {
   return p;
 }
 
-/** Entrega o prêmio da fatia da roleta (os itens que o servidor não conhece saem aqui). */
-function premioDaFatia(save: Save, fatia: number): void {
-  const { id, quantidade: q } = roletaNinho()[fatia] ?? { id: 'silver', quantidade: 0 };
-  const dar = (item: string, qtd = 1) => (save.itens[item] = (save.itens[item] ?? 0) + qtd);
-  const sorteia = (lista: string[]) => lista[Math.floor(Math.random() * lista.length)];
-  if (id === 'silver') save.silver += q;
-  else if (id === 'gold') save.gold += q;
-  else if (id === 'fragmentos') save.fragmentos = (save.fragmentos ?? 0) + q;
-  else if (id === 'mint') dar(sorteia(TODOS_OS_ITENS.filter((i) => i.categoria === 'mints').map((i) => i.id)), q);
-  else if (id === 'charm') dar(sorteia(itensDoGrupo('charm')), q);
-  else if (id === 'orb') dar(sorteia(TICKETS.map((t) => t.id)), q);
-  else dar(id, q);
-}
-
 /**
  * Botão "Enfrentar o ninho" no canto do mapa: só aparece no mapa (região + bioma) do ninho. `lutar` abre a batalha
  * (a tela do bioma cuida da pausa do mapa) e chama `aoFim(venceu)`.
  */
-export function botaoDoNinho(save: Save, regiao: string, bioma: string, cena: () => { mostrarNinho(p: { especie: number; semente: string; aoClicar: () => void } | null): void } | null, lutar: (equipe: PokemonIndividual[], nome: string, aoFim: (venceu: boolean) => void) => void, aoMudar: () => void): { elemento: HTMLElement; parar: () => void } {
+/** O que o fim da luta no ninho precisa saber (fica anotado com a batalha: recarregar a página volta para ela). */
+export interface LutaNoNinho { slot: number; lendario: boolean; nome: string; especieId: number }
+
+/** Fim da luta no ninho: o servidor confere, paga e gira a roleta. */
+export function fimDaLutaNoNinho(save: Save, n: LutaNoNinho, aoMudar: () => void): (venceu: boolean) => Promise<void> {
+  return async (venceu) => {
+    try {
+      const r = await api<{ venceu: boolean; fatia?: number; lendario?: boolean }>('POST', '/eventos/ninho/resultado', { slot: n.slot, venceu, lendario: n.lendario, especie: n.nome });
+      if (!r.venceu) return void (await atualizar());
+      save.silver += premioNinho();
+      if (await girarRoleta('Roleta do Ninho', roletaNinho(), r.fatia ?? 0, { perdeAoFechar: true })) {
+        // o prêmio da fatia é entregue pelo servidor (pode ser Origin Coins, que só ele dá)
+        try {
+          salvar(save);
+          await salvarAgora();
+          const p = await api<{ save: Save; versao: number }>('POST', '/eventos/ninho/premio');
+          adotarSaveDoServidor(p.save, p.versao);
+        } catch (e) {
+          avisar(e instanceof ErroApi ? e.message : 'Sem conexão: o prêmio da roleta não chegou.', 'erro');
+        }
+      } else avisar('Você fechou a roleta e perdeu o prêmio dela.', 'info');
+      if (r.lendario) {
+        const p = novoPokemon(n.especieId, 100, false);
+        p.origem = 'ticket';
+        p.obtido = 'ninho';
+        registrarCapturado(save, n.especieId, false);
+        if (save.time.length < TAMANHO_MAXIMO_TIME && podeUsar(save, p)) save.time.push(p);
+        else guardarNoPC(save, p);
+        avisar(`Sorte grande! O ${n.nome} do ninho quis ir com você!`, 'ok');
+      }
+      salvar(save);
+      aoMudar();
+    } catch (e) {
+      avisar(e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.', 'erro');
+    }
+    await atualizar();
+  };
+}
+
+export function botaoDoNinho(save: Save, regiao: string, bioma: string, cena: () => { mostrarNinho(p: { especie: number; semente: string; aoClicar: () => void } | null): void } | null, lutar: (equipe: PokemonIndividual[], nome: string, aoFim: (venceu: boolean) => void, luta: LutaNoNinho) => void, aoMudar: () => void): { elemento: HTMLElement; parar: () => void } {
   const botao = el('button', { class: 'botao-ninho', hidden: true }) as HTMLButtonElement;
   const desenhar = () => {
     const n = ninhoAtual();
@@ -155,6 +180,8 @@ export function botaoDoNinho(save: Save, regiao: string, bioma: string, cena: ()
   botao.onclick = async () => {
     const n = ninhoAtual();
     if (!n) return;
+    // ninho de lendário pode dar o Pokémon: com o PC cheio não entra (regra do dono)
+    if (n.lendario && !cabemPokemons(save)) return avisar(PC_CHEIO, 'erro');
     const preco = vipAtivo(save) ? PRECO_NINHO_VIP : PRECO_NINHO;
     if (!(await confirmar('Ninho', `Pagar ${preco.toLocaleString('pt-BR')} Poké Dólares para enfrentar o ${n.nome} nível ${NIVEL_NINHO}? Ele não pode ser capturado. Vencendo: ${premioNinho().toLocaleString('pt-BR')} + a roleta do Ninho${n.lendario ? ` e ${CHANCE_LENDARIO_NINHO * 100}% de chance de ganhar o ${n.nome}` : ''}.`))) return;
     try {
@@ -166,28 +193,8 @@ export function botaoDoNinho(save: Save, regiao: string, bioma: string, cena: ()
       avisar(e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.', 'erro');
       return;
     }
-    lutar([pokemonDoNinho(n)], n.nome, async (venceu) => {
-      try {
-        const r = await api<{ venceu: boolean; fatia?: number; lendario?: boolean }>('POST', '/eventos/ninho/resultado', { slot: n.servidor.slot, venceu, lendario: n.lendario, especie: n.nome });
-        if (!r.venceu) return void (await atualizar());
-        save.silver += premioNinho();
-        if (await girarRoleta('Roleta do Ninho', roletaNinho(), r.fatia ?? 0, { perdeAoFechar: true })) premioDaFatia(save, r.fatia ?? 0);
-        else avisar('Você fechou a roleta e perdeu o prêmio dela.', 'info');
-        if (r.lendario) {
-          const p = novoPokemon(n.especieId, 100, false);
-          p.origem = 'ticket';
-          registrarCapturado(save, n.especieId, false);
-          if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(p);
-          else guardarNoPC(save, p);
-          avisar(`Sorte grande! O ${n.nome} do ninho quis ir com você!`, 'ok');
-        }
-        salvar(save);
-        aoMudar();
-      } catch (e) {
-        avisar(e instanceof ErroApi ? e.message : 'Sem conexão com o servidor.', 'erro');
-      }
-      await atualizar();
-    });
+    const luta: LutaNoNinho = { slot: n.servidor.slot, lendario: n.lendario, nome: n.nome, especieId: n.especieId };
+    lutar([pokemonDoNinho(n)], n.nome, fimDaLutaNoNinho(save, luta, aoMudar), luta);
   };
   ouvintes.add(desenhar);
   desenhar();

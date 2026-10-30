@@ -3,7 +3,8 @@ import { SPRITE_OVO } from '../creche';
 import { pokemonPorId } from '../dados';
 import { treinadorParaUsar } from '../../../shared/treinador';
 import { podeUsar, textoDoLimite } from '../limiteNivel';
-import { casaLivre, numeroDeBoxes, organizarCasas, TAMANHO_BOX, TAMANHO_MAXIMO_TIME, TAMANHO_NOME_BOX, nomeDaBox, pokemonsDaBox, salvar, type PokemonDoJogador, type Save } from '../estado';
+import { MOTIVO_NA_TROCA, estaNaTroca } from '../trocas';
+import { aoAdotarSave, estaNoSave, casaLivre, numeroDeBoxes, organizarCasas, TAMANHO_BOX, TAMANHO_MAXIMO_TIME, TAMANHO_NOME_BOX, nomeDaBox, pokemonsDaBox, salvar, type PokemonDoJogador, type Save } from '../estado';
 import { tornarArrastavel } from './arrastar';
 import { fichaPokemon } from './detalhes';
 import { precoAvaliarIvs } from '../../../shared/loja';
@@ -57,7 +58,9 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
   /** Tira o Pokémon de onde estiver (time ou PC). */
   const remover = (p: PokemonDoJogador) => {
     const lista = noTime(p) ? save.time : save.caixa;
-    lista.splice(lista.indexOf(p), 1);
+    // indexOf -1 (versão velha do Pokémon) faria o splice tirar o ÚLTIMO da lista
+    const i = lista.indexOf(p);
+    if (i >= 0) lista.splice(i, 1);
   };
   /**
    * Coloca no PC, na box e na casa escolhidas (sem casa = a primeira livre). Casa ocupada: os dois trocam de lugar
@@ -105,6 +108,7 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
       }
       // time cheio: troca de lugar com quem está na vaga (o outro vai para o lugar dele na box)
       const outro = save.time[i];
+      if (!save.caixa.includes(p)) return false;
       save.caixa[save.caixa.indexOf(p)] = outro;
       outro.box = p.box;
       outro.casa = p.casa;
@@ -116,8 +120,8 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
       const box = tipo === 'box' ? boxAtual : Number(alvo.dataset.box);
       // trocar de lugar dentro da box ou com outro da box sempre cabe; vindo de fora, precisa de casa livre
       const cabe = pokemonsDaBox(save, box).filter((q) => q !== p).length < TAMANHO_BOX || (tipo === 'box' && !noTime(p));
-      if (!cabe) return false;
-      if (noTime(p) && save.time.length <= 1) return false;
+      if (!cabe) return (avisar('Esta box está cheia.', 'erro'), false);
+      if (noTime(p) && save.time.length <= 1) return (avisar('O time precisa ficar com pelo menos 1 Pokémon.', 'erro'), false);
       colocarNaBox(p, box, tipo === 'box' ? i : undefined);
       return true;
     }
@@ -132,9 +136,11 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
         el(
           'div',
           { class: 'soltar' },
-          el('div', { class: 'soltar-palco' }, spritePokemon(pokemonPorId(p.especieId), { shiny: p.shiny, palco: true, chao: 0.85 })),
-          el('p', {}, 'Soltar ', el('strong', {}, `${nome(p)} Nv. ${p.nivel}`), '? Ele vai embora e não volta mais.'),
+          el('div', { class: 'soltar-palco' }, p.ovo ? el('img', { class: 'casa-ovo', src: SPRITE_OVO, alt: 'Ovo' }) : spritePokemon(pokemonPorId(p.especieId), { shiny: p.shiny, palco: true, chao: 0.85 })),
+          el('p', {}, 'Soltar ', el('strong', {}, p.ovo ? 'Ovo' : `${nome(p)} Nv. ${p.nivel}`), '? Ele vai embora e não volta mais.'),
           p.item ? el('p', { class: 'meta' }, `O item ${nomeItemEquipado(p.item)} volta para a bolsa.`) : null,
+          // fusão (DNA Splicers…): o parceiro está guardado dentro dele e vai embora junto
+          p.fundido ? el('p', { class: 'aviso-bolsa' }, `Atenção: ${nome(p)} está fundido com ${pokemonPorId(p.fundido.especieId).nome}. Os dois vão embora juntos. Para ficar com o parceiro, separe-os antes com o Homem Suspeito.`) : null,
           el(
             'div',
             { class: 'soltar-botoes' },
@@ -144,6 +150,8 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
               {
                 class: 'botao perigo',
                 onclick: () => {
+                  // o jogo foi atualizado pelo servidor com esta pergunta aberta: não solta a versão velha
+                  if (!estaNoSave(save, p)) return void (janela.fechar(), depois());
                   if (p.item) save.itens[p.item] = (save.itens[p.item] ?? 0) + 1;
                   remover(p);
                   janela.fechar();
@@ -166,9 +174,10 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
         el(
           'div',
           { class: 'soltar' },
-          el('div', { class: 'soltar-grupo' }, ...lista.map((p) => el('div', { class: 'soltar-mini' }, spritePokemon(pokemonPorId(p.especieId), { shiny: p.shiny, animado: false }), el('small', {}, `${nome(p)} Nv. ${p.nivel}`)))),
+          el('div', { class: 'soltar-grupo' }, ...lista.map((p) => el('div', { class: 'soltar-mini' }, p.ovo ? el('img', { class: 'casa-ovo', src: SPRITE_OVO, alt: 'Ovo' }) : spritePokemon(pokemonPorId(p.especieId), { shiny: p.shiny, animado: false }), el('small', {}, p.ovo ? 'Ovo' : `${nome(p)} Nv. ${p.nivel}`)))),
           el('p', {}, `Soltar estes ${lista.length} Pokémon? Eles vão embora e não voltam mais.`),
           lista.some((p) => p.item) ? el('p', { class: 'meta' }, 'Os itens que eles seguravam voltam para a bolsa.') : null,
+          lista.some((p) => p.fundido) ? el('p', { class: 'aviso-bolsa' }, 'Atenção: há Pokémon fundidos na lista. O parceiro guardado dentro deles vai embora junto. Para ficar com ele, separe antes com o Homem Suspeito.') : null,
           el(
             'div',
             { class: 'soltar-botoes' },
@@ -177,6 +186,7 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
               class: 'botao perigo',
               onclick: () => {
                 for (const p of lista) {
+                  if (!estaNoSave(save, p)) continue;
                   if (p.item) save.itens[p.item] = (save.itens[p.item] ?? 0) + 1;
                   remover(p);
                 }
@@ -201,7 +211,7 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
     ordenados.forEach((p, k) => (p.casa = k));
   };
 
-  abrirJanela(
+  const janelaPc = abrirJanela(
     'PC de Pokémon',
     (janela) => {
       const refazer = () => janela.redesenhar();
@@ -373,7 +383,7 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
         if (p.item) {
           const item = p.item;
           acoes.push(
-            el('button', { class: 'botao secundario', onclick: () => ((save.itens[item] = (save.itens[item] ?? 0) + 1), (p.item = null), mudou(), refazer()) }, `Tirar ${nomeItemEquipado(item)}`),
+            el('button', { class: 'botao secundario', disabled: estaNaTroca(p.uid), title: estaNaTroca(p.uid) ? MOTIVO_NA_TROCA : '', onclick: () => ((save.itens[item] = (save.itens[item] ?? 0) + 1), (p.item = null), mudou(), refazer()) }, `Tirar ${nomeItemEquipado(item)}`),
           );
         }
         if (noTime(p)) {
@@ -383,7 +393,7 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
               {
                 class: 'botao secundario',
                 disabled: save.time.length <= 1 || daBox.length >= TAMANHO_BOX,
-                title: save.time.length <= 1 ? 'O time precisa de pelo menos 1 Pokémon' : '',
+                title: save.time.length <= 1 ? 'O time precisa ficar com pelo menos 1 Pokémon' : daBox.length >= TAMANHO_BOX ? 'Esta box está cheia' : '',
                 onclick: () => (colocarNaBox(p, boxAtual), mudou(), refazer()),
               },
               `Guardar em ${nomeDaBox(save, boxAtual)}`,
@@ -427,8 +437,8 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
             'button',
             {
               class: 'botao perigo',
-              disabled: !!p.trancado || (noTime(p) && save.time.length <= 1),
-              title: p.trancado ? 'Trancado: destranque para poder soltar' : '',
+              disabled: !!p.trancado || (noTime(p) && save.time.length <= 1) || estaNaTroca(p.uid),
+              title: p.trancado ? 'Trancado: destranque para poder soltar' : estaNaTroca(p.uid) ? MOTIVO_NA_TROCA : noTime(p) && save.time.length <= 1 ? 'O time precisa ficar com pelo menos 1 Pokémon' : '',
               onclick: () => confirmarSoltar(p, () => ((selecionado = null), mudou(), refazer())),
             },
             'Soltar',
@@ -492,8 +502,10 @@ export function abrirPC(save: Save, aoMudar: () => void): void {
       queueMicrotask(() => pc.closest('.janela')?.classList.toggle('com-ficha', verFicha && !!p));
       return verFicha && p ? el('div', { class: 'pc-com-ficha' }, el('div', { class: 'pc-ficha' }, fichaPokemon(p)), pc) : pc;
     },
-    { classe: 'janela-pc' },
+    { classe: 'janela-pc', aoFechar: () => pararDeOuvir() },
   );
+  // o servidor trocou o save: limpa a seleção (redesenhar já tira quem não está mais no save) e mostra o PC novo
+  const pararDeOuvir = aoAdotarSave(() => janelaPc.redesenhar());
 }
 
 /** { alvo: 'box', i: 3 } → { 'data-alvo': 'box', 'data-i': 3 } */

@@ -3,7 +3,10 @@
 import { DURACOES_EXPEDICAO, POKEMON_POR_EXPEDICAO, PRECO_EXPEDICAO, PRECO_EXPEDICAO_VIP, faixaDoPower, premiosDaExpedicao } from '../../shared/expedicao';
 import { power } from '../../shared/batalha/pokemon';
 import { vipAtivo } from '../../shared/vip';
-import { TAMANHO_MAXIMO_TIME, guardarNoPC, salvar, type PokemonDoJogador, type Save } from './estado';
+import { podeUsar } from './limiteNivel';
+import { TAMANHO_MAXIMO_TIME, aoSalvar, carregarSave, estaNoSave, guardarNoPC, salvar, type PokemonDoJogador, type Save } from './estado';
+import { caixaDeAvisos } from './outbreak';
+import { el } from './ui/dom';
 import { entregar } from './ui/ticket';
 
 export const precoDaExpedicao = (save: Save) => (vipAtivo(save) ? PRECO_EXPEDICAO_VIP : PRECO_EXPEDICAO);
@@ -16,6 +19,8 @@ export function comecarExpedicao(save: Save, escolhidos: PokemonDoJogador[], hor
   if (save.expedicao) return 'Já há uma expedição em andamento.';
   if (!DURACOES_EXPEDICAO.includes(horas)) return 'Duração inválida.';
   if (!escolhidos.length || escolhidos.length > POKEMON_POR_EXPEDICAO) return `Escolha de 1 a ${POKEMON_POR_EXPEDICAO} Pokémon.`;
+  // a janela pode estar com Pokémon de antes de o servidor atualizar o save (iam junto e ficavam no time também)
+  if (!escolhidos.every((p) => estaNoSave(save, p))) return 'Seu jogo foi atualizado agora há pouco. Escolha os Pokémon de novo.';
   if (save.time.filter((p) => !escolhidos.includes(p)).length < 1) return 'Deixe pelo menos um Pokémon no time.';
   const preco = precoDaExpedicao(save);
   if (save.silver < preco) return 'Poké Dólares insuficientes.';
@@ -37,10 +42,29 @@ export function buscarExpedicao(save: Save): string[] | null {
   const frases = entregar(save, { raridade: 'comum', shiny: [], pacote: Object.entries(itens).map(([id, quantidade]) => ({ tipo: 'item' as const, id, quantidade })) }, { nt: true });
   for (const p of e.pokemons) {
     delete p.box;
-    if (save.time.length < TAMANHO_MAXIMO_TIME) save.time.push(p);
+    // acima do limite de nível do treinador: volta para o PC (pedido do dono)
+    if (save.time.length < TAMANHO_MAXIMO_TIME && podeUsar(save, p)) save.time.push(p);
     else guardarNoPC(save, p);
   }
   delete save.expedicao;
   salvar(save);
   return frases;
+}
+
+/** Selo no canto (junto do Outbreak e do Ninho) com o tempo que falta para a expedição voltar. Uma vez, no main. */
+export function vigiarExpedicao(): void {
+  const selo = el('div', { class: 'aviso-viagem aviso-expedicao', role: 'status', hidden: true });
+  caixaDeAvisos().append(selo);
+  const desenhar = () => {
+    const e = carregarSave()?.expedicao;
+    selo.hidden = !e;
+    if (!e) return;
+    const falta = e.fim - Date.now();
+    const min = Math.max(1, Math.ceil(falta / 60_000));
+    selo.replaceChildren(el('strong', {}, '🧭 Expedição'),
+      el('span', {}, falta <= 0 ? 'voltou! Busque com o NPC Eventos.' : `volta em ${min >= 60 ? `${Math.floor(min / 60)} h ${min % 60} min` : `${min} min`}`));
+  };
+  aoSalvar(desenhar);
+  desenhar();
+  setInterval(desenhar, 30_000);
 }

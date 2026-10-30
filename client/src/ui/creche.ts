@@ -6,7 +6,7 @@ import { vipAtivo } from '../../../shared/vip';
 import { SPRITE_OVO, atualizarCreche, buscarChocado, casaisDe, chocandoNoDaycare, deixarCasal, deixarOvoParaChocar, ovosNoPC, retirarCasal, retirarOvo, vagasDaCreche } from '../creche';
 import { valorEmMoeda } from './moeda';
 import { pokemonPorId } from '../dados';
-import { salvar, type PokemonDoJogador, type Save } from '../estado';
+import { cabemPokemons, PC_CHEIO, salvar, type PokemonDoJogador, type Save } from '../estado';
 import { conteudoLiberado } from '../trancas';
 import { confirmar } from './confirmar';
 import { el, spritePokemon } from './dom';
@@ -83,9 +83,11 @@ export function abrirCreche(save: Save, aoMudar: () => void = () => {}): void {
             c.ovo ? el('strong', { class: 'creche-ovo' }, '🥚 Um ovo apareceu!') : el('span', {}, `Próximo ciclo em ${duracao(c.desde + ciclo - Date.now())}`),
             el('small', { class: 'meta' }, `Chance de shiny: ${Math.round(chanceShinyDoCasal(mae, pai) * 100)}%`),
             el('div', { class: 'creche-acoes' },
-              c.ovo ? el('button', { class: 'botao', onclick: () => (retirarOvo(save, i), mudou('O ovo foi para o seu PC.')) }, 'Retirar ovo') : null,
+              c.ovo ? el('button', { class: 'botao', onclick: () => (cabemPokemons(save) ? (retirarOvo(save, i), mudou('O ovo foi para o seu PC.')) : mudou(PC_CHEIO)) }, 'Retirar ovo') : null,
               el('button', {
                 class: 'botao secundario', onclick: async () => {
+                  // os dois (e o ovo pronto) precisam de lugar no time ou no PC
+                  if (!cabemPokemons(save, c.ovo ? 3 : 2)) return mudou(PC_CHEIO);
                   if (!(await confirmar('Retirar casal', `Retirar ${nome(mae)} e ${nome(pai)} do Daycare?${c.ovo ? ' O ovo pronto vai junto para o PC.' : ' O ciclo em andamento se perde.'}`))) return;
                   retirarCasal(save, i);
                   mudou('O casal voltou para você (time ou PC).');
@@ -108,7 +110,7 @@ export function abrirCreche(save: Save, aoMudar: () => void = () => {}): void {
         return el('div', { class: 'creche-ovo-linha' },
           el('img', { class: 'casa-ovo', src: SPRITE_OVO, alt: 'Ovo' }),
           el('span', {}, pronto ? '🐣 Chocou!' : `Chocando · pronto em ${duracao(c.pronto - Date.now())}`),
-          pronto ? el('button', { class: 'botao', onclick: () => { const p = buscarChocado(save, i); if (p) mudou(`Nasceu: ${nome(p)}! Foi para o seu ${save.time.includes(p) ? 'time' : 'PC'}.`); } }, 'Buscar') : null);
+          pronto ? el('button', { class: 'botao', onclick: () => { if (!cabemPokemons(save)) return mudou(PC_CHEIO); const p = buscarChocado(save, i); if (p) mudou(`Nasceu: ${nome(p)}! Foi para o seu ${save.time.includes(p) ? 'time' : 'PC'}.`); } }, 'Buscar') : null);
       }),
       doPC.length
         ? el('div', { class: 'creche-ovos' }, ...doPC.map((p) => el('div', { class: 'creche-ovo-linha' },

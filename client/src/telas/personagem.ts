@@ -1,5 +1,7 @@
 // Criação/edição do personagem (antes da roleta do inicial, ou depois pelo menu da região).
 // Camadas do LPC + detalhes Pokémon (estampa, Pokébolas no cinto) em lpc.ts. Cada sexo tem a sua lista de cabelos.
+import { ehAdministrador } from '../bonificacao';
+import { nomeReservado } from '../../../shared/nomes';
 import type { Tela } from '../main';
 import { carregarSave, salvar } from '../estado';
 import { falarProfessor } from '../tutorial';
@@ -145,6 +147,12 @@ export const telaPersonagem: Tela = (raiz, navegar) => {
     const nome = campoNome.value.trim().replace(/\s+/g, ' ');
     if (nome.length < 3) {
       avisoNome.textContent = 'Escolha um nome de 3 a 16 letras.';
+      campoNome.focus();
+      return;
+    }
+    // "ADM", "Staff", "Moderador"… só para a equipe (o servidor também confere)
+    if (nomeReservado(nome) && nome !== save?.aparencia?.nome && !ehAdministrador()) {
+      avisoNome.textContent = 'Este nome é reservado para a equipe do jogo. Escolha outro.';
       campoNome.focus();
       return;
     }

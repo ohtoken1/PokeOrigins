@@ -34,23 +34,39 @@ function adotarConcluidas(lista: MissaoConcluida[]): void {
   concluidas = new Map(lista.map((m) => [m.id, m]));
   ouvintes.forEach((f) => f());
 }
-/** Busca no servidor quais missões já foram concluídas. */
+// As missões vêm do servidor (ele sorteia com o mesmo código e é quem confere); sem a lista dele (antes de buscar,
+// sem conexão ou virou a rodada), o jogo sorteia aqui mesmo para mostrar.
+let doServidor: { rodada: number; missoes: MissaoQuadro[] } | null = null;
+let buscando = false;
+/** Busca no servidor as missões do quadro e quais já foram concluídas. */
 export async function atualizarQuadro(): Promise<void> {
+  if (buscando) return;
+  buscando = true;
   try {
-    adotarConcluidas((await api<{ concluidas: MissaoConcluida[] }>('GET', '/missoes')).concluidas);
+    const r = await api<{ missoes?: MissaoQuadro[]; concluidas: MissaoConcluida[] }>('GET', '/missoes');
+    const rodada = Number(r.missoes?.[0]?.id.split('-')[0]);
+    doServidor = r.missoes?.length && Number.isFinite(rodada) ? { rodada, missoes: r.missoes } : null;
+    adotarConcluidas(r.concluidas);
   } catch {
     // sem conexão: fica com a lista que tinha
+  } finally {
+    buscando = false;
   }
 }
 /** Ao abrir o jogo e a cada aviso do servidor ("alguém concluiu uma missão"). */
 export function vigiarQuadro(): void {
   void atualizarQuadro();
   aoAvisoDoServidor((msg) => {
-    if (msg.t === 'missoes') void atualizarQuadro();
+    // 'ajustes': a staff mudou os biomas, e as espécies comuns (e o quadro) mudam junto
+    if (msg.t === 'missoes' || msg.t === 'ajustes') void atualizarQuadro();
   });
 }
 
-export const missoesDeAgora = (agora = Date.now()): MissaoQuadro[] => missoesDoQuadro(agora, especiesComuns());
+export function missoesDeAgora(agora = Date.now()): MissaoQuadro[] {
+  if (doServidor?.rodada === rodadaDe(agora)) return doServidor.missoes;
+  if (doServidor) void atualizarQuadro(); // virou a rodada: busca a lista nova
+  return missoesDoQuadro(agora, especiesComuns());
+}
 /** Quem concluiu a missão (null = ainda está disponível). */
 export const quemConcluiu = (m: MissaoQuadro): MissaoConcluida | null => concluidas.get(m.id) ?? null;
 /** Fui eu? */
@@ -75,7 +91,7 @@ export async function concluirMissaoCom(save: Save, m: MissaoQuadro, p: PokemonD
   if (!cumpreMissao(m, p)) return p.natureza !== m.natureza ? `Este tem a Nature ${p.natureza}; a missão pede ${m.natureza}.` : 'Este Pokémon não tem o IV ou a qualidade que a missão pede.';
   try {
     await salvarAgora();
-    const r = await api<{ save: Save; versao: number; concluidas: MissaoConcluida[] }>('POST', '/missoes/concluir', { id: m.id, uid: p.uid, especie: m.especie, natureza: m.natureza, iv: m.iv, qualidade: m.qualidade });
+    const r = await api<{ save: Save; versao: number; concluidas: MissaoConcluida[] }>('POST', '/missoes/concluir', { id: m.id, uid: p.uid });
     adotarSaveDoServidor(r.save, r.versao);
     adotarConcluidas(r.concluidas);
     return '';

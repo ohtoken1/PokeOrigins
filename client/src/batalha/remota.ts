@@ -126,6 +126,10 @@ export class BatalhaRemota {
   get vencedor() {
     return this.foto.vencedor;
   }
+  /** Boss (calculado no servidor): dano causado e se acabou pelos turnos. */
+  get boss(): { dano: number; turnosAcabaram: boolean } | null {
+    return this.foto.boss ?? null;
+  }
   /** HP e PP não voltam para o save: o PvP usa cópias curadas do time. */
   sincronizar(): void {}
 }

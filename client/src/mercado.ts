@@ -65,7 +65,9 @@ export function vigiarMercado(): void {
       if (!r.acertos.length || !r.save || r.versao === undefined) return;
       adotarSaveDoServidor(r.save, r.versao);
       aviso.replaceChildren(el('strong', {}, 'Mercado negro'), ...r.acertos.map((a) =>
-        el('span', {}, a.motivo === 'vendido' ? `Vendeu ${nomeDoAnunciado(a)} por ${numero(a.valor ?? 0)} ${nomeDaMoeda(a.moeda, a.valor ?? 0)}` : `${nomeDoAnunciado(a)} voltou: ninguém comprou`)));
+        el('span', {}, a.motivo === 'vendido' ? `Vendeu ${nomeDoAnunciado(a)} por ${numero(a.valor ?? 0)} ${nomeDaMoeda(a.moeda, a.valor ?? 0)}`
+        : a.motivo === 'pcCheio' ? `${nomeDoAnunciado(a)} não foi vendido e está esperando: seu PC está cheio. Libere espaço no PC para receber.`
+        : `${nomeDoAnunciado(a)} voltou: ninguém comprou`)));
       aviso.hidden = false;
       clearTimeout(esconder);
       esconder = window.setTimeout(() => (aviso.hidden = true), 9000);

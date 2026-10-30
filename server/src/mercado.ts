@@ -11,14 +11,13 @@ import { ErroConta } from './contas.ts';
 import { contar } from './dashboard.ts';
 import { marcarConquistaNoSave } from './entregas.ts';
 import { avisar, avisarTodos } from './mundo.ts';
-import { guardarPokemon, type PokemonSave, type SaveMin } from './trocas.ts';
+import { cabePokemon, guardarPokemon, type PokemonSave, type SaveMin } from './trocas.ts';
 import {
-  ANUNCIOS_NA_LISTA, MAX_ANUNCIOS_POR_JOGADOR, PRECO_MAXIMO_MERCADO, QUANTIDADE_MAXIMA_MERCADO, VALIDADE_ANUNCIO_MS, valorDoVendedor,
-  type AcertoMercado, type AnuncioMercado, type MoedaMercado, type PokemonAnunciado, type TipoAnuncio,
+  ANUNCIOS_NA_LISTA, MAX_ANUNCIOS_POR_JOGADOR, PRECO_MAXIMO_MERCADO, QUANTIDADE_MAXIMA_MERCADO, VALIDADE_ANUNCIO_MS, valorDoVendedor, verPokemon,
+  type AcertoMercado, type AnuncioMercado, type MoedaMercado, type TipoAnuncio,
 } from '../../shared/mercado.ts';
 import { itemInegociavel } from '../../shared/naoTrocavel.ts';
-import { contarSkinNaBolsa, ehSkin, quantidadeNegociavel } from '../../shared/skins.ts';
-import { faixaDoIv, tierIv } from '../../shared/tierIv.ts';
+import { contarSkinNaBolsa, ehSkin, itemEquipadoNt, quantidadeNegociavel } from '../../shared/skins.ts';
 import { liberado, NIVEL_MINIMO } from '../../shared/trancas.ts';
 import { nivelTreinador } from '../../shared/treinador.ts';
 import { nomeDaMoeda } from '../../shared/moedas.ts';
@@ -43,28 +42,12 @@ function exigirNivel(conta: banco.Conta): void {
 
 const vipAgora = (save: Record<string, unknown>) => typeof save.vipAte === 'number' && save.vipAte > Date.now();
 
-/** O que o comprador vê do Pokémon: tier e IVs só se o vendedor avaliou; valor exato só para VIP. */
-function verPokemon(p: PokemonSave, vip: boolean): PokemonAnunciado {
-  const ivs = (p.ivs && typeof p.ivs === 'object' ? p.ivs : {}) as Record<string, number>;
-  const avaliado = !!(p.ivsRevelados || p.ivsFaixa);
-  const golpes = Array.isArray(p.golpes) ? (p.golpes as { id?: unknown }[]).map((g) => g?.id).filter((id): id is string => typeof id === 'string') : [];
-  const visto: PokemonAnunciado = {
-    especieId: p.especieId, nivel: p.nivel, shiny: !!p.shiny, genero: typeof p.genero === 'string' ? p.genero : 'N',
-    natureza: typeof p.natureza === 'string' ? p.natureza : '', habilidade: typeof p.habilidade === 'string' ? p.habilidade : '',
-    item: typeof p.item === 'string' ? p.item : null, golpes, avaliado,
-  };
-  if (!avaliado) return visto;
-  visto.tier = tierIv({ ivs } as Parameters<typeof tierIv>[0]);
-  if (vip || p.ivsRevelados) visto.ivs = ivs;
-  else visto.faixas = Object.fromEntries(Object.entries(ivs).map(([a, v]) => [a, faixaDoIv(v)]));
-  return visto;
-}
-
 function verAnuncio(l: banco.LinhaMercado, conta: banco.Conta, vip: boolean): AnuncioMercado {
   const g = JSON.parse(l.dados) as Guardado;
   return {
     id: l.id, tipo: l.tipo as TipoAnuncio, vendedor: l.vendedor_nome, meu: l.vendedor === conta.id, preco: l.preco, moeda: l.moeda as MoedaMercado, expiraEm: l.expira_em,
-    ...(g.pokemon ? { pokemon: verPokemon(g.pokemon, vip || l.vendedor === conta.id) } : {}),
+    // regra do dono: quem não é VIP vê só a faixa de IV, inclusive no próprio anúncio
+    ...(g.pokemon ? { pokemon: verPokemon(g.pokemon, vip) } : {}),
     ...(g.item ? { item: g.item } : {}),
     ...(g.quantidade ? { quantidade: g.quantidade } : {}),
   };
@@ -96,7 +79,7 @@ function comSave(conta: banco.Conta) {
 
 /** Põe o que estava guardado num anúncio dentro de um save. */
 function entregar(save: SaveMin, tipo: string, g: Guardado, deOutroJogador: boolean): void {
-  if (tipo === 'pokemon' && g.pokemon) guardarPokemon(save, g.pokemon, deOutroJogador);
+  if (tipo === 'pokemon' && g.pokemon) guardarPokemon(save, g.pokemon, deOutroJogador, 'mercado');
   else if (tipo === 'item' && g.item && g.quantidade) {
     const itens = (save.itens && typeof save.itens === 'object' ? save.itens : (save.itens = {})) as Record<string, number>;
     itens[g.item] = saldo(itens[g.item]) + g.quantidade;
@@ -106,9 +89,26 @@ function entregar(save: SaveMin, tipo: string, g: Guardado, deOutroJogador: bool
   else throw new ErroConta('Anúncio estragado.', 500);
 }
 
+/**
+ * Anunciar e tirar anúncio: uma vez a cada ESPERA_ANUNCIO_MS por conta. Cada um avisa todos os jogadores (as listas
+ * abertas buscam tudo de novo); sem espera, anunciar e tirar sem parar deixava o jogo de todos lento.
+ */
+const ESPERA_ANUNCIO_MS = 3000;
+const ultimaMudanca = new Map<number, number>();
+function semPressa(conta: banco.Conta): void {
+  const agora = Date.now();
+  if (agora - (ultimaMudanca.get(conta.id) ?? 0) < ESPERA_ANUNCIO_MS) throw new ErroConta('Espere alguns segundos antes de mexer nos anúncios de novo.', 429);
+  ultimaMudanca.set(conta.id, agora);
+}
+setInterval(() => {
+  const agora = Date.now();
+  for (const [id, em] of ultimaMudanca) if (agora - em > ESPERA_ANUNCIO_MS) ultimaMudanca.delete(id);
+}, 60_000).unref();
+
 /** Anuncia: `{ tipo: 'pokemon', uid }`, `{ tipo: 'item', item, quantidade }` ou `{ tipo: 'gold', quantidade }`, mais `preco` e `moeda`. */
 export function anunciar(conta: banco.Conta, dados: Record<string, unknown>) {
   exigirNivel(conta);
+  semPressa(conta);
   const tipo = dados.tipo;
   if (tipo !== 'pokemon' && tipo !== 'item' && tipo !== 'gold') throw new ErroConta('Anúncio inválido.');
   const preco = inteiro(dados.preco, 1, PRECO_MAXIMO_MERCADO);
@@ -128,6 +128,7 @@ export function anunciar(conta: banco.Conta, dados: Record<string, unknown>) {
       if (p.inegociavel) throw new ErroConta('Pokémon NT não pode ser vendido.', 409);
       if (p.fundido) throw new ErroConta('Separe a fusão antes de vender esse Pokémon.', 409);
       if (p.ovo) throw new ErroConta('Ovos não podem ser vendidos.', 409);
+      if (p.item && (itemInegociavel(p.item) || itemEquipadoNt(save, p.item))) throw new ErroConta('Este Pokémon está segurando um item NT. Tire o item antes de vender.', 409);
       if (p.trancado) throw new ErroConta('Pokémon trancado não pode ser vendido (destranque no PC).', 409);
       if (save.time.filter((x) => x !== p).length < 1) throw new ErroConta('Precisa ficar pelo menos 1 Pokémon no time.', 409);
       save.time = save.time.filter((x) => x !== p);
@@ -170,8 +171,11 @@ export function comprar(conta: banco.Conta, id: number) {
     const save = s as unknown as SaveMin;
     const moeda = l.moeda === 'gold' ? 'gold' : 'silver';
     if (saldo(save[moeda]) < l.preco) throw new ErroConta(`Você não tem ${nomeDaMoeda(moeda)} suficientes.`, 409);
+    const g = JSON.parse(l.dados) as Guardado;
+    // PC cheio: não compra (regra do dono: sem espaço, nenhum Pokémon novo entra)
+    if (l.tipo === 'pokemon' && g.pokemon && !cabePokemon(save, g.pokemon)) throw new ErroConta('Seu PC está cheio. Libere espaço no PC para comprar este Pokémon.', 409);
     save[moeda] = saldo(save[moeda]) - l.preco;
-    entregar(save, l.tipo, JSON.parse(l.dados) as Guardado, true);
+    entregar(save, l.tipo, g, true);
     if (!banco.venderAnuncioMercado(id)) throw new ErroConta('Este anúncio não está mais à venda.', 409);
     vendedor = l.vendedor;
     contar('mercado-vendas', 1, conta);
@@ -185,11 +189,14 @@ export function comprar(conta: banco.Conta, id: number) {
 
 /** O vendedor tira o anúncio: a coisa volta para ele. */
 export function cancelar(conta: banco.Conta, id: number) {
+  semPressa(conta);
   banco.mudarSaves([conta.id], ([s]) => {
     const l = banco.anuncioMercado(id);
     if (!l || l.vendedor !== conta.id) throw new ErroConta('Anúncio não encontrado.', 404);
     if (l.status !== 'ativo') throw new ErroConta('Este anúncio já foi vendido.', 409);
-    entregar(s as unknown as SaveMin, l.tipo, JSON.parse(l.dados) as Guardado, false);
+    const g = JSON.parse(l.dados) as Guardado;
+    if (l.tipo === 'pokemon' && g.pokemon && !cabePokemon(s as unknown as SaveMin, g.pokemon)) throw new ErroConta('Seu PC está cheio. Libere espaço no PC para tirar este anúncio.', 409);
+    entregar(s as unknown as SaveMin, l.tipo, g, false);
     banco.apagarAnuncioMercado(id);
   });
   avisarTodos({ t: 'mercado' });
@@ -212,6 +219,10 @@ export function receber(conta: banco.Conta) {
         acertos.push({ motivo: 'vendido', ...oQue, valor, moeda });
         // conquista "Eu sou um comerciante!": vendeu um Pokémon no Mercado negro
         if (l.tipo === 'pokemon') marcarConquistaNoSave(s, 'vendeuPokemon');
+      } else if (l.tipo === 'pokemon' && g.pokemon && !cabePokemon(save, g.pokemon)) {
+        // PC cheio: o Pokémon que venceu espera no Mercado (os pagamentos continuam chegando)
+        acertos.push({ motivo: 'pcCheio', ...oQue });
+        continue;
       } else {
         entregar(save, l.tipo, g, false);
         acertos.push({ motivo: 'venceu', ...oQue });

@@ -4,7 +4,7 @@
 import { especieComItem } from '../formas';
 import { megaPorForma } from '../megas';
 import { DYNAMAX_BAND, TERASTALLIZER_BAND } from '../loja';
-import { Battle, Dex } from '@pkmn/sim';
+import { Battle, Dex, PRNG } from '@pkmn/sim';
 import { AMIZADE_INICIAL, especie, ppComPPMax, ppMaximo, type PokemonIndividual } from './pokemon';
 import { aplicarRemedio, usarRemedio, type Item } from '../itens';
 import type { EfeitoBola } from '../bolas';
@@ -187,6 +187,26 @@ function aplicarEstado(sim: PokemonSim, p: PokemonIndividual) {
   }
 }
 
+/** Semente nova para uma batalha (o simulador e o nosso `aleatorio` saem dela: a mesma semente refaz a mesma batalha). */
+export const novaSemente = (): string => PRNG.generateSeed();
+
+/** Sorteador (0 a 1) que sai sempre igual para a mesma semente (mulberry32 em cima de um hash do texto). */
+export function aleatorioDaSemente(semente: string): () => number {
+  let h = 1779033703 ^ semente.length;
+  for (let i = 0; i < semente.length; i++) {
+    h = Math.imul(h ^ semente.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  let a = h >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 export class BatalhaSelvagem {
   private batalha: Battle;
   private lidas = 0;
@@ -264,6 +284,8 @@ export class BatalhaSelvagem {
      * (`lado`): o "jogador" é ele e o "selvagem" é o outro jogador. Não cria batalha nem escolhe pelo adversário.
      */
     readonly pvp: { batalha: Battle; lado: 'p1' | 'p2' } | null = null,
+    /** Semente do simulador (`novaSemente`): com ela e as mesmas ações, a batalha sai igual (voltar depois de recarregar). */
+    semente: string | null = null,
   ) {
     this.indices = time.map((_, i) => i).filter((i) => time[i].hp > 0);
     if (this.indices.length === 0) throw new Error('Nenhum Pokémon em condições de lutar');
@@ -273,7 +295,7 @@ export class BatalhaSelvagem {
       this.batalha = pvp.batalha;
       this.meuLado = pvp.lado;
     } else {
-      this.batalha = new Battle({ formatid: 'gen9customgame' as never });
+      this.batalha = new Battle({ formatid: 'gen9customgame' as never, ...(semente ? { seed: semente as never } : {}) });
       this.batalha.setPlayer('p1', { name: 'Jogador', team: this.indices.map((i) => conjuntoShowdown(time[i], `P${i}`)) as never });
       this.batalha.setPlayer('p2', { name: treinador ? treinador.nome : 'Selvagem', team: this.adversarios.map((p, k) => conjuntoShowdown(p, `S${k}`)) as never });
       // Dynamax: o simulador só libera na 8ª geração; religamos para o jogador (a Dynamax Band é conferida em `pedido`).
@@ -313,13 +335,22 @@ export class BatalhaSelvagem {
   private contarDanoNoBoss(): void {
     const linhas = this.batalha.log;
     for (; this.lidasBoss < linhas.length; this.lidasBoss++) {
-      const l = linhas[this.lidasBoss];
-      const m = /^\|-(damage|heal|sethp)\|p2a: [^|]*\|(\d+)\//.exec(l);
-      if (!m) continue;
-      const hp = Number(m[2]);
-      if (m[1] === 'damage' && !l.includes('[from]')) this.danoBoss += Math.max(0, this.hpVistoBoss - hp);
-      this.hpVistoBoss = hp;
+      // "|split|": a linha seguinte tem o HP exato e a outra, o que todos veem (no PvP, só a porcentagem): vale só a exata
+      if (linhas[this.lidasBoss].startsWith('|split|')) {
+        this.lidasBoss++;
+        this.lerLinhaDoBoss(linhas[this.lidasBoss] ?? '');
+        this.lidasBoss++;
+        continue;
+      }
+      this.lerLinhaDoBoss(linhas[this.lidasBoss]);
     }
+  }
+  private lerLinhaDoBoss(l: string): void {
+    const m = /^\|-(damage|heal|sethp)\|p2a: [^|]*\|(\d+)\//.exec(l);
+    if (!m) return;
+    const hp = Number(m[2]);
+    if (m[1] === 'damage' && !l.includes('[from]')) this.danoBoss += Math.max(0, this.hpVistoBoss - hp);
+    this.hpVistoBoss = hp;
   }
   /** Dano total causado no boss até agora. */
   get danoNoBoss(): number {
@@ -339,6 +370,8 @@ export class BatalhaSelvagem {
   get vencedor(): Lado | null {
     if (this.turnosAcabaram && !this.batalha.ended) return 'jogador';
     if (!this.batalha.ended) return null;
+    // empate (os dois caíram juntos ou os dois deixaram o tempo acabar): ninguém venceu
+    if (!this.batalha.winner) return null;
     return this.batalha.winner === this.eu.name ? 'jogador' : 'selvagem';
   }
 

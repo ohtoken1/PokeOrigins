@@ -43,6 +43,12 @@ export interface SafariAberto {
   /** já batalhou nesta sala (os Pokémon dela sumiram e a saída está aberta) */
   escolhido: boolean;
   salas: PokemonSafari[][];
+  /** quem o jogador escolheu em cada sala e como acabou (resumo na saída) */
+  escolhas?: EscolhaSafari[];
+}
+
+export interface EscolhaSafari extends PokemonSafari {
+  resultado: 'vitoria' | 'derrota' | 'captura' | 'fuga' | null;
 }
 
 export interface EstadoSafari {
@@ -89,8 +95,9 @@ export function ticketsDoDia(usadas: EntradaSafari[], vip: boolean, comprada: bo
 export function lerSafariAberto(v: unknown): SafariAberto | null {
   const aberto = v && typeof v === 'object' ? (v as Record<string, unknown>).aberto : null;
   if (!aberto || typeof aberto !== 'object') return null;
-  const { tipo, sala, escolhido, salas } = aberto as Record<string, unknown>;
+  const { tipo, sala, escolhido, salas, escolhas } = aberto as Record<string, unknown>;
   if (typeof tipo !== 'string' || !TIPOS_SAFARI.includes(tipo)) return null;
   if (typeof sala !== 'number' || !Number.isInteger(sala) || sala < 0 || sala >= SALAS_SAFARI) return null;
-  return { tipo, sala, escolhido: escolhido === true, salas: Array.isArray(salas) ? (salas as PokemonSafari[][]) : [] };
+  return { tipo, sala, escolhido: escolhido === true, salas: Array.isArray(salas) ? (salas as PokemonSafari[][]) : [],
+    ...(Array.isArray(escolhas) ? { escolhas: escolhas as EscolhaSafari[] } : {}) };
 }

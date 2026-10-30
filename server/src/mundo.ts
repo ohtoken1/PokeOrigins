@@ -42,10 +42,15 @@ interface Conexao {
   visual: Visual;
   mensagens: number;
   vivo: boolean;
-  /** horários das últimas mensagens de chat (anti-spam) */
-  chats: number[];
 }
 type Canal = 'local' | 'global' | 'cla';
+/** Horários das últimas mensagens de chat de cada conta (anti-spam; sobrevive a sair e entrar de novo). */
+const chatsDaConta = new Map<number, number[]>();
+/** Esquece quem já pode falar de novo (chamado a cada minuto pelo ping). */
+function limparChats(): void {
+  const agora = Date.now();
+  for (const [id, tempos] of chatsDaConta) if (tempos.every((t) => agora - t >= CHAT_JANELA_MS)) chatsDaConta.delete(id);
+}
 interface MensagemChat {
   t: 'chat';
   canal: Canal;
@@ -242,11 +247,15 @@ function receber(c: Conexao, texto: string): void {
   } catch {
     return;
   }
+  // "null", números, listas: não é mensagem do jogo
+  if (!msg || typeof msg !== 'object' || Array.isArray(msg)) return;
   if (!c.conta) {
     // primeira mensagem: o token da sessão (não vai na URL para não aparecer em registros)
     if (msg.t !== 'entrar' || typeof msg.token !== 'string') return void c.ws.close(4001, 'Sem sessão');
     const conta = contaDoToken(msg.token);
     if (!conta) return void c.ws.close(4001, 'Sessão expirada');
+    // conta banida não entra no mundo (banir já fecha a conexão; isto cobre uma sessão que tenha sobrado)
+    if (banco.banimentoAtivo(conta.id)) return void c.ws.close(4003, 'Conta banida');
     // pré-registro sem acesso não entra no mundo (server/src/preRegistro.ts)
     if (!temAcesso(conta)) return void c.ws.close(4005, 'Pré-registro');
     // uma conexão por conta: a mais nova fica (a outra aba é avisada e para de reconectar)
@@ -310,9 +319,10 @@ function falar(c: Conexao, canal: unknown, bruto: unknown): void {
   if (canal === 'cla' && !cla) return erro('Você ainda não está em uma guilda.');
   if (canal === 'local' && !c.sala) return erro('Entre num mapa para falar no chat local.');
   const agora = Date.now();
-  c.chats = c.chats.filter((t) => agora - t < CHAT_JANELA_MS);
-  if (c.chats.length >= CHAT_RAJADA) return erro('Calma! Espere um pouco para mandar outra mensagem.');
-  c.chats.push(agora);
+  // anti-spam por CONTA (antes era por conexão e zerava ao sair e entrar de novo)
+  const recentes = (chatsDaConta.get(c.conta!.id) ?? []).filter((t) => agora - t < CHAT_JANELA_MS);
+  if (recentes.length >= CHAT_RAJADA) return erro('Calma! Espere um pouco para mandar outra mensagem.');
+  chatsDaConta.set(c.conta!.id, [...recentes, agora]);
   const m: MensagemChat = { t: 'chat', canal, id: c.conta!.id, usuario: c.conta!.usuario, nome: c.nome, texto, em: agora };
   if (cla) {
     const lista = historicoCla.get(cla.id) ?? [];
@@ -338,10 +348,18 @@ export function ligarMundo(servidor: Server): void {
     wss.handleUpgrade(req, socket, cabeca, (ws) => wss.emit('connection', ws, req));
   });
   wss.on('connection', (ws: WebSocket) => {
-    const c: Conexao = { ws, conta: null, nome: '', sala: null, x: 0, y: 0, dir: 2, visual: { aparencia: null, seguidor: null }, mensagens: 0, vivo: true, chats: [] };
+    const c: Conexao = { ws, conta: null, nome: '', sala: null, x: 0, y: 0, dir: 2, visual: { aparencia: null, seguidor: null }, mensagens: 0, vivo: true };
     // sem se identificar em 10 s: fecha
     const prazo = setTimeout(() => !c.conta && ws.close(4001, 'Sem sessão'), 10_000);
-    ws.on('message', (dados) => receber(c, String(dados)));
+    ws.on('message', (dados) => {
+      try {
+        receber(c, String(dados));
+      } catch (e) {
+        console.error('Mensagem do /ws falhou', e);
+      }
+    });
+    // mensagem acima do limite e outros erros da conexão: a biblioteca fecha a conexão sozinha; sem este ouvinte o servidor caía
+    ws.on('error', () => {});
     ws.on('pong', () => (c.vivo = true));
     ws.on('close', () => {
       clearTimeout(prazo);
@@ -361,6 +379,7 @@ export function ligarMundo(servidor: Server): void {
     }
   }, 1000).unref();
   setInterval(() => {
+    limparChats();
     for (const ws of wss.clients) {
       const c = (ws as WebSocket & { conexao?: Conexao }).conexao;
       if (!c) continue;

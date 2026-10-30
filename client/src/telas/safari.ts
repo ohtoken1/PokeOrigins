@@ -6,11 +6,13 @@ import { aplicarLiderNoSelvagem } from '../../../shared/campo';
 import { SALAS_SAFARI } from '../../../shared/safari';
 import { nomeTipo } from '../../../shared/traducao';
 import { abrirBatalha } from '../batalha/telaBatalha';
+import { batalhaParaRetomar, descartarBatalha, opcoesDaRetomada, type BatalhaAberta } from '../batalha/retomada';
+import type { PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { pokemonPorId } from '../dados';
 import { carregarSave, novoPokemon, salvar, usarSave } from '../estado';
 import { sortearIvs } from '../../../shared/ovos';
 import { IV_MIN_SHINY, hpMaximo } from '../../../shared/batalha/pokemon';
-import { IVS_MINIMOS_SAFARI } from '../../../shared/safari';
+import { IVS_MINIMOS_SAFARI, type EscolhaSafari } from '../../../shared/safari';
 import type { BiomaScene, OpcoesBioma } from '../jogo/BiomaScene';
 import { mostrarJogo } from '../jogo/jogoUnico';
 import type { Tela } from '../main';
@@ -18,8 +20,8 @@ import { aparenciaDoSave } from '../personagem/aparencia';
 import { montarPersonagem } from '../personagem/lpc';
 import { biomaDoTipo, fecharSafari, guardarSafari, prepararSafari } from '../safari';
 import { montarChat } from '../ui/chat';
-import { el } from '../ui/dom';
-import { aoMudarJanelas } from '../ui/janela';
+import { el, spritePokemon } from '../ui/dom';
+import { abrirJanela, aoMudarJanelas } from '../ui/janela';
 import { acompanharTime, painelTime } from '../ui/time';
 
 export const telaSafari: Tela = (raiz, navegar) => {
@@ -27,7 +29,11 @@ export const telaSafari: Tela = (raiz, navegar) => {
   if (!save) return navegar({ tela: 'inicial' });
   usarSave(save);
   const aberto = prepararSafari(save);
-  if (!aberto) return navegar({ tela: 'cidade' });
+  if (!aberto) {
+    // a batalha anotada era de um Safari que não existe mais
+    if (batalhaParaRetomar(save, 'safari')) (descartarBatalha(save), salvar(save));
+    return navegar({ tela: 'cidade' });
+  }
   const bioma = biomaDoTipo(aberto.tipo);
   document.body.dataset.fundo = bioma.id;
 
@@ -59,11 +65,13 @@ export const telaSafari: Tela = (raiz, navegar) => {
   atualizarTextos();
 
   let saindo = false;
-  const sair = () => {
+  const sair = (resumo = false) => {
     if (saindo) return;
     saindo = true;
+    const escolhas = aberto.escolhas ?? [];
     fecharSafari(save);
     navegar({ tela: 'cidade' });
+    if (resumo && escolhas.length) mostrarResumo(escolhas);
   };
   let confirmando = false;
   const botaoSair = el('button', {
@@ -127,6 +135,8 @@ export const telaSafari: Tela = (raiz, navegar) => {
         if (!save.time.some((p) => p.hp > 0)) return avisar('Seu time está desmaiado. Cure no Centro Pokémon e volte: o Safari fica guardado.');
         // a escolha vale a partir daqui (fugir ou perder também gasta a sala)
         aberto.escolhido = true;
+        const escolha: EscolhaSafari = { ...sorteado, resultado: null };
+        aberto.escolhas = [...(aberto.escolhas ?? []), escolha];
         guardarSafari(save, aberto);
         if (!save.vistos.includes(sorteado.id)) save.vistos.push(sorteado.id);
         cena()?.escolherNoSafari();
@@ -137,20 +147,7 @@ export const telaSafari: Tela = (raiz, navegar) => {
         selvagem.hp = hpMaximo(selvagem);
         // Synchronize (Nature) e Cute Charm (gênero) do primeiro do time valem como nos mapas
         aplicarLiderNoSelvagem(selvagem, save.time[0]);
-        emBatalha = true;
-        atualizarPausa();
-        abrirBatalha({
-          save,
-          bioma,
-          selvagem,
-          aoTerminar: (resultado) => {
-            // perdeu: o Safari acaba (o time é curado, como nos mapas)
-            if (resultado === 'derrota') return sair();
-            atualizarTime();
-            emBatalha = false;
-            atualizarPausa();
-          },
-        });
+        lutar(selvagem, escolha);
       },
       aoMudarSala: (sala) => {
         aberto.sala = sala;
@@ -158,9 +155,44 @@ export const telaSafari: Tela = (raiz, navegar) => {
         guardarSafari(save, aberto);
         atualizarTextos();
       },
-      aoSair: sair,
+      aoSair: () => sair(true),
     },
   };
+  /** Batalha com o Pokémon escolhido na sala (ou a volta para ela depois de recarregar, `retomada`). */
+  function lutar(selvagem: PokemonIndividual, escolha: EscolhaSafari, retomada?: BatalhaAberta) {
+    emBatalha = true;
+    atualizarPausa();
+    abrirBatalha({
+      save: save!,
+      bioma,
+      selvagem,
+      contexto: { tipo: 'safari' },
+      ...(retomada ? opcoesDaRetomada(retomada) : {}),
+      aoTerminar: (resultado) => {
+        escolha.resultado = resultado;
+        guardarSafari(save!, aberto!);
+        // perdeu: o Safari acaba (o time é curado, como nos mapas)
+        if (resultado === 'derrota') return sair(true);
+        atualizarTime();
+        emBatalha = false;
+        atualizarPausa();
+      },
+    });
+  }
+  // recarregou a página no meio da batalha: volta para ela (a escolha da sala já estava feita) quando o mapa ficar pronto
+  const aoProntoAntes = opcoes.aoPronto;
+  let retomou = false;
+  opcoes.aoPronto = () => {
+    aoProntoAntes?.();
+    if (retomou) return;
+    retomou = true;
+    const anotada = batalhaParaRetomar(save, 'safari');
+    if (!anotada) return;
+    const escolha = aberto.escolhas?.[aberto.escolhas.length - 1];
+    if (!aberto.escolhido || !escolha || escolha.resultado) return (descartarBatalha(save), salvar(save));
+    lutar(anotada.selvagem, escolha, anotada);
+  };
+
   const jogo = mostrarJogo(areaJogo, opcoes);
   cena = jogo.cena;
 
@@ -177,3 +209,22 @@ export const telaSafari: Tela = (raiz, navegar) => {
     jogo.tirar();
   };
 };
+
+const TEXTO_RESULTADO: Record<string, string> = {
+  captura: '✅ Capturado', vitoria: '⚔️ Derrotado', fuga: '💨 Fugiu', derrota: '❌ Você perdeu',
+};
+
+/** Resumo na saída do Safari: os Pokémon escolhidos em cada sala e como acabou. */
+function mostrarResumo(escolhas: EscolhaSafari[]): void {
+  abrirJanela('Resumo do Safari', () =>
+    el('div', { class: 'safari-resumo' },
+      ...escolhas.map((e, i) => {
+        const pk = pokemonPorId(e.id);
+        return el('div', { class: 'safari-resumo-item' },
+          el('small', {}, `Sala ${i + 1}`),
+          spritePokemon(pk, { shiny: e.shiny, animado: false }),
+          el('strong', {}, `${e.shiny ? '★ ' : ''}${pk.nome}`),
+          el('span', {}, `Nv. ${e.nivel}`),
+          el('span', {}, e.resultado ? TEXTO_RESULTADO[e.resultado] : '—'));
+      })));
+}

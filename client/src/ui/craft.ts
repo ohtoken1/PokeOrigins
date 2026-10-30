@@ -37,7 +37,8 @@ import { el } from './dom';
 import { iconeItem } from './iconeItem';
 import { abrirJanela } from './janela';
 import { valorEmMoeda } from './moeda';
-import { tutorialFez } from '../tutorialEventos';
+import { esperaDoTutorial, tutorialFez } from '../tutorialEventos';
+import { avisar } from './avisos';
 
 type Aba = 'bolas' | 'charms' | 'canteiros';
 const ABAS: { id: Aba; nome: string; tranca: ConteudoTrancado }[] = [
@@ -95,6 +96,8 @@ export function abrirCraft(save: Save, aoMudar: () => void = () => {}): void {
             class: 'botao', disabled: maximo < 1,
             onclick: async () => {
               const n = Math.max(1, Math.min(maximo, Math.floor(Number(campo.value) || 1)));
+              const espera = esperaDoTutorial('craftBola');
+              if (espera) return avisar(espera, 'info');
               if (!(await confirmar('Criar Pokébolas', `Gastar ${n}× ${ids.map(nomeItem).join(' + ')} e ${numero(n * preco)} Poké Dólares para criar ${n * BOLAS_POR_CRAFT} ${nomeItem(bola)}?`))) return;
               if (Math.min(...ids.map((id) => tenho(save, id))) < n || save.silver < n * preco) return;
               ids.forEach((id) => gastar(save, id, n));
@@ -124,6 +127,8 @@ export function abrirCraft(save: Save, aoMudar: () => void = () => {}): void {
           el('button', {
             class: 'botao', disabled: !pode,
             onclick: async () => {
+              const espera = esperaDoTutorial('craftCharm');
+              if (espera) return avisar(espera, 'info');
               if (!(await confirmar('Criar Charm', `Gastar ${BERRIES_POR_CHARM} ${nomeItem(r.berry)}, ${ENERGIES_POR_CHARM} ${nomeItem(r.energia)} e ${numero(PRECO_CRAFT_CHARM)} Poké Dólares para criar ${sai} ${nomeItem(r.charm)}?`))) return;
               if (tenho(save, r.berry) < BERRIES_POR_CHARM || tenho(save, r.energia) < ENERGIES_POR_CHARM || save.silver < PRECO_CRAFT_CHARM) return;
               gastar(save, r.berry, BERRIES_POR_CHARM);
@@ -152,6 +157,9 @@ export function abrirCraft(save: Save, aoMudar: () => void = () => {}): void {
     const secos = meus.filter((c) => canteiroSeco(c, agora, vip));
 
     const plantarEm = async (lista: Canteiro[]) => {
+      // antes de a missão dos canteiros chegar não planta (a semente de presente é dela)
+      const espera = esperaDoTutorial('plantouApricorn');
+      if (espera) return avisar(espera, 'info');
       // sementes de presente (tutorial do Professor) são usadas antes
       const gratis = Math.min(save.sementesGratis ?? 0, lista.length);
       const custo = (lista.length - gratis) * PRECO_SEMENTE;

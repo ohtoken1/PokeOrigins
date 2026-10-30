@@ -1,11 +1,13 @@
 // Servidor do PokeOrigins: contas, login e save na nuvem. Em produção (Railway) também entrega o site já montado
 // (client/dist); no desenvolvimento o Vite manda as chamadas /api para cá.
+import { nomeReservado } from '../../shared/nomes.ts';
 import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { extname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as banco from './banco.ts';
 import { cadastrar, contaDoToken, entrar, ErroConta, publica, sair } from './contas.ts';
+import { lerComoConheceu } from '../../shared/comoConheceu.ts';
 import * as trocas from './trocas.ts';
 import * as amigos from './amigos.ts';
 import * as cla from './cla.ts';
@@ -32,6 +34,8 @@ import * as pvp from './pvp.ts';
 import * as torneio from './torneio.ts';
 import * as ranqueado from './ranqueado.ts';
 import * as lojas from './lojas.ts';
+import * as tickets from './tickets.ts';
+import * as protecaoSave from './protecaoSave.ts';
 import * as dashboard from './dashboard.ts';
 import { avisarDaStaff, estaOnline, ligarMundo, nomeMudou } from './mundo.ts';
 import { tituloAtivo } from '../../shared/conquistas.ts';
@@ -95,7 +99,27 @@ async function lerCorpo(req: IncomingMessage, limite = TAMANHO_MAX_PEDIDO_PEQUEN
 }
 
 const tokenDe = (req: IncomingMessage) => req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];
-const ipDe = (req: IncomingMessage) => String(req.headers['x-forwarded-for'] ?? '').split(',')[0].trim() || req.socket.remoteAddress || '?';
+// IP de quem pediu. O X-Forwarded-For é uma lista: o começo pode ser inventado por quem pede; o ÚLTIMO valor é o que o
+// proxy do Railway acrescentou (o endereço que chegou nele). Sem proxy (no computador), vale o endereço da conexão.
+const ipDe = (req: IncomingMessage) => String(req.headers['x-forwarded-for'] ?? '').split(',').map((s) => s.trim()).filter(Boolean).at(-1) || req.socket.remoteAddress || '?';
+
+/**
+ * Formato mínimo de um save (PUT /api/save). Um save que não é objeto (ex.: uma lista) passava e apagava os campos
+ * que o servidor protege; um time com Pokémon vazio quebrava as conferências do Torneio/Ranqueado e o perfil.
+ * O nome de treinador longo demais é cortado (o jogo só deixa criar até 16 letras).
+ */
+const NOME_TREINADOR_MAX = 16;
+const ehObjeto = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+const ehPokemon = (p: unknown) => ehObjeto(p) && Number.isSafeInteger(p.especieId) && (p.especieId as number) > 0;
+function saveTemFormato(save: unknown): save is Record<string, unknown> {
+  if (!ehObjeto(save)) return false;
+  if (!Array.isArray(save.time) || save.time.length < 1 || save.time.length > 6 || !save.time.every(ehPokemon)) return false;
+  if (save.caixa !== undefined && (!Array.isArray(save.caixa) || !save.caixa.every(ehPokemon))) return false;
+  if (save.aparencia !== undefined && save.aparencia !== null && !ehObjeto(save.aparencia)) return false;
+  const ap = save.aparencia as Record<string, unknown> | null | undefined;
+  if (ap && typeof ap.nome === 'string' && ap.nome.length > NOME_TREINADOR_MAX) ap.nome = ap.nome.slice(0, NOME_TREINADOR_MAX);
+  return true;
+}
 
 function exigirConta(req: IncomingMessage): banco.Conta {
   const conta = contaDoToken(tokenDe(req));
@@ -114,12 +138,17 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   if (metodo === 'POST' && caminho === '/api/cadastro') {
     limitar(ipDe(req));
     const c = await lerCorpo(req);
-    // código de criador (opcional) conferido ANTES de criar a conta; `via` = veio do link /c/CODIGO ou foi digitado
+    // "Por onde conheceu o jogo?" (obrigatório) e o código de criador, conferidos ANTES de criar a conta.
+    // Resposta "Criador de conteúdo": o código é o detalhe e precisa existir. Outra resposta: só vale o código que veio
+    // do link /c/CODIGO (inválido = ignorado). `via` = veio do link ou foi digitado.
+    const origem = lerComoConheceu(c.comoConheceu, c.comoConheceuDetalhe);
+    if (typeof origem === 'string') throw new ErroConta(origem);
     const via = c.via === 'link' ? 'link' : 'codigo';
-    const codigo = preRegistro.lerCodigo(c.codigo, via);
+    const codigo = origem.tipo === 'criador' ? preRegistro.lerCodigo(origem.detalhe, 'codigo') : preRegistro.lerCodigo(c.codigo, 'link');
     const r = await cadastrar(c.usuario, c.email, c.senha, c.manter === true);
+    banco.guardarComoConheceu(r.conta.id, origem.tipo, codigo && origem.tipo === 'criador' ? codigo : origem.detalhe);
     preRegistro.aoCadastrar(r.conta.id, codigo);
-    parcerias.ligarConta(r.conta.id, codigo, via);
+    parcerias.ligarConta(r.conta.id, codigo, origem.tipo === 'criador' ? via : 'link');
     return responder(res, 201, r);
   }
   if (metodo === 'POST' && caminho === '/api/entrar') {
@@ -150,7 +179,7 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
   if (metodo === 'PUT' && caminho === '/api/save') {
     const conta = exigirConta(req);
     const c = await lerCorpo(req, TAMANHO_MAX_PEDIDO);
-    if (!c.save || typeof c.save !== 'object' || typeof c.versao !== 'number') throw new ErroConta('Save inválido.');
+    if (typeof c.versao !== 'number' || !saveTemFormato(c.save)) throw new ErroConta('Save inválido.');
     // conta comum: região e viagem só mudam pelo trem (server/src/viagem.ts)
     const guardado = banco.lerSave(conta.id);
     const antes = guardado ? (JSON.parse(guardado.dados) as Record<string, unknown>) : null;
@@ -159,6 +188,13 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     safari.proteger(c.save as Record<string, unknown>, antes);
     lojas.proteger(c.save as Record<string, unknown>, antes);
     tutorial.proteger(c.save as Record<string, unknown>, antes);
+    // Origin Coins, VIP, títulos, pacotes, NT e o Passe: só o servidor sobe (server/src/protecaoSave.ts)
+    protecaoSave.proteger(conta, c.save as Record<string, unknown>, antes);
+    // nome reservado à equipe ("ADM", "Staff"…): conta comum fica com o nome que tinha (o jogo já não deixa escolher)
+    const ap = (c.save as Record<string, unknown>).aparencia as Record<string, unknown> | null | undefined;
+    const nomeAntes = ((antes?.aparencia ?? null) as Record<string, unknown> | null)?.nome;
+    if (!conta.admin && ap && typeof ap.nome === 'string' && ap.nome !== nomeAntes && nomeReservado(ap.nome))
+      ap.nome = typeof nomeAntes === 'string' ? nomeAntes : conta.usuario.slice(0, NOME_TREINADOR_MAX);
     const texto = JSON.stringify(c.save);
     if (texto.length > TAMANHO_MAX_SAVE) throw new ErroConta('Save grande demais.', 413);
     const versao = banco.gravarSave(conta.id, texto, c.versao);
@@ -245,6 +281,15 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     exigirConta(req);
     return responder(res, 200, { cofre: cambio.cofre() });
   }
+  if (caminho === '/api/admin/meu-ip' && metodo === 'GET') {
+    if (!exigirConta(req).admin) throw new ErroConta('Só administradores.', 403);
+    return responder(res, 200, { ip: ipDe(req), xForwardedFor: req.headers['x-forwarded-for'] ?? null, xRealIp: req.headers['x-real-ip'] ?? null, conexao: req.socket.remoteAddress ?? null });
+  }
+  if (caminho === '/api/admin/cofre' && metodo === 'GET') return responder(res, 200, cambio.verCofreStaff(exigirConta(req)));
+  if (caminho === '/api/admin/cofre' && metodo === 'POST') {
+    const conta = exigirConta(req);
+    return responder(res, 200, cambio.definirCofre(conta, await lerCorpo(req)));
+  }
   if (caminho === '/api/cambio' && metodo === 'POST') {
     const conta = exigirConta(req);
     return responder(res, 200, cambio.trocar(conta, await lerCorpo(req)));
@@ -324,6 +369,13 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
       return responder(res, 200, f(conta, await lerCorpo(req)));
     }
 
+  // ---- Orbs, Passe de batalha e Kit de pré-registro: sorteados e entregues no servidor (server/src/tickets.ts) ----
+  for (const [rota, f] of [['/api/tickets/abrir', tickets.abrir], ['/api/passe/resgatar', tickets.resgatarPasse], ['/api/kit-pre-registro/abrir', tickets.abrirKitPreRegistro]] as const)
+    if (caminho === rota && metodo === 'POST') {
+      const conta = exigirConta(req);
+      return responder(res, 200, f(conta, await lerCorpo(req)));
+    }
+
   // ---- presentes do tutorial (server/src/tutorial.ts) ----
   if (caminho === '/api/tutorial/presente' && metodo === 'POST') {
     const conta = exigirConta(req);
@@ -374,7 +426,7 @@ async function api(req: IncomingMessage, res: ServerResponse, caminho: string): 
     const conta = exigirConta(req);
     return responder(res, 200, eventos.comprarBilhetes(conta, await lerCorpo(req)));
   }
-  for (const [rota, f] of [['/api/eventos/ninho/entrar', eventos.entrarNoNinho], ['/api/eventos/ninho/resultado', eventos.resultadoDoNinho], ['/api/eventos/captura/iniciar', eventos.iniciarCaptura], ['/api/eventos/captura/registrar', eventos.registrarCaptura], ['/api/eventos/ligar', eventos.ligarEvento], ['/api/eventos/boss/iniciar', eventos.iniciarBoss], ['/api/eventos/boss/encerrar', eventos.encerrarBoss], ['/api/eventos/boss/entrar', eventos.entrarNoBoss], ['/api/eventos/boss/resultado', eventos.resultadoDoBoss]] as const)
+  for (const [rota, f] of [['/api/eventos/ninho/entrar', eventos.entrarNoNinho], ['/api/eventos/ninho/resultado', eventos.resultadoDoNinho], ['/api/eventos/ninho/premio', eventos.pegarPremioDoNinho], ['/api/eventos/captura/iniciar', eventos.iniciarCaptura], ['/api/eventos/captura/registrar', eventos.registrarCaptura], ['/api/eventos/ligar', eventos.ligarEvento], ['/api/eventos/boss/iniciar', eventos.iniciarBoss], ['/api/eventos/boss/encerrar', eventos.encerrarBoss], ['/api/eventos/boss/entrar', eventos.entrarNoBoss]] as const)
     if (caminho === rota && metodo === 'POST') {
       const conta = exigirConta(req);
       return responder(res, 200, f(conta, await lerCorpo(req)));
@@ -527,7 +579,8 @@ function perfilPublico(save: Record<string, unknown>) {
     insignias: save.insignias ?? [],
     vistos: save.vistos ?? [],
     capturados: save.capturados ?? [],
-    estatisticas: save.estatisticas ?? null,
+    // sem `porDia` (Poké Dólares ganhos e compras de cada dia: só para o dashboard da staff)
+    estatisticas: ehObjeto(save.estatisticas) ? Object.fromEntries(Object.entries(save.estatisticas).filter(([k]) => k !== 'porDia')) : null,
     titulo: tituloAtivo(save),
     // selos sazonais (itens de coleção): só os ids que o jogador tem
     selos: save.itens && typeof save.itens === 'object' ? Object.entries(save.itens as Record<string, unknown>).filter(([id, qtd]) => id.startsWith('selo-') && typeof qtd === 'number' && qtd > 0).map(([id]) => id) : [],
@@ -576,4 +629,6 @@ cla.consertar();
 // tiers e prêmios mudados pela staff valem aqui também (server/src/ajustes.ts)
 ajustes.aplicarAoLigar();
 ligarMundo(servidor);
+process.on('uncaughtException', (e) => console.error('Erro não tratado (o servidor continua no ar)', e));
+process.on('unhandledRejection', (e) => console.error('Promessa sem tratamento (o servidor continua no ar)', e));
 servidor.listen(PORTA, () => console.log(`Servidor do PokeOrigins em http://localhost:${PORTA}`));

@@ -4,6 +4,7 @@ import type { Tela } from '../main';
 import { BIOMAS } from '../../../shared/biomas';
 import { NOMES_DIFICULDADE, RECOMPENSA_POR_POKEMON, recompensaDoDuelo, TREINADORES_NPC, montarTimeNpc, sortearTreinador, type Dificuldade, type TreinadorNpc } from '../../../shared/treinadoresNpc';
 import { abrirBatalha } from '../batalha/telaBatalha';
+import { batalhaParaRetomar, descartarBatalha, opcoesDaRetomada, type BatalhaAberta } from '../batalha/retomada';
 import { pokemonPorId } from '../dados';
 import { carregarSave, salvar } from '../estado';
 import { colunaDoTime } from '../ui/time';
@@ -57,6 +58,29 @@ export const telaDuelos: Tela = (raiz, navegar) => {
   let sorteando = false;
   let equipe = montarTimeNpc(npc, save.time, crescimentoDe);
   const cartao = el('section', { class: 'cartao-duelo' });
+
+  /** Duelo contra `alvo` (ou a volta para ele depois de recarregar, `retomada`). */
+  const batalhar = (alvo: TreinadorNpc, retomada?: BatalhaAberta) => {
+    // nível, tamanho e recompensa valem os do time que está entrando AGORA (não dá mais para trocar depois)
+    equipe = montarTimeNpc(alvo, save.time, crescimentoDe);
+    const recompensa = recompensaDoDuelo(alvo.dificuldade, equipe.length);
+    abrirBatalha({
+      save,
+      selvagem: equipe[0],
+      bioma: BIOMAS[Math.floor(Math.random() * BIOMAS.length)],
+      treinador: { nome: alvo.nome, titulo: alvo.titulo, equipe, recompensa, imagem: imagemTreinador(alvo.id), duelo: true, ia: 'facil' },
+      contexto: { tipo: 'duelo', npc: alvo.id },
+      ...(retomada ? opcoesDaRetomada(retomada) : {}),
+      aoTerminar: (resultado) => {
+        // conquista 50/50: guarda quem já foi vencido
+        if (resultado === 'vitoria' && !(save.duelosVencidos ??= []).includes(alvo.id)) save.duelosVencidos.push(alvo.id);
+        // depois da batalha vem outro adversário
+        npcAtual = null;
+        salvar(save);
+        navegar({ tela: 'duelos' });
+      },
+    });
+  };
 
   /** Roleta: os retratos passam cada vez mais devagar e param no sorteado; botões travados até acabar. */
   const sortearOutro = () => {
@@ -133,31 +157,20 @@ export const telaDuelos: Tela = (raiz, navegar) => {
           class: 'botao grande',
           disabled: !podeLutar,
           title: podeLutar ? '' : 'Seu time está todo desmaiado: cure no Centro Pokémon',
-          onclick: () => {
-            // nível, tamanho e recompensa valem os do time que está entrando AGORA (não dá mais para trocar depois)
-            equipe = montarTimeNpc(npc, save.time, crescimentoDe);
-            const recompensa = recompensaDoDuelo(npc.dificuldade, equipe.length);
-            abrirBatalha({
-              save,
-              selvagem: equipe[0],
-              bioma: BIOMAS[Math.floor(Math.random() * BIOMAS.length)],
-              treinador: { nome: npc.nome, titulo: npc.titulo, equipe, recompensa, imagem: imagemTreinador(npc.id), duelo: true, ia: 'facil' },
-              aoTerminar: (resultado) => {
-                // conquista 50/50: guarda quem já foi vencido
-                if (resultado === 'vitoria' && !(save.duelosVencidos ??= []).includes(npc.id)) save.duelosVencidos.push(npc.id);
-                // depois da batalha vem outro adversário
-                npcAtual = null;
-                salvar(save);
-                navegar({ tela: 'duelos' });
-              },
-            });
-          },
+          onclick: () => batalhar(npc),
         }, 'Batalhar!'),
         el('button', { class: 'botao secundario', onclick: sortearOutro }, 'Sortear outro'),
         el('button', { class: 'botao secundario', onclick: () => abrirCaderno(save) }, '📖 Treinadores')),
     );
   };
   desenhar();
+  // recarregou a página no meio de um duelo: volta para ele
+  const anotada = batalhaParaRetomar(save, 'duelo');
+  if (anotada) {
+    const alvo = TREINADORES_NPC.find((t) => t.id === anotada.contexto.npc);
+    if (alvo) batalhar(alvo, anotada);
+    else (descartarBatalha(save), salvar(save));
+  }
 
   tela.append(el('div', { class: 'layout-bioma' },
     el('section', {}, el('p', { class: 'sub' }, 'Um treinador é sorteado entre 50 personagens dos jogos e do anime.'), cartao),

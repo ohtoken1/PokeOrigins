@@ -12,6 +12,7 @@ import { itemAleatorio, nomeDoItem } from './motorDoJogo.ts';
 import { liberado } from '../../shared/trancas.ts';
 import { nivelTreinador } from '../../shared/treinador.ts';
 import { avisar } from './mundo.ts';
+import { CONQUISTAS } from '../../shared/conquistas.ts';
 import {
   diaBrasilia, diasEntre, DIAS_LOGIN, DIAS_LOGIN_TRINTA, INICIO_LOGIN_TRINTA, metasDoacao, premiosLogin, premiosLoginTrinta,
   RECUPERACOES_VIP, trimestreDoacao, type EstadoRecompensas, type PremioRecompensa,
@@ -61,6 +62,11 @@ function inicioTrinta(): string | null {
   return diaBrasilia(quando);
 }
 /** Que dia do Login dos 30 dias é hoje (1 a 30), ou null se ainda não começou ou já acabou. */
+/** O primeiro dia do Login dos 30 dias em que a conta já existia (os anteriores não contam como perdidos). */
+function primeiroDiaDaConta(conta: banco.Conta): number {
+  const inicio = inicioTrinta();
+  return inicio ? Math.max(1, diasEntre(inicio, diaBrasilia(conta.criada_em)) + 1) : 1;
+}
 function diaDoTrinta(hoje = diaBrasilia()): number | null {
   const inicio = inicioTrinta();
   if (!inicio) return null;
@@ -125,6 +131,7 @@ export function recuperar(conta: banco.Conta, dados: Record<string, unknown>) {
   const hoje = diaDoTrinta();
   if (hoje === null) throw new ErroConta('O Login dos 30 dias não está acontecendo.', 409);
   if (typeof dia !== 'number' || !Number.isInteger(dia) || dia < 1 || dia >= hoje) throw new ErroConta('Só dá para recuperar um dia que já passou.');
+  if (dia < primeiroDiaDaConta(conta)) throw new ErroConta('Esse dia foi antes de a sua conta existir: não dá para recuperar.');
   if (!vipAgora(conta.id)) throw new ErroConta('Só jogadores VIP podem recuperar prêmios perdidos.', 403);
   banco.transacao(() => {
     const t = progressoTrinta(conta.id);
@@ -147,7 +154,7 @@ export function estado(conta: banco.Conta): EstadoRecompensas {
   const tri = trimestreDoacao();
   return {
     login: { fim: Date.now() < fimLogin ? fimLogin : null, dia: l.dia, hoje: l.ultimo === hoje },
-    trinta: { inicio: inicioTrinta() ?? hoje, diaAtual: diaDoTrinta(hoje), pegos: t.pegos, recuperacoes: t.recuperacoes, vip: vipAgora(conta.id) },
+    trinta: { inicio: inicioTrinta() ?? hoje, diaAtual: diaDoTrinta(hoje), pegos: t.pegos, recuperacoes: t.recuperacoes, vip: vipAgora(conta.id), primeiroDia: primeiroDiaDaConta(conta) },
     doacao: { trimestre: tri.id, fim: tri.fim, gold: banco.doadoNoPeriodo(conta.id, tri.inicio, tri.fim), metas: banco.metasPremiadas(conta.id, tri.id) },
   };
 }
@@ -156,13 +163,17 @@ export function estado(conta: banco.Conta): EstadoRecompensas {
  * Soma uma doação confirmada ao acumulado do trimestre e manda pelo Correio o prêmio de cada meta que passou.
  * Chamar SÓ quando o pagamento for confirmado (ou pela staff, em doação manual / teste). `gold` = Origin Coins.
  */
+/** Dias de VIP da conquista "Faça uma doação" (shared/conquistas.ts): vão na carta da primeira doação. */
+const VIP_DA_CONQUISTA_DOACAO = ((r) => (r?.tipo === 'vip' ? r.dias : 3))(CONQUISTAS.find((c) => c.id === 'doacao')?.recompensa);
+
 export function somarDoacao(contaId: number, gold: number, origem: string): void {
   if (!Number.isSafeInteger(gold) || gold <= 0) return;
   const t = trimestreDoacao();
   banco.transacao(() => {
     // primeira doação da conta: carta de agradecimento com a marca da conquista "Faça uma doação"
     if (banco.doadoNoPeriodo(contaId, 0, Number.MAX_SAFE_INTEGER) === 0)
-      correio.enviar(contaId, 'Obrigado pela doação!', 'Obrigado por apoiar o PokeOrigins! Sua primeira doação liberou a conquista "Faça uma doação" (Minha conta → Conquistas).', [correio.anexoMarca('doou')], 'doacoes');
+      // a recompensa da conquista (dias de VIP) vem junto: só o servidor mexe no VIP
+      correio.enviar(contaId, 'Obrigado pela doação!', `Obrigado por apoiar o PokeOrigins! Sua primeira doação liberou a conquista "Faça uma doação" (Minha conta → Conquistas) e os ${VIP_DA_CONQUISTA_DOACAO} dias de VIP dela estão nesta carta.`, [correio.anexoMarca('doou'), correio.anexoItem('vip-dias', 'Dias de VIP', VIP_DA_CONQUISTA_DOACAO)], 'doacoes');
     banco.registrarDoacaoAcumulada(contaId, gold, origem);
     const total = banco.doadoNoPeriodo(contaId, t.inicio, t.fim);
     for (const meta of metasDoacao()) {

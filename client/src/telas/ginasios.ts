@@ -4,7 +4,8 @@
 // na primeira vitória.
 import type { Tela } from '../main';
 import { BIOMAS } from '../../../shared/biomas';
-import { RECOMPENSA_GINASIO, lideresDaRegiao, type LiderGinasio } from '../../../shared/ginasios';
+import { LIDERES, RECOMPENSA_GINASIO, lideresDaRegiao, type LiderGinasio } from '../../../shared/ginasios';
+import { batalhaParaRetomar, descartarBatalha, opcoesDaRetomada, type BatalhaAberta } from '../batalha/retomada';
 import { DIFICULDADES_GINASIO, MULT_RECOMPENSA_GINASIO, NOME_DIFICULDADE_GINASIO, nivelDoLider, type DificuldadeGinasio } from '../../../shared/ginasiosDificuldade';
 import { REGIOES } from '../../../shared/regioes';
 import { montarTimeNpc, nivelDoGinasio } from '../../../shared/treinadoresNpc';
@@ -88,10 +89,11 @@ export const telaGinasios: Tela = (raiz, navegar) => {
   const recompensaDe = (lider: LiderGinasio) => RECOMPENSA_GINASIO[lider.ordem - 1] * MULT_RECOMPENSA_GINASIO[dificuldade];
   const corpo = el('div', { class: 'ginasios-corpo' });
 
-  const desafiar = (lider: LiderGinasio) => {
-    if (bloqueio() || faltaAntes(lider) || semTime(lider)) return desenhar();
-    const d = dificuldade;
-    const equipe = equipeDoLider(lider, d, save.time);
+  /** Desafia o líder (ou volta para a batalha depois de recarregar, `retomada`: as conferências já foram feitas). */
+  const desafiar = (lider: LiderGinasio, retomada?: BatalhaAberta & { contexto: { tipo: 'ginasio' } }) => {
+    if (!retomada && (bloqueio() || faltaAntes(lider) || semTime(lider))) return desenhar();
+    const d = retomada ? (retomada.contexto.dificuldade as DificuldadeGinasio) : dificuldade;
+    const equipe = retomada ? [] : equipeDoLider(lider, d, save.time);
     const jaTinha = vencidos(save, d).includes(lider.id);
     const daInsignia = d === 'facil' && !jaTinha;
     abrirBatalha({
@@ -110,6 +112,8 @@ export const telaGinasios: Tela = (raiz, navegar) => {
         mensagemVitoria: daInsignia ? `Você ganhou a ${lider.insignia}!` : jaTinha ? undefined : `Você venceu ${lider.nome} no ${NOME_DIFICULDADE_GINASIO[d]}!`,
         avisoFuga: jaTinha ? 'Você não ganha nada desta batalha.' : daInsignia ? `Você não ganha a ${lider.insignia} nem a recompensa.` : 'Você não ganha a recompensa.',
       },
+      contexto: { tipo: 'ginasio', lider: lider.id, dificuldade: d },
+      ...(retomada ? opcoesDaRetomada(retomada) : {}),
       aoTerminar: (resultado) => {
         if (resultado === 'vitoria' && !vencidos(save, d).includes(lider.id)) vencidos(save, d).push(lider.id);
         salvar(save);
@@ -167,6 +171,13 @@ export const telaGinasios: Tela = (raiz, navegar) => {
     );
   }
   desenhar();
+  // recarregou a página no meio de uma batalha de ginásio: volta para ela
+  const anotada = batalhaParaRetomar(save, 'ginasio');
+  if (anotada) {
+    const lider = LIDERES.find((l) => l.id === anotada.contexto.lider);
+    if (lider && (DIFICULDADES_GINASIO as string[]).includes(anotada.contexto.dificuldade)) desafiar(lider, anotada);
+    else (descartarBatalha(save), salvar(save));
+  }
   tela.append(el('div', { class: 'layout-bioma' },
     el('section', {}, el('p', { class: 'sub' }, 'Vença os líderes em ordem. A insígnia sai no Fácil; Médio e Difícil pagam mais na primeira vitória.'), corpo),
     colunaDoTime(save.time, () => salvar(save), () => corpo.isConnected && desenhar())));

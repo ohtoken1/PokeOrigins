@@ -9,7 +9,7 @@ import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { avisarTodos } from './mundo.ts';
 import { contar } from './dashboard.ts';
-import { CAMBIO_MAX_POR_VEZ, COFRE_GOLD_INICIAL, COFRE_SILVER_INICIAL, silverDaOperacao } from '../../shared/cambio.ts';
+import { CAMBIO_MAX_POR_VEZ, COFRE_GOLD_INICIAL, COFRE_MAXIMO, COFRE_SILVER_INICIAL, silverDaOperacao } from '../../shared/cambio.ts';
 
 banco.garantirCofre(COFRE_SILVER_INICIAL, COFRE_GOLD_INICIAL);
 
@@ -53,4 +53,32 @@ export function trocar(conta: banco.Conta, dados: Record<string, unknown>) {
   // devolve o save já mudado (o jogo troca o dele por este)
   const guardado = banco.lerSave(conta.id)!;
   return { save: JSON.parse(guardado.dados), versao: guardado.versao, cofre: agora };
+}
+
+// ---- Administração → Banco (pedido do dono): a staff vê e muda o que o cofre tem; cada mudança fica no histórico ----
+const CHAVE_HISTORICO = 'historico-cofre';
+const NO_HISTORICO = 100;
+type RegistroCofre = { quando: number; por: string; antes: { silver: number; gold: number }; depois: { silver: number; gold: number } };
+
+function exigirStaff(conta: banco.Conta): void {
+  if (!conta.admin) throw new ErroConta('Só administradores.', 403);
+}
+
+export function verCofreStaff(conta: banco.Conta) {
+  exigirStaff(conta);
+  return { cofre: banco.lerCofre(), historico: (banco.lerEvento<RegistroCofre[]>(CHAVE_HISTORICO) ?? []).slice(-NO_HISTORICO).reverse() };
+}
+
+export function definirCofre(conta: banco.Conta, dados: Record<string, unknown>) {
+  exigirStaff(conta);
+  const { silver, gold } = dados;
+  const valido = (v: unknown) => Number.isSafeInteger(v) && (v as number) >= 0 && (v as number) <= COFRE_MAXIMO;
+  if (!valido(silver) || !valido(gold)) throw new ErroConta(`Valores inválidos: números inteiros de 0 a ${COFRE_MAXIMO.toLocaleString('pt-BR')}.`);
+  const antes = banco.lerCofre();
+  banco.mudarCofre(silver as number, gold as number);
+  const historico = banco.lerEvento<RegistroCofre[]>(CHAVE_HISTORICO) ?? [];
+  historico.push({ quando: Date.now(), por: conta.usuario, antes, depois: banco.lerCofre() });
+  banco.gravarEvento(CHAVE_HISTORICO, historico.slice(-NO_HISTORICO));
+  avisarTodos({ t: 'cofre', cofre: banco.lerCofre() });
+  return verCofreStaff(conta);
 }

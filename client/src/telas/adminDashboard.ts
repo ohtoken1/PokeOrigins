@@ -67,7 +67,9 @@ function desenhar(d: Dashboard): HTMLElement[] {
         el('div', { class: 'dash-coluna', title: `${dia(x.dia)}: ${x.ativos} jogadores, ${x.horas} h online` },
           el('small', {}, String(x.ativos)),
           el('span', { class: 'dash-coluna-barra', style: `height:${(x.ativos / maxAtivos) * 100}%` }),
-          el('small', { class: 'meta' }, dia(x.dia)))))),
+          el('small', { class: 'meta' }, dia(x.dia))))),
+      el('h3', {}, 'Por onde conheceram o jogo'),
+      barras(j.comoConheceram, 'Ninguém respondeu ainda (a pergunta é do cadastro).')),
 
     bloco('Capturas', 'Hoje, 7 dias e 30 dias = capturas em batalha (Safari incluso). "Existem hoje" = Pokémon nos times e PCs de todos, vindos de qualquer lugar (captura, ovo, Orb, troca, staff).',
       el('table', { class: 'dash-tabela' },

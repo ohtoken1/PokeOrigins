@@ -13,6 +13,7 @@ import { HORARIOS_TORNEIO, ABRE_ANTES_MS, NOMES_RODADAS } from '../../../shared/
 import { agoraDoServidor } from '../ui/relogio';
 import { el } from '../ui/dom';
 import { EVENTOS, bannerEvento, textoTrancaDoEvento, type IdEvento } from '../ui/temaEvento';
+import { emblemaEvento } from '../ui/emblemaEvento';
 
 interface EstadoEventos {
   boss: { tipo: string; nome: string; fim: number; ativo: boolean } | null;
@@ -98,7 +99,7 @@ export const telaEventosInfo: Tela = (raiz) => {
       const horario = i.desdeMeiaNoite ? `até ${hora(i.fim)}` : i.fim - i.inicio > 60_000 ? `${hora(i.inicio)}–${hora(i.fim)}` : hora(i.inicio);
       return el('li', { class: `tema-${i.id} ${estado}` },
         el('span', { class: 'hora' }, i.amanha ? `Amanhã ${horario}` : horario),
-        el('span', { 'aria-hidden': 'true' }, EVENTOS[i.id].emblema),
+        emblemaEvento(i.id),
         el('span', {}, i.texto),
         el('span', { class: 'estado' }, estado === 'passou' ? 'Já passou' : estado === 'agora' ? 'Agora' : estado === 'proximo' ? `Em ${falta(i.inicio - agora)}` : ''));
     }));

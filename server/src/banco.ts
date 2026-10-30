@@ -121,12 +121,12 @@ const sql = {
   contaPorLogin: db.prepare('SELECT * FROM contas WHERE usuario = ? OR email = ?'),
   contaPorId: db.prepare('SELECT * FROM contas WHERE id = ?'),
   contaPorUsuario: db.prepare('SELECT * FROM contas WHERE usuario = ?'),
-  ranking: db.prepare(`SELECT c.usuario, json_extract(s.dados, '$.aparencia.nome') AS nome, json_extract(s.dados, '$.xpTreinador') AS xp,
+  ranking: db.prepare(`SELECT c.usuario, substr(json_extract(s.dados, '$.aparencia.nome'), 1, 16) AS nome, json_extract(s.dados, '$.xpTreinador') AS xp,
     json_extract(s.dados, '$.estatisticas.capturas') AS capturas, json_extract(s.dados, '$.estatisticas.capturasShiny') AS shiny,
     json_extract(s.dados, '$.estatisticas.capturasLendarios') AS lendarios, (ifnull(json_extract(s.dados, '$.estatisticas.medalhasOuro'), 0) + ifnull(json_extract(s.dados, '$.estatisticas.medalhasPrata'), 0) + ifnull(json_extract(s.dados, '$.estatisticas.medalhasBronze'), 0)) AS medalhas,
     json_extract(s.dados, '$.estatisticas.missoesQuadro') AS missoes, json_extract(s.dados, '$.silver') AS silver, json_extract(s.dados, '$.gold') AS gold
-    FROM contas c JOIN saves s ON s.conta_id = c.id LIMIT 5000`),
-  buscar: db.prepare(`SELECT c.id, c.usuario, json_extract(s.dados, '$.aparencia.nome') AS nome FROM contas c JOIN saves s ON s.conta_id = c.id
+    FROM contas c JOIN saves s ON s.conta_id = c.id WHERE c.admin = 0 LIMIT 5000`),
+  buscar: db.prepare(`SELECT c.id, c.usuario, substr(json_extract(s.dados, '$.aparencia.nome'), 1, 16) AS nome FROM contas c JOIN saves s ON s.conta_id = c.id
     WHERE c.usuario LIKE ? ESCAPE '!' OR json_extract(s.dados, '$.aparencia.nome') LIKE ? ESCAPE '!' ORDER BY c.usuario LIMIT 20`),
   existe: db.prepare('SELECT usuario, email FROM contas WHERE usuario = ? OR email = ?'),
   quantas: db.prepare('SELECT COUNT(*) AS n FROM contas'),
@@ -142,7 +142,7 @@ const sql = {
   apagarSave: db.prepare('DELETE FROM saves WHERE conta_id = ?'),
   regravarSave: db.prepare('UPDATE saves SET dados = ?, versao = versao + 1, atualizado_em = ? WHERE conta_id = ?'),
   amizade: db.prepare('SELECT de, para, aceita FROM amizades WHERE (de = ? AND para = ?) OR (de = ? AND para = ?)'),
-  amizades: db.prepare(`SELECT a.de, a.aceita, c.id, c.usuario, json_extract(s.dados, '$.aparencia.nome') AS nome
+  amizades: db.prepare(`SELECT a.de, a.aceita, c.id, c.usuario, substr(json_extract(s.dados, '$.aparencia.nome'), 1, 16) AS nome
     FROM amizades a JOIN contas c ON c.id = CASE WHEN a.de = ? THEN a.para ELSE a.de END LEFT JOIN saves s ON s.conta_id = c.id
     WHERE a.de = ? OR a.para = ? ORDER BY c.usuario`),
   criarAmizade: db.prepare('INSERT INTO amizades (de, para, aceita, criada_em) VALUES (?, ?, 0, ?)'),
@@ -279,7 +279,7 @@ export interface MembroCla {
   vice: number;
   entrou_em: number;
 }
-const NOME_TREINADOR = `json_extract(s.dados, '$.aparencia.nome')`;
+const NOME_TREINADOR = `substr(json_extract(s.dados, '$.aparencia.nome'), 1, 16)`;
 const sqlCla = {
   porId: db.prepare('SELECT * FROM clas WHERE id = ?'),
   porChave: db.prepare('SELECT * FROM clas WHERE chave = ?'),
@@ -770,7 +770,7 @@ const sqlRanqueado = {
   resultado: db.prepare(`UPDATE ranqueado SET pontos = MAX(0, pontos + ?), vitorias = vitorias + ?, derrotas = derrotas + ?,
     subiu_em = CASE WHEN ? > 0 THEN ? ELSE subiu_em END WHERE conta_id = ? AND formato = ?`),
   pontos: db.prepare('SELECT pontos FROM ranqueado WHERE conta_id = ? AND formato = ?'),
-  lista: db.prepare(`SELECT r.conta_id, c.usuario, json_extract(s.dados, '$.aparencia.nome') AS nome, r.formato, r.pontos, r.vitorias, r.derrotas
+  lista: db.prepare(`SELECT r.conta_id, c.usuario, substr(json_extract(s.dados, '$.aparencia.nome'), 1, 16) AS nome, r.formato, r.pontos, r.vitorias, r.derrotas
     FROM ranqueado r JOIN contas c ON c.id = r.conta_id LEFT JOIN saves s ON s.conta_id = r.conta_id
     WHERE r.formato = ? AND (r.vitorias + r.derrotas) > 0 ORDER BY r.pontos DESC, r.subiu_em ASC, r.conta_id ASC LIMIT ?`),
   masters: db.prepare('SELECT conta_id FROM ranqueado WHERE formato = ? AND pontos >= ? ORDER BY pontos DESC, subiu_em ASC, conta_id ASC LIMIT ?'),
@@ -787,6 +787,29 @@ export const pontosRanqueado = (contaId: number, formato: string) => (sqlRanquea
 export const listaRanqueado = (formato: string, limite: number) => sqlRanqueado.lista.all(formato, limite) as unknown as LinhaRanqueado[];
 /** Os donos das vagas da Master Ball (os primeiros com pontos de Beast Ball). */
 export const mastersRanqueado = (formato: string, pontosMinimos: number, vagas: number) => (sqlRanqueado.masters.all(formato, pontosMinimos, vagas) as { conta_id: number }[]).map((l) => l.conta_id);
+
+// Partidas do ranqueado entre cada dupla (pedido do dono, 29/10/2026): a mesma dupla com as últimas 4 partidas com o
+// MESMO vencedor não cai mais junta (contra conta secundária que perde de propósito). `menor`/`maior` = ids da dupla em ordem.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS ranqueado_partidas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    menor INTEGER NOT NULL REFERENCES contas(id) ON DELETE CASCADE,
+    maior INTEGER NOT NULL REFERENCES contas(id) ON DELETE CASCADE,
+    formato TEXT NOT NULL,
+    vencedor INTEGER,
+    quando INTEGER NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS ranqueado_partidas_dupla ON ranqueado_partidas (menor, maior, id DESC);
+`);
+const sqlPartidas = {
+  gravar: db.prepare('INSERT INTO ranqueado_partidas (menor, maior, formato, vencedor, quando) VALUES (?, ?, ?, ?, ?)'),
+  ultimas: db.prepare('SELECT vencedor FROM ranqueado_partidas WHERE menor = ? AND maior = ? ORDER BY id DESC LIMIT ?'),
+};
+const dupla = (a: number, b: number) => (a < b ? [a, b] : [b, a]);
+/** Guarda uma partida do ranqueado (vencedor null = empate). */
+export const gravarPartidaRanqueado = (a: number, b: number, formato: string, vencedor: number | null) => void sqlPartidas.gravar.run(...dupla(a, b), formato, vencedor, Date.now());
+/** Os vencedores das últimas `n` partidas entre os dois (a mais nova primeiro; null = empate). */
+export const ultimasPartidasDaDupla = (a: number, b: number, n: number) => (sqlPartidas.ultimas.all(...dupla(a, b), n) as { vencedor: number | null }[]).map((l) => l.vencedor);
 
 // ---------- Dashboard da Administração (server/src/dashboard.ts) ----------
 // `atividade` = quanto tempo cada conta ficou com o jogo aberto em cada dia (Brasília), medido pelo servidor a cada
@@ -920,6 +943,24 @@ db.exec(`
   INSERT OR IGNORE INTO parceria_contas (conta_id, codigo, via, criada_em)
     SELECT p.conta_id, p.codigo, 'codigo', c.criada_em FROM pre_registro p JOIN contas c ON c.id = p.conta_id WHERE p.codigo IS NOT NULL;
 `);
+// "Por onde conheceu o jogo?" do cadastro (shared/comoConheceu.ts): uma linha por conta criada depois da pergunta.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS conta_origem (
+    conta_id INTEGER PRIMARY KEY REFERENCES contas(id) ON DELETE CASCADE,
+    tipo TEXT NOT NULL,
+    detalhe TEXT NOT NULL,
+    criada_em INTEGER NOT NULL
+  );
+`);
+const sqlOrigem = {
+  guardar: db.prepare('INSERT OR REPLACE INTO conta_origem (conta_id, tipo, detalhe, criada_em) VALUES (?, ?, ?, ?)'),
+  contar: db.prepare(`SELECT o.tipo, o.detalhe, COUNT(*) AS n FROM conta_origem o JOIN contas c ON c.id = o.conta_id
+    WHERE c.admin = 0 GROUP BY o.tipo, lower(o.detalhe) ORDER BY n DESC`),
+};
+export const guardarComoConheceu = (contaId: number, tipo: string, detalhe: string) => void sqlOrigem.guardar.run(contaId, tipo, detalhe, Date.now());
+/** Respostas somadas (sem as contas ADM), por resposta e detalhe, da mais comum para a menos. */
+export const contagemComoConheceu = () => sqlOrigem.contar.all() as { tipo: string; detalhe: string; n: number }[];
+
 const sqlLinks = {
   ligar: db.prepare('INSERT OR IGNORE INTO parceria_contas (conta_id, codigo, via, criada_em) SELECT id, ?, ?, criada_em FROM contas WHERE id = ?'),
   trocar: db.prepare('INSERT OR REPLACE INTO parceria_contas (conta_id, codigo, via, criada_em) SELECT id, ?, ?, criada_em FROM contas WHERE id = ?'),

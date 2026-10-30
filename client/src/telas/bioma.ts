@@ -1,7 +1,9 @@
 import { comBonificacao } from '../bonificacao';
 import { botaoTelaCheia } from '../ui/telaCheia';
 import { chancesComOutbreak, tabelaComOutbreak } from '../outbreak';
-import { botaoDoNinho } from '../ninho';
+import { botaoDoNinho, fimDaLutaNoNinho, type LutaNoNinho } from '../ninho';
+import { batalhaParaRetomar, opcoesDaRetomada, descartarBatalha, type BatalhaAberta } from '../batalha/retomada';
+import type { PokemonIndividual } from '../../../shared/batalha/pokemon';
 import { registrarNaCaptura } from '../ui/eventos';
 import { passoDosOvos } from '../creche';
 import { numeroNaDex } from '../../../shared/formasRegionais';
@@ -157,13 +159,16 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
   }, '%');
   areaJogo.append(botaoChances, painelChances);
   // Ninho (client/src/ninho.ts): botão no canto quando o ninho está neste mapa; a batalha é como a de um treinador (sem captura)
-  const ninho = botaoDoNinho(save, regiao.id, bioma.id, () => cena(), (equipe, nome, aoFim) => {
+  /** Luta no ninho (ou volta para ela depois de recarregar, `retomada`). */
+  const lutarNoNinho = (equipe: PokemonIndividual[], nome: string, aoFim: (venceu: boolean) => void, luta: LutaNoNinho, retomada?: BatalhaAberta) => {
     fugirDoEncontro();
     emBatalha = true;
     atualizarPausa();
     abrirBatalha({
       save, bioma, selvagem: equipe[0],
       treinador: { ia: 'dificil', nome: `Ninho de ${nome}`, titulo: 'Ninho', equipe, recompensa: 0, mensagemInicio: `Um ${nome} furioso saltou do ninho!`, avisoFuga: 'Os Poké Dólares pagos para entrar no ninho NÃO serão devolvidos.' },
+      contexto: { tipo: 'ninho', regiao: regiao.id, bioma: bioma.id, ...luta },
+      ...(retomada ? opcoesDaRetomada(retomada) : {}),
       aoTerminar: (resultado) => {
         aoFim(resultado === 'vitoria');
         if (resultado === 'derrota') return navegar({ tela: 'cidade' });
@@ -172,7 +177,8 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         atualizarPausa();
       },
     });
-  }, () => atualizarTime());
+  };
+  const ninho = botaoDoNinho(save, regiao.id, bioma.id, () => cena(), lutarNoNinho, () => atualizarTime());
   areaJogo.append(ninho.elemento);
   const chat = montarChat();
   // o teto dos encontros agora é escolhido na aba Opções (barra do topo)
@@ -250,26 +256,57 @@ export const telaBioma = (biomaId: string): Tela => (raiz, navegar) => {
         bloqueio: temQuemLute ? null : 'Seu time está desmaiado. Cure no Centro Pokémon.',
         lutar: () => {
           if (janelaAberta) return;
-          fugirDoEncontro();
-          emBatalha = true;
-          atualizarPausa();
-          abrirBatalha({
-            save,
-            bioma,
-            selvagem,
-            aoTerminar: (resultado) => {
-              if (resultado === 'derrota') return navegar({ tela: 'cidade' });
-              // Evento de captura: o servidor confere a captura no save guardado
-              if (resultado === 'captura') void registrarNaCaptura(selvagem);
-              atualizarTime();
-              atualizarContador();
-              emBatalha = false;
-              atualizarPausa();
-            },
-          });
+          lutarComSelvagem(selvagem);
         },
       }, selvagem.genero);
     },
+  };
+
+  /** Batalha contra o selvagem do encontro (ou a volta para ela depois de recarregar, `retomada`). */
+  function lutarComSelvagem(selvagem: PokemonIndividual, retomada?: BatalhaAberta) {
+    fugirDoEncontro();
+    emBatalha = true;
+    atualizarPausa();
+    const opcoes = retomada ? opcoesDaRetomada(retomada) : { selvagem, bioma };
+    abrirBatalha({
+      save: save!,
+      ...opcoes,
+      contexto: { tipo: 'selvagem', regiao: regiao.id, bioma: bioma.id },
+      aoTerminar: (resultado) => {
+        if (resultado === 'derrota') return navegar({ tela: 'cidade' });
+        // Evento de captura: o servidor confere a captura no save guardado
+        if (resultado === 'captura') void registrarNaCaptura(opcoes.selvagem);
+        atualizarTime();
+        atualizarContador();
+        emBatalha = false;
+        atualizarPausa();
+      },
+    });
+  }
+
+  // recarregou a página no meio de uma batalha deste mapa: volta para ela assim que o mapa ficar pronto
+  let retomou = false;
+  const retomarBatalha = () => {
+    if (retomou) return;
+    retomou = true;
+    const anotada = save.batalhaAberta;
+    if (!anotada) return;
+    const c = anotada.contexto;
+    if ((c.tipo !== 'selvagem' && c.tipo !== 'ninho') || c.bioma !== bioma.id || c.regiao !== regiao.id) return;
+    const selvagem = batalhaParaRetomar(save, 'selvagem');
+    if (selvagem) return lutarComSelvagem(selvagem.selvagem, selvagem);
+    const noNinho = batalhaParaRetomar(save, 'ninho');
+    if (!noNinho) return;
+    const { slot, lendario, nome, especieId } = noNinho.contexto;
+    const luta = { slot, lendario, nome, especieId };
+    const { treinador } = opcoesDaRetomada(noNinho);
+    if (!treinador) return (descartarBatalha(save), salvar(save));
+    lutarNoNinho(treinador.equipe, nome, fimDaLutaNoNinho(save, luta, () => atualizarTime()), luta, noNinho);
+  };
+  const aoProntoAntes = opcoesCena.aoPronto;
+  opcoesCena.aoPronto = () => {
+    aoProntoAntes?.();
+    retomarBatalha();
   };
 
   // personagem do jogador (LPC + detalhes Pokémon); a cena troca o desenho quando ficar pronto

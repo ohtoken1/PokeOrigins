@@ -1,5 +1,6 @@
 // Anúncios da staff (server/src/anuncios.ts): a lista fica guardada aqui e é buscada de novo quando o servidor
 // avisa que mudou. O jogador lê no Mural de anúncios da cidade; a staff publica em Administração → Anúncios.
+import { depoisDaBatalha } from './ui/semBatalha';
 import type { Anuncio } from '../../shared/anuncios';
 import { api, conta } from './conta';
 import { aoAvisoDoServidor } from './online';
@@ -58,9 +59,11 @@ export function vigiarAnuncios(): void {
     const novo = lista[0];
     // só avisa de anúncio NOVO (apagar um também muda a lista) e não para quem publicou
     if (!novo || novo.id <= maisNovoAntes || novo.autor === conta()?.usuario) return;
-    aviso.replaceChildren(el('strong', {}, 'Novo anúncio no Mural da cidade'), el('span', {}, novo.titulo));
-    aviso.hidden = false;
-    clearTimeout(relogio);
-    relogio = window.setTimeout(() => (aviso.hidden = true), 8000);
+    depoisDaBatalha(() => {
+      aviso.replaceChildren(el('strong', {}, 'Novo anúncio no Mural da cidade'), el('span', {}, novo.titulo));
+      aviso.hidden = false;
+      clearTimeout(relogio);
+      relogio = window.setTimeout(() => (aviso.hidden = true), 8000);
+    });
   });
 }

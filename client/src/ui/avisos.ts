@@ -3,12 +3,17 @@
 // - `ativarDicasDoJogo()`: todo `title` vira uma dica no visual do jogo (a do navegador não aparece mais).
 // Para perguntar Sim/Não, usar `confirmar` de ui/confirmar.ts.
 import { el } from './dom';
+import { depoisDaBatalha } from './semBatalha';
 
 export type TipoAviso = 'info' | 'erro' | 'ok';
 const ICONES: Record<TipoAviso, string> = { info: 'ℹ️', erro: '⚠️', ok: '✅' };
 let pilha: HTMLElement | null = null;
 
 export function avisar(texto: string, tipo: TipoAviso = 'info', duracaoMs = 4500): void {
+  // com uma batalha aberta, o aviso espera ela acabar (não cobre a luta)
+  depoisDaBatalha(() => mostrarAviso(texto, tipo, duracaoMs));
+}
+function mostrarAviso(texto: string, tipo: TipoAviso, duracaoMs: number): void {
   pilha ??= el('div', { class: 'avisos-jogo', role: 'status', 'aria-live': 'polite' });
   if (!pilha.isConnected) document.body.append(pilha);
   const cartao = el('div', { class: `aviso-jogo aviso-${tipo}`, onclick: () => fechar() }, el('span', { class: 'aviso-jogo-icone' }, ICONES[tipo]), el('span', {}, texto));

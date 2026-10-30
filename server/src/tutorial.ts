@@ -30,7 +30,8 @@ export function presente(conta: banco.Conta, dados: Record<string, unknown>) {
 
 /** PUT /api/save: a lista de presentes recebidos vale a guardada (o navegador não pede o mesmo presente de novo). */
 export function proteger(save: Record<string, unknown>, antes: Record<string, unknown> | null): void {
-  if (!antes) return;
+  // primeiro save da conta: os presentes só o servidor marca
+  if (!antes) return void delete save.tutorialPresentes;
   if (antes.tutorialPresentes === undefined) delete save.tutorialPresentes;
   else save.tutorialPresentes = antes.tutorialPresentes;
 }

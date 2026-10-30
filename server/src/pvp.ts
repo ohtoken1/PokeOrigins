@@ -2,11 +2,12 @@
 // O navegador só manda a escolha do turno; o servidor confere, roda o turno e manda a cada um o que ele pode ver.
 // Os times saem do save GUARDADO no servidor (curados; o save de ninguém muda). Base do Torneio e do ranqueado:
 // `criarBatalha` aceita regras e um aviso de fim (`aoFim`) para quem organizar as partidas.
+import { tarefaSegura } from './tarefaSegura.ts';
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
 import { avisar, estaOnline } from './mundo.ts';
 import { NOME_MECANICA } from '../../shared/torneioRegras.ts';
-import { nomeDaEspecie, novaBatalhaPvp, type BatalhaPvp, type EscolhaPvp, type JogadorPvp, type MecanicasPvp } from './motorDoJogo.ts';
+import { nomeDaEspecie, novaBatalhaPvp, problemasDeLegalidade, type BatalhaPvp, type EscolhaPvp, type JogadorPvp, type MecanicasPvp } from './motorDoJogo.ts';
 
 /** Tempo para escolher cada turno (regra do dono para o Torneio; vale para todo PvP). */
 export const TEMPO_TURNO_PVP_MS = 60_000;
@@ -20,7 +21,7 @@ interface Sala {
   contas: [number, number];
   nomes: [string, string];
   prazo: number;
-  tipo: 'amistoso' | 'torneio' | 'ranqueado' | 'liga';
+  tipo: 'amistoso' | 'torneio' | 'ranqueado' | 'liga' | 'boss';
   aoFim?: (vencedor: number | null) => void;
   /** Tempo de cada turno (PvP 60 s; Liga 180 s). */
   tempo: number;
@@ -51,11 +52,13 @@ function nomeDe(conta: { id: number; usuario: string }): string {
   return typeof n === 'string' && n.trim() ? n.trim().slice(0, 16) : conta.usuario;
 }
 
-/** Time do save guardado (sem ovos). */
-function jogadorDe(conta: { id: number; usuario: string }): JogadorPvp {
+/** Time do save guardado (sem ovos), conferido (`problemasDeLegalidade`). */
+export function jogadorDe(conta: { id: number; usuario: string }): JogadorPvp {
   const save = lerJson(conta.id);
   const time = (Array.isArray(save?.time) ? save.time : []).filter((p: { ovo?: unknown }) => p && !p.ovo) as Record<string, unknown>[];
   if (!time.length) throw new ErroConta('Sem Pokémon no time.');
+  const ilegais = problemasDeLegalidade(time);
+  if (ilegais.length) throw new ErroConta(`O time de ${nomeDe(conta)} tem um Pokémon inválido. ${ilegais[0]}`, 409);
   return { nome: nomeDe(conta), time, nomes: time.map((p) => nomeDaEspecie(Number(p.especieId))) };
 }
 
@@ -104,24 +107,32 @@ export function criarBatalha(a: banco.Conta, b: banco.Conta, opcoes: { tipo: Sal
 }
 
 /**
- * Batalha contra um treinador NPC, calculada aqui como o PvP (Liga Pokémon): o lado 1 é o NPC e o servidor escolhe
- * por ele. O time do jogador entra COMO ESTÁ (sem curar); `aoFim` recebe se o jogador venceu e o time como terminou.
+ * Batalha contra um treinador NPC, calculada aqui como o PvP (Liga Pokémon e Boss): o lado 1 é o NPC e o servidor
+ * escolhe por ele. Na Liga o time do jogador entra COMO ESTÁ (sem curar); no Boss, curado (nada volta para o save).
+ * `aoFim` recebe se o jogador venceu, o time como terminou e o dano no boss.
  * Recarregar a página volta para a batalha (`atual`) e o relógio do turno não para.
  */
-export function criarBatalhaPve(conta: banco.Conta, jogador: JogadorPvp, npc: JogadorPvp, opcoes: { titulo: string; tempo: number; ia?: 'facil' | 'medio' | 'dificil'; aoFim: (venceu: boolean, time: Record<string, unknown>[]) => void }): number {
+export function criarBatalhaPve(conta: banco.Conta, jogador: JogadorPvp, npc: JogadorPvp, opcoes: {
+  titulo: string; tempo: number; ia?: 'facil' | 'medio' | 'dificil';
+  /** 'boss' (eventos): o time entra curado, o NPC ganha vida enorme e a luta acaba em `turnosBoss` turnos */
+  tipo?: 'liga' | 'boss'; turnosBoss?: number;
+  aoFim: (venceu: boolean, time: Record<string, unknown>[], danoNoBoss: number) => void;
+}): number {
   if (salaDaConta.has(conta.id)) throw new ErroConta('Você já está numa batalha.', 409);
-  const batalha = novaBatalhaPvp(jogador, npc, [], undefined, [false, true]);
+  const tipo = opcoes.tipo ?? 'liga';
+  const batalha = novaBatalhaPvp(jogador, npc, [], undefined, tipo === 'boss' ? [true, true] : [false, true]);
+  if (tipo === 'boss') batalha.modoBoss(opcoes.turnosBoss ?? 50);
   const sala: Sala = {
-    id: proximaSala++, batalha, contas: [conta.id, 0], nomes: [jogador.nome, npc.nome], prazo: Date.now() + opcoes.tempo + FOLGA_ANIMACAO_MS, tipo: 'liga', tempo: opcoes.tempo, npc: true, nivelIa: opcoes.ia ?? 'dificil',
+    id: proximaSala++, batalha, contas: [conta.id, 0], nomes: [jogador.nome, npc.nome], prazo: Date.now() + opcoes.tempo + FOLGA_ANIMACAO_MS, tipo, tempo: opcoes.tempo, npc: true, nivelIa: opcoes.ia ?? 'dificil',
     historico: [[], []], abertura: [{}, {}], umaMecanica: false, mecanicaUsada: [null, null],
-    aoFim: (v) => opcoes.aoFim(v === conta.id, batalha.timeFinal(0)),
+    aoFim: (v) => opcoes.aoFim(v === conta.id, batalha.timeFinal(0), batalha.danoNoBoss),
   };
   salas.set(sala.id, sala);
   salaDaConta.set(conta.id, sala);
   const inicio = batalha.iniciar();
   vezDoNpc(sala);
   sala.historico[0].push(...inicio[0]);
-  sala.abertura[0] = { tipo: 'liga', titulo: opcoes.titulo, adversario: { nome: npc.nome, time: timeVisivel(npc.time) }, nomes: jogador.nomes, meuTime: jogador.time };
+  sala.abertura[0] = { tipo, titulo: opcoes.titulo, adversario: { nome: npc.nome, time: timeVisivel(npc.time) }, nomes: jogador.nomes, meuTime: jogador.time };
   avisar(conta.id, { t: 'pvp-inicio', id: sala.id, eventos: inicio[0], foto: batalha.foto(0), prazo: sala.prazo - FOLGA_ANIMACAO_MS, tempo: sala.tempo, ...sala.abertura[0] });
   return sala.id;
 }
@@ -152,6 +163,17 @@ function depoisDaEscolha(sala: Sala): void {
   else vezDoNpc(sala);
 }
 
+/** O especial pedido (Mega, Tera, Z-Move) dá para usar agora? (as mesmas regras de `escolher` da BatalhaPvp) */
+function especialPossivel(sala: Sala, lado: 0 | 1, escolha: ReturnType<typeof lerEscolha>): boolean {
+  if (escolha.tipo !== 'golpe') return false;
+  const p = sala.batalha.foto(lado).pedido as { tipo: string; mega?: boolean; tera?: string | null; zGolpes?: (string | null)[] | null };
+  if (p.tipo !== 'acao') return false;
+  if (escolha.especial === 'mega') return !!p.mega;
+  if (escolha.especial === 'tera') return !!p.tera;
+  if (escolha.especial === 'z') return !!p.zGolpes?.[escolha.indice - 1];
+  return false;
+}
+
 export function escolher(conta: banco.Conta, dados: Record<string, unknown>) {
   const sala = salaDaConta.get(conta.id);
   if (!sala || sala.id !== dados.id) throw new ErroConta('Você não está nesta batalha.', 409);
@@ -159,8 +181,9 @@ export function escolher(conta: banco.Conta, dados: Record<string, unknown>) {
   const escolha = lerEscolha(dados.escolha);
   const especial = escolha.tipo === 'golpe' && escolha.especial && escolha.especial !== 'dynamax' ? escolha.especial : null;
   const usada = sala.mecanicaUsada[lado];
-  // regra do ranqueado: uma mecânica só; a segunda diferente perde a partida
-  if (sala.umaMecanica && especial && usada && usada !== especial) {
+  // regra do ranqueado: uma mecânica só; a segunda diferente perde a partida. Pedir uma que nem dá para usar agora
+  // (sem a Mega Stone, sem o Z-Crystal certo…) é só uma escolha inválida, não conta.
+  if (sala.umaMecanica && especial && usada && usada !== especial && especialPossivel(sala, lado, escolha)) {
     const texto = `${sala.nomes[lado]} usou duas mecânicas (${NOME_MECANICA[usada]} e ${NOME_MECANICA[especial]}) e perdeu a partida.`;
     sala.batalha.desistir(lado);
     for (const c of sala.contas) avisar(c, { t: 'pvp-aviso', texto });
@@ -176,6 +199,9 @@ export function escolher(conta: banco.Conta, dados: Record<string, unknown>) {
 export function desistir(conta: banco.Conta, dados: Record<string, unknown>) {
   const sala = salaDaConta.get(conta.id);
   if (!sala || sala.id !== dados.id) throw new ErroConta('Você não está nesta batalha.', 409);
+  // brecha do elo (pedido do dono): uma conta secundária desistia na hora e a outra subia. No ranqueado, o 1º turno
+  // precisa ser jogado (o tempo esgotado continua valendo como derrota).
+  if (sala.tipo === 'ranqueado' && sala.batalha.turno <= 1) throw new ErroConta('No PvP Ranqueado não dá para desistir no 1º turno. Jogue pelo menos um turno.', 409);
   sala.batalha.desistir(sala.contas[0] === conta.id ? 0 : 1);
   depoisDaEscolha(sala);
   return { ok: true };
@@ -206,7 +232,7 @@ function conferirPrazos(agora = Date.now()): void {
     depoisDaEscolha(sala);
   }
 }
-setInterval(conferirPrazos, 2000).unref();
+setInterval(() => tarefaSegura('pvp', conferirPrazos), 2000).unref();
 
 // ---- desafio amistoso (clicar no outro jogador no mapa → Desafiar para duelo) ----
 export function desafiar(conta: banco.Conta, dados: Record<string, unknown>) {
@@ -216,6 +242,10 @@ export function desafiar(conta: banco.Conta, dados: Record<string, unknown>) {
   if (salaDaConta.has(conta.id)) throw new ErroConta('Você já está numa batalha.', 409);
   if (salaDaConta.has(alvo.id)) throw new ErroConta('Este jogador já está numa batalha.', 409);
   if (lerJson(alvo.id)?.aceitarDuelos === false) throw new ErroConta('Este jogador não aceita desafios.', 409);
+  // um desafio por vez (pedido do dono): com um esperando resposta, outro só depois de ele recusar (ou o tempo acabar)
+  const esperando = convites.get(alvo.id);
+  if (esperando && Date.now() <= esperando.ate)
+    throw new ErroConta(esperando.de === conta.id ? 'Você já desafiou este jogador. Espere a resposta.' : 'Este jogador já tem um desafio esperando resposta. Tente depois.', 409);
   jogadorDe(conta);
   const nome = nomeDe(conta);
   convites.set(alvo.id, { de: conta.id, nome, usuario: conta.usuario, ate: Date.now() + VALIDADE_CONVITE_MS });

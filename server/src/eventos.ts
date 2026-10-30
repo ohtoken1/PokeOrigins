@@ -1,5 +1,6 @@
 // Cofre e Loteria (eventos da planilha do dono). O servidor é o juiz: sorteia a senha e os números, cobra os
 // bilhetes no save guardado e entrega o prêmio da Loteria por uma entrega (server/src/entregas.ts).
+import { tarefaSegura } from './tarefaSegura.ts';
 import { randomInt } from 'node:crypto';
 import * as banco from './banco.ts';
 import { ErroConta } from './contas.ts';
@@ -7,6 +8,8 @@ import { avisar, avisarEvento, avisarTodos } from './mundo.ts';
 import * as correio from './correio.ts';
 import { anexosDePremios } from './recompensas.ts';
 import { lerNome, lerPokemon } from './entregas.ts';
+import { criarBatalhaPve, emBatalha, jogadorDe, TEMPO_TURNO_PVP_MS } from './pvp.ts';
+import { golpesProibidosNoBoss, itemAleatorio, nomeDaEspecie } from './motorDoJogo.ts';
 import { NIVEL_MINIMO, liberado } from '../../shared/trancas.ts';
 import { nivelTreinador } from '../../shared/treinador.ts';
 import {
@@ -14,7 +17,7 @@ import {
   PRECO_BILHETE, PREMIO_COFRE_MAX, agoraEmBrasilia, formatarBilhete, primeiroDoProximoMes,
   CHANCE_LENDARIO_NINHO, DURACAO_NINHO_MS, EXTRA_POR_DERROTA_MS, INTERVALO_NINHO_MS, LUTA_NINHO_MS, PRECO_NINHO, PRECO_NINHO_VIP, premiosCaptura, roletaNinho,
   proximaMeiaNoite, slotDoNinho, sortearFatia,
-  DANO_MAXIMO_BOSS, DURACAO_BOSS_MS, NIVEL_BOSS, pontosGuildaDaPosicao, premiosBossGlobal,
+  DANO_MAXIMO_BOSS, DURACAO_BOSS_MS, NIVEL_BOSS, TURNOS_BOSS, pontosGuildaDaPosicao, premiosBossGlobal,
 } from '../../shared/eventosRegras.ts';
 
 /** Nome de treinador (o que os outros veem), ou o usuário. */
@@ -87,7 +90,7 @@ export function tentarCofre(conta: banco.Conta, dados: Record<string, unknown>) 
   const senha = typeof dados.senha === 'string' && new RegExp(`^\\d{${DIGITOS_COFRE}}$`).test(dados.senha) ? dados.senha : null;
   if (!senha) throw new ErroConta('Senha inválida.');
   const agora = Date.now();
-  if (agora - (ultimaTentativa.get(conta.id) ?? 0) < INTERVALO_TENTATIVA_COFRE_MS) throw new ErroConta('Calma! Espere um instante antes de tentar de novo.', 429);
+  if (agora - (ultimaTentativa.get(conta.id) ?? 0) < INTERVALO_TENTATIVA_COFRE_MS) throw new ErroConta('Espere 10 segundos entre uma tentativa e outra.', 429);
   ultimaTentativa.set(conta.id, agora);
   const resultado = banco.transacao(() => {
     const c = cofre();
@@ -155,7 +158,7 @@ export function conferirSorteio(agora = Date.now(), forcar = false): void {
   });
   mudou();
 }
-setInterval(() => conferirSorteio(), 30_000).unref();
+setInterval(() => tarefaSegura('loteria', conferirSorteio), 30_000).unref();
 
 export function comprarBilhetes(conta: banco.Conta, dados: Record<string, unknown>) {
   conferirSorteio();
@@ -255,6 +258,8 @@ export function entrarNoNinho(conta: banco.Conta, dados: Record<string, unknown>
     const n = ninhoVigente(agora);
     if (n.derrotado || agora >= fimDoNinho(n)) throw new ErroConta('Este ninho já sumiu.', 409);
     if (n.lutando && n.lutando.ate > agora && n.lutando.contaId !== conta.id) throw new ErroConta('Outro treinador está enfrentando este ninho agora.', 409);
+    // uma entrada = uma luta (pedido do dono): já está lutando, não entra (nem paga) de novo; perdeu, procura o ninho e paga outra vez
+    if (n.lutando && n.lutando.ate > agora) throw new ErroConta('Você já está enfrentando este ninho.', 409);
     banco.mudarSaves([conta.id], ([save]) => {
       const vip = typeof save.vipAte === 'number' && save.vipAte > agora;
       const preco = vip ? PRECO_NINHO_VIP : PRECO_NINHO;
@@ -278,12 +283,23 @@ export function resultadoDoNinho(conta: banco.Conta, dados: Record<string, unkno
     if (typeof slot !== 'number') throw new ErroConta('Ninho inválido.');
     const n = ninhoDoSlot(slot);
     if (!n.lutando || n.lutando.contaId !== conta.id) throw new ErroConta('Você não está enfrentando este ninho.', 409);
+    // passou o tempo da luta (LUTA_NINHO_MS): o resultado não vale mais
+    if (n.lutando.ate <= Date.now()) {
+      delete n.lutando;
+      banco.gravarEvento('ninho', n);
+      throw new ErroConta('O tempo para enfrentar este ninho acabou.', 409);
+    }
     delete n.lutando;
     if (dados.venceu === true) {
       n.derrotado = { nome: nomeDe(conta), especie };
       banco.gravarEvento('ninho', n);
       avisarEvento(`🪺 ${n.derrotado.nome} derrotou o ninho de ${especie}!`);
-      return { venceu: true, fatia: sortearFatia(roletaNinho()), lendario: dados.lendario === true && Math.random() < CHANCE_LENDARIO_NINHO };
+      const fatia = sortearFatia(roletaNinho());
+      // o prêmio da roleta fica esperando o "Pegar prêmio" (fechar a roleta antes perde) e é entregue AQUI
+      const premios = banco.lerEvento<PremiosDaRoleta>('ninho-premios') ?? {};
+      premios[conta.id] = { fatia, ate: Date.now() + VALIDADE_PREMIO_NINHO_MS };
+      banco.gravarEvento('ninho-premios', premios);
+      return { venceu: true, fatia, lendario: dados.lendario === true && Math.random() < CHANCE_LENDARIO_NINHO };
     }
     n.derrotas++;
     banco.gravarEvento('ninho', n);
@@ -291,6 +307,35 @@ export function resultadoDoNinho(conta: banco.Conta, dados: Record<string, unkno
   });
   mudou();
   return { ...resposta, ninho: ninhoParaFora(conta) };
+}
+
+/** Prêmios da Roleta do Ninho esperando o jogador pegar (contaId → fatia sorteada e até quando vale). */
+type PremiosDaRoleta = Record<string, { fatia: number; ate: number }>;
+const VALIDADE_PREMIO_NINHO_MS = 10 * 60 * 1000;
+
+/** "Pegar prêmio" da Roleta do Ninho: entrega a fatia sorteada no fim da luta (Origin Coins inclusive). */
+export function pegarPremioDoNinho(conta: banco.Conta) {
+  let fatia = -1;
+  banco.transacao(() => {
+    const premios = banco.lerEvento<PremiosDaRoleta>('ninho-premios') ?? {};
+    const p = premios[conta.id];
+    for (const [id, x] of Object.entries(premios)) if (x.ate <= Date.now()) delete premios[id];
+    delete premios[conta.id];
+    banco.gravarEvento('ninho-premios', premios);
+    if (!p || p.ate <= Date.now()) throw new ErroConta('Não há prêmio da roleta esperando.', 409);
+    fatia = p.fatia;
+  });
+  const { id, quantidade } = roletaNinho()[fatia] ?? { id: 'silver', quantidade: 0 };
+  banco.mudarSaves([conta.id], ([save]) => {
+    const itens = (save.itens && typeof save.itens === 'object' ? save.itens : (save.itens = {})) as Record<string, number>;
+    if (id === 'silver' || id === 'gold' || id === 'fragmentos') save[id] = (Number(save[id]) || 0) + quantidade;
+    else {
+      const item = id === 'mint' || id === 'charm' || id === 'orb' ? itemAleatorio(id) : id;
+      itens[item] = (itens[item] ?? 0) + quantidade;
+    }
+  });
+  const guardado = banco.lerSave(conta.id)!;
+  return { save: JSON.parse(guardado.dados), versao: guardado.versao };
 }
 
 // ---------- Evento de captura ----------
@@ -332,8 +377,10 @@ export function registrarCaptura(conta: banco.Conta, dados: Record<string, unkno
   const s = banco.lerSave(conta.id);
   if (typeof uid !== 'number' || !s) return { registrado: false };
   const save = JSON.parse(s.dados) as { time?: unknown[]; caixa?: unknown[] };
-  const p = [...(save.time ?? []), ...(save.caixa ?? [])].find((x) => (x as { uid?: number }).uid === uid) as { especieId?: number; origem?: string; ivs?: Record<string, number> } | undefined;
+  const p = [...(save.time ?? []), ...(save.caixa ?? [])].find((x) => (x as { uid?: number }).uid === uid) as { especieId?: number; origem?: string; ivs?: Record<string, number>; capturadoEm?: number } | undefined;
   if (!p || p.especieId !== c.especieId || p.origem || !p.ivs) return { registrado: false };
+  // só vale quem foi capturado DEPOIS que o evento começou (antes aceitava um Pokémon antigo)
+  if (typeof p.capturadoEm !== 'number' || p.capturadoEm < c.inicio || p.capturadoEm > Date.now()) return { registrado: false };
   const soma = Object.values(p.ivs).reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
   const antes = c.melhores[conta.id];
   if (antes && antes.soma >= soma) return { registrado: false, soma };
@@ -363,7 +410,7 @@ export function conferirCaptura(agora = Date.now()): void {
   } else avisarEvento(`🎯 O Evento de captura do ${c.nome} terminou sem capturas.`);
   mudou();
 }
-setInterval(() => conferirCaptura(), 30_000).unref();
+setInterval(() => tarefaSegura('captura', conferirCaptura), 30_000).unref();
 
 function capturaParaFora(conta: banco.Conta) {
   const c = captura();
@@ -404,7 +451,8 @@ export function ligarEvento(conta: banco.Conta, dados: Record<string, unknown>) 
 
 // ---------- Bosses (global e da guilda) ----------
 // A staff monta o Pokémon (Administração → Eventos) e o boss fica 2 h na gaiola da cidade. Cada jogador luta UMA vez
-// (HP infinito, 50 turnos; o jogo manda o dano). Global: top 3 jogadores. Guilda: soma por guilda, top 3 guildas;
+// (HP infinito, 50 turnos). A luta é calculada AQUI (server/src/pvp.ts, como a Liga): o navegador só escolhe os
+// golpes, e o dano é contado pelo servidor (antes vinha do jogo e dava para mandar um número falso). Global: top 3 jogadores. Guilda: soma por guilda, top 3 guildas;
 // cada membro delas que lutou ganha pontos de guilda (loja da guilda futuramente).
 interface EstadoBoss {
   tipo: 'global' | 'guilda';
@@ -453,32 +501,49 @@ export function encerrarBoss(conta: banco.Conta) {
   return estado(conta);
 }
 
-/** Entrar na luta: uma vez por jogador; no da guilda, só quem tem guilda. Devolve o Pokémon do boss. */
+/**
+ * Entrar na luta: uma vez por jogador; no da guilda, só quem tem guilda. A batalha começa no servidor (o jogo abre
+ * a tela pelo aviso `pvp-inicio`) e o dano é anotado no fim (`anotarDano`).
+ */
 export function entrarNoBoss(conta: banco.Conta) {
   conferirBoss();
   const b = boss();
-  if (!b || b.premiado) throw new ErroConta('Não há boss na gaiola agora.', 409);
+  if (!b || b.premiado) throw new ErroConta('Nenhum Boss agora.', 409);
   if (b.danos[conta.id] || b.lutando[conta.id]) throw new ErroConta('Você já enfrentou este boss.', 409);
   // tranca de nível (pedido do dono), pelo save guardado
   const guardado = banco.lerSave(conta.id);
-  const xp = guardado ? (JSON.parse(guardado.dados) as Record<string, unknown>).xpTreinador : 0;
+  const save = guardado ? (JSON.parse(guardado.dados) as Record<string, unknown>) : {};
+  const xp = save.xpTreinador;
   if (!liberado('boss', nivelTreinador(typeof xp === 'number' && xp > 0 ? xp : 0), !!conta.admin)) throw new ErroConta(`O Boss abre no nível ${NIVEL_MINIMO.boss} de treinador.`, 403);
   if (b.tipo === 'guilda' && !banco.claDaConta(conta.id)) throw new ErroConta('O Boss da guilda é só para quem está numa guilda.', 409);
+  if (emBatalha(conta.id)) throw new ErroConta('Você já está numa batalha.', 409);
+  const jogador = jogadorDe(conta);
+  const proibidos = golpesProibidosNoBoss(jogador.time);
+  if (proibidos.length) throw new ErroConta(`Golpes proibidos no seu time: ${proibidos.join(', ')}. Troque antes de lutar.`, 409);
+  const pokemon = JSON.parse(b.pokemon) as Record<string, unknown>;
+  const inicio = b.inicio;
+  criarBatalhaPve(conta, jogador, { nome: b.nome, time: [pokemon], nomes: [nomeDaEspecie(Number(pokemon.especieId))] }, {
+    titulo: 'Boss', tipo: 'boss', turnosBoss: TURNOS_BOSS, tempo: TEMPO_TURNO_PVP_MS, ia: 'dificil',
+    aoFim: (_venceu, _time, dano) => anotarDano(conta, inicio, dano),
+  });
   b.lutando[conta.id] = Date.now();
   banco.gravarEvento('boss', b);
-  return { pokemon: JSON.parse(b.pokemon), nome: b.nome };
+  mudou();
+  return { ok: true };
 }
 
-export function resultadoDoBoss(conta: banco.Conta, dados: Record<string, unknown>) {
+/** Fim da luta (calculada aqui): o dano conta se o boss ainda está na gaiola. */
+function anotarDano(conta: banco.Conta, inicio: number, danoDaLuta: number): void {
   const b = boss();
-  if (!b || !b.lutando[conta.id] || b.danos[conta.id]) throw new ErroConta('Você não está enfrentando este boss.', 409);
-  const dano = typeof dados.dano === 'number' && Number.isFinite(dados.dano) ? Math.max(0, Math.min(DANO_MAXIMO_BOSS, Math.floor(dados.dano))) : 0;
+  // outro boss já entrou, ou este saiu da gaiola (passaram as 2 h ou a staff encerrou): o dano não vale mais
+  if (!b || b.inicio !== inicio || !b.lutando[conta.id] || b.danos[conta.id]) return;
+  if (b.premiado || Date.now() >= b.fim) return void avisar(conta.id, { t: 'pvp-aviso', texto: 'O tempo do boss acabou: o dano não contou.' });
+  const dano = Math.max(0, Math.min(DANO_MAXIMO_BOSS, Math.floor(danoDaLuta)));
   const cla = banco.claDaConta(conta.id);
   b.danos[conta.id] = { nome: nomeDe(conta), dano, guilda: cla ? { id: cla.id, nome: cla.nome } : null };
   delete b.lutando[conta.id];
   banco.gravarEvento('boss', b);
   mudou();
-  return { dano, ...estado(conta) };
 }
 
 /** Passaram as 2 h (ou a staff encerrou): entrega os prêmios. */
@@ -514,7 +579,7 @@ export function conferirBoss(agora = Date.now()): void {
   avisarEvento(`${b.tipo === 'global' ? '👹 Boss global' : '🛡️ Boss da guilda'} ${b.nome} terminou! ${frases.length ? frases.join(' · ') : 'Ninguém causou dano.'}`);
   mudou();
 }
-setInterval(() => conferirBoss(), 30_000).unref();
+setInterval(() => tarefaSegura('boss', conferirBoss), 30_000).unref();
 
 function bossParaFora(conta: banco.Conta) {
   const b = boss();

@@ -16,6 +16,7 @@ import { PRODUTOS_LIGA, PRODUTOS_PREMIUM } from '../../shared/lojasEspeciais.ts'
 import { TITULOS_EXTRAS } from '../../shared/conquistas.ts';
 import { produtosDaGuilda, mesDaLoja } from '../../shared/lojaGuilda.ts';
 import { DOACOES_LIGADAS, PRODUTOS_DINHEIRO_REAL } from '../../shared/doacao.ts';
+import { COMO_CONHECEU } from '../../shared/comoConheceu.ts';
 
 const MINUTO = 60_000;
 const DIA = 86_400_000;
@@ -64,6 +65,20 @@ function nomeDaCompra(id: string): string {
 }
 
 let guardado: Dashboard | null = null;
+
+/** Respostas do "Por onde conheceu o jogo?", com os 3 detalhes mais escritos de cada uma. */
+function comoConheceram(): LinhaContagem[] {
+  const porTipo = new Map<string, { valor: number; detalhes: string[] }>();
+  for (const l of banco.contagemComoConheceu()) {
+    const t = porTipo.get(l.tipo) ?? { valor: 0, detalhes: [] };
+    t.valor += l.n;
+    if (l.detalhe && t.detalhes.length < 3) t.detalhes.push(`${l.detalhe} (${l.n})`);
+    porTipo.set(l.tipo, t);
+  }
+  return [...porTipo.entries()].sort((a, b) => b[1].valor - a[1].valor).map(([tipo, t]) => ({
+    nome: COMO_CONHECEU.find((o) => o.id === tipo)?.nome ?? tipo, valor: t.valor, extra: t.detalhes.length ? t.detalhes.join(', ') : undefined,
+  }));
+}
 
 export function painel(conta: banco.Conta): Dashboard {
   if (!conta.admin) throw new ErroConta('Só a administração pode ver isso.', 403);
@@ -211,6 +226,7 @@ function montar(agora: number): Dashboard {
       minutosPorAtivoHoje: msPorConta.hoje.size ? Math.round(soma(msPorConta.hoje) / msPorConta.hoje.size / MINUTO) : 0,
       retornoD1: retorno(1),
       retornoD7: retorno(7),
+      comoConheceram: comoConheceram(),
       ativosPorDia: Array.from({ length: 14 }, (_, i) => dia(13 - i)).map((d) => ({ dia: d, ativos: porDia.get(d)?.contas.size ?? 0, horas: Math.round(horas(porDia.get(d)?.ms ?? 0) * 10) / 10 })),
     },
     capturas: { total: capturas, existentes },
